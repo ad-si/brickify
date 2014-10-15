@@ -1,0 +1,30 @@
+{
+  "name": "lowfab",
+  "version": "0.0.1",
+  "description": "Combine various fabrication techniques to materialize your 3D-models",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/hpihci/fab3d-lowfab"
+  },
+  "keywords": [
+    "fabrication",
+    "3d printing",
+    "laser cutting"
+  ],
+  "author": "HPI HCI-Bachelorprojekt 2014",
+  "contributors": "Adrian Sieber, Arthur Silber, Dogan Onat Turkcuoglu, Johannes Deselaers, Stefan Neubert, Yannis Kommana",
+  "license": "All rights reserved",
+  "private": true,
+  "dependencies": {
+    "express": "^4.9.7"
+  },
+  "homepage": "http://lowfab.net",
+  "engines": {
+	  "node": "~0.10.32"
+  },
+  "bugs": "https://bitbucket.org/hpihci/fab3d-lowfab/issues"
+}

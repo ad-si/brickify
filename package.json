@@ -13,8 +13,7 @@
   },
   "scripts": {
     "build": "node ./node_modules/coffee-script/bin/cake build",
-    "watch": "",
-    "start": "node ./build/server/main.js"
+	"start": "node ./node_modules/coffee-script/bin/cake start"
   },
   "repository": {
     "type": "git",

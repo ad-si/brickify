@@ -2,7 +2,7 @@
 
 ## Installation
 
-`$ git clone https://adius@bitbucket.org/hpihci/fab3d-lowfab.git`
+`$ git clone https://bitbucket.org/hpihci/fab3d-lowfab.git`
 
 `$ cd fab3d-lowfab`
 

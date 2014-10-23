@@ -85,8 +85,6 @@ task 'start', 'Builds files and starts server', ->
 	buildClient()
 	buildServer()
 
-	lowfab
-		.createServer()
-		.startServer()
+	lowfab.startServer()
 
 

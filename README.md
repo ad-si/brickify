@@ -1,5 +1,8 @@
 # Lowfab
 
-## Getting started
+## Installation
 
-Start server: `$ npm start`
+```
+$ npm install
+$ npm start
+```

@@ -1,30 +1,25 @@
 {
-  "name": "lowfab",
-  "version": "0.0.1",
-  "description": "Combine various fabrication techniques to materialize your 3D-models",
-  "main": "server.js",
+  "name": "fab3d-basic",
+  "version": "0.1.0",
+  "description": "A basic framework for fabrication projects which provides a WebGL based UI and a build environment",
+  "main": "index.html",
+  "dependencies": {
+    "browserify": "~6.1.0",
+    "coffee-script": "~1.8.0",
+    "js-yaml": "~3.2.2",
+    "mkdirp": "~0.5.0",
+    "rehab": "~0.0.3",
+    "win-spawn": "~2.0.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node ./node_modules/coffee-script/bin/cake build",
+    "watch": "",
+    "start": "node ./build/server/main.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/hpihci/fab3d-lowfab"
+    "url": "bitbucket.org/hpihci/fab3d-basic.git"
   },
-  "keywords": [
-    "fabrication",
-    "3d printing",
-    "laser cutting"
-  ],
-  "author": "HPI HCI-Bachelorprojekt 2014",
-  "contributors": "Adrian Sieber, Arthur Silber, Dogan Onat Turkcuoglu, Johannes Deselaers, Stefan Neubert, Yannis Kommana",
-  "license": "All rights reserved",
-  "private": true,
-  "dependencies": {
-    "express": "^4.9.7"
-  },
-  "homepage": "http://lowfab.net",
-  "engines": {
-	  "node": "~0.10.32"
-  },
-  "bugs": "https://bitbucket.org/hpihci/fab3d-lowfab/issues"
+  "author": "Stefanie Müller, Dustin Beyer, Serafima Gurevich",
+  "license": "All rights reserved"
 }

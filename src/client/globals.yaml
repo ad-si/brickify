@@ -1,0 +1,33 @@
+# unit - all units are in mm (do not change...)
+mm: 1
+
+# camera adjustments
+fov: 40
+cameraNearPlane: 0.1
+cameraFarPlane: 1000
+
+# animations
+animationStepSize: 0.02
+animations: []
+
+# coordinate system
+axisLength: 100
+axisXColor: 0xff0000
+axisYColor: 0x00ff00
+axisZColor: 0x0000ff
+axisLineWidth: 2
+
+# objects
+defaultObjectColor: 0xccaa33
+meshes: []
+
+# grid
+gridColorNormal: 0xcccccc
+gridColor5: 0x999999
+gridColor10: 0x666666
+gridLineWidthNormal: 1
+gridLineWidth5: 1
+gridLineWidth10: 1
+gridSize: 200
+gridStepSize: 10 
+

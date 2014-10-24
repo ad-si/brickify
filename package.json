@@ -20,6 +20,7 @@
     "express-session": "~1.9.1",
     "jade": "~1.7.0",
     "js-yaml": "~3.2.2",
+    "jsondiffpatch": "^0.1.17",
     "mkdirp": "~0.5.0",
     "morgan": "~1.4.1",
     "rehab": "~0.0.3",

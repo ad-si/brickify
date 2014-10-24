@@ -19,6 +19,10 @@ compression = require 'compression'
 index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
 
+#test for state sync
+statesync.addDiffCallback (delta, state) ->
+	state.iHazModified = true
+
 app = express()
 server = ''
 port = process.env.NODEJS_PORT or process.env.PORT or 3000

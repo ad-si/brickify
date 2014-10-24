@@ -56,7 +56,7 @@ buildClient = () ->
 	compileAndExecuteOnJs sourcePath, buildPath, (outfilename) ->
 		browserify.add outfilename
 
-	browserify.bundle().pipe fs.createWriteStream(__dirname + '/build/client/index.js')
+	browserify.bundle().pipe fs.createWriteStream(__dirname + '/public/index.js')
 
 
 buildServer = () ->

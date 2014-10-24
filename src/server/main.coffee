@@ -17,6 +17,7 @@ compression = require 'compression'
 
 
 index = require '../../routes/index.coffee'
+statesync = require '../../routes/statesync.coffee'
 
 app = express()
 server = ''
@@ -42,11 +43,13 @@ if app.get 'env' is 'development'
 then app.use morgan 'dev'
 else app.use morgan()
 
-app.use bodyParser()
+app.use bodyParser.json()
+app.use bodyParser.urlencoded()
 
 
-app.get '/', index
-
+app.get  '/', index
+app.get  '/statesync', statesync.getState
+app.post '/statesync', statesync.setState
 
 if app.get 'env' is 'development'
 	app.use errorHandler()

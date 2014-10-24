@@ -14,9 +14,14 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
+globalConfig.stateSession = 0;
+
 ui = require("./ui")(globalConfig)
 ui.init()
 
 renderer = require("./render")
 renderer(ui)
 
+statesync = require("./statesync")
+statesync.init(globalConfig)
+statesync.sync()

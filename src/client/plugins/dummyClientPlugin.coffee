@@ -4,5 +4,5 @@ module.exports.init = () ->
 	console.log 'Dummy Client Plugin initialization'
 
 module.exports.handleStateChange = (delta, state) ->
-	console.log 'Dummy Plugin got a state change'
-	state.dummyPluginModifiedIt = true
+	console.log 'Dummy Plugin changes ClientModified to true'
+	state.dummyPluginClientModifiedIt = true

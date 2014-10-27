@@ -25,15 +25,11 @@ renderer(ui)
 statesync = require './statesync'
 statesync.init globalConfig
 
+#test for statesync
+statesync.addUpdateCallback (delta, state) ->
+	console.log 'Updated state from server: ' + JSON.stringify(state) + ', Delta: ' + JSON.stringify(delta)
+
 pluginLoader = require './pluginLoader'
 pluginLoader.loadPlugins statesync
 
-#test for statesync
-statesync.addUpdateCallback (state, delta) ->
-	console.log 'UpdatedState: ' + JSON.stringify(state) + ', Delta: ' + JSON.stringify(delta)
-	if statesync.state.test == 'value'
-		statesync.state.test = 'new value'
-		statesync.sync()
-
-statesync.state.test = 'value'
-statesync.sync()
+#statesync.sync(true)

@@ -23,5 +23,5 @@ checkForPluginMethods = (object) ->
 	return hasAllMethods
 
 initPluginInstance = (pluginInstance) ->
-	pluginInstance.init();
+	pluginInstance.init()
 	stateSyncModule.addUpdateCallback pluginInstance.handleStateChange

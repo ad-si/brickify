@@ -1,0 +1,37 @@
+{
+  "name": "Lowfab",
+  "version": "0.1.0",
+  "authors": [
+    "Adrian Sieber",
+    "Arthur Silber",
+    "Dogan Onat Turkcuoglu",
+    "Johannes Deselaers",
+    "Stefan Neubert",
+    "Yannis Kommana"
+  ],
+  "description": "Combine various fabrication techniques to materialize your 3D-models",
+  "main": "build/server/main.js",
+  "keywords": [
+    "fabrication",
+    "3d printing",
+    "laser cutting"
+  ],
+  "license": "All rights reserved",
+  "homepage": "http://lowfab.net",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "threejs": "*",
+    "STLLoader": "https://raw.githubusercontent.com/mrdoob/three.js/2d59713328c421c3edfc3feda1b116af13140b94/examples/js/loaders/STLLoader.js",
+    "OrbitControls": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js",
+    "TrackballControls": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/TrackballControls.js",
+    "bootstrap": "~3.2.0"
+  }
+}

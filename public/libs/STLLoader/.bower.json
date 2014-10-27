@@ -1,0 +1,13 @@
+{
+  "name": "STLLoader",
+  "_cacheHeaders": {
+    "ETag": "\"4e5f426c3ea7908f4f84bc81993a1577d549f3e1\"",
+    "Content-Length": "11345",
+    "Content-Type": "text/plain; charset=utf-8"
+  },
+  "_release": "e-tag:4e5f426c3",
+  "main": "index.js",
+  "_source": "https://raw.githubusercontent.com/mrdoob/three.js/2d59713328c421c3edfc3feda1b116af13140b94/examples/js/loaders/STLLoader.js",
+  "_target": "*",
+  "_originalSource": "https://raw.githubusercontent.com/mrdoob/three.js/2d59713328c421c3edfc3feda1b116af13140b94/examples/js/loaders/STLLoader.js"
+}

@@ -1,5 +1,6 @@
-build
+/build
 node_modules
 npm-debug.log
 .idea
 *.iml
+/public/index.js

@@ -22,3 +22,8 @@ Install it globally with `$ npm install -g supervisor` and use it like this:
 ## Tasks
 
 Run `$ ./node_modules/.bin/cake` to list available tasks.
+
+
+## Package managmenet
+
+We use [bower](http://bower.io/) for frontend package management.

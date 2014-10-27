@@ -56,7 +56,7 @@ buildClient = () ->
 	compileAndExecuteOnJs sourcePath, buildPath, (outfilename) ->
 		browserify.add outfilename
 
-	browserify.bundle().pipe fs.createWriteStream(__dirname + '/build/client/index.js')
+	browserify.bundle().pipe fs.createWriteStream(__dirname + '/public/index.js')
 
 
 buildServer = () ->
@@ -66,6 +66,38 @@ buildServer = () ->
 	mkdirp.sync buildPath
 
 	compileAndExecuteOnJs sourcePath, buildPath, null
+
+
+linkHooks = () ->
+	# gist.github.com/domenic/2238951
+	[
+		'applypatch-msg'
+		'commit-msg'
+		'post-commit'
+		'post-receive'
+		'post-update'
+		'pre-applypatch'
+		'pre-commit'
+		'prepare-commit-msg'
+		'pre-rebase'
+		'update'
+	]
+	.forEach (hook) ->
+		hookPath = path.join(__dirname, 'hooks', hook)
+		gitHookPath = path.join(".git/hooks", hook)
+
+		fs.unlink gitHookPath, (error) ->
+			if error then return
+
+		fs.exists hookPath, (exists) ->
+			if exists
+				fs.link hookPath, gitHookPath, (error) ->
+					if error
+						throw new Error error
+
+
+task 'linkHooks', 'Links git hooks into .git/hooks', ->
+	linkHooks()
 
 
 task 'buildClient', 'Builds the client js files', ->
@@ -85,8 +117,6 @@ task 'start', 'Builds files and starts server', ->
 	buildClient()
 	buildServer()
 
-	lowfab
-		.createServer()
-		.startServer()
+	linkHooks()
 
-
+	lowfab.startServer()

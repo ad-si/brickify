@@ -14,7 +14,7 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-globalConfig.stateSession = 0;
+globalConfig.stateSession = 0
 
 ui = require("./ui")(globalConfig)
 ui.init()
@@ -26,8 +26,9 @@ statesync = require './statesync'
 statesync.init globalConfig
 
 #test for statesync
-statesync.addUpdateCallback (delta, state) ->
-	console.log 'Updated state from server: ' + JSON.stringify(state) + ', Delta: ' + JSON.stringify(delta)
+statesync.addUpdateCallback (state, delta) ->
+	console.log 'UpdatedState: %s, Delta: %s',
+		JSON.stringify(state), JSON.stringify(delta)
 
 pluginLoader = require './pluginLoader'
 pluginLoader.loadPlugins statesync

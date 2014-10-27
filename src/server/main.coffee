@@ -34,7 +34,7 @@ if not developmentMode
 app.set 'views', path.normalize 'views'
 app.set 'view engine', 'jade'
 
-app.use favicon(path.normalize 'public/img/favicon.png')
+app.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
 
 app.use compress()
 

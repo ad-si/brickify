@@ -18,7 +18,11 @@ stylus = require 'stylus'
 nib = require 'nib'
 
 index = require '../../routes/index.coffee'
+statesync = require '../../routes/statesync.coffee'
 
+#test for state sync
+statesync.addDiffCallback (delta, state) ->
+	state.iHazModified = true
 
 app = express()
 server = ''
@@ -56,10 +60,15 @@ if developmentMode
 then app.use morgan 'dev'
 else app.use morgan()
 
-app.use bodyParser()
+app.use bodyParser.json()
+app.use bodyParser.urlencoded()
 
+app.use session {secret: 'lowfabCookieSecret!'}
 
-app.get '/', index
+app.get  '/', index
+app.get  '/statesync/get', statesync.getState
+app.post '/statesync/set', statesync.setState
+app.get  '/statesync/reset', statesync.resetState
 
 
 if app.get 'env' is 'development'

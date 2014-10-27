@@ -1,4 +1,6 @@
 jsondiffpatch = require 'jsondiffpatch'
+logger = require 'winston'
+
 diffCallbacks = []
 
 exports.getState = (request, response) ->
@@ -7,12 +9,10 @@ exports.getState = (request, response) ->
 
 exports.setState = (request, response) ->
 	delta = request.body.deltaState
-	console.log 'updated delta: ' + JSON.stringify(delta)
-
 	state = getInitializedState request
 
 	jsondiffpatch.patch(state,delta)
-	console.log 'updated state:' + JSON.stringify(state)
+	logger.debug 'updated state:' + JSON.stringify(state) + ' from delta: ' + JSON.stringify(delta)
 	#state now contains the current state of both client and server
 
 	oldState = JSON.parse JSON.stringify state
@@ -24,7 +24,7 @@ exports.setState = (request, response) ->
 	#send diff with our initial state to the client
 	diff  = jsondiffpatch.diff oldState, state
 
-	console.log 'Sending delta to client: ' + JSON.stringify(diff)
+	logger.debug 'Sending delta to client: ' + JSON.stringify(diff)
 	response.json diff
 
 exports.resetState = (request, response) ->

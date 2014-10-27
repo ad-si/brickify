@@ -1,6 +1,7 @@
 fs = require 'fs'
 pluginInstances = []
 stateSyncModule = null
+logger = require 'winston'
 
 module.exports.loadPlugins = (stateSync, directory) ->
 	stateSyncModule = stateSync
@@ -11,9 +12,9 @@ module.exports.loadPlugins = (stateSync, directory) ->
 		if checkForPluginMethods instance
 			pluginInstances.push instance
 			initPluginInstance instance
-			console.log 'Plugin "' + instance.pluginName + '" (' + file + ') loaded'
+			logger.info 'Plugin "' + instance.pluginName + '" (' + file + ') loaded'
 		else
-			console.log 'Plugin "' + file + '" does not contain all necessary methods, will not be loaded'
+			logger.warn 'Plugin "' + file + '" does not contain all necessary methods, will not be loaded'
 
 checkForPluginMethods = (object) ->
 	hasAllMethods = true;

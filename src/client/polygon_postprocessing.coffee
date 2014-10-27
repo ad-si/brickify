@@ -22,16 +22,19 @@ mergeUnmergedPolygons = (listOfPoly) ->
 		for poly_index_outer in [0...poly_outer.length]
 
 			p1 = poly_outer[poly_index_outer]
-			poly_index_outer2 = if (poly_index_outer == (poly_outer.length-1)) then 0 else poly_index_outer+1
+			poly_index_outer2 = if (poly_index_outer is (poly_outer.length-1))
+			then 0 else poly_index_outer+1
+
 			p2 = poly_outer[poly_index_outer2]
 			polygons_index_inner = 0
 
-			for polygons_index_inner in [polygons_index_outer+1...listOfPoly.length]
+			for polygons_index_inner in [polygons_index_outer+1...
+				listOfPoly.length]
 				continue if polygons_index_inner in throw_away_polygons
 
 				poly_inner = listOfPoly[polygons_index_inner]
 				poly_index_inner = 0
-				
+
 				# don't merge holes with contours
 				#is_inner_hole = not isClockWise(poly_inner)
 				#if is_inner_hole
@@ -40,7 +43,9 @@ mergeUnmergedPolygons = (listOfPoly) ->
 
 				for poly_index_inner in [0...poly_inner.length]
 					p3 = poly_inner[poly_index_inner]
-					poly_index_inner2 = if (poly_index_inner == (poly_inner.length-1)) then 0 else poly_index_inner+1
+					poly_index_inner2 =
+						if (poly_index_inner is (poly_inner.length-1))
+						then 0 else poly_index_inner+1
 					p4 = poly_inner[poly_index_inner2]
 
 					if arePointsOnSameLineSegment(p3, p4, p1, p2)
@@ -53,15 +58,23 @@ mergeUnmergedPolygons = (listOfPoly) ->
 							poly_range = [0...poly_inner.length].reverse()
 
 						throw_away_polygons.push(polygons_index_inner)
-						key = "#{polygons_index_outer},#{poly_index_outer},#{poly_index_outer2}"
+						key = [polygons_index_outer, poly_index_outer,
+							poly_index_outer2].join()
 						if not polygons_to_merge[key] != "undefined"
 							polygons_to_merge[key] = {}
 
-						polygons_to_merge[key][polygons_index_inner] = ((if c+p_first < poly_inner.length then c+p_first else c+p_first-poly_inner.length) for c in poly_range)
+						polygons_to_merge[key][polygons_index_inner] =
+							((if c+p_first < poly_inner.length
+							then c+p_first
+							else c+p_first-poly_inner.length
+							) for c in poly_range)
 						break
 
-	# sort index concerning to insert position which is the index of p2 -> begin with biggest index
-	#polygons_to_merge = sorted(polygons_to_merge.items(), key=lambda x: x[0].p2_idx, reverse=true)
+	# sort index concerning to insert position which is the index
+	# of p2 -> begin with biggest index
+
+	# polygons_to_merge = sorted(polygons_to_merge.items(),
+	# key=lambda x: x[0].p2_idx, reverse=true)
 	console.log polygons_to_merge
 	console.log throw_away_polygons
 	tuples = ([key, poly] for key, poly of polygons_to_merge)
@@ -91,7 +104,8 @@ mergeUnmergedPolygons = (listOfPoly) ->
 		tuples = ([k, poly] for k, poly of merge)
 		tuples.sort(
 			(a, b) ->
-				result = listOfPoly[a[0]][a[1][0]].distanceTo(target_p1) < listOfPoly[b[0]][b[1][0]].distanceTo(target_p1)
+				result = listOfPoly[a[0]][a[1][0]].distanceTo(target_p1) <
+					listOfPoly[b[0]][b[1][0]].distanceTo(target_p1)
 				return if result then 1 else -1
 		)
 
@@ -100,7 +114,8 @@ mergeUnmergedPolygons = (listOfPoly) ->
 			for merge_vertex_idx in item[1]
 				listOfPoly[target_idx].splice(target_key, 0, merge_poly[merge_vertex_idx])
 
-	listOfPoly = (poly for poly, idx in listOfPoly when idx not in throw_away_polygons and poly.length > 2)
+	listOfPoly = (poly for poly, idx in listOfPoly when idx not
+		in throw_away_polygons and poly.length > 2)
 
 
 arePointsOnSameLineSegment = (p1, p2, p3, p4) ->
@@ -109,17 +124,21 @@ arePointsOnSameLineSegment = (p1, p2, p3, p4) ->
 	threshhold = Math.pow(10,-1)
 	if p3.x != p4.x
 	    t1 = (p1.x - p3.x) / v.x # 0.333333019
-	    if t1 > 1.0+threshhold or t1 < 0.0-threshhold or not isInRange( p1.y -  ( p3.y + t1*v.y ), threshhold ) # −0.000100007
+	    if t1 > 1.0+threshhold or t1 < 0.0-threshhold or not
+	    isInRange( p1.y -  ( p3.y + t1*v.y ), threshhold ) # −0.000100007
 	        return false
 	    t2 = (p2.x - p3.x) / v.x # 0.666666981
-	    if t2 > 1.0+threshhold or t2 < 0.0-threshhold or not isInRange( p2.y - ( p3.y + t2*v.y ), threshhold ) #
+	    if t2 > 1.0+threshhold or t2 < 0.0-threshhold or not
+	    isInRange( p2.y - ( p3.y + t2*v.y ), threshhold ) #
 	        return false
 	else if p3.y != p4.y
 	    t3 = (p1.y - p3.y) / v.y
-	    if t3 > 1.0+threshhold or t3 < 0.0-threshhold or not isInRange( p1.x - ( p3.x + t3*v.x ), threshhold )
+	    if t3 > 1.0+threshhold or t3 < 0.0-threshhold or not
+	    isInRange( p1.x - ( p3.x + t3*v.x ), threshhold )
 	        return false
 	    t4 = (p2.y - p3.y) / v.y
-	    if t4 > 1.0+threshhold or t4 < 0.0-threshhold or not isInRange( p2.x - ( p3.x + t4*v.x ), threshhold )
+	    if t4 > 1.0+threshhold or t4 < 0.0-threshhold or not
+	    isInRange( p2.x - ( p3.x + t4*v.x ), threshhold )
 	        return false
 	else
 	    return false
@@ -130,13 +149,17 @@ arePointPairsEqual = (p1, p2, p3, p4) ->
 	threshhold = Math.pow(10, -3)
 	result = true
 
-	result &&= isInRange(p1.x - p3.x, threshhold) or isInRange(p1.x - p4.x, threshhold)
-	
-	result &&= isInRange(p2.x - p3.x, threshhold) or isInRange(p2.x - p4.x, threshhold)
-	
-	result &&= isInRange(p1.y - p3.y, threshhold) or isInRange(p1.y - p4.y, threshhold)
-	
-	result &&= isInRange(p2.y - p3.y, threshhold) or isInRange(p2.y - p4.y, threshhold)
+	result &&= isInRange(p1.x - p3.x, threshhold) or
+		isInRange(p1.x - p4.x, threshhold)
+
+	result &&= isInRange(p2.x - p3.x, threshhold) or
+		isInRange(p2.x - p4.x, threshhold)
+
+	result &&= isInRange(p1.y - p3.y, threshhold) or
+		isInRange(p1.y - p4.y, threshhold)
+
+	result &&= isInRange(p2.y - p3.y, threshhold) or
+		isInRange(p2.y - p4.y, threshhold)
 
 	return result
 
@@ -165,7 +188,7 @@ removeCollinearPoints = (listOfPoly) ->
 			# also check small area sub polys?
 			while pointsOnOneLine( sub_poly )
 				#print(sub_poly)
-				#print( 'throw away ' + str(poly[i2].x) + ', ' + str(poly[i2].y))
+				#print('throw away ' + str(poly[i2].x) + ', ' + str(poly[i2].y))
 				throw_away_vertices.push(i2)
 				i2 = if i2 == (poly.length-1) then 0 else i2+1
 				sub_poly.push(poly[i2])
@@ -215,7 +238,7 @@ pointsOnOneLine = (poly) ->
 		b = -1
 		a = (y2 - y1)/(x2 - x1)
 	else if not isInRange( y2 - y1, threshhold )
-		a = -1;
+		a = -1
 		b = (x2 - x1)/(y2 - y1)
 	else
 		return true
@@ -253,12 +276,11 @@ removeDuplicates = (listOfPoly) ->
 				i += 2
 
 		#polygons_merged.push(distinct_vertices) if distinct_vertices.length > 2
-			
+
 	return listOfPoly
 
 exports =
 	mergeUnmergedPolygons: mergeUnmergedPolygons
-	arePointPairsEqual: arePointPairsEqual
 	arePointsOnSameLineSegment : arePointsOnSameLineSegment
 	arePointPairsEqual: arePointPairsEqual
 	removeCollinearPoints: removeCollinearPoints

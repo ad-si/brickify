@@ -14,6 +14,7 @@
     "body-parser": "~1.9.1",
     "browserify": "~6.1.0",
     "coffee-script": "~1.8.0",
+    "coffeelint": "^1.6.1",
     "compression": "~1.2.0",
     "errorhandler": "~1.2.2",
     "express": "~4.9.8",
@@ -30,7 +31,8 @@
   },
   "scripts": {
     "build": "node ./node_modules/coffee-script/bin/cake build",
-    "start": "node ./node_modules/coffee-script/bin/cake start"
+    "start": "node ./node_modules/coffee-script/bin/cake start",
+	"linkHooks": "node ./node_modules/coffee-script/bin/cake linkHooks"
   },
   "repository": {
     "type": "git",

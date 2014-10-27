@@ -68,6 +68,37 @@ buildServer = () ->
 	compileAndExecuteOnJs sourcePath, buildPath, null
 
 
+linkHooks = () ->
+	# gist.github.com/domenic/2238951
+	[
+		'applypatch-msg'
+		'commit-msg'
+		'post-commit'
+		'post-receive'
+		'post-update'
+		'pre-applypatch'
+		'pre-commit'
+		'prepare-commit-msg'
+		'pre-rebase'
+		'update'
+	]
+	.forEach (hook) ->
+		hookPath = path.join('hooks', hook)
+		if fs.existsSync(hookPath)
+			gitHookPath = path.join(".git/hooks", hook)
+
+			if fs.existsSync(gitHookPath)
+				fs.unlinkSync gitHookPath
+
+			fs.linkSync hookPath, gitHookPath
+
+
+
+
+task 'linkHooks', 'Symlinks git hooks into .git/hooks', ->
+	linkHooks()
+
+
 task 'buildClient', 'Builds the client js files', ->
 	buildClient()
 
@@ -85,6 +116,6 @@ task 'start', 'Builds files and starts server', ->
 	buildClient()
 	buildServer()
 
+	linkHooks()
+
 	lowfab.startServer()
-
-

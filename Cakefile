@@ -83,16 +83,17 @@ linkHooks = () ->
 		'update'
 	]
 	.forEach (hook) ->
-		hookPath = path.join('hooks', hook)
-		if fs.existsSync(hookPath)
-			gitHookPath = path.join(".git/hooks", hook)
+		hookPath = path.join(__dirname, 'hooks', hook)
+		gitHookPath = path.join(".git/hooks", hook)
 
-			if fs.existsSync(gitHookPath)
-				fs.unlinkSync gitHookPath
+		fs.unlink gitHookPath, (error) ->
+			if error then return
 
-			fs.linkSync hookPath, gitHookPath
-
-
+		fs.exists hookPath, (exists) ->
+			if exists
+				fs.symlink hookPath, gitHookPath, (error) ->
+					if error
+						throw new Error error
 
 
 task 'linkHooks', 'Symlinks git hooks into .git/hooks', ->

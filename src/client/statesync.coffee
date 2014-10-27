@@ -23,7 +23,10 @@ sync = (force = false) ->
 	#deep copy
 	oldState = JSON.parse JSON.stringify state
 
-	console.log 'Sending delta: ' + JSON.stringify({deltaState: delta}) + ' to server (state: ' + JSON.stringify(state) + ')'
+	console.log 'Sending delta: ' +
+		JSON.stringify({deltaState: delta}) +
+		' to server (state: ' +
+		JSON.stringify(state) + ')'
 
 	$.ajax '/statesync/set',
 		type: 'POST'

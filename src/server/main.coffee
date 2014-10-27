@@ -15,7 +15,6 @@ session = require 'express-session'
 favicon = require 'serve-favicon'
 compression = require 'compression'
 
-
 index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
 
@@ -50,10 +49,13 @@ else app.use morgan()
 app.use bodyParser.json()
 app.use bodyParser.urlencoded()
 
+app.use session {secret: 'lowfabCookieSecret!'}
 
 app.get  '/', index
-app.get  '/statesync', statesync.getState
-app.post '/statesync', statesync.setState
+app.get  '/statesync/get', statesync.getState
+app.post '/statesync/set', statesync.setState
+app.get  '/statesync/reset', statesync.resetState
+
 
 if app.get 'env' is 'development'
 	app.use errorHandler()

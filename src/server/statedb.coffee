@@ -2,7 +2,7 @@
 dbstate = {}
 
 exports.saveState = (sessionId, state) ->
-	dbstate = state;
+	dbstate = state
 
 exports.retrieveState = (sessionId, stateCallback) ->
-	stateCallback(dbstate);
+	stateCallback(dbstate)

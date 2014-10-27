@@ -10,13 +10,15 @@ exports.state = state
 
 exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
+	$.get "/statesync/get", {}, (data, textStatus, jqXHR) ->
+		state = data
 
 exports.sync = () ->
 	delta = jsondiffpatch.diff oldState, state
 	#deep copy
 	oldState = JSON.parse JSON.stringify state
 
-	$.post "/statesync", {deltaState: delta, stateSession: globalConfigInstance.stateSession}, (data, textStatus, jqXHR) ->
+	$.post "/statesync/set", {deltaState: delta, stateSession: globalConfigInstance.stateSession}, (data, textStatus, jqXHR) ->
 		#patch state with server changes
 		delta = data
 		jsondiffpatch.patch state, delta

@@ -105,20 +105,21 @@ linkHooks = () ->
 getFilesSync = (nodePath, options) ->
 	returnFiles = []
 
-	walkTree = (nodePath) ->
-		stats = fs.statSync(nodePath)
+	walkTree = (localNodePath) ->
+		stats = fs.statSync(localNodePath)
 
 		if stats.isFile()
-			if options.regex.test(nodePath)
-				returnFiles.push(nodePath)
+
+			if (localNodePath.search(options.regex) >= 0)
+				returnFiles.push localNodePath
 
 		else if stats.isDirectory()
 
-			files = fs.readdirSync nodePath
+			files = fs.readdirSync localNodePath
 
 			for file in files
-				if file and options.ignore.indexOf file
-					walkTree path.join(nodePath, file)
+				if file and options.ignore.indexOf(file) is -1
+					walkTree path.join(localNodePath, file)
 
 	walkTree(nodePath)
 
@@ -128,9 +129,12 @@ getFilesSync = (nodePath, options) ->
 checkStyle = () ->
 	getFilesSync('.',
 		ignore: ['node_modules', '.git']
-		regex: /.*\.coffee/g
+		regex: /.*\.coffee/gi
 	)
 	.forEach (file) ->
+
+		console.log file
+
 		coffeelint
 		.lint(fs.readFileSync(file, 'utf8'),
 			no_tabs:

@@ -34,7 +34,6 @@
     "build": "node ./node_modules/coffee-script/bin/cake build",
     "start": "node ./node_modules/coffee-script/bin/cake start",
     "linkHooks": "node ./node_modules/coffee-script/bin/cake linkHooks",
-    "prepublish": "node ./node_modules/coffee-script/bin/cake prepublish",
     "checkStyle": "node ./node_modules/coffee-script/bin/cake checkStyle"
   },
   "repository": {

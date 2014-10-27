@@ -91,12 +91,12 @@ linkHooks = () ->
 
 		fs.exists hookPath, (exists) ->
 			if exists
-				fs.symlink hookPath, gitHookPath, (error) ->
+				fs.link hookPath, gitHookPath, (error) ->
 					if error
 						throw new Error error
 
 
-task 'linkHooks', 'Symlinks git hooks into .git/hooks', ->
+task 'linkHooks', 'Links git hooks into .git/hooks', ->
 	linkHooks()
 
 

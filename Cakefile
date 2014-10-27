@@ -20,7 +20,7 @@ sourceDir = '/src/'
 
 
 compileFile = (inputfile, compilerOptions, outputfile) ->
-	console.log inputfile
+	console.log inputfile + ' -> ' + outputfile
 	fcontent = fs.readFileSync inputfile, 'utf8'
 	compileObject = coffeeScript.compile fcontent, compilerOptions
 	fs.writeFile outputfile, compileObject.js, (error) ->
@@ -48,12 +48,18 @@ yamlToJson = () ->
 buildClient = () ->
 	sourcePath = path.normalize __dirname + sourceDir + 'client/'
 	buildPath = path.normalize __dirname + buildDir + 'client/'
+	sourcePathPlugins = path.normalize __dirname + sourceDir + 'client/plugins/'
+	buildPathPlugins = path.normalize __dirname + buildDir + 'client/plugins/'
 
 	mkdirp.sync buildPath
+	mkdirp.sync buildPathPlugins
 
 	yamlToJson()
 
 	compileAndExecuteOnJs sourcePath, buildPath, (outfilename) ->
+		browserify.add outfilename
+
+	compileAndExecuteOnJs sourcePathPlugins, buildPathPlugins, (outfilename) ->
 		browserify.add outfilename
 
 	browserify.bundle().pipe fs.createWriteStream(__dirname + '/public/index.js')
@@ -62,10 +68,14 @@ buildClient = () ->
 buildServer = () ->
 	sourcePath = path.normalize __dirname + sourceDir + 'server/'
 	buildPath = path.normalize __dirname + buildDir + 'server/'
+	sourcePathPlugins = path.normalize __dirname + sourceDir + 'server/plugins/'
+	buildPathPlugins = path.normalize __dirname + buildDir + 'server/plugins/'
 
 	mkdirp.sync buildPath
+	mkdirp.sync buildPathPlugins
 
 	compileAndExecuteOnJs sourcePath, buildPath, null
+	compileAndExecuteOnJs sourcePathPlugins, buildPathPlugins, null
 
 
 task 'buildClient', 'Builds the client js files', ->

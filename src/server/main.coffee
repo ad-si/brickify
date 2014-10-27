@@ -16,13 +16,9 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-
+pluginLoader = require '../../src/server/pluginLoader.coffee'
 index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
-
-#test for state sync
-statesync.addDiffCallback (delta, state) ->
-	state.iHazModified = true
 
 app = express()
 server = ''
@@ -30,12 +26,10 @@ port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
 developmentMode = true if app.get('env') is 'development'
 
-
 app.set 'hostname', 'localhost:' + port
 
 if not developmentMode
 	app.set('hostname', process.env.HOSTNAME or 'lowfab.net')
-
 
 app.set 'views', path.normalize 'views'
 app.set 'view engine', 'jade'
@@ -70,6 +64,7 @@ app.get  '/statesync/get', statesync.getState
 app.post '/statesync/set', statesync.setState
 app.get  '/statesync/reset', statesync.resetState
 
+pluginLoader.loadPlugins statesync, path.normalize __dirname + '../../../src/server/plugins/'
 
 if app.get 'env' is 'development'
 	app.use errorHandler()

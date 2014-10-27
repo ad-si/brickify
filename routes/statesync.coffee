@@ -25,7 +25,7 @@ exports.setState = (request, response) ->
 exports.resetState = (request, response) ->
 	request.session.state = {empty: true}
 
-exports.addDiffCallback = (callback) ->
+exports.addUpdateCallback = (callback) ->
 	diffCallbacks.push callback
 
 getInitializedState = (request) ->

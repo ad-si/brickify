@@ -22,8 +22,11 @@ ui.init()
 renderer = require("./render")
 renderer(ui)
 
-statesync = require("./statesync")
-statesync.init(globalConfig)
+statesync = require './statesync'
+statesync.init globalConfig
+
+pluginLoader = require './pluginLoader'
+pluginLoader.loadPlugins statesync
 
 #test for statesync
 statesync.addUpdateCallback (state, delta) ->

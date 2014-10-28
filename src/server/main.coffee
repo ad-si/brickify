@@ -19,6 +19,7 @@ nib = require 'nib'
 pluginLoader = require './pluginLoader.coffee'
 index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
+logger = require 'winston'
 
 app = express()
 server = ''
@@ -28,8 +29,13 @@ developmentMode = true if app.get('env') is 'development'
 
 app.set 'hostname', 'localhost:' + port
 
+logger.remove logger.transports.Console
+
 if not developmentMode
 	app.set('hostname', process.env.HOSTNAME or 'lowfab.net')
+	logger.add logger.transports.Console, {colorize: true, level: 'warn'}
+else
+	logger.add logger.transports.Console, {colorize: true, level: 'debug'}
 
 app.set 'views', path.normalize 'views'
 app.set 'view engine', 'jade'
@@ -51,11 +57,17 @@ app.use stylus.middleware(
 app.use express.static(path.normalize 'public')
 
 if developmentMode
-then app.use morgan 'dev'
-else app.use morgan()
+then app.use morgan 'dev',
+	stream:
+		write: (str) ->
+			logger.info(str.substring(0, str.length-1))
+else app.use morgan 'combined',
+	stream:
+		write: (str) ->
+			logger.info(str.substring(0, str.length-1))
 
 app.use bodyParser.json()
-app.use bodyParser.urlencoded()
+app.use bodyParser.urlencoded extended: true
 
 app.use session {secret: 'lowfabCookieSecret!'}
 
@@ -75,7 +87,7 @@ app.use ((req, res) ->
 
 module.exports.startServer = () ->
 	app.listen(port, ip)
-	console.log('Server is listening on ' + ip + ':' + port)
+	logger.info 'Server is listening on ' + ip + ':' + port
 
 
 ###

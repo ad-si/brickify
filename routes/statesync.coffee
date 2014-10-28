@@ -12,7 +12,8 @@ exports.setState = (request, response) ->
 	state = getInitializedState request
 
 	jsondiffpatch.patch(state,delta)
-	logger.debug 'updated state:' + JSON.stringify(state) + ' from delta: ' + JSON.stringify(delta)
+	logger.debug 'updated state:', JSON.stringify(state),
+			'from delta:', JSON.stringify(delta)
 	#state now contains the current state of both client and server
 
 	oldState = JSON.parse JSON.stringify state

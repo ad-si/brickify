@@ -87,8 +87,10 @@ module.exports.linkHooks = () ->
 		'update'
 	]
 	.forEach (hook) ->
-		hookPath = path.join(__dirname, 'hooks', hook)
+		hookPath = path.join('hooks', hook)
 		gitHookPath = path.join(".git/hooks", hook)
+
+		console.log hookPath, gitHookPath
 
 		fs.unlink gitHookPath, (error) ->
 			if error then return

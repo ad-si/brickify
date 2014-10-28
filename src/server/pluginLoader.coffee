@@ -12,12 +12,13 @@ module.exports.loadPlugins = (stateSync, directory) ->
 		if checkForPluginMethods instance
 			pluginInstances.push instance
 			initPluginInstance instance
-			logger.info 'Plugin "' + instance.pluginName + '" (' + file + ') loaded'
+			logger.info 'Plugin "#{instance.pluginName}" (#{file}) loaded'
 		else
-			logger.warn 'Plugin "' + file + '" does not contain all necessary methods, will not be loaded'
+			logger.warn 'Plugin "#{file}" does not contain
+							all necessary methods and will not be loaded'
 
 checkForPluginMethods = (object) ->
-	hasAllMethods = true;
+	hasAllMethods = true
 	hasAllMethods = object.hasOwnProperty('pluginName') and hasAllMethods
 	hasAllMethods = object.hasOwnProperty('init') and hasAllMethods
 	hasAllMethods = object.hasOwnProperty('handleStateChange') and hasAllMethods

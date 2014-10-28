@@ -60,23 +60,24 @@ if developmentMode
 then app.use morgan 'dev',
 	stream:
 		write: (str) ->
-			logger.info(str.substring(0, str.length-1))
+			logger.info str.substring(0, str.length - 1)
 else app.use morgan 'combined',
 	stream:
 		write: (str) ->
-			logger.info(str.substring(0, str.length-1))
+			logger.info str.substring(0, str.length - 1)
 
 app.use bodyParser.json()
 app.use bodyParser.urlencoded extended: true
 
 app.use session {secret: 'lowfabCookieSecret!'}
 
-app.get  '/', index
-app.get  '/statesync/get', statesync.getState
+app.get '/', index
+app.get '/statesync/get', statesync.getState
 app.post '/statesync/set', statesync.setState
-app.get  '/statesync/reset', statesync.resetState
+app.get '/statesync/reset', statesync.resetState
 
-pluginLoader.loadPlugins statesync, path.normalize __dirname + '../../../src/server/plugins/'
+pluginLoader.loadPlugins statesync, path.normalize __dirname +
+	'../../../src/server/plugins/'
 
 if app.get 'env' is 'development'
 	app.use errorHandler()
@@ -104,7 +105,9 @@ module.exports.createServer = () ->
 			else
 				fs.readFile full_path, 'binary', (err, file) ->
 					if err
-						response.writeHeader(500, {'Content-Type': 'text/plain'})
+						response.writeHeader(500,
+                            'Content-Type': 'text/plain'
+                        )
 						response.write(err + '\n')
 						response.end()
 					else

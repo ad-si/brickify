@@ -13,7 +13,9 @@
   "dependencies": {
     "body-parser": "~1.9.1",
     "browserify": "~6.1.0",
+    "browserify-data": "^0.2.0",
     "coffee-script": "~1.8.0",
+    "coffeeify": "^0.7.0",
     "coffeelint": "~1.6.1",
     "compression": "~1.2.0",
     "errorhandler": "~1.2.2",

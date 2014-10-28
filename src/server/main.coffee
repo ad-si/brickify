@@ -16,7 +16,7 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-pluginLoader = require '../../src/server/pluginLoader.coffee'
+pluginLoader = require './pluginLoader.coffee'
 index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
 

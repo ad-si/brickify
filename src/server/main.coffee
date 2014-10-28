@@ -20,6 +20,7 @@ pluginLoader = require '../../src/server/pluginLoader.coffee'
 index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
 logger = require 'winston'
+exec = require 'exec'
 
 app = express()
 server = ''
@@ -75,6 +76,11 @@ app.get  '/', index
 app.get  '/statesync/get', statesync.getState
 app.post '/statesync/set', statesync.setState
 app.get  '/statesync/reset', statesync.resetState
+
+app.post '/updateGitAndRestart', (request, response) ->
+	response.send ""
+	exec '../updateAndRestart.sh', (err, out, code) ->
+		logger.warn "Error while updating server: " + err if err?
 
 pluginLoader.loadPlugins statesync, path.normalize __dirname + '../../../src/server/plugins/'
 

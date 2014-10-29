@@ -1,3 +1,6 @@
+statesync = require './statesync'
+objectTree = require '../common/objectTree'
+
 module.exports = (globalConfig) ->
 	return {
 		# setup scene
@@ -27,7 +30,7 @@ module.exports = (globalConfig) ->
 		loadHandler: ( event ) ->
 			geometry = @stlLoader.parse( event.target.result )
 			$(@).trigger( 'geometry-loaded', geometry )
-			###
+
 			objectMaterial = new THREE.MeshLambertMaterial(
 				{
 					color: globalConfig.defaultObjectColor
@@ -36,8 +39,11 @@ module.exports = (globalConfig) ->
 			)
 			object = new THREE.Mesh( geometry, objectMaterial )
 			@scene.add( object )
-			globalConfig.meshes.push( object )
-			###
+
+			statesync.performStateAction (state) ->
+				objectTree.addThreeObject state.rootNode, object
+
+
 
 
 		dropHandler: ( event ) ->
@@ -45,7 +51,7 @@ module.exports = (globalConfig) ->
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
 			for file in files
-				if file.name.contains( '.stl' )
+				if file.name.search( '.stl' ) >= 0
 					@fileReader.readAsBinaryString( file )
 
 

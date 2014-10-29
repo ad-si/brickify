@@ -62,12 +62,15 @@ module.exports.buildServer = (buildDir, sourceDir) ->
 	buildPath = path.join buildDir, '/server'
 	sourcePathPlugins = path.join sourceDir, '/server/plugins'
 	buildPathPlugins = path.join buildDir, '/server/plugins'
+	sourcePathRoutes = path.join sourceDir, '../routes'
+	buildPathRoutes = path.join buildDir, '../routes'
 
 	mkdirp.sync buildPath
 	mkdirp.sync buildPathPlugins
 
-	compileAndExecuteOnJs sourcePath, buildPath, null
-	compileAndExecuteOnJs sourcePathPlugins, buildPathPlugins, null
+	compileAndExecuteOnJs sourcePath, sourcePath, null
+	compileAndExecuteOnJs sourcePathPlugins, sourcePathPlugins, null
+	compileAndExecuteOnJs sourcePathRoutes, sourcePathRoutes, null
 
 	return module.exports
 

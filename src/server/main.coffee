@@ -4,7 +4,7 @@ url = require 'url'
 fs = require 'fs'
 
 # Makes it possible to directly require coffee modules
-require 'coffee-script/register'
+#require 'coffee-script/register'
 
 express = require 'express'
 bodyParser = require 'body-parser'
@@ -17,10 +17,12 @@ compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
 pluginLoader = require './pluginLoader'
-index = require '../../routes/index.coffee'
-statesync = require '../../routes/statesync.coffee'
+index = require '../../routes/index'
+statesync = require '../../routes/statesync'
 logger = require 'winston'
 exec = require 'exec'
+modelStorage = require './modelStorage'
+modelStorageApi = require '../../routes/modelStorageApi'
 
 app = express()
 server = ''
@@ -40,9 +42,6 @@ else
 
 app.set 'views', path.normalize 'views'
 app.set 'view engine', 'jade'
-
-app.use bodyParser.json {limit: '100mb'}
-app.use bodyParser.urlencoded {extended: true, limit: '100mb'}
 
 app.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
 
@@ -72,10 +71,19 @@ else app.use morgan 'combined',
 
 app.use session {secret: 'lowfabCookieSecret!'}
 
+modelStorage.init()
+
+jsonParser = bodyParser.json {limit: '100mb'}
+urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
+rawParser = bodyParser.raw({limit: '100mb'})
+
 app.get '/', index
-app.get '/statesync/get', statesync.getState
-app.post '/statesync/set', statesync.setState
-app.get '/statesync/reset', statesync.resetState
+app.get '/statesync/get', jsonParser, statesync.getState
+app.post '/statesync/set', jsonParser, statesync.setState
+app.get '/statesync/reset', jsonParser, statesync.resetState
+app.get '/model/exists/:md5/:extension', urlParser, modelStorageApi.modelExists
+app.get '/model/get/:md5/:extension', urlParser, modelStorageApi.getModel
+app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
 
 app.post '/updateGitAndRestart', (request, response) ->
 	response.send ""

@@ -31,7 +31,8 @@
     "stylus": "^0.49.2",
     "win-spawn": "^2.0.0",
     "winston": "^0.8.1",
-    "exec": "~0.1.2"
+    "exec": "~0.1.2",
+    "MD5": "~1.2.1"
   },
   "scripts": {
     "build": "./node_modules/.bin/cake build",

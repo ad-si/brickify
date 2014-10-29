@@ -18,9 +18,9 @@ sync = (force = false) ->
 
 	if not force
 		if not delta?
-			return;
+			return
 
-	#deep copy
+	# deep copy
 	oldState = JSON.parse JSON.stringify state
 
 	console.log 'Sending delta: ' +
@@ -31,13 +31,18 @@ sync = (force = false) ->
 	$.ajax '/statesync/set',
 		type: 'POST'
 		data: JSON.stringify({deltaState: delta})
-		dataType: 'json' #what jquery expects as an answer
-		contentType: 'application/json; charset=utf-8' #what is sent in the post request as a header
+		# what jquery expects as an answer
+		dataType: 'json'
+		# what is sent in the post request as a header
+		contentType: 'application/json; charset=utf-8'
+		# check whether client modified its local state
+		# since the post request was sent
 		success: (data, textStatus, jqXHR) ->
-			#check whether client modified its local state since the post request was sent
+
 			clientDelta = jsondiffpatch.diff oldState, state
 			if clientDelta?
-				console.log 'The client modified its state while the server worked, this should not happen!'
+				console.log 'The client modified its state' +
+					'while the server worked, this should not happen!'
 
 			#patch state with server changes
 			delta = data

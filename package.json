@@ -37,7 +37,9 @@
     "build": "./node_modules/.bin/cake build",
     "start": "./node_modules/.bin/cake start",
     "linkHooks": "./node_modules/.bin/cake linkHooks",
-    "checkStyle": "./node_modules/.bin/coffeelint Cakefile ."
+    "checkStyle": "./node_modules/.bin/coffeelint Cakefile .",
+    "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
+    "documentation": "./node_modules/.bin/groc"
   },
   "repository": {
     "type": "git",
@@ -49,5 +51,9 @@
   "private": true,
   "engines": {
     "node": "~0.10.32"
+  },
+  "devDependencies": {
+    "crojsdoc": "^0.8.8",
+    "groc": "^0.7.0"
   }
 }

@@ -1,0 +1,3 @@
+{
+  "glob": ["src/**/*.coffee", "README.md", "src/**/**/*.coffee"]
+}

@@ -4,7 +4,7 @@ mm: 1
 # camera adjustments
 fov: 40
 cameraNearPlane: 0.1
-cameraFarPlane: 1000
+cameraFarPlane: 2500
 
 # animations
 animationStepSize: 0.02
@@ -29,5 +29,4 @@ gridLineWidthNormal: 1
 gridLineWidth5: 1
 gridLineWidth10: 1
 gridSize: 200
-gridStepSize: 10 
-
+gridStepSize: 10

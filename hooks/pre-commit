@@ -1,1 +1,1 @@
-npm run-script checkStyle
+npm run-script prepublish

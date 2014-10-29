@@ -82,7 +82,8 @@ app.post '/updateGitAndRestart', (request, response) ->
 	exec '../updateAndRestart.sh', (err, out, code) ->
 		logger.warn "Error while updating server: " + err if err?
 
-pluginLoader.loadPlugins statesync, path.normalize __dirname + '../../../src/server/plugins/'
+pluginLoader.loadPlugins statesync,
+	path.normalize __dirname + '../../../src/server/plugins/'
 
 if app.get 'env' is 'development'
 	app.use errorHandler()
@@ -91,10 +92,20 @@ app.use ((req, res) ->
 	res.render '404'
 )
 
-module.exports.startServer = () ->
-	app.listen(port, ip)
-	logger.info 'Server is listening on ' + ip + ':' + port
+module.exports.startServer = (_port, _ip) ->
 
+	port = _port || port
+	ip = _ip || ip
+	server = false
+
+	try
+		server = app.listen(port, ip)
+		logger.info 'Server is listening on ' + ip + ':' + port
+
+	catch error
+		winston.error 'Server could not be started!'
+
+	return server
 
 ###
 module.exports.createServer = () ->

@@ -270,7 +270,7 @@ module.exports = (globalConfig) ->
 			@camera.up.set(0, 1, 0)
 			@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-			@controls = new THREE.OrbitControls(@camera)
+			@controls = new THREE.OrbitControls(@camera, @renderer.domElement)
 			@controls.target.set(0, 0, 0)
 
 			@setupCoordinateSystem()

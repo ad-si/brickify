@@ -34,10 +34,10 @@
     "exec": "~0.1.2"
   },
   "scripts": {
-    "build": "node ./node_modules/coffee-script/bin/cake build",
-    "start": "node ./node_modules/coffee-script/bin/cake start",
-    "linkHooks": "node ./node_modules/coffee-script/bin/cake linkHooks",
-    "checkStyle": "node ./node_modules/.bin/coffeelint Cakefile ."
+    "build": "./node_modules/.bin/cake build",
+    "start": "./node_modules/.bin/cake start",
+    "linkHooks": "./node_modules/.bin/cake linkHooks",
+    "checkStyle": "./node_modules/.bin/coffeelint Cakefile ."
   },
   "repository": {
     "type": "git",

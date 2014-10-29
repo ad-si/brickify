@@ -7,6 +7,7 @@ ui = require("./ui")(globalConfig)
 renderer = require "./render"
 pluginLoader = require './pluginLoader'
 statesync = require './statesync'
+objectTree = require '../common/objectTree'
 
 ### TODO: move somewhere where it is needed
 # geometry functions
@@ -26,13 +27,13 @@ ui.init()
 
 renderer(ui)
 
-statesync.init globalConfig
-
 #test for statesync
 statesync.addUpdateCallback (state, delta) ->
 	console.log 'UpdatedState: %s, Delta: %s',
 		JSON.stringify(state), JSON.stringify(delta)
 
-pluginLoader.loadPlugins statesync
+statesync.init globalConfig, (state) ->
+	objectTree.init state
+	pluginLoader.loadPlugins statesync
 
-#statesync.sync(true)
+

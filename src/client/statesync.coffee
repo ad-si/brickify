@@ -6,11 +6,15 @@ oldState = {}
 globalConfigInstance = null
 stateUpdateCallbacks = []
 
-exports.init = (globalConfig) ->
+exports.getState = () ->
+	return state
+
+exports.init = (globalConfig, stateInitializedCallback) ->
 	globalConfigInstance = globalConfig
 	$.get "/statesync/get", {}, (data, textStatus, jqXHR) ->
 		state = data
 		oldState = JSON.parse JSON.stringify state
+		stateInitializedCallback state if stateInitializedCallback?
 		handleUpdatedState({}, state)
 
 sync = (force = false) ->

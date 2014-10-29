@@ -82,7 +82,8 @@ app.post '/updateGitAndRestart', (request, response) ->
 	exec '../updateAndRestart.sh', (err, out, code) ->
 		logger.warn "Error while updating server: " + err if err?
 
-pluginLoader.loadPlugins statesync, path.normalize __dirname + '../../../src/server/plugins/'
+pluginLoader.loadPlugins statesync,
+	path.normalize __dirname + '../../../src/server/plugins/'
 
 if app.get 'env' is 'development'
 	app.use errorHandler()

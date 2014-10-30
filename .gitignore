@@ -6,5 +6,5 @@ npm-debug.log
 /public/index.js
 *.css
 /modelCache
-!/src/**/*.js/doc
 /apidoc
+/doc

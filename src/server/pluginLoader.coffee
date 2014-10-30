@@ -4,7 +4,7 @@ stateSyncModule = null
 logger = require 'winston'
 
 String.prototype.endsWith = (suffix) ->
-	return this.indexOf(suffix, this.length - suffix.length) != -1;
+	return this.indexOf(suffix, this.length - suffix.length) != -1
 
 module.exports.loadPlugins = (stateSync, directory) ->
 	stateSyncModule = stateSync

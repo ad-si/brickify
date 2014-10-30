@@ -21,6 +21,7 @@ exports.setState = (request, response) ->
 	oldState = JSON.parse JSON.stringify state
 
 	#check functionality of jsondiffpatch
+	#ToDo: could cause performance problems, maybe replace in the future?
 	if diffpatch.diff(oldState,state)?
 		logger.error 'Diff of identical states was not undefined'
 

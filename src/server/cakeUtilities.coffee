@@ -3,12 +3,11 @@ path = require 'path'
 coffeeScript = require 'coffee-script'
 mkdirp = require 'mkdirp'
 browserify = require('browserify')
-winston = require 'winston'
 coffeeify = require 'coffeeify'
 browserifyData = require('browserify-data')
+winston = require 'winston'
 
-logger = new winston.Logger()
-logger.add winston.transports.Console, {colorize: true}
+buildLog = winston.loggers.get('buildLog')
 
 
 compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
@@ -31,7 +30,7 @@ compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
 
 
 compileFile = (inputfile, compilerOptions, outputfile) ->
-	logger.info inputfile + ' -> ' + outputfile
+	buildLog.info inputfile + ' -> ' + outputfile
 	fcontent = fs.readFileSync inputfile, 'utf8'
 	compileObject = coffeeScript.compile fcontent, compilerOptions
 	fs.writeFile outputfile, compileObject.js, (error) ->
@@ -90,16 +89,17 @@ module.exports.linkHooks = () ->
 		hookPath = path.join('hooks', hook)
 		gitHookPath = path.join(".git/hooks", hook)
 
-		console.log hookPath, gitHookPath
-
 		fs.unlink gitHookPath, (error) ->
-			if error then return
+			if error and error.code is not 'ENOENT'
+				buildLog.error error
 
 		fs.exists hookPath, (exists) ->
 			if exists
 				fs.link hookPath, gitHookPath, (error) ->
 					if error
-						throw new Error error
+						buildLog.error error
+					else
+						buildLog.info hookPath, '->', gitHookPath
 
 	return module.exports
 
@@ -114,8 +114,6 @@ module.exports.checkStyle = () ->
 	)
 	.forEach (file) ->
 
-		console.log file
-
 		coffeelint
 		.lint(fs.readFileSync(file, 'utf8'),
 			no_tabs:
@@ -124,7 +122,7 @@ module.exports.checkStyle = () ->
 				level: 'ignore'
 		)
 		.forEach (error) ->
-			logger.warn file,
+			buildLog.warn file,
 				(error.lineNumber + '\n'),
 				(error.rule + ':'),
 				(error.message + '\n')

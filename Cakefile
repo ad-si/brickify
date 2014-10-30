@@ -1,8 +1,14 @@
 coffeelint = require 'coffeelint'
 coffeeScript = require 'coffee-script'
+winston = require 'winston'
+winston.loggers.add 'buildLog',
+	console:
+		level: 'debug'
+		colorize: true
 
 cakeUtilities = require './src/server/cakeUtilities'
 lowfab = require './src/server/main'
+
 
 
 coffeeScript.register()
@@ -25,14 +31,14 @@ task 'buildServer', 'Builds the server js files', ->
 
 task 'build', 'Builds client and server js files', ->
 	cakeUtilities
-	.buildClient(buildDir, sourceDir)
+	.buildClient()
 	.buildServer(buildDir, sourceDir)
 
 
 task 'start', 'Builds files and starts server', ->
 	cakeUtilities
-	.buildClient(buildDir, sourceDir)
-	.buildServer(buildDir, sourceDir)
 	.linkHooks()
+	.buildClient()
+	.buildServer(buildDir, sourceDir)
 
 	lowfab.startServer()

@@ -7,7 +7,6 @@ lowfab = require './src/server/main'
 
 coffeeScript.register()
 
-buildDir = 'build'
 sourceDir = 'src'
 
 
@@ -20,19 +19,19 @@ task 'buildClient', 'Builds the client js files', ->
 
 
 task 'buildServer', 'Builds the server js files', ->
-	cakeUtilities.buildServer(buildDir, sourceDir)
+	cakeUtilities.buildServer(sourceDir)
 
 
 task 'build', 'Builds client and server js files', ->
 	cakeUtilities
-	.buildClient(buildDir, sourceDir)
-	.buildServer(buildDir, sourceDir)
+	.buildClient()
+	.buildServer(sourceDir)
 
 
 task 'start', 'Builds files and starts server', ->
 	cakeUtilities
-	.buildClient(buildDir, sourceDir)
-	.buildServer(buildDir, sourceDir)
+	.buildClient()
+	.buildServer(sourceDir)
 	.linkHooks()
 
 	lowfab.startServer()

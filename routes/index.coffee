@@ -7,6 +7,7 @@ module.exports = (request, response) ->
 			STLLoader: 'libs/STLLoader/index.js'
 			TrackballControls: 'libs/TrackballControls/index.js'
 			OrbitControls: 'libs/OrbitControls/index.js'
+			JavaScriptMD5: 'libs/JavaScript-MD5/js/md5.min.js'
 			index: 'index.js'
 		styles:
 			bootstrap: 'libs/bootstrap/dist/css/bootstrap.css'

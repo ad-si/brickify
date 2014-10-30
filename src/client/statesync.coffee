@@ -6,11 +6,19 @@ oldState = {}
 globalConfigInstance = null
 stateUpdateCallbacks = []
 
-exports.init = (globalConfig) ->
+exports.getState = () ->
+	return state
+
+exports.performStateAction = (callback) ->
+	callback(state)
+	sync()
+
+exports.init = (globalConfig, stateInitializedCallback) ->
 	globalConfigInstance = globalConfig
 	$.get "/statesync/get", {}, (data, textStatus, jqXHR) ->
 		state = data
 		oldState = JSON.parse JSON.stringify state
+		stateInitializedCallback state if stateInitializedCallback?
 		handleUpdatedState({}, state)
 
 sync = (force = false) ->
@@ -22,11 +30,6 @@ sync = (force = false) ->
 
 	# deep copy
 	oldState = JSON.parse JSON.stringify state
-
-	console.log 'Sending delta: ' +
-		JSON.stringify({deltaState: delta}) +
-		' to server (state: ' +
-		JSON.stringify(state) + ')'
 
 	$.ajax '/statesync/set',
 		type: 'POST'

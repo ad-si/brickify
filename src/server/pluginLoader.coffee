@@ -3,11 +3,17 @@ pluginInstances = []
 stateSyncModule = null
 logger = require 'winston'
 
+String.prototype.endsWith = (suffix) ->
+	return this.indexOf(suffix, this.length - suffix.length) != -1
+
 module.exports.loadPlugins = (stateSync, directory) ->
 	stateSyncModule = stateSync
 
 	files = fs.readdirSync directory
 	for file in files
+		if not file.endsWith('.js')
+			continue
+
 		instance = require (directory + file)
 		if checkForPluginMethods instance
 			pluginInstances.push instance

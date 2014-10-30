@@ -1,5 +1,5 @@
 jsondiffpatch = require 'jsondiffpatch'
-#compary objects in arrays by using json.stringify
+#compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
 

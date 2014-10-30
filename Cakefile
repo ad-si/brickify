@@ -22,6 +22,9 @@ task 'buildServer', 'Builds the server js files', ->
 	cakeUtilities.buildServer(sourceDir)
 
 
+task 'clean', 'Removes js files from src directory', ->
+    cakeUtilities.buildServer(sourceDir, true)
+
 task 'build', 'Builds client and server js files', ->
 	cakeUtilities
 	.buildClient()

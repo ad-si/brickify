@@ -21,7 +21,7 @@ exports.init = (globalConfig, stateInitializedCallback) ->
 	$.get "/statesync/get", {}, (data, textStatus, jqXHR) ->
 		state = data
 		oldState = JSON.parse JSON.stringify state
-		console.log "Got initial state from server"
+		console.log "Got initial state from server: " + JSON.stringify(state)
 		stateInitializedCallback state if stateInitializedCallback?
 		handleUpdatedState({}, state)
 

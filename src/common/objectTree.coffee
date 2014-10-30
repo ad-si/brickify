@@ -1,7 +1,9 @@
 module.exports.init = (state) ->
-	state.rootNode = {}
-	initNode(state.rootNode)
-	return state.rootNode
+	if not state.objectTreeInitialized
+		state.rootNode = {}
+		initNode(state.rootNode)
+		state.objectTreeInitialized = true
+		return state.rootNode
 
 module.exports.addChildNode = (node) ->
 	newNode = {}
@@ -15,6 +17,12 @@ module.exports.addThreeObjectCoordiates = (node, object) ->
 		rotation: object.rotation
 		scale: object.scale
 
+forAllSubnodes = (node, callback, recursive = true) ->
+	for child in node.childNodes
+		callback child
+		if recursive
+			forAllSubnodes(child, callback)
+module.exports.forAllSubnodes = forAllSubnodes
 
 initNode = (node) ->
 		node.childNodes = []

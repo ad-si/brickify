@@ -6,6 +6,12 @@ fs = require 'fs'
 # Makes it possible to directly require coffee modules
 #require 'coffee-script/register'
 
+winston = require 'winston'
+# Make logger available to other modules
+winston.loggers.add 'log',
+	console:
+		level: 'debug' #if developmentMode then 'debug' else 'warn'
+		colorize: true
 express = require 'express'
 bodyParser = require 'body-parser'
 compress = require 'compression'
@@ -16,29 +22,26 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-pluginLoader = require './pluginLoader'
-index = require '../../routes/index'
-statesync = require '../../routes/statesync'
-logger = require 'winston'
+pluginLoader = require './pluginLoader.coffee'
+index = require '../../routes/index.coffee'
+statesync = require '../../routes/statesync.coffee'
 exec = require 'exec'
+http = require 'http'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 
 app = express()
-server = ''
+developmentMode = true if app.get('env') is 'development'
+log = winston.loggers.get('log')
+
+
+server = http.createServer(app)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
-developmentMode = true if app.get('env') is 'development'
 
-app.set 'hostname', 'localhost:' + port
+app.set 'hostname', if developmentMode then "localhost:#{port}" else
+	 process.env.HOSTNAME or 'lowfab.net'
 
-logger.remove logger.transports.Console
-
-if not developmentMode
-	app.set('hostname', process.env.HOSTNAME or 'lowfab.net')
-	logger.add logger.transports.Console, {colorize: true, level: 'warn'}
-else
-	logger.add logger.transports.Console, {colorize: true, level: 'debug'}
 
 app.set 'views', path.normalize 'views'
 app.set 'view engine', 'jade'
@@ -60,14 +63,15 @@ app.use stylus.middleware(
 app.use express.static(path.normalize 'public')
 
 if developmentMode
-then app.use morgan 'dev',
-	stream:
-		write: (str) ->
-			logger.info str.substring(0, str.length - 1)
-else app.use morgan 'combined',
-	stream:
-		write: (str) ->
-			logger.info str.substring(0, str.length - 1)
+	app.use morgan 'dev',
+		stream:
+			write: (str) ->
+				log.info str.substring(0, str.length - 1)
+else
+	app.use morgan 'combined',
+		stream:
+			write: (str) ->
+				log.info str.substring(0, str.length - 1)
 
 app.use session {secret: 'lowfabCookieSecret!'}
 
@@ -88,7 +92,7 @@ app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
 app.post '/updateGitAndRestart', (request, response) ->
 	response.send ""
 	exec '../updateAndRestart.sh', (err, out, code) ->
-		logger.warn "Error while updating server: " + err if err?
+		log.warn "Error while updating server: " + err if err?
 
 pluginLoader.loadPlugins statesync,
 	path.normalize __dirname + '../../../src/server/plugins/'
@@ -103,14 +107,14 @@ app.use ((req, res) ->
 module.exports.startServer = (_port, _ip) ->
 	port = _port || port
 	ip = _ip || ip
-	server = false
 
-	try
-		server = app.listen(port, ip)
-		logger.info 'Server is listening on ' + ip + ':' + port
+	server.on 'error', (error) ->
+		if error.code is 'EADDRINUSE'
+			log.error "Another Server is already listening on #{ip}:#{port}"
+		else
+			log.error 'Server could not be started:', error
 
-	catch error
-		winston.error 'Server could not be started!'
+	server.listen port, ip, () ->
+		log.info "Server is listening on #{ip}:#{port}"
 
 	return server
-

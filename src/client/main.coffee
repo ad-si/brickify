@@ -1,8 +1,6 @@
 path = require 'path'
 globalConfig = require './globals.yaml'
 
-globalConfig.stateSession = 0
-
 ui = require("./ui")(globalConfig)
 renderer = require "./render"
 pluginLoader = require './pluginLoader'
@@ -34,6 +32,6 @@ statesync.addUpdateCallback (state, delta) ->
 
 statesync.init globalConfig, (state) ->
 	objectTree.init state
-	pluginLoader.loadPlugins statesync
+	pluginLoader.loadPlugins ui, globalConfig, statesync
 
 

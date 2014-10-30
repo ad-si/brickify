@@ -20,5 +20,6 @@ initNode = (node) ->
 		node.childNodes = []
 		node.properties = {}
 		node.positionData = {}
-		node.meshName = ""
+		node.meshHash = ""
+		node.threeObjectUuid = ""
 		node.pluginData = {}

@@ -28,37 +28,7 @@ module.exports = (globalConfig) ->
 
 		# overwrite if in your code neccessary
 		loadHandler: ( event ) ->
-			geometry = @stlLoader.parse( event.target.result )
-			$(@).trigger( 'geometry-loaded', geometry )
-
-			objectMaterial = new THREE.MeshLambertMaterial(
-				{
-					color: globalConfig.defaultObjectColor
-					ambient: globalConfig.defaultObjectColor
-				}
-			)
-			object = new THREE.Mesh( geometry, objectMaterial )
-			@scene.add( object )
-
-			md5hash = md5(event.target.result)
-			fileEnding = 'stl'
-
-			statesync.performStateAction (state) ->
-				state.rootNode.modelLink = md5hash + '.' + fileEnding
-
-			$.get('/model/exists/' + md5hash + '/' + fileEnding).fail () ->
-				#server hasn't got the model, send it
-				$.ajax '/model/submit/' + md5hash + '/' + fileEnding,
-					data: event.target.result
-					type: 'POST'
-					contentType: 'application/octet-stream'
-					success: () ->
-						console.log 'sent model to the server'
-					error: () ->
-						console.log 'unable to send model to the server'
-
-
-
+			return 0
 
 		dropHandler: ( event ) ->
 			event.stopPropagation()
@@ -67,7 +37,6 @@ module.exports = (globalConfig) ->
 			for file in files
 				if file.name.search( '.stl' ) >= 0
 					@fileReader.readAsBinaryString( file )
-
 
 		dragOverHandler: ( event ) ->
 			event.stopPropagation()

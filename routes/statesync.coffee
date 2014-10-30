@@ -1,4 +1,8 @@
 jsondiffpatch = require 'jsondiffpatch'
+#compary objects in arrays by using json.stringify
+diffpatch = jsondiffpatch.create objectHash: (obj) ->
+	return JSON.stringify(obj)
+
 logger = require 'winston'
 
 diffCallbacks = []
@@ -8,23 +12,27 @@ exports.getState = (request, response) ->
 	response.json state
 
 exports.setState = (request, response) ->
-	delta = request.body.deltaState
+	clientDiff = request.body.deltaState
 	state = getInitializedState request
 
-	jsondiffpatch.patch(state,delta)
+	diffpatch.patch(state,clientDiff)
 	#state now contains the current state of both client and server
 
 	oldState = JSON.parse JSON.stringify state
 
+	#check functionality of jsondiffpatch
+	if diffpatch.diff(oldState,state)?
+		logger.error 'Diff of identical states was not undefined'
+
 	#call callbacks, let them modify state
 	for callback in diffCallbacks
-		callback delta, state
+		callback clientDiff, state
 
 	#send diff with our initial state to the client
-	diff  = jsondiffpatch.diff oldState, state
+	serverDiff = diffpatch.diff oldState, state
 
-	logger.debug 'Sending delta to client: ' + JSON.stringify(diff)
-	response.json diff
+	logger.debug 'Sending delta to client: ' + JSON.stringify(serverDiff)
+	response.json serverDiff
 
 exports.resetState = (request, response) ->
 	request.session.state = {empty: true}

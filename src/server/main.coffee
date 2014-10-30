@@ -59,7 +59,7 @@ module.exports.loadFrontendDependencies = (callback) ->
 	allDependencies = []
 
 	getDependencyPath = (depPath) ->
-		path.join.apply null, depPath.split(path.sep).slice(1)
+		path.join.apply null, depPath.split('/').slice(1)
 
 	bower
 	.commands

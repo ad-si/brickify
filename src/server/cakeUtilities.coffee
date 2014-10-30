@@ -6,12 +6,12 @@ browserify = require('browserify')
 coffeeify = require 'coffeeify'
 browserifyData = require('browserify-data')
 winston = require 'winston'
-
 buildLog = winston.loggers.get('buildLog')
 
 compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
 	# Compiles all .coffee files in sourcePath to .js files in buildPath
 	# and calls the callback with the build-filename
+	buildLog.info "Compiling files from #{sourcePath} to #{buildPath}"
 	fs
 	.readdirSync sourcePath
 	.filter((element)->
@@ -28,7 +28,7 @@ compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
 		callback outfilename if callback?
 
 compileFile = (inputfile, compilerOptions, outputfile) ->
-	buildLog.info inputfile + ' -> ' + outputfile
+	buildLog.info ' ' + inputfile + ' -> ' + outputfile
 	fcontent = fs.readFileSync inputfile, 'utf8'
 	compileObject = coffeeScript.compile fcontent, compilerOptions
 	fs.writeFile outputfile, compileObject.js, (error) ->
@@ -41,14 +41,15 @@ compileFile = (inputfile, compilerOptions, outputfile) ->
 String.prototype.endsWith = (suffix) ->
 	return this.indexOf(suffix, this.length - suffix.length) != -1
 
-deleteAllJsFiles = (directory) ->
+deleteAllJsFiles = (directory, afterDeleteCallback) ->
+	buildLog.info "Clearing directory #{directory}..."
+
 	fs.readdir directory, (err, files) ->
 		for file in files
 			if (file.endsWith '.js') or (file.endsWith '.js.map')
-				fs.unlink path.join(directory, file), (err) ->
-					console.log 'Unable to delete file "' +
-						path.join(directory, file) +
-						'" (' + err + ')' if err
+				fs.unlinkSync path.join(directory, file)
+		afterDeleteCallback(directory) if afterDeleteCallback?
+
 
 module.exports.buildClient = () ->
 	browserify = browserify
@@ -64,7 +65,6 @@ module.exports.buildClient = () ->
 
 	return module.exports
 
-
 module.exports.buildServer = (sourceDir, onlyDelete = false) ->
 	directories = [
 		path.join sourceDir, '/server'
@@ -74,8 +74,8 @@ module.exports.buildServer = (sourceDir, onlyDelete = false) ->
 
 	for dir in directories
 		#build js in same directory as coffeescript to enable server debugging
-		deleteAllJsFiles dir
-		compileAndExecuteOnJs dir, dir, null if not onlyDelete
+		deleteAllJsFiles dir, (directory) ->
+			compileAndExecuteOnJs(directory, directory, null) if not onlyDelete
 
 	return module.exports
 

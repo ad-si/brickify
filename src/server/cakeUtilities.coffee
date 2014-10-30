@@ -58,19 +58,15 @@ module.exports.buildClient = () ->
 
 
 module.exports.buildServer = (buildDir, sourceDir) ->
-	sourcePath = path.join sourceDir, '/server'
-	buildPath = path.join buildDir, '/server'
-	sourcePathPlugins = path.join sourceDir, '/server/plugins'
-	buildPathPlugins = path.join buildDir, '/server/plugins'
-	sourcePathRoutes = path.join sourceDir, '../routes'
-	buildPathRoutes = path.join buildDir, '../routes'
+	paths = [
+		path.join sourceDir, '/server'
+		path.join sourceDir, '/server/plugins'
+		path.join sourceDir, '../routes'
+	]
 
-	mkdirp.sync buildPath
-	mkdirp.sync buildPathPlugins
-
-	compileAndExecuteOnJs sourcePath, sourcePath, null
-	compileAndExecuteOnJs sourcePathPlugins, sourcePathPlugins, null
-	compileAndExecuteOnJs sourcePathRoutes, sourcePathRoutes, null
+	for path in paths
+		#build js in same directory as coffeescript to enable server debugging
+		compileAndExecuteOnJs path, path, null
 
 	return module.exports
 

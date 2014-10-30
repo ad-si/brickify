@@ -5,8 +5,13 @@ http = require('http')
 describe 'Lowfab', () ->
 	server = {}
 
-	before () ->
-		server = lowfab.startServer(3001)
+	before (done) ->
+		lowfab.loadFrontendDependencies () ->
+			server = lowfab
+				.setupRouting()
+				.startServer(3001)
+
+			done()
 
 	describe 'Server', () ->
 		it 'should host the lowfab website', (done) ->

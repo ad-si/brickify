@@ -43,4 +43,7 @@ task 'start', 'Builds files and starts server', ->
 	.buildClient()
 	.buildServer(sourceDir)
 
-	lowfab.startServer()
+	lowfab.loadFrontendDependencies () ->
+		lowfab
+			.setupRouting()
+			.startServer()

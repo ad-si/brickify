@@ -11,7 +11,9 @@
   "bugs": "https://bitbucket.org/hpihci/fab3d-lowfab/issues",
   "main": "build/server/main.js",
   "dependencies": {
+    "MD5": "^1.2.1",
     "body-parser": "^1.9.1",
+    "bower": "^1.3.12",
     "browserify": "^6.1.0",
     "browserify-data": "^0.2.0",
     "coffee-script": "^1.8.0",
@@ -30,15 +32,14 @@
     "serve-favicon": "^2.1.6",
     "stylus": "^0.49.2",
     "win-spawn": "^2.0.0",
-    "winston": "^0.8.1",
-    "MD5": "^1.2.1"
+    "winston": "^0.8.1"
   },
   "devDependencies": {
     "chai": "^1.9.2",
     "coffeelint": "^1.6.1",
     "mocha": "^2.0.1",
-	"crojsdoc": "^0.8.8",
-	"groc": "^0.7.0"
+    "crojsdoc": "^0.8.8",
+    "groc": "^0.7.0"
   },
   "scripts": {
     "build": "./node_modules/.bin/cake build",
@@ -48,7 +49,7 @@
     "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
-	"prepublish": "npm test && npm run-script checkStyle"
+    "prepublish": "npm test && npm run-script checkStyle"
   },
   "repository": {
     "type": "git",

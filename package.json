@@ -35,13 +35,17 @@
   "devDependencies": {
     "chai": "^1.9.2",
     "coffeelint": "^1.6.1",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+	"crojsdoc": "^0.8.8",
+	"groc": "^0.7.0"
   },
   "scripts": {
-    "build": "node ./node_modules/coffee-script/bin/cake build",
-    "start": "node ./node_modules/coffee-script/bin/cake start",
-    "linkHooks": "node ./node_modules/coffee-script/bin/cake linkHooks",
-    "checkStyle": "node ./node_modules/.bin/coffeelint Cakefile .",
+    "build": "./node_modules/.bin/cake build",
+    "start": "./node_modules/.bin/cake start",
+    "linkHooks": "./node_modules/.bin/cake linkHooks",
+    "checkStyle": "./node_modules/.bin/coffeelint Cakefile .",
+    "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
+    "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
 	"prepublish": "npm test && npm run-script checkStyle"
   },

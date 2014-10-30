@@ -5,3 +5,5 @@ npm-debug.log
 *.iml
 /public/index.js
 *.css
+/doc
+/apidoc

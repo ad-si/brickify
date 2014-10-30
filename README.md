@@ -24,6 +24,13 @@ Install it globally with `$ npm install -g supervisor` and use it like this:
 Run `$ ./node_modules/.bin/cake` to list available tasks.
 
 
-## Package managmenet
+## Package management
 
 We use [bower](http://bower.io/) for frontend package management.
+
+
+## Documentation
+
+We use [groc](http://nevir.github.io/groc/) for code documentation and [CroJSDoc](http://croquiscom.github.io/crojsdoc/) for api documentation.
+
+Call `$ npm run-script documentation` and `$ npm run-script apiDocumentation` respectively.

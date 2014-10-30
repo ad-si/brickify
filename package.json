@@ -16,9 +16,9 @@
     "browserify-data": "^0.2.0",
     "coffee-script": "^1.8.0",
     "coffeeify": "^0.7.0",
-    "coffeelint": "^1.6.1",
     "compression": "^1.2.0",
     "errorhandler": "^1.2.2",
+    "exec": "^0.1.2",
     "express": "^4.9.8",
     "express-session": "^1.9.1",
     "jade": "^1.7.0",
@@ -30,9 +30,15 @@
     "serve-favicon": "^2.1.6",
     "stylus": "^0.49.2",
     "win-spawn": "^2.0.0",
-    "winston": "^0.8.1",
     "exec": "~0.1.2",
     "MD5": "~1.2.1"
+  },
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "coffeelint": "^1.6.1",
+    "mocha": "^2.0.1",
+	"crojsdoc": "^0.8.8",
+	"groc": "^0.7.0"
   },
   "scripts": {
     "build": "./node_modules/.bin/cake build",
@@ -40,7 +46,9 @@
     "linkHooks": "./node_modules/.bin/cake linkHooks",
     "checkStyle": "./node_modules/.bin/coffeelint Cakefile .",
     "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
-    "documentation": "./node_modules/.bin/groc"
+    "documentation": "./node_modules/.bin/groc",
+    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
+	"prepublish": "npm test && npm run-script checkStyle"
   },
   "repository": {
     "type": "git",
@@ -52,9 +60,5 @@
   "private": true,
   "engines": {
     "node": "~0.10.32"
-  },
-  "devDependencies": {
-    "crojsdoc": "^0.8.8",
-    "groc": "^0.7.0"
   }
 }

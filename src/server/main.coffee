@@ -100,6 +100,17 @@ app.use ((req, res) ->
 	res.render '404'
 )
 
-module.exports.startServer = () ->
-	app.listen(port, ip)
-	logger.info 'Server is listening on ' + ip + ':' + port
+module.exports.startServer = (_port, _ip) ->
+	port = _port || port
+	ip = _ip || ip
+	server = false
+
+	try
+		server = app.listen(port, ip)
+		logger.info 'Server is listening on ' + ip + ':' + port
+
+	catch error
+		winston.error 'Server could not be started!'
+
+	return server
+

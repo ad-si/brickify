@@ -4,7 +4,7 @@ url = require 'url'
 fs = require 'fs'
 
 # Makes it possible to directly require coffee modules
-require 'coffee-script/register'
+#require 'coffee-script/register'
 
 winston = require 'winston'
 # Make logger available to other modules
@@ -27,7 +27,8 @@ index = require '../../routes/index.coffee'
 statesync = require '../../routes/statesync.coffee'
 exec = require 'exec'
 http = require 'http'
-
+modelStorage = require './modelStorage'
+modelStorageApi = require '../../routes/modelStorageApi'
 
 app = express()
 developmentMode = true if app.get('env') is 'development'
@@ -72,15 +73,21 @@ else
 			write: (str) ->
 				log.info str.substring(0, str.length - 1)
 
-app.use bodyParser.json()
-app.use bodyParser.urlencoded extended: true
-
 app.use session {secret: 'lowfabCookieSecret!'}
 
+modelStorage.init()
+
+jsonParser = bodyParser.json {limit: '100mb'}
+urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
+rawParser = bodyParser.raw({limit: '100mb'})
+
 app.get '/', index
-app.get '/statesync/get', statesync.getState
-app.post '/statesync/set', statesync.setState
-app.get '/statesync/reset', statesync.resetState
+app.get '/statesync/get', jsonParser, statesync.getState
+app.post '/statesync/set', jsonParser, statesync.setState
+app.get '/statesync/reset', jsonParser, statesync.resetState
+app.get '/model/exists/:md5/:extension', urlParser, modelStorageApi.modelExists
+app.get '/model/get/:md5/:extension', urlParser, modelStorageApi.getModel
+app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
 
 app.post '/updateGitAndRestart', (request, response) ->
 	response.send ""

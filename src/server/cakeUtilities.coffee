@@ -9,7 +9,6 @@ winston = require 'winston'
 
 buildLog = winston.loggers.get('buildLog')
 
-
 compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
 	# Compiles all .coffee files in sourcePath to .js files in buildPath
 	# and calls the callback with the build-filename
@@ -28,7 +27,6 @@ compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
 		)
 		callback outfilename if callback?
 
-
 compileFile = (inputfile, compilerOptions, outputfile) ->
 	buildLog.info inputfile + ' -> ' + outputfile
 	fcontent = fs.readFileSync inputfile, 'utf8'
@@ -40,6 +38,17 @@ compileFile = (inputfile, compilerOptions, outputfile) ->
 
 	return module.exports
 
+String.prototype.endsWith = (suffix) ->
+	return this.indexOf(suffix, this.length - suffix.length) != -1
+
+deleteAllJsFiles = (directory) ->
+	fs.readdir directory, (err, files) ->
+		for file in files
+			if (file.endsWith '.js') or (file.endsWith '.js.map')
+				fs.unlink path.join(directory, file), (err) ->
+					console.log 'Unable to delete file "' +
+						path.join(directory, file) +
+						'" (' + err + ')' if err
 
 module.exports.buildClient = () ->
 	browserify = browserify
@@ -56,17 +65,17 @@ module.exports.buildClient = () ->
 	return module.exports
 
 
-module.exports.buildServer = (buildDir, sourceDir) ->
-	sourcePath = path.join sourceDir, '/server'
-	buildPath = path.join buildDir, '/server'
-	sourcePathPlugins = path.join sourceDir, '/server/plugins'
-	buildPathPlugins = path.join buildDir, '/server/plugins'
+module.exports.buildServer = (sourceDir, onlyDelete = false) ->
+	directories = [
+		path.join sourceDir, '/server'
+		path.join sourceDir, '/server/plugins'
+		path.join sourceDir, '../routes'
+	]
 
-	mkdirp.sync buildPath
-	mkdirp.sync buildPathPlugins
-
-	compileAndExecuteOnJs sourcePath, buildPath, null
-	compileAndExecuteOnJs sourcePathPlugins, buildPathPlugins, null
+	for dir in directories
+		#build js in same directory as coffeescript to enable server debugging
+		deleteAllJsFiles dir
+		compileAndExecuteOnJs dir, dir, null if not onlyDelete
 
 	return module.exports
 

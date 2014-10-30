@@ -1,3 +1,6 @@
+statesync = require './statesync'
+objectTree = require '../common/objectTree'
+
 module.exports = (globalConfig) ->
 	return {
 		# setup scene
@@ -27,7 +30,7 @@ module.exports = (globalConfig) ->
 		loadHandler: ( event ) ->
 			geometry = @stlLoader.parse( event.target.result )
 			$(@).trigger( 'geometry-loaded', geometry )
-			###
+
 			objectMaterial = new THREE.MeshLambertMaterial(
 				{
 					color: globalConfig.defaultObjectColor
@@ -36,8 +39,25 @@ module.exports = (globalConfig) ->
 			)
 			object = new THREE.Mesh( geometry, objectMaterial )
 			@scene.add( object )
-			globalConfig.meshes.push( object )
-			###
+
+			md5hash = md5(event.target.result)
+			fileEnding = 'stl'
+
+			statesync.performStateAction (state) ->
+				state.rootNode.modelLink = md5hash + '.' + fileEnding
+
+			$.get('/model/exists/' + md5hash + '/' + fileEnding).fail () ->
+				#server hasn't got the model, send it
+				$.ajax '/model/submit/' + md5hash + '/' + fileEnding,
+					data: event.target.result
+					type: 'POST'
+					contentType: 'application/octet-stream'
+					success: () ->
+						console.log 'sent model to the server'
+					error: () ->
+						console.log 'unable to send model to the server'
+
+
 
 
 		dropHandler: ( event ) ->
@@ -45,7 +65,7 @@ module.exports = (globalConfig) ->
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
 			for file in files
-				if file.name.contains( '.stl' )
+				if file.name.search( '.stl' ) >= 0
 					@fileReader.readAsBinaryString( file )
 
 

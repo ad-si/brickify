@@ -66,7 +66,7 @@ module.exports.buildClient = () ->
 	return module.exports
 
 
-module.exports.buildServer = (sourceDir) ->
+module.exports.buildServer = (sourceDir, onlyDelete = false) ->
 	directories = [
 		path.join sourceDir, '/server'
 		path.join sourceDir, '/server/plugins'
@@ -76,7 +76,7 @@ module.exports.buildServer = (sourceDir) ->
 	for dir in directories
 		#build js in same directory as coffeescript to enable server debugging
 		deleteAllJsFiles dir
-		compileAndExecuteOnJs dir, dir, null
+		compileAndExecuteOnJs dir, dir, null if not onlyDelete
 
 	return module.exports
 

@@ -34,7 +34,6 @@ cakeUtilities = require './src/server/cakeUtilities'
 # website and for server-side plugin integration and model processing
 lowfab = require './src/server/main'
 
-
 # Makes it possible to directly require coffee modules
 coffeeScript.register()
 
@@ -69,7 +68,6 @@ task 'build', 'Builds client and server js files', ->
 	cakeUtilities
 	.buildClient()
 	.buildServer(sourceDir)
-
 
 ###
   ##Building and starting

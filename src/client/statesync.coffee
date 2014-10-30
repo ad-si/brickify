@@ -1,4 +1,7 @@
 jsondiffpatch = require 'jsondiffpatch'
+#compare objects in arrays by using json.stringify
+diffpatch = jsondiffpatch.create objectHash: (obj) ->
+	return JSON.stringify(obj)
 
 state = {}
 oldState = {}
@@ -18,11 +21,12 @@ exports.init = (globalConfig, stateInitializedCallback) ->
 	$.get "/statesync/get", {}, (data, textStatus, jqXHR) ->
 		state = data
 		oldState = JSON.parse JSON.stringify state
+		console.log "Got initial state from server: " + JSON.stringify(state)
 		stateInitializedCallback state if stateInitializedCallback?
 		handleUpdatedState({}, state)
 
 sync = (force = false) ->
-	delta = jsondiffpatch.diff oldState, state
+	delta = diffpatch.diff oldState, state
 
 	if not force
 		if not delta?
@@ -30,6 +34,8 @@ sync = (force = false) ->
 
 	# deep copy
 	oldState = JSON.parse JSON.stringify state
+
+	console.log "Sending delta to server:" + JSON.stringify(delta)
 
 	$.ajax '/statesync/set',
 		type: 'POST'
@@ -41,15 +47,16 @@ sync = (force = false) ->
 		# check whether client modified its local state
 		# since the post request was sent
 		success: (data, textStatus, jqXHR) ->
+			delta = data
+			console.log "Got delta from server: " + JSON.stringify(delta)
 
-			clientDelta = jsondiffpatch.diff oldState, state
+			clientDelta = diffpatch.diff oldState, state
 			if clientDelta?
 				console.log 'The client modified its state' +
 					'while the server worked, this should not happen!'
 
 			#patch state with server changes
-			delta = data
-			jsondiffpatch.patch state, delta
+			diffpatch.patch state, delta
 
 			#deep copy current state
 			oldState = JSON.parse JSON.stringify state

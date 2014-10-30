@@ -1,15 +1,22 @@
 pluginInstances = []
 stateSyncModule = null
+uiInstance = null
+globalConfigInstance = null
 
 # since browserify.js does not support dynamic require
 # all plugins must be written down
-module.exports.loadPlugins = (stateSync) ->
-	dummyPlugin = require './plugins/dummyClientPlugin'
-	loadPlugin stateSync, dummyPlugin
-
-loadPlugin = (stateSync, instance) ->
+module.exports.loadPlugins = (ui, globalConfig, stateSync) ->
+	uiInstance = ui
 	stateSyncModule = stateSync
+	globalConfigInstance = globalConfig
 
+	dummyPlugin = require './plugins/dummyClientPlugin'
+	stlImport = require './plugins/stlImportPlugin'
+
+	loadPlugin dummyPlugin
+	loadPlugin stlImport
+
+loadPlugin = (instance) ->
 	if checkForPluginMethods instance
 		pluginInstances.push instance
 		initPluginInstance instance
@@ -26,5 +33,5 @@ checkForPluginMethods = (object) ->
 	return hasAllMethods
 
 initPluginInstance = (pluginInstance) ->
-	pluginInstance.init()
+	pluginInstance.init uiInstance, globalConfigInstance, stateSyncModule
 	stateSyncModule.addUpdateCallback pluginInstance.handleStateChange

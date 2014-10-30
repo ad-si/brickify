@@ -6,6 +6,4 @@ module.exports.init = () ->
 	logger.debug 'Dummy Server Plugin initialization'
 
 module.exports.handleStateChange = (delta, state) ->
-	if state.dummyPluginClientModifiedIt == true
-		logger.debug 'Dummy Server Plugin changes its state after client changed it'
-		state.dummyServerPluginModifiedIt = true
+	logger.debug 'Dummy Server Plugin state change'

@@ -1,8 +1,10 @@
-module.exports.pluginName = 'Dummy Client Plugin'
+common = require '../../common/pluginCommon'
 
-module.exports.init = () ->
+module.exports.pluginName = 'Dummy Client Plugin'
+module.exports.category = common.CATEGORY_IMPORT
+
+module.exports.init = (ui, stateSync) ->
 	console.log 'Dummy Client Plugin initialization'
 
 module.exports.handleStateChange = (delta, state) ->
-	console.log 'Dummy Plugin changes ClientModified to true'
-	state.dummyPluginClientModifiedIt = true
+	console.log 'Dummy Client Plugin state change'

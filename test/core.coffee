@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test'
+
 expect = require('chai').expect
 lowfab = require('../src/server/main')
 http = require('http')

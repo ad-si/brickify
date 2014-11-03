@@ -48,6 +48,7 @@ sortedDependencies = [
 	'jquery',
 	'bootstrap',
 	'threejs',
+	'react',
 	'JavaScript-MD5',
 	'STLLoader',
 	'TrackballControls',

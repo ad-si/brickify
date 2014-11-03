@@ -2,7 +2,11 @@ path = require 'path'
 globalConfig = require './globals.yaml'
 
 ui = require("./ui")(globalConfig)
+ui.init()
+
 renderer = require "./render"
+renderer.init(ui)
+
 pluginLoader = require './pluginLoader'
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
@@ -20,11 +24,6 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-
-ui.init()
-
-renderer(ui)
-
 #test for statesync
 statesync.addUpdateCallback (state, delta) ->
 	console.log 'UpdatedState: %s, Delta: %s',
@@ -32,6 +31,7 @@ statesync.addUpdateCallback (state, delta) ->
 
 statesync.init globalConfig, (state) ->
 	objectTree.init state
-	pluginLoader.loadPlugins ui, globalConfig, statesync
+	pluginLoader.init globalConfig, statesync, ui, renderer
+	pluginLoader.loadPlugins()
 
 

@@ -1,7 +1,7 @@
 common = require '../../common/pluginCommon'
 objectTree = require '../../common/objectTree'
 
-uiInstance = null
+threejsRootNode = null
 stlLoader = new THREE.STLLoader()
 stateInstance = null
 globalConfigInstance = null
@@ -9,8 +9,7 @@ globalConfigInstance = null
 module.exports.pluginName = 'stl Import Plugin'
 module.exports.category = common.CATEGORY_IMPORT
 
-module.exports.init = (ui, globalConfig, state) ->
-	uiInstance = ui
+module.exports.init = (globalConfig, state, ui) ->
 	stateInstance = state
 	globalConfigInstance = globalConfig
 
@@ -20,6 +19,13 @@ module.exports.init = (ui, globalConfig, state) ->
 		handleDroppedFile.bind(@),
 		false
 	)
+
+module.exports.init3d = (threejsNode) ->
+  threejsRootNode = threejsNode
+
+module.exports.needs3dAnimation = false
+module.exports.update3d = (renderer) ->
+
 
 module.exports.handleStateChange = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
@@ -38,7 +44,6 @@ module.exports.handleStateChange = (delta, state) ->
 							#ToDo: transform three object to position saved in state
 					() ->
 						console.log 'Unable to get model from server: ' + node.meshHash
-
 
 handleDroppedFile = (event) ->
 	fileContent = event.target.result
@@ -65,7 +70,7 @@ addModelToThree = (binary) ->
 		}
 	)
 	object = new THREE.Mesh( geometry, objectMaterial )
-	uiInstance.scene.add( object )
+	threejsRootNode.add( object )
 	return object
 
 submitMeshToServer = (md5hash, fileEnding, data) ->

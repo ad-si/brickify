@@ -26,7 +26,6 @@ module.exports.init3d = (threejsNode) ->
 module.exports.needs3dAnimation = false
 module.exports.update3d = (renderer) ->
 
-
 module.exports.handleStateChange = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
 	objectTree.forAllSubnodes state.rootNode, (node) ->

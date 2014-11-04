@@ -4,11 +4,11 @@ uiInstance = null
 globalConfigInstance = null
 rendererInstance  = null
 
-module.exports.init = (globalConfig, stateSync, ui, renderer) ->
-	stateSyncModule = stateSync
-	globalConfigInstance = globalConfig
-	uiInstance = ui
-	rendererInstance = renderer
+module.exports.init = (neededInstances) ->
+	stateSyncModule = neededInstances.statesync
+	globalConfigInstance = neededInstances.config
+	uiInstance = neededInstances.ui
+	rendererInstance = neededInstances.renderer
 
 # since browserify.js does not support dynamic require
 # all plugins must be written down

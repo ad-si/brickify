@@ -31,7 +31,13 @@ statesync.addUpdateCallback (state, delta) ->
 
 statesync.init globalConfig, (state) ->
 	objectTree.init state
-	pluginLoader.init globalConfig, statesync, ui, renderer
+	neededInstances =
+		config: globalConfig
+		statesync: statesync
+		ui: ui
+		renderer: renderer
+
+	pluginLoader.init neededInstances
 	pluginLoader.loadPlugins()
 
 

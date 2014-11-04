@@ -131,7 +131,12 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-	app.use session {secret: sessionSecret}
+
+	app.use session {
+		secret: sessionSecret
+		resave: true
+		saveUninitialized: true
+	}
 
 	modelStorage.init()
 

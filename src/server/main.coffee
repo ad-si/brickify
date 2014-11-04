@@ -3,9 +3,6 @@ path = require 'path'
 url = require 'url'
 fs = require 'fs'
 
-# Makes it possible to directly require coffee modules
-# require 'coffee-script/register'
-
 winston = require 'winston'
 express = require 'express'
 

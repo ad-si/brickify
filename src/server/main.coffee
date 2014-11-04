@@ -129,7 +129,11 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-	app.use session {secret: 'lowfabCookieSecret!'}
+	app.use session {
+		secret: 'lowfabCookieSecret!'
+		resave: true
+		saveUninitialized: true
+	}
 
 	modelStorage.init()
 

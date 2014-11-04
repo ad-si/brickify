@@ -1,16 +1,25 @@
 common = require '../../common/pluginCommon'
 objectTree = require '../../common/objectTree'
 
-uiInstance = null
+threejsRootNode = null
 stlLoader = new THREE.STLLoader()
 stateInstance = null
 globalConfigInstance = null
 
+pluginPropertyName = "stlImport"
+class StlProperty
+	constructor: () ->
+		@threeObjectUuid = ""
+		@meshHash = ""
+		@positionData =
+			position: null
+			rotation: null
+			scale: null
+
 module.exports.pluginName = 'stl Import Plugin'
 module.exports.category = common.CATEGORY_IMPORT
 
-module.exports.init = (ui, globalConfig, state) ->
-	uiInstance = ui
+module.exports.init = (globalConfig, state, ui) ->
 	stateInstance = state
 	globalConfigInstance = globalConfig
 
@@ -21,23 +30,28 @@ module.exports.init = (ui, globalConfig, state) ->
 		false
 	)
 
+module.exports.init3d = (threejsNode) ->
+  threejsRootNode = threejsNode
+
+module.exports.needs3dAnimation = false
+module.exports.update3d = (renderer) ->
+
 module.exports.handleStateChange = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
-	objectTree.forAllSubnodes state.rootNode, (node) ->
-		if node.meshHash.length > 0
-			storedUuid = node.threeObjectUuid
-			threeObject = uiInstance.scene.getObjectById storedUuid, true
-			if not threeObject?
-				#Create object and override uuid
-				requestMeshFromServer node.meshHash,
-					(modelBinaryData) ->
-						console.log 'Got the model ' + node.meshHash + ' from the server'
-						newThreeObj = addModelToThree(modelBinaryData)
-						stateInstance.performStateAction (state) ->
-							node.threeObjectUuid = newThreeObj.uuid
-							#ToDo: transform three object to position saved in state
-					() ->
-						console.log 'Unable to get model from server: ' + node.meshHash
+	objectTree.forAllSubnodeProperties state.rootNode, pluginPropertyName, (property) ->
+		storedUuid = property.threeObjectUuid
+		threeObject = threejsRootNode.getObjectById storedUuid, true
+
+		if not threeObject?
+			#Create object and override uuid
+			requestMeshFromServer property.meshHash,
+				(modelBinaryData) ->
+					console.log 'Got the model ' + property.meshHash + ' from the server'
+					newThreeObj = addModelToThree(modelBinaryData)
+					stateInstance.performStateAction (state) ->
+						copyPropertyDataToThree property, newThreeObj
+				() ->
+					console.log 'Unable to get model from server: ' + property.meshHash
 
 
 handleDroppedFile = (event) ->
@@ -47,10 +61,12 @@ handleDroppedFile = (event) ->
 	fileEnding = 'stl'
 
 	stateInstance.performStateAction (state) ->
-		node = objectTree.addChildNode(state.rootNode)
-		node.meshHash = md5hash + '.' + fileEnding
-		node.threeObjectUuid = threeObject.uuid
-		objectTree.addThreeObjectCoordiates(node, threeObject)
+		node = objectTree.addChildNode state.rootNode
+		property = new StlProperty()
+		objectTree.addPluginData node, pluginPropertyName, property
+
+		property.meshHash = md5hash + '.' + fileEnding
+		copyThreeDataToProperty property, threeObject
 
 	submitMeshToServer md5hash, fileEnding, fileContent
 
@@ -65,7 +81,7 @@ addModelToThree = (binary) ->
 		}
 	)
 	object = new THREE.Mesh( geometry, objectMaterial )
-	uiInstance.scene.add( object )
+	threejsRootNode.add( object )
 	return object
 
 submitMeshToServer = (md5hash, fileEnding, data) ->
@@ -92,3 +108,16 @@ requestMeshFromServer = (md5hashWithEnding, successCallback, failCallback) ->
 			successCallback(data)
 	.fail () ->
 		failCallback() if failCallback?
+
+copyThreeDataToProperty = (property, threeObject) ->
+	property.threeObjectUuid = threeObject.uuid
+	property.positionData.position = threeObject.position
+	property.positionData.rotation = threeObject.rotation
+	property.positionData.scale = threeObject.scale
+
+copyPropertyDataToThree = (property, threeObject) ->
+	posd = property.positionData
+	threeObject.uuid =  property.threeObjectUuid
+	threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
+	threeObject.rotation.set(posd.rotation._x, posd.rotation._y, posd.rotation._z)
+	threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)

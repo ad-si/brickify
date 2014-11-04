@@ -23,28 +23,45 @@ html
 				#navbarToggle.collapse.navbar-collapse
 					ul.nav.navbar-nav
 						li.dropdown
-							a.dropdown-toggle(data-toggle='dropdown') Import
+							a.dropdown-toggle(data-toggle='dropdown')
+								span.fa.fa-fw.fa-lg.fa-plus
+								|  Import
 								span.caret
 							ul.dropdown-menu(role='menu')
-								li: a(href='#') Action 1
-								li: a(href='#') Action 2
-								li: a(href='#') Action 3
+								li: a(href='#'): span.fa.fa-upload  Upoad file
+								li: a(href='#'): span.fa.fa-cloud-download
+									|  Dowload from cloud
 
 						li.dropdown
-							a.dropdown-toggle(data-toggle='dropdown') View
+							a.dropdown-toggle(data-toggle='dropdown')
+								span.fa.fa-fw.fa-lg.fa-columns
+								|  View
 								span.caret
 							ul.dropdown-menu(role='menu')
-								li: a(href='#') Action 1
-								li: a(href='#') Action 2
-								li: a(href='#') Action 3
+								li: a(href='#'): span.fa.fa-fw.fa-dot-circle-o  Front
+								li: a(href='#'): span.fa.fa-fw.fa-times-circle-o  Back
+								li: a(href='#'): span.fa.fa-fw.fa-arrow-circle-o-down  Top
+								li: a(href='#'): span.fa.fa-fw.fa-arrow-circle-o-up  Bottom
+								li: a(href='#'): span.fa.fa-fw.fa-arrow-circle-o-right  Left
+								li: a(href='#'): span.fa.fa-fw.fa-arrow-circle-o-left  Right
+								li.divider(role="presentation")
+								li: a(href='#'): span.fa.fa-fw.fa-table  Hide Grid
+								li: a(href='#'): span.fa.fa-fw.fa-plus-square-o  Hide Axis
+								li: a(href='#'): span.fa.fa-fw.fa-paper-plane-o  Show Wireframe
+								li.divider(role="presentation")
+								li: a(href='#'): span.fa.fa-fw.fa-square-o  Orthogonal
+								li: a(href='#'): span.fa.fa-fw.fa-inbox  Perspective
 
 						li.dropdown
-							a.dropdown-toggle(data-toggle='dropdown') Export
+							a.dropdown-toggle(data-toggle='dropdown')
+								span.fa.fa-fw.fa-lg.fa-sign-out
+								|  Export
 								span.caret
 							ul.dropdown-menu(role='menu')
-								li: a(href='#') Action 1
-								li: a(href='#') Action 2
-								li: a(href='#') Action 3
+								li: a(href='#'): span.fa.fa-file-text-o  STL
+								li: a(href='#'): span.fa.fa-file-text-o  OBJ
+								li: a(href='#'): span.fa.fa-file-text-o  AMF
+								li: a(href='#'): span.fa.fa-file-text-o  PLY
 
 		block content
 

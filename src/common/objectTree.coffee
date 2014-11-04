@@ -17,7 +17,8 @@ forAllSubnodes = (node, callback, recursive = true) ->
 			forAllSubnodes child, callback, recursive
 module.exports.forAllSubnodes = forAllSubnodes
 
-#Executes callback(childNodePluginData) for all subnodes that have a pluginData entry matching to key
+# Executes callback(childNodePluginData) for all subnodes
+# that have a pluginData entry matching to key
 forAllSubnodePluginData = (node, key, callback, recursive = true) ->
 	forAllSubnodes node, (child) ->
 		for pd in child.pluginData

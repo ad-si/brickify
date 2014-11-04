@@ -38,7 +38,8 @@ module.exports.update3d = (renderer) ->
 
 module.exports.handleStateChange = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
-	objectTree.forAllSubnodeProperties state.rootNode, pluginPropertyName, (property) ->
+	objectTree.forAllSubnodeProperties state.rootNode,
+		pluginPropertyName, (property) ->
 		storedUuid = property.threeObjectUuid
 		threeObject = threejsRootNode.getObjectById storedUuid, true
 
@@ -46,12 +47,14 @@ module.exports.handleStateChange = (delta, state) ->
 			#Create object and override uuid
 			requestMeshFromServer property.meshHash,
 				(modelBinaryData) ->
-					console.log 'Got the model ' + property.meshHash + ' from the server'
+					console.log "Got the model #{property.meshHash}
+					from the server"
 					newThreeObj = addModelToThree(modelBinaryData)
 					stateInstance.performStateAction (state) ->
 						copyPropertyDataToThree property, newThreeObj
 				() ->
-					console.log 'Unable to get model from server: ' + property.meshHash
+					console.log "Unable to get model from server: ",
+						property.meshHash
 
 
 handleDroppedFile = (event) ->
@@ -119,5 +122,9 @@ copyPropertyDataToThree = (property, threeObject) ->
 	posd = property.positionData
 	threeObject.uuid =  property.threeObjectUuid
 	threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
-	threeObject.rotation.set(posd.rotation._x, posd.rotation._y, posd.rotation._z)
+	threeObject.rotation.set(
+		posd.rotation._x,
+		posd.rotation._y,
+		posd.rotation._z
+	)
 	threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)

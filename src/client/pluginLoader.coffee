@@ -2,14 +2,17 @@ pluginInstances = []
 stateSyncModule = null
 uiInstance = null
 globalConfigInstance = null
+rendererInstance  = null
+
+module.exports.init = (neededInstances) ->
+	stateSyncModule = neededInstances.statesync
+	globalConfigInstance = neededInstances.config
+	uiInstance = neededInstances.ui
+	rendererInstance = neededInstances.renderer
 
 # since browserify.js does not support dynamic require
 # all plugins must be written down
-module.exports.loadPlugins = (ui, globalConfig, stateSync) ->
-	uiInstance = ui
-	stateSyncModule = stateSync
-	globalConfigInstance = globalConfig
-
+module.exports.loadPlugins = () ->
 	dummyPlugin = require './plugins/dummyClientPlugin'
 	stlImport = require './plugins/stlImportPlugin'
 
@@ -33,5 +36,13 @@ checkForPluginMethods = (object) ->
 	return hasAllMethods
 
 initPluginInstance = (pluginInstance) ->
-	pluginInstance.init uiInstance, globalConfigInstance, stateSyncModule
+	pluginInstance.init globalConfigInstance, stateSyncModule, uiInstance
+
+	threeNode = new THREE.Object3D()
+	uiInstance.scene.add threeNode
+	pluginInstance.init3d threeNode
+
+	if pluginInstance.needs3dAnimation == true
+		rendererInstance.addToRenderQueue pluginInstance
+
 	stateSyncModule.addUpdateCallback pluginInstance.handleStateChange

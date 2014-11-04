@@ -77,11 +77,8 @@ task 'build', 'Builds client and server js files', ->
   This task creates all git-hooks, builds the client and the server and starts
   the server afterwards.
 ###
-task 'start', 'Builds files and starts server', ->
-	cakeUtilities
-	.linkHooks()
-	.buildClient()
-	.buildServer(sourceDir)
+task 'start', 'Links hooks and starts server', ->
+	cakeUtilities.linkHooks()
 
 	lowfab.loadFrontendDependencies () ->
 		lowfab

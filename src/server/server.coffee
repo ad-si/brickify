@@ -26,14 +26,10 @@
   run to rebuild and run the server.
 ###
 
-# Make it possible to directly require coffee modules
-#require 'coffee-script/register'
-
 # Require the real server application
 lowfab = require './main'
 
 # Start the server
-
 lowfab.loadFrontendDependencies () ->
 	lowfab
 	.setupRouting()

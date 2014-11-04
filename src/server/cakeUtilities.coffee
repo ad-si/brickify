@@ -1,10 +1,18 @@
+# File system support
 fs = require 'fs'
+# Manipulate platform-independent path strings
 path = require 'path'
+# Coffeescript-compiler for build chain
 coffeeScript = require 'coffee-script'
+# Recursively create folders
 mkdirp = require 'mkdirp'
+# Resolve javascript dependencies and build the js file for client side
 browserify = require('browserify')
+# Support mixing .coffee and .js files in lowfab-project
 coffeeify = require 'coffeeify'
+# Load yaml configuration into javascript file
 browserifyData = require('browserify-data')
+# Colorful logger for console
 winston = require 'winston'
 buildLog = winston.loggers.get('buildLog')
 

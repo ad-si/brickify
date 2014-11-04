@@ -3,16 +3,24 @@ path = require 'path'
 url = require 'url'
 fs = require 'fs'
 
-# Makes it possible to directly require coffee modules
-#require 'coffee-script/register'
-
 winston = require 'winston'
+express = require 'express'
+
+app = express()
+developmentMode = if app.get('env') is 'development' then true else false
+testMode = if app.get('env') is 'test' then true else false
+
+loggingLevel = if developmentMode then 'debug' else 'warn'
+loggingLevel = 'error' if testMode
+
 # Make logger available to other modules
 winston.loggers.add 'log',
 	console:
-		level: 'debug' #if developmentMode then 'debug' else 'warn'
+		level: loggingLevel
 		colorize: true
-express = require 'express'
+
+log = winston.loggers.get('log')
+
 bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
@@ -34,10 +42,6 @@ index = require '../../routes/index'
 statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
-
-app = express()
-developmentMode = true if app.get('env') is 'development'
-log = winston.loggers.get('log')
 
 
 server = http.createServer(app)
@@ -66,7 +70,6 @@ module.exports.loadFrontendDependencies = (callback) ->
 	.commands
 	.list {paths: true}
 	.on 'end', (dependencies) ->
-
 		for name, depPath of dependencies
 			if Array.isArray depPath
 				for subPath in depPath
@@ -127,7 +130,11 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-	app.use session {secret: 'lowfabCookieSecret!'}
+	app.use session {
+		secret: 'lowfabCookieSecret!'
+		resave: true
+		saveUninitialized: true
+	}
 
 	modelStorage.init()
 
@@ -164,6 +171,7 @@ module.exports.setupRouting = () ->
 module.exports.startServer = (_port, _ip) ->
 	port = _port || port
 	ip = _ip || ip
+
 
 	server.on 'error', (error) ->
 		if error.code is 'EADDRINUSE'

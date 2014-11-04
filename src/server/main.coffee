@@ -47,6 +47,8 @@ modelStorageApi = require '../../routes/modelStorageApi'
 server = http.createServer(app)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
+sessionSecret = process.env.LOWFAB_SESSION_SECRET or "lowfabSessionSecret!"
+
 links = {}
 sortedDependencies = [
 	'jquery',
@@ -130,8 +132,9 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
+
 	app.use session {
-		secret: 'lowfabCookieSecret!'
+		secret: sessionSecret
 		resave: true
 		saveUninitialized: true
 	}

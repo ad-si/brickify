@@ -13,8 +13,8 @@ module.exports.init = (neededInstances) ->
 # since browserify.js does not support dynamic require
 # all plugins must be written down
 module.exports.loadPlugins = () ->
-	dummyPlugin = require './plugins/dummyClientPlugin'
-	stlImport = require './plugins/stlImportPlugin'
+	dummyPlugin = require './plugins/dummy/dummy'
+	stlImport = require './plugins/stlImport/stlImport'
 
 	loadPlugin dummyPlugin
 	loadPlugin stlImport
@@ -25,8 +25,12 @@ loadPlugin = (instance) ->
 		initPluginInstance instance
 		console.log "Plugin #{instance.pluginName} loaded"
 	else
-		console.log "Plugin #{plugin} does not contain all
-				necessary methods, will not be loaded"
+		if instance.pluginName?
+			console.log "Plugin #{instance.pluginName} does not contain all
+					necessary methods, will not be loaded"
+		else
+			console.log 'Plugin ? (name missing) does not contain all neccessary
+				methods, will not be loaded'
 
 checkForPluginMethods = (object) ->
 	hasAllMethods = true

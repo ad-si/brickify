@@ -6,6 +6,8 @@ path = require 'path'
 coffeeScript = require 'coffee-script'
 # Recursively create folders
 mkdirp = require 'mkdirp'
+# Recursively process folders and files
+readdirp = require 'readdirp'
 # Resolve javascript dependencies and build the js file for client side
 browserify = require('browserify')
 # Support mixing .coffee and .js files in lowfab-project
@@ -16,48 +18,32 @@ browserifyData = require('browserify-data')
 winston = require 'winston'
 buildLog = winston.loggers.get('buildLog')
 
-compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
-	# Compiles all .coffee files in sourcePath to .js files in buildPath
-	# and calls the callback with the build-filename
-	buildLog.info "Compiling files from #{sourcePath} to #{buildPath}"
-	fs
-	.readdirSync sourcePath
-	.filter((element)->
-		element.search(/.*\.coffee/g) >= 0)
-	.forEach (file) ->
-		outfilename = path.join buildPath, '/',
-				path.basename(file, '.coffee') + '.js'
-		compileFile(
-			path.join(sourcePath, file),
-			sourceMap: true
-			filename: 'test.map',
-			outfilename
-		)
-		callback outfilename if callback?
+compileAllCoffeeFiles = (directory, afterCompileCallback) ->
+	buildLog.info "Compiling files from #{directory}"
+	readdirp root: directory, fileFilter: '*.coffee'
+	.on 'data', (entry) -> compileFile entry
+	.on 'error', (error) -> buildLog.error error
+	.on 'warn', (warning) -> buildLog.warn warning
+	.on 'end', () -> afterCompileCallback(directory) if afterCompileCallback?
 
-compileFile = (inputfile, compilerOptions, outputfile) ->
-	buildLog.info ' ' + inputfile + ' -> ' + outputfile
-	fcontent = fs.readFileSync inputfile, 'utf8'
-	compileObject = coffeeScript.compile fcontent, compilerOptions
+compileFile = (inputfileEntry) ->
+	inputfile = inputfileEntry.fullPath
+	buildLog.info " compile #{inputfile}"
+	compileObject = coffeeScript._compileFile inputfile, sourceMap = yes
+	outputfile = path.join inputfileEntry.fullParentDir,
+			path.basename(inputfile, '.coffee') + '.js'
 	fs.writeFile outputfile, compileObject.js, (error) ->
 		throw error if error
 	fs.writeFile outputfile + '.map', compileObject.v3SourceMap, (error) ->
 		throw error if error
 
-	return module.exports
-
-String.prototype.endsWith = (suffix) ->
-	return this.indexOf(suffix, this.length - suffix.length) != -1
-
 deleteAllJsFiles = (directory, afterDeleteCallback) ->
 	buildLog.info "Clearing directory #{directory}..."
-
-	fs.readdir directory, (err, files) ->
-		for file in files
-			if (file.endsWith '.js') or (file.endsWith '.js.map')
-				fs.unlinkSync path.join(directory, file)
-		afterDeleteCallback(directory) if afterDeleteCallback?
-
+	readdirp root: directory, fileFilter: ['*.js','*.js.map']
+	.on 'data', (entry) -> fs.unlinkSync entry.fullPath
+	.on 'error', (error) -> buildLog.error error
+	.on 'warn', (warning) -> buildLog.warn warning
+	.on 'end', () -> afterDeleteCallback(directory) if afterDeleteCallback?
 
 module.exports.buildClient = () ->
 	browserify = browserify
@@ -73,17 +59,17 @@ module.exports.buildClient = () ->
 
 	return module.exports
 
-module.exports.buildServer = (sourceDir, onlyDelete = false) ->
+module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
-		path.join sourceDir, '/server'
-		path.join sourceDir, '/server/plugins'
-		path.join sourceDir, '../routes'
+		__dirname
+		path.join __dirname, '../../routes'
+		path.join __dirname, '../common'
 	]
 
 	for dir in directories
 		#build js in same directory as coffeescript to enable server debugging
 		deleteAllJsFiles dir, (directory) ->
-			compileAndExecuteOnJs(directory, directory, null) if not onlyDelete
+			compileAllCoffeeFiles(directory, null) if not onlyDelete
 
 	return module.exports
 

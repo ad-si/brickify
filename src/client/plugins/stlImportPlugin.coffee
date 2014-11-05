@@ -34,7 +34,7 @@ module.exports.init3d = (threejsNode) ->
   threejsRootNode = threejsNode
 
 module.exports.needs3dAnimation = false
-module.exports.update3d = (renderer) ->
+module.exports.update3d = () ->
 
 module.exports.handleStateChange = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
@@ -55,7 +55,6 @@ module.exports.handleStateChange = (delta, state) ->
 					() ->
 						console.log "Unable to get model from server: ",
 							property.meshHash
-
 
 handleDroppedFile = (event) ->
 	fileContent = event.target.result

@@ -59,10 +59,10 @@ module.exports.buildClient = () ->
 
 	return module.exports
 
-module.exports.buildServer = (sourceDir, onlyDelete = false) ->
+module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
-		path.join sourceDir, '/server'
-		path.join sourceDir, '../routes'
+		__dirname
+		path.join __dirname, '../../routes'
 	]
 
 	for dir in directories

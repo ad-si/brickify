@@ -27,15 +27,23 @@ loadPlugin = (entry) ->
 			pluginMain = entry.fullPath
 		else if(entry.stat.isDirectory())
 			pluginMain = path.join entry.fullPath, entry.name + '.js'
-
-		instance = require pluginMain
+		try
+			instance = require pluginMain
+		catch error
+			log.error "Plugin #{pluginMain} could not be found. Maybe the plugin's
+				main filename does not match its folder name?"
+			return
 		if checkForPluginMethods instance
 			pluginInstances.push instance
 			initPluginInstance instance
 			log.info "Plugin '#{instance.pluginName}' (#{pluginMain}) loaded"
 		else
-			log.warn "Plugin '#{entry.name}' (#{pluginMain}) does not contain
-							all necessary methods and will not be loaded"
+			if instance.pluginName?
+				console.log "Plugin '#{instance.pluginName}' (#{pluginMain}) does not
+									contain all necessary methods, will not be loaded"
+			else
+				console.log 'Plugin ? (name missing) (#{pluginMain}) does not contain
+								all necessary methods, will not be loaded'
 
 checkForPluginMethods = (object) ->
 	hasAllMethods = true

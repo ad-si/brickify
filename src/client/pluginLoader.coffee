@@ -25,8 +25,12 @@ loadPlugin = (instance) ->
 		initPluginInstance instance
 		console.log "Plugin #{instance.pluginName} loaded"
 	else
-		console.log "Plugin #{plugin} does not contain all
-				necessary methods, will not be loaded"
+		if instance.pluginName?
+			console.log "Plugin #{instance.pluginName} does not contain all
+					necessary methods, will not be loaded"
+		else
+			console.log 'Plugin ? (name missing) does not contain all neccessary
+				methods, will not be loaded'
 
 checkForPluginMethods = (object) ->
 	hasAllMethods = true

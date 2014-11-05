@@ -40,21 +40,21 @@ module.exports.handleStateChange = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
 	objectTree.forAllSubnodeProperties state.rootNode,
 		pluginPropertyName, (property) ->
-		storedUuid = property.threeObjectUuid
-		threeObject = threejsRootNode.getObjectById storedUuid, true
+			storedUuid = property.threeObjectUuid
+			threeObject = threejsRootNode.getObjectById storedUuid, true
 
-		if not threeObject?
-			#Create object and override uuid
-			requestMeshFromServer property.meshHash,
-				(modelBinaryData) ->
-					console.log "Got the model #{property.meshHash}
-					from the server"
-					newThreeObj = addModelToThree(modelBinaryData)
-					stateInstance.performStateAction (state) ->
-						copyPropertyDataToThree property, newThreeObj
-				() ->
-					console.log "Unable to get model from server: ",
-						property.meshHash
+			if not threeObject?
+				#Create object and override uuid
+				requestMeshFromServer property.meshHash,
+					(modelBinaryData) ->
+						console.log "Got the model #{property.meshHash}
+						from the server"
+						newThreeObj = addModelToThree(modelBinaryData)
+						stateInstance.performStateAction (state) ->
+							copyPropertyDataToThree property, newThreeObj
+					() ->
+						console.log "Unable to get model from server: ",
+							property.meshHash
 
 
 handleDroppedFile = (event) ->

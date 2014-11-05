@@ -5,6 +5,7 @@ npm-debug.log
 *.iml
 /public/index.js
 *.css
+!/public/libs/**/*.css
 /modelCache
 /doc
 /apidoc

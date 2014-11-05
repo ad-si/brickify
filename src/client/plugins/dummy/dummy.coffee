@@ -1,4 +1,4 @@
-common = require '../../common/pluginCommon'
+common = require '../../../common/pluginCommon'
 
 module.exports.pluginName = 'Dummy Client Plugin'
 module.exports.category = common.CATEGORY_IMPORT

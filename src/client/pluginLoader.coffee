@@ -13,8 +13,8 @@ module.exports.init = (neededInstances) ->
 # since browserify.js does not support dynamic require
 # all plugins must be written down
 module.exports.loadPlugins = () ->
-	dummyPlugin = require './plugins/dummyClientPlugin'
-	stlImport = require './plugins/stlImportPlugin'
+	dummyPlugin = require './plugins/dummy/dummy'
+	stlImport = require './plugins/stlImport/stlImport'
 
 	loadPlugin dummyPlugin
 	loadPlugin stlImport

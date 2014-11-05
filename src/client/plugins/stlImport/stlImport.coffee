@@ -1,5 +1,5 @@
-common = require '../../common/pluginCommon'
-objectTree = require '../../common/objectTree'
+common = require '../../../common/pluginCommon'
+objectTree = require '../../../common/objectTree'
 
 threejsRootNode = null
 stlLoader = new THREE.STLLoader()

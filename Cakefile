@@ -37,8 +37,6 @@ lowfab = require './src/server/main'
 # Makes it possible to directly require coffee modules
 coffeeScript.register()
 
-sourceDir = 'src'
-
 ###
   #Tasks
 ###
@@ -57,17 +55,17 @@ task 'buildClient', 'Builds the client js files', ->
 # `src/server`<br>
 # See [cakeUtilities](src/server/cakeUtilities.html)
 task 'buildServer', 'Builds the server js files', ->
-	cakeUtilities.buildServer(sourceDir)
+	cakeUtilities.buildServer()
 
 # Delete old javascript files from previous builds
 task 'clean', 'Removes js files from src directory', ->
-    cakeUtilities.buildServer(sourceDir, true)
+    cakeUtilities.buildServer(true)
 
 # Build the client and the server
 task 'build', 'Builds client and server js files', ->
 	cakeUtilities
 	.buildClient()
-	.buildServer(sourceDir)
+	.buildServer()
 
 ###
   ##Building and starting

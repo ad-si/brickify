@@ -1,0 +1,3 @@
+{
+  "glob": ["README.md", "Cakefile", "package.json", "coffeelint.json", "src/**/*.coffee", "src/**/**/*.coffee"]
+}

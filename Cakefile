@@ -1,122 +1,86 @@
-fs = require 'fs'
-path = require 'path'
-coffeeScript = require 'coffee-script'
-browserify = require('browserify')({debug: true})
-mkdirp = require('mkdirp');
-yamlParser = require 'js-yaml'
+###
+  #Cakefile
+  Building and running of lowfab is specified through this cakefile.
 
+  **Note that you should only need to run `$ npm install` and `$ npm start`,
+  all other tasks are being executed automatically.**
+
+  For information on how to *build the documentation* have a look on the
+  [readme](index.html) and the [package declaration](package.html).
+###
+
+###
+  #Modules
+###
+
+###
+  We use *coffeelint* to enforce code style guidelines.<br>
+  See [coffeelint configuration](coffeelint.html)
+###
+coffeelint = require 'coffeelint'
+
+coffeeScript = require 'coffee-script'
+winston = require 'winston'
+winston.loggers.add 'buildLog',
+	console:
+		level: 'debug'
+		colorize: true
+
+# *CakeUtilities* provides the build and start functions called below.<br>
+# See [cakeUtilities](src/server/cakeUtilities.html)
+cakeUtilities = require './src/server/cakeUtilities'
+
+# *Lowfab* is the main server part which is responsible for delivering the
+# website and for server-side plugin integration and model processing
 lowfab = require './src/server/main'
 
-
+# Makes it possible to directly require coffee modules
 coffeeScript.register()
 
-tasks = {}
-options = {}
-switches = []
-oparse = null
+sourceDir = 'src'
 
-buildDir = '/build/'
-sourceDir = '/src/'
+###
+  #Tasks
+###
 
-
-compileFile = (inputfile, compilerOptions, outputfile) ->
-	console.log inputfile
-	fcontent = fs.readFileSync inputfile, 'utf8'
-	compileObject = coffeeScript.compile fcontent, compilerOptions
-	fs.writeFile outputfile, compileObject.js, (error) ->
-		throw error if error
-	fs.writeFile outputfile + '.map', compileObject.v3SourceMap, (error) ->
-		throw error if error
-
-# Compiles all .coffee files in sourcePath to .js files in buildPath
-# and calls the callback with the build-filename
-compileAndExecuteOnJs = (sourcePath, buildPath, callback) ->
-	fs
-	.readdirSync sourcePath
-	.filter((element)->
-		element.search(/.*\.coffee/g) >= 0)
-	.forEach (file) ->
-		outfilename = buildPath + path.basename(file, '.coffee') + '.js'
-		compileFile path.normalize(sourcePath + file), {sourceMap: true, filename: 'test.map'}, outfilename
-		callback outfilename if callback?
-
-yamlToJson = () ->
-	globalConfig = yamlParser.safeLoad fs.readFileSync(path.normalize('src/client/globals.yaml'), 'utf8')
-	fs.writeFileSync(path.normalize('build/client/globals.json'), JSON.stringify(globalConfig))
-
-
-buildClient = () ->
-	sourcePath = path.normalize __dirname + sourceDir + 'client/'
-	buildPath = path.normalize __dirname + buildDir + 'client/'
-
-	mkdirp.sync buildPath
-
-	yamlToJson()
-
-	compileAndExecuteOnJs sourcePath, buildPath, (outfilename) ->
-		browserify.add outfilename
-
-	browserify.bundle().pipe fs.createWriteStream(__dirname + '/public/index.js')
-
-
-buildServer = () ->
-	sourcePath = path.normalize __dirname + sourceDir + 'server/'
-	buildPath = path.normalize __dirname + buildDir + 'server/'
-
-	mkdirp.sync buildPath
-
-	compileAndExecuteOnJs sourcePath, buildPath, null
-
-
-linkHooks = () ->
-	# gist.github.com/domenic/2238951
-	[
-		'applypatch-msg'
-		'commit-msg'
-		'post-commit'
-		'post-receive'
-		'post-update'
-		'pre-applypatch'
-		'pre-commit'
-		'prepare-commit-msg'
-		'pre-rebase'
-		'update'
-	]
-	.forEach (hook) ->
-		hookPath = path.join(__dirname, 'hooks', hook)
-		gitHookPath = path.join(".git/hooks", hook)
-
-		fs.unlink gitHookPath, (error) ->
-			if error then return
-
-		fs.exists hookPath, (exists) ->
-			if exists
-				fs.link hookPath, gitHookPath, (error) ->
-					if error
-						throw new Error error
-
-
+# Git hooks are used for automated test running and code style checking
 task 'linkHooks', 'Links git hooks into .git/hooks', ->
-	linkHooks()
+	cakeUtilities.linkHooks()
 
-
+# Build the client javascript files from all coffee-script files inside
+# `src/client`<br>
+# See [cakeUtilities](src/server/cakeUtilities.html)
 task 'buildClient', 'Builds the client js files', ->
-	buildClient()
+	cakeUtilities.buildClient()
 
-
+# Build the server javascript files from all coffee-script files inside
+# `src/server`<br>
+# See [cakeUtilities](src/server/cakeUtilities.html)
 task 'buildServer', 'Builds the server js files', ->
-	buildServer()
+	cakeUtilities.buildServer(sourceDir)
 
+# Delete old javascript files from previous builds
+task 'clean', 'Removes js files from src directory', ->
+    cakeUtilities.buildServer(sourceDir, true)
 
+# Build the client and the server
 task 'build', 'Builds client and server js files', ->
-	buildClient()
-	buildServer()
+	cakeUtilities
+	.buildClient()
+	.buildServer(sourceDir)
 
+###
+  ##Building and starting
 
-task 'start', 'Builds files and starts server', ->
-	buildClient()
-	buildServer()
+  **This is the only task you should need to invoke directly.**
 
-	linkHooks()
+  This task creates all git-hooks, builds the client and the server and starts
+  the server afterwards.
+###
+task 'start', 'Links hooks and starts server', ->
+	cakeUtilities.linkHooks()
 
-	lowfab.startServer()
+	lowfab.loadFrontendDependencies () ->
+		lowfab
+			.setupRouting()
+			.startServer()

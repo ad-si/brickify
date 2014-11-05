@@ -1,17 +1,10 @@
-doctype html
-html
-	head
-		meta(charset='utf-8')
-		title Lowfab
-		each path, name in styles
-			link(rel='stylesheet', href=path)
+extends layout
 
-	body
+block content
+	p You should not see this text! Do you use a webGL ready browser?
+		a(href='http://get.webgl.org') get.webgl.org
 
-		nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role='navigation')
-			.container-fluid
-				.navbar-header
-					a.navbar-brand(href='/') Lowfab
-
-		each path, name in scripts
+block scripts
+	if scripts
+		each path in scripts
 			script(src=path)

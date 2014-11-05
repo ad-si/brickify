@@ -1,3 +1,2 @@
-#! /usr/bin/env node
-
-console.log('Pre-commit script was executed!')
+#!/bin/sh
+npm run prepublish

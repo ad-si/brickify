@@ -1,0 +1,19 @@
+doctype html
+html
+	head
+		meta(charset='utf-8')
+		title Lowfab
+		if styles
+			each path in styles
+				link(rel='stylesheet', href=path)
+
+	body
+
+		nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role='navigation')
+			.container-fluid
+				.navbar-header
+					a.navbar-brand(href='/') Lowfab
+
+		block content
+
+		block scripts

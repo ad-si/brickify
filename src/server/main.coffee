@@ -3,10 +3,24 @@ path = require 'path'
 url = require 'url'
 fs = require 'fs'
 
-# Makes it possible to directly require coffee modules
-require 'coffee-script/register'
-
+winston = require 'winston'
 express = require 'express'
+
+app = express()
+developmentMode = if app.get('env') is 'development' then true else false
+testMode = if app.get('env') is 'test' then true else false
+
+loggingLevel = if developmentMode then 'debug' else 'warn'
+loggingLevel = 'error' if testMode
+
+# Make logger available to other modules
+winston.loggers.add 'log',
+	console:
+		level: loggingLevel
+		colorize: true
+
+log = winston.loggers.get('log')
+
 bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
@@ -16,101 +30,158 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
+bower = require 'bower'
+pluginLoader = require './pluginLoader'
+index = require '../../routes/index'
+statesync = require '../../routes/statesync'
+exec = require 'exec'
+http = require 'http'
 
-index = require '../../routes/index.coffee'
-statesync = require '../../routes/statesync.coffee'
+pluginLoader = require './pluginLoader'
+index = require '../../routes/index'
+statesync = require '../../routes/statesync'
+modelStorage = require './modelStorage'
+modelStorageApi = require '../../routes/modelStorageApi'
 
-#test for state sync
-statesync.addDiffCallback (delta, state) ->
-	state.iHazModified = true
 
-app = express()
-server = ''
+server = http.createServer(app)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
-developmentMode = true if app.get('env') is 'development'
+sessionSecret = process.env.LOWFAB_SESSION_SECRET or "lowfabSessionSecret!"
+
+links = {}
+sortedDependencies = [
+	'jquery',
+	'bootstrap',
+	'threejs',
+	'JavaScript-MD5',
+	'STLLoader',
+	'TrackballControls',
+	'OrbitControls'
+]
 
 
-app.set 'hostname', 'localhost:' + port
+module.exports.loadFrontendDependencies = (callback) ->
+	allDependencies = []
 
-if not developmentMode
-	app.set('hostname', process.env.HOSTNAME or 'lowfab.net')
+	getDependencyPath = (depPath) ->
+		path.join.apply null, depPath.split('/').slice(1)
 
-
-app.set 'views', path.normalize 'views'
-app.set 'view engine', 'jade'
-
-app.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
-
-app.use compress()
-
-app.use stylus.middleware(
-	src: 'public',
-	compile: (string, path) ->
-		stylus string
-		.set 'filename', path
-		.set 'compress', !developmentMode
-		.use nib()
-		.import 'nib'
-)
-
-app.use express.static(path.normalize 'public')
-
-if developmentMode
-then app.use morgan 'dev'
-else app.use morgan()
-
-app.use bodyParser.json()
-app.use bodyParser.urlencoded()
-
-app.use session {secret: 'lowfabCookieSecret!'}
-
-app.get  '/', index
-app.get  '/statesync/get', statesync.getState
-app.post '/statesync/set', statesync.setState
-app.get  '/statesync/reset', statesync.resetState
-
-
-if app.get 'env' is 'development'
-	app.use errorHandler()
-
-app.use ((req, res) ->
-	res.render '404'
-)
-
-module.exports.startServer = () ->
-	app.listen(port, ip)
-	console.log('Server is listening on ' + ip + ':' + port)
-
-
-###
-module.exports.createServer = () ->
-	server = http.createServer (request, response) ->
-		my_path = url.parse(request.url).pathname
-		full_path = path.join(process.cwd(), my_path)
-
-		fs.exists full_path, (exists) ->
-			if not exists
-				response.writeHeader(404, {'Content-Type': 'text/plain'})
-				response.write('404 Not Found\n')
-				response.end()
+	bower
+	.commands
+	.list {paths: true}
+	.on 'end', (dependencies) ->
+		for name, depPath of dependencies
+			if Array.isArray depPath
+				for subPath in depPath
+					allDependencies.push getDependencyPath subPath
 			else
-				fs.readFile full_path, 'binary', (err, file) ->
-					if err
-						response.writeHeader(500, {'Content-Type': 'text/plain'})
-						response.write(err + '\n')
-						response.end()
-					else
-						response.writeHeader(200)
-						response.write(file, 'binary')
-						response.end()
+				allDependencies.push getDependencyPath depPath
 
-	return @
+		isCss = (element) ->
+			path.extname(element) is '.css'
+		isJs = (element) ->
+			path.extname(element) is '.js'
+
+		links.styles = allDependencies.filter(isCss)
+		links.styles.push('styles/screen.css')
+
+		links.scripts = sortedDependencies.map (element, index) ->
+			if Array.isArray dependencies[element]
+				getDependencyPath dependencies[element].filter(isJs)[0]
+			else
+				getDependencyPath dependencies[element]
+		links.scripts.push('index.js')
+
+		callback()
 
 
-module.exports.startServer = () ->
-	server.listen(8080)
-	console.log 'Started server. Access website on http://localhost:8080'
+module.exports.setupRouting = () ->
+	app.set 'hostname', if developmentMode then "localhost:#{port}" else
+		process.env.HOSTNAME or 'lowfab.net'
 
-	return @
-###
+
+	app.set 'views', path.normalize 'views'
+	app.set 'view engine', 'jade'
+
+	app.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
+
+	app.use compress()
+
+	app.use stylus.middleware(
+		src: 'public',
+		compile: (string, path) ->
+			stylus string
+			.set 'filename', path
+			.set 'compress', !developmentMode
+			.use nib()
+			.import 'nib'
+	)
+
+	app.use express.static(path.normalize 'public')
+
+	if developmentMode
+		app.use morgan 'dev',
+			stream:
+				write: (str) ->
+					log.info str.substring(0, str.length - 1)
+	else
+		app.use morgan 'combined',
+			stream:
+				write: (str) ->
+					log.info str.substring(0, str.length - 1)
+
+
+	app.use session {
+		secret: sessionSecret
+		resave: true
+		saveUninitialized: true
+	}
+
+	modelStorage.init()
+
+	jsonParser = bodyParser.json {limit: '100mb'}
+	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
+	rawParser = bodyParser.raw({limit: '100mb'})
+
+
+	app.get '/', index(links)
+	app.get '/statesync/get', jsonParser, statesync.getState
+	app.post '/statesync/set', jsonParser, statesync.setState
+	app.get '/statesync/reset', jsonParser, statesync.resetState
+	app.get '/model/exists/:md5/:extension', urlParser, modelStorageApi.modelExists
+	app.get '/model/get/:md5/:extension', urlParser, modelStorageApi.getModel
+	app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
+
+	app.post '/updateGitAndRestart', (request, response) ->
+		response.send ""
+		exec '../updateAndRestart.sh', (err, out, code) ->
+			log.warn "Error while updating server: " + err if err?
+
+	pluginLoader.loadPlugins statesync,
+		path.normalize __dirname + '../../../src/server/plugins/'
+
+	if developmentMode
+		app.use errorHandler()
+
+	app.use (req, res) ->
+		res.render '404', links
+
+	return module.exports
+
+
+module.exports.startServer = (_port, _ip) ->
+	port = _port || port
+	ip = _ip || ip
+
+
+	server.on 'error', (error) ->
+		if error.code is 'EADDRINUSE'
+			log.error "Another Server is already listening on #{ip}:#{port}"
+		else
+			log.error 'Server could not be started:', error
+
+	server.listen port, ip, () ->
+		log.info "Server is listening on #{ip}:#{port}"
+
+	return server

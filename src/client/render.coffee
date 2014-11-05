@@ -1,21 +1,16 @@
-render = (ui) ->
+renderQueue = []
+uiInstance = null
 
-	localRenderer = () ->
-		requestAnimationFrame( localRenderer )
-		ui.renderer.render( ui.scene, ui.camera )
-	
+localRenderer = () ->
+	requestAnimationFrame( localRenderer )
+	uiInstance.renderer.render( uiInstance.scene, uiInstance.camera )
+
+	for plugin in renderQueue
+		plugin.update3d()
+
+module.exports.init = (ui) ->
+	uiInstance = ui
 	localRenderer()
-	
-	###
-	len = animations.length
-	if len
-		loop
-			len--
-			break unless len >= 0
-			animation = animations[len]
-			if animation.status > 1.0
-				animations.splice( len, 1 )
-			animation.doAnimationStep()
-	###
 
-module.exports = render
+module.exports.addToRenderQueue = (plugin) ->
+	renderQueue.push plugin

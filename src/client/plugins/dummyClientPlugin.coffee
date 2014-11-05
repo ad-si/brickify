@@ -14,8 +14,8 @@ module.exports.init = (globalConfig, stateSync) ->
 module.exports.init3d = (threejsNode) ->
 	console.log 'Dummy Client Plugin initializes 3d'
 
-#Is called when the server changes the state, where state is the new state and delta the difference
-#to the old state
+# Is called when the server changes the state,
+# where state is the new state and delta the difference to the old state
 module.exports.handleStateChange = (delta, state) ->
 	console.log 'Dummy Client Plugin state change'
 
@@ -23,5 +23,6 @@ module.exports.handleStateChange = (delta, state) ->
 #consider setting it to false to improve performance
 module.exports.needs3dAnimation = false
 
-#Is called every frame, use it for animations or updates that have to be performed every frame
+# Is called every frame
+# Use it for animations or updates that have to be performed every frame
 module.exports.update3D = () ->

@@ -63,6 +63,7 @@ module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
 		__dirname
 		path.join __dirname, '../../routes'
+		path.join __dirname, '../common'
 	]
 
 	for dir in directories

@@ -49,7 +49,7 @@
     "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
-    "prepublish": "npm test && npm run-script checkStyle"
+    "prepublish": "npm test && npm run checkStyle"
   },
   "repository": {
     "type": "git",

@@ -16,7 +16,7 @@
   - Add an external tool in the **Before launch** section
       - Give it any name you want
       - point it to the npm executable in the **Program** field
-      - give it `$ run-script build` as **Parameters**
+      - give it `$ run build` as **Parameters**
       - choose the same **Working directory** as before
 
 

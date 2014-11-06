@@ -15,9 +15,11 @@ module.exports.init = (neededInstances) ->
 module.exports.loadPlugins = () ->
 	dummyPlugin = require './plugins/dummy/dummy'
 	stlImport = require './plugins/stlImport/stlImport'
+	stlExport = require './plugins/stlExport/stlExport'
 
 	loadPlugin dummyPlugin
 	loadPlugin stlImport
+	loadPlugin stlExport
 
 loadPlugin = (instance) ->
 	if checkForPluginMethods instance

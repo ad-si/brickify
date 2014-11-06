@@ -1,9 +1,10 @@
-/build
 node_modules
 npm-debug.log
 .idea
 *.iml
-/public/index.js
+*.js
+*.js.map
+!/public/libs/**/*.js
 *.css
 !/public/libs/**/*.css
 /modelCache

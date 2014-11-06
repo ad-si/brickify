@@ -160,7 +160,7 @@ module.exports.setupRouting = () ->
 			log.warn "Error while updating server: " + err if err?
 
 	pluginLoader.loadPlugins statesync,
-		path.normalize __dirname + '../../../src/server/plugins/'
+		path.join __dirname, 'plugins/'
 
 	if developmentMode
 		app.use errorHandler()

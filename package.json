@@ -1,6 +1,6 @@
 {
   "name": "Lowfab",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Combine various fabrication techniques to materialize your 3D-models",
   "keywords": [
     "fabrication",
@@ -29,6 +29,7 @@
     "mkdirp": "^0.5.0",
     "morgan": "^1.4.1",
     "nib": "^1.0.4",
+    "readdirp": "^1.1.0",
     "serve-favicon": "^2.1.6",
     "stylus": "^0.49.2",
     "win-spawn": "^2.0.0",
@@ -49,7 +50,7 @@
     "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
-    "prepublish": "npm test && npm run-script checkStyle"
+    "prepublish": "npm test && npm run checkStyle"
   },
   "repository": {
     "type": "git",

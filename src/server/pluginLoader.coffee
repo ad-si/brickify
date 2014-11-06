@@ -1,6 +1,13 @@
+# File system support
 fs = require 'fs'
+# Manipulate platform-independent path strings
+path = require 'path'
+# Recursively process folders and files
+readdirp = require 'readdirp'
+# Server-side plugins
 pluginInstances = []
 stateSyncModule = null
+# Colorful logger for console
 winston = require 'winston'
 log = winston.loggers.get('log')
 
@@ -9,20 +16,34 @@ String.prototype.endsWith = (suffix) ->
 
 module.exports.loadPlugins = (stateSync, directory) ->
 	stateSyncModule = stateSync
+	readdirp root: directory, depth: 0, fileFilter: '*.js', entryType: 'both'
+	.on 'data', (entry) -> loadPlugin entry
+	.on 'error', (error) -> log.error error
+	.on 'warn', (warning) -> log.warn warning
+	.on 'end', () -> afterCompileCallback(directory) if afterCompileCallback?
 
-	files = fs.readdirSync directory
-	for file in files
-		if not file.endsWith('.js')
-			continue
-
-		instance = require (directory + file)
+loadPlugin = (entry) ->
+		if(entry.stat.isFile())
+			pluginMain = entry.fullPath
+		else if(entry.stat.isDirectory())
+			pluginMain = path.join entry.fullPath, entry.name + '.js'
+		try
+			instance = require pluginMain
+		catch error
+			log.error "Plugin #{pluginMain} could not be found. Maybe the plugin's
+				main filename does not match its folder name?"
+			return
 		if checkForPluginMethods instance
 			pluginInstances.push instance
 			initPluginInstance instance
-			log.info "Plugin '#{instance.pluginName}' (#{file}) loaded"
+			log.info "Plugin '#{instance.pluginName}' (#{pluginMain}) loaded"
 		else
-			log.warn "Plugin '#{file}' does not contain
-							all necessary methods and will not be loaded"
+			if instance.pluginName?
+				console.log "Plugin '#{instance.pluginName}' (#{pluginMain}) does not
+									contain all necessary methods, will not be loaded"
+			else
+				console.log 'Plugin ? (name missing) (#{pluginMain}) does not contain
+								all necessary methods, will not be loaded'
 
 checkForPluginMethods = (object) ->
 	hasAllMethods = true

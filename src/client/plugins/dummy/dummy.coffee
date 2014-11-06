@@ -1,4 +1,4 @@
-common = require '../../common/pluginCommon'
+common = require '../../../common/pluginCommon'
 
 module.exports.pluginName = 'Dummy Client Plugin'
 module.exports.category = common.CATEGORY_IMPORT
@@ -24,5 +24,5 @@ module.exports.handleStateChange = (delta, state) ->
 module.exports.needs3dAnimation = false
 
 # Is called every frame
-# Use it for animations or updates that have to be performed every frame
+# Use it for animations or updates that have to be performed every frame.coffee
 module.exports.update3D = () ->

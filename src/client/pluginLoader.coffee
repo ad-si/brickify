@@ -13,9 +13,11 @@ module.exports.init = (neededInstances) ->
 # since browserify.js does not support dynamic require
 # all plugins must be written down
 module.exports.loadPlugins = () ->
+	coordinateSystem = require './plugins/coordinateSystem/coordinateSystem'
 	dummyPlugin = require './plugins/dummy/dummy'
 	stlImport = require './plugins/stlImport/stlImport'
 
+	loadPlugin coordinateSystem
 	loadPlugin dummyPlugin
 	loadPlugin stlImport
 

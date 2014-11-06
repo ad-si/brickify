@@ -12,7 +12,6 @@ module.exports.category = common.CATEGORY_EXPORT
 
 # This plugin needs no initialization
 module.exports.init = (globalConfig, stateSync) ->
-    console.log 'stl Export Plugin initialization'
 module.exports.init3d = (threejsNode) ->
 
 # This plugin performs no updates
@@ -30,12 +29,13 @@ stringifyVertex = (vec) ->
 
 
 #main method creating an ASCII .stl string
-generateAsciiStl = (threejsGeometry) ->
+generateAsciiStl = (threejsGeometry, filename) ->
     vertices = threejsGeometry.vertices
     faces = threejsGeometry.faces
-    stl = "solid pixel"
-    i = 0
 
+    stl = "solid #{filename}"
+    
+    i = 0
     while i < faces.length
         stl += ("facet normal " + stringifyVector(faces[i].normal) + " \n")
         stl += ("outer loop \n")
@@ -49,9 +49,9 @@ generateAsciiStl = (threejsGeometry) ->
     stl
 
 #method to save generated ASCII string to disk
-saveStl = (threejsGeometry) ->
-    stlString = generateSTL(threejsGeometry)
+saveStl = (threejsGeometry, filename) ->
+    stlString = generateAsciiStl(threejsGeometry)
     blob = new Blob([stlString], type: "text/plain" )
-    saveAs blob, "threejsGeometry.stl"
+    saveAs blob, "#{filename}.stl"
     return
 

@@ -2,13 +2,16 @@ statesync = require './statesync'
 objectTree = require '../common/objectTree'
 
 module.exports = (globalConfig) ->
+
+	fileReader = new FileReader()
+
 	return {
 		# setup scene
 		scene: new THREE.Scene()
 		camera: new THREE.PerspectiveCamera(
-			globalConfig.fov,
-			window.innerWidth / window.innerHeight,
-			globalConfig.cameraNearPlane,
+			globalConfig.fov
+			window.innerWidth / window.innerHeight
+			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)
 		renderer: new THREE.WebGLRenderer(
@@ -16,29 +19,24 @@ module.exports = (globalConfig) ->
 			antialiasing: true
 			preserveDrawingBuffer: true
 		)
+		fileReader: fileReader
 		controls: null
 		stlLoader: new THREE.STLLoader()
-		fileReader: new FileReader()
-
-		keyUpHandler: ( event ) ->
+		keyUpHandler: (event) ->
 			if event.keyCode == 67
 				for mesh in globalConfig.meshes
 					@scene.remove mesh
 				globalConfig.meshes = []
 
-		# overwrite if in your code neccessary
-		loadHandler: ( event ) ->
-			return 0
-
-		dropHandler: ( event ) ->
+		dropHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
 			for file in files
 				if file.name.search( '.stl' ) >= 0
-					@fileReader.readAsBinaryString( file )
+					fileReader.readAsBinaryString( file )
 
-		dragOverHandler: ( event ) ->
+		dragOverHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			event.dataTransfer.dropEffect = 'copy'
@@ -46,27 +44,27 @@ module.exports = (globalConfig) ->
 		# Bound to updates to the window size:
 		# Called whenever the window is resized.
 		# It updates the scene settings (@camera and @renderer)
-		windowResizeHandler: ( event ) ->
+		windowResizeHandler: () ->
 			@camera.aspect = window.innerWidth / window.innerHeight
 			@camera.updateProjectionMatrix()
 
-			@renderer.setSize( window.innerWidth, window.innerHeight )
-			@renderer.render(@scene, @camera)
+			@renderer.setSize window.innerWidth, window.innerHeight
+			@renderer.render @scene, @camera
 
 		init: ->
 			# setup renderer
-			@renderer.setSize( window.innerWidth, window.innerHeight )
-			@renderer.setClearColor( 0xf6f6f6, 1)
-			document.body.appendChild( @renderer.domElement )
+			@renderer.setSize window.innerWidth, window.innerHeight
+			@renderer.setClearColor 0xf6f6f6, 1
+			document.body.appendChild @renderer.domElement
 
 			# Scene rotation because orbit controls only works
 			# with up vector of 0, 1, 0
 			sceneRotation = new THREE.Matrix4()
 			sceneRotation.makeRotationAxis(
-				new THREE.Vector3( 1, 0, 0 ),
-				(-Math.PI/2)
+				new THREE.Vector3 1, 0, 0
+				-Math.PI/2
 			)
-			@scene.applyMatrix(sceneRotation)
+			@scene.applyMatrix sceneRotation
 
 
 			# setup camera
@@ -76,36 +74,16 @@ module.exports = (globalConfig) ->
 				globalConfig.axisLength/2
 			)
 			@camera.up.set(0, 1, 0)
-			@camera.lookAt(new THREE.Vector3(0, 0, 0))
+			@camera.lookAt new THREE.Vector3 0, 0, 0
 
-			@controls = new THREE.OrbitControls(@camera, @renderer.domElement)
-			@controls.target.set(0, 0, 0)
+			@controls = new THREE.OrbitControls @camera, @renderer.domElement
+			@controls.target.set 0, 0, 0
 
 			# event listener
-			@renderer.domElement.addEventListener(
-				'dragover'
-				@dragOverHandler.bind( @ )
-				false
-			)
-			@renderer.domElement.addEventListener(
-				'drop'
-				@dropHandler.bind( @ )
-				false
-			)
-			@fileReader.addEventListener(
-				'loadend',
-				@loadHandler.bind( @ ),
-				false
-			)
-			document.addEventListener(
-				'keyup',
-				@keyUpHandler.bind( @ )
-			)
-			window.addEventListener(
-				'resize',
-				@windowResizeHandler.bind( @ ),
-				false
-			)
+			@renderer.domElement.addEventListener 'dragover', @dragOverHandler
+			@renderer.domElement.addEventListener 'drop', @dropHandler
+			document.addEventListener 'keyup', @keyUpHandler
+			window.addEventListener 'resize', @windowResizeHandler
 
 			# lightning
 			ambientLight = new THREE.AmbientLight(0x404040)

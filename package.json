@@ -44,6 +44,7 @@
   },
   "scripts": {
     "build": "./node_modules/.bin/cake build",
+    "clean": "./node_modules/.bin/cake clean",
     "start": "./node_modules/.bin/cake start",
     "linkHooks": "./node_modules/.bin/cake linkHooks",
     "checkStyle": "./node_modules/.bin/coffeelint Cakefile .",

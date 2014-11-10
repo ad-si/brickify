@@ -4,7 +4,6 @@
     Converts any ThreeJS geometry to ASCII-.stl data format
 ###
 
-
 common = require '../../../common/pluginCommon'
 
 module.exports.pluginName = 'stl Export Plugin'
@@ -12,6 +11,7 @@ module.exports.category = common.CATEGORY_EXPORT
 
 # This plugin needs no initialization
 module.exports.init = (globalConfig, stateSync) ->
+
 module.exports.init3d = (threejsNode) ->
 
 # This plugin performs no updates
@@ -49,9 +49,9 @@ generateAsciiStl = (threejsGeometry, filename) ->
     stl
 
 #method to save generated ASCII string to disk
-saveStl = (threejsGeometry, filename) ->
+module.exports.saveStl = (threejsGeometry, filename) ->
     stlString = generateAsciiStl(threejsGeometry)
-    blob = new Blob([stlString], type: "text/plain" )
-    saveAs blob, "#{filename}.stl"
+    blob = new Blob([stlString], {type: "text/plain;charset=utf-8"})
+    saveAs blob, filename
     return
 

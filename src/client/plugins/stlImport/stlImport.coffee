@@ -1,5 +1,6 @@
 common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
+stlExport = require '../stlExport/stlExport'
 
 threejsRootNode = null
 stlLoader = new THREE.STLLoader()
@@ -84,6 +85,11 @@ addModelToThree = (binary) ->
 	)
 	object = new THREE.Mesh( geometry, objectMaterial )
 	threejsRootNode.add( object )
+
+	# test export of the model that was just loaded
+	# console.log 'exporting loaded model'
+	# stlExport.saveStl(object.geometry, 'object.stl')
+	
 	return object
 
 submitMeshToServer = (md5hash, fileEnding, data) ->

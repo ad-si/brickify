@@ -1,8 +1,9 @@
 common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
+stlLoader = require './stlLoader'
+#stlLoader = new THREE.STLLoader()
 
 threejsRootNode = null
-stlLoader = new THREE.STLLoader()
 stateInstance = null
 globalConfigInstance = null
 

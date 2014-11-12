@@ -1,3 +1,7 @@
+###
+# @module render
+###
+
 pluginHooks = require './pluginHooks'
 uiInstance = null
 

@@ -1,3 +1,6 @@
+###
+# @module pluginLoader
+###
 pluginHooks = require('./pluginHooks')
 pluginHooks.init()
 

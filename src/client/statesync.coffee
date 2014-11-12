@@ -1,3 +1,7 @@
+###
+# @module stateSynchronization
+###
+
 jsondiffpatch = require 'jsondiffpatch'
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->

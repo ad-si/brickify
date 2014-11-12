@@ -1,3 +1,7 @@
+###
+# @module ui
+###
+
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
 

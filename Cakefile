@@ -56,6 +56,14 @@ task 'buildClient', 'Builds the client js files', ->
 # See [cakeUtilities](src/server/cakeUtilities.html)
 task 'buildServer', 'Builds the server js files', ->
 	cakeUtilities.buildServer()
+	
+# Build the test javascript files from all coffee-script files inside
+# `test/`<br>
+# See [cakeUtilities](src/server/cakeUtilities.html)
+task 'buildClientTest', 'Builds the test js files', ->
+	cakeUtilities.buildClientTest()
+	
+
 
 # Delete old javascript files from previous builds
 task 'clean', 'Removes js files from src directory', ->
@@ -66,6 +74,7 @@ task 'build', 'Builds client and server js files', ->
 	cakeUtilities
 	.buildClient()
 	.buildServer()
+	.buildClientTest()
 
 ###
   ##Building and starting

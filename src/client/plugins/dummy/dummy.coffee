@@ -5,7 +5,7 @@ module.exports.category = common.CATEGORY_IMPORT
 
 #Called when the plugin is initialized.
 #You should create your plugin dependent datastructures here
-module.exports.init = (globalConfig, stateSync) ->
+module.exports.init = (globalConfig, stateSync, ui) ->
 	console.log 'Dummy Client Plugin initialization'
 
 #Called when the plugin is initialized.

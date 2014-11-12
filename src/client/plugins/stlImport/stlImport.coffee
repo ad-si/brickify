@@ -76,7 +76,8 @@ handleDroppedFile = (event) ->
 addModelToThree = (binary) ->
 	#parses the binary geometry and adds it to the three scene,
 	#returning the uuid of the three object
-	geometry = stlLoader.parse binary
+	stl = stlLoader.parse binary
+	geometry = stlLoader.convertToThreeGeometry stl
 	objectMaterial = new THREE.MeshLambertMaterial(
 		{
 			color: globalConfigInstance.defaultObjectColor

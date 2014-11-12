@@ -50,8 +50,45 @@ parseAscii = (fileContent) ->
 				if (!(vx?) || !(vy?) || !(vz?))
 					stl.addError "Invalid vertex definition: (#{nx}, #{ny}, #{nz})"
 				else
-					currentPoly.addPoint = new Vec3d(vx, vy, vz)
+					currentPoly.addPoint new Vec3d(vx, vy, vz)
 	return stl
+
+module.exports.convertToThreeGeometry = (stlModel,
+																				 pointDistanceEpsilon = 0.0001) ->
+	geometry = new THREE.BufferGeometry()
+
+	positions = []#xyz xyz xyz
+	normal = [] # t1 t2 t3
+	index = [] #vert1 vert2 vert3
+
+	for poly in stlModel.polygons
+		#add points if they don't exist, or get index of these points
+		indices = [-1,-1,-1]
+		for pi in [0..2]
+			point = poly.points[pi]
+			for gi in  [0..positions.length-1] by 3
+				geopoint = new Vec3d(positions[gi], positions[gi+1], positions[gi+2])
+				if (point.euclideanDistanceTo geopoint) < pointDistanceEpsilon
+					indices[pi] = gi / 3
+					break
+			if indices[pi] == -1
+				indices[pi] = positions.length / 3
+				positions.push point.x
+				positions.push point.y
+				positions.push point.z
+
+		index.push indices[0]
+		index.push indices[1]
+		index.push indices[2]
+		normal.push poly.normal.x
+		normal.push poly.normal.y
+		normal.push poly.normal.z
+
+	geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+	geometry.addAttribute('normal', new THREE.BufferAttribute(normal, 3))
+	geometry.addAttribute('index', new THREE.BufferAttribute(index, 1))
+	return geometry
+
 
 class AsciiStl
 	constructor: (fileContent) ->
@@ -131,11 +168,12 @@ class Vec3d
 				@x*vec.y - @y*vec.x)
 	length: () ->
 		return Math.sqrt(@x*@x + @y*@y + @z*@z)
+	euclideanDistanceTo: (vec) ->
+		return (@minus vec).length()
 	multiplyScalar: (scalar) ->
 		return new Vec3d(@x * scalar, @y * scalar, @z * scalar)
 	normalized: () ->
 		return @multiplyScalar (1.0/@length())
-
 
 module.exports.Vec3d = Vec3d
 

@@ -84,12 +84,7 @@ addModelToThree = (binary) ->
 		}
 	)
 	object = new THREE.Mesh( geometry, objectMaterial )
-	threejsRootNode.add( object )
-
-	# test export of the model that was just loaded
-	# console.log 'exporting loaded model'
-	# stlExport.saveStl(object.geometry, 'object.stl')
-	
+	threejsRootNode.add( object )	
 	return object
 
 submitMeshToServer = (md5hash, fileEnding, data) ->

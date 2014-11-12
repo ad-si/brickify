@@ -28,7 +28,7 @@ stringifyVertex = (vec) ->
   "vertex " + stringifyVector(vec) + " \n"
 
 
-#main method creating an ASCII .stl string
+#main method creating an ASCII .stl string from the geometry
 generateAsciiStl = (threejsGeometry, filename) ->
     vertices = threejsGeometry.vertices
     faces = threejsGeometry.faces

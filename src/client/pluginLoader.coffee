@@ -1,3 +1,6 @@
+pluginHooks = require('./pluginHooks')
+pluginHooks.init()
+
 pluginInstances = []
 stateSyncModule = null
 uiInstance = null
@@ -6,23 +9,16 @@ rendererInstance  = null
 
 
 checkForPluginMethods = (object) ->
-	hasAllMethods = true
-	hasAllMethods = object.hasOwnProperty('pluginName') and hasAllMethods
-	hasAllMethods = object.hasOwnProperty('init') and hasAllMethods
-	hasAllMethods = object.hasOwnProperty('handleStateChange') and hasAllMethods
-	return hasAllMethods
+	object.hasOwnProperty('pluginName')
 
 initPluginInstance = (pluginInstance) ->
-	pluginInstance.init globalConfigInstance, stateSyncModule, uiInstance
+	pluginInstance.init? globalConfigInstance, stateSyncModule, uiInstance
+	pluginInstance.init3D? threeNode = new THREE.Object3D()
 
-	threeNode = new THREE.Object3D()
-	uiInstance.scene.add threeNode
-	pluginInstance.init3d threeNode
+	pluginHooks.register pluginInstance
 
-	if pluginInstance.needs3dAnimation == true
-		rendererInstance.addToRenderQueue pluginInstance
-
-	stateSyncModule.addUpdateCallback pluginInstance.handleStateChange
+	if threeNode?
+		uiInstance.scene.add threeNode
 
 loadPlugin = (instance) ->
 	if checkForPluginMethods instance
@@ -34,7 +30,7 @@ loadPlugin = (instance) ->
 			console.log "Plugin #{instance.pluginName} does not contain all
 					necessary methods, will not be loaded"
 		else
-			console.log 'Plugin ? (name missing) does not contain all neccessary
+			console.log 'Plugin ? (name missing) does not contain all necessary
 				methods, will not be loaded'
 
 

@@ -16,12 +16,8 @@ module.exports.init3d = (threejsNode) ->
 
 # Is called when the server changes the state,
 # where state is the new state and delta the difference to the old state
-module.exports.handleStateChange = (delta, state) ->
+module.exports.updateState = (delta, state) ->
 	console.log 'Dummy Client Plugin state change'
-
-#if set to true, update3D() will be called every frame
-#consider setting it to false to improve performance
-module.exports.needs3dAnimation = false
 
 # Is called every frame
 # Use it for animations or updates that have to be performed every frame.coffee

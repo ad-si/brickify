@@ -1,6 +1,8 @@
 ###
-# #Dummy Plugin#
-#
+  #Dummy Plugin#
+###
+
+###
 # A demo plugin implementation for client-side
 #
 # We encourage plugin developers to split their plugins in several modules.

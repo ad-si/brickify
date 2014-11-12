@@ -7,7 +7,7 @@ jsondiffpatch = require 'jsondiffpatch'
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
 
-pluginHooks = require './pluginHooks'
+pluginHooks = require '../common/pluginHooks'
 
 state = {}
 oldState = {}

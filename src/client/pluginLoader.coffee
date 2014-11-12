@@ -1,8 +1,11 @@
 ###
 # @module pluginLoader
 ###
-pluginHooks = require('./pluginHooks')
-pluginHooks.init()
+
+# Load the hook list and initialize the pluginHook management
+hooks = require('./pluginHooks.yaml')
+pluginHooks = require('../common/pluginHooks')
+pluginHooks.init(hooks)
 
 pluginInstances = []
 stateSyncModule = null

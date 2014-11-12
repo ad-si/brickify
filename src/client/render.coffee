@@ -2,7 +2,7 @@
 # @module render
 ###
 
-pluginHooks = require './pluginHooks'
+pluginHooks = require '../common/pluginHooks'
 uiInstance = null
 
 localRenderer = () ->

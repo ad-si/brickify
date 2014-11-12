@@ -76,17 +76,27 @@ module.exports.convertToThreeGeometry = (stlModel,
 				positions.push point.x
 				positions.push point.y
 				positions.push point.z
-
+				normal.push poly.normal.x
+				normal.push poly.normal.y
+				normal.push poly.normal.z
 		index.push indices[0]
 		index.push indices[1]
 		index.push indices[2]
-		normal.push poly.normal.x
-		normal.push poly.normal.y
-		normal.push poly.normal.z
 
-	geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
-	geometry.addAttribute('normal', new THREE.BufferAttribute(normal, 3))
-	geometry.addAttribute('index', new THREE.BufferAttribute(index, 1))
+	parray = new Float32Array(positions.length)
+	for i in [0..positions.length-1]
+		parray[i] = positions[i]
+	narray = new Float32Array(normal.length)
+	for i in [0..normal.length-1]
+		narray[i]  = normal[i]
+	iarray = new Uint32Array(index.length)
+	for i in [0..index.length-1]
+		iarray[i] = index[i]
+	geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
+	geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
+	geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
+	geometry.computeBoundingSphere()
+	
 	return geometry
 
 

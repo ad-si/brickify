@@ -30,13 +30,10 @@ module.exports.init = (globalConfig, state, ui) ->
 		false
 	)
 
-module.exports.init3d = (threejsNode) ->
+module.exports.init3D = (threejsNode) ->
   threejsRootNode = threejsNode
 
-module.exports.needs3dAnimation = false
-module.exports.update3d = () ->
-
-module.exports.handleStateChange = (delta, state) ->
+module.exports.updateState = (delta, state) ->
 	#check if there are any threejs objects that haven't been loaded yet
 	objectTree.forAllSubnodeProperties state.rootNode,
 		pluginPropertyName, (property) ->

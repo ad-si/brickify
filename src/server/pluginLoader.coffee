@@ -17,7 +17,7 @@ hooks = yaml.load(
 		fs.readFileSync path.join(__dirname, './pluginHooks.yaml'), 'utf8'
 	)
 pluginHooks = require '../common/pluginHooks'
-pluginHooks.init(hooks)
+pluginHooks.initHooks(hooks)
 
 String.prototype.endsWith = (suffix) ->
 	return this.indexOf(suffix, this.length - suffix.length) != -1

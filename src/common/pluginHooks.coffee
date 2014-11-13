@@ -31,7 +31,7 @@ module.exports.call = (plugin, hook, args...) =>
   to all registered callbacks, that is all plugins that provide a method named
   `foo`.
 ###
-module.exports.init = (hookList) =>
+module.exports.initHooks = (hookList) =>
 	@hooks = hookList
 	@lists[hook] = [] for hook in @hooks
 	for hook in @hooks

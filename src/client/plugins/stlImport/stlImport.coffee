@@ -84,7 +84,7 @@ addModelToThree = (binary) ->
 		}
 	)
 	object = new THREE.Mesh( geometry, objectMaterial )
-	threejsRootNode.add( object )	
+	threejsRootNode.add( object )
 	return object
 
 submitMeshToServer = (md5hash, fileEnding, data) ->

@@ -3,17 +3,17 @@
 ###
 
 # list of all hooks
-@hooks = []
+hooks = []
 
 # list of all hooks and their registered callbacks
-@lists = []
+lists = []
 
 # **check if a plugin provides a named hook method**
-hasHook = (plugin, hook) =>
+hasHook = (plugin, hook) ->
 	typeof plugin[hook] is 'function'
 
 # **call the plugin's hook if provided with the passed arguments**
-module.exports.call = (plugin, hook, args...) =>
+module.exports.call = (plugin, hook, args...) ->
 	plugin[hook] args... if hasHook plugin, hook
 
 # ***
@@ -31,28 +31,28 @@ module.exports.call = (plugin, hook, args...) =>
   to all registered callbacks, that is all plugins that provide a method named
   `foo`.
 ###
-module.exports.initHooks = (hookList) =>
-	@hooks = hookList
-	@lists[hook] = [] for hook in @hooks
-	for hook in @hooks
+module.exports.initHooks = (hookList) ->
+	hooks = hookList
+	lists[hook] = [] for hook in hooks
+	for hook in hooks
 		module.exports[hook] =
 			do (hook) ->
-				(args...) -> callback args... for callback in @lists[hook]
+				(args...) -> callback args... for callback in lists[hook]
 
 # **register a plugin for all the hooks it provides**
-module.exports.register = (plugin) =>
-	registerHook plugin, hook for hook in @hooks
+module.exports.register = (plugin) ->
+	registerHook plugin, hook for hook in hooks
 
 # **register a plugin for a specific hook if provided**
-registerHook = (plugin, hook) =>
-	@lists[hook].push plugin[hook] if hasHook plugin, hook
+registerHook = (plugin, hook) ->
+	lists[hook].push plugin[hook] if hasHook plugin, hook
 
 # **unregister a plugin for all hooks it was registered for**
-module.exports.unregister = (plugin) =>
-	unregisterHook plugin, hook for hook in @hooks
+module.exports.unregister = (plugin) ->
+	unregisterHook plugin, hook for hook in hooks
 
 # **unregister a plugin for a specific hook if provided and registered**
-unregisterHook = (plugin, hook) =>
+unregisterHook = (plugin, hook) ->
 	if hasHook plugin, hook
-		index = @lists[hook].indexOf plugin[hook]
-		@lists[hook].splice index, 1 if index != -1
+		index = lists[hook].indexOf plugin[hook]
+		lists[hook].splice index, 1 if index != -1

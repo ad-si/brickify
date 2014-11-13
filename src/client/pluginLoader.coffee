@@ -13,7 +13,6 @@ uiInstance = null
 globalConfigInstance = null
 rendererInstance  = null
 
-
 checkForPluginMethods = (instance) ->
 	instance.hasOwnProperty('pluginName')
 
@@ -53,7 +52,9 @@ module.exports.loadPlugins = () ->
 	coordinateSystem = require './plugins/coordinateSystem/coordinateSystem'
 	dummyPlugin = require './plugins/dummy/dummy'
 	stlImport = require './plugins/stlImport/stlImport'
+	stlExport = require './plugins/stlExport/stlExport'
 
 	loadPlugin coordinateSystem
 	loadPlugin dummyPlugin
 	loadPlugin stlImport
+	loadPlugin stlExport

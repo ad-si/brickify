@@ -58,7 +58,9 @@ sortedDependencies = [
 	'JavaScript-MD5',
 	'STLLoader',
 	'TrackballControls',
-	'OrbitControls'
+	'OrbitControls',
+	'FileSaver',
+	'Blob'
 ]
 
 

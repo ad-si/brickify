@@ -11,6 +11,14 @@ stateSyncModule = null
 winston = require 'winston'
 log = winston.loggers.get('log')
 
+# Load the hook list and initialize the pluginHook management
+yaml = require 'js-yaml'
+hooks = yaml.load(
+		fs.readFileSync path.join(__dirname, './pluginHooks.yaml'), 'utf8'
+	)
+pluginHooks = require '../common/pluginHooks'
+pluginHooks.init(hooks)
+
 String.prototype.endsWith = (suffix) ->
 	return this.indexOf(suffix, this.length - suffix.length) != -1
 
@@ -46,12 +54,8 @@ loadPlugin = (entry) ->
 								all necessary methods, will not be loaded'
 
 checkForPluginMethods = (object) ->
-	hasAllMethods = true
-	hasAllMethods = object.hasOwnProperty('pluginName') and hasAllMethods
-	hasAllMethods = object.hasOwnProperty('init') and hasAllMethods
-	hasAllMethods = object.hasOwnProperty('handleStateChange') and hasAllMethods
-	return hasAllMethods
+	object.hasOwnProperty('pluginName')
 
 initPluginInstance = (pluginInstance) ->
-	pluginInstance.init()
-	stateSyncModule.addUpdateCallback pluginInstance.handleStateChange
+	pluginInstance.init?()
+	pluginHooks.register pluginInstance

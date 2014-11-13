@@ -107,15 +107,36 @@ parseBinary = (fileContent) ->
 
 	return stl
 
-module.exports.convertToThreeGeometry = (stlModel,
-																				 pointDistanceEpsilon = 0.0001) ->
+module.exports.convertToThreeGeometry = (stlModel) ->
 	geometry = new THREE.BufferGeometry()
 
+	optimized = optimizeModel stlModel
+
+	#officially, threejs supports normal array, but in fact,
+	#you have to use this lowlevel datatype to view something
+	parray = new Float32Array(optimized.positions.length)
+	for i in [0..optimized.positions.length-1]
+		parray[i] = optimized.positions[i]
+	narray = new Float32Array(optimized.normals.length)
+	for i in [0..optimized.normals.length-1]
+		narray[i]  = optimized.normals[i]
+	iarray = new Uint32Array(optimized.indices.length)
+	for i in [0..optimized.indices.length-1]
+		iarray[i] = optimized.indices[i]
+
+	geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
+	geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
+	geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
+	geometry.computeBoundingSphere()
+
+	return geometry
+
+optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
 	positions = []#xyz xyz xyz
 	normal = [] # t1 t2 t3
 	index = [] #vert1 vert2 vert3
 
-	for poly in stlModel.polygons
+	for poly in importedStl.polygons
 		#add points if they don't exist, or get index of these points
 		indices = [-1,-1,-1]
 		for pi in [0..2]
@@ -139,24 +160,19 @@ module.exports.convertToThreeGeometry = (stlModel,
 		index.push indices[1]
 		index.push indices[2]
 
-	#officially, threejs supports normal array, but in fact,
-	#you have to use this lowlevel datatype to view something
-	parray = new Float32Array(positions.length)
-	for i in [0..positions.length-1]
-		parray[i] = positions[i]
-	narray = new Float32Array(normal.length)
-	for i in [0..normal.length-1]
-		narray[i]  = normal[i]
-	iarray = new Uint32Array(index.length)
-	for i in [0..index.length-1]
-		iarray[i] = index[i]
-	geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
-	geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
-	geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
-	geometry.computeBoundingSphere()
+	optimized = new OptimizedModel()
+	optimized.positions = positions
+	optimized.normals = normal
+	optimized.indices = index
+	return optimized
+module.exports.optimizeModel = optimizeModel
 
-	return geometry
-
+class OptimizedModel
+	constructor: ()->
+		@positions = []
+		@normals = []
+		@indices = []
+module.exports.OptimizedModel = OptimizedModel
 
 class AsciiStl
 	constructor: (fileContent) ->

@@ -67,8 +67,7 @@ describe 'stl import tests', ->
 			done()
 
 	# Bulk import these models
-	models = ['AutoSave_soap_casing_turned5.skp',
-						'ballista.stl',
+	models = ['ballista.stl',
 						'citrus_reamer.stl',
 						'cube.stl',
 						'faberdashery_spanner.stl',
@@ -77,7 +76,6 @@ describe 'stl import tests', ->
 						'goprodyk.stl',
 						'house.stl',
 						'house2.stl',
-						'house_r.skp',
 						'KeeponMessengerHat_R2.stl',
 						'kinect_mount_wide.stl',
 						'microphone.stl',

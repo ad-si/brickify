@@ -5,16 +5,16 @@ expect = require('chai').expect
 process.env.NODE_ENV = 'test'
 
 describe 'stlImport', () ->
+	modelPath = 'test/models/'
 	models = []
 	parsedModels = []
 
 	before (done) ->
-			models.push fs.readFileSync 'test/testmodel_googles.stl',
-				{encoding: 'utf8'}
-			models.push fs.readFileSync 'test/testmodel_house.stl',
-				{encoding: 'utf8'}
-			models.push fs.readFileSync 'test/testmodel_screwdriver.stl',
-				{encoding: 'utf8'}
+			files = fs.readdirSync modelPath
+			for file in files
+				if file.endsWith '.stl'
+					models.push fs.readFileSync modelPath + file,
+						{encoding: 'utf8'}
 			done()
 
 	describe 'stlImport', () ->

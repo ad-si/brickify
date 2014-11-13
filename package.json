@@ -51,7 +51,7 @@
     "documentation": "./node_modules/.bin/groc",
     "test": "npm run testServer",
     "buildClientTest": "./node_modules/.bin/cake buildClientTest",
-	"testServer": "./node_modules/.bin/mocha",
+	"testServer": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
     "prepublish": "npm test && npm run checkStyle"
   },
   "repository": {

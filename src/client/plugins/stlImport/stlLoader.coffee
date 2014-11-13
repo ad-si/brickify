@@ -123,63 +123,105 @@ parseBinary = (fileContent) ->
 
 	return stl
 
-module.exports.convertToThreeGeometry = (stlModel) ->
+createBufferGeometry = (optimizedModel) ->
 	geometry = new THREE.BufferGeometry()
-
-	optimized = optimizeModel stlModel
-
 	#officially, threejs supports normal array, but in fact,
 	#you have to use this lowlevel datatype to view something
-	parray = new Float32Array(optimized.positions.length)
-	for i in [0..optimized.positions.length-1]
-		parray[i] = optimized.positions[i]
-	narray = new Float32Array(optimized.normals.length)
-	for i in [0..optimized.normals.length-1]
-		narray[i]  = optimized.normals[i]
-	iarray = new Uint32Array(optimized.indices.length)
-	for i in [0..optimized.indices.length-1]
-		iarray[i] = optimized.indices[i]
+	parray = new Float32Array(optimizedModel.positions.length)
+	for i in [0..optimizedModel.positions.length - 1]
+		parray[i] = optimizedModel.positions[i]
+	narray = new Float32Array(optimizedModel.vertexNormals.length)
+	for i in [0..optimizedModel.vertexNormals.length - 1]
+		narray[i] = optimizedModel.vertexNormals[i]
+	iarray = new Uint32Array(optimizedModel.indices.length)
+	for i in [0..optimizedModel.indices.length - 1]
+		iarray[i] = optimizedModel.indices[i]
 
 	geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
 	geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
 	geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
 	geometry.computeBoundingSphere()
+	return geometry
+
+createStandardGeometry = (optimizedModel) ->
+	geometry = new THREE.Geometry()
+
+	for vi in [0..optimizedModel.positions.length-1] by 3
+		geometry.vertices.push new THREE.Vector3(optimizedModel.positions[vi],
+			optimizedModel.positions[vi+1], optimizedModel.positions[vi+2])
+
+	for fi in [0..optimizedModel.indices.length-1] by 3
+		geometry.faces.push new THREE.Face3(optimizedModel.indices[fi],
+			optimizedModel.indices[fi+1], optimizedModel.indices[fi+2],
+			new THREE.Vector3(optimizedModel.faceNormals[fi],
+				optimizedModel.faceNormals[fi+1],
+				optimizedModel.faceNormals[fi+2]))
 
 	return geometry
 
+#Creates a ThreeGeometry
+#if bufferGeoemtry is set to true, a BufferGeometry using
+#the vertex normals will be created
+#else, a normal Geometry with face normals will be created
+#(contains duplicate points, but provides better shading for sharp edges)
+module.exports.convertToThreeGeometry = (stlModel, bufferGeometry = false) ->
+	optimized = optimizeModel stlModel
+
+	if (bufferGeometry)
+		return createBufferGeometry(optimized)
+	else
+		return createStandardGeometry(optimized)
+
 optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
 	positions = []#xyz xyz xyz
-	normal = [] # t1 t2 t3
+	vertexnormals = []
+	faceNormals = []
 	index = [] #vert1 vert2 vert3
 
 	for poly in importedStl.polygons
 		#add points if they don't exist, or get index of these points
 		indices = [-1,-1,-1]
-		for pi in [0..2]
-			point = poly.points[pi]
-			for gi in  [0..positions.length-1] by 3
-				geopoint = new Vec3d(positions[gi], positions[gi+1], positions[gi+2])
+		for vertexIndex in [0..2]
+			point = poly.points[vertexIndex]
+			for geoPointIndex in  [0..positions.length-1] by 3
+				geopoint = new Vec3d(positions[geoPointIndex],
+					positions[geoPointIndex+1],
+					positions[geoPointIndex+2])
 				if (point.euclideanDistanceTo geopoint) < pointDistanceEpsilon
-					indices[pi] = gi / 3
+					indices[vertexIndex] = geoPointIndex / 3
 					break
-			if indices[pi] == -1
-				indices[pi] = positions.length / 3
+			if indices[vertexIndex] == -1
+				indices[vertexIndex] = positions.length / 3
 				positions.push point.x
 				positions.push point.y
 				positions.push point.z
-				#ToDo: calculate the average normal out
-				#ToDo: of all polygon normals next to this vertex
-				normal.push poly.normal.x
-				normal.push poly.normal.y
-				normal.push poly.normal.z
+				vertexnormals.push [
+					new Vec3d(poly.normal.x, poly.normal.y, poly.normal.z)]
 		index.push indices[0]
 		index.push indices[1]
 		index.push indices[2]
+		faceNormals.push poly.normal.x
+		faceNormals.push poly.normal.y
+		faceNormals.push poly.normal.z
+
+	#average all vertexnormals
+	avgNormals = []
+	for normalList in vertexnormals
+		avg = new Vec3d(0,0,0)
+		for normal in normalList
+			normal = normal.normalized()
+			avg = avg.add normal
+		avg = avg.normalized()
+
+		avgNormals.push avg.x
+		avgNormals.push avg.y
+		avgNormals.push avg.z
 
 	optimized = new OptimizedModel()
 	optimized.positions = positions
-	optimized.normals = normal
 	optimized.indices = index
+	optimized.vertexNormals = avgNormals
+	optimized.faceNormals = faceNormals
 
 	return optimized
 module.exports.optimizeModel = optimizeModel
@@ -187,8 +229,9 @@ module.exports.optimizeModel = optimizeModel
 class OptimizedModel
 	constructor: ()->
 		@positions = []
-		@normals = []
 		@indices = []
+		@vertexNormals = []
+		@faceNormals = []
 module.exports.OptimizedModel = OptimizedModel
 
 class AsciiStl
@@ -263,6 +306,8 @@ class Vec3d
 	constructor: (@x, @y, @z) ->
 	minus: (vec) ->
 		return new Vec3d(@x - vec.x, @y - vec.y, @z - vec.z)
+	add: (vec) ->
+		return new Vec3d(@x + vec.x, @y + vec.y, @z + vec.z)
 	crossProduct: (vec) ->
 		return new Vec3d(@y*vec.z - @z-vec.y,
 				@z*vec.x - @x*vec.z,

@@ -81,7 +81,7 @@ addModelToThree = (binary) ->
 		for error in errors
 			console.log "-> " + error
 
-	geometry = stlLoader.convertToThreeGeometry stl
+	geometry = stlLoader.convertToThreeGeometry stl, false
 	objectMaterial = new THREE.MeshLambertMaterial(
 		{
 			color: globalConfigInstance.defaultObjectColor

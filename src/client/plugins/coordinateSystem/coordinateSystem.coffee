@@ -19,11 +19,6 @@ module.exports.init = (globalConfig, state, ui) ->
 	@globalConfig = globalConfig
 
 # Generate the grid and the axis on 3d scene initialization
-module.exports.init3d = (threejsNode) ->
+module.exports.init3D = (threejsNode) ->
 	setupGrid(threejsNode, @globalConfig)
 	setupAxis(threejsNode, @globalConfig)
-
-# This plugin performs no updates
-module.exports.needs3dAnimation = false
-module.exports.update3d = () ->
-module.exports.handleStateChange = () ->

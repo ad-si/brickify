@@ -1,7 +1,13 @@
+###
+# @module stateSynchronization
+###
+
 jsondiffpatch = require 'jsondiffpatch'
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
+
+pluginHooks = require '../common/pluginHooks'
 
 state = {}
 oldState = {}
@@ -70,8 +76,7 @@ exports.addUpdateCallback = (callback) ->
 
 handleUpdatedState = (delta, curstate) ->
 	#Client plugins maybe modify state...
-	for callback in stateUpdateCallbacks
-		callback(delta, curstate)
+	pluginHooks.updateState delta, curstate
 
 	#sync back as long client plugins modify state
 	sync()

@@ -53,7 +53,7 @@ module.exports.buildClient = () ->
 		extensions: ['.coffee']
 
 	browserify
-	.add path.join __dirname, '..', 'client', 'main'
+	.add path.join __dirname, '/src/client', 'main.coffee'
 	.transform coffeeify
 	.transform browserifyData
 	.bundle()
@@ -63,9 +63,9 @@ module.exports.buildClient = () ->
 
 module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
-		__dirname
-		path.join __dirname, '../../routes'
-		path.join __dirname, '../common'
+		path.join __dirname, '/src/server'
+		path.join __dirname, '/routes'
+		path.join __dirname, '/src/common'
 	]
 
 	for dir in directories
@@ -97,61 +97,10 @@ module.exports.linkHooks = () ->
 			if error and error.code is not 'ENOENT'
 				buildLog.error error
 
-		fs.exists hookPath, (exists) ->
-			if exists
-				fs.link hookPath, gitHookPath, (error) ->
-					if error
-						buildLog.error error
-					else
-						buildLog.info hookPath, '->', gitHookPath
+		fs.link hookPath, gitHookPath, (error) ->
+			if error
+				buildLog.error error
+			else
+				buildLog.info hookPath, '->', gitHookPath
 
 	return module.exports
-
-
-# No used at the moment
-# Please keep for future usage
-###
-module.exports.checkStyle = () ->
-	getFilesSync('.',
-		ignore: ['node_modules', '.git']
-		regex: /.*\.coffee/gi
-	)
-	.forEach (file) ->
-
-		coffeelint
-		.lint(fs.readFileSync(file, 'utf8'),
-			no_tabs:
-				level: 'ignore'
-			indentation:
-				level: 'ignore'
-		)
-		.forEach (error) ->
-			buildLog.warn file,
-				(error.lineNumber + '\n'),
-				(error.rule + ':'),
-				(error.message + '\n')
-
-
-module.exports.getFilesSync = (nodePath, options) ->
-	returnFiles = []
-
-	walkTree = (localNodePath) ->
-		stats = fs.statSync(localNodePath)
-
-		if stats.isFile()
-
-			if (localNodePath.search(options.regex) >= 0)
-				returnFiles.push localNodePath
-
-		else if stats.isDirectory()
-
-			files = fs.readdirSync localNodePath
-
-			for file in files
-				if file and options.ignore.indexOf(file) is -1
-					walkTree path.join(localNodePath, file)
-
-	walkTree(nodePath)
-
-	return returnFiles
-###

@@ -34,7 +34,9 @@ describe 'stlImport', () ->
 
 	describe 'stlConvert', () ->
 		it 'should convert the models to optimized geometry', (done) ->
+			totalBegin = new Date()
 			@timeout(30000)
+
 			for i in [0..modelFiles.length-1]
 				if !shallOptimize[i]
 					continue
@@ -44,6 +46,9 @@ describe 'stlImport', () ->
 				optGeo = stlLoader.optimizeModel parsedModels[i]
 				deltaTime = new Date - begin
 				console.log "--> Model optimized in #{deltaTime}ms"
+
+			console.log "All selected models have been
+									optimized in #{new Date() - totalBegin}ms"
 			done()
 
 	after () ->

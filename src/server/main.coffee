@@ -60,7 +60,7 @@ sortedDependencies = [
 	'TrackballControls',
 	'OrbitControls',
 	'FileSaver',
-    'Blob'
+	'Blob'
 ]
 
 

@@ -62,9 +62,7 @@ module.exports.handleStateChange = (delta, state) ->
 
 handleDroppedFile = (event) ->
 	fileContent = event.target.result
-	importFile(fileContent)
 
-module.exports.importFile = (fileContent) ->
 	threeObject = addModelToThree fileContent
 	md5hash = md5(event.target.result)
 	fileEnding = 'stl'

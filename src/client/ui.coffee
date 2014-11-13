@@ -36,7 +36,7 @@ module.exports = (globalConfig) ->
 			files = event.target.files ? event.dataTransfer.files
 			for file in files
 				if file.name.toLowerCase().search( '.stl' ) >= 0
-					fileReader.readAsBinaryString( file )
+					@fileReader.readAsBinaryString( file )
 
 		dragOverHandler: ( event ) ->
 			event.stopPropagation()

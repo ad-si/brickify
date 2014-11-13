@@ -1,5 +1,8 @@
-#parses the content of the file
-module.exports.parse = (fileContent, errorCallback) ->
+#Parses the content of a stl file.
+#if optimize is set to true, an optimized mesh is returned
+#else, a stl representation is returned, which should not be
+#used for further processing
+module.exports.parse = (fileContent, errorCallback, optimize = true) ->
 	model = null
 
 	startsWithSolid = false
@@ -27,6 +30,9 @@ module.exports.parse = (fileContent, errorCallback) ->
 	if model.importErrors.length > 0
 		if errorCallback?
 			errorCallback model.importErrors
+
+	if optimize
+		return optimizeModel model
 	return model
 
 toArrayBuffer = (buf) ->
@@ -41,6 +47,7 @@ toArrayBuffer = (buf) ->
 	else
 		return buf
 
+#Parses an stl ASCII file to the internal representation
 parseAscii = (fileContent) ->
 	astl = new AsciiStl(fileContent)
 	stl = new Stl()
@@ -85,6 +92,7 @@ parseAscii = (fileContent) ->
 					currentPoly.addPoint new Vec3d(vx, vy, vz)
 	return stl
 
+#Parses a binary stl file to the internal representation
 parseBinary = (fileContent) ->
 	stl = new Stl()
 	reader = new DataView(fileContent,80)
@@ -123,6 +131,7 @@ parseBinary = (fileContent) ->
 
 	return stl
 
+#Creates a THREE.BufferGeometry using vertex normals
 createBufferGeometry = (optimizedModel) ->
 	geometry = new THREE.BufferGeometry()
 	#officially, threejs supports normal array, but in fact,
@@ -143,6 +152,7 @@ createBufferGeometry = (optimizedModel) ->
 	geometry.computeBoundingSphere()
 	return geometry
 
+#uses a THREE.Geometry using face normals
 createStandardGeometry = (optimizedModel) ->
 	geometry = new THREE.Geometry()
 
@@ -159,19 +169,21 @@ createStandardGeometry = (optimizedModel) ->
 
 	return geometry
 
-#Creates a ThreeGeometry
+#Creates a ThreeGeometry out of an optimized model
 #if bufferGeoemtry is set to true, a BufferGeometry using
 #the vertex normals will be created
 #else, a normal Geometry with face normals will be created
 #(contains duplicate points, but provides better shading for sharp edges)
-module.exports.convertToThreeGeometry = (stlModel, bufferGeometry = false) ->
-	optimized = optimizeModel stlModel
-
+module.exports.convertToThreeGeometry = (optimizedModel,
+																				 bufferGeometry = false) ->
 	if (bufferGeometry)
-		return createBufferGeometry(optimized)
+		return createBufferGeometry(optimizedModel)
 	else
-		return createStandardGeometry(optimized)
+		return createStandardGeometry(optimizedModel)
 
+#Optimizes the internal stl model representation by removing duplicate points
+#and creating an indexed face list
+#Takes the face normals from the stl and calculates vertex normals
 optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
 	vertexnormals = []
 	faceNormals = []
@@ -230,6 +242,8 @@ optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
 	return optimized
 module.exports.optimizeModel = optimizeModel
 
+#An optimized model structure with indexed faces / vertices
+#and cached vertex and face normals
 class OptimizedModel
 	constructor: ()->
 		@positions = []
@@ -270,6 +284,7 @@ class AsciiStl
 	reachedEnd: () ->
 		return (@index == @content.length)
 
+#An unoptimized data structure that holds the same content as a stl file
 class Stl
 	constructor: () ->
 		@polygons = []

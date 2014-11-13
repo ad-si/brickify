@@ -41,8 +41,9 @@ describe 'stlImport', () ->
 		it 'should load stl files, convert to the internal representation', (done) ->
 			for i in [0..models.length-1]
 				console.log "Importing "  + modelFiles[i]
-				parsedModel = stlLoader.parse models[i], (error) ->
+				errorcallback = (error) ->
 					console.log "-> Import Error: " + error
+				parsedModel = stlLoader.parse models[i], errorcallback, false
 
 				expect(parsedModel.importErrors.length).to.equals(expectedWarnings[i])
 				parsedModels.push parsedModel

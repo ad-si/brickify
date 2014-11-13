@@ -75,21 +75,6 @@ module.exports.buildServer = (onlyDelete = false) ->
 
 	return module.exports
 	
-module.exports.buildClientTest = () ->
-	browserify = browserify
-		debug: true
-		extensions: ['.coffee']
-
-	browserify
-	.add path.join __dirname, '..', '..', 'testClient', 'scripts', 'dropStlTest'
-	.transform coffeeify
-	.transform browserifyData
-	.bundle()
-	.pipe fs.createWriteStream 'testClient/scripts/tests.js'
-
-	return module.exports
-
-
 module.exports.linkHooks = () ->
 	# gist.github.com/domenic/2238951
 	[

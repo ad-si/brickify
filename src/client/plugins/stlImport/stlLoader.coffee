@@ -5,9 +5,21 @@ module.exports.parse = (fileContent) ->
 	if fileContent.startsWith "solid"
 		model = parseAscii fileContent
 	else
-		model = parseBinary	fileContent
+		model = parseBinary	toArrayBuffer fileContent
 
 	return model
+
+toArrayBuffer = (buf) ->
+	if typeof buf is "string"
+		array_buffer = new Uint8Array(buf.length)
+		i = 0
+
+		while i < buf.length
+			array_buffer[i] = buf.charCodeAt(i) & 0xff # implicitly assumes little-endian
+			i++
+		return array_buffer.buffer or array_buffer
+	else
+		return buf
 
 parseAscii = (fileContent) ->
 	astl = new AsciiStl(fileContent)
@@ -53,6 +65,44 @@ parseAscii = (fileContent) ->
 					currentPoly.addPoint new Vec3d(vx, vy, vz)
 	return stl
 
+parseBinary = (fileContent) ->
+	stl = new Stl()
+	reader = new DataView(fileContent,80)
+	numTriangles = reader.getUint32 0, true
+
+	#check if file size matches with numTriangles
+	datalength = fileContent.byteLength - 80 - 4
+	polyLength = 50
+	calcDataLength = polyLength * numTriangles
+
+	if (calcDataLength > datalength)
+		stl.addError "Calculated length of triangle data does not match filesize,
+		triangles might be missing"
+
+	binaryIndex = 4
+	while binaryIndex < datalength
+		poly = new StlPoly()
+		nx = reader.getFloat32 binaryIndex, true
+		binaryIndex += 4
+		ny = reader.getFloat32 binaryIndex, true
+		binaryIndex += 4
+		nz = reader.getFloat32 binaryIndex, true
+		binaryIndex += 4
+		poly.setNormal new Vec3d(nx, ny, nz)
+		for i in [0..2]
+			vx = reader.getFloat32 binaryIndex, true
+			binaryIndex += 4
+			vy = reader.getFloat32 binaryIndex, true
+			binaryIndex += 4
+			vz = reader.getFloat32 binaryIndex, true
+			binaryIndex += 4
+			poly.addPoint new Vec3d(vx,vy,vz)
+		#skip uint 16
+		binaryIndex += 2
+		stl.addPolygon poly
+
+	return stl
+
 module.exports.convertToThreeGeometry = (stlModel,
 																				 pointDistanceEpsilon = 0.0001) ->
 	geometry = new THREE.BufferGeometry()
@@ -76,6 +126,8 @@ module.exports.convertToThreeGeometry = (stlModel,
 				positions.push point.x
 				positions.push point.y
 				positions.push point.z
+				#ToDo: calculate the average normal out
+				#ToDo: of all polygon normals next to this vertex
 				normal.push poly.normal.x
 				normal.push poly.normal.y
 				normal.push poly.normal.z
@@ -83,6 +135,8 @@ module.exports.convertToThreeGeometry = (stlModel,
 		index.push indices[1]
 		index.push indices[2]
 
+	#officially, threejs supports normal array, but in fact,
+	#you have to use this lowlevel datatype to view something
 	parray = new Float32Array(positions.length)
 	for i in [0..positions.length-1]
 		parray[i] = positions[i]
@@ -96,7 +150,7 @@ module.exports.convertToThreeGeometry = (stlModel,
 	geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
 	geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
 	geometry.computeBoundingSphere()
-	
+
 	return geometry
 
 

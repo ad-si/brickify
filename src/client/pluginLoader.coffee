@@ -14,14 +14,14 @@ globalConfigInstance = null
 rendererInstance  = null
 
 
-checkForPluginMethods = (object) ->
-	object.hasOwnProperty('pluginName')
+checkForPluginMethods = (instance) ->
+	instance.hasOwnProperty('pluginName')
 
-initPluginInstance = (pluginInstance) ->
-	pluginInstance.init? globalConfigInstance, stateSyncModule, uiInstance
-	pluginInstance.init3D? threeNode = new THREE.Object3D()
+initPluginInstance = (instance) ->
+	instance.init? globalConfigInstance, stateSyncModule, uiInstance
+	instance.init3D? threeNode = new THREE.Object3D()
 
-	pluginHooks.register pluginInstance
+	pluginHooks.register instance
 
 	if threeNode?
 		uiInstance.scene.add threeNode

@@ -18,7 +18,8 @@ browserifyData = require('browserify-data')
 winston = require 'winston'
 buildLog = winston.loggers.get('buildLog')
 
-compileAllCoffeeFiles = (directory, afterCompileCallback, createSourceMap = true) ->
+compileAllCoffeeFiles = (directory, afterCompileCallback,
+												 createSourceMap = true) ->
 	buildLog.info "Compiling files from #{directory}"
 	readdirp root: directory, fileFilter: '*.coffee'
 	.on 'data', (entry) -> compileFile entry, createSourceMap
@@ -75,12 +76,16 @@ module.exports.buildServer = (onlyDelete = false) ->
 	return module.exports
 	
 module.exports.buildClientTest = () ->
-	directories = [
-		path.join __dirname, '../../testClient'
-	]
+	browserify = browserify
+		debug: true
+		extensions: ['.coffee']
 
-	for dir in directories
-		compileAllCoffeeFiles(dir, null, false)
+	browserify
+	.add path.join __dirname, '..', '..', 'testClient', 'scripts', 'dropStlTest'
+	.transform coffeeify
+	.transform browserifyData
+	.bundle()
+	.pipe fs.createWriteStream 'testClient/scripts/tests.js'
 
 	return module.exports
 

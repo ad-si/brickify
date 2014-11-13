@@ -30,6 +30,9 @@ module.exports.init = (globalConfig, state, ui) ->
 		false
 	)
 
+module.exports.setGlobalConfig = (globalConfig) ->
+	globalConfigInstance = globalConfig
+
 module.exports.init3d = (threejsNode) ->
   threejsRootNode = threejsNode
 
@@ -58,17 +61,21 @@ module.exports.handleStateChange = (delta, state) ->
 
 handleDroppedFile = (event) ->
 	fileContent = event.target.result
+	importFile(fileContent)
+
+module.exports.importFile = (fileContent) ->
 	threeObject = addModelToThree fileContent
 	md5hash = md5(event.target.result)
 	fileEnding = 'stl'
 
-	stateInstance.performStateAction (state) ->
-		node = objectTree.addChildNode state.rootNode
-		property = new StlProperty()
-		objectTree.addPluginData node, pluginPropertyName, property
+	if stateInstance?
+		stateInstance.performStateAction (state) ->
+			node = objectTree.addChildNode state.rootNode
+			property = new StlProperty()
+			objectTree.addPluginData node, pluginPropertyName, property
 
-		property.meshHash = md5hash + '.' + fileEnding
-		copyThreeDataToProperty property, threeObject
+			property.meshHash = md5hash + '.' + fileEnding
+			copyThreeDataToProperty property, threeObject
 
 	submitMeshToServer md5hash, fileEnding, fileContent
 

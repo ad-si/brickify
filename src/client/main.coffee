@@ -1,16 +1,15 @@
 path = require 'path'
-
 globalConfig = require './globals.yaml'
+
 ui = require("./ui")(globalConfig)
+ui.init()
+
 renderer = require "./render"
+renderer.init(ui)
+
 pluginLoader = require './pluginLoader'
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
-
-
-ui.init()
-renderer.init(ui)
-
 
 ### TODO: move somewhere where it is needed
 # geometry functions
@@ -25,12 +24,10 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-
-# Test for statesync
+#test for statesync
 statesync.addUpdateCallback (state, delta) ->
 	console.log 'UpdatedState: %s, Delta: %s',
 		JSON.stringify(state), JSON.stringify(delta)
-
 
 statesync.init globalConfig, (state) ->
 	objectTree.init state

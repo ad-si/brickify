@@ -66,6 +66,7 @@ task 'build', 'Builds client and server js files', ->
 	cakeUtilities
 	.buildClient()
 	.buildServer()
+	.buildClientTest()
 
 ###
   ##Building and starting

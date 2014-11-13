@@ -5,25 +5,41 @@ expect = require('chai').expect
 process.env.NODE_ENV = 'test'
 
 describe 'stlImport', () ->
-
+	modelPath = 'test/models/'
 	models = []
+	modelFiles = []
 	parsedModels = []
-	modelFiles = [
-		'test/testmodel_googles.stl'
-		'test/testmodel_house.stl'
-		'test/testmodel_microphone.stl'
-		'test/testmodel_screwdriver.stl'
-	]
-	expectedWarnings = [0,0,1,1]
-	shallOptimize = [true,true,true,true]
+	expectedWarnings = []
+	shallOptimize = []
+
 	before (done) ->
-		for file in modelFiles
-			models.push fs.readFileSync file, {encoding: 'utf8'}
-		done()
+			#read all models and config files
+			files = fs.readdirSync modelPath
+			for file in files
+				if file.endsWith '.stl'
+					models.push fs.readFileSync modelPath + file,
+						{encoding: 'utf8'}
+					modelFiles.push modelPath + file
+
+					jsonfile = file.substring(0,file.length-4) + ".json"
+					json = {}
+					if fs.existsSync(modelPath + jsonfile)
+						json = JSON.parse fs.readFileSync(modelPath + jsonfile)
+
+					if json.expectedWarnings?
+						expectedWarnings.push json.expectedWarnings
+					else
+						expectedWarnings.push 0
+
+					if json.optimize?
+						shallOptimize.push json.optimize
+					else
+						shallOptimize.push true
+			done()
 
 	describe 'stlImport', () ->
 		it 'should load stl files, convert to the internal representation', (done) ->
-			for i in [0..modelFiles.length-1]
+			for i in [0..models.length-1]
 				console.log "Importing "  + modelFiles[i]
 				parsedModel = stlLoader.parse models[i], (error) ->
 					console.log "-> Import Error: " + error

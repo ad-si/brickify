@@ -2,8 +2,8 @@ renderQueue = []
 uiInstance = null
 
 localRenderer = () ->
-	requestAnimationFrame localRenderer
-	uiInstance.renderer.render uiInstance.scene, uiInstance.camera
+	requestAnimationFrame( localRenderer )
+	uiInstance.renderer.render( uiInstance.scene, uiInstance.camera )
 
 	for plugin in renderQueue
 		plugin.update3d()

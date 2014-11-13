@@ -2,15 +2,31 @@
 module.exports.parse = (fileContent, errorCallback) ->
 	model = null
 
-	if fileContent.startsWith "solid"
-		model = parseAscii fileContent
-	else
+	startsWithSolid = false
+	hasFacet = false
+	hasVertex = false
+	if fileContent.indexOf("solid") == 0
+		startsWithSolid = true
+		if fileContent.indexOf("facet") > 0
+			hasFacet = true
+		if fileContent.indexOf("vertex") > 0
+			hasVertex = true
+
+	if !startsWithSolid
+		#Import binary, since 'solid' is reserved for ascii
 		model = parseBinary	toArrayBuffer fileContent
+	else
+		#Okay, it should be ascii. does it contain other keywords?
+		if hasFacet and hasVertex
+			model = parseAscii fileContent
+		else
+			#No facet and vertex? maybe it's a binary
+			#that uses the solid keyword (it is not allowed to do so!)
+			model = parseBinary	toArrayBuffer fileContent
 
 	if model.importErrors.length > 0
 		if errorCallback?
 			errorCallback model.importErrors
-
 	return model
 
 toArrayBuffer = (buf) ->
@@ -84,7 +100,7 @@ parseBinary = (fileContent) ->
 		triangles might be missing"
 
 	binaryIndex = 4
-	while binaryIndex < datalength
+	while binaryIndex + polyLength <= datalength
 		poly = new StlPoly()
 		nx = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
@@ -164,6 +180,7 @@ optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
 	optimized.positions = positions
 	optimized.normals = normal
 	optimized.indices = index
+
 	return optimized
 module.exports.optimizeModel = optimizeModel
 
@@ -260,6 +277,3 @@ class Vec3d
 		return @multiplyScalar (1.0/@length())
 
 module.exports.Vec3d = Vec3d
-
-String.prototype.startsWith = (str) ->
-	return this.indexOf(str) == 0

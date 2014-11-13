@@ -15,7 +15,7 @@ describe 'stlImport', () ->
 		'test/testmodel_screwdriver.stl'
 	]
 	expectedWarnings = [0,0,1,1]
-	shallOptimize = [true,true,true,false]
+	shallOptimize = [true,true,true,true]
 	before (done) ->
 		for file in modelFiles
 			models.push fs.readFileSync file, {encoding: 'utf8'}
@@ -47,8 +47,15 @@ describe 'stlImport', () ->
 				deltaTime = new Date - begin
 				console.log "--> Model optimized in #{deltaTime}ms"
 
+				numPoly = 0
+				for m in parsedModels
+					numPoly += m.polygons.length
+
+				deltaTime = new Date() - totalBegin
+				msPerPoly = deltaTime / numPoly
 			console.log "All selected models have been
 									optimized in #{new Date() - totalBegin}ms"
+			console.log "It took #{(msPerPoly * 1000).toFixed 2}ms for 1000 Polygons"
 			done()
 
 	after () ->

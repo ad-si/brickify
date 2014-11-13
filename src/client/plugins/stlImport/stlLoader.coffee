@@ -173,30 +173,24 @@ module.exports.convertToThreeGeometry = (stlModel, bufferGeometry = false) ->
 		return createStandardGeometry(optimized)
 
 optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
-	positions = []#xyz xyz xyz
 	vertexnormals = []
 	faceNormals = []
 	index = [] #vert1 vert2 vert3
+
+	octreeRoot = new Octree(pointDistanceEpsilon)
+	biggestPointIndex = -1
 
 	for poly in importedStl.polygons
 		#add points if they don't exist, or get index of these points
 		indices = [-1,-1,-1]
 		for vertexIndex in [0..2]
 			point = poly.points[vertexIndex]
-			for geoPointIndex in  [0..positions.length-1] by 3
-				geopoint = new Vec3d(positions[geoPointIndex],
-					positions[geoPointIndex+1],
-					positions[geoPointIndex+2])
-				if (point.euclideanDistanceTo geopoint) < pointDistanceEpsilon
-					indices[vertexIndex] = geoPointIndex / 3
-					break
-			if indices[vertexIndex] == -1
-				indices[vertexIndex] = positions.length / 3
-				positions.push point.x
-				positions.push point.y
-				positions.push point.z
-				vertexnormals.push [
-					new Vec3d(poly.normal.x, poly.normal.y, poly.normal.z)]
+			newPointIndex = octreeRoot.add point,
+				new Vec3d(poly.normal.x, poly.normal.y, poly.normal.z), biggestPointIndex
+			indices[vertexIndex] = newPointIndex
+			if newPointIndex > biggestPointIndex
+				biggestPointIndex = newPointIndex
+
 		index.push indices[0]
 		index.push indices[1]
 		index.push indices[2]
@@ -204,21 +198,31 @@ optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
 		faceNormals.push poly.normal.y
 		faceNormals.push poly.normal.z
 
+	#get a list out of the octree
+	vertexPositions = new Array((biggestPointIndex+1)*3)
+	octreeRoot.forEach (node) ->
+		v = node.vec
+		i = node.index * 3
+		vertexPositions[i] = v.x
+		vertexPositions[i+1] = v.y
+		vertexPositions[i+2] = v.z
+
 	#average all vertexnormals
-	avgNormals = []
-	for normalList in vertexnormals
+	avgNormals = new Array((biggestPointIndex+1)*3)
+	octreeRoot.forEach (node) ->
+		normalList = node.normalList
+		i = node.index * 3
 		avg = new Vec3d(0,0,0)
 		for normal in normalList
 			normal = normal.normalized()
 			avg = avg.add normal
 		avg = avg.normalized()
-
-		avgNormals.push avg.x
-		avgNormals.push avg.y
-		avgNormals.push avg.z
+		avgNormals[i] = avg.x
+		avgNormals[i+2] = avg.y
+		avgNormals[i+3] = avg.z
 
 	optimized = new OptimizedModel()
-	optimized.positions = positions
+	optimized.positions = vertexPositions
 	optimized.indices = index
 	optimized.vertexNormals = avgNormals
 	optimized.faceNormals = faceNormals
@@ -322,3 +326,93 @@ class Vec3d
 		return @multiplyScalar (1.0/@length())
 
 module.exports.Vec3d = Vec3d
+
+class Octree
+	constructor: (@distanceDelta) ->
+		@index = -1
+		@vec = null
+		@normalList = null
+		@bxbybz = null #child that has a _b_igger x,y and z
+		@bxbysz = null
+		@bxsybz = null
+		@bxsysz = null
+		@sxbybz = null
+		@sxbysz = null
+		@sxsybz = null
+		@sxbysz = null
+	forEach: (callback) ->
+		callback(@)
+		if @bxbybz?
+			@bxbybz.forEach callback
+		if @bxbysz?
+			@bxbysz.forEach callback
+		if @bxsybz?
+			@bxsybz.forEach callback
+		if @bxsysz?
+			@bxsysz.forEach callback
+		if @sxbybz?
+			@sxbybz.forEach callback
+		if @sxbysz?
+			@sxbysz.forEach callback
+		if @sxsybz?
+			@sxsybz.forEach callback
+		if @sxsysz?
+			@sxsysz.forEach callback
+	add: (point, normal, biggestUsedIndex = 0) ->
+		if @vec == null
+			#if the tree is not initialized, set the vector as first element
+			@vec = point
+			@normalList = []
+			@normalList.push normal
+			@index = biggestUsedIndex+1
+			return @index
+		else if (point.euclideanDistanceTo @vec) < @distanceDelta
+			#if the points are near together, return own index
+			@normalList.push normal
+			return @index
+		else
+			#init the subnode this leaf belongs to
+			if point.x > @vec.x
+				#bx....
+				if point.y > @vec.y
+					#bxby..
+					if point.z > @vec.z
+						if (!(@bxbybz?))
+							@bxbybz = new Octree(@distanceDelta)
+						return @bxbybz.add point, normal, biggestUsedIndex
+					else
+						if (!(@bxbysz?))
+							@bxbysz = new Octree(@distanceDelta)
+						return @bxbysz.add point, normal, biggestUsedIndex
+				else
+					#bxsy..
+					if point.z > @vec.z
+						if (!(@bxsybz?))
+							@bxsybz = new Octree(@distanceDelta)
+						return @bxsybz.add point, normal, biggestUsedIndex
+					else
+						if (!(@bxsysz?))
+							@bxsysz = new Octree(@distanceDelta)
+						return @bxsysz.add point, normal, biggestUsedIndex
+			else
+				#sx....
+				if point.y > @vec.y
+					#sxby..
+					if point.z > @vec.z
+						if (!(@sxbybz?))
+							@sxbybz = new Octree(@distanceDelta)
+						return @sxbybz.add point, normal, biggestUsedIndex
+					else
+						if (!(@sxbysz?))
+							@sxbysz = new Octree(@distanceDelta)
+						return @sxbysz.add point, normal, biggestUsedIndex
+				else
+					#sxsy..
+					if point.z > @vec.z
+						if (!(@sxsybz?))
+							@sxsybz = new Octree(@distanceDelta)
+						return @sxsybz.add point, normal, biggestUsedIndex
+					else
+						if (!(@sxsysz?))
+							@sxsysz = new Octree(@distanceDelta)
+						return @sxsysz.add point, normal, biggestUsedIndex

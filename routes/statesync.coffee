@@ -5,6 +5,8 @@ diffpatch = jsondiffpatch.create objectHash: (obj) ->
 
 logger = require 'winston'
 
+pluginHooks = require('../src/common/pluginHooks')
+
 diffCallbacks = []
 
 exports.getState = (request, response) ->
@@ -26,8 +28,8 @@ exports.setState = (request, response) ->
 		logger.error 'Diff of identical states was not undefined'
 
 	#call callbacks, let them modify state
-	for callback in diffCallbacks
-		callback clientDiff, state
+
+	pluginHooks.updateState clientDiff, state
 
 	#send diff with our initial state to the client
 	serverDiff = diffpatch.diff oldState, state
@@ -38,9 +40,6 @@ exports.setState = (request, response) ->
 exports.resetState = (request, response) ->
 	request.session.state = {empty: true}
 	response.json request.session.state
-
-exports.addUpdateCallback = (callback) ->
-	diffCallbacks.push callback
 
 getInitializedState = (request) ->
 	state = request.session.state

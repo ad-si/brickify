@@ -76,7 +76,11 @@ handleDroppedFile = (event) ->
 addModelToThree = (binary) ->
 	#parses the binary geometry and adds it to the three scene,
 	#returning the uuid of the three object
-	stl = stlLoader.parse binary
+	stl = stlLoader.parse binary, (errors) ->
+		console.log "Errors occured while importing the stl file:"
+		for error in errors
+			console.log "-> " + error
+
 	geometry = stlLoader.convertToThreeGeometry stl
 	objectMaterial = new THREE.MeshLambertMaterial(
 		{

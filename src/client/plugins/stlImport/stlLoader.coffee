@@ -1,11 +1,15 @@
 #parses the content of the file
-module.exports.parse = (fileContent) ->
+module.exports.parse = (fileContent, errorCallback) ->
 	model = null
 
 	if fileContent.startsWith "solid"
 		model = parseAscii fileContent
 	else
 		model = parseBinary	toArrayBuffer fileContent
+
+	if model.importErrors.length > 0
+		if errorCallback?
+			errorCallback model.importErrors
 
 	return model
 

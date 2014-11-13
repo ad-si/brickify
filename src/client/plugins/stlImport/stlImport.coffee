@@ -1,8 +1,9 @@
 common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
+stlLoader = require './stlLoader'
+#stlLoader = new THREE.STLLoader()
 
 threejsRootNode = null
-stlLoader = new THREE.STLLoader()
 stateInstance = null
 globalConfigInstance = null
 
@@ -82,7 +83,12 @@ module.exports.importFile = (fileContent) ->
 addModelToThree = (binary) ->
 	#parses the binary geometry and adds it to the three scene,
 	#returning the uuid of the three object
-	geometry = stlLoader.parse binary
+	stl = stlLoader.parse binary, (errors) ->
+		console.log "Errors occured while importing the stl file:"
+		for error in errors
+			console.log "-> " + error
+
+	geometry = stlLoader.convertToThreeGeometry stl
 	objectMaterial = new THREE.MeshLambertMaterial(
 		{
 			color: globalConfigInstance.defaultObjectColor

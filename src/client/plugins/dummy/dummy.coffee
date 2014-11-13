@@ -26,3 +26,4 @@ module.exports.needs3dAnimation = false
 # Is called every frame
 # Use it for animations or updates that have to be performed every frame.coffee
 module.exports.update3D = () ->
+

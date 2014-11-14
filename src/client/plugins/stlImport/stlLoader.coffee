@@ -409,9 +409,9 @@ class Vec3d
 	add: (vec) ->
 		return new Vec3d(@x + vec.x, @y + vec.y, @z + vec.z)
 	crossProduct: (vec) ->
-		return new Vec3d(@y*vec.z - @z-vec.y,
-				@z*vec.x - @x*vec.z,
-				@x*vec.y - @y*vec.x)
+		return new Vec3d(@y * vec.z - @z * vec.y,
+				@z * vec.x - @x * vec.z,
+				@x * vec.y - @y * vec.x)
 	length: () ->
 		return Math.sqrt(@x*@x + @y*@y + @z*@z)
 	euclideanDistanceTo: (vec) ->

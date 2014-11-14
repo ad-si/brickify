@@ -66,7 +66,7 @@ handleDroppedFile = (event) ->
 		console.log "Errors occured while importing the stl file:"
 		for error in errors
 			console.log "-> " + error
-	optimizedModel = stlLoader.parse fileContent, errorCallback, true, false
+	optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel

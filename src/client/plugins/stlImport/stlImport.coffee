@@ -1,7 +1,7 @@
 common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 stlLoader = require './stlLoader'
-#stlLoader = new THREE.STLLoader()
+modelCache = require '../../modelCache'
 
 threejsRootNode = null
 stateInstance = null
@@ -44,11 +44,13 @@ module.exports.updateState = (delta, state) ->
 
 			if not threeObject?
 				#Create object and override uuid
-				requestMeshFromServer property.meshHash,
+				modelCache.requestMeshFromServer property.meshHash,
 					(modelBinaryData) ->
 						console.log "Got the model #{property.meshHash}
 						from the server"
-						newThreeObj = addModelToThree(modelBinaryData)
+						optimizedModel = new stlLoader.OptimizedModel()
+						optimizedModel.fromBase64 modelBinaryData
+						newThreeObj = addModelToThree optimizedModel
 						stateInstance.performStateAction (state) ->
 							copyPropertyDataToThree property, newThreeObj
 					() ->
@@ -59,10 +61,15 @@ module.exports.updateState = (delta, state) ->
 # send it to the server if it is not cached there
 handleDroppedFile = (event) ->
 	fileContent = event.target.result
-	threeObject = addModelToThree fileContent
-	md5hash = md5(event.target.result)
-	fileEnding = 'stl'
-
+	errorCallback = (errors) ->
+		console.log "Errors occured while importing the stl file:"
+		for error in errors
+			console.log "-> " + error
+	optimizedModel = stlLoader.parse fileContent, errorCallback, true, false
+	base64Optimized = optimizedModel.toBase64()
+	md5hash = md5(base64Optimized)
+	threeObject = addModelToThree optimizedModel
+	fileEnding = 'optimized'
 	if stateInstance?
 		stateInstance.performStateAction (state) ->
 			node = objectTree.addChildNode state.rootNode
@@ -71,18 +78,12 @@ handleDroppedFile = (event) ->
 
 			property.meshHash = md5hash + '.' + fileEnding
 			copyThreeDataToProperty property, threeObject
-
-	submitMeshToServer md5hash, fileEnding, fileContent
+	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
 
 # parses the binary geometry and adds it to the three scene,
 # returning the uuid of the three object
-addModelToThree = (binary) ->
-	stl = stlLoader.parse binary, (errors) ->
-		console.log "Errors occured while importing the stl file:"
-		for error in errors
-			console.log "-> " + error
-
-	geometry = stlLoader.convertToThreeGeometry stl, false
+addModelToThree = (optimizedModel) ->
+	geometry = stlLoader.convertToThreeGeometry optimizedModel, false
 	objectMaterial = new THREE.MeshLambertMaterial(
 		{
 			color: globalConfigInstance.defaultObjectColor
@@ -92,32 +93,6 @@ addModelToThree = (binary) ->
 	object = new THREE.Mesh( geometry, objectMaterial )
 	threejsRootNode.add( object )
 	return object
-
-# sends the model to the server if the server hasn't got a file
-# with the same file ending and md5 value
-submitMeshToServer = (md5hash, fileEnding, data) ->
-	$.get('/model/exists/' + md5hash + '/' + fileEnding).fail () ->
-		#server hasn't got the model, send it
-		$.ajax '/model/submit/' + md5hash + '/' + fileEnding,
-			data: data
-			type: 'POST'
-			contentType: 'application/octet-stream'
-			success: () ->
-				console.log 'sent model to the server'
-			error: () ->
-				console.log 'unable to send model to the server'
-
-# requests a mesh with the given md5hash.ending from the server
-requestMeshFromServer = (md5hashWithEnding, successCallback, failCallback) ->
-	splitted = md5hashWithEnding.split('.')
-	md5hash = splitted[0]
-	fileEnding = splitted[1]
-	$.get '/model/get/' + md5hash + '/' + fileEnding,
-		"",
-		(data, textStatus, jqXHR) ->
-			successCallback(data)
-	.fail () ->
-		failCallback() if failCallback?
 
 # Copys Three data (transforms, UUID) to the property object
 copyThreeDataToProperty = (property, threeObject) ->

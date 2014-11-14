@@ -184,7 +184,15 @@ module.exports.convertToThreeGeometry = (optimizedModel,
 # Optimizes the internal stl model representation by removing duplicate points
 # and creating an indexed face list
 # Takes the face normals from the stl and calculates vertex normals
-optimizeModel = (importedStl, pointDistanceEpsilon = 0.0001) ->
+# if cleanseStl is set to true, invalid polygons will be removed and
+# the face normals will be recalculated before processing the model
+# further
+optimizeModel = (importedStl,
+								 cleanseStl = true,
+								 pointDistanceEpsilon = 0.0001) ->
+	if cleanseStl
+		importedStl.cleanse()
+
 	vertexnormals = []
 	faceNormals = []
 	index = [] #vert1 vert2 vert3
@@ -299,13 +307,13 @@ class Stl
 			#check if it has 3 vectors
 			if poly.points.length == 3
 				newPolys.push poly
-		polygons = newPolys
+		@polygons = newPolys
 	recalculateNormals: () ->
 		for poly in @polygons
-			d1 = poly.points[0] minus poly.points[1]
-			d2 = poly.points[2] minus poly.points[1]
-			n = d1 crossProduct d2
-			n = n normalized()
+			d1 = poly.points[0].minus poly.points[1]
+			d2 = poly.points[2].minus poly.points[1]
+			n = d1.crossProduct d2
+			n = n.normalized()
 			poly.normal = n
 	cleanse: () ->
 		@removeInvalidPolygons()

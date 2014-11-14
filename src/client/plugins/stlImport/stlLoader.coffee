@@ -10,11 +10,11 @@ module.exports.parse = (fileContent, errorCallback,
 	startsWithSolid = false
 	hasFacet = false
 	hasVertex = false
-	if fileContent.indexOf("solid") == 0
+	if fileContent.indexOf('solid') == 0
 		startsWithSolid = true
-		if fileContent.indexOf("facet") > 0
+		if fileContent.indexOf('facet') > 0
 			hasFacet = true
-		if fileContent.indexOf("vertex") > 0
+		if fileContent.indexOf('vertex') > 0
 			hasVertex = true
 
 	if !startsWithSolid
@@ -38,7 +38,7 @@ module.exports.parse = (fileContent, errorCallback,
 	return model
 
 toArrayBuffer = (buf) ->
-	if typeof buf is "string"
+	if typeof buf is 'string'
 		array_buffer = new Uint8Array(buf.length)
 		i = 0
 
@@ -60,21 +60,21 @@ parseAscii = (fileContent) ->
 		cmd = cmd.toLowerCase()
 
 		switch cmd
-			when "solid"
+			when 'solid'
 				astl.nextText() #skip description of model
-			when "facet"
+			when 'facet'
 				if (currentPoly?)
-					stl.addError "Beginning a facet without ending the previous one"
+					stl.addError 'Beginning a facet without ending the previous one'
 					stl.addPolygon currentPoly
 					currentPoly = null
 				currentPoly = new StlPoly()
-			when "endfacet"
+			when 'endfacet'
 				if !(currentPoly?)
-					stl.addError "Ending a facet without beginning it"
+					stl.addError 'Ending a facet without beginning it'
 				else
 					stl.addPolygon currentPoly
 					currentPoly = null
-			when "normal"
+			when 'normal'
 				nx = parseFloat astl.nextText()
 				ny = parseFloat astl.nextText()
 				nz = parseFloat astl.nextText()
@@ -83,7 +83,7 @@ parseAscii = (fileContent) ->
 					stl.addError "Invalid normal definition: (#{nx}, #{ny}, #{nz})"
 				else
 					currentPoly.setNormal new Vec3d(nx,ny,nz)
-			when "vertex"
+			when 'vertex'
 				vx = parseFloat astl.nextText()
 				vy = parseFloat astl.nextText()
 				vz = parseFloat astl.nextText()
@@ -106,8 +106,8 @@ parseBinary = (fileContent) ->
 	calcDataLength = polyLength * numTriangles
 
 	if (calcDataLength > datalength)
-		stl.addError "Calculated length of triangle data does not match filesize,
-		triangles might be missing"
+		stl.addError 'Calculated length of triangle data does not match filesize,
+		triangles might be missing'
 
 	binaryIndex = 4
 	while binaryIndex + polyLength <= datalength
@@ -158,16 +158,16 @@ createBufferGeometry = (optimizedModel) ->
 createStandardGeometry = (optimizedModel) ->
 	geometry = new THREE.Geometry()
 
-	for vi in [0..optimizedModel.positions.length-1] by 3
+	for vi in [0..optimizedModel.positions.length - 1] by 3
 		geometry.vertices.push new THREE.Vector3(optimizedModel.positions[vi],
-			optimizedModel.positions[vi+1], optimizedModel.positions[vi+2])
+			optimizedModel.positions[vi + 1], optimizedModel.positions[vi + 2])
 
-	for fi in [0..optimizedModel.indices.length-1] by 3
+	for fi in [0..optimizedModel.indices.length - 1] by 3
 		geometry.faces.push new THREE.Face3(optimizedModel.indices[fi],
-			optimizedModel.indices[fi+1], optimizedModel.indices[fi+2],
+			optimizedModel.indices[fi + 1], optimizedModel.indices[fi + 2],
 			new THREE.Vector3(optimizedModel.faceNormals[fi],
-				optimizedModel.faceNormals[fi+1],
-				optimizedModel.faceNormals[fi+2]))
+				optimizedModel.faceNormals[fi + 1],
+				optimizedModel.faceNormals[fi + 2]))
 
 	return geometry
 
@@ -189,9 +189,8 @@ module.exports.convertToThreeGeometry = (optimizedModel,
 # if cleanseStl is set to true, invalid polygons will be removed and
 # the face normals will be recalculated before processing the model
 # further
-optimizeModel = (importedStl,
-								 cleanseStl = true,
-								 pointDistanceEpsilon = 0.0001) ->
+optimizeModel = (importedStl, cleanseStl = true,
+                 pointDistanceEpsilon = 0.0001) ->
 	if cleanseStl
 		importedStl.cleanse()
 
@@ -221,16 +220,16 @@ optimizeModel = (importedStl,
 		faceNormals.push poly.normal.z
 
 	#get a list out of the octree
-	vertexPositions = new Array((biggestPointIndex+1)*3)
+	vertexPositions = new Array((biggestPointIndex + 1) * 3)
 	octreeRoot.forEach (node) ->
 		v = node.vec
 		i = node.index * 3
 		vertexPositions[i] = v.x
-		vertexPositions[i+1] = v.y
-		vertexPositions[i+2] = v.z
+		vertexPositions[i + 1] = v.y
+		vertexPositions[i + 2] = v.z
 
 	#average all vertexnormals
-	avgNormals = new Array((biggestPointIndex+1)*3)
+	avgNormals = new Array((biggestPointIndex + 1) * 3)
 	octreeRoot.forEach (node) ->
 		normalList = node.normalList
 		i = node.index * 3
@@ -240,8 +239,8 @@ optimizeModel = (importedStl,
 			avg = avg.add normal
 		avg = avg.normalized()
 		avgNormals[i] = avg.x
-		avgNormals[i+1] = avg.y
-		avgNormals[i+2] = avg.z
+		avgNormals[i + 1] = avg.y
+		avgNormals[i + 2] = avg.z
 
 	optimized = new OptimizedModel()
 	optimized.positions = vertexPositions
@@ -258,43 +257,43 @@ base64ByteLength = (base64Length) ->
 stringToUint8Array = (str) ->
 	ab = new ArrayBuffer(str.length)
 	uintarray = new Uint8Array(ab)
-	for i in [0..str.length-1]
+	for i in [0..str.length - 1]
 		uintarray[i] = str.charCodeAt i
 	return uintarray
 
 # An optimized model structure with indexed faces / vertices
 # and cached vertex and face normals
 class OptimizedModel
-	constructor: ()->
+	constructor: () ->
 		@positions = []
 		@indices = []
 		@vertexNormals = []
 		@faceNormals = []
 	toBase64: () ->
 		posA = new Float32Array(@positions.length)
-		for i in [0..@positions.length-1]
+		for i in [0..@positions.length - 1]
 			posA[i] = @positions[i]
 		indA = new Int32Array(@indices.length)
-		for i in [0..@indices.length-1]
+		for i in [0..@indices.length - 1]
 			indA[i] = @indices[i]
 		vnA = new Float32Array(@vertexNormals.length)
-		for i in [0..@vertexNormals.length-1]
+		for i in [0..@vertexNormals.length - 1]
 			vnA[i] = @vertexNormals[i]
 		fnA = new Float32Array(@faceNormals.length)
-		for i in [0..@faceNormals.length-1]
+		for i in [0..@faceNormals.length - 1]
 			fnA[i] = @faceNormals[i]
 
 		posBase = @arrayBufferToBase64 posA.buffer
 		baseString = posBase
-		baseString += "|"
+		baseString += '|'
 
 		indBase = @arrayBufferToBase64 indA.buffer
 		baseString += indBase
-		baseString += "|"
+		baseString += '|'
 
 		vnBase = @arrayBufferToBase64 vnA.buffer
 		baseString += vnBase
-		baseString += "|"
+		baseString += '|'
 
 		fnBase = @arrayBufferToBase64 fnA.buffer
 		baseString += fnBase
@@ -312,22 +311,22 @@ class OptimizedModel
 		result = new Float32Array(numFloats)
 		decoded = stringToUint8Array atob(b64)
 		pview = new DataView(decoded.buffer)
-		for i in [0..numFloats-1]
-			result[i] = pview.getFloat32 i*4, true
+		for i in [0..numFloats - 1]
+			result[i] = pview.getFloat32 i * 4, true
 		return result
 	base64ToInt32Array: (b64) ->
 		numInts =  (base64ByteLength b64.length) / 4
 		result = new Int32Array(numInts)
 		decoded = stringToUint8Array atob(b64)
 		pview = new DataView(decoded.buffer)
-		for i in [0..numInts-1]
-			result[i] = pview.getInt32 i*4, true
+		for i in [0..numInts - 1]
+			result[i] = pview.getInt32 i * 4, true
 		return result
 	arrayBufferToBase64: (buffer) ->
 		binary = ''
 		bytes = new Uint8Array( buffer )
 		len = bytes.byteLength
-		for i in [0..len-1]
+		for i in [0..len - 1]
 			binary += String.fromCharCode( bytes[ i ] )
 		return window.btoa binary
 
@@ -357,7 +356,7 @@ class AsciiStl
 				return true
 		return false
 	readUntilWhitespace: () ->
-		readContent = ""
+		readContent = ''
 		while (!@currentCharIsWhitespace() && !@reachedEnd())
 			readContent = readContent + @currentChar()
 			@index++
@@ -418,12 +417,14 @@ class StlPoly
 		@points = []
 		@normal = new Vec3d(0,0,0)
 	setNormal: (@normal) ->
+		return undefined
 	addPoint: (p) ->
 		@points.push p
 module.exports.Stlpoly = StlPoly
 
 class Vec3d
 	constructor: (@x, @y, @z) ->
+		return undefined
 	minus: (vec) ->
 		return new Vec3d(@x - vec.x, @y - vec.y, @z - vec.z)
 	add: (vec) ->
@@ -433,13 +434,13 @@ class Vec3d
 				@z * vec.x - @x * vec.z,
 				@x * vec.y - @y * vec.x)
 	length: () ->
-		return Math.sqrt(@x*@x + @y*@y + @z*@z)
+		return Math.sqrt(@x * @x + @y * @y + @z * @z)
 	euclideanDistanceTo: (vec) ->
 		return (@minus vec).length()
 	multiplyScalar: (scalar) ->
 		return new Vec3d(@x * scalar, @y * scalar, @z * scalar)
 	normalized: () ->
-		return @multiplyScalar (1.0/@length())
+		return @multiplyScalar (1.0 / @length())
 
 module.exports.Vec3d = Vec3d
 
@@ -480,7 +481,7 @@ class Octree
 			@vec = point
 			@normalList = []
 			@normalList.push normal
-			@index = biggestUsedIndex+1
+			@index = biggestUsedIndex + 1
 			return @index
 		else if (point.euclideanDistanceTo @vec) < @distanceDelta
 			#if the points are near together, return own index

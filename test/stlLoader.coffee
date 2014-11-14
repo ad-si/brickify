@@ -21,7 +21,7 @@ describe 'stlImport', () ->
 						{encoding: 'utf8'}
 					modelFiles.push modelPath + file
 
-					jsonfile = file.substring(0,file.length-4) + ".json"
+					jsonfile = file.substring(0, file.length - 4) + '.json'
 					json = {}
 					if fs.existsSync(modelPath + jsonfile)
 						json = JSON.parse fs.readFileSync(modelPath + jsonfile)
@@ -39,10 +39,10 @@ describe 'stlImport', () ->
 
 	describe 'stlImport', () ->
 		it 'should load stl files, convert to the internal representation', (done) ->
-			for i in [0..models.length-1]
-				console.log "Importing "  + modelFiles[i]
+			for i in [0..models.length - 1]
+				console.log "Importing #{modelFiles[i]}"
 				errorcallback = (error) ->
-					console.log "-> Import Error: " + error
+					console.log "-> Import Error: #{error}"
 				parsedModel = stlLoader.parse models[i], errorcallback, false
 
 				expect(parsedModel.importErrors.length).to.equals(expectedWarnings[i])
@@ -54,15 +54,16 @@ describe 'stlImport', () ->
 			totalBegin = new Date()
 			@timeout(30000)
 
-			for i in [0..modelFiles.length-1]
+			for i in [0..modelFiles.length - 1]
 				if !shallOptimize[i]
 					continue
-				console.log "Optimizing model " + modelFiles[i]
-				console.log "--> Model has #{parsedModels[i].polygons.length} Polygons"
+				console.log "Optimizing model #{modelFiles[i]}"
+				console.log "--> Model has #{parsedModels[i].polygons.length}
+				            Polygons"
 				begin = new Date()
 				optGeo = stlLoader.optimizeModel parsedModels[i]
 				deltaTime = new Date - begin
-				console.log "--> Model optimized in #{deltaTime}ms"
+				console.log "--> Model optimized in #{deltaTime} ms"
 
 				numPoly = 0
 				for m in parsedModels
@@ -70,9 +71,13 @@ describe 'stlImport', () ->
 
 				deltaTime = new Date() - totalBegin
 				msPerPoly = deltaTime / numPoly
+
 			console.log "All selected models have been
-									optimized in #{new Date() - totalBegin}ms"
-			console.log "It took #{(msPerPoly * 1000).toFixed 2}ms for 1000 Polygons"
+						optimized in #{new Date() - totalBegin} ms"
+
+			console.log "It took #{(msPerPoly * 1000).toFixed 2} ms
+						for 1000 Polygons"
 			done()
 
 	after () ->
+		return undefined

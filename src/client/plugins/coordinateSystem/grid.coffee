@@ -52,13 +52,13 @@ axisLines = (threejsNode, globalConfig) ->
 		new THREE.Vector3(  0,  0, 0)
 	)
 	gridLineGeometryXPositive.vertices.push(
-		new THREE.Vector3( globalConfig.gridSize/2, 0, 0)
+		new THREE.Vector3( globalConfig.gridSize / 2, 0, 0)
 	)
 	gridLineGeometryXPositive.vertices.push(
 		new THREE.Vector3(  globalConfig.gridSize, 0, 0)
 	)
 	gridLineGeometryYPositive.vertices.push(
-		new THREE.Vector3( 0, globalConfig.gridSize/2, 0)
+		new THREE.Vector3( 0, globalConfig.gridSize / 2, 0)
 	)
 	gridLineGeometryYPositive.vertices.push(
 		new THREE.Vector3( 0,  globalConfig.gridSize, 0)
@@ -86,8 +86,8 @@ axisLines = (threejsNode, globalConfig) ->
   Construct grid lines that are not on the X or Y axis
 ###
 otherLines = (threejsNode, globalConfig) ->
-	for i in [1..globalConfig.gridSize/globalConfig.gridStepSize]
-		num = i*globalConfig.gridStepSize
+	for i in [1..globalConfig.gridSize / globalConfig.gridStepSize]
+		num = i * globalConfig.gridStepSize
 		if i % 10 == 0
 			material = @materialGrid10
 		else if i % 5 == 0

@@ -91,7 +91,7 @@ module.exports.linkHooks = () ->
 	]
 	.forEach (hook) ->
 		hookPath = path.join('hooks', hook)
-		gitHookPath = path.join(".git/hooks", hook)
+		gitHookPath = path.join('.git/hooks', hook)
 
 		fs.unlink gitHookPath, (error) ->
 			if error and error.code is not 'ENOENT'

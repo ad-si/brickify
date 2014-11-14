@@ -8,7 +8,7 @@ readFile = (filename, callBack) ->
 		if xmlhttp.readyState == 4
 			txt = xmlhttp.responseText
 			callBack(txt)
-	xmlhttp.open("GET", filename, true)
+	xmlhttp.open('GET', filename, true)
 	xmlhttp.send();
 
 describe 'stl import tests', ->
@@ -27,11 +27,11 @@ describe 'stl import tests', ->
 				txt = xmlhttp.responseText
 				expect(txt).to.equal('testfile')
 				done()
-		xmlhttp.open("GET", "testfile_for_local_file_access.txt", true)
+		xmlhttp.open('GET', 'testfile_for_local_file_access.txt', true)
 		xmlhttp.send()
 
 	it 'imports correct stl', (done) ->
-		readFile 'models/unit_cube.stl', (fileContent)->
+		readFile 'models/unit_cube.stl', (fileContent) ->
 			threeObject = new THREE.Object3D()
 			stlImport.init3d(threeObject)
 			stlImport.importFile(fileContent)
@@ -110,7 +110,7 @@ describe 'stl import tests', ->
 
 	for name in models
 		it 'imports models/' + name, (done) ->
-			readFile 'models/' + name, (fileContent)->
+			readFile 'models/' + name, (fileContent) ->
 				threeObject = new THREE.Object3D()
 				stlImport.init3d(threeObject)
 				stlImport.importFile(fileContent)

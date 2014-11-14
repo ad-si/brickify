@@ -374,23 +374,43 @@ class Stl
 		@polygons.push(stlPolygon)
 	addError: (string) ->
 		@importErrors.push string
-	removeInvalidPolygons: () ->
+	removeInvalidPolygons: (infoResult) ->
 		newPolys = []
+		deletedPolys = 0
+
 		for poly in @polygons
 			#check if it has 3 vectors
 			if poly.points.length == 3
 				newPolys.push poly
+
+		if (infoResult)
+			deletedPolys = @polygons.length - newPolys.length
+
 		@polygons = newPolys
-	recalculateNormals: () ->
+		return deletedPolys
+	recalculateNormals: (infoResult) ->
+		newNormals = 0
 		for poly in @polygons
 			d1 = poly.points[0].minus poly.points[1]
 			d2 = poly.points[2].minus poly.points[1]
 			n = d1.crossProduct d2
 			n = n.normalized()
+
+			if infoResult
+				if poly.normal?
+					dist = poly.normal.euclideanDistanceTo n
+					if (dist > 0.001)
+						newNormals++
+				else
+					newNormals++
+
 			poly.normal = n
-	cleanse: () ->
-		@removeInvalidPolygons()
-		@recalculateNormals()
+			return newNormals
+	cleanse: (infoResult = false) ->
+		result = {}
+		result.deletedPolygons = @removeInvalidPolygons infoResult
+		result.recalculatedNormals = @recalculateNormals infoResult
+		return result
 module.exports.Stl = Stl
 
 class StlPoly

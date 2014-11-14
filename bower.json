@@ -34,7 +34,6 @@
     "TrackballControls": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/TrackballControls.js",
     "bootstrap": "~3.2.0",
     "JavaScript-MD5": "~1.1.0",
-    "react": "~0.12.0",
     "fontawesome": "~4.2.0",
     "FileSaver": "*",
     "Blob": "*"

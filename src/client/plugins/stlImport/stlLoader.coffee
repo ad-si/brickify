@@ -285,22 +285,18 @@ class OptimizedModel
 			fnA[i] = @faceNormals[i]
 
 		posBase = @arrayBufferToBase64 posA.buffer
-		console.log posBase.length
 		baseString = posBase
 		baseString += "|"
 
 		indBase = @arrayBufferToBase64 indA.buffer
-		console.log indBase.length
 		baseString += indBase
 		baseString += "|"
 
 		vnBase = @arrayBufferToBase64 vnA.buffer
-		console.log vnBase.length
 		baseString += vnBase
 		baseString += "|"
 
 		fnBase = @arrayBufferToBase64 fnA.buffer
-		console.log fnBase.length
 		baseString += fnBase
 
 		return baseString

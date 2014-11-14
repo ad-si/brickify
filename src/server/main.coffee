@@ -54,7 +54,6 @@ sortedDependencies = [
 	'jquery',
 	'bootstrap',
 	'threejs',
-	'react',
 	'JavaScript-MD5',
 	'STLLoader',
 	'TrackballControls',
@@ -121,7 +120,7 @@ module.exports.setupRouting = () ->
 			.import 'nib'
 	)
 
-	app.use express.static(path.normalize 'public')
+	app.use(express.static('public'))
 
 	if developmentMode
 		app.use morgan 'dev',

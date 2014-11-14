@@ -90,3 +90,4 @@ module.exports.updateState = (delta, state) ->
 # @see render
 ###
 module.exports.update3D = () ->
+

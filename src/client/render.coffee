@@ -6,8 +6,8 @@ pluginHooks = require '../common/pluginHooks'
 uiInstance = null
 
 localRenderer = () ->
-	requestAnimationFrame localRenderer
-	uiInstance.renderer.render uiInstance.scene, uiInstance.camera
+	requestAnimationFrame( localRenderer )
+	uiInstance.renderer.render( uiInstance.scene, uiInstance.camera )
 
 	pluginHooks.update3D()
 

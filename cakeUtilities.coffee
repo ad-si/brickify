@@ -74,9 +74,9 @@ module.exports.buildServer = (onlyDelete = false) ->
 			compileAllCoffeeFiles(directory, null) if not onlyDelete
 
 	return module.exports
-	
+
 module.exports.linkHooks = () ->
-	# gist.github.com/domenic/2238951
+
 	[
 		'applypatch-msg'
 		'commit-msg'
@@ -97,10 +97,11 @@ module.exports.linkHooks = () ->
 			if error and error.code is not 'ENOENT'
 				buildLog.error error
 
-		fs.link hookPath, gitHookPath, (error) ->
-			if error
-				buildLog.error error
-			else
-				buildLog.info hookPath, '->', gitHookPath
+			fs.link hookPath, gitHookPath, (error) ->
+				if error
+					if error.code is not 'ENOENT'
+						buildLog.error error
+				else
+					buildLog.info hookPath, '->', gitHookPath
 
 	return module.exports

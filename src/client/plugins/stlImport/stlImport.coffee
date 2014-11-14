@@ -57,8 +57,9 @@ module.exports.updateState = (delta, state) ->
 						console.log "Unable to get model from server: ",
 							property.meshHash
 
-# Add the model as a three model,
-# send it to the server if it is not cached there
+# Imports the stl, optimizes it,
+# sends it to the server (if not cached there)
+# and adds it to the scene as a THREE.Geometry
 handleDroppedFile = (event) ->
 	fileContent = event.target.result
 	errorCallback = (errors) ->
@@ -97,9 +98,20 @@ addModelToThree = (optimizedModel) ->
 # Copys Three data (transforms, UUID) to the property object
 copyThreeDataToProperty = (property, threeObject) ->
 	property.threeObjectUuid = threeObject.uuid
-	property.positionData.position = threeObject.position
-	property.positionData.rotation = threeObject.rotation
-	property.positionData.scale = threeObject.scale
+	property.positionData.position = {x:null, y:null, z:null}
+	property.positionData.position.x = threeObject.position.x
+	property.positionData.position.y = threeObject.position.y
+	property.positionData.position.z = threeObject.position.z
+
+	property.positionData.rotation = {_x:null, _y:null, _z:null}
+	property.positionData.rotation._x = threeObject.rotation._x
+	property.positionData.rotation._y = threeObject.rotation._y
+	property.positionData.rotation._z = threeObject.rotation._z
+
+	property.positionData.scale = {x:null, y:null, z:null}
+	property.positionData.scale.x = threeObject.scale.x
+	property.positionData.scale.y = threeObject.scale.y
+	property.positionData.scale.z = threeObject.scale.z
 
 # copys stored transforms and UUID from the property to the tree object.
 copyPropertyDataToThree = (property, threeObject) ->

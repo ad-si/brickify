@@ -42,3 +42,4 @@ statesync.init globalConfig, (state) ->
 
 	pluginLoader.init neededInstances
 	pluginLoader.loadPlugins()
+	

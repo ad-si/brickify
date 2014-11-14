@@ -35,14 +35,14 @@ module.exports.saveModel = (request, response) ->
 	calculatedMd5 = md5Calc content
 
 	if not md5 == calculatedMd5
-		response.status(500).send "Calculated MD5 value does not match"
+		response.status(500).send 'Calculated MD5 value does not match'
 	else
 		console.log 'Saving model ' + md5
 		modelStorage.saveModel calculatedMd5, fileEnding, content, (error) ->
 			if err?
-				response.status(500).send "Error while saving the file"
+				response.status(500).send 'Error while saving the file'
 			else
-				response.send "Saved model"
+				response.send 'Saved model'
 
 
 

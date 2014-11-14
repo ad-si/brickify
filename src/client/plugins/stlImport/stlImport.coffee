@@ -7,11 +7,11 @@ threejsRootNode = null
 stateInstance = null
 globalConfigInstance = null
 
-pluginPropertyName = "stlImport"
+pluginPropertyName = 'stlImport'
 class StlProperty
 	constructor: () ->
-		@threeObjectUuid = ""
-		@meshHash = ""
+		@threeObjectUuid = ''
+		@meshHash = ''
 		@positionData =
 			position: null
 			rotation: null
@@ -54,7 +54,7 @@ module.exports.updateState = (delta, state) ->
 						stateInstance.performStateAction (state) ->
 							copyPropertyDataToThree property, newThreeObj
 					() ->
-						console.log "Unable to get model from server: ",
+						console.log 'Unable to get model from server: ',
 							property.meshHash
 
 # Imports the stl, optimizes it,
@@ -63,9 +63,9 @@ module.exports.updateState = (delta, state) ->
 handleDroppedFile = (event) ->
 	fileContent = event.target.result
 	errorCallback = (errors) ->
-		console.log "Errors occured while importing the stl file:"
+		console.log 'Errors occured while importing the stl file:'
 		for error in errors
-			console.log "-> " + error
+			console.log '-> ' + error
 	optimizedModel = stlLoader.parse fileContent, errorCallback, true, false
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
@@ -98,17 +98,17 @@ addModelToThree = (optimizedModel) ->
 # Copys Three data (transforms, UUID) to the property object
 copyThreeDataToProperty = (property, threeObject) ->
 	property.threeObjectUuid = threeObject.uuid
-	property.positionData.position = {x:null, y:null, z:null}
+	property.positionData.position = {x: null, y: null, z: null}
 	property.positionData.position.x = threeObject.position.x
 	property.positionData.position.y = threeObject.position.y
 	property.positionData.position.z = threeObject.position.z
 
-	property.positionData.rotation = {_x:null, _y:null, _z:null}
+	property.positionData.rotation = {_x: null, _y: null, _z: null}
 	property.positionData.rotation._x = threeObject.rotation._x
 	property.positionData.rotation._y = threeObject.rotation._y
 	property.positionData.rotation._z = threeObject.rotation._z
 
-	property.positionData.scale = {x:null, y:null, z:null}
+	property.positionData.scale = {x: null, y: null, z: null}
 	property.positionData.scale.x = threeObject.scale.x
 	property.positionData.scale.y = threeObject.scale.y
 	property.positionData.scale.z = threeObject.scale.z

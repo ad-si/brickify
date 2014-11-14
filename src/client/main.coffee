@@ -2,8 +2,8 @@ path = require 'path'
 r = require 'react'
 
 globalConfig = require './globals.yaml'
-ui = require("./ui")(globalConfig)
-renderer = require "./render"
+ui = require('./ui')(globalConfig)
+renderer = require './render'
 pluginLoader = require './pluginLoader'
 statesync = require './statesync'
 objectTree = require '../common/objectTree'

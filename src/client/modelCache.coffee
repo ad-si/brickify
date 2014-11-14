@@ -10,7 +10,7 @@ modelCache = []
 # with the same file ending and md5 value
 # model will be cached locally
 submitMeshToServer = (md5hash, fileEnding, data) ->
-	addModelToCache md5hash+'.'+fileEnding, data
+	addModelToCache md5hash + '.' + fileEnding, data
 
 	$.get('/model/exists/' + md5hash + '/' + fileEnding).fail () ->
 		#server hasn't got the model, send it
@@ -40,7 +40,7 @@ requestMeshFromServer = (md5hashWithEnding, successCallback, failCallback) ->
 		addModelToCache md5hashWithEnding, data
 		successCallback(data)
 
-	$.get(requestUrl, "", responseCallback).fail () ->
+	$.get(requestUrl, '', responseCallback).fail () ->
 		failCallback() if failCallback?
 module.exports.requestMeshFromServer = requestMeshFromServer
 

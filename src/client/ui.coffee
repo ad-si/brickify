@@ -73,11 +73,11 @@ module.exports = (globalConfig) ->
 			)
 
 			#Grids that are not on the X or Y axis
-			for i in [1..globalConfig.gridSize/globalConfig.gridStepSize]
-				num = i*globalConfig.gridStepSize
-				if i % 10*globalConfig.gridStepSize == 0
+			for i in [1..globalConfig.gridSize / globalConfig.gridStepSize]
+				num = i * globalConfig.gridStepSize
+				if i % 10 * globalConfig.gridStepSize == 0
 					material = materialGrid10
-				else if i % 5*globalConfig.gridStepSize == 0
+				else if i % 5 * globalConfig.gridStepSize == 0
 					material = materialGrid5
 				else
 					material = materialGridNormal
@@ -156,13 +156,13 @@ module.exports = (globalConfig) ->
 				new THREE.Vector3(  0,  0, 0)
 			)
 			gridLineGeometryXPositive.vertices.push(
-				new THREE.Vector3( globalConfig.gridSize/2, 0, 0)
+				new THREE.Vector3( globalConfig.gridSize / 2, 0, 0)
 			)
 			gridLineGeometryXPositive.vertices.push(
 				new THREE.Vector3(  globalConfig.gridSize, 0, 0)
 			)
 			gridLineGeometryYPositive.vertices.push(
-				new THREE.Vector3( 0, globalConfig.gridSize/2, 0)
+				new THREE.Vector3( 0, globalConfig.gridSize / 2, 0)
 			)
 			gridLineGeometryYPositive.vertices.push(
 				new THREE.Vector3( 0,  globalConfig.gridSize, 0)
@@ -244,7 +244,7 @@ module.exports = (globalConfig) ->
 			sceneRotation = new THREE.Matrix4()
 			sceneRotation.makeRotationAxis(
 				new THREE.Vector3( 1, 0, 0 ),
-				(-Math.PI/2)
+				(-Math.PI / 2)
 			)
 			@scene.applyMatrix(sceneRotation)
 
@@ -252,8 +252,8 @@ module.exports = (globalConfig) ->
 			# setup camera
 			@camera.position.set(
 				globalConfig.axisLength
-				globalConfig.axisLength+10
-				globalConfig.axisLength/2
+				globalConfig.axisLength + 10
+				globalConfig.axisLength / 2
 			)
 			@camera.up.set(0, 1, 0)
 			@camera.lookAt(new THREE.Vector3(0, 0, 0))

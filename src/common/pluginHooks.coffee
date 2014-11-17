@@ -47,6 +47,10 @@ module.exports.register = (plugin) ->
 registerHook = (plugin, hook) ->
 	lists[hook].push plugin[hook] if hasHook plugin, hook
 
+# **get all callbacks that are registered for a specific hook**
+module.exports.get = (hook) ->
+	lists[hook]
+
 # **unregister a plugin for all hooks it was registered for**
 module.exports.unregister = (plugin) ->
 	unregisterHook plugin, hook for hook in hooks

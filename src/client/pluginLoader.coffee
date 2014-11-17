@@ -6,12 +6,12 @@
 hooks = require('./pluginHooks.yaml')
 pluginHooks = require('../common/pluginHooks')
 pluginHooks.initHooks(hooks)
+renderer = require './renderer'
 
 pluginInstances = []
 stateSyncModule = null
 uiInstance = null
 globalConfigInstance = null
-rendererInstance  = null
 
 checkForPluginMethods = (instance) ->
 	instance.hasOwnProperty('pluginName')
@@ -23,7 +23,7 @@ initPluginInstance = (instance) ->
 	pluginHooks.register instance
 
 	if threeNode?
-		uiInstance.scene.add threeNode
+		renderer.addToScene threeNode
 
 loadPlugin = (instance) ->
 	if checkForPluginMethods instance
@@ -42,7 +42,6 @@ module.exports.init = (neededInstances) ->
 	stateSyncModule = neededInstances.statesync
 	globalConfigInstance = neededInstances.config
 	uiInstance = neededInstances.ui
-	rendererInstance = neededInstances.renderer
 
 # Since browserify.js does not support dynamic require
 # all plugins must be written down

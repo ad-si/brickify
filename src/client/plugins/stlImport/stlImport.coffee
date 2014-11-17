@@ -2,6 +2,7 @@ common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 stlLoader = require './stlLoader'
 modelCache = require '../../modelCache'
+OptimizedModel = require '../../../common/OptimizedModel'
 
 threejsRootNode = null
 stateInstance = null
@@ -48,7 +49,7 @@ module.exports.updateState = (delta, state) ->
 					(modelBinaryData) ->
 						console.log "Got the model #{property.meshHash}
 						from the server"
-						optimizedModel = new stlLoader.OptimizedModel()
+						optimizedModel = new OptimizedModel()
 						optimizedModel.fromBase64 modelBinaryData
 						newThreeObj = addModelToThree optimizedModel
 						stateInstance.performStateAction (state) ->
@@ -66,7 +67,7 @@ handleDroppedFile = (event) ->
 		console.log 'Errors occured while importing the stl file:'
 		for error in errors
 			console.log '-> ' + error
-	optimizedModel = stlLoader.parse fileContent, errorCallback, true, false
+	optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel

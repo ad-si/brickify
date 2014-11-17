@@ -67,6 +67,11 @@ task 'build', 'Builds client and server js files', ->
 	.buildClient()
 	.buildServer()
 
+# Run all batch tests on models
+task 'batchTest', 'Runs batch tests on models', ->
+    batchTester = require './batchTesting/batchTesting'
+    batchTester.startTesting()
+
 ###
   ##Building and starting
 

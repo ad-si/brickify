@@ -1,3 +1,5 @@
+OptimizedModel = require '../../../common/OptimizedModel'
+
 # Parses the content of a stl file.
 # if optimize is set to true, an optimized mesh is returned
 # else, a stl representation is returned, which should not be
@@ -110,7 +112,7 @@ parseBinary = (fileContent) ->
 		triangles might be missing'
 
 	binaryIndex = 4
-	while binaryIndex + polyLength <= datalength
+	while (binaryIndex - 4) + polyLength <= datalength
 		poly = new StlPoly()
 		nx = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
@@ -251,87 +253,6 @@ optimizeModel = (importedStl, cleanseStl = true,
 	return optimized
 module.exports.optimizeModel = optimizeModel
 
-base64ByteLength = (base64Length) ->
-	return (base64Length / 4) * 3
-
-stringToUint8Array = (str) ->
-	ab = new ArrayBuffer(str.length)
-	uintarray = new Uint8Array(ab)
-	for i in [0..str.length - 1]
-		uintarray[i] = str.charCodeAt i
-	return uintarray
-
-# An optimized model structure with indexed faces / vertices
-# and cached vertex and face normals
-class OptimizedModel
-	constructor: () ->
-		@positions = []
-		@indices = []
-		@vertexNormals = []
-		@faceNormals = []
-	toBase64: () ->
-		posA = new Float32Array(@positions.length)
-		for i in [0..@positions.length - 1]
-			posA[i] = @positions[i]
-		indA = new Int32Array(@indices.length)
-		for i in [0..@indices.length - 1]
-			indA[i] = @indices[i]
-		vnA = new Float32Array(@vertexNormals.length)
-		for i in [0..@vertexNormals.length - 1]
-			vnA[i] = @vertexNormals[i]
-		fnA = new Float32Array(@faceNormals.length)
-		for i in [0..@faceNormals.length - 1]
-			fnA[i] = @faceNormals[i]
-
-		posBase = @arrayBufferToBase64 posA.buffer
-		baseString = posBase
-		baseString += '|'
-
-		indBase = @arrayBufferToBase64 indA.buffer
-		baseString += indBase
-		baseString += '|'
-
-		vnBase = @arrayBufferToBase64 vnA.buffer
-		baseString += vnBase
-		baseString += '|'
-
-		fnBase = @arrayBufferToBase64 fnA.buffer
-		baseString += fnBase
-
-		return baseString
-	fromBase64: (base64String) ->
-		strArray = base64String.split '|'
-
-		@positions = @base64ToFloat32Array strArray[0]
-		@indices = new @base64ToInt32Array strArray[1]
-		@vertexNormals = @base64ToFloat32Array strArray[2]
-		@faceNormals = @base64ToFloat32Array strArray[3]
-	base64ToFloat32Array: (b64) ->
-		numFloats =  (base64ByteLength b64.length) / 4
-		result = new Float32Array(numFloats)
-		decoded = stringToUint8Array atob(b64)
-		pview = new DataView(decoded.buffer)
-		for i in [0..numFloats - 1]
-			result[i] = pview.getFloat32 i * 4, true
-		return result
-	base64ToInt32Array: (b64) ->
-		numInts =  (base64ByteLength b64.length) / 4
-		result = new Int32Array(numInts)
-		decoded = stringToUint8Array atob(b64)
-		pview = new DataView(decoded.buffer)
-		for i in [0..numInts - 1]
-			result[i] = pview.getInt32 i * 4, true
-		return result
-	arrayBufferToBase64: (buffer) ->
-		binary = ''
-		bytes = new Uint8Array( buffer )
-		len = bytes.byteLength
-		for i in [0..len - 1]
-			binary += String.fromCharCode( bytes[ i ] )
-		return window.btoa binary
-
-module.exports.OptimizedModel = OptimizedModel
-
 class AsciiStl
 	constructor: (fileContent) ->
 		@content = fileContent
@@ -373,23 +294,43 @@ class Stl
 		@polygons.push(stlPolygon)
 	addError: (string) ->
 		@importErrors.push string
-	removeInvalidPolygons: () ->
+	removeInvalidPolygons: (infoResult) ->
 		newPolys = []
+		deletedPolys = 0
+
 		for poly in @polygons
 			#check if it has 3 vectors
 			if poly.points.length == 3
 				newPolys.push poly
+
+		if (infoResult)
+			deletedPolys = @polygons.length - newPolys.length
+
 		@polygons = newPolys
-	recalculateNormals: () ->
+		return deletedPolys
+	recalculateNormals: (infoResult) ->
+		newNormals = 0
 		for poly in @polygons
-			d1 = poly.points[0].minus poly.points[1]
-			d2 = poly.points[2].minus poly.points[1]
+			d1 = poly.points[1].minus poly.points[0]
+			d2 = poly.points[2].minus poly.points[0]
 			n = d1.crossProduct d2
 			n = n.normalized()
+
+			if infoResult
+				if poly.normal?
+					dist = poly.normal.euclideanDistanceTo n
+					if (dist > 0.001)
+						newNormals++
+				else
+					newNormals++
+
 			poly.normal = n
-	cleanse: () ->
-		@removeInvalidPolygons()
-		@recalculateNormals()
+			return newNormals
+	cleanse: (infoResult = false) ->
+		result = {}
+		result.deletedPolygons = @removeInvalidPolygons infoResult
+		result.recalculatedNormals = @recalculateNormals infoResult
+		return result
 module.exports.Stl = Stl
 
 class StlPoly

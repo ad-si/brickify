@@ -59,4 +59,4 @@ module.exports.init3d = (threejsNode) ->
 
 module.exports.voxelise = (threejsGeometry, brickSystem) ->
 	# more to come
-	return
+	voxeliser.voxelise threejsRootNode, Lego

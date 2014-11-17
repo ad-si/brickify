@@ -89,4 +89,5 @@ module.exports.updateState = (delta, state) ->
 # @memberOf dummyClientPlugin
 # @see render
 ###
-module.exports.update3D = () ->
+module.exports.update3D = ->
+	return undefined

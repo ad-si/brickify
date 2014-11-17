@@ -47,14 +47,13 @@ modelStorageApi = require '../../routes/modelStorageApi'
 server = http.createServer(app)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
-sessionSecret = process.env.LOWFAB_SESSION_SECRET or "lowfabSessionSecret!"
+sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
 
 links = {}
 sortedDependencies = [
 	'jquery',
 	'bootstrap',
 	'threejs',
-	'react',
 	'JavaScript-MD5',
 	'STLLoader',
 	'TrackballControls',
@@ -121,7 +120,7 @@ module.exports.setupRouting = () ->
 			.import 'nib'
 	)
 
-	app.use express.static(path.normalize 'public')
+	app.use(express.static('public'))
 
 	if developmentMode
 		app.use morgan 'dev',
@@ -157,9 +156,10 @@ module.exports.setupRouting = () ->
 	app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
 
 	app.post '/updateGitAndRestart', (request, response) ->
-		response.send ""
-		exec '../updateAndRestart.sh', (err, out, code) ->
-			log.warn "Error while updating server: " + err if err?
+		response.send ''
+		exec '../updateAndRestart.sh', (error, out, code) ->
+			if error
+				log.warn "Error while updating server: #{error}"
 
 	pluginLoader.loadPlugins statesync,
 		path.join __dirname, 'plugins/'

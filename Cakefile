@@ -28,7 +28,7 @@ winston.loggers.add 'buildLog',
 
 # *CakeUtilities* provides the build and start functions called below.<br>
 # See [cakeUtilities](src/server/cakeUtilities.html)
-cakeUtilities = require './src/server/cakeUtilities'
+cakeUtilities = require './cakeUtilities'
 
 # *Lowfab* is the main server part which is responsible for delivering the
 # website and for server-side plugin integration and model processing

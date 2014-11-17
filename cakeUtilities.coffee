@@ -18,15 +18,16 @@ browserifyData = require('browserify-data')
 winston = require 'winston'
 buildLog = winston.loggers.get('buildLog')
 
-compileAllCoffeeFiles = (directory, afterCompileCallback) ->
+compileAllCoffeeFiles = (directory, afterCompileCallback,
+												 createSourceMap = true) ->
 	buildLog.info "Compiling files from #{directory}"
 	readdirp root: directory, fileFilter: '*.coffee'
-	.on 'data', (entry) -> compileFile entry
+	.on 'data', (entry) -> compileFile entry, createSourceMap
 	.on 'error', (error) -> buildLog.error error
 	.on 'warn', (warning) -> buildLog.warn warning
 	.on 'end', () -> afterCompileCallback(directory) if afterCompileCallback?
 
-compileFile = (inputfileEntry) ->
+compileFile = (inputfileEntry, createSourceMap = true) ->
 	inputfile = inputfileEntry.fullPath
 	buildLog.info " compile #{inputfile}"
 	compileObject = coffeeScript._compileFile inputfile, sourceMap = yes
@@ -34,8 +35,9 @@ compileFile = (inputfileEntry) ->
 			path.basename(inputfile, '.coffee') + '.js'
 	fs.writeFile outputfile, compileObject.js, (error) ->
 		throw error if error
-	fs.writeFile outputfile + '.map', compileObject.v3SourceMap, (error) ->
-		throw error if error
+	if createSourceMap
+		fs.writeFile outputfile + '.map', compileObject.v3SourceMap, (error) ->
+			throw error if error
 
 deleteAllJsFiles = (directory, afterDeleteCallback) ->
 	buildLog.info "Clearing directory #{directory}..."
@@ -51,7 +53,7 @@ module.exports.buildClient = () ->
 		extensions: ['.coffee']
 
 	browserify
-	.add path.join __dirname, '..', 'client', 'main'
+	.add path.join __dirname, '/src/client', 'main.coffee'
 	.transform coffeeify
 	.transform browserifyData
 	.bundle()
@@ -61,9 +63,9 @@ module.exports.buildClient = () ->
 
 module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
-		__dirname
-		path.join __dirname, '../../routes'
-		path.join __dirname, '../common'
+		path.join __dirname, '/src/server'
+		path.join __dirname, '/routes'
+		path.join __dirname, '/src/common'
 	]
 
 	for dir in directories
@@ -73,9 +75,8 @@ module.exports.buildServer = (onlyDelete = false) ->
 
 	return module.exports
 
-
 module.exports.linkHooks = () ->
-	# gist.github.com/domenic/2238951
+
 	[
 		'applypatch-msg'
 		'commit-msg'
@@ -90,67 +91,17 @@ module.exports.linkHooks = () ->
 	]
 	.forEach (hook) ->
 		hookPath = path.join('hooks', hook)
-		gitHookPath = path.join(".git/hooks", hook)
+		gitHookPath = path.join('.git/hooks', hook)
 
 		fs.unlink gitHookPath, (error) ->
 			if error and error.code is not 'ENOENT'
 				buildLog.error error
 
-		fs.exists hookPath, (exists) ->
-			if exists
-				fs.link hookPath, gitHookPath, (error) ->
-					if error
+			fs.link hookPath, gitHookPath, (error) ->
+				if error
+					if error.code is not 'ENOENT'
 						buildLog.error error
-					else
-						buildLog.info hookPath, '->', gitHookPath
+				else
+					buildLog.info hookPath, '->', gitHookPath
 
 	return module.exports
-
-
-# No used at the moment
-# Please keep for future usage
-###
-module.exports.checkStyle = () ->
-	getFilesSync('.',
-		ignore: ['node_modules', '.git']
-		regex: /.*\.coffee/gi
-	)
-	.forEach (file) ->
-
-		coffeelint
-		.lint(fs.readFileSync(file, 'utf8'),
-			no_tabs:
-				level: 'ignore'
-			indentation:
-				level: 'ignore'
-		)
-		.forEach (error) ->
-			buildLog.warn file,
-				(error.lineNumber + '\n'),
-				(error.rule + ':'),
-				(error.message + '\n')
-
-
-module.exports.getFilesSync = (nodePath, options) ->
-	returnFiles = []
-
-	walkTree = (localNodePath) ->
-		stats = fs.statSync(localNodePath)
-
-		if stats.isFile()
-
-			if (localNodePath.search(options.regex) >= 0)
-				returnFiles.push localNodePath
-
-		else if stats.isDirectory()
-
-			files = fs.readdirSync localNodePath
-
-			for file in files
-				if file and options.ignore.indexOf(file) is -1
-					walkTree path.join(localNodePath, file)
-
-	walkTree(nodePath)
-
-	return returnFiles
-###

@@ -38,13 +38,11 @@ loadPlugin = (instance) ->
 			console.log 'Plugin ? (name missing) does not contain all necessary
 				methods, will not be loaded'
 
-
 module.exports.init = (neededInstances) ->
 	stateSyncModule = neededInstances.statesync
 	globalConfigInstance = neededInstances.config
 	uiInstance = neededInstances.ui
 	rendererInstance = neededInstances.renderer
-
 
 # Since browserify.js does not support dynamic require
 # all plugins must be written down

@@ -15,6 +15,7 @@ threejsRootNode = null
 stateInstance = null
 globalConfigInstance = null
 
+Converter = require './geometry/Converter'
 Voxeliser = require './geometry/Voxeliser'
 # console.log Voxeliser
 voxeliser = new Voxeliser
@@ -44,8 +45,12 @@ module.exports.init3d = (threejsNode) ->
 # @memberOf dummyClientPlugin
 # @see stateSynchronization
 ###
-# module.exports.updateState = (delta, state) ->
-	# console.log 'Dummy Client Plugin state change'
+module.exports.updateState = (delta, state) ->
+	Lego = null
+	for node in state.rootNode.childNodes
+		console.log 'voxelising ' + getModelFromCache node.pluginData.value.meshHash
+		optimizedModel = getModelFromCache node.pluginData.value.meshHash
+		voxelise optimizedModel, Lego
 
 
 ###
@@ -57,6 +62,7 @@ module.exports.init3d = (threejsNode) ->
 ###
 # module.exports.update3D = () ->
 
-module.exports.voxelise = (threejsGeometry, brickSystem) ->
-	# more to come
-	return
+voxelise = (optimizedModel, brickSystem) ->
+	# convert optimizedModel to solidObject3D
+	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
+	Voxeliser.voxelise(solidObject3D, brickSystem)

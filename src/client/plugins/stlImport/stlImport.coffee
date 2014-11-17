@@ -2,6 +2,7 @@ common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 stlLoader = require './stlLoader'
 modelCache = require '../../modelCache'
+OptimizedModel = require '../../../common/OptimizedModel'
 
 threejsRootNode = null
 stateInstance = null
@@ -48,7 +49,7 @@ module.exports.updateState = (delta, state) ->
 					(modelBinaryData) ->
 						console.log "Got the model #{property.meshHash}
 						from the server"
-						optimizedModel = new stlLoader.OptimizedModel()
+						optimizedModel = new OptimizedModel()
 						optimizedModel.fromBase64 modelBinaryData
 						newThreeObj = addModelToThree optimizedModel
 						stateInstance.performStateAction (state) ->

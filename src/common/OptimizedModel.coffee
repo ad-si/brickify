@@ -69,3 +69,13 @@ class OptimizedModel
 		return window.btoa binary
 
 module.exports = OptimizedModel
+
+base64ByteLength = (base64Length) ->
+	return (base64Length / 4) * 3
+
+stringToUint8Array = (str) ->
+	ab = new ArrayBuffer(str.length)
+	uintarray = new Uint8Array(ab)
+	for i in [0..str.length - 1]
+		uintarray[i] = str.charCodeAt i
+	return uintarray

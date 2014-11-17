@@ -10,6 +10,8 @@
 
 common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
+modelCache = require '../../modelCache'
+OptimizedModel = require '../../../common/OptimizedModel'
 
 threejsRootNode = null
 stateInstance = null
@@ -48,9 +50,13 @@ module.exports.init3d = (threejsNode) ->
 module.exports.updateState = (delta, state) ->
 	Lego = null
 	for node in state.rootNode.childNodes
-		console.log 'voxelising ' + getModelFromCache node.pluginData.value.meshHash
-		optimizedModel = getModelFromCache node.pluginData.value.meshHash
-		voxelise optimizedModel, Lego
+		modelCache.requestMeshFromServer node.pluginData[0].value.meshHash,
+			(modelBinaryData) ->
+				optimizedModel = new OptimizedModel()
+				optimizedModel.fromBase64 modelBinaryData
+				voxelise optimizedModel, Lego
+			->
+				return
 
 
 ###

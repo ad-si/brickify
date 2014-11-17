@@ -1,3 +1,6 @@
+Object3D = require './Object3D'
+# require CSG lib
+
 class BoundaryBox
 	constructor: (@minPoint, @maxPoint) ->
 		@centerPoint = null

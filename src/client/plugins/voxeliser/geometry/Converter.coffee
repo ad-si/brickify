@@ -1,3 +1,5 @@
+SolidObject3D = require './SolidObject3D'
+
 module.exports.convertToSolidObject3D = (optimizedModel) ->
 	object = new SolidObject3D()
 	for i in optimizedModel.faceNormals by 1

@@ -1,3 +1,12 @@
+Object3D = require './Object3D'
+Vector3D = require './Vector3D'
+Plane = require './Plane'
+Polygon = require './Polygon'
+Point = require './Point'
+Mesh = require './Mesh'
+Edge = require './Edge'
+BoundaryBox = require './BoundaryBox'
+
 # Base class for all three-dimentional Objects.
 class SolidObject3D extends Object3D
 	constructor: () ->

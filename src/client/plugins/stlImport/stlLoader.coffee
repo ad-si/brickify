@@ -112,7 +112,7 @@ parseBinary = (fileContent) ->
 		triangles might be missing'
 
 	binaryIndex = 4
-	while binaryIndex + polyLength <= datalength
+	while (binaryIndex - 4) + polyLength <= datalength
 		poly = new StlPoly()
 		nx = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
@@ -321,8 +321,8 @@ class Stl
 	recalculateNormals: (infoResult) ->
 		newNormals = 0
 		for poly in @polygons
-			d1 = poly.points[0].minus poly.points[1]
-			d2 = poly.points[2].minus poly.points[1]
+			d1 = poly.points[1].minus poly.points[0]
+			d2 = poly.points[2].minus poly.points[0]
 			n = d1.crossProduct d2
 			n = n.normalized()
 

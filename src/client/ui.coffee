@@ -4,6 +4,7 @@
 
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
+fileLoader = require './fileLoader'
 
 module.exports = (globalConfig) ->
 	return {
@@ -21,8 +22,6 @@ module.exports = (globalConfig) ->
 			preserveDrawingBuffer: true
 		)
 		controls: null
-		stlLoader: new THREE.STLLoader()
-		fileReader: new FileReader()
 
 		keyUpHandler: ( event ) ->
 			if event.keyCode == 67
@@ -30,17 +29,11 @@ module.exports = (globalConfig) ->
 					@scene.remove mesh
 				globalConfig.meshes = []
 
-		# overwrite if in your code neccessary
-		loadHandler: ( event ) ->
-			return 0
-
 		dropHandler: ( event ) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
-			for file in files
-				if file.name.toLowerCase().search( '.stl' ) >= 0
-					@fileReader.readAsBinaryString( file )
+			fileLoader.readFiles files if files?
 
 		dragOverHandler: ( event ) ->
 			event.stopPropagation()
@@ -58,6 +51,7 @@ module.exports = (globalConfig) ->
 			@renderer.render(@scene, @camera)
 
 		init: ->
+			fileLoader.init()
 			# setup renderer
 			@renderer.setSize( window.innerWidth, window.innerHeight )
 			@renderer.setClearColor( 0xf6f6f6, 1)
@@ -95,11 +89,6 @@ module.exports = (globalConfig) ->
 			@renderer.domElement.addEventListener(
 				'drop'
 				@dropHandler.bind( @ )
-				false
-			)
-			@fileReader.addEventListener(
-				'loadend',
-				@loadHandler.bind( @ ),
 				false
 			)
 			document.addEventListener(

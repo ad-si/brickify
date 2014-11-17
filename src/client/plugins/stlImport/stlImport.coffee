@@ -25,13 +25,6 @@ module.exports.init = (globalConfig, state, ui) ->
 	stateInstance = state
 	globalConfigInstance = globalConfig
 
-	#Bind to the fileLoader
-	ui.fileReader.addEventListener(
-		'loadend',
-		handleDroppedFile.bind(@),
-		false
-	)
-
 module.exports.init3D = (threejsNode) ->
   threejsRootNode = threejsNode
 
@@ -61,8 +54,7 @@ module.exports.updateState = (delta, state) ->
 # Imports the stl, optimizes it,
 # sends it to the server (if not cached there)
 # and adds it to the scene as a THREE.Geometry
-handleDroppedFile = (event) ->
-	fileContent = event.target.result
+module.exports.importFile = (fileContent) ->
 	errorCallback = (errors) ->
 		console.log 'Errors occured while importing the stl file:'
 		for error in errors

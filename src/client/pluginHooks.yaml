@@ -39,3 +39,10 @@
 #  On each render frame the [renderer](render.html) will call the `update3D`
 #  method of all plugins that provide it. There are no arguments passed.
 - update3D
+
+#  ##File import##
+#
+#  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
+#  try to import it with every plugin that implements importFile until one
+#  succeeds.
+- importFile

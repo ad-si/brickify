@@ -18,16 +18,15 @@ browserifyData = require('browserify-data')
 winston = require 'winston'
 buildLog = winston.loggers.get('buildLog')
 
-compileAllCoffeeFiles = (directory, afterCompileCallback,
-												 createSourceMap = true) ->
+compileAllCoffeeFiles = (directory, afterCompileCallback) ->
 	buildLog.info "Compiling files from #{directory}"
 	readdirp root: directory, fileFilter: '*.coffee'
-	.on 'data', (entry) -> compileFile entry, createSourceMap
+	.on 'data', (entry) -> compileFile entry
 	.on 'error', (error) -> buildLog.error error
 	.on 'warn', (warning) -> buildLog.warn warning
 	.on 'end', () -> afterCompileCallback(directory) if afterCompileCallback?
 
-compileFile = (inputfileEntry, createSourceMap = true) ->
+compileFile = (inputfileEntry) ->
 	inputfile = inputfileEntry.fullPath
 	buildLog.info " compile #{inputfile}"
 	compileObject = coffeeScript._compileFile inputfile, sourceMap = yes
@@ -35,9 +34,8 @@ compileFile = (inputfileEntry, createSourceMap = true) ->
 			path.basename(inputfile, '.coffee') + '.js'
 	fs.writeFile outputfile, compileObject.js, (error) ->
 		throw error if error
-	if createSourceMap
-		fs.writeFile outputfile + '.map', compileObject.v3SourceMap, (error) ->
-			throw error if error
+	fs.writeFile outputfile + '.map', compileObject.v3SourceMap, (error) ->
+		throw error if error
 
 deleteAllJsFiles = (directory, afterDeleteCallback) ->
 	buildLog.info "Clearing directory #{directory}..."

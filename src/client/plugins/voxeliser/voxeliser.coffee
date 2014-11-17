@@ -15,12 +15,17 @@ threejsRootNode = null
 stateInstance = null
 globalConfigInstance = null
 
+Voxeliser = require './geometry/Voxeliser'
+# console.log Voxeliser
+voxeliser = new Voxeliser
+# console.log typeof voxeliser.voxelise
+# console.log typeof voxeliser.slice_Object
 
 module.exports.pluginName = 'Voxeliser Plugin'
 module.exports.category = common.CATEGORY_CONVERTER
 
 module.exports.init = (globalConfig, stateSync, ui) ->
-	stateInstance = state
+	stateInstance = stateSync
 	globalConfigInstance = globalConfig
 
 module.exports.init3d = (threejsNode) ->
@@ -54,3 +59,4 @@ module.exports.init3d = (threejsNode) ->
 
 module.exports.voxelise = (threejsGeometry, brickSystem) ->
 	# more to come
+	return

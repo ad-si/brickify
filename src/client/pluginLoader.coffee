@@ -51,8 +51,10 @@ module.exports.loadPlugins = () ->
 	dummyPlugin = require './plugins/dummy/dummy'
 	stlImport = require './plugins/stlImport/stlImport'
 	stlExport = require './plugins/stlExport/stlExport'
+	voxeliser = require './plugins/voxeliser/voxeliser'
 
 	loadPlugin coordinateSystem
 	loadPlugin dummyPlugin
 	loadPlugin stlImport
 	loadPlugin stlExport
+	loadPlugin voxeliser

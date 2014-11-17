@@ -237,7 +237,10 @@ module.exports = (globalConfig) ->
 			@renderer.setSize( window.innerWidth, window.innerHeight )
 			@renderer.setClearColor( 0xf6f6f6, 1)
 			@renderer.domElement.setAttribute('id', 'canvas')
-			document.body.appendChild( @renderer.domElement )
+
+			document
+			.getElementById('renderArea')
+			.appendChild( @renderer.domElement )
 
 			# Scene rotation because orbit controls only works
 			# with up vector of 0, 1, 0

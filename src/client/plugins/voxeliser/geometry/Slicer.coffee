@@ -1,3 +1,35 @@
+BoundaryBox = require './BoundaryBox'
+# BspNode = require './BspNode'
+# BspTree = require './BspTree'
+# Edge = require './Edge'
+# Mesh = require './Mesh'
+# Object3D = require './Object3D'
+# Plane = require './Plane'
+# Point = require './Point'
+# Polygon = require './Polygon'
+# Ray = require './Ray'
+# Slicer = require './Slicer'
+# SolidObject3D = require './SolidObject3D'
+# Tag = require './Tag'
+# Vector3D = require './Vector3D'
+
+# Brick = require '../Bricks/Brick'
+# BrickGrid = require '../Bricks/BrickGrid'
+BrickGroup = require '../Bricks/BrickGroup'
+# BrickInstruction = require '../Bricks/BrickInstruction'
+# BrickLayout = require '../Bricks/BrickLayout'
+# BrickLayouter = require '../Bricks/BrickLayouter'
+BrickSpace = require '../Bricks/BrickSpace'
+# BrickSpaceGrid = require '../Bricks/BrickSpaceGrid'
+# BrickSystem = require '../Bricks/BrickSystem'
+# BrickSystems = require '../Bricks/BrickSystems'
+# BrickType = require '../Bricks/BrickType'
+# CustomBrick = require '../Bricks/CustomBrick'
+# IterationInstruction = require '../Bricks/IterationInstruction'
+
+#require LegoGrid !?!
+
+
 class Slicer
 	constuctor: () ->
 		return

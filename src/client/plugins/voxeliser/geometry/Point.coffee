@@ -1,3 +1,5 @@
+Vector3D = require './Vector3D'
+
 class Point extends Vector3D
 
 	# specifies in which object this point is contained

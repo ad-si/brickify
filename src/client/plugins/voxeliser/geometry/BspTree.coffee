@@ -1,3 +1,20 @@
+# BoundaryBox = require './BoundaryBox'
+BspNode = require './BspNode'
+# BspTree = require './BspTree'
+# Edge = require './Edge'
+# Mesh = require './Mesh'
+# Object3D = require './Object3D'
+# Plane = require './Plane'
+# Point = require './Point'
+# Polygon = require './Polygon'
+# Ray = require './Ray'
+# Slicer = require './Slicer'
+SolidObject3D = require './SolidObject3D'
+# Tag = require './Tag'
+# Vector3D = require './Vector3D'
+
+#require Lego?
+
 class BspTree
 	constructor: () ->
 		@base_Node = null

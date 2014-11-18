@@ -1,3 +1,32 @@
+# BoundaryBox = require '../geometry/BoundaryBox'
+# BspNode = require '../geometry/BspNode'
+# BspTree = require '../geometry/BspTree'
+# Edge = require '../geometry/Edge'
+# Mesh = require '../geometry/Mesh'
+# Object3D = require '../geometry/Object3D'
+# Plane = require '../geometry/Plane'
+# Point = require '../geometry/Point'
+# Polygon = require '../geometry/Polygon'
+# Ray = require '../geometry/Ray'
+# Slicer = require '../geometry/Slicer'
+SolidObject3D = require '../geometry/SolidObject3D'
+# Tag = require '../geometry/Tag'
+Vector3D = require '../geometry/Vector3D'
+
+# Brick = require './Brick'
+# BrickGrid = require './BrickGrid'
+# BrickGroup = require './BrickGroup'
+# BrickInstruction = require './BrickInstruction'
+# BrickLayout = require './BrickLayout'
+# BrickLayouter = require './BrickLayouter'
+# BrickSpace = require './BrickSpace'
+# BrickSpaceGrid = require './BrickSpaceGrid'
+# BrickSystem = require './BrickSystem'
+# BrickSystems = require './BrickSystems'
+BrickType = require './BrickType'
+# CustomBrick = require './CustomBrick'
+# IterationInstruction = require './IterationInstruction'
+
 class BrickSystem
   constructor: (@width, @depth, @height, @knob_height, @knob_radius) ->
 
@@ -96,8 +125,8 @@ class BrickSystem
     side_y ?= 0
 
     points = [ object.get_Point( factor_x * @width + side_x * @width + position.x, factor_y * @depth +                   position.y,            position.z),
-               object.get_Point( factor_x * @width +                    position.x, factor_y * @depth + side_y * @depth + position.y,            position.z),
-               object.get_Point( factor_x * @width +                    position.x, factor_y * @depth + side_y * @depth + position.y,  @height + position.z),
+               object.get_Point( factor_x * @width +                   position.x, factor_y * @depth + side_y * @depth + position.y,            position.z),
+               object.get_Point( factor_x * @width +                   position.x, factor_y * @depth + side_y * @depth + position.y,  @height + position.z),
                object.get_Point( factor_x * @width + side_x * @width + position.x, factor_y * @depth +                   position.y,  @height + position.z) ]
 
     points.reverse() if reverse
@@ -244,3 +273,4 @@ class BrickSystem
     else
       object.add_Polygon_for( [ edge_points[3], edge_points[2], edge_points[1], edge_points[0] ], object.get_Normal( 0, 0, -1), {origin: ['brick'], side: '-z'})
 
+module.exports = BrickSystem

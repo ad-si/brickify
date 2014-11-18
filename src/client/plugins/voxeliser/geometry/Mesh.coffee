@@ -1,5 +1,3 @@
-#<< app/geometry/Object3D
-
 class Mesh extends Object3D
 	constructor: (triangles) ->
 		#super()
@@ -18,4 +16,4 @@ class Mesh extends Object3D
 
 		@geometry.verticies = @points
 	
-	module.exports = Mesh
+module.exports = Mesh

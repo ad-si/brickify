@@ -115,3 +115,5 @@ class BrickSpaceGrid
     for brick in @all_bricks
       mesh.add brick.get_SceneModel()
     mesh
+
+module.exports = BrickSpaceGrid

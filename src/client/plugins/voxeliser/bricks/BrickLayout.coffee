@@ -1,3 +1,7 @@
+Brick = require './Brick'
+Vector3D = require '../geometry/Vector3D'
+
+
 class BrickLayout
   constructor: (@brickSpaceGrid) ->
     @bricksystem = @brickSpaceGrid.bricksystem
@@ -179,3 +183,5 @@ class BrickLayout
     stats['Details on connections'] = conns
 
     stats
+
+module.exports = BrickLayout

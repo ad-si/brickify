@@ -12,6 +12,7 @@ common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
+BrickSystems = require './Bricks/BrickSystems'
 
 threejsRootNode = null
 stateInstance = null
@@ -48,7 +49,7 @@ module.exports.init3d = (threejsNode) ->
 # @see stateSynchronization
 ###
 module.exports.updateState = (delta, state) ->
-	Lego = null
+	Lego = BrickSystems.Lego
 	for node in state.rootNode.childNodes
 		modelCache.requestMeshFromServer node.pluginData[0].value.meshHash,
 			(modelBinaryData) ->

@@ -15,7 +15,7 @@ module.exports = (globalConfig) ->
 		loadHandler: ( event ) ->
 			return 0
 
-		dropHandler: ( event ) ->
+		dropHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
@@ -23,15 +23,15 @@ module.exports = (globalConfig) ->
 				if file.name.toLowerCase().search( '.stl' ) >= 0
 					@fileReader.readAsBinaryString( file )
 
-		dragOverHandler: ( event ) ->
+		dragOverHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			event.dataTransfer.dropEffect = 'copy'
 
 		# Bound to updates to the window size:
 		# Called whenever the window is resized.
-		windowResizeHandler: ( event ) ->
-			renderer windowResizeHandler()
+		windowResizeHandler: (event) ->
+			renderer.windowResizeHandler()
 
 		init: ->
 			renderer.init(globalConfig)
@@ -39,22 +39,22 @@ module.exports = (globalConfig) ->
 			# event listener
 			renderer.getDomElement().addEventListener(
 				'dragover'
-				@dragOverHandler.bind( @ )
+				@dragOverHandler.bind @
 				false
 			)
 			renderer.getDomElement().addEventListener(
 				'drop'
-				@dropHandler.bind( @ )
+				@dropHandler.bind @
 				false
 			)
 			@fileReader.addEventListener(
 				'loadend',
-				@loadHandler.bind( @ ),
+				@loadHandler.bind @,
 				false
 			)
 			window.addEventListener(
 				'resize',
-				@windowResizeHandler.bind( @ ),
+				@windowResizeHandler.bind @,
 				false
 			)
 	}

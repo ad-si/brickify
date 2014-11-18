@@ -36,6 +36,7 @@ Following scripts are currently available:
 - `apiDocumentation`: Generates API documentation
 - `documentation`: Generates code documentation
 - `test`: Executes tests
+- `batchTest`: Batch test all models and create a HTML report
 - `prepublish`: Prepares publication of project
 
 

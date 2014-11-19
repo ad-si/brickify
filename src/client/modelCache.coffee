@@ -35,7 +35,7 @@ submitOptimizedMeshToServer = (md5hash, fileEnding, optimizedModelInstance) ->
 	addOptimizedInstance md5hash + '.' + fileEnding, optimizedModelInstance
 	serialized = optimizedModelInstance.toBase64()
 
-	submitMeshToServer(md5hash,fileEnding, optimizedModelInstance)
+	submitMeshToServer md5hash,fileEnding, optimizedModelInstance
 module.exports.submitOptimizedMeshToServer = submitOptimizedMeshToServer
 
 # requests a mesh with the given md5hash.ending from the server
@@ -45,7 +45,7 @@ module.exports.submitOptimizedMeshToServer = submitOptimizedMeshToServer
 requestMeshFromServer = (md5hashWithEnding, successCallback, failCallback) ->
 	model = getModelFromCache md5hashWithEnding
 	if model?
-		successCallback(model)
+		successCallback model
 		return
 
 	splitted = md5hashWithEnding.split('.')
@@ -54,7 +54,7 @@ requestMeshFromServer = (md5hashWithEnding, successCallback, failCallback) ->
 	requestUrl = '/model/get/' + md5hash + '/' + fileEnding
 	responseCallback = (data, textStatus, jqXHR) ->
 			addModelToCache md5hashWithEnding, data
-			successCallback(data)
+			successCallback data
 
 	$.get(requestUrl, '', responseCallback).fail () ->
 		failCallback() if failCallback?
@@ -63,39 +63,39 @@ module.exports.requestMeshFromServer = requestMeshFromServer
 # Same as requestMeshFromServer, but returns cached optimizedModel instance if
 # it exists
 requestOptimizedMeshFromServer = (md5hashWithEnding, success, fail) ->
-	modelInstance = getOptimizedInstance(md5hashWithEnding)
+	modelInstance = getOptimizedInstance md5hashWithEnding
 	if modelInstance?
-		success(modelInstance)
+		success modelInstance
 
 	successCb = (data) ->
 		modelInstance = new OptimizedModel()
 		modelInstance.fromBase64 data
 		addOptimizedInstance md5hashWithEnding, modelInstance
-		success(modelInstance)
+		success modelInstance
 
 	requestMeshFromServer md5hashWithEnding, successCb, fail
 module.exports.requestOptimizedMeshFromServer = requestOptimizedMeshFromServer
 
 addModelToCache = (md5hashWithEnding, data) ->
 	for m in modelCache
-		if (m.hash == md5hashWithEnding)
+		if m.hash == md5hashWithEnding
 			return
 	modelCache.push {hash: md5hashWithEnding, data: data}
 
 getModelFromCache = (md5hashWithEnding) ->
 	for m in modelCache
-		if (m.hash == md5hashWithEnding)
+		if m.hash == md5hashWithEnding
 			return m.data
 	return null
 
 addOptimizedInstance = (md5HashWithEnding, instance) ->
 	for m in optimizedModelCache
-		if (m.hash == md5HashWithEnding)
+		if m.hash == md5HashWithEnding
 			return
 	optimizedModelCache.push {hash: md5HashWithEnding, data: instance}
 
 getOptimizedInstance = (md5HashWithEnding) ->
 	for m in optimizedModelCache
-		if (m.hash == md5HashWithEnding)
+		if m.hash == md5HashWithEnding
 			return m.data
 	return null

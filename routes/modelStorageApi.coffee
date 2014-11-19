@@ -27,6 +27,10 @@ module.exports.getModel = (request, response) ->
 					logger.debug 'Sending model ' + md5 + '.' + fileEnding
 					response.set 'Content-Type', 'application/octet-stream'
 					response.send data
+		else
+			logger.warn 'Unable to load model ' +
+				md5 + '.' + fileEnding + ': model not found'
+			response.status(404).send 'Model not found'
 
 module.exports.saveModel = (request, response) ->
 	md5 = request.params.md5

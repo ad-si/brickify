@@ -37,17 +37,19 @@ module.exports.updateState = (delta, state) ->
 			threeObject = threejsRootNode.getObjectById storedUuid, true
 
 			if not threeObject?
-				#Create object and override uuid
-				modelCache.requestOptimizedMeshFromServer property.meshHash,
-					(optimizedModel) ->
-						console.log "Got the model #{property.meshHash}
-						from the server"
-						newThreeObj = addModelToThree optimizedModel
-						stateSync.performStateAction (state) ->
-							copyPropertyDataToThree property, newThreeObj
-					() ->
-						console.log 'Unable to get model from server: ',
-							property.meshHash
+				loadModelFromCache property
+
+loadModelFromCache = (property) ->
+	#Create object and override uuid
+	success = (optimizedModel) ->
+		console.log "Got the model #{property.meshHash} from the server"
+		threeObj = addModelToThree optimizedModel
+		stateSync.performStateAction (state) ->
+			copyPropertyDataToThree property, threeObj
+	failure = () ->
+		console.error "Unable to get model #{property.meshHash} from server"
+
+	modelCache.requestOptimizedMeshFromServer property.meshHash, success, failure
 
 # Imports the stl, optimizes it,
 # sends it to the server (if not cached there)

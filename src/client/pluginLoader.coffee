@@ -9,15 +9,13 @@ pluginHooks.initHooks(hooks)
 renderer = require './renderer'
 
 pluginInstances = []
-stateSyncModule = null
-uiInstance = null
 globalConfigInstance = null
 
 checkForPluginMethods = (instance) ->
 	instance.hasOwnProperty('pluginName')
 
 initPluginInstance = (instance) ->
-	instance.init? globalConfigInstance, stateSyncModule, uiInstance
+	instance.init? globalConfigInstance
 	instance.init3D? threeNode = new THREE.Object3D()
 
 	pluginHooks.register instance
@@ -38,10 +36,8 @@ loadPlugin = (instance) ->
 			console.log 'Plugin ? (name missing) does not contain all necessary
 				methods, will not be loaded'
 
-module.exports.init = (neededInstances) ->
-	stateSyncModule = neededInstances.statesync
-	globalConfigInstance = neededInstances.config
-	uiInstance = neededInstances.ui
+module.exports.init = (globalConfig) ->
+	globalConfigInstance = globalConfig
 
 # Since browserify.js does not support dynamic require
 # all plugins must be written down

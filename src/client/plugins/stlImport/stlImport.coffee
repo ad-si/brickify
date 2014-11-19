@@ -4,8 +4,9 @@ stlLoader = require './stlLoader'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
 
+stateSync = require '../../statesync'
+
 threejsRootNode = null
-stateInstance = null
 globalConfigInstance = null
 
 pluginPropertyName = 'stlImport'
@@ -21,8 +22,7 @@ class StlProperty
 module.exports.pluginName = 'stl Import Plugin'
 module.exports.category = common.CATEGORY_IMPORT
 
-module.exports.init = (globalConfig, state, ui) ->
-	stateInstance = state
+module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
 module.exports.init3D = (threejsNode) ->
@@ -45,7 +45,7 @@ module.exports.updateState = (delta, state) ->
 						optimizedModel = new OptimizedModel()
 						optimizedModel.fromBase64 modelBinaryData
 						newThreeObj = addModelToThree optimizedModel
-						stateInstance.performStateAction (state) ->
+						stateSync.performStateAction (state) ->
 							copyPropertyDataToThree property, newThreeObj
 					() ->
 						console.log 'Unable to get model from server: ',
@@ -64,8 +64,8 @@ module.exports.importFile = (fileContent) ->
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel
 	fileEnding = 'optimized'
-	if stateInstance?
-		stateInstance.performStateAction (state) ->
+	if stateSync?
+		stateSync.performStateAction (state) ->
 			node = objectTree.addChildNode state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property

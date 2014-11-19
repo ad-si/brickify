@@ -125,10 +125,5 @@ String::contains = (str) -> -1 isnt this.indexOf str
 
 statesync.init globalConfig, (state) ->
 	objectTree.init state
-	neededInstances =
-		config: globalConfig
-		statesync: statesync
-		ui: ui
-
-	pluginLoader.init neededInstances
+	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()

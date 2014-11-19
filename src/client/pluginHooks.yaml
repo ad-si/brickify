@@ -11,8 +11,7 @@
 #  ##Plugin Initialization##
 #  The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
 #  (if provided) after loading the plugin. It is the first method to be called
-#  and provides access to the [global configuration](globals.html), the
-#  [state synchronization module](statesync.html) and the [ui module](ui.html).
+#  and provides access to the [global configuration](globals.html).
 - init
 
 #  ##State synchronization##

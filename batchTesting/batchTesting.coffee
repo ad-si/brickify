@@ -41,7 +41,11 @@ module.exports.startTesting = () ->
 		result.fileName = model
 		resultLogger.info result
 		results.push result
-	reportGenerator.generateReport results, 'batchTestResult.html'
+
+	if results.length == 0
+		logger.warn 'No models where processed, test report can\'t be created'
+	else
+		reportGenerator.generateReport results, 'batchTestResult.html'
 
 # parses all models in the modelPath directory
 parseModelFiles = () ->

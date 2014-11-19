@@ -38,17 +38,14 @@ module.exports.category = common.CATEGORY_IMPORT
 # The plugin loader will call each plugin's `init` method (if provided) after
 # loading the plugin.
 #
-# It is the first method to be called
-# and provides access to the global configuration the state synchronization
-# module and the ui module.
+# It is the first method to be called and provides access to the global
+# configuration.
 #
 # @param {Object} globalConfig A key=>value-mapping of the global configuration
-# @param {stateSynchronization} stateSync The state synchronization module
-# @param {ui} ui The user interface module
 # @memberOf dummyClientPlugin
 # @see pluginLoader
 ###
-module.exports.init = (globalConfig, stateSync, ui) ->
+module.exports.init = (globalConfig) ->
 	console.log 'Dummy Client Plugin initialization'
 
 ###

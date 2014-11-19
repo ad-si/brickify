@@ -123,13 +123,6 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-
-# Test for statesync
-statesync.addUpdateCallback (state, delta) ->
-	console.log 'UpdatedState: %s, Delta: %s',
-		JSON.stringify(state), JSON.stringify(delta)
-
-
 statesync.init globalConfig, (state) ->
 	objectTree.init state
 	neededInstances =

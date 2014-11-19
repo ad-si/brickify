@@ -1,11 +1,13 @@
 fs = require 'fs'
+path = require 'path'
 winston = require 'winston'
-stlLoader = require '../src/client/plugins/stlImport/stlLoader.coffee'
+stlLoader = require '../src/client/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
 
-modelPath = './batchTesting/models/'
-debugLogFile = 'batchTestDebug.log'
-testResultFile = 'batchTestResults.log'
+modelPath = path.join 'batchTesting', 'models'
+debugLogFile = path.join 'batchTesting', 'results', 'batchTestDebug.log'
+testResultFile = path.join 'batchTesting', 'results', 'batchTestResults.log'
+reportFile = path.join 'batchTesting', 'results', 'batchTestResults.html'
 
 logger = new (winston.Logger)({
 	transports: [
@@ -45,7 +47,7 @@ module.exports.startTesting = () ->
 	if results.length == 0
 		logger.warn 'No models where processed, test report can\'t be created'
 	else
-		reportGenerator.generateReport results, 'batchTestResult.html'
+		reportGenerator.generateReport results, reportFile
 
 # parses all models in the modelPath directory
 parseModelFiles = () ->
@@ -60,7 +62,8 @@ parseModelFiles = () ->
 testModel = (filename) ->
 	logger.info "Testing model '#{filename}'"
 	testResult = new ModelTestResult()
-	fileContent = fs.readFileSync modelPath + filename, {encoding: 'utf8'}
+	filepath = path.join(modelPath, filename)
+	fileContent = fs.readFileSync filepath, {encoding: 'utf8'}
 
 	begin = new Date()
 	stlModel = stlLoader.parse fileContent,null,false,false

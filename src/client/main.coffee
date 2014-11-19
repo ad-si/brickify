@@ -3,7 +3,6 @@ r = require 'react'
 
 globalConfig = require './globals.yaml'
 ui = require('./ui')(globalConfig)
-renderer = require './render'
 pluginLoader = require './pluginLoader'
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
@@ -109,7 +108,6 @@ r.render(
 
 
 ui.init()
-renderer.init(ui)
 
 
 ### TODO: move somewhere where it is needed
@@ -138,7 +136,6 @@ statesync.init globalConfig, (state) ->
 		config: globalConfig
 		statesync: statesync
 		ui: ui
-		renderer: renderer
 
 	pluginLoader.init neededInstances
 	pluginLoader.loadPlugins()

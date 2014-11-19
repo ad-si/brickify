@@ -1,6 +1,7 @@
 fs = require 'fs'
 winston = require 'winston'
 stlLoader = require '../src/client/plugins/stlImport/stlLoader.coffee'
+reportGenerator = require './reportGenerator'
 
 modelPath = './batchTesting/models/'
 debugLogFile = 'batchTestDebug.log'
@@ -34,10 +35,13 @@ module.exports.startTesting = () ->
 	logger.info 'starting batch testing'
 	models = parseModelFiles()
 	logger.info "Testing #{models.length} models"
+	results = []
 	for model in models
 		result = testModel model
 		result.fileName = model
 		resultLogger.info result
+		results.push result
+	reportGenerator.generateReport results, 'batchTestResult.html'
 
 # parses all models in the modelPath directory
 parseModelFiles = () ->
@@ -72,6 +76,10 @@ testModel = (filename) ->
 	#{cleanseResult.deletedPolygons} deleted Polygons and
 	#{cleanseResult.recalculatedNormals} fixedNormals"
 
+	begin = new Date()
+	optimizedModel = stlLoader.optimizeModel stlModel
+	testResult.optimizationTime  = new Date() - begin
+
 	return testResult
 
 # This class holds all test results for one model and is
@@ -83,3 +91,4 @@ class ModelTestResult
 		@stlCleansingTime = 0
 		@stlDeletedPolygons = 0
 		@stlRecalculatedNormals = 0
+		@optimizationTime = 0

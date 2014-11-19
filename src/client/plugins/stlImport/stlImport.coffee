@@ -38,12 +38,10 @@ module.exports.updateState = (delta, state) ->
 
 			if not threeObject?
 				#Create object and override uuid
-				modelCache.requestMeshFromServer property.meshHash,
-					(modelBinaryData) ->
+				modelCache.requestOptimizedMeshFromServer property.meshHash,
+					(optimizedModel) ->
 						console.log "Got the model #{property.meshHash}
 						from the server"
-						optimizedModel = new OptimizedModel()
-						optimizedModel.fromBase64 modelBinaryData
 						newThreeObj = addModelToThree optimizedModel
 						stateSync.performStateAction (state) ->
 							copyPropertyDataToThree property, newThreeObj

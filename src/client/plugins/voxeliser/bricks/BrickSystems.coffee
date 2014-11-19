@@ -110,8 +110,6 @@ class BrickSystems
       model = bricksystem.build_Brick( p , new Vector3D(type.width, type.depth, type.height) )
       editor.iteration_Manager.model_dropped model
 
-
-
   #Lego2.add_Brick_Sides o,p, new Vector3D(1,1,1)
   #Lego2.add_Brick_top_Cap_to o,p
   #Lego2.add_Brick_top_Cap_Sides_to o,p

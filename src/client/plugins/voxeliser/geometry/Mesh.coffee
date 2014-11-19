@@ -18,4 +18,4 @@ class Mesh extends Object3D
 
 		@geometry.verticies = @points
 	
-	module.exports = Mesh
+module.exports = Mesh

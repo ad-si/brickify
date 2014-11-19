@@ -1,3 +1,5 @@
+Vector3D = require '../geometry/Vector3D'
+
 class BrickLayouter
 
   constructor: (@layout) ->
@@ -895,3 +897,5 @@ class BrickLayouter
     'delete brick'
 
     return splitBricks
+
+module.exports = BrickLayouter

@@ -4,3 +4,5 @@ class BrickGrid
     @space.align_to bricksystem
     # increase border by one
     @space.minPoint.remove()
+
+module.exports = BrickGrid

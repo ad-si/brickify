@@ -86,4 +86,5 @@ find_objects = (obj) ->
 	remain_polygons
 
 
-module.exports =  Edge
+module.exports = Edge
+

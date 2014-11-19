@@ -1,4 +1,8 @@
 ColorPalette = require '../ColorPalette'
+BspNode = require './BspNode'
+SolidObject3D = require './SolidObject3D'
+#require Lego?
+
 class BspTree
 	constructor: () ->
 		@base_Node = null

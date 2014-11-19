@@ -100,8 +100,8 @@ class BrickSystem
     side_y ?= 0
 
     points = [ object.get_Point( factor_x * @width + side_x * @width + position.x, factor_y * @depth +                   position.y,            position.z),
-               object.get_Point( factor_x * @width +                    position.x, factor_y * @depth + side_y * @depth + position.y,            position.z),
-               object.get_Point( factor_x * @width +                    position.x, factor_y * @depth + side_y * @depth + position.y,  @height + position.z),
+               object.get_Point( factor_x * @width +                   position.x, factor_y * @depth + side_y * @depth + position.y,            position.z),
+               object.get_Point( factor_x * @width +                   position.x, factor_y * @depth + side_y * @depth + position.y,  @height + position.z),
                object.get_Point( factor_x * @width + side_x * @width + position.x, factor_y * @depth +                   position.y,  @height + position.z) ]
 
     points.reverse() if reverse

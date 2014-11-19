@@ -3,6 +3,8 @@
 # euclidian check?
 #CSG.Plane.EPSILON = 1e-5;
 
+Polygon = require './Polygon'
+
 class Plane
 	constructor: (@normal, @lambda) ->
 		return

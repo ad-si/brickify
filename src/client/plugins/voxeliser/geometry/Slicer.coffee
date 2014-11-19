@@ -1,3 +1,10 @@
+BoundaryBox = require './BoundaryBox'
+BrickGroup = require '../Bricks/BrickGroup'
+BrickSpace = require '../Bricks/BrickSpace'
+
+#require LegoGrid !?!
+
+
 class Slicer
 	constuctor: () ->
 		return

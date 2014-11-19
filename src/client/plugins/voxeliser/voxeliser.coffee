@@ -12,6 +12,7 @@ common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
+
 Converter = require './geometry/Converter'
 BrickSystems = require './bricks/BrickSystems'
 Voxeliser = require './geometry/Voxeliser'

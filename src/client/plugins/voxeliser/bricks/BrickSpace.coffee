@@ -224,3 +224,5 @@ class BrickSpace
         @sides_lookup['+z'].current_polygons,
         @sides_lookup['-z'].current_polygons)
 
+  module.exports = BrickSpace
+

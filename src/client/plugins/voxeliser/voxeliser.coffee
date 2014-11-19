@@ -1,5 +1,5 @@
 ###
-  #Voxeliser Plugin#
+	#Voxeliser Plugin#
 ###
 
 ###
@@ -15,6 +15,7 @@ OptimizedModel = require '../../../common/OptimizedModel'
 
 Converter = require './geometry/Converter'
 BrickSystems = require './bricks/BrickSystems'
+BrickSystem = require './bricks/BrickSystem'
 Voxeliser = require './geometry/Voxeliser'
 voxeliser = new Voxeliser
 
@@ -51,8 +52,14 @@ module.exports.updateState = (delta, state) ->
 			(modelBinaryData) ->
 				optimizedModel = new OptimizedModel()
 				optimizedModel.fromBase64 modelBinaryData
-				voxelise optimizedModel, BrickSystems.Lego
-			->
+
+				Lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
+				Lego.add_BrickTypes [
+					[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],[2,4,1],[2,6,1],[2,8,1],[2,10,1],
+					[1,1,3],[1,2,3],[1,3,3],[1,4,3],[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],[2,6,3],[2,8,3],[2,10,3]
+				]
+				
+				voxelise optimizedModel, Lego
 				return
 
 

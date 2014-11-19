@@ -1,6 +1,8 @@
 #class point & normal
 #class Matrix4x4
 
+Tolerances = require './Tolerances'
+
 class Vector3D
 	constructor: (@x, @y, @z) ->
 		return

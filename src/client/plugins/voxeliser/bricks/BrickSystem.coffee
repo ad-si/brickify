@@ -1,3 +1,7 @@
+Vector3D = require '../geometry/Vector3D'
+BrickType = require './BrickType'
+SolidObject3D = require '../geometry/SolidObject3D'
+
 class BrickSystem
   constructor: (@width, @depth, @height, @knob_height, @knob_radius) ->
 
@@ -244,3 +248,4 @@ class BrickSystem
     else
       object.add_Polygon_for( [ edge_points[3], edge_points[2], edge_points[1], edge_points[0] ], object.get_Normal( 0, 0, -1), {origin: ['brick'], side: '-z'})
 
+module.exports = BrickSystem

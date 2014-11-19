@@ -1,3 +1,4 @@
+ColorPalette = require '../ColorPalette'
 class BspTree
 	constructor: () ->
 		@base_Node = null

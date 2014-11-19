@@ -1,3 +1,5 @@
+Vector3D = require '../geometry/Vector3D'
+
 class BrickType
   constructor: (@bricksystem, @width, @depth, @height) ->
     @available_Bricks = 100.000
@@ -8,3 +10,5 @@ class BrickType
 
   get_Edge_SceneModel: () ->
     @model.get_Edge_SceneModel()
+
+module.exports = BrickType

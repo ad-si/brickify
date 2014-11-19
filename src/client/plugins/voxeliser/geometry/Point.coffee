@@ -1,3 +1,5 @@
+Vector3D = require './Vector3D'
+
 class Point extends Vector3D
 
 	# specifies in which object this point is contained
@@ -21,4 +23,4 @@ class Point extends Vector3D
 			else return @y < point.z
 		else return @x < point.x
 
-module.exports = Vector3D
+module.exports = Point

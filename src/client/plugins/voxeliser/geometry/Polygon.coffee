@@ -1,3 +1,6 @@
+require '../Helpers'
+Tag = require './Tag'
+
 class Polygon
 	constructor: (@points, @plane, @edges) ->
 		@render_Faces = null

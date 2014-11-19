@@ -12,17 +12,14 @@ common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
+Converter = require './geometry/Converter'
+BrickSystems = require './bricks/BrickSystems'
+Voxeliser = require './geometry/Voxeliser'
+voxeliser = new Voxeliser
 
 threejsRootNode = null
 stateInstance = null
 globalConfigInstance = null
-
-Converter = require './geometry/Converter'
-Voxeliser = require './geometry/Voxeliser'
-# console.log Voxeliser
-voxeliser = new Voxeliser
-# console.log typeof voxeliser.voxelise
-# console.log typeof voxeliser.slice_Object
 
 module.exports.pluginName = 'Voxeliser Plugin'
 module.exports.category = common.CATEGORY_CONVERTER
@@ -48,13 +45,12 @@ module.exports.init3d = (threejsNode) ->
 # @see stateSynchronization
 ###
 module.exports.updateState = (delta, state) ->
-	Lego = null
 	for node in state.rootNode.childNodes
 		modelCache.requestMeshFromServer node.pluginData[0].value.meshHash,
 			(modelBinaryData) ->
 				optimizedModel = new OptimizedModel()
 				optimizedModel.fromBase64 modelBinaryData
-				voxelise optimizedModel, Lego
+				voxelise optimizedModel, BrickSystems.Lego
 			->
 				return
 
@@ -71,4 +67,4 @@ module.exports.updateState = (delta, state) ->
 voxelise = (optimizedModel, brickSystem) ->
 	# convert optimizedModel to solidObject3D
 	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-	Voxeliser.voxelise(solidObject3D, brickSystem)
+	voxeliser.voxelise(solidObject3D, brickSystem)

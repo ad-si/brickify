@@ -1,5 +1,3 @@
-#<< app/Settings
-
 #class point & normal
 #class Matrix4x4
 

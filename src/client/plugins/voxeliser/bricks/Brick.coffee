@@ -1,4 +1,4 @@
-#<< app/modules/Bricks/BrickLayouter
+BrickLayouter = require './BrickLayouter'
 
 # Represent a classical Brick of the Bricksystem
 ids = 0

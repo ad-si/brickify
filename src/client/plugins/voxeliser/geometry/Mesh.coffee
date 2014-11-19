@@ -1,4 +1,4 @@
-#<< app/geometry/Object3D
+Object3D = require './Object3D'
 
 class Mesh extends Object3D
 	constructor: (triangles) ->

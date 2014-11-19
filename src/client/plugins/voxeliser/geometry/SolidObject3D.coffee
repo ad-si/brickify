@@ -6,6 +6,7 @@ Point = require './Point'
 Mesh = require './Mesh'
 Edge = require './Edge'
 BoundaryBox = require './BoundaryBox'
+ColorPalette = require './../ColorPalette'
 
 # Base class for all three-dimentional Objects.
 class SolidObject3D extends Object3D

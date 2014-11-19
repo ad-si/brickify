@@ -1,3 +1,9 @@
+Vector3D = require './Vector3D'
+Plane = require './Plane'
+Polygon = require './Polygon'
+Edge = require './Edge'
+Point = require './Point'
+
 class Object3D
 	constructor: () ->
 		@points = []

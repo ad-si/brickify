@@ -31,7 +31,7 @@ module.exports = (globalConfig) ->
 		# Bound to updates to the window size:
 		# Called whenever the window is resized.
 		windowResizeHandler: ( event ) ->
-			renderer windowResizeHandler()
+			renderer.windowResizeHandler()
 
 		init: ->
 			renderer.init(globalConfig)

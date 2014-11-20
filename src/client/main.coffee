@@ -3,7 +3,6 @@ r = require 'react'
 
 globalConfig = require './globals.yaml'
 ui = require('./ui')(globalConfig)
-renderer = require './render'
 pluginLoader = require './pluginLoader'
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
@@ -109,7 +108,6 @@ r.render(
 
 
 ui.init()
-renderer.init(ui)
 
 
 ### TODO: move somewhere where it is needed
@@ -125,20 +123,7 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-
-# Test for statesync
-statesync.addUpdateCallback (state, delta) ->
-	console.log 'UpdatedState: %s, Delta: %s',
-		JSON.stringify(state), JSON.stringify(delta)
-
-
 statesync.init globalConfig, (state) ->
 	objectTree.init state
-	neededInstances =
-		config: globalConfig
-		statesync: statesync
-		ui: ui
-		renderer: renderer
-
-	pluginLoader.init neededInstances
+	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()

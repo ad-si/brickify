@@ -4,8 +4,9 @@ stlLoader = require './stlLoader'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
 
+stateSync = require '../../statesync'
+
 threejsRootNode = null
-stateInstance = null
 globalConfigInstance = null
 
 pluginPropertyName = 'stlImport'
@@ -21,16 +22,8 @@ class StlProperty
 module.exports.pluginName = 'stl Import Plugin'
 module.exports.category = common.CATEGORY_IMPORT
 
-module.exports.init = (globalConfig, state, ui) ->
-	stateInstance = state
+module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
-
-	#Bind to the fileLoader
-	ui.fileReader.addEventListener(
-		'loadend',
-		handleDroppedFile.bind(@),
-		false
-	)
 
 module.exports.init3D = (threejsNode) ->
   threejsRootNode = threejsNode
@@ -44,25 +37,24 @@ module.exports.updateState = (delta, state) ->
 			threeObject = threejsRootNode.getObjectById storedUuid, true
 
 			if not threeObject?
-				#Create object and override uuid
-				modelCache.requestMeshFromServer property.meshHash,
-					(modelBinaryData) ->
-						console.log "Got the model #{property.meshHash}
-						from the server"
-						optimizedModel = new OptimizedModel()
-						optimizedModel.fromBase64 modelBinaryData
-						newThreeObj = addModelToThree optimizedModel
-						stateInstance.performStateAction (state) ->
-							copyPropertyDataToThree property, newThreeObj
-					() ->
-						console.log 'Unable to get model from server: ',
-							property.meshHash
+				loadModelFromCache property
+
+loadModelFromCache = (property) ->
+	#Create object and override uuid
+	success = (optimizedModel) ->
+		console.log "Got the model #{property.meshHash} from the server"
+		threeObj = addModelToThree optimizedModel
+		stateSync.performStateAction (state) ->
+			copyPropertyDataToThree property, threeObj
+	failure = () ->
+		console.error "Unable to get model #{property.meshHash} from server"
+
+	modelCache.requestOptimizedMeshFromServer property.meshHash, success, failure
 
 # Imports the stl, optimizes it,
 # sends it to the server (if not cached there)
 # and adds it to the scene as a THREE.Geometry
-handleDroppedFile = (event) ->
-	fileContent = event.target.result
+module.exports.importFile = (fileContent) ->
 	errorCallback = (errors) ->
 		console.log 'Errors occured while importing the stl file:'
 		for error in errors
@@ -72,8 +64,8 @@ handleDroppedFile = (event) ->
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel
 	fileEnding = 'optimized'
-	if stateInstance?
-		stateInstance.performStateAction (state) ->
+	if stateSync?
+		stateSync.performStateAction (state) ->
 			node = objectTree.addChildNode state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property

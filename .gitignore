@@ -10,6 +10,5 @@ npm-debug.log
 /modelCache
 /doc
 /apidoc
-/batchTestDebug.log
-/batchTestResults.log
 /batchTesting/models
+/batchTesting/results

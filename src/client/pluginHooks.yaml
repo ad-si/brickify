@@ -11,8 +11,7 @@
 #  ##Plugin Initialization##
 #  The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
 #  (if provided) after loading the plugin. It is the first method to be called
-#  and provides access to the [global configuration](globals.html), the
-#  [state synchronization module](statesync.html) and the [ui module](ui.html).
+#  and provides access to the [global configuration](globals.html).
 - init
 
 #  ##State synchronization##
@@ -39,3 +38,10 @@
 #  On each render frame the [renderer](render.html) will call the `update3D`
 #  method of all plugins that provide it. There are no arguments passed.
 - update3D
+
+#  ##File import##
+#
+#  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
+#  try to import it with every plugin that implements importFile until one
+#  succeeds.
+- importFile

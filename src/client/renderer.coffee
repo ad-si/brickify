@@ -9,11 +9,12 @@ scene = null
 camera = null
 controls = null
 
-localRenderer = () ->
-	requestAnimationFrame localRenderer
-	renderer.render scene, camera
 
+localRenderer = () ->
+	renderer.render scene, camera
 	pluginHooks.update3D()
+
+	requestAnimationFrame localRenderer
 
 module.exports.addToScene = (node) ->
 	scene.add node
@@ -21,7 +22,7 @@ module.exports.addToScene = (node) ->
 module.exports.getDomElement = () ->
 	renderer.domElement
 
-module.exports.windowResizeHandler = (event) ->
+module.exports.windowResizeHandler = () ->
 	camera.aspect = window.innerWidth / window.innerHeight
 	camera.updateProjectionMatrix()
 
@@ -45,7 +46,9 @@ setupRenderer = (globalConfig) ->
 	renderer.setSize window.innerWidth, window.innerHeight
 	renderer.setClearColor 0xf6f6f6, 1
 	renderer.domElement.setAttribute 'id', 'canvas'
-	document.body.appendChild renderer.domElement
+	document
+	.getElementById('renderArea')
+	.appendChild renderer.domElement
 
 setupScene = (globalConfig) ->
 	scene = new THREE.Scene()

@@ -121,6 +121,7 @@ module.exports.setupRouting = () ->
 	)
 
 	app.use(express.static('public'))
+	app.use('/node_modules', express.static('node_modules'))
 
 	if developmentMode
 		app.use morgan 'dev',

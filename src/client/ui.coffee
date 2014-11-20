@@ -10,20 +10,20 @@ fileLoader = require './fileLoader'
 module.exports = (globalConfig) ->
 	return {
 
-		dropHandler: ( event ) ->
+		dropHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
 			fileLoader.readFiles files if files?
 
-		dragOverHandler: ( event ) ->
+		dragOverHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			event.dataTransfer.dropEffect = 'copy'
 
 		# Bound to updates to the window size:
 		# Called whenever the window is resized.
-		windowResizeHandler: ( event ) ->
+		windowResizeHandler: (event) ->
 			renderer.windowResizeHandler()
 
 		init: ->
@@ -33,17 +33,18 @@ module.exports = (globalConfig) ->
 			# event listener
 			renderer.getDomElement().addEventListener(
 				'dragover'
-				@dragOverHandler.bind( @ )
+				@dragOverHandler.bind @
 				false
 			)
 			renderer.getDomElement().addEventListener(
 				'drop'
-				@dropHandler.bind( @ )
+				@dropHandler.bind @
 				false
 			)
+
 			window.addEventListener(
 				'resize',
-				@windowResizeHandler.bind( @ ),
+				@windowResizeHandler.bind @,
 				false
 			)
 	}

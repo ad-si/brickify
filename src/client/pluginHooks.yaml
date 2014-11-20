@@ -1,4 +1,4 @@
-#  #Plugin API#
+#  # Plugin API
 #
 #  Client-side plugins can provide the following hooks to interact with lowfab.
 #
@@ -8,13 +8,16 @@
 #  See [dummyPlugin](plugins/dummy/dummy.html) for a example implementation
 #  and further documentation of the plugin API.
 
-#  ##Plugin Initialization##
+
+#  ## Plugin Initialization
 #  The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
 #  (if provided) after loading the plugin. It is the first method to be called
 #  and provides access to the [global configuration](globals.html).
+
 - init
 
-#  ##State synchronization##
+
+#  ## State synchronization
 #
 #  The [state synchronization module](statesync.html) will call each plugin's
 #  `updateState` method (if provided) whenever the current state changes
@@ -22,26 +25,40 @@
 #
 #  The hook provides both the delta to the previous state and the new complete
 #  state as arguments.
+
 - updateState
 
-#  ##3D scene initialization##
+
+#  ## 3D scene initialization
 #
 #  Each plugin that provides a `init3D` method is able to initialize its 3D
 #  rendering there and receives a three.js node as argument.
 #
 #  If the plugin needs its node for later use it has to store it in `init3D`
 #  because it won't be handed the node again later.
+
 - init3D
 
-#  ##3D scene update and animation##
+
+#  ## 3D scene update and animation
 #
 #  On each render frame the [renderer](render.html) will call the `update3D`
 #  method of all plugins that provide it. There are no arguments passed.
+
 - update3D
 
-#  ##File import##
+#  ## File import
 #
 #  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
 #  try to import it with every plugin that implements importFile until one
 #  succeeds.
+
 - importFile
+
+
+# ## UI Initalization
+#
+# Provides the plugins the possibility to add elements to the UI.
+# Receives a DOM element to insert itself into.
+
+- onUiInit

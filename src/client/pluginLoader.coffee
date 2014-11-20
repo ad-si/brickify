@@ -17,6 +17,11 @@ checkForPluginMethods = (instance) ->
 initPluginInstance = (instance) ->
 	instance.init? globalConfigInstance
 	instance.init3D? threeNode = new THREE.Object3D()
+	instance.onUiInit? {
+		menuBar: document.getElementById('navbarToggle')
+		toolsContainer: document.getElementById('toolsContainer')
+		sceneGraphContainer: document.getElementById('sceneGraphContainer')
+	}
 
 	pluginHooks.register instance
 
@@ -28,6 +33,7 @@ loadPlugin = (instance) ->
 		pluginInstances.push instance
 		initPluginInstance instance
 		console.log "Plugin #{instance.pluginName} loaded"
+
 	else
 		if instance.pluginName?
 			console.log "Plugin #{instance.pluginName} does not contain all
@@ -39,17 +45,13 @@ loadPlugin = (instance) ->
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
-# Since browserify.js does not support dynamic require
-# all plugins must be written down
-module.exports.loadPlugins = () ->
-	coordinateSystem = require './plugins/coordinateSystem/coordinateSystem'
-	dummyPlugin = require './plugins/dummy/dummy'
-	stlImport = require './plugins/stlImport/stlImport'
-	stlExport = require './plugins/stlExport/stlExport'
-	voxeliser = require './plugins/voxeliser/voxeliser'
 
-	loadPlugin coordinateSystem
-	loadPlugin dummyPlugin
-	loadPlugin stlImport
-	loadPlugin stlExport
-	loadPlugin voxeliser
+# Since browserify.js does not support dynamic require
+# all plugins must be explicitly written down
+module.exports.loadPlugins = () ->
+	loadPlugin require './plugins/dummy/dummy'
+	loadPlugin require './plugins/coordinateSystem/coordinateSystem'
+	loadPlugin require './plugins/stlImport/stlImport'
+	loadPlugin require './plugins/stlExport/stlExport'
+	loadPlugin require './plugins/sceneGraph/sceneGraph'
+	loadPlugin require './plugins/voxeliser/voxeliser'

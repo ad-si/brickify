@@ -1,4 +1,5 @@
 OptimizedModel = require '../../../common/OptimizedModel'
+Vec3 = require '../../../common/Vec3'
 
 # Parses the content of a stl file.
 # if optimize is set to true, an optimized mesh is returned
@@ -84,7 +85,7 @@ parseAscii = (fileContent) ->
 				if (!(nx?) || !(ny?) || !(nz?))
 					stl.addError "Invalid normal definition: (#{nx}, #{ny}, #{nz})"
 				else
-					currentPoly.setNormal new Vec3d(nx,ny,nz)
+					currentPoly.setNormal new Vec3(nx,ny,nz)
 			when 'vertex'
 				vx = parseFloat astl.nextText()
 				vy = parseFloat astl.nextText()
@@ -93,7 +94,7 @@ parseAscii = (fileContent) ->
 				if (!(vx?) || !(vy?) || !(vz?))
 					stl.addError "Invalid vertex definition: (#{nx}, #{ny}, #{nz})"
 				else
-					currentPoly.addPoint new Vec3d(vx, vy, vz)
+					currentPoly.addPoint new Vec3(vx, vy, vz)
 	return stl
 
 # Parses a binary stl file to the internal representation
@@ -120,7 +121,7 @@ parseBinary = (fileContent) ->
 		binaryIndex += 4
 		nz = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
-		poly.setNormal new Vec3d(nx, ny, nz)
+		poly.setNormal new Vec3(nx, ny, nz)
 		for i in [0..2]
 			vx = reader.getFloat32 binaryIndex, true
 			binaryIndex += 4
@@ -128,7 +129,7 @@ parseBinary = (fileContent) ->
 			binaryIndex += 4
 			vz = reader.getFloat32 binaryIndex, true
 			binaryIndex += 4
-			poly.addPoint new Vec3d(vx,vy,vz)
+			poly.addPoint new Vec3(vx,vy,vz)
 		#skip uint 16
 		binaryIndex += 2
 		stl.addPolygon poly
@@ -209,7 +210,7 @@ optimizeModel = (importedStl, cleanseStl = true,
 		for vertexIndex in [0..2]
 			point = poly.points[vertexIndex]
 			newPointIndex = octreeRoot.add point,
-				new Vec3d(poly.normal.x, poly.normal.y, poly.normal.z), biggestPointIndex
+				new Vec3(poly.normal.x, poly.normal.y, poly.normal.z), biggestPointIndex
 			indices[vertexIndex] = newPointIndex
 			if newPointIndex > biggestPointIndex
 				biggestPointIndex = newPointIndex
@@ -235,7 +236,7 @@ optimizeModel = (importedStl, cleanseStl = true,
 	octreeRoot.forEach (node) ->
 		normalList = node.normalList
 		i = node.index * 3
-		avg = new Vec3d(0,0,0)
+		avg = new Vec3(0,0,0)
 		for normal in normalList
 			normal = normal.normalized()
 			avg = avg.add normal
@@ -336,34 +337,12 @@ module.exports.Stl = Stl
 class StlPoly
 	constructor: () ->
 		@points = []
-		@normal = new Vec3d(0,0,0)
+		@normal = new Vec3(0,0,0)
 	setNormal: (@normal) ->
 		return undefined
 	addPoint: (p) ->
 		@points.push p
 module.exports.Stlpoly = StlPoly
-
-class Vec3d
-	constructor: (@x, @y, @z) ->
-		return undefined
-	minus: (vec) ->
-		return new Vec3d(@x - vec.x, @y - vec.y, @z - vec.z)
-	add: (vec) ->
-		return new Vec3d(@x + vec.x, @y + vec.y, @z + vec.z)
-	crossProduct: (vec) ->
-		return new Vec3d(@y * vec.z - @z * vec.y,
-				@z * vec.x - @x * vec.z,
-				@x * vec.y - @y * vec.x)
-	length: () ->
-		return Math.sqrt(@x * @x + @y * @y + @z * @z)
-	euclideanDistanceTo: (vec) ->
-		return (@minus vec).length()
-	multiplyScalar: (scalar) ->
-		return new Vec3d(@x * scalar, @y * scalar, @z * scalar)
-	normalized: () ->
-		return @multiplyScalar (1.0 / @length())
-
-module.exports.Vec3d = Vec3d
 
 class Octree
 	constructor: (@distanceDelta) ->

@@ -14,10 +14,12 @@ modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
 
 Converter = require './geometry/Converter'
-BrickSystems = require './bricks/BrickSystems'
+#BrickSystems = require './bricks/BrickSystems'
 BrickSystem = require './bricks/BrickSystem'
 Voxeliser = require './geometry/Voxeliser'
 voxeliser = null
+
+voxelRenderer = require './rendering/voxelRenderer'
 
 threejsRootNode = null
 stateInstance = null
@@ -30,7 +32,7 @@ module.exports.init = (globalConfig, stateSync, ui) ->
 	stateInstance = stateSync
 	globalConfigInstance = globalConfig
 
-module.exports.init3d = (threejsNode) ->
+module.exports.init3D = (threejsNode) ->
 	threejsRootNode = threejsNode
 
 ###
@@ -72,4 +74,5 @@ voxelise = (optimizedModel, brickSystem) ->
 	voxeliser ?= new Voxeliser
 	# convert optimizedModel to solidObject3D
 	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-	voxeliser.voxelise(solidObject3D, brickSystem)
+	voxelisedModel = voxeliser.voxelise(solidObject3D, brickSystem)
+	threejsRootNode.add voxelRenderer voxelisedModel

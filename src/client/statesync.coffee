@@ -16,7 +16,6 @@ state = {}
 oldState = {}
 
 globalConfigInstance = null
-stateUpdateCallbacks = []
 
 exports.getState = (callback) ->
 	if initialStateIsLoaded
@@ -83,9 +82,6 @@ sync = (force = false) ->
 			handleUpdatedState(delta, state)
 
 exports.sync = sync
-
-exports.addUpdateCallback = (callback) ->
-	stateUpdateCallbacks.push callback
 
 handleUpdatedState = (delta, curstate) ->
 	#Client plugins maybe modify state...

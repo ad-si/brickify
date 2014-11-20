@@ -8,8 +8,6 @@ common = require '../../../common/pluginCommon'
 
 module.exports.pluginName = 'stl Export Plugin'
 module.exports.category = common.CATEGORY_EXPORT
-module.exports.needs3dAnimation = false
-
 
 #helper methods
 stringifyVector = (vec) ->

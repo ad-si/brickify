@@ -5,23 +5,16 @@
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
 renderer = require './renderer'
+fileLoader = require './fileLoader'
 
 module.exports = (globalConfig) ->
 	return {
-		stlLoader: new THREE.STLLoader()
-		fileReader: new FileReader()
-
-		# overwrite if in your code neccessary
-		loadHandler: ( event ) ->
-			return 0
 
 		dropHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
-			for file in files
-				if file.name.toLowerCase().search( '.stl' ) >= 0
-					@fileReader.readAsBinaryString( file )
+			fileLoader.readFiles files if files?
 
 		dragOverHandler: (event) ->
 			event.stopPropagation()
@@ -35,6 +28,7 @@ module.exports = (globalConfig) ->
 
 		init: ->
 			renderer.init(globalConfig)
+			fileLoader.init()
 
 			# event listener
 			renderer.getDomElement().addEventListener(
@@ -47,11 +41,7 @@ module.exports = (globalConfig) ->
 				@dropHandler.bind @
 				false
 			)
-			@fileReader.addEventListener(
-				'loadend',
-				@loadHandler.bind @,
-				false
-			)
+
 			window.addEventListener(
 				'resize',
 				@windowResizeHandler.bind @,

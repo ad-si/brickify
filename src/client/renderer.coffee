@@ -9,11 +9,12 @@ scene = null
 camera = null
 controls = null
 
-localRenderer = () ->
-	requestAnimationFrame localRenderer
-	renderer.render scene, camera
 
+localRenderer = () ->
+	renderer.render scene, camera
 	pluginHooks.update3D()
+
+	requestAnimationFrame localRenderer
 
 module.exports.addToScene = (node) ->
 	scene.add node

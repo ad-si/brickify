@@ -48,9 +48,6 @@ menuItems = [
 	}
 ]
 
-statesync.getState (state) ->
-	console.log(state)
-
 # Generate UI
 dom = r.DOM
 

@@ -1,8 +1,11 @@
-#Plugin categories
-module.exports.CATEGORY_IMPORT = 'Import'
-module.exports.CATEGORY_EXPORT = 'Export'
-module.exports.CATEGORY_SPLIT = 'Split'
-module.exports.CATEGORY_CONVERTER = 'Converter'
-module.exports.CATEGORY_CONNECTOR = 'Connector'
-module.exports.CATEGORY_VALIDATOR = 'Validator'
-module.exports.CATEGORY_DUMMY = 'Dummy'
+# Plugin categories
+module.exports = {
+	CATEGORY_IMPORT: 'Import'
+	CATEGORY_EXPORT: 'Export'
+	CATEGORY_SPLIT: 'Split'
+	CATEGORY_CONVERTER: 'Converter'
+	CATEGORY_CONNECTOR: 'Connector'
+	CATEGORY_VALIDATOR: 'Validator'
+	CATEGORY_DUMMY: 'Dummy'
+	CATEGORY_UI: 'UI'
+}

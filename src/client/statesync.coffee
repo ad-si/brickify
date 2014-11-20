@@ -43,6 +43,7 @@ exports.init = (globalConfig, stateInitializedCallback) ->
 
 		handleUpdatedState({}, state)
 
+
 sync = (force = false) ->
 	delta = diffpatch.diff oldState, state
 
@@ -80,6 +81,7 @@ sync = (force = false) ->
 			oldState = JSON.parse JSON.stringify state
 
 			handleUpdatedState(delta, state)
+
 
 exports.sync = sync
 

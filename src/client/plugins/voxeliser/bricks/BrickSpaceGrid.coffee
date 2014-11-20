@@ -1,3 +1,7 @@
+BrickSpace = require './BrickSpace'
+Object3D = require '../geometry/Object3D'
+Vector3D = require '../geometry/Vector3D'
+
 class BrickSpaceGrid
   constructor: (boundaryBox, @bricksystem) ->
     @scene_model = null

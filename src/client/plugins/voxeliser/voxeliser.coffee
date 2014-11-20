@@ -17,7 +17,7 @@ Converter = require './geometry/Converter'
 BrickSystems = require './bricks/BrickSystems'
 BrickSystem = require './bricks/BrickSystem'
 Voxeliser = require './geometry/Voxeliser'
-voxeliser = new Voxeliser
+voxeliser = null
 
 threejsRootNode = null
 stateInstance = null
@@ -60,7 +60,6 @@ module.exports.updateState = (delta, state) ->
 				]
 				
 				voxelise optimizedModel, Lego
-				return
 
 
 ###
@@ -73,6 +72,7 @@ module.exports.updateState = (delta, state) ->
 # module.exports.update3D = () ->
 
 voxelise = (optimizedModel, brickSystem) ->
+	voxeliser ?= new Voxeliser
 	# convert optimizedModel to solidObject3D
 	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
 	voxeliser.voxelise(solidObject3D, brickSystem)

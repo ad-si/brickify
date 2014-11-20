@@ -2,6 +2,7 @@ BrickSpaceGrid = require './../bricks/BrickSpaceGrid'
 Vector3D = require './Vector3D'
 Ray = require './Ray'
 SolidObject3D = require './SolidObject3D'
+Tolerances = require './Tolerances'
 
 class Voxeliser
 	constructor: () ->

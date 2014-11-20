@@ -1,3 +1,5 @@
+Object3D = require '../geometry/Object3D'
+
 class BrickSpace
   constructor: (@bricksystem, @x, @y, @z, @default_Brick = yes) ->
     @grid = null

@@ -9,11 +9,12 @@ module.exports.convertToSolidObject3D = (optimizedModel) ->
 			optimizedModel.positions[i + 1], optimizedModel.positions[i + 2])
 	for point in vertices
 		solidObject.set_Point(point.x, point.y, point.z)
-	for j in [0..optimizedModel.faceNormals - 1] by 1
+	for j in [0..optimizedModel.indices.length - 1] by 3
 		points = []
 		points.push vertices[optimizedModel.indices[j]]
 		points.push vertices[optimizedModel.indices[j + 1]]
 		points.push vertices[optimizedModel.indices[j + 2]]
-		normal = optimizedModel.faceNormals[j]
+		normal = new Point(optimizedModel.faceNormals[j],
+			optimizedModel.faceNormals[j + 1], optimizedModel.faceNormals[j + 2])
 		solidObject.add_Polygon_for(points, normal)
 	solidObject

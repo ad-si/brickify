@@ -18,6 +18,7 @@
     "browserify-middleware": "^4.1.0",
     "coffee-script": "^1.8.0",
     "coffeeify": "^0.7.0",
+    "coffeelint-newline-at-eof": "^0.4.1",
     "compression": "^1.2.0",
     "errorhandler": "^1.2.2",
     "exec": "^0.1.2",

@@ -58,7 +58,6 @@ task 'clean', 'Removes js files from src directory', ->
 # Build the client and the server
 task 'build', 'Builds client and server js files', ->
 	cakeUtilities
-	.buildClient()
 	.buildServer()
 
 # Run all batch tests on models

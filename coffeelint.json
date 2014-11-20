@@ -45,6 +45,11 @@
         "value": 3,
         "level": "ignore"
     },
+    "newline_at_eof": {
+        "module": "coffeelint-newline-at-eof",
+        "level": "error",
+        "behaviour": "require"
+    },
     "no_backticks": {
         "level": "error"
     },

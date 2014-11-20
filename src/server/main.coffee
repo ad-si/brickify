@@ -21,6 +21,14 @@ winston.loggers.add 'log',
 
 log = winston.loggers.get('log')
 
+# Support mixing .coffee and .js files in lowfab-project
+coffeeify = require 'coffeeify'
+# Load yaml configuration into javascript file
+browserifyData = require('browserify-data')
+browserify = require 'browserify-middleware'
+browserify.settings({
+	transform: [coffeeify, browserifyData]
+})
 bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
@@ -120,7 +128,10 @@ module.exports.setupRouting = () ->
 			.import 'nib'
 	)
 
-	app.use(express.static('public'))
+	app.get '/index.js', browserify('src/client/main.coffee', {
+		extensions: ['.coffee']
+	})
+	app.use express.static('public')
 	app.use('/node_modules', express.static('node_modules'))
 
 	if developmentMode

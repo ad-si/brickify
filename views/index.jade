@@ -1,8 +1,16 @@
 extends layout
 
 block content
-	p You should not see this text! Do you use a webGL ready browser?
-		a(href='http://get.webgl.org') get.webgl.org
+
+	div#renderArea
+
+	aside#sceneGraphContainer
+	aside#toolsContainer
+
+	div#webGlWarning
+		p You should not see this text! Do you use a webGL ready browser?
+			= ' '
+			a(href='http://get.webgl.org') get.webgl.org
 
 block scripts
 	if scripts

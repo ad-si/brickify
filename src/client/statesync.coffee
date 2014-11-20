@@ -9,13 +9,19 @@ diffpatch = jsondiffpatch.create objectHash: (obj) ->
 
 pluginHooks = require '../common/pluginHooks'
 
+initialStateIsLoaded = false
+initialStateLoadedCallbacks = []
+
 state = {}
 oldState = {}
 
 globalConfigInstance = null
 
-exports.getState = () ->
-	return state
+exports.getState = (callback) ->
+	if initialStateIsLoaded
+		callback(state)
+	else
+		initialStateLoadedCallbacks.push(callback)
 
 exports.performStateAction = (callback) ->
 	callback(state)
@@ -26,9 +32,17 @@ exports.init = (globalConfig, stateInitializedCallback) ->
 	$.get '/statesync/get', {}, (data, textStatus, jqXHR) ->
 		state = data
 		oldState = JSON.parse JSON.stringify state
+
 		console.log "Got initial state from server: #{JSON.stringify(state)}"
+
 		stateInitializedCallback state if stateInitializedCallback?
+
+		initialStateIsLoaded = true
+		initialStateLoadedCallbacks.forEach (callback) ->
+			callback(state)
+
 		handleUpdatedState({}, state)
+
 
 sync = (force = false) ->
 	delta = diffpatch.diff oldState, state
@@ -67,6 +81,7 @@ sync = (force = false) ->
 			oldState = JSON.parse JSON.stringify state
 
 			handleUpdatedState(delta, state)
+
 
 exports.sync = sync
 

@@ -1,5 +1,7 @@
 ###
   # Scene Graph Plugin
+
+  Renders interactive scene graph tree in sceneGraphContainer
 ###
 
 common = require '../../../common/pluginCommon'

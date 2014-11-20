@@ -45,12 +45,6 @@ coffeeScript.register()
 task 'linkHooks', 'Links git hooks into .git/hooks', ->
 	cakeUtilities.linkHooks()
 
-# Build the client javascript files from all coffee-script files inside
-# `src/client`<br>
-# See [cakeUtilities](src/server/cakeUtilities.html)
-task 'buildClient', 'Builds the client js files', ->
-	cakeUtilities.buildClient()
-
 # Build the server javascript files from all coffee-script files inside
 # `src/server`<br>
 # See [cakeUtilities](src/server/cakeUtilities.html)

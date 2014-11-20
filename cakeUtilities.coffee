@@ -45,20 +45,6 @@ deleteAllJsFiles = (directory, afterDeleteCallback) ->
 	.on 'warn', (warning) -> buildLog.warn warning
 	.on 'end', () -> afterDeleteCallback(directory) if afterDeleteCallback?
 
-module.exports.buildClient = () ->
-	browserify = browserify
-		debug: process.env.NODE_ENV is not 'production'
-		extensions: ['.coffee']
-
-	browserify
-	.add path.join __dirname, '/src/client', 'main.coffee'
-	.transform coffeeify
-	.transform browserifyData
-	.bundle()
-	.pipe fs.createWriteStream 'public/index.js'
-
-	return module.exports
-
 module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
 		path.join __dirname, '/src/server'

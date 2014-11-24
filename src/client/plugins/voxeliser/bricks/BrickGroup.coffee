@@ -88,7 +88,8 @@ class BrickGroup
     @scene_Model ?= @.build_SceneModel()
 
   build_SceneModel: () ->
-    material = new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors, color: @color, ambient: @color, wireframe: false} )
+    material = new THREE.MeshPhongMaterial( {vertexColors: THREE.FaceColors,\
+      color: @color, ambient: @color, wireframe: false} )
     geometry = new THREE.Geometry()
 
     polygons = @.get_Polygons()

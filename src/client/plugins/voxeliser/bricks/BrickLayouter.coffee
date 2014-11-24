@@ -3,8 +3,10 @@ Vector3D = require '../geometry/Vector3D'
 class BrickLayouter
 
   constructor: (@layout) ->
-    @heights = [] # Saves possible brick heights (except for standard height 1)
-    @debugging = false # Determines if scene models will be rendered in layouting substeps
+    # Saves possible brick heights (except for standard height 1)
+    @heights = []
+    # Determines if scene models will be rendered in layouting substeps
+    @debugging = false
 
     @initHeights()
 
@@ -130,9 +132,12 @@ class BrickLayouter
           mergeUp = yes
 
           for i in [1...slider]
-            upperBrick = @layout.get_Brick(brick.position.x, brick.position.y, brick.position.z + i)
+            upperBrick = @layout.get_Brick(brick.position.x,
+              brick.position.y, brick.position.z + i)
 
-            if not upperBrick? or not layerBricks[brick.position.z + i].includes(upperBrick) or upperBrick.id == brick.id
+            if not upperBrick? or
+            not layerBricks[brick.position.z + i].includes(upperBrick) or
+            upperBrick.id == brick.id
               mergeUp = no
               break
             else
@@ -176,8 +181,11 @@ class BrickLayouter
           mergeUp = yes
           for brick in bricks
             for i in [1...slider]
-              upperBrick = @layout.get_Brick(brick.position.x, brick.position.y, brick.position.z + i)
-              if not upperBrick? or not layerBricks[z + i].includes(upperBrick) or upperBrick.id == brick.id
+              upperBrick = @layout.get_Brick(brick.position.x, brick.position.y,
+                brick.position.z + i)
+              if not upperBrick? or
+              not layerBricks[z + i].includes(upperBrick) or
+              upperBrick.id == brick.id
                 mergeUp = no
                 break
             break if not mergeUp
@@ -200,7 +208,8 @@ class BrickLayouter
     for brick in bricks
       uppers = []
       for i in [1...height]
-        br = @layout.get_Brick(brick.position.x, brick.position.y, brick.position.z + i)
+        br = @layout.get_Brick(brick.position.x, brick.position.y,
+          brick.position.z + i)
         if br? and layerBricks[layerIdx + i].includes(br)
           uppers.push br
 
@@ -236,7 +245,8 @@ class BrickLayouter
     if numOverhanging == 0
       log 'SUCCESS: Model buildable, no overhanging bricks'
     else
-      log 'Stop fixing overhanging bricks. Still ' + numOverhanging + ' overhanging bricks after ' + maxIterations + ' iterations.'
+      log 'Stop fixing overhanging bricks. Still ' + numOverhanging +
+        ' overhanging bricks after ' + maxIterations + ' iterations.'
 
 
   fixWeakBricks: (maxIterations) ->
@@ -247,15 +257,20 @@ class BrickLayouter
     if numWeak == 0
       log 'SUCCESS: No weak bricks found in the model'
     else
-      log 'Stop fixing weak bricks. Still ' + numWeak + ' weak bricks after ' + maxIterations + ' iterations.'
+      log 'Stop fixing weak bricks. Still ' + numWeak + ' weak bricks after ' +
+        maxIterations + ' iterations.'
 
 
 
   fixBricks: (badBricks, iteration, maxIterations) ->
-    if 'overhanging' of badBricks and badBricks['overhanging'].length > 0 and iteration <= maxIterations
-      log 'Try fixing ' + badBricks['overhanging'].length + ' overhanging bricks: Iteration ' + iteration
+    if 'overhanging' of badBricks and
+    badBricks['overhanging'].length > 0 and
+    iteration <= maxIterations
+      log 'Try fixing ' + badBricks['overhanging'].length +
+        ' overhanging bricks: Iteration ' + iteration
       @tryFixOverlappers(badBricks)
-      log 'Overhanging bricks fix iteration: ' + iteration + ' complete. Total bricks: ' + @layout.get_BrickCount() + ' bricks'
+      log 'Overhanging bricks fix iteration: ' + iteration +
+        ' complete. Total bricks: ' + @layout.get_BrickCount() + ' bricks'
 
       badBricks = @findOverhangingBricks()
       iteration += 1
@@ -266,11 +281,15 @@ class BrickLayouter
       # , 1000)
       return @fixBricks(badBricks, iteration, maxIterations)
 
-    else if 'weak' of badBricks and badBricks['weak'].length > 0 and iteration <= maxIterations
-      log 'Try fixing ' + badBricks['weak'].length + ' weak bricks: Iteration ' + iteration
+    else if 'weak' of badBricks and
+    badBricks['weak'].length > 0 and
+    iteration <= maxIterations
+      log 'Try fixing ' + badBricks['weak'].length +
+        ' weak bricks: Iteration ' + iteration
       log badBricks['weak']
       @tryFixWeakPoints(badBricks)
-      log 'Weak bricks fix iteration: ' + iteration + ' complete. Remaining bricks: ' + @layout.get_BrickCount() + ' bricks'
+      log 'Weak bricks fix iteration: ' + iteration +
+        ' complete. Remaining bricks: ' + @layout.get_BrickCount() + ' bricks'
 
       badBricks = @findWeakArticulationBricks()
       iteration += 1
@@ -285,14 +304,16 @@ class BrickLayouter
 
 
   findOverhangingBricks: ->
-    # Bad = if brick is overhanging OR is direct neighbor of an overhanging brick
+    # Bad = if brick is overhanging OR is direct
+    # neighbor of an overhanging brick
     overhangingBricks = []
     badNeighborBricks = []
 
     graphs = @findSubgraphs()
     if graphs.length > 1
       # Sort graphs by brickcount descending
-      graphs.sort((a,b) -> return (Object.keys(b).length - Object.keys(a).length))
+      graphs.sort((a,b) ->
+        return (Object.keys(b).length - Object.keys(a).length))
 
       # DEBUG
       # console.log 'Found subgraphs:'
@@ -304,7 +325,9 @@ class BrickLayouter
         for id, brick of graphs[i]
           bricksToSplit[id] = brick
           for dir, bricks of @getLayerNeighbors(brick)
-            if dir == 'left' or dir == 'right' or dir == 'top' or dir == 'bottom' or dir
+            if dir == 'left' or dir == 'right' or
+            dir == 'top' or dir == 'bottom' or
+            dir
               for b in bricks
                 if b.id not of bricksToSplit
                   bricksToSplit[b.id] = b
@@ -342,13 +365,16 @@ class BrickLayouter
     bad1x1Bricks = {'overhanging': [], 'neighbors': []}
     for type, bricks of badBricks
       for brick in bricks
-        bad1x1Bricks[type] = bad1x1Bricks[type].concat(@resetToBasicBricks(brick, yes))
+        bad1x1Bricks[type] = bad1x1Bricks[type].concat(
+          @resetToBasicBricks(brick, yes))
 
     overhangingBricks = bad1x1Bricks['overhanging']
     badNeighborBricks = bad1x1Bricks['neighbors']
 
-    # TODO: Start with overhanging bricks and try to grow to the good neighbors direction
-    # Neighbors are bricks connected to the rest of the model (not overhanging, but neighbors overhanging bricks)
+    # TODO: Start with overhanging bricks and try to grow to the good neighbors
+    # direction
+    # Neighbors are bricks connected to the rest of the model (not overhanging,
+    # but neighbors overhanging bricks)
     growableBricks = overhangingBricks.concat(badNeighborBricks)
 
     @growBricks(growableBricks)
@@ -365,7 +391,8 @@ class BrickLayouter
       brick = growableBricks[brickIndex]
       growableBricks.splice(brickIndex, 1)
 
-      if brick.slots != null # brick might already be merged with by a previous growBrick
+      # brick might already be merged with by a previous growBrick
+      if brick.slots != null
 
         if useAsWhiteList
           brick = @growBrick(brick, bricks)
@@ -394,7 +421,8 @@ class BrickLayouter
     brick.lowerBricks = {}
     if brick.position.z + brick.extend.z < @layout.extend.z
       # Check upper layer
-      brick.upperBricks = @buildLayerConnections(brick.position.z + brick.extend.z, brick)
+      brick.upperBricks = @buildLayerConnections(brick.position.z +
+        brick.extend.z, brick)
     if brick.position.z > 0
       # Check lower layer
       brick.lowerBricks = @buildLayerConnections(brick.position.z - 1, brick)
@@ -434,7 +462,8 @@ class BrickLayouter
             startingBrick = brick
             break
         if startingBrick.id == startId
-          console.log 'Error: This should not happen, check your graph traversal algorithm, bro!'
+          console.log 'Error: This should not happen, check your graph traversal
+           algorithm, bro!'
           console.log graphs
           console.log numBricksFound
           remaining = @legoGrid.all_bricks.clone()
@@ -475,7 +504,8 @@ class BrickLayouter
       brick.upperBricks = {}
 
       # Check for changed graph connectivity
-      newGraphs = @findSubgraphs() # Will contain the just removed brick in a separate graph
+      # Will contain the just removed brick in a separate graph
+      newGraphs = @findSubgraphs()
       if newGraphs.length == graphs.length
         console.log 'ERROR: Weakbrick-Graphs have the same length!'
       if newGraphs.length - 1 != graphs.length
@@ -487,7 +517,11 @@ class BrickLayouter
         if subgraphsLongerThanOne > 1
           weakBricks[brick.id] = brick
           for dir, bricks of @getLayerNeighbors(brick)
-            if dir == 'left' or dir == 'right' or dir == 'top' or dir == 'bottom' or dir
+            if dir == 'left' or
+            dir == 'right' or
+            dir == 'top' or
+            dir == 'bottom' or
+            dir
               for b in bricks
                 if b.id not of weakBricks
                   weakBricks[b.id] = b
@@ -542,13 +576,15 @@ class BrickLayouter
 
 
   calculateBestNeighbors: (brick, neighbors) ->
-    # Idea: Best neighbors are those that create the most connections among the Lego graph
+    # Idea: Best neighbors are those that create the most connections among the
+    # Lego graph
     bestNeighbors = null
     maxCreatedConnections = -1
 
     for direction, neighborBricks of neighbors
       if @isLegalMerge(brick, neighborBricks)
-        createdConnections = @caluculateCreatedConnections(brick, neighborBricks)
+        createdConnections = @caluculateCreatedConnections(brick,
+          neighborBricks)
 
         # Find max
         if createdConnections > maxCreatedConnections
@@ -566,12 +602,14 @@ class BrickLayouter
     for [bricks, direction] in bestNeighbors
       if brick.position.z % 2 == 0 and
         (direction == 'top' or direction == 'bottom' or
-        direction == 'topbottom' or direction == 'bottom2' or direction == 'top2')
+        direction == 'topbottom' or direction == 'bottom2' or
+        direction == 'top2')
           zigzags = bricks
           break
       else if brick.position.z % 2 != 0 and
         (direction == 'left' or direction == 'right' or
-        direction == 'leftright' or direction == 'right2' or direction == 'left2')
+        direction == 'leftright' or direction == 'right2' or
+        direction == 'left2')
           zigzags = bricks
           break
 
@@ -672,10 +710,12 @@ class BrickLayouter
     #
     # IMAGINE: A brick can be high, deep and wide, making neighbor search
     #  a search of all bricks next to a 'wall' of single 1x1 bricks
-    # IMAGINE: For the directions you look on the model from the top (only X and Y visible)
+    # IMAGINE: For the directions you look on the model from the top (only X and
+    # Y visible)
     # ----------------
     neighbors = {}
-    directions = ['left', 'right', 'top', 'bottom', 'topbottom', 'leftright', 'top2', 'left2', 'right2', 'bottom2']
+    directions = ['left', 'right', 'top', 'bottom', 'topbottom', 'leftright',
+                  'top2', 'left2', 'right2', 'bottom2']
 
     pushNeighborBrick = (direction, neighbors, x, y, z) =>
       br = @layout.get_Brick(x, y, z)
@@ -694,25 +734,30 @@ class BrickLayouter
     if brick.position.x > 0
       for y in [0...brick.extend.y] by 1
         for z in [0...brick.extend.z] by 1
-          pushNeighborBrick('left', neighbors, brick.position.x - 1, y + brick.position.y, z + brick.position.z)
+          pushNeighborBrick('left', neighbors, brick.position.x - 1,
+            y + brick.position.y, z + brick.position.z)
 
     # Right
     if brick.position.x + brick.extend.x < @layout.extend.x
       for y in [0...brick.extend.y] by 1
         for z in [0...brick.extend.z] by 1
-          pushNeighborBrick('right', neighbors, brick.position.x + brick.extend.x, y + brick.position.y, z + brick.position.z)
+          pushNeighborBrick('right', neighbors,
+            brick.position.x + brick.extend.x, y + brick.position.y,
+            z + brick.position.z)
 
     # Top
     if brick.position.y > 0
       for x in [0...brick.extend.x] by 1
         for z in [0...brick.extend.z] by 1
-          pushNeighborBrick('top', neighbors, x + brick.position.x, brick.position.y - 1, z + brick.position.z)
+          pushNeighborBrick('top', neighbors, x + brick.position.x,
+            brick.position.y - 1, z + brick.position.z)
 
     # Bottom
     if brick.position.y + brick.extend.y < @layout.extend.y
       for x in [0...brick.extend.x] by 1
         for z in [0...brick.extend.z] by 1
-          pushNeighborBrick('bottom', neighbors, x + brick.position.x, brick.position.y + brick.extend.y, z + brick.position.z)
+          pushNeighborBrick('bottom', neighbors, x + brick.position.x,
+            brick.position.y + brick.extend.y, z + brick.position.z)
 
     neighbors['topbottom'].push n for n in neighbors['top']
     neighbors['topbottom'].push n for n in neighbors['bottom']
@@ -729,7 +774,8 @@ class BrickLayouter
       if n.position.y > 0
         for x in [0...n.extend.x] by 1
           for z in [0...n.extend.z] by 1
-            pushNeighborBrick('top2', neighbors, x + n.position.x, n.position.y - 1, z + n.position.z)
+            pushNeighborBrick('top2', neighbors, x + n.position.x,
+              n.position.y - 1, z + n.position.z)
 
     # Push all left neighbors of left neighbors (second left neighbors of brick)
     neighbors['left2'].push n for n in neighbors['left']
@@ -737,23 +783,28 @@ class BrickLayouter
       if n.position.x > 0
         for y in [0...n.extend.y] by 1
           for z in [0...n.extend.z] by 1
-            pushNeighborBrick('left2', neighbors, n.position.x - 1, y + n.position.y, z + n.position.z)
+            pushNeighborBrick('left2', neighbors, n.position.x - 1,
+              y + n.position.y, z + n.position.z)
 
-    # Push all right neighbors of right neighbors (second right neighbors of brick)
+    # Push all right neighbors of right neighbors (second right neighbors of
+    # brick)
     neighbors['right2'].push n for n in neighbors['right']
     for n in neighbors['right']
       if n.position.x + n.extend.x < @layout.extend.x
         for y in [0...n.extend.y] by 1
           for z in [0...n.extend.z] by 1
-            pushNeighborBrick('right2', neighbors, n.position.x + n.extend.x, y + n.position.y, z + n.position.z)
+            pushNeighborBrick('right2', neighbors, n.position.x + n.extend.x,
+              y + n.position.y, z + n.position.z)
 
-    # Push all bottom neighbors of bottom neighbors (second bottom neighbors of brick)
+    # Push all bottom neighbors of bottom neighbors (second bottom neighbors of
+    # brick)
     neighbors['bottom2'].push n for n in neighbors['bottom']
     for n in neighbors['bottom']
       if n.position.y + n.extend.y < @layout.extend.y
         for x in [0...n.extend.x] by 1
           for z in [0...n.extend.z] by 1
-            pushNeighborBrick('bottom2', neighbors, x + n.position.x, n.position.y + n.extend.y, z + n.position.z)
+            pushNeighborBrick('bottom2', neighbors, x + n.position.x,
+              n.position.y + n.extend.y, z + n.position.z)
 
     return neighbors
 
@@ -841,7 +892,8 @@ class BrickLayouter
       zMax = z if z > zMax
 
     brick.position = new Vector3D(xMin, yMin, zMin)
-    brick.extend = new Vector3D(xMax - xMin + 1, yMax - yMin + 1, zMax - zMin + 1)
+    brick.extend = new Vector3D(xMax - xMin + 1, yMax - yMin + 1,
+      zMax - zMin + 1)
     brick.update_Bricktype()
 
     return brick
@@ -860,7 +912,8 @@ class BrickLayouter
     if keepHeight
       # Add 1x1xheight bricks
       for [x,y] in brick.get_XY_Slots()
-        newBrick = @layout.add_BasicBrick_with_Height(x,y,brick.position.z, brick.extend.z)
+        newBrick = @layout.add_BasicBrick_with_Height(x,y,brick.position.z,
+          brick.extend.z)
 
         if @debugging
           newBrick.update_SceneModel()

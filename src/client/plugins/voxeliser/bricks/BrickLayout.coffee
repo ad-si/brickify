@@ -78,12 +78,13 @@ class BrickLayout
       @.remove_Brick brick
 
   add_BasicBrick_for: (x,y,z) ->
-    brick = new Brick(@, @bricksystem, new Vector3D(x,y,z), new Vector3D(1,1,1) )
+    brick = new Brick(@, @bricksystem, new Vector3D(x,y,z), new Vector3D(1,1,1))
     @.add_Brick(brick, x, y, z)
     brick
 
   add_BasicBrick_with_Height: (x,y,z, height) ->
-    brick = new Brick(@, @bricksystem, new Vector3D(x,y,z), new Vector3D(1,1,height) )
+    brick = new Brick(@, @bricksystem,
+      new Vector3D(x,y,z), new Vector3D(1,1,height))
     @.add_Brick(brick, x, y, z)
 
   add_Brick: (brick) ->
@@ -91,7 +92,8 @@ class BrickLayout
     for x in [0...brick.extend.x] by 1
       for y in [0...brick.extend.y] by 1
         for z in [0...brick.extend.z] by 1
-          @grid[x + brick.position.x][y + brick.position.y][z + brick.position.z] = brick
+          @grid[x + brick.position.x][y + brick.position.y]
+          [z + brick.position.z] = brick
 
     brick
 
@@ -109,10 +111,12 @@ class BrickLayout
 
   show_StabilityView: () ->
     for brick in @.all_bricks
-      conns = Object.keys(brick.upperBricks).length + Object.keys(brick.lowerBricks).length
+      conns = Object.keys(brick.upperBricks).length +
+          bject.keys(brick.lowerBricks).length
 
       # Magic formula
-      brickStability = Math.min(conns / (Math.ceil(Math.sqrt(brick.slots.length)) * 2), 1.0)
+      brickStability = Math.min(
+        conns / (Math.ceil(Math.sqrt(brick.slots.length)) * 2), 1.0)
 
       color = new THREE.Color().setHSL 0.4 * brickStability, 0.55, 0.5
       ambient = new THREE.Color().setHSL 0.4 * brickStability, 0.6, 0.4
@@ -125,10 +129,7 @@ class BrickLayout
       brick.update_SceneModel()
 
   build_SceneModel: () ->
-    #geo = new THREE.Geometry()
-    #material = new THREE.MeshPhongMaterial( { color: @color1, ambient: @color2 } )
     mesh = new THREE.Mesh()
-    #mesh = new THREE.Mesh()
     mesh.position = @brickSpaceGrid.position
     for brick in @all_bricks
       brick.set_Default_Color @color
@@ -160,7 +161,8 @@ class BrickLayout
     total = 0
     conns = {} # e.g. conns = {0:2, 1:20, 2:40, 3:23}
     for brick in @all_bricks
-      connCount = Object.keys(brick.upperBricks).length + Object.keys(brick.lowerBricks).length
+      connCount = Object.keys(brick.upperBricks).length +
+          Object.keys(brick.lowerBricks).length
       total += connCount
 
       # Save for later

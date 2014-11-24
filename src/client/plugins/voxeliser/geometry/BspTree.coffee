@@ -23,13 +23,15 @@ class BspTree
 		back_facing_coplanar = []
 
 		for polygon in polygons
-			[ before, behind, front_coplanar, back_coplanar ] = @base_Node.covers_Polygon polygon
+			[ before, behind, front_coplanar, back_coplanar ] =
+			@base_Node.covers_Polygon polygon
 			before_polygons = before_polygons.concat before
 			behind_polygons = behind_polygons.concat behind
 			front_facing_coplanar = front_facing_coplanar.concat front_coplanar
 			back_facing_coplanar = back_facing_coplanar.concat back_coplanar
 
-		[before_polygons, behind_polygons, front_facing_coplanar, back_facing_coplanar]
+		[before_polygons, behind_polygons, front_facing_coplanar,
+		 back_facing_coplanar]
 
 
 
@@ -75,7 +77,8 @@ test12 = () ->
 	#window.m.remove_SceneModel()
 	window.p = m.polygons
 	window.t = BspTree.build_Tree(p)
-	[window.before1, window.behind1, window.front_co1, window.back_co1] = window.t.split_Polygons( p )
+	[window.before1, window.behind1, window.front_co1, window.back_co1] =
+		window.t.split_Polygons( p )
 	for polygon in window.front_co1
 		window.a1.copy_foreign_Polygon polygon
 
@@ -103,14 +106,16 @@ old_test3 = () ->
 
 	window.t = BspTree.build_Tree(m.polygons)
 
-	[window.before1, window.behind1, window.front_co1, window.back_co1] = window.t.split_Polygons( window.b.polygons )
+	[window.before1, window.behind1, window.front_co1, window.back_co1] =
+		window.t.split_Polygons( window.b.polygons )
 	for polygon in window.behind1
 		window.a1.copy_foreign_Polygon polygon
 
 
 	window.t = BspTree.build_Tree(b.polygons)
 
-	[window.before1, window.behind1, window.front_co1, window.back_co1] = window.t.split_Polygons( window.m.polygons )
+	[window.before1, window.behind1, window.front_co1, window.back_co1] =
+		window.t.split_Polygons( window.m.polygons )
 	for polygon in window.behind1
 		window.a2.copy_foreign_Polygon polygon
 	for polygon in window.front_co1
@@ -142,7 +147,8 @@ old_test = () ->
 
 	window.a1 = new SolidObject3D()
 	window.a1.color = ColorPalette.next()
-	#[window.before1, window.behind1, window.front_co1, window.back_co1] = window.t.split_Polygons( window.b.polygons )
+	#[window.before1, window.behind1, window.front_co1, window.back_co1] =
+	# 	window.t.split_Polygons( window.b.polygons )
 
 	console.log 'cut'
 	#for polygon in window.before1
@@ -154,7 +160,8 @@ old_test = () ->
 	window.a2.color = ColorPalette.green()
 
 	#window.t = BspTree.build_Tree(b.polygons)
-	#[window.before2, window.behind2, window.front_co2, window.back_co2] = window.t.split_Polygons(window.m.polygons)
+	#[window.before2, window.behind2, window.front_co2, window.back_co2] =
+	# 	window.t.split_Polygons(window.m.polygons)
 	#for polygon in window.behind2
 	#  window.a1.copy_foreign_Polygon polygon
 
@@ -183,7 +190,8 @@ old_test_2 = () ->
 
 	window.a1 = new SolidObject3D()
 	window.a1.color = ColorPalette.next()
-	#[window.before1, window.behind1, window.front_co1, window.back_co1] = window.t.split_Polygons( window.b.polygons )
+	#[window.before1, window.behind1, window.front_co1, window.back_co1] =
+	# 	window.t.split_Polygons( window.b.polygons )
 
 	console.log 'cut'
 	#for polygon in window.before1
@@ -195,7 +203,8 @@ old_test_2 = () ->
 	window.a2.color = ColorPalette.green()
 
 	#window.t = BspTree.build_Tree(b.polygons)
-	#[window.before2, window.behind2, window.front_co2, window.back_co2] = window.t.split_Polygons(window.m.polygons)
+	#[window.before2, window.behind2, window.front_co2, window.back_co2] =
+	# 	window.t.split_Polygons(window.m.polygons)
 	#for polygon in window.behind2
 	#  window.a1.copy_foreign_Polygon polygon
 

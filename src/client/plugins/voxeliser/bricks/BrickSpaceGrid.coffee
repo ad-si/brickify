@@ -42,17 +42,23 @@ class BrickSpaceGrid
     for brickspace in @all_bricks
       brickspace.set_Grid @
 
-      if neighbor = @.get_BrickSpace brickspace.x + 1, brickspace.y, brickspace.z
+      if neighbor = @.get_BrickSpace(brickspace.x + 1, brickspace.y,
+      brickspace.z)
         brickspace.set_Neighbor_for '+x', neighbor
-      if neighbor = @.get_BrickSpace brickspace.x - 1, brickspace.y, brickspace.z
+      if neighbor = @.get_BrickSpace(brickspace.x - 1, brickspace.y,
+      brickspace.z)
         brickspace.set_Neighbor_for '-x', neighbor
-      if neighbor = @.get_BrickSpace brickspace.x, brickspace.y + 1, brickspace.z
+      if neighbor = @.get_BrickSpace(brickspace.x, brickspace.y + 1,
+      brickspace.z)
         brickspace.set_Neighbor_for '+y', neighbor
-      if neighbor = @.get_BrickSpace brickspace.x, brickspace.y - 1, brickspace.z
+      if neighbor = @.get_BrickSpace(brickspace.x, brickspace.y - 1,
+      brickspace.z)
         brickspace.set_Neighbor_for '-y', neighbor
-      if neighbor = @.get_BrickSpace brickspace.x, brickspace.y, brickspace.z + 1
+      if neighbor = @.get_BrickSpace(brickspace.x, brickspace.y,
+      brickspace.z + 1)
         brickspace.set_Neighbor_for '+z', neighbor
-      if neighbor = @.get_BrickSpace brickspace.x, brickspace.y, brickspace.z - 1
+      if neighbor = @.get_BrickSpace(brickspace.x, brickspace.y,
+      brickspace.z - 1)
         brickspace.set_Neighbor_for '-z', neighbor
 
       if brickspace.inner
@@ -75,7 +81,8 @@ class BrickSpaceGrid
 
 
   get_BrickSpace: (x,y,z) ->
-    if 0 <= x < @brick_extend.x and 0 <= y < @brick_extend.y and 0 <= z < @brick_extend.z
+    if 0 <= x < @brick_extend.x and 0 <= y < @brick_extend.y and
+    0 <= z < @brick_extend.z
       @grid[x][y][z]
     else
       console.warn 'Grid: Out of Range'
@@ -88,7 +95,8 @@ class BrickSpaceGrid
     @.get_BrickSpace_for x, y, z
 
   get_BrickSpace_for: (x,y,z) ->
-    if 0 <= x < @brick_extend.x and 0 <= y < @brick_extend.y and 0 <= z < @brick_extend.z
+    if 0 <= x < @brick_extend.x and 0 <= y < @brick_extend.y and
+    0 <= z < @brick_extend.z
       space = @grid[x][y][z]
       space = @.create_BrickSpace_for(x,y,z) if space == undefined
       space

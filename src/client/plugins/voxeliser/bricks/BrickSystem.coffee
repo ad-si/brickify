@@ -20,8 +20,10 @@ class BrickSystem
     @brick_type_lookup[width] = [] unless @brick_type_lookup[width]
     @brick_type_lookup[depth] = [] unless @brick_type_lookup[depth]
 
-    @brick_type_lookup[width][depth] = [] unless @brick_type_lookup[width][depth]
-    @brick_type_lookup[depth][width] = [] unless @brick_type_lookup[depth][width]
+    @brick_type_lookup[width][depth] = [] \
+    unless @brick_type_lookup[width][depth]
+    @brick_type_lookup[depth][width] = [] \
+    unless @brick_type_lookup[depth][width]
 
     @brick_type_lookup[width][depth][height] = type
     @brick_type_lookup[depth][width][height] = type
@@ -74,13 +76,17 @@ class BrickSystem
 
     for y in [0...extend.y] by 1
       for z in [0...extend.z] by 1
-        @.add_Brick_Side object, position.plus(new Vector3D((extend.x - 1) * @width, y * @depth, z * @height) ), normal_xp
-        @.add_Brick_Side object, position.plus(new Vector3D(0, y * @depth, z * @height) ), normal_xn
+        vector = new Vector3D((extend.x - 1) * @width, y * @depth, z * @height)
+        @.add_Brick_Side object, position.plus(vector), normal_xp
+        vector2 = new Vector3D(0, y * @depth, z * @height)
+        @.add_Brick_Side object, position.plus(vector), normal_xn
 
     for x in [0...extend.x] by 1
       for z in [0...extend.z] by 1
-        @.add_Brick_Side object, position.plus(new Vector3D( x * @width, (extend.y - 1) * @depth, z * @height) ), normal_yp
-        @.add_Brick_Side object, position.plus(new Vector3D( x * @width, 0, z * @height) ), normal_yn
+        vector = new Vector3D( x * @width, (extend.y - 1) * @depth, z * @height)
+        @.add_Brick_Side object, position.plus(vector), normal_yp
+        vector2 = new Vector3D( x * @width, 0, z * @height)
+        @.add_Brick_Side object, position.plus(vector2), normal_yn
 
 
   add_Brick_Side: (object, position, normal) ->
@@ -99,10 +105,18 @@ class BrickSystem
     side_y = 1 if normal.y == 0
     side_y ?= 0
 
-    points = [ object.get_Point( factor_x * @width + side_x * @width + position.x, factor_y * @depth +                   position.y,            position.z),
-               object.get_Point( factor_x * @width +                   position.x, factor_y * @depth + side_y * @depth + position.y,            position.z),
-               object.get_Point( factor_x * @width +                   position.x, factor_y * @depth + side_y * @depth + position.y,  @height + position.z),
-               object.get_Point( factor_x * @width + side_x * @width + position.x, factor_y * @depth +                   position.y,  @height + position.z) ]
+    points = [object.get_Point(factor_x * @width + side_x * @width + position.x,
+                               factor_y * @depth + position.y,
+                               position.z),
+              object.get_Point(factor_x * @width + position.x,
+                               factor_y * @depth + side_y * @depth + position.y,
+                               position.z),
+              object.get_Point(factor_x * @width + position.x,
+                               factor_y * @depth + side_y * @depth + position.y,
+                               @height + position.z),
+              object.get_Point(factor_x * @width + side_x * @width + position.x,
+                               factor_y * @depth + position.y,
+                               @height + position.z) ]
 
     points.reverse() if reverse
 
@@ -122,9 +136,13 @@ class BrickSystem
     circle_cap = []
 
     for angle in [0...360] by @knob_circle_steps
-      circle_cap.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z + @knob_height)
+      x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+      y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+      z = middle_point.z + @knob_height
+      circle_cap.push object.get_Point(x, y, z)
 
-    object.add_Polygon_for( circle_cap, object.get_Normal(0, 0, 1), {origin: ['brick'], side: '+z', knob: yes} )
+    object.add_Polygon_for( circle_cap, object.get_Normal(0, 0, 1),
+      {origin: ['brick'], side: '+z', knob: yes} )
 
 
   add_Brick_top_Cap_Sides_to: (object, position) ->
@@ -134,8 +152,12 @@ class BrickSystem
     circle_cap = []
     circle_top = []
     for angle in [0...360] by  @knob_circle_steps
-      circle_cap.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z + @knob_height)
-      circle_top.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z)
+      x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+      y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+      z = middle_point.z + @knob_height
+      circle_cap.push object.get_Point(x, y, z)
+      z = middle_point.z
+      circle_top.push object.get_Point(x, y, z)
 
     last_cap_point = circle_cap[ circle_cap.length - 1 ]
     last_top_point = circle_top[ circle_top.length - 1 ]
@@ -156,24 +178,39 @@ class BrickSystem
   add_Brick_top_Plate_to: (object, position) ->
     middle_point = new Vector3D(@width / 2, @depth / 2, @height).add position
     point_per_segement = 360 / @knob_circle_steps / 4
-    edge_points = [ object.get_Point( @width + position.x, @depth + position.y, @height + position.z) ,
-                    object.get_Point(           position.x, @depth + position.y, @height + position.z) ,
-                    object.get_Point(           position.x,          position.y, @height + position.z) ,
-                    object.get_Point( @width + position.x,          position.y, @height + position.z) ]
+    edge_points = [object.get_Point(@width + position.x,
+                                    @depth + position.y,
+                                    @height + position.z),
+                   object.get_Point(position.x,
+                                    @depth + position.y,
+                                    @height + position.z),
+                   object.get_Point(position.x,
+                                    position.y,
+                                    @height + position.z),
+                   object.get_Point(@width + position.x,
+                                    position.y,
+                                    @height + position.z)]
 
     circle_points = []
     for angle in [0...360] by @knob_circle_steps
-      circle_points.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z)
+      x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+      y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+      z = middle_point.z
+      circle_points.push object.get_Point(x, y, z)
     circle_points.push circle_points.first()
 
     last_edge_point = edge_points[ edge_points.length - 1]
     last_point = circle_points.first()
 
     for edge_point, side in edge_points
-      object.add_Polygon_for( [last_point, last_edge_point, edge_point] , object.get_Normal(0, 0, 1), {origin: ['brick'], side: '+z'} )
+      object.add_Polygon_for( [last_point, last_edge_point, edge_point],
+        object.get_Normal(0, 0, 1), {origin: ['brick'], side: '+z'} )
 
-      for point in circle_points[side * point_per_segement + 1 .. (side + 1) * point_per_segement ]
-        object.add_Polygon_for( [ edge_point, point, last_point ], object.get_Normal( 0, 0, 1), {origin: ['brick'], side: '+z'} )
+      beginning = side * point_per_segement + 1
+      end = (side + 1) * point_per_segement
+      for point in circle_points[beginning .. end]
+        object.add_Polygon_for([edge_point, point, last_point ],
+          object.get_Normal( 0, 0, 1), {origin: ['brick'], side: '+z'} )
         last_point = point
 
       last_edge_point = edge_point
@@ -181,14 +218,19 @@ class BrickSystem
 
   add_Brick_bottom_Cap_to: (object, position, flat) ->
     unless flat
-      middle_point = new Vector3D(@width / 2, @depth / 2, @knob_height).add position
+      middle_point =
+        new Vector3D(@width / 2, @depth / 2, @knob_height).add position
       circle_cap = []
 
       for angle in [0...360] by @knob_circle_steps
-        circle_cap.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z)
+        x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+        y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+        z = middle_point.z
+        circle_cap.push object.get_Point(x, y, z)
       circle_cap.reverse()
 
-      object.add_Polygon_for( circle_cap, object.get_Normal(0, 0, -1), {origin: ['brick'], side: '-z', knob: yes} )
+      object.add_Polygon_for( circle_cap, object.get_Normal(0, 0, -1),
+        {origin: ['brick'], side: '-z', knob: yes} )
 
 
   add_Brick_bottom_Cap_Sides_to: (object, position, flat) ->
@@ -199,8 +241,14 @@ class BrickSystem
       circle_cap = []
       circle_top = []
       for angle in [0...360] by @knob_circle_steps
-        circle_cap.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z + @knob_height)
-        circle_top.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z)
+        x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+        y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+        z = middle_point.z + @knob_height
+        circle_cap.push object.get_Point(x, y, z)
+        x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+        y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+        z = middle_point.z
+        circle_top.push object.get_Point(x, y, z)
       circle_cap.reverse()
       circle_top.reverse()
 
@@ -223,29 +271,46 @@ class BrickSystem
   add_Brick_bottom_Plate_to: (object, position, flat) ->
     middle_point = new Vector3D(@width / 2, @depth / 2, 0).add position
     point_per_segement = 360 / @knob_circle_steps / 4
-    edge_points = [ object.get_Point( @width + position.x, @depth + position.y, position.z) ,
-                    object.get_Point(           position.x, @depth + position.y, position.z) ,
-                    object.get_Point(           position.x,          position.y, position.z) ,
-                    object.get_Point( @width + position.x,          position.y, position.z) ]
+    edge_points = [object.get_Point(@width + position.x,
+                                    @depth + position.y,
+                                    position.z),
+                   object.get_Point(position.x,
+                                    @depth + position.y,
+                                    position.z) ,
+                   object.get_Point(position.x,
+                                    position.y,
+                                    position.z) ,
+                   object.get_Point(@width + position.x,
+                                    position.y,
+                                    position.z) ]
 
     unless flat
       circle_points = []
       for angle in [0...360] by @knob_circle_steps
-        circle_points.push object.get_Point( middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius , middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius, middle_point.z)
+        x = middle_point.x + Math.cos(angle * Math.PI / 180.0) * @knob_radius
+        y = middle_point.y + Math.sin(angle * Math.PI / 180.0) * @knob_radius
+        z = middle_point.z
+        circle_points.push object.get_Point(x, y, z)
       circle_points.push circle_points.first()
 
       last_edge_point = edge_points[ edge_points.length - 1]
       last_point = circle_points.first()
 
       for edge_point, side in edge_points
-        object.add_Polygon_for( [last_point, edge_point, last_edge_point] , object.get_Normal(0, 0, -1), {origin: ['brick'], side: '-z'} )
+        object.add_Polygon_for( [last_point, edge_point, last_edge_point] ,
+          object.get_Normal(0, 0, -1), {origin: ['brick'], side: '-z'} )
 
-        for point in circle_points[side * point_per_segement + 1 .. (side + 1) * point_per_segement ]
-          object.add_Polygon_for( [ edge_point, last_point, point ], object.get_Normal( 0, 0, -1), {origin: ['brick'], side: '-z'} )
+        beginning = side * point_per_segement + 1
+        end = (side + 1) * point_per_segement
+        for point in circle_points[beginning .. end]
+          object.add_Polygon_for( [ edge_point, last_point, point ],
+            object.get_Normal( 0, 0, -1), {origin: ['brick'], side: '-z'} )
           last_point = point
 
         last_edge_point = edge_point
     else
-      object.add_Polygon_for( [ edge_points[3], edge_points[2], edge_points[1], edge_points[0] ], object.get_Normal( 0, 0, -1), {origin: ['brick'], side: '-z'})
+      object.add_Polygon_for( [ edge_points[3], edge_points[2], edge_points[1],
+                                edge_points[0] ], object.get_Normal( 0, 0, -1),
+                                {origin: ['brick'], side: '-z'})
 
 module.exports = BrickSystem

@@ -13,8 +13,10 @@ class BspNode
 		@before_polygons = []
 		@behind_polygons = []
 
-		for polygon in remaining_polygons[1..] # otherwise points vs plane incorrect = endless loop
-			@hyperplane.arrange_Polygon polygon, @polygons, @before_polygons, @behind_polygons, Tolerances.bspt_build
+		# otherwise points vs plane incorrect = endless loop
+		for polygon in remaining_polygons[1..]
+			@hyperplane.arrange_Polygon polygon, @polygons, @before_polygons,
+				@behind_polygons, Tolerances.bspt_build
 
 		if @before_polygons.is_not_empty()
 			@before_Node = new BspNode()
@@ -88,7 +90,8 @@ class BspNode
 
 
 	covers_Polygon: (polygon) ->
-		[category, point_positons, point_distances] = @hyperplane.classify_Polygon polygon, Tolerances.bspt_cover
+		[category, point_positons, point_distances] =
+			@hyperplane.classify_Polygon polygon, Tolerances.bspt_cover
 		if category == Plane.BEFORE
 			if @before_Node?
 				return @before_Node.covers_Polygon polygon
@@ -106,11 +109,13 @@ class BspNode
 			coplanar_polygons = [polygon]
 			behind_polygons = []
 			if @before_Node?
-				[coplanar_polygons, behind_polygons] = @before_Node.covers_Polygon polygon # no coplanar should exist
+				[coplanar_polygons, behind_polygons] =
+					@before_Node.covers_Polygon polygon # no coplanar should exist
 			if @behind_Node?
 				collected_coplanar = []
 				for co_polygon in coplanar_polygons
-					[ temp_before_polygons, temp_coplanar_polygons] = @behind_Node.covers_Polygon co_polygon  # no coplanar should exist
+					[ temp_before_polygons, temp_coplanar_polygons] =
+						@behind_Node.covers_Polygon co_polygon  # no coplanar should exist
 
 					collected_coplanar = collected_coplanar.concat temp_coplanar_polygons
 					before_polygons = before_polygons.concat temp_before_polygons
@@ -127,10 +132,12 @@ class BspNode
 				else
 					back_facing_coplanar.add co_polygon
 
-			return [ before_polygons, behind_polygons, front_facing_coplanar, back_facing_coplanar ]
+			return [ before_polygons, behind_polygons, front_facing_coplanar,
+							 back_facing_coplanar ]
 
 		else if category == Plane.SPLIT
-			[before_polygon, behind_polygon] = @hyperplane.split_Polygon polygon, point_positons, point_distances
+			[before_polygon, behind_polygon] = @hyperplane.split_Polygon polygon,
+				point_positons, point_distances
 
 			outside_before = []
 			outside_behind = []
@@ -144,21 +151,25 @@ class BspNode
 
 
 			if @before_Node?
-				[outside_before, outside_behind, outside_front_coplanar, outside_back_coplanar ] = @before_Node.covers_Polygon before_polygon
+				[outside_before, outside_behind, outside_front_coplanar,
+					outside_back_coplanar ] = @before_Node.covers_Polygon before_polygon
 			else
 				outside_before.add before_polygon
 
 			if @behind_Node?
-				[inside_before, inside_behind, inside_front_coplanar, inside_back_coplanar ] = @behind_Node.covers_Polygon behind_polygon
+				[inside_before, inside_behind, inside_front_coplanar,
+					inside_back_coplanar ] = @behind_Node.covers_Polygon behind_polygon
 			else
 				inside_behind.add behind_polygon
 
 			before_polygons = outside_before.concat inside_before
 			behind_polygons = outside_behind.concat inside_behind
-			front_facing_coplanar = outside_front_coplanar.concat inside_front_coplanar
+			front_facing_coplanar =
+				outside_front_coplanar.concat inside_front_coplanar
 			back_facing_coplanar = outside_back_coplanar.concat inside_back_coplanar
 
-			return [ before_polygons, behind_polygons, front_facing_coplanar, back_facing_coplanar ]
+			return [ before_polygons, behind_polygons, front_facing_coplanar,
+							 back_facing_coplanar ]
 		else
 			debugger #else should never occur
 

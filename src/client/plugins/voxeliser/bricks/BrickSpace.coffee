@@ -1,4 +1,5 @@
 Object3D = require '../geometry/Object3D'
+BspTree = require '../geometry/BspTree'
 
 class BrickSpace
   constructor: (@bricksystem, @x, @y, @z, @default_Brick = yes) ->
@@ -29,7 +30,8 @@ class BrickSpace
 
     
     #color = new THREE.Color( Math.random() * 0xDDDDDD)
-    #@full_model = new THREE.Mesh(geo, new THREE.MeshLambertMaterial( {color: color, ambient: color} ))
+    #@full_model = new THREE.Mesh(geo, new THREE.MeshLambertMaterial(
+    # {color: color, ambient: color} ))
     #@full_model.position.x = @x * @bricksystem.width
     #@full_model.position.y = @y * @bricksystem.depth
     #@full_model.position.z = @z * @bricksystem.height
@@ -125,8 +127,8 @@ class BrickSpace
   sort_Outer_Sides: (polygons) ->
     for polygon in polygons
       side_label = polygon.tag.side
-      if side_label not in @side_labels
-        debugger
+      #if side_label not in @side_labels
+      #  debugger
       side = @sides_lookup[side_label]
       side.outsidePolygon.add polygon
       polygon.set_Object @
@@ -169,7 +171,8 @@ class BrickSpace
         side.current_polygons = side.onCutPolygon
     else
       if @default
-        side.current_polygons = side.insidePolygon.concat( side.outsidePolygon, side.onCutPolygon )
+        side.current_polygons = side.insidePolygon.concat( side.outsidePolygon,
+          side.onCutPolygon )
       else
         side.current_polygons = side.insidePolygon.concat( side.onCutPolygon )
 

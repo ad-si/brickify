@@ -24,7 +24,13 @@ module.exports.startTesting = () ->
 	models = parseModelFiles()
 	logger.info "Testing #{models.length} models"
 	results = []
-	for model in models
+	for i in [0..models.length - 1] by 1
+		model = models[i]
+
+		perc = (i + 1) / models.length * 100
+		perc = perc.toFixed(1)
+
+		logger.info "#{perc}% Testing model '#{model}'"
 		result = testModel model
 		result.fileName = model
 		results.push result
@@ -41,11 +47,16 @@ parseModelFiles = () ->
 		return []
 	else
 		files = fs.readdirSync modelPath
-		return files
+		models = []
+
+		for file in files
+			if file.toLowerCase().indexOf('.stl') > 0
+				models.push file
+
+		return models
 
 # performs various tests on a single model
 testModel = (filename) ->
-	logger.info "Testing model '#{filename}'"
 	testResult = new ModelTestResult()
 	filepath = path.join(modelPath, filename)
 	fileContent = fs.readFileSync filepath, {encoding: 'utf8'}
@@ -71,6 +82,15 @@ testModel = (filename) ->
 	begin = new Date()
 	optimizedModel = stlLoader.optimizeModel stlModel
 	testResult.optimizationTime  = new Date() - begin
+	logger.debug "model optimized in #{testResult.optimizationTime}ms"
+
+	begin = new Date()
+	if optimizedModel.isTwoManifold()
+		testResult.isTwoManifold = 1
+	else
+		testResult.isTwoManifold = 0
+	testResult.twoManifoldCheckTime = new Date() - begin
+	logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
 
 	return testResult
 
@@ -84,3 +104,5 @@ class ModelTestResult
 		@stlDeletedPolygons = 0
 		@stlRecalculatedNormals = 0
 		@optimizationTime = 0
+		@isTwoManifold = 0
+		@twoManifoldCheckTime = 0

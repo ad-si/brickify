@@ -10,6 +10,9 @@ module.exports.parse = (fileContent, errorCallback,
 												cleanse = true) ->
 	model = null
 
+	if fileContent.length == 0
+		return null
+
 	startsWithSolid = false
 	hasFacet = false
 	hasVertex = false

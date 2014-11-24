@@ -60,6 +60,11 @@ module.exports.importFile = (fileContent) ->
 		for error in errors
 			console.log '-> ' + error
 	optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
+
+	# happens with empty files
+	if !optimizedModel
+		return
+
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel

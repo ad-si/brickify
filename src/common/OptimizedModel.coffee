@@ -12,6 +12,9 @@ class OptimizedModel
 	# to exactly two faces. This also implies that the mesh is a closed body
 	# without holes
 	isTwoManifold: () ->
+		if @_isTwoManifold?
+			return @_isTwoManifold
+
 		edges = []
 		numEdges = []
 
@@ -40,13 +43,16 @@ class OptimizedModel
 			r = addEdge(c,a) and r
 
 			if not r
-				return false
+				@_isTwoManifold = false
+				return @_isTwoManifold
 
 		# check that each edge exists exactly twice
 		for num in numEdges
 			if num != 2
-				return false
-		return true
+				@_isTwoManifold = false
+				return @_isTwoManifold
+		@_isTwoManifold = true
+		return @_isTwoManifold
 
 	toBase64: () ->
 		posA = new Float32Array(@positions.length)

@@ -48,6 +48,8 @@ html
                         th stl recalculated Normals
                         th stl Cleansing Time
                         th Optimization Time
+                        th is 2-manifold
+                        th 2-mnf check Time
                 tbody
                     each result in results
                         tr
@@ -58,4 +60,6 @@ html
                             td= result.stlRecalculatedNormals
                             td= result.stlCleansingTime + ' ms'
                             td= result.optimizationTime + ' ms'
+                            td= result.isTwoManifold
+                            td= result.twoManifoldCheckTime  + ' ms'
 

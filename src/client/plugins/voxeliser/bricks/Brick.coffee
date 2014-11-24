@@ -31,7 +31,8 @@ class Brick
 					@slots.push [@position.x + x, @position.y + y, @position.z + z]
 
 	get_BrickSpace_Extend: (x,y,z) ->
-		@layout.brickSpaceGrid.get_BrickSpace(@position.x + x, @position.y + y, @position.z + z)
+		@layout.brickSpaceGrid.get_BrickSpace(@position.x + x, @position.y + y,
+			@position.z + z)
 
 	get_all_BrickSpaces: () ->
 		brickspaces = []
@@ -102,7 +103,8 @@ class Brick
 
 	highlight_Brick: (colorPalette) ->
 		selected = colorPalette.get_Variation_of_Color colorPalette.selected, 0.1
-		selected_specular = colorPalette.get_Variation_of_Color colorPalette.selected, 0.1
+		selected_specular =
+			colorPalette.get_Variation_of_Color colorPalette.selected, 0.1
 		@.set_Color selected, selected_specular
 
 	set_Color: (color, specular) ->
@@ -117,8 +119,8 @@ class Brick
 		@scene_model.geometry.colorsNeedUpdate = yes if @scene_model
 
 	build_SceneModel: () ->
-		#material = new THREE.MeshLambertMaterial({color:0xffffff * Math.random(),wireframe:false})
-		material = new THREE.MeshPhongMaterial( { color: @color, ambient: @color_ambient } )
+		material =
+			new THREE.MeshPhongMaterial {color: @color, ambient: @color_ambient}
 		geometry = @bricktype.get_SceneModel().geometry
 		#geometry = new THREE.SphereGeometry(3)
 
@@ -134,8 +136,9 @@ class Brick
 		mesh.position.y  = (@position.y + delta) * @bricksystem.depth
 		mesh.position.z  = @position.z * @bricksystem.height
 
-
-		edge_material = new THREE.LineBasicMaterial( { color: new THREE.Color( 0x000000 ), linewidth: 1.2, wireframe: true, type: THREE.LinePieces} )
+		black = new THREE.Color(0x000000)
+		{color: black, linewidth: 1.2, wireframe: true, type: THREE.LinePieces}
+		edge_material = new THREE.LineBasicMaterial parameters
 		edge_geometry = @bricktype.get_Edge_SceneModel().children.first().geometry
 		edge_lines = new THREE.Line(edge_geometry, edge_material)
 		edge_lines.type = THREE.LinePieces

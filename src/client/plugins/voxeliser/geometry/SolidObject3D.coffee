@@ -22,16 +22,16 @@ class SolidObject3D extends Object3D
 		@edge_threshold = null
 		@selection_group = []
 
-#  ##     ## ##    ## ########  ######## ########  ########  ##          ###    ##    ## ########
-#  ##     ##  ##  ##  ##     ## ##       ##     ## ##     ## ##         ## ##   ###   ## ##
-#  ##     ##   ####   ##     ## ##       ##     ## ##     ## ##        ##   ##  ####  ## ##
-#  #########    ##    ########  ######   ########  ########  ##       ##     ## ## ## ## ######
-#  ##     ##    ##    ##        ##       ##   ##   ##        ##       ######### ##  #### ##
-#  ##     ##    ##    ##        ##       ##    ##  ##        ##       ##     ## ##   ### ##
-#  ##     ##    ##    ##        ######## ##     ## ##        ######## ##     ## ##    ## ########
+#################################################
+#                                               #
+#                  HYPERPLANE                   #
+#                                               #
+#################################################
 
 	check_Hyperplane: (x, y, z, w) ->
-		if @hyperplanes_lookup[x] and @hyperplanes_lookup[x][y] and @hyperplanes_lookup[x][y][z]
+		if @hyperplanes_lookup[x] and
+		@hyperplanes_lookup[x][y] and
+		@hyperplanes_lookup[x][y][z]
 			@hyperplanes_lookup[x][y][z][w]
 		else
 			undefined
@@ -53,13 +53,11 @@ class SolidObject3D extends Object3D
 			edge.check_Visibility()
 
 
-#   ######   ######  ######## ##    ## ######## ##     ##  #######  ########  ######## ##
-#  ##    ## ##    ## ##       ###   ## ##       ###   ### ##     ## ##     ## ##       ##
-#  ##       ##       ##       ####  ## ##       #### #### ##     ## ##     ## ##       ##
-#   ######  ##       ######   ## ## ## ######   ## ### ## ##     ## ##     ## ######   ##
-#        ## ##       ##       ##  #### ##       ##     ## ##     ## ##     ## ##       ##
-#  ##    ## ##    ## ##       ##   ### ##       ##     ## ##     ## ##     ## ##       ##
-#   ######   ######  ######## ##    ## ######## ##     ##  #######  ########  ######## ########
+#################################################
+#                                               #
+#                  SCENEMODEL                   #
+#                                               #
+#################################################
 
 	select_Polygons: (polygons) ->
 		for polygon in polygons
@@ -142,38 +140,14 @@ class SolidObject3D extends Object3D
 
 		geometry = new THREE.Geometry()
 
-		# WebGL Render delete Butter
-		# var deleteBuffers = function ( geometry ) {
-		# var deallocateGeometry = function ( geometry ) {
+		material = new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors, \
+			color: @color.specular, ambient: @color.base, opacity: 1.0, \
+			transparent: true} );
 
-		#material = new THREE.MeshPhongMaterial( { color: @color.specular, ambient: @color.base, opacity: 1.0, transparent: true} );
-		material = new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors, color: @color.specular, ambient: @color.base, opacity: 1.0, transparent: true} );
-
-		#material2 = new THREE.MeshLambertMaterial( { vertexColors: THREE.VertexColors, color: @color.specular, ambient: @color.base, opacity: 1.0, transparent: true} );
 
 		phongShader = THREE.ShaderLib.phong
-		uniforms = THREE.UniformsUtils.clone(phongShader.uniforms);
+		uniforms = THREE.UniformsUtils.clone(phongShader.uniforms)
 
-		#material.uniforms = uniforms;
-		#material.vertexShader = document.getElementById( 'vertexShader2' ).textContent;
-		#material.fragmentShader = document.getElementById( 'fragmentShader2' ).textContent;
-
-
-		#material = new THREE.ShaderMaterial( );
-
-
-		###material = new THREE.ShaderMaterial({
-			uniforms: uniforms,
-			vertexShader: phongShader.vertexShader,
-			fragmentShader: phongShader.fragmentShader,
-			color: @color.specular,
-			ambient: @color.base
-		});
-		###
-		#material.setValues( {color: new THREE.Color( 0xffffff ), ambient: new THREE.Color( 0xffffff ), emissive: new THREE.Color( 0x000000 ), specular: new THREE.Color( 0x111111 ), shininess: 30, metal: false, perPixel: true, wrapAround: false, wrapRGB: new THREE.Vector3( 1, 1, 1 ), map: null, lightMap: null, bumpMap: null, bumpScale: 1, normalMap: null, normalScale: new THREE.Vector2( 1, 1 ), specularMap: null, envMap: null, combine: THREE.MultiplyOperation, reflectivity: 1, refractionRatio: 0.98, fog: true, shading: THREE.SmoothShading, wireframe: false, wireframeLinewidth: 1, wireframeLinecap: 'round', wireframeLinejoin: 'round', vertexColors: THREE.NoColors, skinning: false, morphTargets: false, morphNormals: false })
-		#material.setValues( { uniforms: THREE.ShaderLib.phong.uniforms, vertexShader: document.getElementById( 'vertexShader2' ).textContent, fragmentShader: document.getElementById( 'fragmentShader2' ).textContent, color: @color.specular, ambient: @color.base, opacity: 1.0, transparent: true } )
-
-		#sub_poly = (polygon for polygon in @csg.polygons when polygon.shared.tag isnt 5 and polygon.shared.tag isnt 3)
 		for point in @points
 			geometry.vertices.push THREE.get_Vector_for point
 
@@ -182,9 +156,7 @@ class SolidObject3D extends Object3D
 				geometry.faces.push face
 
 		@ed
-		#geometry.mergeVertices()
 		geometry.computeFaceNormals()
-		#geometry.computeVertexNormals()
 
 		mesh = new THREE.Mesh(geometry, material)
 
@@ -198,11 +170,14 @@ class SolidObject3D extends Object3D
 	build_Edge_SceneModel: () ->
 		edges = new THREE.Object3D()
 		edge_geo = new THREE.Geometry()
-		edge_material = new THREE.LineBasicMaterial( { color: new THREE.Color( 0x000000 ), linewidth: 2, wireframe: true} )
+		edge_material = new THREE.LineBasicMaterial(
+			{ color: new THREE.Color( 0x000000 ), linewidth: 2, wireframe: true} )
 		triangle_geo = new THREE.Geometry()
-		triangle_material = new THREE.LineBasicMaterial( { color: @color.error, linewidth: 0.5, wireframe: true} )
+		triangle_material = new THREE.LineBasicMaterial(
+			{ color: @color.error, linewidth: 0.5, wireframe: true} )
 		broken_geo = new THREE.Geometry()
-		broken_material = new THREE.LineBasicMaterial( { color: @color.error, linewidth: 3, wireframe: true} )
+		broken_material = new THREE.LineBasicMaterial(
+			{ color: @color.error, linewidth: 3, wireframe: true} )
 
 		@.update_FaceGroups()
 
@@ -212,10 +187,13 @@ class SolidObject3D extends Object3D
 			#  broken_geo.vertices.push THREE.get_Vector_for edge.from_point
 			#  broken_geo.vertices.push THREE.get_Vector_for edge.to_point
 			if edge.hard_edge
-				t = (edge.inner_Polygon.plane.normal).cross(edge.from_point.to(edge.to_point)).scalar(edge.inner_Polygon.plane.normal.plus(edge.outer_Polygon.plane.normal))
+				t = (edge.inner_Polygon.plane.normal).cross(
+					edge.from_point.to(edge.to_point)).scalar(edge.inner_Polygon.plane.
+					normal.plus(edge.outer_Polygon.plane.normal))
 				h = new Vector3D(0,0,0)
 				if (t > 0)
-					h = edge.inner_Polygon.plane.normal.plus(edge.outer_Polygon.plane.normal)
+					h = edge.inner_Polygon.plane.normal.plus(
+						edge.outer_Polygon.plane.normal)
 					r = h.length_squared() * h.length_squared()
 					if r < 0.8
 						r = 0.8
@@ -250,7 +228,9 @@ class SolidObject3D extends Object3D
 	build_Reverse_SceneModel: () ->
 
 		geometry = new THREE.Geometry()
-		material = new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors, color: @color.specular, ambient: @color.base, opacity: 0.3, transparent: true} )
+		material = new THREE.MeshPhongMaterial( { vertexColors: THREE.FaceColors, \
+			color: @color.specular, ambient: @color.base, opacity: 0.3, \
+			transparent: true} )
 
 		for point in @points
 			geometry.vertices.push THREE.get_Vector_for point
@@ -265,11 +245,14 @@ class SolidObject3D extends Object3D
 
 
 		edge_geo = new THREE.Geometry()
-		edge_material = new THREE.LineBasicMaterial( { color: new THREE.Color( 0x707070 ), linewidth: 2, wireframe: true} )
+		edge_material = new THREE.LineBasicMaterial(
+			{ color: new THREE.Color( 0x707070 ), linewidth: 2, wireframe: true} )
 		triangle_geo = new THREE.Geometry()
-		triangle_material = new THREE.LineBasicMaterial( { color: @color.error, linewidth: 0.5, wireframe: true} )
+		triangle_material = new THREE.LineBasicMaterial(
+			{ color: @color.error, linewidth: 0.5, wireframe: true} )
 		broken_geo = new THREE.Geometry()
-		broken_material = new THREE.LineBasicMaterial( { color: @color.error, linewidth: 3, wireframe: true} )
+		broken_material = new THREE.LineBasicMaterial(
+			{ color: @color.error, linewidth: 3, wireframe: true} )
 
 		for edge in @edges
 			edge.check_Visibility()
@@ -277,10 +260,13 @@ class SolidObject3D extends Object3D
 				broken_geo.vertices.push THREE.get_Vector_for edge.from_point
 				broken_geo.vertices.push THREE.get_Vector_for edge.to_point
 			else if edge.hard_edge
-				t = (edge.inner_Polygon.plane.normal).cross(edge.from_point.to(edge.to_point)).scalar(edge.inner_Polygon.plane.normal.plus(edge.outer_Polygon.plane.normal))
+				t = (edge.inner_Polygon.plane.normal).cross(edge.from_point.to(
+					edge.to_point)).scalar(edge.inner_Polygon.plane.normal.plus(
+					edge.outer_Polygon.plane.normal))
 				h = new Vector3D(0,0,0)
 				if (t > 0)
-					h = edge.inner_Polygon.plane.normal.plus(edge.outer_Polygon.plane.normal)
+					h = edge.inner_Polygon.plane.normal.plus(
+						edge.outer_Polygon.plane.normal)
 					r = h.length_squared() * h.length_squared()
 					if r < 0.8
 						r = 0.8

@@ -16,17 +16,14 @@ class Object3D
 		@scene_model_edges = null
 		@ref_point = new Vector3D(0,0,0)
 
+#################################################
+#                                               #
+#               POINT OPERATIONS                #
+#                                               #
+#################################################
 
-#  ########   #######  #### ##    ## ########     #######  ########  ######## ########     ###    ######## ####  #######  ##    ##  ######
-#  ##     ## ##     ##  ##  ###   ##    ##       ##     ## ##     ## ##       ##     ##   ## ##      ##     ##  ##     ## ###   ## ##    ##
-#  ##     ## ##     ##  ##  ####  ##    ##       ##     ## ##     ## ##       ##     ##  ##   ##     ##     ##  ##     ## ####  ## ##
-#  ########  ##     ##  ##  ## ## ##    ##       ##     ## ########  ######   ########  ##     ##    ##     ##  ##     ## ## ## ##  ######
-#  ##        ##     ##  ##  ##  ####    ##       ##     ## ##        ##       ##   ##   #########    ##     ##  ##     ## ##  ####       ##
-#  ##        ##     ##  ##  ##   ###    ##       ##     ## ##        ##       ##    ##  ##     ##    ##     ##  ##     ## ##   ### ##    ##
-#  ##         #######  #### ##    ##    ##        #######  ##        ######## ##     ## ##     ##    ##    ####  #######  ##    ##  ######
-
-
-	# checks whether a point is contained in the object. If so the point is returned.
+	# checks whether a point is contained in the object. If so the point is
+	# returned.
 	# If not undefined.
 	# @param x [float] the x coordinate
 	# @param y [float] the y coordinate
@@ -38,8 +35,8 @@ class Object3D
 		else
 			undefined
 
-	# Gets the specified point from the Object. If the Object doesn't contain this point,
-	# the point is added and returned
+	# Gets the specified point from the Object. If the Object doesn't contain
+	# this point, the point is added and returned
 	# @param x [float] the x coordinate
 	# @param y [float] the y coordinate
 	# @param z [float] the z coordinate
@@ -67,14 +64,11 @@ class Object3D
 		@point_lookup[x][y] ?= {}
 		@point_lookup[x][y][z] = point
 
-
-#  ######## ########   ######   ########     #######  ########  ######## ########     ###    ######## ####  #######  ##    ##  ######
-#  ##       ##     ## ##    ##  ##          ##     ## ##     ## ##       ##     ##   ## ##      ##     ##  ##     ## ###   ## ##    ##
-#  ##       ##     ## ##        ##          ##     ## ##     ## ##       ##     ##  ##   ##     ##     ##  ##     ## ####  ## ##
-#  ######   ##     ## ##   #### ######      ##     ## ########  ######   ########  ##     ##    ##     ##  ##     ## ## ## ##  ######
-#  ##       ##     ## ##    ##  ##          ##     ## ##        ##       ##   ##   #########    ##     ##  ##     ## ##  ####       ##
-#  ##       ##     ## ##    ##  ##          ##     ## ##        ##       ##    ##  ##     ##    ##     ##  ##     ## ##   ### ##    ##
-#  ######## ########   ######   ########     #######  ##        ######## ##     ## ##     ##    ##    ####  #######  ##    ##  ######
+#################################################
+#                                               #
+#               EDGE OPERATIONS                 #
+#                                               #
+#################################################
 
 	check_Edge: (point1, point2) ->
 		if @edges_lookup[point1.x] and @edges_lookup[point1.x][point1.y] and @edges_lookup[point1.x][point1.y][point1.z] and @edges_lookup[point1.x][point1.y][point1.z][point2.x] and @edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y]
@@ -103,14 +97,11 @@ class Object3D
 		@edges_lookup[point2.x][point2.y][point2.z][point1.x][point1.y] ?= {}
 		@edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y][point2.z] = @edges_lookup[point2.x][point2.y][point2.z][point1.x][point1.y][point1.z] = edge
 
-
-#  ##    ##  #######  ########  ##     ##    ###    ##           #######  ########  ######## ########     ###    ######## ####  #######  ##    ##  ######
-#  ###   ## ##     ## ##     ## ###   ###   ## ##   ##          ##     ## ##     ## ##       ##     ##   ## ##      ##     ##  ##     ## ###   ## ##    ##
-#  ####  ## ##     ## ##     ## #### ####  ##   ##  ##          ##     ## ##     ## ##       ##     ##  ##   ##     ##     ##  ##     ## ####  ## ##
-#  ## ## ## ##     ## ########  ## ### ## ##     ## ##          ##     ## ########  ######   ########  ##     ##    ##     ##  ##     ## ## ## ##  ######
-#  ##  #### ##     ## ##   ##   ##     ## ######### ##          ##     ## ##        ##       ##   ##   #########    ##     ##  ##     ## ##  ####       ##
-#  ##   ### ##     ## ##    ##  ##     ## ##     ## ##          ##     ## ##        ##       ##    ##  ##     ##    ##     ##  ##     ## ##   ### ##    ##
-#  ##    ##  #######  ##     ## ##     ## ##     ## ########     #######  ##        ######## ##     ## ##     ##    ##    ####  #######  ##    ##  ######
+#################################################
+#                                               #
+#               NORMAL OPERATIONS               #
+#                                               #
+#################################################
 
 	check_Normal: (x, y, z) ->
 		if @normal_lookup[x] and @normal_lookup[x][y]
@@ -119,7 +110,8 @@ class Object3D
 			undefined
 
 	get_Normal_for: (point_A, point_B, point_C) ->
-		normal = ( point_A.to point_B ).cross( point_A.to point_C ).normalize().round_Tolerances()
+		normal = ( point_A.to point_B ).cross( point_A.to point_C ).normalize().
+			round_Tolerances()
 		@get_Normal normal.x, normal.y, normal.z
 
 	get_Normal: (x, y, z) ->
@@ -135,14 +127,11 @@ class Object3D
 		@normal_lookup[x][y] ?= {}
 		@normal_lookup[x][y][z] = normal
 
-
-#  ########   #######  ##       ##    ##  ######    #######  ##    ##
-#  ##     ## ##     ## ##        ##  ##  ##    ##  ##     ## ###   ##
-#  ##     ## ##     ## ##         ####   ##        ##     ## ####  ##
-#  ########  ##     ## ##          ##    ##   #### ##     ## ## ## ##
-#  ##        ##     ## ##          ##    ##    ##  ##     ## ##  ####
-#  ##        ##     ## ##          ##    ##    ##  ##     ## ##   ###
-#  ##         #######  ########    ##     ######    #######  ##    ##
+#################################################
+#                                               #
+#                  POLYGON                      #
+#                                               #
+#################################################
 
 	add_Polygon: (polygon) ->
 		if !polygon.object
@@ -194,7 +183,8 @@ class Object3D
 	add_Polygon_by: (pointlist, plane) ->
 		edges = []
 		last_point_entry = pointlist[pointlist.length - 1]
-		last =  @.get_Point(last_point_entry[0],last_point_entry[1],last_point_entry[2])
+		last = @.get_Point(last_point_entry[0], last_point_entry[1],
+			last_point_entry[2])
 		points = []
 
 		for point_entry in pointlist
@@ -213,13 +203,11 @@ class Object3D
 	get_Polygon_by_Index: (index) ->
 		@polygons[index]
 
-#   ######   ######  ######## ##    ## ######## ##     ##  #######  ########  ######## ##
-#  ##    ## ##    ## ##       ###   ## ##       ###   ### ##     ## ##     ## ##       ##
-#  ##       ##       ##       ####  ## ##       #### #### ##     ## ##     ## ##       ##
-#   ######  ##       ######   ## ## ## ######   ## ### ## ##     ## ##     ## ######   ##
-#        ## ##       ##       ##  #### ##       ##     ## ##     ## ##     ## ##       ##
-#  ##    ## ##    ## ##       ##   ### ##       ##     ## ##     ## ##     ## ##       ##
-#   ######   ######  ######## ##    ## ######## ##     ##  #######  ########  ######## ########
+#################################################
+#                                               #
+#                  SCENEMODEL                   #
+#                                               #
+#################################################
 
 	update_SceneModel: () ->
 		if @scene_model?
@@ -249,7 +237,8 @@ class Object3D
 
 	build_Edge_SceneModel: () ->
 		edge_geometry = new THREE.Geometry()
-		edge_material = new THREE.LineBasicMaterial( { color: new THREE.Color( 0x000000 ), linewidth: 2, wireframe: true} )
+		parameters = {color: new THREE.Color(0x000000),linewidth: 2,wireframe: true}
+		edge_material = new THREE.LineBasicMaterial(parameters)
 
 		for edge in @edges
 			edge.check_Visibility()

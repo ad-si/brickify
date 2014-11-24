@@ -65,13 +65,16 @@ module.exports.importFile = (fileContent) ->
 	threeObject = addModelToThree optimizedModel
 	fileEnding = 'optimized'
 	if stateSync?
-		stateSync.performStateAction (state) ->
+		loadModelCallback = (state) ->
 			node = objectTree.addChildNode state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property
 
 			property.meshHash = md5hash + '.' + fileEnding
 			copyThreeDataToProperty property, threeObject
+
+		# call updateState on all client plugins and sync
+		stateSync.performStateAction loadModelCallback, true
 	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
 
 # parses the binary geometry and adds it to the three scene,

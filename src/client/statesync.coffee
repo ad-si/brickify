@@ -23,8 +23,17 @@ exports.getState = (callback) ->
 	else
 		initialStateLoadedCallbacks.push(callback)
 
-exports.performStateAction = (callback) ->
+# executes callback(state) and then synchronizes the state with the server.
+# if updatedStateEvent is set to true, the updateState hook of all client
+# plugins will be called before synchronization with the server
+exports.performStateAction = (callback, updatedStateEvent = false) ->
 	callback(state)
+
+	# let every plugin do something with the updated state
+	# before syncing it to the server
+	if updatedStateEvent
+		handleUpdatedState({}, state)
+
 	sync()
 
 exports.init = (globalConfig, stateInitializedCallback) ->

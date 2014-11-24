@@ -23,7 +23,10 @@ class OptimizedModel
 				bea = (edges[i].a == b and edges[i].b == a)
 				if (aeb or bea)
 					numEdges[i]++
-					return
+					if numEdges[i] > 2
+						return false
+					else
+						return true
 			edges.push {a: a, b: b}
 			numEdges.push 1
 
@@ -32,9 +35,12 @@ class OptimizedModel
 			a = @indices[i]
 			b = @indices[i + 1]
 			c = @indices[i + 2]
-			addEdge a,b
-			addEdge b,c
-			addEdge c,a
+			r = addEdge a,b
+			r = addEdge(b,c) and r
+			r = addEdge(c,a) and r
+
+			if not r
+				return false
 
 		# check that each edge exists exactly twice
 		for num in numEdges

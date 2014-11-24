@@ -13,6 +13,9 @@ pluginPropertyName = 'stlImport'
 class StlProperty
 	constructor: () ->
 		@threeObjectUuid = ''
+		# DO NOT use as identifier
+		@fileName = ''
+		# DO use as identifier
 		@meshHash = ''
 		@positionData =
 			position: null
@@ -54,7 +57,7 @@ loadModelFromCache = (property) ->
 # Imports the stl, optimizes it,
 # sends it to the server (if not cached there)
 # and adds it to the scene as a THREE.Geometry
-module.exports.importFile = (fileContent) ->
+module.exports.importFile = (fileName, fileContent) ->
 	errorCallback = (errors) ->
 		console.log 'Errors occured while importing the stl file:'
 		for error in errors
@@ -69,7 +72,7 @@ module.exports.importFile = (fileContent) ->
 			node = objectTree.addChildNode state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property
-
+			property.fileName = fileName
 			property.meshHash = md5hash + '.' + fileEnding
 			copyThreeDataToProperty property, threeObject
 	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized

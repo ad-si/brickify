@@ -9,7 +9,7 @@ calculateNumericStatistics = (data) ->
 			continue
 
 		stats = new NumericStatistic()
-		stats.key = key
+		stats.variableName = key
 		for obj in data
 			value = obj[key]
 			if value?

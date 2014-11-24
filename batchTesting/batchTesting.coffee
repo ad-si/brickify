@@ -5,26 +5,12 @@ stlLoader = require '../src/client/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
 
 modelPath = path.join 'batchTesting', 'models'
-debugLogFile = path.join 'batchTesting', 'results', 'batchTestDebug.log'
-testResultFile = path.join 'batchTesting', 'results', 'batchTestResults.log'
-reportFile = path.join 'batchTesting', 'results', 'batchTestResults.html'
+outputPath = path.join 'batchTesting', 'results'
+reportFile = 'batchTestResults'
 
 logger = new (winston.Logger)({
 	transports: [
-		new winston.transports.Console { level: 'debug' },
-		new winston.transports.File {
-			name: 'debugfile'
-			filename: debugLogFile
-			level: 'debug'}
-	]
-})
-
-resultLogger = new (winston.Logger)({
-	transports: [
-		new winston.transports.File {
-			name: 'resultfile'
-			filename: testResultFile
-			level: 'info'}
+		new winston.transports.Console { level: 'debug' }
 	]
 })
 
@@ -41,13 +27,12 @@ module.exports.startTesting = () ->
 	for model in models
 		result = testModel model
 		result.fileName = model
-		resultLogger.info result
 		results.push result
 
 	if results.length == 0
 		logger.warn 'No models where processed, test report can\'t be created'
 	else
-		reportGenerator.generateReport results, reportFile
+		reportGenerator.generateReport results, outputPath, reportFile
 
 # parses all models in the modelPath directory
 parseModelFiles = () ->

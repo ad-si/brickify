@@ -33,8 +33,8 @@ exports.performStateAction = (callback, updatedStateEvent = false) ->
 	# before syncing it to the server
 	if updatedStateEvent
 		handleUpdatedState({}, state)
-
-	sync()
+	else
+		sync()
 
 exports.init = (globalConfig, stateInitializedCallback) ->
 	globalConfigInstance = globalConfig
@@ -90,8 +90,6 @@ sync = (force = false) ->
 			oldState = JSON.parse JSON.stringify state
 
 			handleUpdatedState(delta, state)
-
-
 exports.sync = sync
 
 handleUpdatedState = (delta, curstate) ->

@@ -43,7 +43,8 @@ class Slicer
 		box = BoundaryBox.create_from(obj)
 		spaces = box.lego_align().voxelize_to()
 
-		cutting_cubes = new LegoGrid(spaces[0][0].length, spaces[0].length, spaces.length)
+		cutting_cubes = new LegoGrid(spaces[0][0].length, spaces[0].length,
+			spaces.length)
 
 		all_BrickSpaces = []
 

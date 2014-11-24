@@ -8,8 +8,10 @@ class Edge
 	clone: () -> new Edge()
 
 	equals: (other_Edge) ->
-		return yes if @vertex1.equals other_Edge.vertex1 and @vertex2.equals other_Edge.vertex2
-		return yes if @vertex1.equals other_Edge.vertex2 and @vertex2.equals other_Edge.vertex1
+		return yes if @vertex1.equals other_Edge.vertex1 and
+			@vertex2.equals other_Edge.vertex2
+		return yes if @vertex1.equals other_Edge.vertex2 and
+			@vertex2.equals other_Edge.vertex1
 		no
 
 	get_Neighbor_of: (polygon) ->
@@ -35,7 +37,8 @@ class Edge
 		if !@inner_Polygon or !@outer_Polygon
 			@broken_edge = yes
 			@hard_edge = no
-		else if treshhold >= @inner_Polygon.plane.normal.scalar @outer_Polygon.plane.normal
+		else if treshhold >= @inner_Polygon.plane.normal.scalar
+			@outer_Polygon.plane.normal
 			@hard_edge = yes
 			@broken_edge = no
 		else

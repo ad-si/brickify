@@ -71,7 +71,11 @@ class Object3D
 #################################################
 
 	check_Edge: (point1, point2) ->
-		if @edges_lookup[point1.x] and @edges_lookup[point1.x][point1.y] and @edges_lookup[point1.x][point1.y][point1.z] and @edges_lookup[point1.x][point1.y][point1.z][point2.x] and @edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y]
+		if @edges_lookup[point1.x] and
+		@edges_lookup[point1.x][point1.y] and
+		@edges_lookup[point1.x][point1.y][point1.z] and
+		@edges_lookup[point1.x][point1.y][point1.z][point2.x] and
+		@edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y]
 			@edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y][point2.z]
 		else
 			undefined
@@ -95,7 +99,9 @@ class Object3D
 		@edges_lookup[point2.x][point2.y][point2.z] ?= {}
 		@edges_lookup[point2.x][point2.y][point2.z][point1.x] ?= {}
 		@edges_lookup[point2.x][point2.y][point2.z][point1.x][point1.y] ?= {}
-		@edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y][point2.z] = @edges_lookup[point2.x][point2.y][point2.z][point1.x][point1.y][point1.z] = edge
+		@edges_lookup[point1.x][point1.y][point1.z][point2.x][point2.y][point2.z] \
+		= @edges_lookup[point2.x][point2.y][point2.z][point1.x][point1.y][point1.z] \
+		= edge
 
 #################################################
 #                                               #

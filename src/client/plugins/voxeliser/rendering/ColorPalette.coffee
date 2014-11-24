@@ -38,8 +38,8 @@ class ColorPalette
 
   variation: (delta_hue, delta_saturation, delta_lightness) ->
     changed_hue        =  ((@hue + delta_hue) % 1 + 1) % 1
-    changed_saturation =  @saturation #Math.between @saturation + delta_saturation, 0, 1.0
-    changed_lightness  =  @lightness #Math.between @lightness + delta_lightness, 0, 1.0
+    changed_saturation =  @saturation
+    changed_lightness  =  @lightness
 
     new THREE.Color().setHSL changed_hue, changed_saturation, changed_lightness
 

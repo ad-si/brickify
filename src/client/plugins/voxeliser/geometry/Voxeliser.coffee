@@ -44,15 +44,24 @@ class Voxeliser
 			dy = 0
 			dz = 0
 
-			if polygon.points[0].x % @bricksystem.width == 0 and -Tolerances.float <= polygon.plane.normal.y <= Tolerances.float and -Tolerances.float <= polygon.plane.normal.z <= Tolerances.float # x co-aligned
+			if polygon.points[0].x % @bricksystem.width == 0 and
+			-Tolerances.float <= polygon.plane.normal.y <= Tolerances.float and
+			# x co-aligned
+			-Tolerances.float <= polygon.plane.normal.z <= Tolerances.float
 				if polygon.plane.normal.x > 0
 					dx = -1
 
-			if polygon.points[0].y % @bricksystem.depth == 0 and -Tolerances.float <= polygon.plane.normal.x <= Tolerances.float and -Tolerances.float <= polygon.plane.normal.z <= Tolerances.float # x co-aligned
+			if polygon.points[0].y % @bricksystem.depth == 0 and
+			-Tolerances.float <= polygon.plane.normal.x <= Tolerances.float and
+			# x co-aligned
+			-Tolerances.float <= polygon.plane.normal.z <= Tolerances.float
 				if polygon.plane.normal.y > 0
 					dy = -1
 
-			if polygon.points[0].z % @bricksystem.height == 0 and -Tolerances.float <= polygon.plane.normal.y <= Tolerances.float and -Tolerances.float <= polygon.plane.normal.x <= Tolerances.float # x co-aligned
+			if polygon.points[0].z % @bricksystem.height == 0 and
+			-Tolerances.float <= polygon.plane.normal.y <= Tolerances.float and
+			# x co-aligned
+			-Tolerances.float <= polygon.plane.normal.x <= Tolerances.float
 				if polygon.plane.normal.z > 0
 					dz = -1
 
@@ -62,9 +71,11 @@ class Voxeliser
 				z = cut.position[2] + dz
 				brickspace = grid.get_BrickSpace_global_for x, y, z
 				brickspace.inner = no
-				cutted_polygon = brickspace.pre_model.add_Polygon_by cut.points, cut.polygon.plane
+				cutted_polygon = brickspace.pre_model.add_Polygon_by cut.points,
+					cut.polygon.plane
 				cutted_polygon.tag.set_Label('original_polygon', polygon)
-				polygon.tag.child_polygons.add {brickspace: brickspace, polygon: cutted_polygon}
+				polygon.tag.child_polygons.add {brickspace: brickspace, \
+					polygon: cutted_polygon}
 
 		#inner Bricks
 
@@ -73,7 +84,8 @@ class Voxeliser
 				column = grid.grid[x][y]
 				range = column.range
 				if range.minZ? and range.minZ != range.maxZ
-					if range.maxZ - range.minZ + 1 > range.bricks.length # check posible hollow bricks
+					# check posible hollow bricks
+					if range.maxZ - range.minZ + 1 > range.bricks.length
 						r_x = (x + grid.brick_position.x - 0.61) * @bricksystem.width
 						r_y = (y + grid.brick_position.y - 0.335) * @bricksystem.depth
 						r_z = grid.extend.z + 100
@@ -320,7 +332,8 @@ class Voxeliser
 				last = point
 
 			if (current_Slice.length > 2)
-				cuts_list.push {position: [x,y,z], points: current_Slice, polygon: original_polygon } if current_Slice.length > 0
+				cuts_list.push {position: [x,y,z], points: current_Slice, \
+					polygon: original_polygon } if current_Slice.length > 0
 
 			if next_Slice.length > 2 and behind_count > on_count
 				working = next_Slice
@@ -328,34 +341,5 @@ class Voxeliser
 				working = []
 			current_Slice = []
 			z++
-
-###
-plane = new Plane(new Vector3D(0,-1,0), 0 );
-polygon = new Polygon([new Vector3D(32,32,0),new Vector3D(0,0,0),new Vector3D(0,32,0)],plane);
-v = new Voxeliser();
-v.bricksystem = LegoPlate;
-r = [];
-v.slicePolygon(polygon, r);
-
-
-		var code = "while(true){}";
-
-		function makeWorker(script) {
-				var URL = window.URL || window.webkitURL;
-				var Blob = window.Blob;
-				var Worker = window.Worker;
-				
-				if (!URL || !Blob || !Worker || !script) {
-						return null;
-				}
-				
-				var blob = new Blob([script]);
-				var worker = new Worker(URL.createObjectURL(blob));
-				return worker;
-		}
-
-
-		makeWorker(code);
-###
 
 module.exports = Voxeliser

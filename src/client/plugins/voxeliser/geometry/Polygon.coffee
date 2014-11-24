@@ -43,7 +43,8 @@ class Polygon
 	build_Export_Faces: () ->
 		faces = []
 		for i in [0...@points.length - 2] by 1
-			face = { normal: @plane.normal, vertices: [ @points[0], @points[i + 1], @points[i + 2] ]}
+			face = { normal: @plane.normal, vertices: [ @points[0], @points[i + 1],
+																									@points[i + 2] ]}
 			faces.add face
 		faces
 
@@ -63,7 +64,8 @@ class Polygon
 		faces = []
 
 		for i in [0...@points.length - 2] by 1
-			face = new THREE.Face3(@points[0].index, @points[i + 1].index, @points[i + 2].index)
+			face = new THREE.Face3(@points[0].index, @points[i + 1].index,
+				@points[i + 2].index)
 			face.parentPolygon = @
 
 			c = new THREE.Color(Math.random() * 0xffffff)
@@ -77,7 +79,8 @@ class Polygon
 		faces = []
 
 		for i in [0...@points.length - 2] by 1
-			face = new THREE.Face3(@points[0].index, @points[i + 2].index, @points[i + 1].index)
+			face = new THREE.Face3(@points[0].index, @points[i + 2].index,
+				@points[i + 1].index)
 			face.parentPolygon = @
 			faces.push face
 		faces

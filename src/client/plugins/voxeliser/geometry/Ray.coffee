@@ -25,13 +25,15 @@ class Ray
 		@direction.multiple( @.distance_to_Point point ).add( @orign )
 
 	build_Debug_Support: () ->
-		origin_point = new THREE.Mesh( new THREE.SphereGeometry( 0.25, 16, 8 ), new THREE.MeshBasicMaterial( { color: new THREE.Color( 0xFF00FF ) } ) )
+		origin_point = new THREE.Mesh( new THREE.SphereGeometry( 0.25, 16, 8 ),
+			new THREE.MeshBasicMaterial( { color: new THREE.Color( 0xFF00FF ) } ) )
 		origin_point.position = @origin
 
 		ray_geometry = new THREE.Geometry()
 		ray_geometry.vertices.push THREE.get_Vector_for new Vector3D(0,0,0)
 		ray_geometry.vertices.push THREE.get_Vector_for @direction.multiple(10000)
-		ray_line = new THREE.Line( ray_geometry, new THREE.LineBasicMaterial( { color: new THREE.Color( 0xFF00FF ), linewidth: 1} ) )
+		ray_line = new THREE.Line( ray_geometry, new THREE.LineBasicMaterial(
+			{ color: new THREE.Color( 0xFF00FF ), linewidth: 1} ) )
 		
 		origin_point.add ray_line
 		origin_point

@@ -39,9 +39,12 @@ class Plane
 
 	clone: () -> new Plane(@normal, @lambda)
 
-	equals: (plane) -> @lambda == plane.lambda and @normal.equals plane.normal # postive
+	# postive
+	equals: (plane) -> @lambda == plane.lambda and @normal.equals plane.normal
 
-	similar: (plane) -> -Tolerances.float <= plane.lambda - @lambda <= Tolerances.float and @normal.similar plane.normal
+	similar: (plane) ->
+		-Tolerances.float <= plane.lambda - @lambda <= Tolerances.float and
+		@normal.similar plane.normal
 
 	set_normal: (@normal) ->
 		return
@@ -75,7 +78,8 @@ class Plane
 	calculate_cutting_point: (from_point, to_point, from_distance, to_distance) ->
 		from_distance = @distance_to from_point unless from_distance
 		to_distance = @distance_to to_point unless to_distance
-		distance = from_distance / (from_distance - to_distance) # sum of both (one distance is negative)
+		# sum of both (one distance is negative)
+		distance = from_distance / (from_distance - to_distance)
 
 		from_point.interpolatedTo to_point, distance
 
@@ -102,25 +106,30 @@ class Plane
 		[category, point_positons, point_distances]
 
 
-	arrange_Polygon: (polygon, onplane_list, before_list, behind_list, tolerance) ->
-		[category, point_positons, point_distances] = @.classify_Polygon polygon, tolerance
+	arrange_Polygon:
+		(polygon, onplane_list, before_list, behind_list, tolerance) ->
+			[category, point_positons, point_distances] =
+				@.classify_Polygon polygon, tolerance
 
-		if category == Plane.ONPLANE
-				onplane_list.add polygon
-		else if category == Plane.BEFORE
-				before_list.add polygon
-		else if category == Plane.BEHIND
-				behind_list.add polygon
-		else if category == Plane.SPLIT
-				[before_polygon, behind_polygon] = @split_Polygon polygon, point_positons, point_distances
-				behind_list.add behind_polygon
-				before_list.add before_polygon
+			if category == Plane.ONPLANE
+					onplane_list.add polygon
+			else if category == Plane.BEFORE
+					before_list.add polygon
+			else if category == Plane.BEHIND
+					behind_list.add polygon
+			else if category == Plane.SPLIT
+					[before_polygon, behind_polygon] =
+						@split_Polygon polygon, point_positons, point_distances
+					behind_list.add behind_polygon
+					before_list.add before_polygon
 
-		category
+			category
 
 
 	split_Polygon: (polygon, point_positons, point_distances, tolerance) ->
-		[category, point_positons, point_distances] = @.classify_Polygon polygon, tolerance unless point_positons and point_distances
+		[category, point_positons, point_distances] =
+		@.classify_Polygon polygon, tolerance unless point_positons and
+			point_distances
 		last_point = polygon.points.last()
 		last_position = point_positons.last()
 		last_distance = point_distances.last()
@@ -136,7 +145,8 @@ class Plane
 			if position == Plane.BEFORE
 
 				if last_position == Plane.BEHIND
-					onplane_point = @.calculate_cutting_point last_point, point, last_distance, distance
+					onplane_point =
+						@.calculate_cutting_point last_point, point, last_distance, distance
 					before_points.add onplane_point
 					behind_points.add onplane_point
 
@@ -145,7 +155,8 @@ class Plane
 			else if position == Plane.BEHIND
 
 				if last_position == Plane.BEFORE
-					onplane_point = @.calculate_cutting_point last_point, point, last_distance, distance
+					onplane_point =
+						@.calculate_cutting_point last_point, point, last_distance, distance
 					before_points.add onplane_point
 					behind_points.add onplane_point
 				

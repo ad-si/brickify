@@ -93,11 +93,13 @@ class Vector3D
 
 	multiple: (factor) -> @.clone() .times factor
 
-	multiple_by: (vector) -> new Vector3D( @x * vector.x, @y * vector.y, @z * vector.z)
+	multiple_by: (vector) -> new Vector3D( @x * vector.x, @y * vector.y,
+		@z * vector.z)
 
 	divide: (by_factor) -> @.clone() .shrink factor
 
-	divide_by: (vector) -> new Vector3D( @x / vector.x, @y / vector.y, @z / vector.z)
+	divide_by: (vector) -> new Vector3D( @x / vector.x, @y / vector.y,
+		@z / vector.z)
 
 	normal: -> @.clone() .normalize()
 

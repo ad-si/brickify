@@ -1,4 +1,4 @@
-ColorPalette = require '../ColorPalette'
+ColorPalette = require '../rendering/ColorPalette'
 BspNode = require './BspNode'
 SolidObject3D = require './SolidObject3D'
 #require Lego?

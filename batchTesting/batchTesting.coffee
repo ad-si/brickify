@@ -82,6 +82,8 @@ testModel = (filename) ->
 	begin = new Date()
 	optimizedModel = stlLoader.optimizeModel stlModel
 	testResult.optimizationTime  = new Date() - begin
+	testResult.numPolygons = optimizedModel.indices.length / 3
+	testResult.numPoints = optimizedModel.positions.length / 3
 	logger.debug "model optimized in #{testResult.optimizationTime}ms"
 
 	begin = new Date()
@@ -104,5 +106,7 @@ class ModelTestResult
 		@stlDeletedPolygons = 0
 		@stlRecalculatedNormals = 0
 		@optimizationTime = 0
+		@numPolygons = 0
+		@numPoints = 0
 		@isTwoManifold = 0
 		@twoManifoldCheckTime = 0

@@ -48,6 +48,8 @@ html
                         th stl recalculated Normals
                         th stl Cleansing Time
                         th Optimization Time
+                        th #Polygons
+                        th #Points
                         th is 2-manifold
                         th 2-mnf check Time
                 tbody
@@ -60,6 +62,8 @@ html
                             td= result.stlRecalculatedNormals
                             td= result.stlCleansingTime + ' ms'
                             td= result.optimizationTime + ' ms'
+                            td= result.numPolygons
+                            td= result.numPoints
                             td= result.isTwoManifold
                             td= result.twoManifoldCheckTime  + ' ms'
 

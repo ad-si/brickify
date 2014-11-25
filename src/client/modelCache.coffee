@@ -6,11 +6,14 @@ OptimizedModel = require '../common/OptimizedModel'
 
 # Caches models and allows all Plugins to retrieve cached models from the server
 
-#the cache for raw data of any kind
+# the cache for raw data of any kind
 modelCache = []
 
-#the cache for optimized model instances
+# the cache for optimized model instances
 optimizedModelCache = []
+
+# currently running model queries
+currentOptimizedModelQueries = []
 
 # sends the model to the server if the server hasn't got a file
 # with the same file ending and md5 value
@@ -67,13 +70,29 @@ requestOptimizedMeshFromServer = (md5hashWithEnding, success, fail) ->
 	if modelInstance?
 		success modelInstance
 
-	successCb = (data) ->
-		modelInstance = new OptimizedModel()
-		modelInstance.fromBase64 data
-		addOptimizedInstance md5hashWithEnding, modelInstance
-		success modelInstance
+	query = getQueryForOptimizedModel md5hashWithEnding
+	query.successCallbacks.push success
+	query.failCallbacks.push fail
 
-	requestMeshFromServer md5hashWithEnding, successCb, fail
+	if query.successCallbacks.length > 1
+		# if this is not the first instance that requests this model, the query
+		# is already running - wait for it to complete
+		return
+	else
+		# this is the first instance that requests this model, we have to run
+		# the query for ourselves
+		successCb = (data) ->
+			modelInstance = new OptimizedModel()
+			modelInstance.fromBase64 data
+			addOptimizedInstance md5hashWithEnding, modelInstance
+			for sc in query.successCallbacks
+				sc modelInstance
+			deleteQuery query
+		failCb = () ->
+			for fc in query.failCallbacks
+				fc()
+			deleteQuery query
+		requestMeshFromServer md5hashWithEnding, successCb, failCb
 module.exports.requestOptimizedMeshFromServer = requestOptimizedMeshFromServer
 
 addModelToCache = (md5hashWithEnding, data) ->
@@ -99,3 +118,16 @@ getOptimizedInstance = (md5HashWithEnding) ->
 		if m.hash == md5HashWithEnding
 			return m.data
 	return null
+
+getQueryForOptimizedModel = (hash) ->
+	for q in currentOptimizedModelQueries
+		if q.hash == hash
+			return q
+	q = {hash: hash; successCallbacks: []; failCallbacks: []}
+	currentOptimizedModelQueries.push q
+	return q
+
+deleteQuery = (query) ->
+	for i in [0..currentOptimizedModelQueries.length - 1] by 1
+		if currentOptimizedModelQueries[i] == query
+			currentOptimizedModelQueries = currentOptimizedModelQueries.splice i,1

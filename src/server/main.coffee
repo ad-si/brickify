@@ -50,7 +50,7 @@ index = require '../../routes/index'
 statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
-
+landingPage = require '../../routes/landingpage'
 
 server = http.createServer(app)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
@@ -158,8 +158,10 @@ module.exports.setupRouting = () ->
 	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
 	rawParser = bodyParser.raw({limit: '100mb'})
 
+	landingPage.setLinks links
 
-	app.get '/', index(links)
+	app.get '/', landingPage.getLandingpage
+	app.get '/app', index(links)
 	app.get '/statesync/get', jsonParser, statesync.getState
 	app.post '/statesync/set', jsonParser, statesync.setState
 	app.get '/statesync/reset', jsonParser, statesync.resetState

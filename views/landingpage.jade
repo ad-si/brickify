@@ -1,8 +1,57 @@
-extends layout
+extends layoutWithoutNavbar
 
 block content
-    p wow.
-    p such lowfab.
-    p very iteration
-    a(href='/app') go to app
+    .container
+        .row
+            .col-lg-6(style='margin-top:8em')
+                h1 Prototyping accelerated
+                p.
+                    Combine various prototyping techniques like 3D-printing, lasercutting, Lego assembly and many more to accelerate the creation of first low-fidelity prtotypes.
+            .col-lg-6
+                img(src='/img/placeholder.png')
+    .container(style='width:100%; text-align:center')
+        a.btn.btn-primary(href='/app', style='margin-top: 5em; margin-bottom: 5em; width:25em; height:5em;padding-top:1.2em')
+            b(style='color:white; font-size: 1.5em;') Go to App
 
+    .container(style='text-align: center')
+        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#whatislowfab")') What is Lowfab?
+        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#features")') Features
+        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#examples")') Examples
+        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#contribute")') Contribue
+        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#team")') Team
+    hr
+
+    #whatislowfab.container.switchcontent
+        p Look at our beautiful placeholder image
+        img(src='/img/placeholder1170.png')
+    #features.container.switchcontent
+        p What are features?
+        .row
+            .col-lg-2
+                img(src='/img/placeholder180.png')
+            .col-lg-4
+                p Feature 1
+            .col-lg-2
+                img(src='/img/placeholder180.png')
+            .col-lg-4
+                p Feature 2
+
+    #examples.container.switchcontent
+        p Examples
+    #contribute.container.switchcontent
+        p Contribute
+    #team.container.switchcontent
+        p Wir brauchen mal ein Teamfoto
+        p Und ein Impressum nach deutschem Recht
+
+block scripts
+    if scripts
+        each path in scripts
+            script(src=path)
+    script.
+        function showContainer(cont){
+            console.log("Showing container: " + cont)
+            $('.switchcontent').hide()
+            $(cont).show()
+        }
+        showContainer("#whatislowfab")

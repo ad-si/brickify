@@ -112,6 +112,7 @@ module.exports.setupRouting = () ->
 
 
 	app.set 'views', path.normalize 'views'
+	app.locals.pretty = true
 	app.set 'view engine', 'jade'
 
 	app.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})

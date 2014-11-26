@@ -120,14 +120,13 @@ getOptimizedInstance = (md5HashWithEnding) ->
 	return null
 
 getQueryForOptimizedModel = (hash) ->
-	for q in currentOptimizedModelQueries
-		if q.hash == hash
-			return q
-	q = {hash: hash; successCallbacks: []; failCallbacks: []}
-	currentOptimizedModelQueries.push q
+	q = currentOptimizedModelQueries[hash]
+	unless q
+		q = {hash: hash; successCallbacks: []; failCallbacks: []}
+		currentOptimizedModelQueries[hash] = q
 	return q
 
 deleteQuery = (query) ->
-	for i in [0..currentOptimizedModelQueries.length - 1] by 1
-		if currentOptimizedModelQueries[i] == query
-			currentOptimizedModelQueries = currentOptimizedModelQueries.splice i,1
+	index = currentOptimizedModelQueries.indexOf query.hash
+	unless index is -1
+		currentOptimizedModelQueries.splice index, 1

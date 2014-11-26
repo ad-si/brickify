@@ -1,4 +1,6 @@
+path = require 'path'
+
 module.exports = (links) ->
 
 	return (request, response) ->
-		response.render 'index', links
+		response.render path.join('app','app'), links

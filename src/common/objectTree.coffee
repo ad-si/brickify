@@ -21,28 +21,16 @@ module.exports.forAllSubnodes = forAllSubnodes
 # that have a pluginData entry matching to key
 forAllSubnodePluginData = (node, key, callback, recursive = true) ->
 	forAllSubnodes node, (child) ->
-		for pd in child.pluginData
-			if pd.key == key
-				callback (pd.value)
-				break
-
+		if child.pluginData[key]?
+			callback (child.pluginData[key])
 		if recursive
 			forAllSubnodePluginData child, key, callback, recursive
 module.exports.forAllSubnodeProperties = forAllSubnodePluginData
 
 #Adds an dataset which can be accessed with the specified key
 addPluginData = (node, key, data) ->
-	for pd in node.pluginData
-		if pd.key == key
-			pd.value = data
-			return
-
-	newData =
-		key: key
-		value: data
-	node.pluginData.push(newData)
-
-	return newData.value
+	node.pluginData[key] = data
+	return data
 module.exports.addPluginData = addPluginData
 
 #The node structure is the base structure for all nodes
@@ -51,5 +39,5 @@ class NodeStructure
 		#A list of child nodes
 		@childNodes = []
 		@properties = {}
-		@pluginData = []
+		@pluginData = {}
 module.exports.NodeStructure = NodeStructure

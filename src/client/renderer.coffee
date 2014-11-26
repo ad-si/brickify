@@ -99,8 +99,9 @@ setupControls = (globalConfig) ->
 
 setupFPSCounter = () ->
 	stats = new Stats()
+	# 0 means FPS, 1 means ms per frame
 	stats.setMode(0)
 	stats.domElement.style.position = 'absolute'
 	stats.domElement.style.right = '0px'
 	stats.domElement.style.bottom = '0px'
-	document.body.appendChild( stats.domElement )
+	document.body.appendChild(stats.domElement)

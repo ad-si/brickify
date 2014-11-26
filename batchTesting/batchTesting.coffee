@@ -3,6 +3,7 @@ path = require 'path'
 winston = require 'winston'
 stlLoader = require '../src/client/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
+mkdirp = require 'mkdirp'
 
 modelPath = path.join 'batchTesting', 'models'
 outputPath = path.join 'batchTesting', 'results'
@@ -20,6 +21,9 @@ logger = new (winston.Logger)({
 # The (debug) output is saved to the debugLogFile, the test results are saved as
 # as JSON in the testResultFile for further processing
 module.exports.startTesting = () ->
+	# create output directory if it does not exist
+	mkdirp.sync(outputPath)
+
 	logger.info 'starting batch testing'
 	models = parseModelFiles()
 	logger.info "Testing #{models.length} models"

@@ -13,45 +13,43 @@ block content
         a.btn.btn-primary(href='/app', style='margin-top: 5em; margin-bottom: 5em; width:25em; height:5em;padding-top:1.2em')
             b(style='color:white; font-size: 1.5em;') Drop a .stl file to start!
 
-    .container(style='text-align: center')
-        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#whatislowfab")') What is Lowfab?
-        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#features")') Features
-        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#examples")') Examples
-        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#contribute")') Contribue
-        a(style='margin-left: 2em; margin-right:2em', onclick='showContainer("#team")') Team
-    hr
+    .container(role='tabpanel')
+        ul.nav.nav-tabs
+            li(role='presentation').active
+                a(href='#whatislowfab' aria-controls='whatislowfab' role='tab' data-toggle='tab') What is Lowfab?
+            li(role='presentation')
+                a(href='#features' aria-controls='features' role='tab' data-toggle='tab') Features
+            li(role='presentation')
+                a(href='#examples' aria-controls='examples' role='tab' data-toggle='tab') Examples
+            li(role='presentation')
+                a(href='#contribute' aria-controls='contribute' role='tab' data-toggle='tab') Contribute
+            li(role='presentation')
+                a(href='#team' aria-controls='team' role='tab' data-toggle='tab') Team
 
-    #whatislowfab.container.switchcontent
-        p Look at our beautiful placeholder image
-        img(src='/img/placeholder1170.png')
-    #features.container.switchcontent
-        p What are features?
-        .row
-            .col-lg-2
-                img(src='/img/placeholder180.png')
-            .col-lg-4
-                p Feature 1
-            .col-lg-2
-                img(src='/img/placeholder180.png')
-            .col-lg-4
-                p Feature 2
-
-    #examples.container.switchcontent
-        p Examples
-    #contribute.container.switchcontent
-        p Contribute
-    #team.container.switchcontent
-        p Wir brauchen mal ein Teamfoto
-        p Und ein Impressum nach deutschem Recht
+        .tab-content
+            #whatislowfab(role='tabpanel').tab-pane.active
+                p Look at our beautiful placeholder image
+                img(src='/img/placeholder1170.png')
+            #features(role='tabpanel').tab-pane
+                p What are features?
+                .row
+                    .col-lg-2
+                        img(src='/img/placeholder180.png')
+                    .col-lg-4
+                        p Feature 1
+                    .col-lg-2
+                        img(src='/img/placeholder180.png')
+                    .col-lg-4
+                        p Feature 2
+            #examples(role='tabpanel').tab-pane
+                p Examples
+            #contribute(role='tabpanel').tab-pane
+                p Contribute
+            #team(role='tabpanel').tab-pane
+                p Wir brauchen mal ein Teamfoto
+                p Und ein Impressum nach deutschem Recht
 
 block scripts
     if scripts
         each path in scripts
             script(src=path)
-    script.
-        function showContainer(cont){
-            console.log("Showing container: " + cont)
-            $('.switchcontent').hide()
-            $(cont).show()
-        }
-        showContainer("#whatislowfab")

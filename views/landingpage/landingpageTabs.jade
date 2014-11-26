@@ -1,0 +1,35 @@
+#landingtabs.container(role='tabpanel')
+	ul.nav.nav-tabs.nav-tabs-centered
+		li(role='presentation').active
+			a(href='#whatislowfab' aria-controls='whatislowfab' role='tab' data-toggle='tab') What is Lowfab?
+		li(role='presentation')
+			a(href='#features' aria-controls='features' role='tab' data-toggle='tab') Features
+		li(role='presentation')
+			a(href='#examples' aria-controls='examples' role='tab' data-toggle='tab') Examples
+		li(role='presentation')
+			a(href='#contribute' aria-controls='contribute' role='tab' data-toggle='tab') Contribute
+		li(role='presentation')
+			a(href='#team' aria-controls='team' role='tab' data-toggle='tab') Team
+
+	.tab-content
+		#whatislowfab(role='tabpanel').tab-pane.active
+			p Look at our beautiful placeholder image
+			img(src='/img/placeholder1170.png')
+		#features(role='tabpanel').tab-pane
+			p What are features?
+			.row
+				.col-lg-2
+					img(src='/img/placeholder180.png')
+				.col-lg-4
+					p Feature 1
+				.col-lg-2
+					img(src='/img/placeholder180.png')
+				.col-lg-4
+					p Feature 2
+		#examples(role='tabpanel').tab-pane
+			p Examples
+		#contribute(role='tabpanel').tab-pane
+			p Contribute
+		#team(role='tabpanel').tab-pane
+			p Wir brauchen mal ein Teamfoto
+			p Und ein Impressum nach deutschem Recht

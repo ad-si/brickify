@@ -70,13 +70,16 @@ mergeUnmergedPolygons = (listOfPoly) ->
 							) for c in poly_range)
 						break
 
+
 	# sort index concerning to insert position which is the index
 	# of p2 -> begin with biggest index
 
 	# polygons_to_merge = sorted(polygons_to_merge.items(),
 	# key=lambda x: x[0].p2_idx, reverse=true)
+
 	console.log polygons_to_merge
 	console.log throw_away_polygons
+
 	tuples = ([key, poly] for key, poly of polygons_to_merge)
 	tuples.sort(
 		(a, b) ->

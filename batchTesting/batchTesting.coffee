@@ -3,28 +3,15 @@ path = require 'path'
 winston = require 'winston'
 stlLoader = require '../src/client/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
+mkdirp = require 'mkdirp'
 
 modelPath = path.join 'batchTesting', 'models'
-debugLogFile = path.join 'batchTesting', 'results', 'batchTestDebug.log'
-testResultFile = path.join 'batchTesting', 'results', 'batchTestResults.log'
-reportFile = path.join 'batchTesting', 'results', 'batchTestResults.html'
+outputPath = path.join 'batchTesting', 'results'
+reportFile = 'batchTestResults'
 
 logger = new (winston.Logger)({
 	transports: [
-		new winston.transports.Console { level: 'debug' },
-		new winston.transports.File {
-			name: 'debugfile'
-			filename: debugLogFile
-			level: 'debug'}
-	]
-})
-
-resultLogger = new (winston.Logger)({
-	transports: [
-		new winston.transports.File {
-			name: 'resultfile'
-			filename: testResultFile
-			level: 'info'}
+		new winston.transports.Console { level: 'debug' }
 	]
 })
 
@@ -34,20 +21,28 @@ resultLogger = new (winston.Logger)({
 # The (debug) output is saved to the debugLogFile, the test results are saved as
 # as JSON in the testResultFile for further processing
 module.exports.startTesting = () ->
+	# create output directory if it does not exist
+	mkdirp.sync(outputPath)
+
 	logger.info 'starting batch testing'
 	models = parseModelFiles()
 	logger.info "Testing #{models.length} models"
 	results = []
-	for model in models
+	for i in [0..models.length - 1] by 1
+		model = models[i]
+
+		perc = (i + 1) / models.length * 100
+		perc = perc.toFixed(1)
+
+		logger.info "#{perc}% Testing model '#{model}'"
 		result = testModel model
 		result.fileName = model
-		resultLogger.info result
 		results.push result
 
 	if results.length == 0
 		logger.warn 'No models where processed, test report can\'t be created'
 	else
-		reportGenerator.generateReport results, reportFile
+		reportGenerator.generateReport results, outputPath, reportFile
 
 # parses all models in the modelPath directory
 parseModelFiles = () ->
@@ -56,11 +51,16 @@ parseModelFiles = () ->
 		return []
 	else
 		files = fs.readdirSync modelPath
-		return files
+		models = []
+
+		for file in files
+			if path.extname(file).toLowerCase() == '.stl'
+				models.push file
+
+		return models
 
 # performs various tests on a single model
 testModel = (filename) ->
-	logger.info "Testing model '#{filename}'"
 	testResult = new ModelTestResult()
 	filepath = path.join(modelPath, filename)
 	fileContent = fs.readFileSync filepath, {encoding: 'utf8'}
@@ -86,6 +86,17 @@ testModel = (filename) ->
 	begin = new Date()
 	optimizedModel = stlLoader.optimizeModel stlModel
 	testResult.optimizationTime  = new Date() - begin
+	testResult.numPolygons = optimizedModel.indices.length / 3
+	testResult.numPoints = optimizedModel.positions.length / 3
+	logger.debug "model optimized in #{testResult.optimizationTime}ms"
+
+	begin = new Date()
+	if optimizedModel.isTwoManifold()
+		testResult.isTwoManifold = 1
+	else
+		testResult.isTwoManifold = 0
+	testResult.twoManifoldCheckTime = new Date() - begin
+	logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
 
 	return testResult
 
@@ -99,3 +110,7 @@ class ModelTestResult
 		@stlDeletedPolygons = 0
 		@stlRecalculatedNormals = 0
 		@optimizationTime = 0
+		@numPolygons = 0
+		@numPoints = 0
+		@isTwoManifold = 0
+		@twoManifoldCheckTime = 0

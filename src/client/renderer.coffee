@@ -3,16 +3,20 @@
 ###
 
 pluginHooks = require '../common/pluginHooks'
+Stats = require 'stats-js'
 
 renderer = null
 scene = null
 camera = null
 controls = null
+stats = null
 
 
-localRenderer = () ->
+localRenderer = (timestamp) ->
+	stats?.begin()
 	renderer.render scene, camera
-	pluginHooks.update3D()
+	pluginHooks.on3dUpdate timestamp
+	stats?.end()
 
 	requestAnimationFrame localRenderer
 
@@ -35,12 +39,13 @@ module.exports.init = (globalConfig) ->
 	setupLighting globalConfig
 	setupCamera globalConfig
 	setupControls globalConfig
+	setupFPSCounter() if process.env.NODE_ENV is 'development'
 	requestAnimationFrame localRenderer
 
 setupRenderer = (globalConfig) ->
 	renderer = new THREE.WebGLRenderer(
 		alpha: true
-		antialiasing: true
+		antialias: true
 		preserveDrawingBuffer: true
 	)
 	renderer.setSize window.innerWidth, window.innerHeight
@@ -91,3 +96,12 @@ setupCamera = (globalConfig) ->
 setupControls = (globalConfig) ->
 	controls = new THREE.OrbitControls(camera, renderer.domElement)
 	controls.target.set(0, 0, 0)
+
+setupFPSCounter = () ->
+	stats = new Stats()
+	# 0 means FPS, 1 means ms per frame
+	stats.setMode(0)
+	stats.domElement.style.position = 'absolute'
+	stats.domElement.style.right = '0px'
+	stats.domElement.style.bottom = '0px'
+	document.body.appendChild(stats.domElement)

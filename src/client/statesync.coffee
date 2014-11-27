@@ -79,6 +79,7 @@ sync = (force = false) ->
 			console.log "Got delta from server: #{JSON.stringify(delta)}"
 
 			clientDelta = diffpatch.diff oldState, state
+
 			if clientDelta?
 				console.log 'The client modified its state
 						while the server worked, this should not happen!'
@@ -94,7 +95,7 @@ exports.sync = sync
 
 handleUpdatedState = (delta, curstate) ->
 	#Client plugins maybe modify state...
-	pluginHooks.updateState delta, curstate
+	pluginHooks.onStateUpdate delta, curstate
 
 	#sync back as long client plugins modify state
 	sync()

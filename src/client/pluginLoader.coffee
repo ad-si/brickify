@@ -16,8 +16,8 @@ checkForPluginMethods = (instance) ->
 
 initPluginInstance = (instance) ->
 	instance.init? globalConfigInstance
-	instance.init3D? threeNode = new THREE.Object3D()
-	instance.onUiInit? {
+	instance.init3d? threeNode = new THREE.Object3D()
+	instance.initUi? {
 		menuBar: document.getElementById('navbarToggle')
 		toolsContainer: document.getElementById('toolsContainer')
 		sceneGraphContainer: document.getElementById('sceneGraphContainer')
@@ -35,12 +35,8 @@ loadPlugin = (instance) ->
 		console.log "Plugin #{instance.pluginName} loaded"
 
 	else
-		if instance.pluginName?
-			console.log "Plugin #{instance.pluginName} does not contain all
-					necessary methods, will not be loaded"
-		else
-			console.log 'Plugin ? (name missing) does not contain all necessary
-				methods, will not be loaded'
+		console.warn "Plugin #{instance.pluginName?} does not contain all
+				necessary methods, will not be loaded"
 
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig

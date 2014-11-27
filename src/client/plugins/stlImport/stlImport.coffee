@@ -28,17 +28,16 @@ module.exports.category = common.CATEGORY_IMPORT
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
-module.exports.init3D = (threejsNode) ->
+module.exports.init3d = (threejsNode) ->
   threejsRootNode = threejsNode
 
 # check if there are any threejs objects that haven't been loaded yet
 # if so, load the referenced model from the server
-module.exports.updateState = (delta, state) ->
+module.exports.onStateUpdate = (delta, state) ->
 	objectTree.forAllSubnodeProperties state.rootNode,
 		pluginPropertyName, (property) ->
 			storedUuid = property.threeObjectUuid
 			threeObject = threejsRootNode.getObjectById storedUuid, true
-
 			if not threeObject?
 				loadModelFromCache property
 
@@ -59,17 +58,22 @@ loadModelFromCache = (property) ->
 # and adds it to the scene as a THREE.Geometry
 module.exports.importFile = (fileName, fileContent) ->
 	errorCallback = (errors) ->
-		console.log 'Errors occured while importing the stl file:'
+		console.error 'Errors occured while importing the stl file:'
 		for error in errors
-			console.log '-> ' + error
+			console.error '-> ' + error
 	optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
+
+	# happens with empty files
+	if !optimizedModel
+		return
+
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel
 	fileEnding = 'optimized'
 	if stateSync?
 		loadModelCallback = (state) ->
-			node = objectTree.addChildNode state.rootNode
+			node = objectTree.addChild state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property
 			property.fileName = fileName
@@ -79,6 +83,7 @@ module.exports.importFile = (fileName, fileContent) ->
 		# call updateState on all client plugins and sync
 		stateSync.performStateAction loadModelCallback, true
 	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
+	optimizedModel
 
 # parses the binary geometry and adds it to the three scene,
 # returning the uuid of the three object

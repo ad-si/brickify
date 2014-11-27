@@ -20,6 +20,7 @@
     "coffeeify": "^0.7.0",
     "coffeelint-newline-at-eof": "^0.4.1",
     "compression": "^1.2.0",
+    "envify": "^3.2.0",
     "errorhandler": "^1.2.2",
     "exec": "^0.1.2",
     "express": "^4.9.8",

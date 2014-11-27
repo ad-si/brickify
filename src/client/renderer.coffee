@@ -13,10 +13,10 @@ stats = null
 
 
 localRenderer = () ->
-	stats.begin()
+	stats?.begin()
 	renderer.render scene, camera
 	pluginHooks.update3D()
-	stats.end()
+	stats?.end()
 
 	requestAnimationFrame localRenderer
 
@@ -39,7 +39,7 @@ module.exports.init = (globalConfig) ->
 	setupLighting globalConfig
 	setupCamera globalConfig
 	setupControls globalConfig
-	setupFPSCounter()
+	setupFPSCounter() if process.env.NODE_ENV is 'development'
 	requestAnimationFrame localRenderer
 
 setupRenderer = (globalConfig) ->

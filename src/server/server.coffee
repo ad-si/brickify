@@ -18,7 +18,8 @@
       - point it to the npm executable in the **Program** field
       - give it `$ run build` as **Parameters**
       - choose the same **Working directory** as before
-
+  - If you want to see additional debug information such as the FPS counter add
+    the **Environment variable** `NODE_ENV = development`
 
   If you run the server from IntelliJ while no server.js script is present,
   you will need to confirm to continue anyway. As long as you don't delete the

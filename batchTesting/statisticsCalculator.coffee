@@ -22,6 +22,17 @@ calculateNumericStatistics = (data) ->
 				stats.avg += value
 		stats.avg = stats.avg / stats.numValues
 		result.push stats
+
+	# search the numPolygons sum and calculate the average for 1000 polygons
+	sumPoly = 0
+	for s in result
+		if s.variableName == 'numPolygons'
+			sumPoly = s.sum
+			break
+
+	for s in result
+		s.avgPer1000Polys = (s.sum / sumPoly) * 1000
+
 	return result
 module.exports.calculateNumericStatistics = calculateNumericStatistics
 
@@ -33,4 +44,5 @@ class NumericStatistic
 		@sum = 0
 		@numValues = 0
 		@avg = 0
+		@avgPer1000Polys = 0
 module.exports.NumericStatistic = NumericStatistic

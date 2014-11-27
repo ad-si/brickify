@@ -1,3 +1,3 @@
 stlDropper = require './stlDropper'
 
-stlDropper.init $('#dropzone'), $('#droptext')
+stlDropper.init document.getElementById('dropzone'), $('#droptext')

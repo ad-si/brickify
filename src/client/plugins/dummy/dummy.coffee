@@ -92,12 +92,14 @@ module.exports.onStateUpdate = (delta, state) ->
 
 ###
 # On each render frame the renderer will call the `update3D`
-# method of all plugins that provide it. There are no arguments passed.
+# method of all plugins that provide it.
 #
 # @memberOf dummyClientPlugin
+# @param {DOMHighResTimeStamp} timestamp the current time
 # @see renderer
+# @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
 ###
-module.exports.on3dUpdate = ->
+module.exports.on3dUpdate = (timestamp) ->
 	return undefined
 
 ###

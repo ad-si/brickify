@@ -144,27 +144,29 @@ class SolidObject3D extends Object3D
 			color: @color.specular, ambient: @color.base, opacity: 1.0, \
 			transparent: true} );
 
-
+		
 		phongShader = THREE.ShaderLib.phong
 		uniforms = THREE.UniformsUtils.clone(phongShader.uniforms)
-
+			
+		 
 		for point in @points
-			geometry.vertices.push THREE.get_Vector_for point
-
+			geometry.vertices.push point
+	
 		for polygon in @polygons
 			for face in polygon.get_RenderFaces()
 				geometry.faces.push face
-
+		
 		@ed
 		geometry.computeFaceNormals()
 
 		mesh = new THREE.Mesh(geometry, material)
 
+		
 		if with_Edges
 			edges = @.get_Edge_SceneModel()
 			mesh.add edges
 
-
+		
 		mesh
 
 	build_Edge_SceneModel: () ->
@@ -184,8 +186,8 @@ class SolidObject3D extends Object3D
 		for edge in @edges
 			#edge.check_Visibility(@edge_threshold)
 			#if edge.broken_edge
-			#  broken_geo.vertices.push THREE.get_Vector_for edge.from_point
-			#  broken_geo.vertices.push THREE.get_Vector_for edge.to_point
+			#  broken_geo.vertices.push edge.from_point
+			#  broken_geo.vertices.push edge.to_point
 			if edge.hard_edge
 				t = (edge.inner_Polygon.plane.normal).cross(
 					edge.from_point.to(edge.to_point)).scalar(edge.inner_Polygon.plane.
@@ -199,13 +201,13 @@ class SolidObject3D extends Object3D
 						r = 0.8
 					h.shrink(r).times(0.3)
 					#h = new Vector3D(0,0,0)
-				edge_geo.vertices.push THREE.get_Vector_for (edge.from_point)
-				edge_geo.vertices.push THREE.get_Vector_for (edge.to_point)
-				#edge_geo.vertices.push THREE.get_Vector_for edge.from_point
-				#edge_geo.vertices.push THREE.get_Vector_for edge.to_point
+				edge_geo.vertices.push (edge.from_point)
+				edge_geo.vertices.push (edge.to_point)
+				#edge_geo.vertices.push edge.from_point
+				#edge_geo.vertices.push edge.to_point
 			else
-				triangle_geo.vertices.push THREE.get_Vector_for edge.from_point
-				triangle_geo.vertices.push THREE.get_Vector_for edge.to_point
+				triangle_geo.vertices.push edge.from_point
+				triangle_geo.vertices.push edge.to_point
 
 		lines = new THREE.Line(edge_geo, edge_material)
 		lines.type = THREE.LinePieces
@@ -233,7 +235,7 @@ class SolidObject3D extends Object3D
 			transparent: true} )
 
 		for point in @points
-			geometry.vertices.push THREE.get_Vector_for point
+			geometry.vertices.push point
 
 		for polygon in @polygons
 			for face in polygon.get_Reverse_RenderFaces()
@@ -257,8 +259,8 @@ class SolidObject3D extends Object3D
 		for edge in @edges
 			edge.check_Visibility()
 			if edge.broken_edge
-				broken_geo.vertices.push THREE.get_Vector_for edge.from_point
-				broken_geo.vertices.push THREE.get_Vector_for edge.to_point
+				broken_geo.vertices.push edge.from_point
+				broken_geo.vertices.push edge.to_point
 			else if edge.hard_edge
 				t = (edge.inner_Polygon.plane.normal).cross(edge.from_point.to(
 					edge.to_point)).scalar(edge.inner_Polygon.plane.normal.plus(
@@ -272,13 +274,13 @@ class SolidObject3D extends Object3D
 						r = 0.8
 					h.shrink(r).times(0.3)
 					#h = new Vector3D(0,0,0)
-				edge_geo.vertices.push THREE.get_Vector_for (edge.from_point)
-				edge_geo.vertices.push THREE.get_Vector_for (edge.to_point)
-				#edge_geo.vertices.push THREE.get_Vector_for edge.from_point
-				#edge_geo.vertices.push THREE.get_Vector_for edge.to_point
+				edge_geo.vertices.push (edge.from_point)
+				edge_geo.vertices.push (edge.to_point)
+				#edge_geo.vertices.push edge.from_point
+				#edge_geo.vertices.push edge.to_point
 			else
-				triangle_geo.vertices.push THREE.get_Vector_for edge.from_point
-				triangle_geo.vertices.push THREE.get_Vector_for edge.to_point
+				triangle_geo.vertices.push edge.from_point
+				triangle_geo.vertices.push edge.to_point
 
 		lines = new THREE.Line(edge_geo, edge_material)
 		lines.type = THREE.LinePieces

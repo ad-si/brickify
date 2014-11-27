@@ -21,10 +21,12 @@ Voxeliser = require './geometry/Voxeliser'
 voxeliser = null
 
 voxelRenderer = require './rendering/voxelRenderer'
+ColorPalette = require './rendering/ColorPalette'
 
 threejsRootNode = null
 statesync = require '../../statesync'
 stateInstance = null
+voxelisedBrickSpaceGrid = null
 
 module.exports.pluginName = 'Voxeliser Plugin'
 module.exports.category = common.CATEGORY_CONVERTER
@@ -38,49 +40,39 @@ module.exports.init3D = (threejsNode) ->
 module.exports.onUiInit = (elements) ->
 	elements.toolsContainer.innerHTML =
 		'<button id="voxeliseButton" type="button"
-		class="btn btn-default">Voxelise</button>'
+		class="btn btn-default">Voxelise</button>
+		<button id="layoutButton" type="button"
+		class="btn btn-default">Layout</button>'
 	$('#voxeliseButton').click((event) ->
 		event.stopPropagation()
 		startVoxelisation()
+		)
+	$('#layoutButton').click((event) ->
+		event.stopPropagation()
+		layout()
 		)
 	return
 
 setState = (state) ->
 	stateInstance = state
 
-# voxelise = (optimizedModel, brickSystem) ->
-# 	console.log 'voxelise model ' + optimizedModel
-# 	voxeliser ?= new Voxeliser
-# 	# convert optimizedModel to solidObject3D
-# 	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-# 	voxelisedModel = voxeliser.voxelise(solidObject3D, brickSystem)
-# 	threejsRootNode.add voxelRenderer voxelisedModel
-
-# voxelise = (optimizedModel, brickSystem) ->
-#     voxeliser ?= new Voxeliser
-#     # convert optimizedModel to solidObject3D
-#     solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-#     voxelisedBrickSpaceGrid = voxeliser.voxelise(solidObject3D, brickSystem)
-#     layout = new BrickLayout(voxelisedBrickSpaceGrid)
-#     layouter = new BrickLayouter(layout)
-#     layouter.layoutAll()
-#     threejsRootNode.add layouter.get_SceneModel()
-#     # threejsRootNode.add voxelRenderer voxelisedModel
-
 voxelise = (optimizedModel, brickSystem) ->
-    console.log 'voxelise method'
-    voxeliser ?= new Voxeliser
-    # convert optimizedModel to solidObject3D
-    solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-    voxelisedModel = voxeliser.voxelise(solidObject3D, brickSystem)
-    threejsRootNode.add voxelRenderer voxelisedModel
+	voxeliser ?= new Voxeliser
+	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
+	voxelisedBrickSpaceGrid = voxeliser.voxelise(solidObject3D, brickSystem)
+	voxelisedBrickSpaceGrid.set_Color ColorPalette.orange()
+	threejsRootNode.add voxelRenderer voxelisedBrickSpaceGrid
+
+layout = () ->
+	layout = new BrickLayout(voxelisedBrickSpaceGrid)
+	layouter = new BrickLayouter(layout)
+	layouter.layoutAll()
+	threejsRootNode.add layout.get_SceneModel()
 
 startVoxelisation = () ->
-	console.log stateInstance
 	if stateInstance
 		#todo, handle if stateInstance undefined
 		for node in stateInstance.rootNode.childNodes
-			console.log node
 			modelCache.requestOptimizedMeshFromServer node.pluginData[0].value.meshHash,
 			(modelInstance) ->
 				Lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)

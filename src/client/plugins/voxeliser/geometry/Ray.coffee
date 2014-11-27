@@ -30,8 +30,8 @@ class Ray
 		origin_point.position = @origin
 
 		ray_geometry = new THREE.Geometry()
-		ray_geometry.vertices.push THREE.get_Vector_for new Vector3D(0,0,0)
-		ray_geometry.vertices.push THREE.get_Vector_for @direction.multiple(10000)
+		ray_geometry.vertices.push new Vector3D(0,0,0)
+		ray_geometry.vertices.push @direction.multiple(10000)
 		ray_line = new THREE.Line( ray_geometry, new THREE.LineBasicMaterial(
 			{ color: new THREE.Color( 0xFF00FF ), linewidth: 1} ) )
 		

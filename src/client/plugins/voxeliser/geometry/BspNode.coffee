@@ -1,3 +1,5 @@
+Tolerances = require './Tolerances'
+
 class BspNode
 	constructor: () ->
 		@hyperplane = null

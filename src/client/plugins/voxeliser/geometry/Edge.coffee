@@ -1,3 +1,5 @@
+Tolerances = require './Tolerances'
+
 class Edge
 	constructor: (@from_point, @to_point) ->
 		@inner_Polygon = null

@@ -60,7 +60,7 @@ class BrickLayouter
       for brick in @layout.all_bricks
         brick.update_SceneModel()
 
-      @layout.update_SceneModel()
+      #@layout.update_SceneModel()
 
 
   splitBricks: (bricks, keepHeight) ->

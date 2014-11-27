@@ -139,8 +139,12 @@ class Brick
 		mesh.position.y  = (@position.y + delta) * @bricksystem.depth
 		mesh.position.z  = @position.z * @bricksystem.height
 
-		black = new THREE.Color(0x000000)
-		{color: black, linewidth: 1.2, wireframe: true, type: THREE.LinePieces}
+		parameters = {
+			color: new THREE.Color( 0x000000 )
+			linewidth: 1.2
+			wireframe: true
+			type: THREE.LinePieces
+		}
 		edge_material = new THREE.LineBasicMaterial parameters
 		edge_geometry = @bricktype.get_Edge_SceneModel().children.first().geometry
 		edge_lines = new THREE.Line(edge_geometry, edge_material)

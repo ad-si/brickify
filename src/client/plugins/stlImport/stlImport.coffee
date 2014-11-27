@@ -28,12 +28,12 @@ module.exports.category = common.CATEGORY_IMPORT
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
-module.exports.init3D = (threejsNode) ->
+module.exports.init3d = (threejsNode) ->
   threejsRootNode = threejsNode
 
 # check if there are any threejs objects that haven't been loaded yet
 # if so, load the referenced model from the server
-module.exports.updateState = (delta, state) ->
+module.exports.onStateUpdate = (delta, state) ->
 	objectTree.forAllSubnodeProperties state.rootNode,
 		pluginPropertyName, (property) ->
 			storedUuid = property.threeObjectUuid
@@ -79,6 +79,7 @@ module.exports.importFile = (fileName, fileContent) ->
 		# call updateState on all client plugins and sync
 		stateSync.performStateAction loadModelCallback, true
 	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
+	optimizedModel
 
 # parses the binary geometry and adds it to the three scene,
 # returning the uuid of the three object

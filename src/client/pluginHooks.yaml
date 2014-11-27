@@ -18,43 +18,44 @@
 
 #  ## 3D scene initialization
 #
-#  Each plugin that provides a `init3D` method is able to initialize its 3D
+#  Each plugin that provides a `init3d` method is able to initialize its 3D
 #  rendering there and receives a three.js node as argument.
 #
-#  If the plugin needs its node for later use it has to store it in `init3D`
+#  If the plugin needs its node for later use it has to store it in `init3d`
 #  because it won't be handed the node again later.
 
-- init3D
+- init3d
 
 # ## UI Initalization
 #
-# `onUiInit` provides the plugins the possibility to add elements to the UI.
+# `initUi` provides the plugins the possibility to add elements to the UI.
 # Receives a object with DOM elements to insert itself into.
 
-- onUiInit
+- initUi
 
 #  ## State synchronization
 #
 #  The [state synchronization module](statesync.html) will call each plugin's
-#  `updateState` method (if provided) whenever the current state changes
+#  `onStateUpdate` method (if provided) whenever the current state changes
 #  due to user input or calculation results on either server or client side.
 #
 #  The hook provides both the delta to the previous state and the new complete
 #  state as arguments.
 
-- updateState
+- onStateUpdate
 
 #  ## 3D scene update and animation
 #
-#  On each render frame the [renderer](render.html) will call the `update3D`
+#  On each render frame the [renderer](render.html) will call the `on3dUpdate`
 #  method of all plugins that provide it. There are no arguments passed.
 
-- update3D
+- on3dUpdate
 
 #  ## File import
 #
 #  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
 #  try to import it with every plugin that implements `importFile` until one
-#  succeeds. The file's name and its content are provided as arguments.
+#  succeeds and returns an [OptimizedModel](../common/OptimizedModel.html).
+#  The file's name and its content are provided as arguments.
 
 - importFile

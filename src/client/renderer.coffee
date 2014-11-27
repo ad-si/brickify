@@ -12,7 +12,7 @@ controls = null
 
 localRenderer = () ->
 	renderer.render scene, camera
-	pluginHooks.update3D()
+	pluginHooks.on3dUpdate()
 
 	requestAnimationFrame localRenderer
 

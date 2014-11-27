@@ -16,8 +16,8 @@ checkForPluginMethods = (instance) ->
 
 initPluginInstance = (instance) ->
 	instance.init? globalConfigInstance
-	instance.init3D? threeNode = new THREE.Object3D()
-	instance.onUiInit? {
+	instance.init3d? threeNode = new THREE.Object3D()
+	instance.initUi? {
 		menuBar: document.getElementById('navbarToggle')
 		toolsContainer: document.getElementById('toolsContainer')
 		sceneGraphContainer: document.getElementById('sceneGraphContainer')

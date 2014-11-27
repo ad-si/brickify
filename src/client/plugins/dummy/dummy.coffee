@@ -13,7 +13,7 @@
 # the interaction between the lowfab framework and the plugin.
 #
 # Those **hooks** have to be defined in `module.exports`, e.g.
-# `module.exports.pluginName` or `module.exports.update3D()`.
+# `module.exports.pluginName` or `module.exports.on3dUpdate()`.
 #
 # @module dummyClientPlugin
 ###
@@ -49,17 +49,17 @@ module.exports.init = (globalConfig) ->
 	console.log 'Dummy Client Plugin initialization'
 
 ###
-# Each plugin that provides a `init3D` method is able to initialize its 3D
+# Each plugin that provides a `init3d` method is able to initialize its 3D
 # rendering there and receives a three.js node as argument.
 #
-# If the plugin needs its node for later use it has to store it in `init3D`
+# If the plugin needs its node for later use it has to store it in `init3d`
 # because it won't be handed the node again later.
 #
 # @param {ThreeJsNode} threejsNode the plugin's node in the 3D-scenegraph
 # @memberOf dummyClientPlugin
 # @see pluginLoader
 ###
-module.exports.init3D = (threejsNode) ->
+module.exports.init3d = (threejsNode) ->
 	console.log 'Dummy Client Plugin initializes 3d'
 
 ###
@@ -70,7 +70,7 @@ module.exports.init3D = (threejsNode) ->
 # @memberOf dummyClientPlugin
 # @see pluginLoader
 ###
-module.exports.onUiInit = (domElements) ->
+module.exports.initUi = (domElements) ->
 	console.log 'Dummy Client Plugin initializes UI'
 
 ###
@@ -86,7 +86,7 @@ module.exports.onUiInit = (domElements) ->
 # @memberOf dummyClientPlugin
 # @see stateSynchronization
 ###
-module.exports.updateState = (delta, state) ->
+module.exports.onStateUpdate = (delta, state) ->
 	console.log 'Dummy Client Plugin state change'
 
 
@@ -97,7 +97,7 @@ module.exports.updateState = (delta, state) ->
 # @memberOf dummyClientPlugin
 # @see renderer
 ###
-module.exports.update3D = ->
+module.exports.on3dUpdate = ->
 	return undefined
 
 ###
@@ -112,4 +112,5 @@ module.exports.update3D = ->
 ###
 module.exports.importFile = (fileName, fileContent) ->
 	console.log 'Dummy Client Plugin imports a file'
+	return undefined
 

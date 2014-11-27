@@ -13,5 +13,5 @@ module.exports.category = common.CATEGORY_RENDERER
 module.exports.init = (globalConfig, state, ui) ->
     @globalConfig = globalConfig
 
-module.exports.onUiInit = (elements) ->
+module.exports.initUi = (elements) ->
     elements.sceneGraphContainer.innerHTML = 'Scene Graph'

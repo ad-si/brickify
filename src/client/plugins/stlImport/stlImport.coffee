@@ -106,7 +106,7 @@ addModelToState = (fileName, md5HashWithEnding, threeObject) ->
 # parses the binary geometry and adds it to the three scene,
 # returning the uuid of the three object
 addModelToThree = (optimizedModel) ->
-	geometry = stlLoader.convertToThreeGeometry optimizedModel, false
+	geometry = optimizedModel.convertToThreeGeometry()
 	objectMaterial = new THREE.MeshLambertMaterial(
 		{
 			color: globalConfigInstance.defaultObjectColor

@@ -29,7 +29,7 @@ exports.setState = (request, response) ->
 
 	#call callbacks, let them modify state
 
-	pluginHooks.updateState clientDiff, state
+	pluginHooks.onStateUpdate clientDiff, state
 
 	#send diff with our initial state to the client
 	serverDiff = diffpatch.diff oldState, state

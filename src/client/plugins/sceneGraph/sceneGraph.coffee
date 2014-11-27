@@ -56,12 +56,12 @@ module.exports.category = common.CATEGORY_RENDERER
 module.exports.init = (globalConfig, state, ui) ->
 	@globalConfig = globalConfig
 
-module.exports.updateState = (delta, _state) ->
+module.exports.onStateUpdate = (delta, _state) ->
 	state = _state
 	if uiInitialized
 		renderUi htmlElements
 
-module.exports.onUiInit = (elements) ->
+module.exports.initUi = (elements) ->
 	htmlElements = elements
 	uiInitialized = true
 	if state

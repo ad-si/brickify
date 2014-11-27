@@ -12,10 +12,10 @@ controls = null
 stats = null
 
 
-localRenderer = () ->
+localRenderer = (timestamp) ->
 	stats?.begin()
 	renderer.render scene, camera
-	pluginHooks.update3D()
+	pluginHooks.on3dUpdate timestamp
 	stats?.end()
 
 	requestAnimationFrame localRenderer

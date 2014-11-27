@@ -95,7 +95,7 @@ exports.sync = sync
 
 handleUpdatedState = (delta, curstate) ->
 	#Client plugins maybe modify state...
-	pluginHooks.updateState delta, curstate
+	pluginHooks.onStateUpdate delta, curstate
 
 	#sync back as long client plugins modify state
 	sync()

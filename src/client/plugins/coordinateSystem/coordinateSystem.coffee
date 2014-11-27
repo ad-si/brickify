@@ -21,6 +21,6 @@ module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
 # Generate the grid and the axis on 3d scene initialization
-module.exports.init3D = (threejsNode) ->
+module.exports.init3d = (threejsNode) ->
 	setupGrid(threejsNode, globalConfigInstance)
 	setupAxis(threejsNode, globalConfigInstance)

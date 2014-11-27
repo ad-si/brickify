@@ -14,7 +14,7 @@ html
                     tr
                         th Metric
                         each s in stats
-                            th= s.key
+                            th= s.variableName
                 tbody
                     tr
                         td
@@ -36,8 +36,13 @@ html
                             strong Avg
                         each s in stats
                             td= s.avg.toFixed(3)
+                    tr
+                        td
+                            strong Avg per 1000 Polys
+                        each s in stats
+                            td= s.avgPer1000Polys.toFixed(3)
 
-            h2 Individual Models
+            h2 Individual Models - absolute values
             table.table.table-striped.table-hover
                 thead
                     tr
@@ -48,6 +53,10 @@ html
                         th stl recalculated Normals
                         th stl Cleansing Time
                         th Optimization Time
+                        th #Polygons
+                        th #Points
+                        th is 2-manifold
+                        th 2-mnf check Time
                 tbody
                     each result in results
                         tr
@@ -58,4 +67,29 @@ html
                             td= result.stlRecalculatedNormals
                             td= result.stlCleansingTime + ' ms'
                             td= result.optimizationTime + ' ms'
+                            td= result.numPolygons
+                            td= result.numPoints
+                            td= result.isTwoManifold
+                            td= result.twoManifoldCheckTime  + ' ms'
+
+            h2 Individual Models - values relative to model size
+            p All metrics are relative to 1000 polygons
+            table.table.table-striped.table-hover
+                thead
+                    tr
+                        th Filename
+                        th #Polygons
+                        th stl Parsing Time
+                        th stl Cleansing Time
+                        th Optimization Time
+                        th 2-mnf check Time
+                tbody
+                each result in results
+                    tr
+                        td= result.fileName
+                        td= result.numPolygons
+                        td= ((result.stlParsingTime / result.numPolygons) * 1000).toFixed(3) + ' ms'
+                        td= ((result.stlCleansingTime / result.numPolygons) * 1000).toFixed(3) + ' ms'
+                        td= ((result.optimizationTime / result.numPolygons) * 1000).toFixed(3)+ ' ms'
+                        td= ((result.twoManifoldCheckTime/ result.numPolygons) * 1000).toFixed(3)  + ' ms'
 

@@ -1,1 +1,3 @@
-console.log 'le Landingpage'
+stlDropper = require './stlDropper'
+
+stlDropper.init $('#dropzone'), $('#droptext')

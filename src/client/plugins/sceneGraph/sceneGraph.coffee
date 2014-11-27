@@ -33,6 +33,7 @@ renderUi = (elements) ->
 				treeNode.children[index] = {}
 				writeToObject treeNode.children[index], subNode
 
+	writeToObject(treeData[0], state.rootNode)
 
 	if $treeContainer.is(':empty')
 		$treeContainer.tree {
@@ -43,7 +44,6 @@ renderUi = (elements) ->
 		}
 
 	else
-		writeToObject(treeData[0], state.rootNode)
 		$treeContainer.tree 'loadData', treeData
 
 

@@ -1,20 +1,21 @@
 # Executes callback(child) for all subnodes
 forAllSubnodes = (node, callback, recursive = true) ->
-	for child in node.children?
-		callback child
-		if recursive
-			forAllSubnodes child, callback, recursive
+	if Array.isArray(node.children)
+		for child in node.children
+			callback child
+			if recursive
+				forAllSubnodes child, callback, recursive
 
 
 
 # Executes callback(childPluginData) for all subnodes
 # that have a pluginData entry matching to key
-forAllSubnodePluginData = (node, key, callback, recursive = true) ->
+forAllSubnodeProperties = (node, key, callback, recursive = true) ->
 	forAllSubnodes node, (child) ->
 		if child.pluginData[key]?
 			callback (child.pluginData[key])
 		if recursive
-			forAllSubnodePluginData child, key, callback, recursive
+			forAllSubnodeProperties child, key, callback, recursive
 
 
 #Adds an dataset which can be accessed with the specified key
@@ -31,7 +32,7 @@ class NodeStructure
 
 module.exports = {
 	forAllSubnodes: forAllSubnodes
-	forAllSubnodeProperties: forAllSubnodePluginData
+	forAllSubnodeProperties: forAllSubnodeProperties
 	addPluginData: addPluginData
 	NodeStructure: NodeStructure
 

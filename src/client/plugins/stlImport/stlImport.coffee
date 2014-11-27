@@ -38,7 +38,6 @@ module.exports.updateState = (delta, state) ->
 		pluginPropertyName, (property) ->
 			storedUuid = property.threeObjectUuid
 			threeObject = threejsRootNode.getObjectById storedUuid, true
-
 			if not threeObject?
 				loadModelFromCache property
 

@@ -28,7 +28,6 @@ module.exports = (globalConfig) ->
 
 		init: ->
 			renderer.init(globalConfig)
-			fileLoader.init()
 
 			# event listener
 			renderer.getDomElement().addEventListener(

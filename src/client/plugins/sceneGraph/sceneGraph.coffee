@@ -13,7 +13,6 @@ htmlElements = null
 
 renderUi = (elements) ->
 
-
 	$treeContainer = $(elements.sceneGraphContainer)
 	idCounter = 1
 	treeData = [{
@@ -22,11 +21,10 @@ renderUi = (elements) ->
 		children: []
 	}]
 
-
 	writeToObject = (treeNode, node) ->
 
 		treeNode.label = node.pluginData['stlImport']?.fileName or
-			treeNode.label or 'test'
+			treeNode.label or ''
 		treeNode.id = idCounter++
 
 		if node.children
@@ -46,11 +44,6 @@ renderUi = (elements) ->
 
 	else
 		writeToObject(treeData[0], state.rootNode)
-
-		console.log(state.rootNode)
-		console.log(JSON.stringify(treeData[0], null, 4))
-		console.log($treeContainer.tree('getNodeById', 1))
-
 		$treeContainer.tree 'loadData', treeData
 
 

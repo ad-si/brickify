@@ -23,8 +23,8 @@ renderUi = (elements) ->
 
 	writeToObject = (treeNode, node) ->
 
-		treeNode.label = node.pluginData['stlImport']?.fileName or
-			treeNode.label or ''
+		treeNode.label = treeNode.title = node
+			.pluginData['stlImport']?.fileName or treeNode.label or ''
 		treeNode.id = idCounter++
 
 		if node.children
@@ -37,10 +37,12 @@ renderUi = (elements) ->
 
 	if $treeContainer.is(':empty')
 		$treeContainer.tree {
+			autoOpen: 0
 			data: treeData
 			dragAndDrop: true
 			keyboardSupport: false
 			useContextMenu: false
+			onCreateLi: (node, $li) -> $li.attr('title', node.title)
 		}
 
 	else

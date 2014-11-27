@@ -34,7 +34,7 @@ module.exports.category = common.CATEGORY_CONVERTER
 module.exports.init = () ->
 	statesync.getState(setState)
 
-module.exports.init3D = (threejsNode) ->
+module.exports.init3d = (threejsNode) ->
 	threejsRootNode = threejsNode
 
 module.exports.initUi = (elements) ->
@@ -72,7 +72,7 @@ layout = () ->
 startVoxelisation = () ->
 	if stateInstance
 		#todo, handle if stateInstance undefined
-		for node in stateInstance.rootNode.childNodes
+		for node in stateInstance.rootNode.children
 			console.log node
 			modelCache.requestOptimizedMeshFromServer node.pluginData.stlImport.meshHash,
 			(modelInstance) ->

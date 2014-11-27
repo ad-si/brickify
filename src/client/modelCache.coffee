@@ -30,7 +30,7 @@ submitMeshToServer = (md5hash, fileEnding, data) ->
 			success: () ->
 				console.log 'sent model to the server'
 			error: () ->
-				console.log 'unable to send model to the server'
+				console.error 'unable to send model to the server'
 module.exports.submitMeshToServer = submitMeshToServer
 
 # Same as submit mesh to server, but the optimized model instance will be cached

@@ -1,6 +1,9 @@
 BrickLayouter = require './BrickLayouter'
 
-
+SelectType =
+  brick: 'brick'
+  custom: 'custom'
+  unconfirmed: 'unconfirmed'
 
 # Represent a classical Brick of the Bricksystem
 ids = 0

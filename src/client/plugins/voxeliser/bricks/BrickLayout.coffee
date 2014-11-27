@@ -92,8 +92,8 @@ class BrickLayout
     for x in [0...brick.extend.x] by 1
       for y in [0...brick.extend.y] by 1
         for z in [0...brick.extend.z] by 1
-          @grid[x + brick.position.x][y + brick.position.y]
-          [z + brick.position.z] = brick
+          @grid[x + brick.position.x][y + brick.position.y][z +
+            brick.position.z] = brick
 
     brick
 

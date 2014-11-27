@@ -96,14 +96,15 @@ class BrickLayouter
     # @preprocessHeightsBlockwise(@layout.all_bricks)
 
     @layoutInitially()
-    log 'Initial layout done. Remaining bricks: ' + @layout.get_BrickCount()
+    console.log 'Initial layout done. Remaining bricks: ' +
+      @layout.get_BrickCount()
 
     if @layout.extend.z > 1
       @fixOverhangingBricks(200)
       @fixWeakBricks(10)
       @fixOverhangingBricks(200)
 
-    log 'Finished layouting.'
+    console.log 'Finished layouting.'
 
 
   initHeights: ->
@@ -214,7 +215,7 @@ class BrickLayouter
           uppers.push br
 
       if not uppers.length == height - 1
-        log 'ERROR: Merging layers went wrong.'
+        console.log 'ERROR: Merging layers went wrong.'
 
       newBrick = @merge brick, uppers
       newBricks.push newBrick
@@ -243,9 +244,9 @@ class BrickLayouter
 
     numOverhanging = badBricks['overhanging'].length
     if numOverhanging == 0
-      log 'SUCCESS: Model buildable, no overhanging bricks'
+      console.log 'SUCCESS: Model buildable, no overhanging bricks'
     else
-      log 'Stop fixing overhanging bricks. Still ' + numOverhanging +
+      console.log 'Stop fixing overhanging bricks. Still ' + numOverhanging +
         ' overhanging bricks after ' + maxIterations + ' iterations.'
 
 
@@ -255,10 +256,10 @@ class BrickLayouter
     badBricks = @fixBricks(badBricks, 1, maxIterations)
     numWeak = badBricks['weak'].length
     if numWeak == 0
-      log 'SUCCESS: No weak bricks found in the model'
+      console.log 'SUCCESS: No weak bricks found in the model'
     else
-      log 'Stop fixing weak bricks. Still ' + numWeak + ' weak bricks after ' +
-        maxIterations + ' iterations.'
+      console.log 'Stop fixing weak bricks. Still ' + numWeak +
+        ' weak bricks after ' + maxIterations + ' iterations.'
 
 
 
@@ -266,10 +267,10 @@ class BrickLayouter
     if 'overhanging' of badBricks and
     badBricks['overhanging'].length > 0 and
     iteration <= maxIterations
-      log 'Try fixing ' + badBricks['overhanging'].length +
+      console.log 'Try fixing ' + badBricks['overhanging'].length +
         ' overhanging bricks: Iteration ' + iteration
       @tryFixOverlappers(badBricks)
-      log 'Overhanging bricks fix iteration: ' + iteration +
+      console.log 'Overhanging bricks fix iteration: ' + iteration +
         ' complete. Total bricks: ' + @layout.get_BrickCount() + ' bricks'
 
       badBricks = @findOverhangingBricks()
@@ -284,11 +285,11 @@ class BrickLayouter
     else if 'weak' of badBricks and
     badBricks['weak'].length > 0 and
     iteration <= maxIterations
-      log 'Try fixing ' + badBricks['weak'].length +
+      console.log 'Try fixing ' + badBricks['weak'].length +
         ' weak bricks: Iteration ' + iteration
-      log badBricks['weak']
+      console.log badBricks['weak']
       @tryFixWeakPoints(badBricks)
-      log 'Weak bricks fix iteration: ' + iteration +
+      console.log 'Weak bricks fix iteration: ' + iteration +
         ' complete. Remaining bricks: ' + @layout.get_BrickCount() + ' bricks'
 
       badBricks = @findWeakArticulationBricks()

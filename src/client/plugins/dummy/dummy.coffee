@@ -59,8 +59,19 @@ module.exports.init = (globalConfig) ->
 # @memberOf dummyClientPlugin
 # @see pluginLoader
 ###
-module.exports.init3d = (threejsNode) ->
+module.exports.init3D = (threejsNode) ->
 	console.log 'Dummy Client Plugin initializes 3d'
+
+###
+# Provides the plugins the possibility to add elements to the UI.
+# Receives a DOM element to insert itself into.
+#
+# @param {Object} domElements an object of DOM elements to insert itself into
+# @memberOf dummyClientPlugin
+# @see pluginLoader
+###
+module.exports.onUiInit = (domElements) ->
+	console.log 'Dummy Client Plugin initializes UI'
 
 ###
 # The state synchronization module will call each plugin's
@@ -84,7 +95,21 @@ module.exports.updateState = (delta, state) ->
 # method of all plugins that provide it. There are no arguments passed.
 #
 # @memberOf dummyClientPlugin
-# @see render
+# @see renderer
 ###
 module.exports.update3D = ->
 	return undefined
+
+###
+# When a file is loaded into lowfab, the `fileLoader` will try to import it with
+# every plugin that implements importFile until one succeeds. The file's name
+# and its content are provided as arguments.
+#
+# @param {String} fileName the name of the file to import
+# @param {String} fileContent the content of the file to import
+# @memberOf dummyClientPlugin
+# @see fileLoader
+###
+module.exports.importFile = (fileName, fileContent) ->
+	console.log 'Dummy Client Plugin imports a file'
+

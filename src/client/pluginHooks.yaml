@@ -16,6 +16,22 @@
 
 - init
 
+#  ## 3D scene initialization
+#
+#  Each plugin that provides a `init3D` method is able to initialize its 3D
+#  rendering there and receives a three.js node as argument.
+#
+#  If the plugin needs its node for later use it has to store it in `init3D`
+#  because it won't be handed the node again later.
+
+- init3D
+
+# ## UI Initalization
+#
+# `onUiInit` provides the plugins the possibility to add elements to the UI.
+# Receives a object with DOM elements to insert itself into.
+
+- onUiInit
 
 #  ## State synchronization
 #
@@ -28,18 +44,6 @@
 
 - updateState
 
-
-#  ## 3D scene initialization
-#
-#  Each plugin that provides a `init3D` method is able to initialize its 3D
-#  rendering there and receives a three.js node as argument.
-#
-#  If the plugin needs its node for later use it has to store it in `init3D`
-#  because it won't be handed the node again later.
-
-- init3D
-
-
 #  ## 3D scene update and animation
 #
 #  On each render frame the [renderer](render.html) will call the `update3D`
@@ -50,15 +54,7 @@
 #  ## File import
 #
 #  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
-#  try to import it with every plugin that implements importFile until one
-#  succeeds.
+#  try to import it with every plugin that implements `importFile` until one
+#  succeeds. The file's name and its content are provided as arguments.
 
 - importFile
-
-
-# ## UI Initalization
-#
-# Provides the plugins the possibility to add elements to the UI.
-# Receives a DOM element to insert itself into.
-
-- onUiInit

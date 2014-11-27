@@ -1,3 +1,7 @@
+###
+# @module fileLoader
+###
+
 pluginHooks = require '../common/pluginHooks'
 
 fileReader = new FileReader()

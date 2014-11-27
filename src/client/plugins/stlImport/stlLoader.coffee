@@ -10,6 +10,9 @@ module.exports.parse = (fileContent, errorCallback,
 												cleanse = true) ->
 	model = null
 
+	if fileContent.length == 0
+		return null
+
 	startsWithSolid = false
 	hasFacet = false
 	hasVertex = false
@@ -85,6 +88,9 @@ parseAscii = (fileContent) ->
 				if (!(nx?) || !(ny?) || !(nz?))
 					stl.addError "Invalid normal definition: (#{nx}, #{ny}, #{nz})"
 				else
+					if not (currentPoly?)
+						stl.addError 'normal definition without an existing polygon'
+						currentPoly = new StlPoly()
 					currentPoly.setNormal new Vec3(nx,ny,nz)
 			when 'vertex'
 				vx = parseFloat astl.nextText()
@@ -94,6 +100,9 @@ parseAscii = (fileContent) ->
 				if (!(vx?) || !(vy?) || !(vz?))
 					stl.addError "Invalid vertex definition: (#{nx}, #{ny}, #{nz})"
 				else
+					if not (currentPoly?)
+						stl.addError 'point definition without an existing polygon'
+						currentPoly = new StlPoly()
 					currentPoly.addPoint new Vec3(vx, vy, vz)
 	return stl
 

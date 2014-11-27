@@ -169,12 +169,15 @@ module.exports.setupRouting = () ->
 
 	app.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?
-			if not (request.body.ref.indexOf("develop") >= 0 or request.body.ref.indexOf("master") >= 0)
-				log.debug 'Got a server restart command, but "ref" did not contain develop or master'
+			ref = request.body.ref
+			if not (ref.indexOf('develop') >= 0 or ref.indexOf('master') >= 0)
+				log.debug 'Got a server restart command, but "ref" ' +
+									'did not contain develop or master'
 				response.send ''
 				return
 		else
-			log.warn 'Got a server restart command without a "ref" json member from ' + request.connection.remoteAddress
+			log.warn 'Got a server restart command without a "ref" ' +
+								'json member from ' + request.connection.remoteAddress
 			response.send ''
 			return
 

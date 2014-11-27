@@ -73,7 +73,8 @@ startVoxelisation = () ->
 	if stateInstance
 		#todo, handle if stateInstance undefined
 		for node in stateInstance.rootNode.childNodes
-			modelCache.requestOptimizedMeshFromServer node.pluginData[0].value.meshHash,
+			console.log node
+			modelCache.requestOptimizedMeshFromServer node.pluginData.stlImport.meshHash,
 			(modelInstance) ->
 				Lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
 				Lego.add_BrickTypes [

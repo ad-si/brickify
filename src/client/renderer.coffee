@@ -45,7 +45,7 @@ module.exports.init = (globalConfig) ->
 setupRenderer = (globalConfig) ->
 	renderer = new THREE.WebGLRenderer(
 		alpha: true
-		antialiasing: true
+		antialias: true
 		preserveDrawingBuffer: true
 	)
 	renderer.setSize window.innerWidth, window.innerHeight

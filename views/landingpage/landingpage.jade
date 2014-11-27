@@ -7,6 +7,10 @@ block content
 	include landingpageTabs
 
 block scripts
+	//include all general scripts
 	if scripts
 		each path in scripts
 			script(src=path)
+
+	//include landingpage script
+	script(src='landingpage.js')

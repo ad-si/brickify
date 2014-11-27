@@ -101,8 +101,6 @@ module.exports.loadFrontendDependencies = (callback) ->
 				getDependencyPath dependencies[element].filter(isJs)[0]
 			else
 				getDependencyPath dependencies[element]
-		links.scripts.push('index.js')
-
 		callback()
 
 
@@ -129,7 +127,10 @@ module.exports.setupRouting = () ->
 			.import 'nib'
 	)
 
-	app.get '/index.js', browserify('src/client/main.coffee', {
+	app.get '/app.js', browserify('src/client/main.coffee', {
+		extensions: ['.coffee']
+	})
+	app.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
 	app.use express.static('public')

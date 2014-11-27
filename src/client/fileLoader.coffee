@@ -16,7 +16,6 @@ readFile = (file) ->
 
 loadFile = (filename) -> (event) ->
 	fileContent = event.target.result
-	console.log filename, ' load'
 
 	for loader in pluginHooks.get 'importFile'
 		optimizedModel = loader filename, fileContent

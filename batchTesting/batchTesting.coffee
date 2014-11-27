@@ -54,7 +54,7 @@ parseModelFiles = () ->
 		models = []
 
 		for file in files
-			if file.toLowerCase().indexOf('.stl') > 0
+			if path.extname(file).toLowerCase() == '.stl'
 				models.push file
 
 		return models

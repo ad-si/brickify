@@ -20,7 +20,7 @@ module.exports.generateReport = (data, outPath, outFileName) ->
 		JSON.stringify stats
 
 generateDateTimeString = () ->
-	d = new Date()
-	s = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
-	s += '-' + d.getHours() + '' + d.getMinutes()
-	return s
+	new Date()
+		.toJSON()
+		.slice(0,-8)
+		.replace(':','') + 'Z'

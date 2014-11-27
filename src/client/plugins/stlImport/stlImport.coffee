@@ -38,7 +38,6 @@ module.exports.updateState = (delta, state) ->
 		pluginPropertyName, (property) ->
 			storedUuid = property.threeObjectUuid
 			threeObject = threejsRootNode.getObjectById storedUuid, true
-
 			if not threeObject?
 				loadModelFromCache property
 
@@ -59,9 +58,9 @@ loadModelFromCache = (property) ->
 # and adds it to the scene as a THREE.Geometry
 module.exports.importFile = (fileName, fileContent) ->
 	errorCallback = (errors) ->
-		console.log 'Errors occured while importing the stl file:'
+		console.error 'Errors occured while importing the stl file:'
 		for error in errors
-			console.log '-> ' + error
+			console.error '-> ' + error
 	optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
 
 	# happens with empty files
@@ -74,7 +73,7 @@ module.exports.importFile = (fileName, fileContent) ->
 	fileEnding = 'optimized'
 	if stateSync?
 		loadModelCallback = (state) ->
-			node = objectTree.addChildNode state.rootNode
+			node = objectTree.addChild state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property
 			property.fileName = fileName

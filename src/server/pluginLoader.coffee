@@ -47,10 +47,10 @@ loadPlugin = (entry) ->
 			log.info "Plugin '#{instance.pluginName}' (#{pluginMain}) loaded"
 		else
 			if instance.pluginName?
-				console.log "Plugin #{instance.pluginName} (#{pluginMain})
+				console.warn "Plugin #{instance.pluginName} (#{pluginMain})
 				does not contain all necessary methods and will not be loaded"
 			else
-				console.log "Plugin *name missing* (#{pluginMain})
+				console.warn "Plugin *name missing* (#{pluginMain})
 				does not contain all necessary methods and will not be loaded"
 
 checkForPluginMethods = (object) ->

@@ -37,7 +37,7 @@ module.exports.init = () ->
 module.exports.init3D = (threejsNode) ->
 	threejsRootNode = threejsNode
 
-module.exports.onUiInit = (elements) ->
+module.exports.initUi = (elements) ->
 	elements.toolsContainer.innerHTML =
 		'<button id="voxeliseButton" type="button"
 		class="btn btn-default">Voxelise</button>

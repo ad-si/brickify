@@ -16,9 +16,9 @@
 #  ##State synchronization##
 #
 #  The [state synchronization module](statesync.html) will call each plugin's
-#  `updateState` method (if provided) whenever the current state changes
+#  `onStateUpdate` method (if provided) whenever the current state changes
 #  due to user input or calculation results on either server or client side.
 #
 #  The hook provides both the delta to the previous state and the new complete
 #  state as arguments.
-- updateState
+- onStateUpdate

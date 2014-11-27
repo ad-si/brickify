@@ -13,7 +13,7 @@
 # the interaction between the lowfab framework and the plugin.
 #
 # Those **hooks** have to be defined in `module.exports`, e.g.
-# `module.exports.pluginName` or `module.exports.update3D()`.
+# `module.exports.pluginName` or `module.exports.on3dUpdate()`.
 #
 # @module dummyClientPlugin
 ###
@@ -49,10 +49,10 @@ module.exports.init = (globalConfig) ->
 	console.log 'Dummy Client Plugin initialization'
 
 ###
-# Each plugin that provides a `init3D` method is able to initialize its 3D
+# Each plugin that provides a `init3d` method is able to initialize its 3D
 # rendering there and receives a three.js node as argument.
 #
-# If the plugin needs its node for later use it has to store it in `init3D`
+# If the plugin needs its node for later use it has to store it in `init3d`
 # because it won't be handed the node again later.
 #
 # @param {ThreeJsNode} threejsNode the plugin's node in the 3D-scenegraph
@@ -61,6 +61,17 @@ module.exports.init = (globalConfig) ->
 ###
 module.exports.init3d = (threejsNode) ->
 	console.log 'Dummy Client Plugin initializes 3d'
+
+###
+# Provides the plugins the possibility to add elements to the UI.
+# Receives a DOM element to insert itself into.
+#
+# @param {Object} domElements an object of DOM elements to insert itself into
+# @memberOf dummyClientPlugin
+# @see pluginLoader
+###
+module.exports.initUi = (domElements) ->
+	console.log 'Dummy Client Plugin initializes UI'
 
 ###
 # The state synchronization module will call each plugin's
@@ -75,16 +86,33 @@ module.exports.init3d = (threejsNode) ->
 # @memberOf dummyClientPlugin
 # @see stateSynchronization
 ###
-module.exports.updateState = (delta, state) ->
+module.exports.onStateUpdate = (delta, state) ->
 	console.log 'Dummy Client Plugin state change'
 
 
 ###
 # On each render frame the renderer will call the `update3D`
-# method of all plugins that provide it. There are no arguments passed.
+# method of all plugins that provide it.
 #
 # @memberOf dummyClientPlugin
-# @see render
+# @param {DOMHighResTimeStamp} timestamp the current time
+# @see renderer
+# @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
 ###
-module.exports.update3D = ->
+module.exports.on3dUpdate = (timestamp) ->
 	return undefined
+
+###
+# When a file is loaded into lowfab, the `fileLoader` will try to import it with
+# every plugin that implements importFile until one succeeds. The file's name
+# and its content are provided as arguments.
+#
+# @param {String} fileName the name of the file to import
+# @param {String} fileContent the content of the file to import
+# @memberOf dummyClientPlugin
+# @see fileLoader
+###
+module.exports.importFile = (fileName, fileContent) ->
+	console.log 'Dummy Client Plugin imports a file'
+	return undefined
+

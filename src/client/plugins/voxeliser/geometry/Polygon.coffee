@@ -93,7 +93,6 @@ class Polygon
 
 
 	set_Color: (@color) ->
-		console.log @color
 		if !@render_Faces?
 			return null
 		for face in @render_Faces

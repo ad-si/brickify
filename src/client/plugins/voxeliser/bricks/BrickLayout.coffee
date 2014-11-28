@@ -6,7 +6,7 @@ class BrickLayout
   constructor: (@brickSpaceGrid) ->
     @bricksystem = @brickSpaceGrid.bricksystem
     @extend = @brickSpaceGrid.brick_extend
-    @color = @brickSpaceGrid.color
+    @colorPalette = @brickSpaceGrid.colorPalette
     @model = null
     @all_bricks = []
     @grid = new Array(@extend.x)
@@ -68,7 +68,7 @@ class BrickLayout
   add_BasicBrick_by: (brickspace) ->
     brick = @.add_BasicBrick_for brickspace.x, brickspace.y, brickspace.z
     if @scene_Model
-      brick.set_Default_Color @color
+      brick.set_Default_Color @colorPalette
       @scene_Model.add brick.get_SceneModel()
       brick
 
@@ -125,14 +125,14 @@ class BrickLayout
 
   restore_DefaultView: () ->
     for brick in @.all_bricks
-      brick.set_Default_Color @color
+      brick.set_Default_Color @colorPalette
       brick.update_SceneModel()
 
   build_SceneModel: () ->
     mesh = new THREE.Mesh()
     mesh.position = @brickSpaceGrid.position
     for brick in @all_bricks
-      brick.set_Default_Color @color
+      brick.set_Default_Color @colorPalette
       model =  brick.get_SceneModel()
       mesh.add model
       if brick.hidden

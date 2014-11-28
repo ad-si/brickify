@@ -1,6 +1,8 @@
 BrickSpace = require './BrickSpace'
 Object3D = require '../geometry/Object3D'
 Vector3D = require '../geometry/Vector3D'
+ColorPalette = require '../rendering/ColorPalette'
+
 
 class BrickSpaceGrid
   constructor: (boundaryBox, @bricksystem) ->
@@ -23,6 +25,8 @@ class BrickSpaceGrid
     @outer_Bricks = []
     @inner_Bricks = []
 
+    @colorPalette = ColorPalette.default()
+
     @grid = new Array(@brick_extend.x)
 
     for x in [0..@brick_extend.x]
@@ -32,7 +36,7 @@ class BrickSpaceGrid
         @grid[x][y] = new Array(@brick_extend.z)
         @grid[x][y].range = {bricks: [], minZ: null, maxZ: null}
 
-  set_Color: (@color) ->
+  set_Color: (@colorPalette) ->
     return
 
   update_Inner_Relation: () ->

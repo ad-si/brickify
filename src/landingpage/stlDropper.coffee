@@ -59,7 +59,7 @@ handleLoadedFile = (filename) ->
 
 		uploadFinishedCallback = (md5, fileEnding) ->
 			modelhash = md5 + '.' + fileEnding
-			if importError
+			if importErrors
 				modelhash += '+errors'
 			document.location.href += 'quickconvert#' + modelhash
 			return

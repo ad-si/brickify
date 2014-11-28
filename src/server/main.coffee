@@ -133,6 +133,9 @@ module.exports.setupRouting = () ->
 	app.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
+	app.get '/quickconvert.js', browserify('src/quickconvert/main.coffee', {
+		extensions: ['.coffee']
+	})
 	app.use express.static('public')
 	app.use('/node_modules', express.static('node_modules'))
 

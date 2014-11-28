@@ -4,6 +4,10 @@ block content
         h1 Lowfab quick convert
         p.
             We think that you might like these conversions. You can download them directly or refine them using our online editor
+        .alert.alert-warning#importerrors
+            | The file you provided contains some errors. We tried to import it, but the 3d-model might be broken. Please use Meshlab or other software to&nbsp;
+            a(target='_blank',href='https://www.google.com/search?q=fix+3d+model') fix
+            | &nbsp;your 3d-model.
         .row
             .col-lg-4
                 h3
@@ -40,3 +44,5 @@ block scripts
     if scripts
         each path in scripts
             script(src=path)
+    //load quickconvert script
+    script(src='quickconvert.js')

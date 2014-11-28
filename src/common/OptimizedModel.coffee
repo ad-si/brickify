@@ -55,6 +55,9 @@ class OptimizedModel
 		return @_isTwoManifold
 
 	toBase64: () ->
+		if @_b64String?
+			return @_b64String
+
 		posA = new Float32Array(@positions.length)
 		for i in [0..@positions.length - 1]
 			posA[i] = @positions[i]
@@ -83,8 +86,10 @@ class OptimizedModel
 		fnBase = @arrayBufferToBase64 fnA.buffer
 		baseString += fnBase
 
-		return baseString
+		@_b64String = baseString
+		return @_b64String
 	fromBase64: (base64String) ->
+		@_b64String = base64String
 		strArray = base64String.split '|'
 
 		@positions = @base64ToFloat32Array strArray[0]

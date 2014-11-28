@@ -1,0 +1,8 @@
+extends ../layoutWithoutNavbar
+block content
+    h1 Quick convert
+block scripts
+    //include all general scripts
+    if scripts
+        each path in scripts
+            script(src=path)

@@ -163,6 +163,7 @@ module.exports.setupRouting = () ->
 	landingPage.setLinks links
 
 	app.get '/', landingPage.getLandingpage
+	app.get '/quickconvert', urlParser, landingPage.getQuickConvertPage
 	app.get '/app', index(links)
 	app.get '/statesync/get', jsonParser, statesync.getState
 	app.post '/statesync/set', jsonParser, statesync.setState

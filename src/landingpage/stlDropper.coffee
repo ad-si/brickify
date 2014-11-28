@@ -1,4 +1,10 @@
+stlLoader = require '../client/plugins/stlImport/stlLoader.coffee'
+md5 = require 'md5'
+modelCache = require '../client/modelCache'
+
 droptext = null
+readingString = 'Reading file
+<img src="img/spinner.gif" style="height: 1.2em;">'
 uploadString = 'Uploading file
 <img src="img/spinner.gif" style="height: 1.2em;">'
 
@@ -25,17 +31,44 @@ onModelDrop = (event) ->
 
 		fn = file.name.toLowerCase()
 		if (fn.search('.stl') == fn.length - 4)
-			droptext.html uploadString
+			droptext.html readingString
 			loadFile file
 		else
 			alert 'Only .stl files are supported at the moment'
 
 loadFile = (file) ->
 	reader = new FileReader()
-	reader.onLoad = handleLoadedFile
+	reader.onload = handleLoadedFile(file.name)
 	reader.readAsBinaryString(file)
 
 
-handleLoadedFile = (content) ->
-	console.log 'File loaded!'
-	return
+handleLoadedFile = (filename) ->
+	loadCallback = 	(event) ->
+		console.log "File #{filename} loaded"
+		fileContent = event.target.result
+		importErrors = false
+		errorCallback = () ->
+			importErrors = true
+
+		optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
+		# happens with empty files
+		if !optimizedModel
+			alert 'Error loading .stl file'
+
+		droptext.html uploadString
+
+		uploadFinishedCallback = (md5, fileEnding) ->
+			modelhash=md5 + '.' + fileEnding
+			if importErrors
+				modelhash += '+errors'
+
+			document.location.href = document.location.href  + 'quickconvert#' + modelhash
+			return
+
+		base64Optimized = optimizedModel.toBase64()
+		md5hash = md5(base64Optimized)
+		modelCache.submitMeshToServer md5hash,
+			'optimized', base64Optimized, uploadFinishedCallback
+
+		return
+	return loadCallback

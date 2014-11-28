@@ -18,10 +18,15 @@ currentOptimizedModelQueries = []
 # sends the model to the server if the server hasn't got a file
 # with the same file ending and md5 value
 # model will be cached locally
-submitMeshToServer = (md5hash, fileEnding, data) ->
+submitMeshToServer = (md5hash, fileEnding, data, successCallback) ->
 	addModelToCache md5hash + '.' + fileEnding, data
 
-	$.get('/model/exists/' + md5hash + '/' + fileEnding).fail () ->
+	$.get('/model/exists/' + md5hash + '/' + fileEnding)
+	.success () ->
+		console.log 'Server already has mdel'
+		if successCallback?
+			successCallback md5hash, fileEnding
+	.fail () ->
 		#server hasn't got the model, send it
 		$.ajax '/model/submit/' + md5hash + '/' + fileEnding,
 			data: data
@@ -29,16 +34,18 @@ submitMeshToServer = (md5hash, fileEnding, data) ->
 			contentType: 'application/octet-stream'
 			success: () ->
 				console.log 'sent model to the server'
+				if successCallback?
+					successCallback md5hash, fileEnding
 			error: () ->
 				console.error 'unable to send model to the server'
 module.exports.submitMeshToServer = submitMeshToServer
 
 # Same as submit mesh to server, but the optimized model instance will be cached
-submitOptimizedMeshToServer = (md5hash, fileEnding, optimizedModelInstance) ->
+submitOptimizedMeshToServer = (md5hash, fileEnding, optimizedModelInstance, successCallback) ->
 	addOptimizedInstance md5hash + '.' + fileEnding, optimizedModelInstance
 	serialized = optimizedModelInstance.toBase64()
 
-	submitMeshToServer md5hash,fileEnding, optimizedModelInstance
+	submitMeshToServer md5hash,fileEnding, optimizedModelInstance, successCallback
 module.exports.submitOptimizedMeshToServer = submitOptimizedMeshToServer
 
 # requests a mesh with the given md5hash.ending from the server

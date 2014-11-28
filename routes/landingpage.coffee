@@ -7,3 +7,6 @@ module.exports.setLinks = (_links) ->
 
 module.exports.getLandingpage = (request, response) ->
 	response.render path.join('landingpage','landingpage'), links
+
+module.exports.getQuickConvertPage = (request, response) ->
+	response.render path.join('landingpage','quickconvert'), links

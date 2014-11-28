@@ -127,3 +127,25 @@ statesync.init globalConfig, (state) ->
 	objectTree.init state
 	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()
+
+	#look at url hash and run commands
+	hash = window.location.hash
+	hash = hash.substring 1, hash.length
+	commands = hash.split '+'
+	for cmd in commands
+		key = cmd.split('=')[0]
+		value = cmd.split('=')[1]
+		if commandProcesses[key]?
+			commandProcesses[key](state, value)
+
+	#clear url hash after executing commands
+	window.location.hash = ''
+
+
+
+commandProcesses = {
+	initialModel: (state, value) ->
+		console.log 'loading initial model'
+}
+
+

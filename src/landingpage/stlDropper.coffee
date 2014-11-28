@@ -58,11 +58,10 @@ handleLoadedFile = (filename) ->
 		droptext.html uploadString
 
 		uploadFinishedCallback = (md5, fileEnding) ->
-			modelhash=md5 + '.' + fileEnding
-			if importErrors
+			modelhash = md5 + '.' + fileEnding
+			if importError
 				modelhash += '+errors'
-
-			document.location.href = document.location.href  + 'quickconvert#' + modelhash
+			document.location.href += 'quickconvert#' + modelhash
 			return
 
 		base64Optimized = optimizedModel.toBase64()

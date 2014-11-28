@@ -41,7 +41,8 @@ submitMeshToServer = (md5hash, fileEnding, data, successCallback) ->
 module.exports.submitMeshToServer = submitMeshToServer
 
 # Same as submit mesh to server, but the optimized model instance will be cached
-submitOptimizedMeshToServer = (md5hash, fileEnding, optimizedModelInstance, successCallback) ->
+submitOptimizedMeshToServer = (md5hash, fileEnding,
+															 optimizedModelInstance, successCallback) ->
 	addOptimizedInstance md5hash + '.' + fileEnding, optimizedModelInstance
 	serialized = optimizedModelInstance.toBase64()
 

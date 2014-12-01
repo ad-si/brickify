@@ -18,12 +18,12 @@ currentOptimizedModelQueries = {}
 # sends the model to the server if the server hasn't got a file
 # with the same file ending and md5 value
 # model will be cached locally
-submitMeshToServer = (md5hash, fileEnding, data) ->
-	addModelToCache md5hash + '.' + fileEnding, data
+submitMeshToServer = (hash, fileEnding, data) ->
+	addModelToCache hash + '.' + fileEnding, data
 
-	$.get('/model/exists/' + md5hash + '/' + fileEnding).fail () ->
+	$.get('/model/exists/' + hash + '/' + fileEnding).fail () ->
 		#server hasn't got the model, send it
-		$.ajax '/model/submit/' + md5hash + '/' + fileEnding,
+		$.ajax '/model/submit/' + hash + '/' + fileEnding,
 			data: data
 			type: 'POST'
 			contentType: 'application/octet-stream'
@@ -34,11 +34,11 @@ submitMeshToServer = (md5hash, fileEnding, data) ->
 module.exports.submitMeshToServer = submitMeshToServer
 
 # Same as submit mesh to server, but the optimized model instance will be cached
-submitOptimizedMeshToServer = (md5hash, fileEnding, optimizedModelInstance) ->
-	addOptimizedInstance md5hash + '.' + fileEnding, optimizedModelInstance
+submitOptimizedMeshToServer = (hash, fileEnding, optimizedModelInstance) ->
+	addOptimizedInstance hash + '.' + fileEnding, optimizedModelInstance
 	serialized = optimizedModelInstance.toBase64()
 
-	submitMeshToServer md5hash,fileEnding, optimizedModelInstance
+	submitMeshToServer hash, fileEnding, optimizedModelInstance
 module.exports.submitOptimizedMeshToServer = submitOptimizedMeshToServer
 
 # requests a mesh with the given md5hash.ending from the server
@@ -101,18 +101,18 @@ requestOptimizedMeshFail = (query) -> () ->
 	fail() for fail in query.failCallbacks
 	deleteQuery query
 
-addModelToCache = (md5hashWithEnding, data) ->
-	modelCache[md5hashWithEnding] ?= {hash: md5hashWithEnding, data: data}
+addModelToCache = (hash, data) ->
+	modelCache[hash] ?= {hash: hash, data: data}
 
-getModelFromCache = (md5hashWithEnding) ->
-	modelCache[md5hashWithEnding]?.data
+getModelFromCache = (hash) ->
+	modelCache[hash]?.data
 
-addOptimizedInstance = (md5HashWithEnding, instance) ->
-	optimizedModelCache[md5HashWithEnding] ?=
-		{hash: md5HashWithEnding, data: instance}
+addOptimizedInstance = (hash, instance) ->
+	optimizedModelCache[hash] ?=
+		{hash: hash, data: instance}
 
-getOptimizedInstance = (md5HashWithEnding) ->
-	optimizedModelCache[md5HashWithEnding]?.data
+getOptimizedInstance = (hash) ->
+	optimizedModelCache[hash]?.data
 
 getQueryForOptimizedModel = (hash) ->
 	currentOptimizedModelQueries[hash] ?= {

@@ -71,6 +71,12 @@ voxeliseAllModels = () ->
 
 # voxelises a single model
 voxelise = (optimizedModel, node) ->
+	# check if model was already voxelised
+	for data in voxelisedModels
+		if data.node.pluginData.stlImport.meshHash is node.pluginData.stlImport.meshHash
+			console.warn 'already voxelised this model'
+			return
+
 	voxeliser ?= new Voxeliser
 	if not lego
 		lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
@@ -86,27 +92,25 @@ voxelise = (optimizedModel, node) ->
 	voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
 	voxelisedModels.push voxelisedData
 	threejsRootNode.add voxelisedData.gridForThree
-	console.log voxelisedModels
 
 #layouts all voxelised Models
 layout = () ->
 	if not voxelisedModels.length > 0
 		console.warn 'trying to layout, but no voxelisedModels available'
 	else
-		for data in voxelisedModels
-			layout = new BrickLayout(data.grid)
-			layouter = new BrickLayouter(layout)
+		for data in voxelisedModels when data.layout is null
+			legoLayout = new BrickLayout(data.grid)
+			layouter = new BrickLayouter(legoLayout)
 			layouter.layoutAll()
-			legoMesh = layout.get_SceneModel()
-			data.addLayout(layout, legoMesh)
+			legoMesh = legoLayout.get_SceneModel()
+			data.addLayout(legoLayout, legoMesh)
 
 			threejsRootNode.remove data.gridForThree
-			threejsRootNode.add legoMesh
-			console.log data
+			threejsRootNode.add data.layoutForThree
 
 # Helper Class that - after voxelising and layouting -
 # contains the voxelised grid, it's ThreeJS representation
 # and the ThreeJs
 class VoxeliserData
-	constructor: (@node, @grid, @gridForThree, @layout, @layoutForThree) -> return
+	constructor: (@node, @grid, @gridForThree, @layout = null, @layoutForThree = null) -> return
 	addLayout: (@layout, @layoutForThree) -> return

@@ -7,6 +7,7 @@ class OptimizedModel
 		@indices = []
 		@vertexNormals = []
 		@faceNormals = []
+		@originalFileName = 'unknown file'
 
 	# Checks whether the model is 2-manifold, meaning that each edge is connected
 	# to exactly two faces. This also implies that the mesh is a closed body
@@ -83,6 +84,8 @@ class OptimizedModel
 		fnBase = @arrayBufferToBase64 fnA.buffer
 		baseString += fnBase
 
+		baseString += '|' + @originalFileName
+
 		return baseString
 	fromBase64: (base64String) ->
 		strArray = base64String.split '|'
@@ -91,6 +94,7 @@ class OptimizedModel
 		@indices = new @base64ToInt32Array strArray[1]
 		@vertexNormals = @base64ToFloat32Array strArray[2]
 		@faceNormals = @base64ToFloat32Array strArray[3]
+		@originalFileName = strArray[4]
 	base64ToFloat32Array: (b64) ->
 		numFloats =  (base64ByteLength b64.length) / 4
 		result = new Float32Array(numFloats)

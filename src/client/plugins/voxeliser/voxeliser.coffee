@@ -72,9 +72,6 @@ voxeliseAllModels = () ->
 # voxelises a single model
 voxelise = (optimizedModel, node) ->
 	voxeliser ?= new Voxeliser
-
-	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-
 	if not lego
 		lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
 		lego.add_BrickTypes [

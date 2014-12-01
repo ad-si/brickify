@@ -116,6 +116,4 @@ getQueryForOptimizedModel = (hash) ->
 	}
 
 deleteQuery = (query) ->
-	index = currentOptimizedModelQueries.indexOf query.hash
-	unless index is -1
-		currentOptimizedModelQueries.splice index, 1
+	delete currentOptimizedModelQueries[query.hash]

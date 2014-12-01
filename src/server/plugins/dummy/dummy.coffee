@@ -10,5 +10,5 @@ module.exports.category = common.CATEGORY_DUMMY
 module.exports.init = () ->
 	logger.debug 'Dummy Server Folder-Plugin initialization'
 
-module.exports.onUpdateState = (delta, state) ->
+module.exports.onStateUpdate = (delta, state) ->
 	logger.debug 'Dummy Server Folder-Plugin state change'

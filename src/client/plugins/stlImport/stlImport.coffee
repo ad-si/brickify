@@ -67,23 +67,41 @@ module.exports.importFile = (fileName, fileContent) ->
 	if !optimizedModel
 		return
 
+	optimizedModel.originalFileName = fileName
+
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel
 	fileEnding = 'optimized'
+	addModelToState optimizedModel.originalFileName,
+		md5hash + '.' + fileEnding, threeObject
+	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
+	return optimizedModel
+
+# Loads an hash from the server and adds it to the state / three-geometry
+module.exports.importHash = (md5HashWithEnding) ->
+	successCallback = (optimizedModel) ->
+		threeObject = addModelToThree optimizedModel
+		addModelToState optimizedModel.originalFileName,
+			md5HashWithEnding, threeObject
+	failCallback = () ->
+		console.warn "Unable to load hash #{md5HashWithEnding} from Server"
+
+	modelCache.requestOptimizedMeshFromServer md5HashWithEnding,
+		successCallback, failCallback
+
+# adds a new model to the state
+addModelToState = (fileName, md5HashWithEnding, threeObject) ->
 	if stateSync?
 		loadModelCallback = (state) ->
 			node = objectTree.addChild state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property
 			property.fileName = fileName
-			property.meshHash = md5hash + '.' + fileEnding
+			property.meshHash = md5HashWithEnding
 			copyThreeDataToProperty property, threeObject
-
 		# call updateState on all client plugins and sync
 		stateSync.performStateAction loadModelCallback, true
-	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
-	optimizedModel
 
 # parses the binary geometry and adds it to the three scene,
 # returning the uuid of the three object

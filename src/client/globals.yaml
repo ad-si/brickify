@@ -30,3 +30,6 @@ gridLineWidth5: 1
 gridLineWidth10: 1
 gridSize: 200
 gridStepSize: 10
+
+# render DOM
+renderAreaId: 'renderArea'

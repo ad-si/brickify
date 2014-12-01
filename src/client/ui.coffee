@@ -9,7 +9,6 @@ fileLoader = require './fileLoader'
 
 module.exports = (globalConfig) ->
 	return {
-
 		dropHandler: (event) ->
 			event.stopPropagation()
 			event.preventDefault()

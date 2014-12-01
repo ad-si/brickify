@@ -52,7 +52,7 @@ setupRenderer = (globalConfig) ->
 	renderer.setClearColor 0xf6f6f6, 1
 	renderer.domElement.setAttribute 'id', 'canvas'
 	document
-	.getElementById('renderArea')
+	.getElementById(globalConfig.renderAreaId)
 	.appendChild renderer.domElement
 
 setupScene = (globalConfig) ->

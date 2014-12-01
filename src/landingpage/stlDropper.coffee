@@ -55,6 +55,8 @@ handleLoadedFile = (filename) ->
 		if !optimizedModel
 			alert 'Error loading .stl file'
 
+		optimizedModel.originalFileName = filename
+
 		droptext.html uploadString
 
 		uploadFinishedCallback = (md5, fileEnding) ->

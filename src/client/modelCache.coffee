@@ -10,10 +10,10 @@ OptimizedModel = require '../common/OptimizedModel'
 modelCache = {}
 
 # the cache for optimized model instances
-optimizedModelCache = []
+optimizedModelCache = {}
 
 # currently running model queries
-currentOptimizedModelQueries = []
+currentOptimizedModelQueries = {}
 
 # sends the model to the server if the server hasn't got a file
 # with the same file ending and md5 value

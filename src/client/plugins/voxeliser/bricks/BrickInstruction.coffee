@@ -49,8 +49,8 @@ class BrickInstruction
 			x = brick.position.x
 			y = brick.position.y
 			
-			ex = brick.extend.x
-			ey = brick.extend.y
+			ex = brick.extent.x
+			ey = brick.extent.y
 
 			z = brick.position.z
 
@@ -69,7 +69,7 @@ class BrickInstruction
 						if construction.includes lowBrick and not stop
 							deadlock = yes
 					stop = no
-					for dz in [layout.extend.z...z].reverse()
+					for dz in [layout.extent.z...z].reverse()
 						upBrick = grid[ex + x][ey + y][dz]
 						if not upBrick
 							stop = yes
@@ -173,7 +173,7 @@ class BrickInstruction
 	storeBricksLayerwise: ->
 		@sortedBricks = []
 
-		for layerId in [0...@layout.extend.z]
+		for layerId in [0...@layout.extent.z]
 			@sortedBricks.add @layout.get_BricksOfLayer(layerId)
 
 		handled_Bricks = []

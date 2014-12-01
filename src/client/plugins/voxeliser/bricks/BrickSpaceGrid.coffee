@@ -14,12 +14,12 @@ class BrickSpaceGrid
     @space.maxPoint.add(@bricksystem.dimension)
 
     @position = @space.minPoint
-    @extend = @space.get_Extent()
+    @extent = @space.get_Extent()
 
     @brick_position = @position.divide_by @bricksystem.dimension
     @brick_position.addScalar 1
-    @brick_extend = @extend.divide_by(@bricksystem.dimension).round(0)
-    @brick_extend.addScalar 1
+    @brick_extent = @extent.divide_by(@bricksystem.dimension).round(0)
+    @brick_extent.addScalar 1
 
     @all_bricks = []
     @outer_Bricks = []
@@ -27,13 +27,13 @@ class BrickSpaceGrid
 
     @colorPalette = ColorPalette.default()
 
-    @grid = new Array(@brick_extend.x)
+    @grid = new Array(@brick_extent.x)
 
-    for x in [0..@brick_extend.x]
-      @grid[x] = new Array(@brick_extend.y)
+    for x in [0..@brick_extent.x]
+      @grid[x] = new Array(@brick_extent.y)
 
-      for y in [0..@brick_extend.y]
-        @grid[x][y] = new Array(@brick_extend.z)
+      for y in [0..@brick_extent.y]
+        @grid[x][y] = new Array(@brick_extent.z)
         @grid[x][y].range = {bricks: [], minZ: null, maxZ: null}
 
   set_Color: (@colorPalette) ->
@@ -80,13 +80,13 @@ class BrickSpaceGrid
     if not brickSpace.get_Side_for('-z').neighbor
       flat = yes
 
-    extend = new Vector3D(1,1,1)
-    @bricksystem.build_Brick_for position, extend, flat
+    extent = new Vector3D(1,1,1)
+    @bricksystem.build_Brick_for position, extent, flat
 
 
   get_BrickSpace: (x,y,z) ->
-    if 0 <= x < @brick_extend.x and 0 <= y < @brick_extend.y and
-    0 <= z < @brick_extend.z
+    if 0 <= x < @brick_extent.x and 0 <= y < @brick_extent.y and
+    0 <= z < @brick_extent.z
       @grid[x][y][z]
     else
       console.warn 'Grid: Out of Range'
@@ -99,8 +99,8 @@ class BrickSpaceGrid
     @.get_BrickSpace_for x, y, z
 
   get_BrickSpace_for: (x,y,z) ->
-    if 0 <= x < @brick_extend.x and 0 <= y < @brick_extend.y and
-    0 <= z < @brick_extend.z
+    if 0 <= x < @brick_extent.x and 0 <= y < @brick_extent.y and
+    0 <= z < @brick_extent.z
       space = @grid[x][y][z]
       space = @.create_BrickSpace_for(x,y,z) if space == undefined
       space

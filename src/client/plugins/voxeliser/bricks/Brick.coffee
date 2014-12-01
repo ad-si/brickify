@@ -9,7 +9,7 @@ SelectType =
 ids = 0
 
 class Brick
-	constructor: (@layout, @bricksystem, @position, @extend) ->
+	constructor: (@layout, @bricksystem, @position, @extent) ->
 		@id = ids++
 		@.update_Bricktype()
 
@@ -28,32 +28,32 @@ class Brick
 		@type = SelectType.brick
 
 		@slots = []
-		for x in [0...@extend.x] by 1
-			for y in [0...@extend.y] by 1
-				for z in [0...@extend.z] by 1
+		for x in [0...@extent.x] by 1
+			for y in [0...@extent.y] by 1
+				for z in [0...@extent.z] by 1
 					@slots.push [@position.x + x, @position.y + y, @position.z + z]
 
-	get_BrickSpace_Extend: (x,y,z) ->
+	get_BrickSpace_extent: (x,y,z) ->
 		@layout.brickSpaceGrid.get_BrickSpace(@position.x + x, @position.y + y,
 			@position.z + z)
 
 	get_all_BrickSpaces: () ->
 		brickspaces = []
-		for x in [0...@extend.x] by 1
-			for y in [0...@extend.y] by 1
-				for z in [0...@extend.z] by 1
-					brickspaces.add @.get_BrickSpace_Extend x,y,z
+		for x in [0...@extent.x] by 1
+			for y in [0...@extent.y] by 1
+				for z in [0...@extent.z] by 1
+					brickspaces.add @.get_BrickSpace_extent x,y,z
 		brickspaces
 
 	get_XY_Slots: ->
 		slots = []
-		for x in [0...@extend.x] by 1
-			for y in [0...@extend.y] by 1
+		for x in [0...@extent.x] by 1
+			for y in [0...@extent.y] by 1
 				slots.push [x + @position.x, y + @position.y]
 		slots
 
 	update_Bricktype: ->
-		@bricktype = @bricksystem.get_BrickType @extend.x, @extend.y, @extend.z
+		@bricktype = @bricksystem.get_BrickType @extent.x, @extent.y, @extent.z
 
 
 	get_connected_Bricks: () ->
@@ -132,9 +132,9 @@ class Brick
 		mesh.selectType = SelectType.brick
 
 		delta = 0
-		if @extend.x > @extend.y
+		if @extent.x > @extent.y
 			mesh.rotateZ(-Math.PI / 2)
-			delta = @extend.y
+			delta = @extent.y
 		mesh.position.x  = @position.x * @bricksystem.width
 		mesh.position.y  = (@position.y + delta) * @bricksystem.depth
 		mesh.position.z  = @position.z * @bricksystem.height
@@ -156,7 +156,7 @@ class Brick
 
 		###
 		pos = @position.clone().multiply @bricksystem.dimension
-		obj = @bricksystem.build_Brick(pos, @extend)
+		obj = @bricksystem.build_Brick(pos, @extent)
 		obj.get_SceneModel()
 		###
 

@@ -5,18 +5,18 @@ Vector3D = require '../geometry/Vector3D'
 class BrickLayout
   constructor: (@brickSpaceGrid) ->
     @bricksystem = @brickSpaceGrid.bricksystem
-    @extend = @brickSpaceGrid.brick_extend
+    @extent = @brickSpaceGrid.brick_extent
     @colorPalette = @brickSpaceGrid.colorPalette
     @model = null
     @all_bricks = []
-    @grid = new Array(@extend.x)
+    @grid = new Array(@extent.x)
     @is_layouted = no
 
-    for x in [0..@extend.x]
-      @grid[x] = new Array(@extend.y)
+    for x in [0..@extent.x]
+      @grid[x] = new Array(@extent.y)
 
-      for y in [0..@extend.y]
-        @grid[x][y] = new Array(@extend.z)
+      for y in [0..@extent.y]
+        @grid[x][y] = new Array(@extent.z)
 
     for b in @brickSpaceGrid.all_bricks
       @.add_BasicBrick_for(b.x, b.y, b.z)
@@ -89,9 +89,9 @@ class BrickLayout
 
   add_Brick: (brick) ->
     @all_bricks.push brick
-    for x in [0...brick.extend.x] by 1
-      for y in [0...brick.extend.y] by 1
-        for z in [0...brick.extend.z] by 1
+    for x in [0...brick.extent.x] by 1
+      for y in [0...brick.extent.y] by 1
+        for z in [0...brick.extent.z] by 1
           @grid[x + brick.position.x][y + brick.position.y][z +
             brick.position.z] = brick
 

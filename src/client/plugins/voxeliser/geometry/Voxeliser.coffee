@@ -81,8 +81,8 @@ class Voxeliser
 
 		#inner Bricks
 
-		for x in [0..grid.brick_extend.x]
-			for y in [0..grid.brick_extend.y]
+		for x in [0..grid.brick_extent.x]
+			for y in [0..grid.brick_extent.y]
 				column = grid.grid[x][y]
 				range = column.range
 				if range.minZ? and range.minZ != range.maxZ
@@ -90,7 +90,7 @@ class Voxeliser
 					if range.maxZ - range.minZ + 1 > range.bricks.length
 						r_x = (x + grid.brick_position.x - 0.61) * @bricksystem.width
 						r_y = (y + grid.brick_position.y - 0.335) * @bricksystem.depth
-						r_z = grid.extend.z + 100
+						r_z = grid.extent.z + 100
 						ray = new Ray( new Vector3D(r_x, r_y, r_z), new Vector3D(0,0,-1) )
 						#m = ray.build_Debug_Support()
 						#window.editor.workspace.canvas.scene.add m

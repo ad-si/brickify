@@ -99,7 +99,7 @@ class BrickLayouter
     console.log 'Initial layout done. Remaining bricks: ' +
       @layout.get_BrickCount()
 
-    if @layout.extend.z > 1
+    if @layout.extent.z > 1
       @fixOverhangingBricks(200)
       @fixWeakBricks(10)
       @fixOverhangingBricks(200)
@@ -225,7 +225,7 @@ class BrickLayouter
 
   splitBrickArrayLayerwise: (bricks) ->
     layerBricks = []
-    for i in [0...@layout.extend.z] by 1
+    for i in [0...@layout.extent.z] by 1
       layerBricks.push([])
 
     for brick in bricks
@@ -420,10 +420,10 @@ class BrickLayouter
   buildGraphConnections: (brick) ->
     brick.upperBricks = {}
     brick.lowerBricks = {}
-    if brick.position.z + brick.extend.z < @layout.extend.z
+    if brick.position.z + brick.extent.z < @layout.extent.z
       # Check upper layer
       brick.upperBricks = @buildLayerConnections(brick.position.z +
-        brick.extend.z, brick)
+        brick.extent.z, brick)
     if brick.position.z > 0
       # Check lower layer
       brick.lowerBricks = @buildLayerConnections(brick.position.z - 1, brick)
@@ -733,32 +733,32 @@ class BrickLayouter
 
     # Left
     if brick.position.x > 0
-      for y in [0...brick.extend.y] by 1
-        for z in [0...brick.extend.z] by 1
+      for y in [0...brick.extent.y] by 1
+        for z in [0...brick.extent.z] by 1
           pushNeighborBrick('left', neighbors, brick.position.x - 1,
             y + brick.position.y, z + brick.position.z)
 
     # Right
-    if brick.position.x + brick.extend.x < @layout.extend.x
-      for y in [0...brick.extend.y] by 1
-        for z in [0...brick.extend.z] by 1
+    if brick.position.x + brick.extent.x < @layout.extent.x
+      for y in [0...brick.extent.y] by 1
+        for z in [0...brick.extent.z] by 1
           pushNeighborBrick('right', neighbors,
-            brick.position.x + brick.extend.x, y + brick.position.y,
+            brick.position.x + brick.extent.x, y + brick.position.y,
             z + brick.position.z)
 
     # Top
     if brick.position.y > 0
-      for x in [0...brick.extend.x] by 1
-        for z in [0...brick.extend.z] by 1
+      for x in [0...brick.extent.x] by 1
+        for z in [0...brick.extent.z] by 1
           pushNeighborBrick('top', neighbors, x + brick.position.x,
             brick.position.y - 1, z + brick.position.z)
 
     # Bottom
-    if brick.position.y + brick.extend.y < @layout.extend.y
-      for x in [0...brick.extend.x] by 1
-        for z in [0...brick.extend.z] by 1
+    if brick.position.y + brick.extent.y < @layout.extent.y
+      for x in [0...brick.extent.x] by 1
+        for z in [0...brick.extent.z] by 1
           pushNeighborBrick('bottom', neighbors, x + brick.position.x,
-            brick.position.y + brick.extend.y, z + brick.position.z)
+            brick.position.y + brick.extent.y, z + brick.position.z)
 
     neighbors['topbottom'].push n for n in neighbors['top']
     neighbors['topbottom'].push n for n in neighbors['bottom']
@@ -773,8 +773,8 @@ class BrickLayouter
     neighbors['top2'].push n for n in neighbors['top']
     for n in neighbors['top']
       if n.position.y > 0
-        for x in [0...n.extend.x] by 1
-          for z in [0...n.extend.z] by 1
+        for x in [0...n.extent.x] by 1
+          for z in [0...n.extent.z] by 1
             pushNeighborBrick('top2', neighbors, x + n.position.x,
               n.position.y - 1, z + n.position.z)
 
@@ -782,8 +782,8 @@ class BrickLayouter
     neighbors['left2'].push n for n in neighbors['left']
     for n in neighbors['left']
       if n.position.x > 0
-        for y in [0...n.extend.y] by 1
-          for z in [0...n.extend.z] by 1
+        for y in [0...n.extent.y] by 1
+          for z in [0...n.extent.z] by 1
             pushNeighborBrick('left2', neighbors, n.position.x - 1,
               y + n.position.y, z + n.position.z)
 
@@ -791,21 +791,21 @@ class BrickLayouter
     # brick)
     neighbors['right2'].push n for n in neighbors['right']
     for n in neighbors['right']
-      if n.position.x + n.extend.x < @layout.extend.x
-        for y in [0...n.extend.y] by 1
-          for z in [0...n.extend.z] by 1
-            pushNeighborBrick('right2', neighbors, n.position.x + n.extend.x,
+      if n.position.x + n.extent.x < @layout.extent.x
+        for y in [0...n.extent.y] by 1
+          for z in [0...n.extent.z] by 1
+            pushNeighborBrick('right2', neighbors, n.position.x + n.extent.x,
               y + n.position.y, z + n.position.z)
 
     # Push all bottom neighbors of bottom neighbors (second bottom neighbors of
     # brick)
     neighbors['bottom2'].push n for n in neighbors['bottom']
     for n in neighbors['bottom']
-      if n.position.y + n.extend.y < @layout.extend.y
-        for x in [0...n.extend.x] by 1
-          for z in [0...n.extend.z] by 1
+      if n.position.y + n.extent.y < @layout.extent.y
+        for x in [0...n.extent.x] by 1
+          for z in [0...n.extent.z] by 1
             pushNeighborBrick('bottom2', neighbors, x + n.position.x,
-              n.position.y + n.extend.y, z + n.position.z)
+              n.position.y + n.extent.y, z + n.position.z)
 
     return neighbors
 
@@ -879,7 +879,7 @@ class BrickLayouter
       #`delete b`
       'delete b'
 
-    # Update position and extend
+    # Update position and extent
     xMin = xMax = brick.slots[0][0]
     yMin = yMax = brick.slots[0][1]
     zMin = zMax = brick.slots[0][2]
@@ -893,7 +893,7 @@ class BrickLayouter
       zMax = z if z > zMax
 
     brick.position = new Vector3D(xMin, yMin, zMin)
-    brick.extend = new Vector3D(xMax - xMin + 1, yMax - yMin + 1,
+    brick.extent = new Vector3D(xMax - xMin + 1, yMax - yMin + 1,
       zMax - zMin + 1)
     brick.update_Bricktype()
 
@@ -914,7 +914,7 @@ class BrickLayouter
       # Add 1x1xheight bricks
       for [x,y] in brick.get_XY_Slots()
         newBrick = @layout.add_BasicBrick_with_Height(x,y,brick.position.z,
-          brick.extend.z)
+          brick.extent.z)
 
         if @debugging
           newBrick.update_SceneModel()
@@ -934,7 +934,7 @@ class BrickLayouter
     # Setup graphs
     for b in splitBricks
       pos = b.position
-      uBrick = @layout.get_Brick(pos.x, pos.y, pos.z + b.extend.z)
+      uBrick = @layout.get_Brick(pos.x, pos.y, pos.z + b.extent.z)
       if uBrick?
         b.upperBricks[uBrick.id] = uBrick
         uBrick.lowerBricks[b.id] = b

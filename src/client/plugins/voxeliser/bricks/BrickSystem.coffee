@@ -34,56 +34,56 @@ class BrickSystem
         return @brick_type_lookup[width][depth][height]
     return undefined
 
-  build_Brick_for: (brick_position, extend, flat) ->
+  build_Brick_for: (brick_position, extent, flat) ->
     position = brick_position.multiple_by @dimension
-    @.build_Brick position, extend, flat
+    @.build_Brick position, extent, flat
 
-  build_Brick: (position, extend, flat = no) ->
+  build_Brick: (position, extent, flat = no) ->
     object = new SolidObject3D()
     #sides
-    @.add_Brick_Sides object, position, extend
-    for x in [0...extend.x] by 1         #caps
-      for y in [0...extend.y] by 1
-        delta = new Vector3D( @width * x, @depth * y, @height * (extend.z - 1) )
+    @.add_Brick_Sides object, position, extent
+    for x in [0...extent.x] by 1         #caps
+      for y in [0...extent.y] by 1
+        delta = new Vector3D( @width * x, @depth * y, @height * (extent.z - 1) )
         @.add_Brick_top_Cap_to object, position.plus delta
-    for x in [0...extend.x] by 1         #bottom
-      for y in [0...extend.y] by 1
+    for x in [0...extent.x] by 1         #bottom
+      for y in [0...extent.y] by 1
         delta = new Vector3D( @width * x, @depth * y, 0 )
         @.add_Brick_bottom_Plate_to object, position.plus(delta), flat
-    for x in [0...extend.x] by 1         #top plates
-      for y in [0...extend.y] by 1
-        delta = new Vector3D( @width * x, @depth * y, @height * (extend.z - 1) )
+    for x in [0...extent.x] by 1         #top plates
+      for y in [0...extent.y] by 1
+        delta = new Vector3D( @width * x, @depth * y, @height * (extent.z - 1) )
         @.add_Brick_top_Plate_to object, position.plus delta
-    for x in [0...extend.x] by 1         #bottom cap
-      for y in [0...extend.y] by 1
+    for x in [0...extent.x] by 1         #bottom cap
+      for y in [0...extent.y] by 1
         delta = new Vector3D( @width * x, @depth * y, 0 )
         @.add_Brick_bottom_Cap_to object, position.plus(delta), flat
-    for x in [0...extend.x] by 1         #top sides
-      for y in [0...extend.y] by 1
-        delta = new Vector3D( @width * x, @depth * y, @height * (extend.z - 1) )
+    for x in [0...extent.x] by 1         #top sides
+      for y in [0...extent.y] by 1
+        delta = new Vector3D( @width * x, @depth * y, @height * (extent.z - 1) )
         @.add_Brick_top_Cap_Sides_to object, position.plus delta
-    for x in [0...extend.x] by 1         #bottom sides
-      for y in [0...extend.y] by 1
+    for x in [0...extent.x] by 1         #bottom sides
+      for y in [0...extent.y] by 1
         delta = new Vector3D( @width * x, @depth * y, 0 )
         @.add_Brick_bottom_Cap_Sides_to object, position.plus(delta), flat
     object
 
-  add_Brick_Sides: (object, position, extend) ->
+  add_Brick_Sides: (object, position, extent) ->
     normal_xp = object.get_Normal 1,0,0
     normal_xn = object.get_Normal -1,0,0
     normal_yp = object.get_Normal 0,1,0
     normal_yn = object.get_Normal 0,-1,0
 
-    for y in [0...extend.y] by 1
-      for z in [0...extend.z] by 1
-        vector = new Vector3D((extend.x - 1) * @width, y * @depth, z * @height)
+    for y in [0...extent.y] by 1
+      for z in [0...extent.z] by 1
+        vector = new Vector3D((extent.x - 1) * @width, y * @depth, z * @height)
         @.add_Brick_Side object, position.plus(vector), normal_xp
         vector2 = new Vector3D(0, y * @depth, z * @height)
         @.add_Brick_Side object, position.plus(vector), normal_xn
 
-    for x in [0...extend.x] by 1
-      for z in [0...extend.z] by 1
-        vector = new Vector3D( x * @width, (extend.y - 1) * @depth, z * @height)
+    for x in [0...extent.x] by 1
+      for z in [0...extent.z] by 1
+        vector = new Vector3D( x * @width, (extent.y - 1) * @depth, z * @height)
         @.add_Brick_Side object, position.plus(vector), normal_yp
         vector2 = new Vector3D( x * @width, 0, z * @height)
         @.add_Brick_Side object, position.plus(vector2), normal_yn

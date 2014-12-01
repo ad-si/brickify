@@ -96,7 +96,7 @@ requestOptimizedMeshFromServer = (md5hashWithEnding, success, fail) ->
 module.exports.requestOptimizedMeshFromServer = requestOptimizedMeshFromServer
 
 addModelToCache = (md5hashWithEnding, data) ->
-	modelCache[md5hashWithEnding] = {hash: md5hashWithEnding, data: data}
+	modelCache[md5hashWithEnding] ?= {hash: md5hashWithEnding, data: data}
 
 getModelFromCache = (md5hashWithEnding) ->
 	modelCache[md5hashWithEnding]?.data

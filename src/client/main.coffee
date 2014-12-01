@@ -135,17 +135,19 @@ statesync.init globalConfig, (state) ->
 	for cmd in commands
 		key = cmd.split('=')[0]
 		value = cmd.split('=')[1]
-		if commandProcesses[key]?
-			commandProcesses[key](state, value)
+		if commandFunctions[key]?
+			commandFunctions[key](state, value)
 
 	#clear url hash after executing commands
 	window.location.hash = ''
 
 
-
-commandProcesses = {
+commandFunctions = {
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
+		stlImport = require './plugins/stlImport/stlImport'
+		stlImport.importHash value
 }
+
 
 

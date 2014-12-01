@@ -6,6 +6,7 @@ module.exports = {
 	CATEGORY_CONVERTER: 'Converter'
 	CATEGORY_CONNECTOR: 'Connector'
 	CATEGORY_VALIDATOR: 'Validator'
+	CATEGORY_RENDERER: 'Renderer'
 	CATEGORY_DUMMY: 'Dummy'
 	CATEGORY_UI: 'UI'
 }

@@ -146,7 +146,11 @@ commandFunctions = {
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
 		stlImport = require './plugins/stlImport/stlImport'
-		stlImport.importHash value
+		p = /^[0-9a-z]{32}\.optimized$/
+		if p.test value
+			stlImport.importHash value
+		else
+			console.warn 'Invalid value for initialModel'
 }
 
 

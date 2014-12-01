@@ -66,34 +66,40 @@ module.exports.requestMeshFromServer = requestMeshFromServer
 # Same as requestMeshFromServer, but returns cached optimizedModel instance if
 # it exists
 requestOptimizedMeshFromServer = (md5hashWithEnding, success, fail) ->
-	modelInstance = getOptimizedInstance md5hashWithEnding
-	if modelInstance?
-		success modelInstance
-
-	query = getQueryForOptimizedModel md5hashWithEnding
-	query.successCallbacks.push success
-	query.failCallbacks.push fail
-
-	if query.successCallbacks.length > 1
-		# if this is not the first instance that requests this model, the query
-		# is already running - wait for it to complete
-		return
-	else
-		# this is the first instance that requests this model, we have to run
-		# the query for ourselves
-		successCb = (data) ->
-			modelInstance = new OptimizedModel()
-			modelInstance.fromBase64 data
-			addOptimizedInstance md5hashWithEnding, modelInstance
-			for sc in query.successCallbacks
-				sc modelInstance
-			deleteQuery query
-		failCb = () ->
-			for fc in query.failCallbacks
-				fc()
-			deleteQuery query
-		requestMeshFromServer md5hashWithEnding, successCb, failCb
+	hash = md5hashWithEnding.split('.')[0]
+	requestOptimizedMesh hash, success, fail
 module.exports.requestOptimizedMeshFromServer = requestOptimizedMeshFromServer
+
+# NEWONE
+requestOptimizedMesh = (hash, success, fail) ->
+	if (model = modelCache[hash])?
+		success model
+	else if (query = currentOptimizedModelQueries[hash])?
+		query.successCallbacks.push success
+		query.failCallbacks.push fail
+	else
+		query = {
+			hash: hash
+			successCallbacks: [success]
+			failCallbacks: [fail]
+		}
+		currentOptimizedModelQueries[hash] = query
+		requestMeshFromServer(
+			hash+'.optimized'
+			requestOptimizedMeshSuccess query
+			requestOptimizedMeshFail query
+		)
+
+requestOptimizedMeshSuccess = (query) -> (data) ->
+	model = new OptimizedModel()
+	model.fromBase64 data
+	addOptimizedInstance query.hash, model
+	success model for success in query.successCallbacks
+	deleteQuery query
+
+requestOptimizedMeshFail = (query) -> () ->
+	fail() for fail in query.failCallbacks
+	deleteQuery query
 
 addModelToCache = (md5hashWithEnding, data) ->
 	modelCache[md5hashWithEnding] ?= {hash: md5hashWithEnding, data: data}

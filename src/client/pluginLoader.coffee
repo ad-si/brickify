@@ -8,11 +8,7 @@ pluginHooks = require('../common/pluginHooks')
 pluginHooks.initHooks(hooks)
 renderer = require './renderer'
 
-pluginInstances = []
 globalConfigInstance = null
-
-checkForPluginMethods = (instance) ->
-	instance.hasOwnProperty('pluginName')
 
 initPluginInstance = (instance) ->
 	instance.init? globalConfigInstance
@@ -29,14 +25,7 @@ initPluginInstance = (instance) ->
 		renderer.addToScene threeNode
 
 loadPlugin = (instance) ->
-	if checkForPluginMethods instance
-		pluginInstances.push instance
-		initPluginInstance instance
-		console.log "Plugin #{instance.pluginName} loaded"
-
-	else
-		console.warn "Plugin #{instance.pluginName?} does not contain all
-				necessary methods, will not be loaded"
+	initPluginInstance instance
 
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
@@ -45,7 +34,6 @@ module.exports.init = (globalConfig) ->
 # Since browserify.js does not support dynamic require
 # all plugins must be explicitly written down
 module.exports.loadPlugins = () ->
-
 	loadPlugin require './plugins/dummy/dummy'
 	loadPlugin require './plugins/coordinateSystem/coordinateSystem'
 	loadPlugin require './plugins/stlImport/stlImport'

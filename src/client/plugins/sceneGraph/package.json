@@ -1,0 +1,8 @@
+{
+  "name": "scene-graph",
+  "version": "0.1.0",
+  "description": "Renders interactive scene graph.",
+  "lowfab": {
+    "type": "user-inteface"
+  }
+}

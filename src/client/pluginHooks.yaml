@@ -16,6 +16,7 @@
 
 - init
 
+
 #  ## 3D scene initialization
 #
 #  Each plugin that provides a `init3d` method is able to initialize its 3D
@@ -26,12 +27,14 @@
 
 - init3d
 
+
 # ## UI Initalization
 #
 # `initUi` provides the plugins the possibility to add elements to the UI.
 # Receives a object with DOM elements to insert itself into.
 
 - initUi
+
 
 #  ## State synchronization
 #
@@ -44,6 +47,7 @@
 
 - onStateUpdate
 
+
 #  ## 3D scene update and animation
 #
 #  On each render frame the [renderer](render.html) will call the `on3dUpdate`
@@ -55,6 +59,7 @@
 #  https://developer.mozilla.org/en/docs/Web/API/window.requestAnimationFrame)
 
 - on3dUpdate
+
 
 #  ## File import
 #

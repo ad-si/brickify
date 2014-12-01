@@ -5,7 +5,6 @@ path = require 'path'
 # Recursively process folders and files
 readdirp = require 'readdirp'
 # Server-side plugins
-pluginInstances = []
 stateSyncModule = null
 # Colorful logger for console
 winston = require 'winston'
@@ -31,30 +30,18 @@ module.exports.loadPlugins = (stateSync, directory) ->
 	.on 'end', () -> afterCompileCallback(directory) if afterCompileCallback?
 
 loadPlugin = (entry) ->
-		if(entry.stat.isFile())
-			pluginMain = entry.fullPath
-		else if(entry.stat.isDirectory())
-			pluginMain = path.join entry.fullPath, entry.name + '.js'
+
+		pluginMain = path.join entry.fullPath, entry.name
+
 		try
 			instance = require pluginMain
 		catch error
-			log.error "Plugin #{pluginMain} could not be found. Maybe the plugin's
-				main filename does not match its folder name?"
+			log.error "Plugin #{pluginMain} could not be found.
+				Maybe the plugin's filename does not match its folder name?"
 			return
-		if checkForPluginMethods instance
-			pluginInstances.push instance
-			initPluginInstance instance
-			log.info "Plugin '#{instance.pluginName}' (#{pluginMain}) loaded"
-		else
-			if instance.pluginName?
-				console.warn "Plugin #{instance.pluginName} (#{pluginMain})
-				does not contain all necessary methods and will not be loaded"
-			else
-				console.warn "Plugin *name missing* (#{pluginMain})
-				does not contain all necessary methods and will not be loaded"
 
-checkForPluginMethods = (object) ->
-	object.hasOwnProperty('pluginName')
+		initPluginInstance instance
+		log.info "Plugin #{pluginMain} loaded"
 
 initPluginInstance = (pluginInstance) ->
 	pluginInstance.init?()

@@ -1,0 +1,8 @@
+{
+  "name": "stl-import",
+  "version": "0.1.0",
+  "description": "Imports and optimizes STL-files.",
+  "lowfab": {
+    "type": "import"
+  }
+}

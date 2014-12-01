@@ -4,5 +4,6 @@
   "description": "Renders interactive scene graph.",
   "lowfab": {
     "type": "user-inteface"
-  }
+  },
+  "main": "./sceneGraph.coffee"
 }

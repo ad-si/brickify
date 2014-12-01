@@ -4,5 +4,6 @@
   "description": "Demo implementation of a client-side plugin.",
   "lowfab": {
     "type": "example"
-  }
+  },
+  "main": "./dummy.coffee"
 }

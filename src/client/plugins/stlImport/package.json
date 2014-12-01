@@ -4,5 +4,6 @@
   "description": "Imports and optimizes STL-files.",
   "lowfab": {
     "type": "import"
-  }
+  },
+  "main": "./stlImport.coffee"
 }

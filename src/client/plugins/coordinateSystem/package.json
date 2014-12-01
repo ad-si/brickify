@@ -4,5 +4,6 @@
   "description": "Colored coordinate system for better navigation.",
   "lowfab": {
     "type": "converter"
-  }
+  },
+  "main": "./coordinateSystem.coffee"
 }

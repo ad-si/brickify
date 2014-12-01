@@ -3,6 +3,7 @@
 ###
 
 # Load the hook list and initialize the pluginHook management
+path = require 'path'
 hooks = require('./pluginHooks.yaml')
 pluginHooks = require('../common/pluginHooks')
 pluginHooks.initHooks(hooks)
@@ -10,7 +11,10 @@ renderer = require './renderer'
 
 globalConfigInstance = null
 
-initPluginInstance = (instance) ->
+initPlugin = (instance, packageData) ->
+	for own key,value of packageData
+		instance[key] = value
+
 	instance.init? globalConfigInstance
 	instance.init3d? threeNode = new THREE.Object3D()
 	instance.initUi? {
@@ -24,18 +28,30 @@ initPluginInstance = (instance) ->
 	if threeNode?
 		renderer.addToScene threeNode
 
-loadPlugin = (instance) ->
-	initPluginInstance instance
 
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
-
 # Since browserify.js does not support dynamic require
 # all plugins must be explicitly written down
 module.exports.loadPlugins = () ->
-	loadPlugin require './plugins/dummy/dummy'
-	loadPlugin require './plugins/coordinateSystem/coordinateSystem'
-	loadPlugin require './plugins/stlImport/stlImport'
-	loadPlugin require './plugins/stlExport/stlExport'
-	loadPlugin require './plugins/sceneGraph/sceneGraph'
+	initPlugin(
+		require('./plugins/dummy'),
+		require('./plugins/dummy/package.json')
+	)
+	initPlugin(
+		require('./plugins/coordinateSystem'),
+		require('./plugins/coordinateSystem/package.json')
+	)
+	initPlugin(
+		require('./plugins/stlImport'),
+		require('./plugins/stlImport/package.json')
+	)
+	initPlugin(
+		require('./plugins/stlExport'),
+		require('./plugins/stlExport/package.json')
+	)
+	initPlugin(
+		require('./plugins/sceneGraph'),
+		require('./plugins/sceneGraph/package.json')
+	)

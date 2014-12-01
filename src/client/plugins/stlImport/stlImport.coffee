@@ -51,7 +51,7 @@ loadModelFromCache = (property) ->
 	failure = () ->
 		console.error "Unable to get model #{property.meshHash} from server"
 
-	modelCache.requestOptimizedMeshFromServer property.meshHash, success, failure
+	modelCache.request property.meshHash, success, failure
 
 # Imports the stl, optimizes it,
 # sends it to the server (if not cached there)
@@ -72,33 +72,31 @@ module.exports.importFile = (fileName, fileContent) ->
 	base64Optimized = optimizedModel.toBase64()
 	md5hash = md5(base64Optimized)
 	threeObject = addModelToThree optimizedModel
-	fileEnding = 'optimized'
 	addModelToState optimizedModel.originalFileName,
-		md5hash + '.' + fileEnding, threeObject
-	modelCache.submitMeshToServer md5hash, fileEnding, base64Optimized
+		md5hash, threeObject
+	modelCache.store optimizedModel
 	return optimizedModel
 
 # Loads an hash from the server and adds it to the state / three-geometry
-module.exports.importHash = (md5HashWithEnding) ->
+module.exports.importHash = (hash) ->
 	successCallback = (optimizedModel) ->
 		threeObject = addModelToThree optimizedModel
 		addModelToState optimizedModel.originalFileName,
-			md5HashWithEnding, threeObject
+			hash, threeObject
 	failCallback = () ->
-		console.warn "Unable to load hash #{md5HashWithEnding} from Server"
+		console.warn "Unable to load model #{hash} from Server"
 
-	modelCache.requestOptimizedMeshFromServer md5HashWithEnding,
-		successCallback, failCallback
+	modelCache.request hash, successCallback, failCallback
 
 # adds a new model to the state
-addModelToState = (fileName, md5HashWithEnding, threeObject) ->
+addModelToState = (fileName, hash, threeObject) ->
 	if stateSync?
 		loadModelCallback = (state) ->
 			node = objectTree.addChild state.rootNode
 			property = new StlProperty()
 			objectTree.addPluginData node, pluginPropertyName, property
 			property.fileName = fileName
-			property.meshHash = md5HashWithEnding
+			property.meshHash = hash
 			copyThreeDataToProperty property, threeObject
 		# call updateState on all client plugins and sync
 		stateSync.performStateAction loadModelCallback, true

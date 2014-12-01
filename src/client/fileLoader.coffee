@@ -16,7 +16,9 @@ readFile = (file) ->
 
 loadFile = (filename) -> (event) ->
 	fileContent = event.target.result
+	optimizedModel = importFile filename, fileContent
 
+importFile = (filename, fileContent) ->
 	for loader in pluginHooks.get 'importFile'
 		optimizedModel = loader filename, fileContent
 		return if optimizedModel?

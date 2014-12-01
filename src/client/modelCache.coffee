@@ -102,16 +102,11 @@ getModelFromCache = (md5hashWithEnding) ->
 	modelCache[md5hashWithEnding]?.data
 
 addOptimizedInstance = (md5HashWithEnding, instance) ->
-	for m in optimizedModelCache
-		if m.hash == md5HashWithEnding
-			return
-	optimizedModelCache.push {hash: md5HashWithEnding, data: instance}
+	optimizedModelCache[md5HashWithEnding] ?=
+		{hash: md5HashWithEnding, data: instance}
 
 getOptimizedInstance = (md5HashWithEnding) ->
-	for m in optimizedModelCache
-		if m.hash == md5HashWithEnding
-			return m.data
-	return null
+	optimizedModelCache[md5HashWithEnding]?.data
 
 getQueryForOptimizedModel = (hash) ->
 	q = currentOptimizedModelQueries[hash]

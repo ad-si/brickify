@@ -13,7 +13,6 @@ objectTree = require '../../../common/objectTree'
 statesync = require '../../statesync'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
-Converter = require './geometry/Converter'
 BrickSystem = require './bricks/BrickSystem'
 BrickLayout = require './bricks/BrickLayout'
 BrickLayouter = require './bricks/BrickLayouter'
@@ -85,7 +84,7 @@ voxelise = (optimizedModel, node) ->
 				[2,6,3],[2,8,3],[2,10,3]
 			]
 
-	grid = voxeliser.voxelise(solidObject3D, lego)
+	grid = voxeliser.voxelise(optimizedModel, lego)
 	voxelisedModels.push grid
 	threejsRootNode.add voxelRenderer grid
 

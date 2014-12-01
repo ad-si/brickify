@@ -3,6 +3,7 @@ Vector3D = require './Vector3D'
 Ray = require './Ray'
 SolidObject3D = require './SolidObject3D'
 Tolerances = require './Tolerances'
+geometryHelper = require './geometryHelper'
 
 class Voxeliser
 	constructor: () ->
@@ -18,21 +19,22 @@ class Voxeliser
 		#      @grid[z][y][x] = null
 
 
-	voxelise: (object, @bricksystem) ->
+	voxelise: (optimizedModel, @bricksystem) ->
 		#@progress = ProgressBar.span()
 		@hull_voxels = []
 		@mightbe_hull_voxels = []
 		@innervoxels = []
 		@hull_list = {}
-		@box = object.get_BoundaryBox()
-		grid = new BrickSpaceGrid( object.get_BoundaryBox(), @bricksystem)
+		@box = geometryHelper.getBoundaryBox(optimizedModel)
+		grid = new BrickSpaceGrid(@box.clone(), @bricksystem)
 		window.grid = grid
 
 		count = 0
 		# shell bricks
 		#@progress.set_total object.polygons.length
 
-		for polygon in object.polygons
+		polygons = geometryHelper.getPolygons(optimizedModel)
+		for polygon in polygons
 			count++
 			cuts_list = []
 

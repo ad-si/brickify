@@ -7,7 +7,7 @@ OptimizedModel = require '../common/OptimizedModel'
 # Caches models and allows all Plugins to retrieve cached models from the server
 
 # the cache for raw data of any kind
-modelCache = []
+modelCache = {}
 
 # the cache for optimized model instances
 optimizedModelCache = []
@@ -96,16 +96,10 @@ requestOptimizedMeshFromServer = (md5hashWithEnding, success, fail) ->
 module.exports.requestOptimizedMeshFromServer = requestOptimizedMeshFromServer
 
 addModelToCache = (md5hashWithEnding, data) ->
-	for m in modelCache
-		if m.hash == md5hashWithEnding
-			return
-	modelCache.push {hash: md5hashWithEnding, data: data}
+	modelCache[md5hashWithEnding] = {hash: md5hashWithEnding, data: data}
 
 getModelFromCache = (md5hashWithEnding) ->
-	for m in modelCache
-		if m.hash == md5hashWithEnding
-			return m.data
-	return null
+	modelCache[md5hashWithEnding]?.data
 
 addOptimizedInstance = (md5HashWithEnding, instance) ->
 	for m in optimizedModelCache

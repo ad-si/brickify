@@ -48,7 +48,12 @@ setupRenderer = (globalConfig) ->
 		antialias: true
 		preserveDrawingBuffer: true
 	)
-	renderer.setSize window.innerWidth, window.innerHeight
+	if not globalConfig.staticRendererSize
+		renderer.setSize window.innerWidth, window.innerHeight
+	else
+		renderer.setSize globalConfig.staticRendererWidth,
+			globalConfig.staticRendererHeight
+
 	renderer.setClearColor 0xf6f6f6, 1
 	renderer.domElement.setAttribute 'id', 'canvas'
 	document

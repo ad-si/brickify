@@ -33,3 +33,6 @@ gridStepSize: 10
 
 # render DOM
 renderAreaId: 'renderArea'
+staticRendererSize: false
+staticRendererWidth: 100
+staticRendererHeight: 100

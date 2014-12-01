@@ -1,7 +1,7 @@
 fs = require 'fs'
 mkdirp = require 'mkdirp'
-logger = require 'winston'
 path = require 'path'
+
 winston = require 'winston'
 log = winston.loggers.get('log')
 
@@ -10,7 +10,7 @@ modelCacheDir = ''
 module.exports.init = (cacheDir = 'modelCache') ->
 	modelCacheDir = cacheDir
 	mkdirp cacheDir, (err) ->
-		logger.warn 'Unable to create model cache dir: ' + err if err?
+		log.warn 'Unable to create model cache dir: ' + err if err?
 
 module.exports.hasModel = (md5hash, fileEnding, callback) ->
 	if not checkHash md5hash, fileEnding
@@ -44,5 +44,5 @@ checkHash = (md5hash, fileEnding) ->
 	if p.test md5hash
 		if fileEnding == 'optimized' or fileEnding == 'stl'
 			return true
-	logger.warn "Requested model #{md5hash}.#{fileEnding} is no valid hash"
+	log.warn "Requested model #{md5hash}.#{fileEnding} is no valid hash"
 	return false

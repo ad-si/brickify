@@ -130,10 +130,12 @@ class BrickLayout
 
   build_SceneModel: () ->
     mesh = new THREE.Mesh()
-    mesh.position = @brickSpaceGrid.position
+    mesh.position.x = @brickSpaceGrid.position.x
+    mesh.position.y = @brickSpaceGrid.position.y
+    mesh.position.z = @brickSpaceGrid.position.z
     for brick in @all_bricks
       brick.set_Default_Color @colorPalette
-      model =  brick.get_SceneModel()
+      model = brick.get_SceneModel()
       mesh.add model
       if brick.hidden
         brick.hide_SceneModel()

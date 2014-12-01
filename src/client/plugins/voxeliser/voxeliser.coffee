@@ -13,7 +13,6 @@ objectTree = require '../../../common/objectTree'
 statesync = require '../../statesync'
 modelCache = require '../../modelCache'
 OptimizedModel = require '../../../common/OptimizedModel'
-Converter = require './geometry/Converter'
 BrickSystem = require './bricks/BrickSystem'
 BrickLayout = require './bricks/BrickLayout'
 BrickLayouter = require './bricks/BrickLayouter'
@@ -73,9 +72,6 @@ voxeliseAllModels = () ->
 # voxelises a single model
 voxelise = (optimizedModel, node) ->
 	voxeliser ?= new Voxeliser
-
-	solidObject3D = Converter.convertToSolidObject3D(optimizedModel)
-
 	if not lego
 		lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
 		lego.add_BrickTypes [
@@ -85,7 +81,7 @@ voxelise = (optimizedModel, node) ->
 				[2,6,3],[2,8,3],[2,10,3]
 			]
 
-	grid = voxeliser.voxelise(solidObject3D, lego)
+	grid = voxeliser.voxelise(optimizedModel, lego)
 
 	voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
 	voxelisedModels.push voxelisedData

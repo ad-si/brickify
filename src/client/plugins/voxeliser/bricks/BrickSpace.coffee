@@ -1,5 +1,4 @@
 Object3D = require '../geometry/Object3D'
-BspTree = require '../geometry/BspTree'
 
 class BrickSpace
   constructor: (@bricksystem, @x, @y, @z, @default_Brick = yes) ->
@@ -49,13 +48,6 @@ class BrickSpace
     @add_Polygon new Polygon points, plane, edges
   ###
 
-  build_All_Sides: () ->
-    if @pre_model.polygons.length == 0
-      @.build_Default_Model()
-    else
-      @.build_Compose_Model()
-    @.updateSides()
-
   build_Default_Model: () ->
     unless @cutted
       full_brick = @grid.build_Cutting_Model_for @
@@ -65,46 +57,6 @@ class BrickSpace
 
   get_Side_for: (side_label) ->
     @sides_lookup[side_label]
-
-  build_Compose_Model: () ->
-    unless @cutted
-      full_brick = @grid.build_Cutting_Model_for @
-
-      cut_polygons = @pre_model.polygons.clone()
-      if neighbor = @sides_lookup['+z'].neighbor
-        cut_polygons = cut_polygons.concat neighbor.pre_model.polygons
-
-      #original_cut_polygons = []
-      #for polygon in cut_polygons
-      #  parent = polygon.tag.original_polygon
-      #  original_cut_polygons.add_unique parent
-
-      #cut_polygons = original_cut_polygons
-
-      brick_tree = BspTree.build_Tree full_brick.polygons
-      cutting_tree = BspTree.build_Tree cut_polygons
-
-      results = cutting_tree.split_Polygons full_brick.polygons
-
-      @sort_Outer_Sides results[0]
-      @sort_Inner_Sides results[1]
-      @sort_OnCut_Sides results[2]
-
-      #for polygon in results[1]
-      #  cut.copy_foreign_Polygon polygon
-      #for polygon in results[2]
-      #  cut.copy_foreign_Polygon polygon
-
-      results = brick_tree.split_Polygons cut_polygons
-      window.r = results
-      @cut_polygons = results[1]
-      for polygon in @cut_polygons
-        polygon.set_Object @
-
-      @cutted = yes
-    @
-      #for polygon in @cut_polygons
-      #  cut.copy_foreign_Polygon polygon
 
   sort_Inner_Sides: (polygons) ->
     for polygon in polygons

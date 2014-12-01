@@ -406,7 +406,7 @@ class BrickLayouter
 
     # Bricks might have grown into other grown bricks
     for b in grownBricks
-      if b.slots == null
+      if b?.slots == null
         grownBricks.remove(b)
 
     grownBricks

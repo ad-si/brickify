@@ -23,11 +23,11 @@ submitDataToServer = (hash, data) ->
 			success: () -> console.log 'sent model to the server'
 			error: () -> console.error 'unable to send model to the server'
 
-module.exports.store = (optimizedModel, success, fail) ->
+module.exports.store = (optimizedModel) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
-	submitDataToServer(hash, modelData)
 	cache hash, optimizedModel
+	submitDataToServer(hash, modelData)
 
 # requests a mesh with the given hash from the server
 # if it is cached locally, the local reference is returned

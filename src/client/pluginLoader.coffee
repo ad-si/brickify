@@ -48,6 +48,7 @@ module.exports.loadPlugins = () ->
 
 	loadPlugin require './plugins/dummy/dummy'
 	loadPlugin require './plugins/coordinateSystem/coordinateSystem'
+	loadPlugin require './plugins/solidRenderer/solidRenderer'
 	loadPlugin require './plugins/stlImport/stlImport'
 	loadPlugin require './plugins/stlExport/stlExport'
 	loadPlugin require './plugins/sceneGraph/sceneGraph'

@@ -21,6 +21,7 @@
     "coffeeify": "^0.7.0",
     "coffeelint-newline-at-eof": "^0.4.1",
     "compression": "^1.2.0",
+    "envify": "^3.2.0",
     "errorhandler": "^1.2.2",
     "exec": "^0.1.2",
     "express": "^4.9.8",
@@ -35,6 +36,7 @@
     "react": "^0.12.0",
     "readdirp": "^1.1.0",
     "serve-favicon": "^2.1.6",
+    "stats-js": "^1.0.0-alpha1",
     "stylus": "^0.49.2",
     "win-spawn": "^2.0.0",
     "winston": "^0.8.1"

@@ -24,10 +24,11 @@ log = winston.loggers.get('log')
 # Support mixing .coffee and .js files in lowfab-project
 coffeeify = require 'coffeeify'
 # Load yaml configuration into javascript file
-browserifyData = require('browserify-data')
+browserifyData = require 'browserify-data'
+envify = require 'envify'
 browserify = require 'browserify-middleware'
 browserify.settings({
-	transform: [coffeeify, browserifyData]
+	transform: [coffeeify, browserifyData, envify]
 })
 bodyParser = require 'body-parser'
 compress = require 'compression'

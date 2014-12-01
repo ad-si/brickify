@@ -86,16 +86,31 @@ voxelise = (optimizedModel, node) ->
 			]
 
 	grid = voxeliser.voxelise(solidObject3D, lego)
-	voxelisedModels.push grid
-	threejsRootNode.add voxelRenderer grid
+
+	voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
+	voxelisedModels.push voxelisedData
+	threejsRootNode.add voxelisedData.gridForThree
+	console.log voxelisedModels
 
 #layouts all voxelised Models
 layout = () ->
 	if not voxelisedModels.length > 0
 		console.warn 'trying to layout, but no voxelisedModels available'
 	else
-		for grid in voxelisedModels
-				layout = new BrickLayout(grid)
-				layouter = new BrickLayouter(layout)
-				layouter.layoutAll()
-				threejsRootNode.add layout.get_SceneModel()
+		for data in voxelisedModels
+			layout = new BrickLayout(data.grid)
+			layouter = new BrickLayouter(layout)
+			layouter.layoutAll()
+			legoMesh = layout.get_SceneModel()
+			data.addLayout(layout, legoMesh)
+
+			threejsRootNode.remove data.gridForThree
+			threejsRootNode.add legoMesh
+			console.log data
+
+# Helper Class that - after voxelising and layouting -
+# contains the voxelised grid, it's ThreeJS representation
+# and the ThreeJs
+class VoxeliserData
+	constructor: (@node, @grid, @gridForThree, @layout, @layoutForThree) -> return
+	addLayout: (@layout, @layoutForThree) -> return

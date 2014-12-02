@@ -4,7 +4,7 @@ r = require 'react'
 globalConfig = require './globals.yaml'
 ui = require('./ui')(globalConfig)
 pluginLoader = require './pluginLoader'
-Statesync = require './statesync'
+statesync = require './statesync'
 objectTree = require '../common/objectTree'
 
 
@@ -123,9 +123,7 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-statesyncInstance = new Statesync()
-
-statesyncInstance.init globalConfig, (state) ->
+statesync.defaultInstance.init globalConfig, (state) ->
 	objectTree.init state
 	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()

@@ -48,7 +48,7 @@ class Statesync
 		# let every plugin do something with the updated state
 		# before syncing it to the server
 		if updatedStateEvent
-			handleUpdatedState({}, @state)
+			@handleUpdatedState({}, @state)
 		else
 			@sync()
 
@@ -59,7 +59,7 @@ class Statesync
 		#sync back as long client plugins modify state
 		@sync()
 
-	sync: () ->
+	sync: (force = false) ->
 		# if we shall not sync with the server, run the loop internally as long as
 		# plugins change the state
 		if not @syncWithServer
@@ -68,7 +68,7 @@ class Statesync
 
 			delta = diffpatch.diff @oldState, @state
 			while delta != null
-				handleUpdatedState({}, @state)
+				@handleUpdatedState({}, @state)
 				delta = diffpatch.diff @oldState, @state
 				@oldState = JSON.parse JSON.stringify @state
 			return
@@ -108,6 +108,14 @@ class Statesync
 				#deep copy current state
 				@oldState = JSON.parse JSON.stringify @state
 
-				handleUpdatedState(delta, @state)
+				@handleUpdatedState(delta, @state)
 
-module.exports = Statesync
+module.exports.Statesync = Statesync
+
+defaultInstance = new Statesync()
+
+# backwards compatibility for plugins that use statesync.performStateAction
+# directly
+module.exports.defaultInstance = defaultInstance
+module.exports.performStateAction = (callback, updatedStateEvent = false) ->
+	defaultInstance.performStateAction(callback, updatedStateEvent)

@@ -4,8 +4,10 @@
 
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
-renderer = require './renderer'
+_renderer = require './renderer'
+renderer = _renderer.defaultInstance
 fileLoader = require './fileLoader'
+
 
 module.exports = (globalConfig) ->
 	return {

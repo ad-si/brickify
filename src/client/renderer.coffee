@@ -5,108 +5,119 @@
 pluginHooks = require '../common/pluginHooks'
 Stats = require 'stats-js'
 
-renderer = null
-scene = null
-camera = null
-controls = null
-stats = null
+class Renderer
+	constructor: () ->
+		@scene = null
+		@camera = null
+		@threeRenderer = null
 
+	# this structure is needed because 'this' or '@' points to the wrong
+	# object when calling the render-Callback from WebGL
+	renderLoopCreator: (instanceReference) ->
+		return (timestamp) ->
+			i = instanceReference
+			i.stats?.begin()
+			i.threeRenderer.render i.scene, i.camera
+			pluginHooks.on3dUpdate timestamp
+			i.stats?.end()
+			requestAnimationFrame i.renderLoopCreator(i)
 
-localRenderer = (timestamp) ->
-	stats?.begin()
-	renderer.render scene, camera
-	pluginHooks.on3dUpdate timestamp
-	stats?.end()
+	addToScene: (node) ->
+		@scene.add node
 
-	requestAnimationFrame localRenderer
+	getDomElement: () ->
+		return @threeRenderer.domElement
 
-module.exports.addToScene = (node) ->
-	scene.add node
+	windowResizeHandler: () ->
+		if not @staticRendererSize
+			@camera.aspect = window.innerWidth / window.innerHeight
+			@camera.updateProjectionMatrix()
+			@threeRenderer.setSize window.innerWidth, window.innerHeight
 
-module.exports.getDomElement = () ->
-	renderer.domElement
+		@threeRenderer.render @scene, @camera
 
-module.exports.windowResizeHandler = () ->
-	camera.aspect = window.innerWidth / window.innerHeight
-	camera.updateProjectionMatrix()
+	init: (globalConfig) ->
+		@setupRenderer globalConfig
+		@setupScene globalConfig
+		@setupLighting globalConfig
+		@setupCamera globalConfig
+		@setupControls globalConfig
+		@setupFPSCounter() if process.env.NODE_ENV is 'development'
+		requestAnimationFrame @renderLoopCreator(@)
 
-	renderer.setSize( window.innerWidth, window.innerHeight )
-	renderer.render(scene, camera)
+	setupRenderer: (globalConfig) ->
+		@threeRenderer = new THREE.WebGLRenderer(
+			alpha: true
+			antialias: true
+			preserveDrawingBuffer: true
+		)
 
-module.exports.init = (globalConfig) ->
-	setupRenderer globalConfig
-	setupScene globalConfig
-	setupLighting globalConfig
-	setupCamera globalConfig
-	setupControls globalConfig
-	setupFPSCounter() if process.env.NODE_ENV is 'development'
-	requestAnimationFrame localRenderer
+		if not globalConfig.staticRendererSize
+			@staticRendererSize = false
+			@threeRenderer.setSize window.innerWidth, window.innerHeight
+		else
+			@staticRendererSize = true
+			@threeRenderer.setSize globalConfig.staticRendererWidth,
+				globalConfig.staticRendererHeight
 
-setupRenderer = (globalConfig) ->
-	renderer = new THREE.WebGLRenderer(
-		alpha: true
-		antialias: true
-		preserveDrawingBuffer: true
-	)
-	if not globalConfig.staticRendererSize
-		renderer.setSize window.innerWidth, window.innerHeight
-	else
-		renderer.setSize globalConfig.staticRendererWidth,
-			globalConfig.staticRendererHeight
+		@threeRenderer.setClearColor 0xf6f6f6, 1
+		@threeRenderer.domElement.setAttribute 'id', 'canvas'
+		document
+		.getElementById(globalConfig.renderAreaId)
+		.appendChild @threeRenderer.domElement
 
-	renderer.setClearColor 0xf6f6f6, 1
-	renderer.domElement.setAttribute 'id', 'canvas'
-	document
-	.getElementById(globalConfig.renderAreaId)
-	.appendChild renderer.domElement
+	setupScene: (globalConfig) ->
+		@scene = new THREE.Scene()
+		# Scene rotation because orbit controls only works
+		# with up vector of 0, 1, 0
+		sceneRotation = new THREE.Matrix4()
+		sceneRotation.makeRotationAxis(
+			new THREE.Vector3( 1, 0, 0 ),
+			(-Math.PI / 2)
+		)
+		@scene.applyMatrix(sceneRotation)
 
-setupScene = (globalConfig) ->
-	scene = new THREE.Scene()
-	# Scene rotation because orbit controls only works
-	# with up vector of 0, 1, 0
-	sceneRotation = new THREE.Matrix4()
-	sceneRotation.makeRotationAxis(
-		new THREE.Vector3( 1, 0, 0 ),
-		(-Math.PI / 2)
-	)
-	scene.applyMatrix(sceneRotation)
+	setupCamera: (globalConfig) ->
+		@camera = new THREE.PerspectiveCamera(
+			globalConfig.fov,
+			window.innerWidth / window.innerHeight,
+			globalConfig.cameraNearPlane,
+			globalConfig.cameraFarPlane
+		)
+		@camera.position.set(
+			globalConfig.axisLength
+			globalConfig.axisLength + 10
+			globalConfig.axisLength / 2
+		)
+		@camera.up.set(0, 1, 0)
+		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-setupLighting = (globalConfig) ->
-	ambientLight = new THREE.AmbientLight(0x404040)
-	scene.add(ambientLight)
+	setupControls: (globalConfig) ->
+		@controls = new THREE.OrbitControls(@camera, @threeRenderer.domElement)
+		@controls.target.set(0, 0, 0)
 
-	directionalLight = new THREE.DirectionalLight(0xffffff)
-	directionalLight.position.set 0, 20, 30
-	scene.add(directionalLight)
+	setupFPSCounter: () ->
+		@stats = new Stats()
+		# 0 means FPS, 1 means ms per frame
+		@stats.setMode(0)
+		@stats.domElement.style.position = 'absolute'
+		@stats.domElement.style.right = '0px'
+		@stats.domElement.style.bottom = '0px'
+		document.body.appendChild(@stats.domElement)
 
-	directionalLight = new THREE.DirectionalLight(0x808080)
-	directionalLight.position.set 20, 0, 30
-	scene.add( directionalLight )
+	setupLighting: (globalConfig) ->
+		ambientLight = new THREE.AmbientLight(0x404040)
+		@scene.add ambientLight
 
-setupCamera = (globalConfig) ->
-	camera = new THREE.PerspectiveCamera(
-		globalConfig.fov,
-		window.innerWidth / window.innerHeight,
-		globalConfig.cameraNearPlane,
-		globalConfig.cameraFarPlane
-	)
-	camera.position.set(
-		globalConfig.axisLength
-		globalConfig.axisLength + 10
-		globalConfig.axisLength / 2
-	)
-	camera.up.set(0, 1, 0)
-	camera.lookAt(new THREE.Vector3(0, 0, 0))
+		directionalLight = new THREE.DirectionalLight(0xffffff)
+		directionalLight.position.set 0, 20, 30
+		@scene.add directionalLight
 
-setupControls = (globalConfig) ->
-	controls = new THREE.OrbitControls(camera, renderer.domElement)
-	controls.target.set(0, 0, 0)
+		directionalLight = new THREE.DirectionalLight(0x808080)
+		directionalLight.position.set 20, 0, 30
+		@scene.add directionalLight
 
-setupFPSCounter = () ->
-	stats = new Stats()
-	# 0 means FPS, 1 means ms per frame
-	stats.setMode(0)
-	stats.domElement.style.position = 'absolute'
-	stats.domElement.style.right = '0px'
-	stats.domElement.style.bottom = '0px'
-	document.body.appendChild(stats.domElement)
+module.exports.Renderer = Renderer
+
+defaultInstance = new Renderer()
+module.exports.defaultInstance = defaultInstance

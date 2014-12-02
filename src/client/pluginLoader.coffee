@@ -6,7 +6,8 @@
 hooks = require('./pluginHooks.yaml')
 pluginHooks = require('../common/pluginHooks')
 pluginHooks.initHooks(hooks)
-renderer = require './renderer'
+_renderer = require './renderer'
+renderer = _renderer.defaultInstance
 
 pluginInstances = []
 globalConfigInstance = null

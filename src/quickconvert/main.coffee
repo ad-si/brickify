@@ -1,19 +1,28 @@
 globalConfig = require '../client/globals.yaml'
-renderer = require '../client/renderer'
+_renderer = require '../client/renderer'
 pluginLoader = require '../client/pluginLoader'
 statesync = require '../client/statesync'
 objectTree = require '../common/objectTree'
 
 globalConfig.staticRendererSize = true
-globalConfig.staticRendererWidth = 388;
-globalConfig.staticRendererHeight = 388;
+globalConfig.staticRendererWidth = 388
+globalConfig.staticRendererHeight = 388
 
 statesync.init globalConfig, (state) ->
 	objectTree.init state
 	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()
 
+renderer = _renderer.defaultInstance
 renderer.init globalConfig
+
+globalConfig.renderAreaId = 'renderArea2'
+renderer2 = new _renderer.Renderer()
+renderer2.init globalConfig
+
+globalConfig.renderAreaId = 'renderArea3'
+renderer3 = new _renderer.Renderer()
+renderer3.init globalConfig
 
 #get model from url
 hash = window.location.hash

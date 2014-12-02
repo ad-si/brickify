@@ -16,7 +16,7 @@ describe 'stlImport', () ->
 			#read all models and config files
 			files = fs.readdirSync modelPath
 			for file in files
-				if file.endsWith '.stl'
+				if file.search(/\.stl$/) != -1
 					models.push fs.readFileSync modelPath + file,
 						{encoding: 'utf8'}
 					modelFiles.push modelPath + file

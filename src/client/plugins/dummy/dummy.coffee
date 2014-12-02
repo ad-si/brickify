@@ -22,19 +22,6 @@
 common = require '../../../common/pluginCommon'
 
 ###
-# Specifies the plugin's name
-# @memberOf dummyClientPlugin
-###
-module.exports.pluginName = 'Dummy Client Plugin'
-
-###
-# Specifies the plugin's category
-# (Currently not used)
-# @memberOf dummyClientPlugin
-###
-module.exports.category = common.CATEGORY_IMPORT
-
-###
 # The plugin loader will call each plugin's `init` method (if provided) after
 # loading the plugin.
 #

@@ -22,9 +22,6 @@ class StlProperty
 			rotation: null
 			scale: null
 
-module.exports.pluginName = 'stl Import Plugin'
-module.exports.category = common.CATEGORY_IMPORT
-
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 

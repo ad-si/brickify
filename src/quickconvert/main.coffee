@@ -1,7 +1,7 @@
 globalConfig = require '../client/globals.yaml'
 _renderer = require '../client/renderer'
 pluginLoader = require '../client/pluginLoader'
-statesync = require '../client/statesync'
+Statesync = require '../client/statesync'
 objectTree = require '../common/objectTree'
 coordinateSystem = require '../client/plugins/coordinateSystem/coordinateSystem'
 
@@ -45,6 +45,7 @@ vanillaLink = $('.applink').attr('href')
 vanillaLink += 'initialModel=' + hash
 $('.applink').attr('href', vanillaLink)
 
+statesync = new Statesync(false)
 statesync.init globalConfig, (state) ->
 	objectTree.init state
 	pluginLoader.init globalConfig

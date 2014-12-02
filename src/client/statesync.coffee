@@ -64,7 +64,7 @@ class Statesync
 		# plugins change the state
 		if not @syncWithServer
 			@oldState = JSON.parse JSON.stringify @state
-			handleUpdatedState({}, @state)
+			@handleUpdatedState({}, @state)
 
 			delta = diffpatch.diff @oldState, @state
 			while delta != null

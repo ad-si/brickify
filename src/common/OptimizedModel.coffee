@@ -131,7 +131,7 @@ class OptimizedModel
 			return @createStandardGeometry()
 
 	# Creates a THREE.BufferGeometry using vertex normals
-	createBufferGeometry:  ->
+	createBufferGeometry: ->
 		geometry = new THREE.BufferGeometry()
 		#officially, threejs supports normal array, but in fact,
 		#you have to use this lowlevel datatype to view something
@@ -152,7 +152,7 @@ class OptimizedModel
 		return geometry
 
 	# uses a THREE.Geometry using face normals
-	createStandardGeometry:  ->
+	createStandardGeometry: ->
 		geometry = new THREE.Geometry()
 
 		for vi in [0..@positions.length - 1] by 3

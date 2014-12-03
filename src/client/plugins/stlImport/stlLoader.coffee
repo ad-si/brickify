@@ -286,7 +286,7 @@ class Stl
 					newNormals++
 
 			poly.normal = n
-			return newNormals
+		return newNormals
 	cleanse: (infoResult = false) ->
 		result = {}
 		result.deletedPolygons = @removeInvalidPolygons infoResult

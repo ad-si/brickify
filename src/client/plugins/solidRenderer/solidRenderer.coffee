@@ -29,8 +29,8 @@ module.exports.onStateUpdate = (delta, state) ->
 loadModelIfNeeded = (node) ->
 	if node.pluginData.solidRenderer?
 		properties = node.pluginData.solidRenderer
-		storedId = properties.threeObjectId
-		threeObject = threejsRootNode.getObjectById storedId, true
+		storedUuid = properties.threeObjectUuid
+		threeObject = threejsRootNode.getObjectByName storedUuid, true
 		if not threeObject?
 			loadModelFromCache node, properties, true
 	else
@@ -39,14 +39,14 @@ loadModelIfNeeded = (node) ->
 	# TODO: Remove deleted objects
 
 loadModelFromCache = (node, properties, reload = false) ->
-	#Create object and override id
+	#Create object and override name
 	success = (optimizedModel) ->
 		console.log "Got model #{node.meshHash}"
 		threeObj = addModelToThree optimizedModel
 		if reload
-			copyPropertyDataToThree node, properties, threeObj
+			threeObj.name = properties.threeObjectUuid
 		else
-			properties.threeObjectId = threeObj.id
+			properties.threeObjectUuid = threeObj.name
 	failure = () ->
 		console.error "Unable to get model #{node.meshHash}"
 
@@ -62,16 +62,14 @@ addModelToThree = (optimizedModel) ->
 		}
 	)
 	object = new THREE.Mesh(geometry, objectMaterial)
+	object.name = object.uuid
+
 	threejsRootNode.add object
 	return object
 
-# Copys Three data (transforms, ID) to the property object
-copyThreeDataToProperty = (properties, threeObject) ->
-	properties.threeObjectId = threeObject.id
-
-# copys stored transforms and ID from the properties to the tree object.
-copyPropertyDataToThree = (node, properties, threeObject) ->
-	threeObject.id = properties.threeObjectId
+# copys stored transforms to the tree object.
+# TODO: use
+copyTransformDataToThree = (node, threeObject) ->
 	posd = node.positionData
 	threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
 	threeObject.rotation.set(

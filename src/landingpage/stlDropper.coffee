@@ -59,17 +59,17 @@ handleLoadedFile = (filename) ->
 
 		droptext.html uploadString
 
-		uploadFinishedCallback = (md5, fileEnding) ->
-			modelhash = md5 + '.' + fileEnding
+		uploadFinishedCallback = () ->
+			#todo cache this in optimizedModel
+			base64Optimized = optimizedModel.toBase64()
+			md5hash = md5(base64Optimized)
+
 			if importErrors
 				modelhash += '+errors'
-			document.location.href += 'quickconvert#' + modelhash
+			document.location.href += 'quickconvert#' + md5hash
 			return
 
-		base64Optimized = optimizedModel.toBase64()
-		md5hash = md5(base64Optimized)
-		modelCache.submitMeshToServer md5hash,
-			'optimized', base64Optimized, uploadFinishedCallback
+		modelCache.store optimizedModel, uploadFinishedCallback
 
 		return
 	return loadCallback

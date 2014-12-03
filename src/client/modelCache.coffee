@@ -2,8 +2,8 @@ OptimizedModel = require '../common/OptimizedModel'
 
 ##
 #  ModelCache
-#  Caches models and allows all Plugins to retrieve cached models
-#  from the server
+#  Caches models and allows all Plugins to retrieve
+#  cached models from the server
 ##
 
 # The cache of loaded optimized models
@@ -14,21 +14,23 @@ modelQueries = {}
 
 # sends the model to the server if the server hasn't got a file
 # with the same hash value
-submitDataToServer = (hash, data) ->
+submitDataToServer = (hash, data, success) ->
 	$.get('/model/exists/' + hash).fail () ->
 		#server doesn't have the model, send it
 		$.ajax '/model/submit/' + hash,
 			data: data
 			type: 'POST'
 			contentType: 'application/octet-stream'
-			success: () -> console.log 'sent model to the server'
+			success: () ->
+				console.log 'sent model to the server'
+				success?()
 			error: () -> console.error 'unable to send model to the server'
 
-module.exports.store = (optimizedModel) ->
+module.exports.store = (optimizedModel, success) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
 	cache hash, optimizedModel
-	submitDataToServer(hash, modelData)
+	submitDataToServer(hash, modelData, success)
 
 # requests a mesh with the given hash from the server
 # if it is cached locally, the local reference is returned

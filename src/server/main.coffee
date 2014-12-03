@@ -202,7 +202,9 @@ module.exports.setupRouting = () ->
 		app.use errorHandler()
 
 	app.use (req, res) ->
-		res.render '404', links
+		res
+		.status(404)
+		.render '404', links
 
 	return module.exports
 

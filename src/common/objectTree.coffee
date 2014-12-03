@@ -26,9 +26,15 @@ addPluginData = (node, key, data) ->
 #The node structure is the base structure for all nodes
 class NodeStructure
 	constructor: () ->
-		@properties = {}
+		# DO NOT use as identifier
+		@fileName = ''
+		# DO use as identifier
+		@meshHash = ''
+		@positionData =
+			position: {x: 0, y: 0, z: 0}
+			rotation: {_x: 0, _y: 0, _z: 0}
+			scale: {x: 1, y: 1, z: 1}
 		@pluginData = {}
-
 
 module.exports = {
 	forAllSubnodes: forAllSubnodes

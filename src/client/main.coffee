@@ -145,10 +145,10 @@ statesync.defaultInstance.init globalConfig, (state) ->
 commandFunctions = {
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
-		stlImport = require './plugins/stlImport/stlImport'
-		p = /^[0-9a-z]{32}\.optimized$/
+		modelLoader = require './modelLoader'
+		p = /^[0-9a-z]{32}/
 		if p.test value
-			stlImport.importHash value
+			modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
 }

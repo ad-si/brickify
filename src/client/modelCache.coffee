@@ -1,140 +1,78 @@
 OptimizedModel = require '../common/OptimizedModel'
 
 ##
- # ModelCache
+#  ModelCache
+#  Caches models and allows all Plugins to retrieve cached models
+#  from the server
 ##
 
-# Caches models and allows all Plugins to retrieve cached models from the server
-
-# the cache for raw data of any kind
-modelCache = []
-
-# the cache for optimized model instances
-optimizedModelCache = []
+# The cache of loaded optimized models
+modelCache = {}
 
 # currently running model queries
-currentOptimizedModelQueries = []
+modelQueries = {}
 
 # sends the model to the server if the server hasn't got a file
-# with the same file ending and md5 value
-# model will be cached locally
-submitMeshToServer = (md5hash, fileEnding, data, successCallback) ->
-	addModelToCache md5hash + '.' + fileEnding, data
-
-	$.get('/model/exists/' + md5hash + '/' + fileEnding)
-	.success () ->
-		console.log 'Server already has mdel'
-		if successCallback?
-			successCallback md5hash, fileEnding
-	.fail () ->
-		#server hasn't got the model, send it
-		$.ajax '/model/submit/' + md5hash + '/' + fileEnding,
+# with the same hash value
+submitDataToServer = (hash, data) ->
+	$.get('/model/exists/' + hash).fail () ->
+		#server doesn't have the model, send it
+		$.ajax '/model/submit/' + hash,
 			data: data
 			type: 'POST'
 			contentType: 'application/octet-stream'
-			success: () ->
-				console.log 'sent model to the server'
-				if successCallback?
-					successCallback md5hash, fileEnding
-			error: () ->
-				console.error 'unable to send model to the server'
-module.exports.submitMeshToServer = submitMeshToServer
+			success: () -> console.log 'sent model to the server'
+			error: () -> console.error 'unable to send model to the server'
 
-# Same as submit mesh to server, but the optimized model instance will be cached
-submitOptimizedMeshToServer = (md5hash, fileEnding,
-															 optimizedModelInstance, successCallback) ->
-	addOptimizedInstance md5hash + '.' + fileEnding, optimizedModelInstance
-	serialized = optimizedModelInstance.toBase64()
+module.exports.store = (optimizedModel) ->
+	modelData = optimizedModel.toBase64()
+	hash = md5(modelData)
+	cache hash, optimizedModel
+	submitDataToServer(hash, modelData)
 
-	submitMeshToServer md5hash,fileEnding, optimizedModelInstance, successCallback
-module.exports.submitOptimizedMeshToServer = submitOptimizedMeshToServer
-
-# requests a mesh with the given md5hash.ending from the server
+# requests a mesh with the given hash from the server
 # if it is cached locally, the local reference is returned
-# if the mesh ends with .optimized, the instance (and not the raw data)
-# of the optimized model is returned
-requestMeshFromServer = (md5hashWithEnding, successCallback, failCallback) ->
-	model = getModelFromCache md5hashWithEnding
-	if model?
-		successCallback model
-		return
-
-	splitted = md5hashWithEnding.split('.')
-	md5hash = splitted[0]
-	fileEnding = splitted[1]
-	requestUrl = '/model/get/' + md5hash + '/' + fileEnding
-	responseCallback = (data, textStatus, jqXHR) ->
-			addModelToCache md5hashWithEnding, data
-			successCallback data
-
-	$.get(requestUrl, '', responseCallback).fail () ->
+requestDataFromServer = (hash, successCallback, failCallback) ->
+	requestUrl = '/model/get/' + hash
+	$.get(requestUrl, '', successCallback).fail () ->
 		failCallback() if failCallback?
-module.exports.requestMeshFromServer = requestMeshFromServer
 
-# Same as requestMeshFromServer, but returns cached optimizedModel instance if
-# it exists
-requestOptimizedMeshFromServer = (md5hashWithEnding, success, fail) ->
-	modelInstance = getOptimizedInstance md5hashWithEnding
-	if modelInstance?
-		success modelInstance
-
-	query = getQueryForOptimizedModel md5hashWithEnding
-	query.successCallbacks.push success
-	query.failCallbacks.push fail
-
-	if query.successCallbacks.length > 1
-		# if this is not the first instance that requests this model, the query
-		# is already running - wait for it to complete
-		return
+# Request an optimized mesh with the given hash
+# The mesh will be provided by the cache if present or loaded from the server
+# if available. Otherwise, `fail` will be called
+module.exports.request = (hash, success, fail) ->
+	if (model = modelCache[hash])?
+		success model
+	else if (query = modelQueries[hash])?
+		query.successCallbacks.push success
+		query.failCallbacks.push fail
 	else
-		# this is the first instance that requests this model, we have to run
-		# the query for ourselves
-		successCb = (data) ->
-			modelInstance = new OptimizedModel()
-			modelInstance.fromBase64 data
-			addOptimizedInstance md5hashWithEnding, modelInstance
-			for sc in query.successCallbacks
-				sc modelInstance
-			deleteQuery query
-		failCb = () ->
-			for fc in query.failCallbacks
-				fc()
-			deleteQuery query
-		requestMeshFromServer md5hashWithEnding, successCb, failCb
-module.exports.requestOptimizedMeshFromServer = requestOptimizedMeshFromServer
+		query = {
+			hash: hash
+			successCallbacks: [success]
+			failCallbacks: [fail]
+		}
+		modelQueries[hash] = query
+		requestDataFromServer(
+			hash
+			requestOptimizedModelSuccess query
+			requestOptimizedModelFail query
+		)
 
-addModelToCache = (md5hashWithEnding, data) ->
-	for m in modelCache
-		if m.hash == md5hashWithEnding
-			return
-	modelCache.push {hash: md5hashWithEnding, data: data}
+requestOptimizedModelSuccess = (query) -> (data) ->
+	model = new OptimizedModel()
+	model.fromBase64 data
+	hash = md5(data)
+	cache hash, model
+	successCallback model for successCallback in query.successCallbacks
+	deleteQuery query
 
-getModelFromCache = (md5hashWithEnding) ->
-	for m in modelCache
-		if m.hash == md5hashWithEnding
-			return m.data
-	return null
-
-addOptimizedInstance = (md5HashWithEnding, instance) ->
-	for m in optimizedModelCache
-		if m.hash == md5HashWithEnding
-			return
-	optimizedModelCache.push {hash: md5HashWithEnding, data: instance}
-
-getOptimizedInstance = (md5HashWithEnding) ->
-	for m in optimizedModelCache
-		if m.hash == md5HashWithEnding
-			return m.data
-	return null
-
-getQueryForOptimizedModel = (hash) ->
-	q = currentOptimizedModelQueries[hash]
-	unless q
-		q = {hash: hash; successCallbacks: []; failCallbacks: []}
-		currentOptimizedModelQueries[hash] = q
-	return q
+requestOptimizedModelFail = (query) -> () ->
+	failCallback() for failCallback in query.failCallbacks
+	deleteQuery query
 
 deleteQuery = (query) ->
-	index = currentOptimizedModelQueries.indexOf query.hash
-	unless index is -1
-		currentOptimizedModelQueries.splice index, 1
+	delete modelQueries[query.hash]
+
+cache = (hash, model) ->
+	modelCache[hash] = model

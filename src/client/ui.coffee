@@ -6,7 +6,7 @@ statesync = require './statesync'
 objectTree = require '../common/objectTree'
 _renderer = require './renderer'
 renderer = _renderer.defaultInstance
-fileLoader = require './fileLoader'
+modelLoader = require './modelLoader'
 
 
 module.exports = (globalConfig) ->
@@ -15,7 +15,7 @@ module.exports = (globalConfig) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
-			fileLoader.readFiles files if files?
+			modelLoader.readFiles files if files?
 
 		dragOverHandler: (event) ->
 			event.stopPropagation()

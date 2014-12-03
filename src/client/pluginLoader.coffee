@@ -3,19 +3,19 @@
 ###
 
 # Load the hook list and initialize the pluginHook management
+path = require 'path'
 hooks = require('./pluginHooks.yaml')
 pluginHooks = require('../common/pluginHooks')
 pluginHooks.initHooks(hooks)
 _renderer = require './renderer'
 renderer = _renderer.defaultInstance
 
-pluginInstances = []
 globalConfigInstance = null
 
-checkForPluginMethods = (instance) ->
-	instance.hasOwnProperty('pluginName')
+initPlugin = (instance, packageData) ->
+	for own key,value of packageData
+		instance[key] = value
 
-initPluginInstance = (instance) ->
 	instance.init? globalConfigInstance
 	instance.init3d? threeNode = new THREE.Object3D()
 	instance.initUi? {
@@ -29,26 +29,34 @@ initPluginInstance = (instance) ->
 	if threeNode?
 		renderer.addToScene threeNode
 
-loadPlugin = (instance) ->
-	if checkForPluginMethods instance
-		pluginInstances.push instance
-		initPluginInstance instance
-		console.log "Plugin #{instance.pluginName} loaded"
-
-	else
-		console.warn "Plugin #{instance.pluginName?} does not contain all
-				necessary methods, will not be loaded"
 
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig
 
-
 # Since browserify.js does not support dynamic require
 # all plugins must be explicitly written down
 module.exports.loadPlugins = () ->
-
-	loadPlugin require './plugins/dummy/dummy'
-	loadPlugin require './plugins/coordinateSystem/coordinateSystem'
-	loadPlugin require './plugins/stlImport/stlImport'
-	loadPlugin require './plugins/stlExport/stlExport'
-	loadPlugin require './plugins/sceneGraph/sceneGraph'
+	initPlugin(
+		require('./plugins/dummy'),
+		require('./plugins/dummy/package.json')
+	)
+	initPlugin(
+		require('./plugins/coordinateSystem'),
+		require('./plugins/coordinateSystem/package.json')
+	)
+	initPlugin(
+		require('./plugins/solidRenderer'),
+		require('./plugins/solidRenderer/package.json')
+	)
+	initPlugin(
+		require('./plugins/stlImport'),
+		require('./plugins/stlImport/package.json')
+	)
+	initPlugin(
+		require('./plugins/stlExport'),
+		require('./plugins/stlExport/package.json')
+	)
+	initPlugin(
+		require('./plugins/sceneGraph'),
+		require('./plugins/sceneGraph/package.json')
+	)

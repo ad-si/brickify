@@ -5,11 +5,6 @@
   navigation inside lowfab.
 ###
 
-common = require '../../../common/pluginCommon'
-
-module.exports.pluginName = 'Coordinate System Plugin'
-module.exports.category = common.CATEGORY_RENDERER
-
 # Require sub-modules, see [Grid](grid.html) and [Axis](axis.html)
 setupGrid = require './grid'
 setupAxis = require './axis'

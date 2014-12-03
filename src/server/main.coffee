@@ -168,7 +168,7 @@ module.exports.setupRouting = () ->
 	app.get '/model/get/:hash', urlParser, modelStorageApi.getModel
 	app.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
 
-	app.post '/datapacket/packet/', jsonParser, dataPackets.createPacket
+	app.post '/datapacket/packet/undefined', jsonParser, dataPackets.createPacket
 	app.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
 	app.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
 

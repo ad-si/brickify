@@ -11,41 +11,19 @@ module.exports.get = (id, success, fail) ->
 # sends a packet to the server. if id is specified, the packet with the same
 # id is updated. else, a new id is generated
 module.exports.put = (data, id, success, fail) ->
-	if id?
-		updatePacket id, data, (result) ->
-			if result
-				if success?
-					success(id)
-			else
-				if fail?
-					fail()
-	else
-		createPacket data,(newId) ->
-			if newId?
-				if success?
-					success(newId)
-			else
-				if fail?
-					fail()
-
-# creates a packet and returns the id in the callback
-createPacket = (data, callback) ->
-	$.ajax '/datapacket/packet/',
-		data: JSON.stringify {packet: data}
-		type: 'POST'
-		contentType: 'application/json'
-		success: (json) ->
-			callback json.id
-		fail: () ->
-			callback null
+	updatePacket id, data, (result) ->
+		if result?
+			success? result
+		else
+			fail?()
 
 # uploads an updated packet to the server
-updatePacket = (id, packet, callback) ->
+updatePacket = (id = 'undefined', packet, callback) ->
 	$.ajax '/datapacket/packet/' + id,
 		data: JSON.stringify {id: id, packet: packet}
 		type: 'POST'
 		contentType: 'application/json'
-		success: () ->
-			callback true
+		success: (json) ->
+			callback json.id
 		error: () ->
-			callback false
+			callback null

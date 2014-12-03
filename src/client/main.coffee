@@ -152,3 +152,4 @@ commandFunctions = {
 		else
 			console.warn 'Invalid value for initialModel'
 }
+

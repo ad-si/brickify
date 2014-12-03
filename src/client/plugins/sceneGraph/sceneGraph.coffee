@@ -47,10 +47,6 @@ renderUi = (elements) ->
 	else
 		$treeContainer.tree 'loadData', treeData
 
-# Store the global configuration for later use by init3d
-module.exports.init = (globalConfig, state, ui) ->
-	@globalConfig = globalConfig
-
 module.exports.onStateUpdate = (delta, _state) ->
 	state = _state
 	if uiInitialized

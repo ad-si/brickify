@@ -51,7 +51,7 @@ index = require '../../routes/index'
 statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
-
+dataPackets = require '../../routes/dataPackets'
 
 server = http.createServer(app)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
@@ -167,6 +167,10 @@ module.exports.setupRouting = () ->
 	app.get '/model/exists/:md5/:extension', urlParser, modelStorageApi.modelExists
 	app.get '/model/get/:md5/:extension', urlParser, modelStorageApi.getModel
 	app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
+
+	app.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
+	app.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
+	app.get  '/datapacket/create', jsonParser, dataPackets.createPacket
 
 	app.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?

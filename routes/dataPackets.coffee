@@ -1,3 +1,6 @@
+winston = require 'winston'
+log = winston.loggers.get 'log'
+
 dpProvider = require '../src/server/dataPacketProvider'
 dpStorage = require '../src/server/dataPacketRamStorage'
 
@@ -7,13 +10,20 @@ module.exports.getPacket = (request, response) ->
 	id = request.params.id
 	dpProvider.getPacket id, (packet) ->
 		if packet?
+			log.debug "Sending packet '#{id}'"
 			response.json {packet: packet}
 		else
+			log.warn "Requested packet '#{id}' does not exist"
 			response.status(404).send('')
 
 module.exports.createPacket = (request, response) ->
-	dpProvider.createPacket (id, packet) ->
-		response.json {id: id, packet: packet}
+	dpProvider.createPacket (id) ->
+		if id?
+			log.debug "Created packet '#{id}'"
+			response.json {id: id}
+		else
+			log.warn "Error creating packet '#{id}'"
+			response.status(500).send()
 
 module.exports.updatePacket = (request, response) ->
 	if not (request.body.id? and request.body.packet?)
@@ -22,6 +32,8 @@ module.exports.updatePacket = (request, response) ->
 
 	dpProvider.updatePacket request.body.id, request.body.packet, (success) ->
 		if success
+			log.debug "Updated packet '#{request.body.id}'"
 			response.status(200).send()
 		else
+			log.warn "Error updating packet '#{request.body.id}'"
 			response.status(500).send()

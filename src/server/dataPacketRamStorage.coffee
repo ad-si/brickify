@@ -20,5 +20,5 @@ module.exports.updatePacket = (id, data, callback) ->
 
 module.exports.createPacket = (id, callback) ->
 	packets[id] = {}
-	callback packets[id]
+	callback true
 

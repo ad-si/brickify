@@ -18,7 +18,11 @@ module.exports.createPacket = (callback) ->
 			newId = createId()
 			dpStorage.hasPacket newId, check
 		else
-			dpStorage.createPacket id, callback
+			dpStorage.createPacket id, (success) ->
+				if (success)
+					callback id
+				else
+					callback null
 
 	check()
 

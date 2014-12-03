@@ -5,12 +5,6 @@
 ###
 objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
-common = require '../../../common/pluginCommon'
-
-module.exports.pluginName = 'Solid Renderer Plugin'
-module.exports.category = common.CATEGORY_RENDERER
-
-pluginPropertyName = 'solidRenderer'
 
 threejsRootNode = null
 globalConfigInstance = null

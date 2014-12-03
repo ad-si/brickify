@@ -18,9 +18,6 @@
 # @module dummyClientPlugin
 ###
 
-# include common plugin functions and data
-common = require '../../../common/pluginCommon'
-
 ###
 # The plugin loader will call each plugin's `init` method (if provided) after
 # loading the plugin.

@@ -145,55 +145,6 @@ parseBinary = (fileContent) ->
 
 	return stl
 
-# Creates a THREE.BufferGeometry using vertex normals
-createBufferGeometry = (optimizedModel) ->
-	geometry = new THREE.BufferGeometry()
-	#officially, threejs supports normal array, but in fact,
-	#you have to use this lowlevel datatype to view something
-	parray = new Float32Array(optimizedModel.positions.length)
-	for i in [0..optimizedModel.positions.length - 1]
-		parray[i] = optimizedModel.positions[i]
-	narray = new Float32Array(optimizedModel.vertexNormals.length)
-	for i in [0..optimizedModel.vertexNormals.length - 1]
-		narray[i] = optimizedModel.vertexNormals[i]
-	iarray = new Uint32Array(optimizedModel.indices.length)
-	for i in [0..optimizedModel.indices.length - 1]
-		iarray[i] = optimizedModel.indices[i]
-
-	geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
-	geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
-	geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
-	geometry.computeBoundingSphere()
-	return geometry
-
-# uses a THREE.Geometry using face normals
-createStandardGeometry = (optimizedModel) ->
-	geometry = new THREE.Geometry()
-
-	for vi in [0..optimizedModel.positions.length - 1] by 3
-		geometry.vertices.push new THREE.Vector3(optimizedModel.positions[vi],
-			optimizedModel.positions[vi + 1], optimizedModel.positions[vi + 2])
-
-	for fi in [0..optimizedModel.indices.length - 1] by 3
-		geometry.faces.push new THREE.Face3(optimizedModel.indices[fi],
-			optimizedModel.indices[fi + 1], optimizedModel.indices[fi + 2],
-			new THREE.Vector3(optimizedModel.faceNormals[fi],
-				optimizedModel.faceNormals[fi + 1],
-				optimizedModel.faceNormals[fi + 2]))
-
-	return geometry
-
-# Creates a ThreeGeometry out of an optimized model
-# if bufferGeoemtry is set to true, a BufferGeometry using
-# the vertex normals will be created
-# else, a normal Geometry with face normals will be created
-# (contains duplicate points, but provides better shading for sharp edges)
-module.exports.convertToThreeGeometry = (optimizedModel,
-																				 bufferGeometry = false) ->
-	if (bufferGeometry)
-		return createBufferGeometry(optimizedModel)
-	else
-		return createStandardGeometry(optimizedModel)
 
 # Optimizes the internal stl model representation by removing duplicate points
 # and creating an indexed face list

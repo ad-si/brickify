@@ -4,8 +4,6 @@
   Converts any ThreeJS geometry to ASCII-.stl data format
 ###
 
-common = require '../../../common/pluginCommon'
-
 #helper methods
 stringifyVector = (vec) ->
 	'' + vec.x + ' ' + vec.y + ' ' + vec.z

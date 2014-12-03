@@ -164,9 +164,9 @@ module.exports.setupRouting = () ->
 	app.get '/statesync/get', jsonParser, statesync.getState
 	app.post '/statesync/set', jsonParser, statesync.setState
 	app.get '/statesync/reset', jsonParser, statesync.resetState
-	app.get '/model/exists/:md5/:extension', urlParser, modelStorageApi.modelExists
-	app.get '/model/get/:md5/:extension', urlParser, modelStorageApi.getModel
-	app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
+	app.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists
+	app.get '/model/get/:hash', urlParser, modelStorageApi.getModel
+	app.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
 
 	app.post '/datapacket/packet/', jsonParser, dataPackets.createPacket
 	app.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
@@ -198,7 +198,9 @@ module.exports.setupRouting = () ->
 		app.use errorHandler()
 
 	app.use (req, res) ->
-		res.render '404', links
+		res
+		.status(404)
+		.render '404', links
 
 	return module.exports
 

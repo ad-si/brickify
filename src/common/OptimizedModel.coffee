@@ -119,6 +119,55 @@ class OptimizedModel
 			binary += String.fromCharCode( bytes[ i ] )
 		return window.btoa binary
 
+	# Creates a ThreeGeometry out of an optimized model
+	# if bufferGeoemtry is set to true, a BufferGeometry using
+	# the vertex normals will be created
+	# else, a normal Geometry with face normals will be created
+	# (contains duplicate points, but provides better shading for sharp edges)
+	convertToThreeGeometry: (bufferGeometry = false) ->
+		if (bufferGeometry)
+			return @createBufferGeometry()
+		else
+			return @createStandardGeometry()
+
+	# Creates a THREE.BufferGeometry using vertex normals
+	createBufferGeometry: ->
+		geometry = new THREE.BufferGeometry()
+		#officially, threejs supports normal array, but in fact,
+		#you have to use this lowlevel datatype to view something
+		parray = new Float32Array(@positions.length)
+		for i in [0..@positions.length - 1]
+			parray[i] = @positions[i]
+		narray = new Float32Array(@vertexNormals.length)
+		for i in [0..@vertexNormals.length - 1]
+			narray[i] = @vertexNormals[i]
+		iarray = new Uint32Array(@indices.length)
+		for i in [0..@indices.length - 1]
+			iarray[i] = @indices[i]
+
+		geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
+		geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
+		geometry.addAttribute 'normal', new THREE.BufferAttribute(narray, 3)
+		geometry.computeBoundingSphere()
+		return geometry
+
+	# uses a THREE.Geometry using face normals
+	createStandardGeometry: ->
+		geometry = new THREE.Geometry()
+
+		for vi in [0..@positions.length - 1] by 3
+			geometry.vertices.push new THREE.Vector3(@positions[vi],
+				@positions[vi + 1], @positions[vi + 2])
+
+		for fi in [0..@indices.length - 1] by 3
+			geometry.faces.push new THREE.Face3(@indices[fi],
+				@indices[fi + 1], @indices[fi + 2],
+				new THREE.Vector3(@faceNormals[fi],
+					@faceNormals[fi + 1],
+					@faceNormals[fi + 2]))
+
+		return geometry
+
 module.exports = OptimizedModel
 
 base64ByteLength = (base64Length) ->

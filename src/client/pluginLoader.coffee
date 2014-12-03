@@ -44,6 +44,10 @@ module.exports.loadPlugins = () ->
 		require('./plugins/coordinateSystem/package.json')
 	)
 	initPlugin(
+		require('./plugins/solidRenderer'),
+		require('./plugins/solidRenderer/package.json')
+	)
+	initPlugin(
 		require('./plugins/stlImport'),
 		require('./plugins/stlImport/package.json')
 	)

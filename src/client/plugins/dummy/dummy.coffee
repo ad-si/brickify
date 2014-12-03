@@ -59,18 +59,16 @@ module.exports.initUi = (domElements) ->
 
 ###
 # The state synchronization module will call each plugin's
-# `updateState` method (if provided) whenever the current state changes
+# `onStateUpdate` method (if provided) whenever the current state changes
 # due to user input or calculation results on either server or client side.
 #
-# The hook provides both the delta to the previous state and the new complete
-# state as arguments.
+# The hook provides the new complete state as an arguments.
 #
-# @param {Object} delta the state changes since the last updateState call
 # @param {Object} state the complete current state
 # @memberOf dummyClientPlugin
 # @see stateSynchronization
 ###
-module.exports.onStateUpdate = (delta, state) ->
+module.exports.onStateUpdate = (state) ->
 	console.log 'Dummy Client Plugin state change'
 
 

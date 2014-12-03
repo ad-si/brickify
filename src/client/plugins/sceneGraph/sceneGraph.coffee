@@ -23,8 +23,7 @@ renderUi = (elements) ->
 
 	writeToObject = (treeNode, node) ->
 
-		treeNode.label = treeNode.title = node
-			.pluginData['stlImport']?.fileName or treeNode.label or ''
+		treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
 		treeNode.id = idCounter++
 
 		if node.children

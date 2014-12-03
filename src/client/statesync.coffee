@@ -127,4 +127,6 @@ defaultInstance = new Statesync()
 # directly
 module.exports.defaultInstance = defaultInstance
 module.exports.performStateAction = (callback, updatedStateEvent = false) ->
+	console.warn 'performStateAction should not be used anymore, use async code
+and done() in onStateUpdate instead'
 	defaultInstance.performStateAction(callback, updatedStateEvent)

@@ -148,7 +148,7 @@ commandFunctions = {
 		modelLoader = require './modelLoader'
 		p = /^[0-9a-z]{32}/
 		if p.test value
-			modelLoader.loadByHash value
+			modelLoader.loadByHash value, statesync.defaultInstance
 		else
 			console.warn 'Invalid value for initialModel'
 }

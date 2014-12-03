@@ -15,7 +15,7 @@ module.exports = (globalConfig) ->
 			event.stopPropagation()
 			event.preventDefault()
 			files = event.target.files ? event.dataTransfer.files
-			modelLoader.readFiles files if files?
+			modelLoader.readFiles files, statesync.defaultInstance if files?
 
 		dragOverHandler: (event) ->
 			event.stopPropagation()

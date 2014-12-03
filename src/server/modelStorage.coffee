@@ -12,37 +12,36 @@ module.exports.init = (cacheDir = 'modelCache') ->
 	mkdirp cacheDir, (err) ->
 		log.warn 'Unable to create model cache dir: ' + err if err?
 
-module.exports.hasModel = (md5hash, fileEnding, callback) ->
-	if not checkHash md5hash, fileEnding
+module.exports.hasModel = (hash, callback) ->
+	if not checkHash hash
 		callback false
 		return
 
-	fs.exists buildFileName(md5hash, fileEnding), (exists) ->
+	fs.exists buildFileName(hash), (exists) ->
 		callback(exists)
 
-module.exports.loadModel = (md5hash, fileEnding, callback) ->
-	if not checkHash md5hash, fileEnding
+module.exports.loadModel = (hash, callback) ->
+	if not checkHash hash
 		callback 'invalid hash', null
 		return
 
-	fs.readFile buildFileName(md5hash, fileEnding), (error, data) ->
+	fs.readFile buildFileName(hash), (error, data) ->
 		callback(error, data)
 
-module.exports.saveModel = (md5hash, fileEnding, data, callback) ->
-	if not checkHash md5hash, fileEnding
+module.exports.saveModel = (hash, data, callback) ->
+	if not checkHash hash
 		callback 'invalid hash', null
 		return
 
-	fs.writeFile buildFileName(md5hash, fileEnding), data, callback
+	fs.writeFile buildFileName(hash), data, callback
 
-buildFileName = (md5hash, fileEnding) ->
-	return path.normalize modelCacheDir + '/' + md5hash + '.' + fileEnding
+buildFileName = (hash) ->
+	return path.normalize modelCacheDir + '/' + hash
 
 # checks if the hash and fileEnding are in a valid format
-checkHash = (md5hash, fileEnding) ->
+checkHash = (hash) ->
 	p = /^[0-9a-z]{32}$/
-	if p.test md5hash
-		if fileEnding == 'optimized' or fileEnding == 'stl'
-			return true
-	log.warn "Requested model #{md5hash}.#{fileEnding} is no valid hash"
+	if p.test hash
+		return true
+	log.warn "Requested model #{hash} is no valid hash"
 	return false

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Colored coordinate system for better navigation.",
   "lowfab": {
-    "type": "converter"
+    "type": "renderer"
   },
   "main": "./coordinateSystem.coffee"
 }

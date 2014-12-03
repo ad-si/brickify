@@ -40,7 +40,7 @@ module.exports.updatePacket = (request, response) ->
 	dpProvider.updatePacket request.body.id, request.body.packet, (success) ->
 		if success
 			log.debug "Updated packet '#{request.body.id}'"
-			response.status(200).send()
+			response.json {id: request.body.id}
 		else
 			log.warn "Error updating packet '#{request.body.id}'"
 			response.status(500).send()

@@ -70,7 +70,7 @@ module.exports.initUi = (domElements) ->
 # @memberOf dummyClientPlugin
 # @see stateSynchronization
 ###
-module.exports.onStateUpdate = (delta, state) ->
+module.exports.onStateUpdate = (state) ->
 	console.log 'Dummy Client Plugin state change'
 
 

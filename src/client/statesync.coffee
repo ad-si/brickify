@@ -32,7 +32,7 @@ exports.performStateAction = (callback, updatedStateEvent = false) ->
 	# let every plugin do something with the updated state
 	# before syncing it to the server
 	if updatedStateEvent
-		handleUpdatedState({}, state)
+		handleUpdatedState state
 	else
 		sync()
 
@@ -50,7 +50,7 @@ exports.init = (globalConfig, stateInitializedCallback) ->
 		initialStateLoadedCallbacks.forEach (callback) ->
 			callback(state)
 
-		handleUpdatedState({}, state)
+		handleUpdatedState state
 
 
 sync = (force = false) ->
@@ -90,12 +90,12 @@ sync = (force = false) ->
 			#deep copy current state
 			oldState = JSON.parse JSON.stringify state
 
-			handleUpdatedState(delta, state)
+			handleUpdatedState state
 exports.sync = sync
 
-handleUpdatedState = (delta, curstate) ->
+handleUpdatedState = (curstate) ->
 	#Client plugins maybe modify state...
-	pluginHooks.onStateUpdate delta, curstate
+	pluginHooks.onStateUpdate curstate
 
 	#sync back as long client plugins modify state
 	sync()

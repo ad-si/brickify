@@ -28,8 +28,7 @@ exports.setState = (request, response) ->
 		logger.error 'Diff of identical states was not undefined'
 
 	#call callbacks, let them modify state
-
-	pluginHooks.onStateUpdate clientDiff, state
+	pluginHooks.onStateUpdate state
 
 	#send diff with our initial state to the client
 	serverDiff = diffpatch.diff oldState, state

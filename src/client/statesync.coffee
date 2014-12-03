@@ -31,7 +31,7 @@ class Statesync
 			initialStateIsLoaded = true
 			self.initialStateLoadedCallbacks.forEach (callback) ->
 				callback(state)
-			self.handleUpdatedState({}, self.state)
+			self.handleUpdatedState self.state
 
 	getState: (callback) ->
 		if @initialStateIsLoaded
@@ -48,13 +48,13 @@ class Statesync
 		# let every plugin do something with the updated state
 		# before syncing it to the server
 		if updatedStateEvent
-			@handleUpdatedState({}, @state)
+			@handleUpdatedState @state
 		else
 			@sync()
 
-	handleUpdatedState: (delta, curstate) ->
+	handleUpdatedState: (curstate) ->
 		#Client plugins maybe modify state...
-		pluginHooks.onStateUpdate delta, curstate
+		pluginHooks.onStateUpdate curstate
 
 		#sync back as long client plugins modify state
 		@sync()
@@ -64,11 +64,11 @@ class Statesync
 		# plugins change the state
 		if not @syncWithServer
 			@oldState = JSON.parse JSON.stringify @state
-			@handleUpdatedState({}, @state)
+			@handleUpdatedState @state
 
 			delta = diffpatch.diff @oldState, @state
 			while delta != null
-				@handleUpdatedState({}, @state)
+				@handleUpdatedState @state
 				delta = diffpatch.diff @oldState, @state
 				@oldState = JSON.parse JSON.stringify @state
 			return
@@ -108,7 +108,7 @@ class Statesync
 				#deep copy current state
 				@oldState = JSON.parse JSON.stringify @state
 
-				@handleUpdatedState(delta, @state)
+				@handleUpdatedState @state
 
 module.exports.Statesync = Statesync
 

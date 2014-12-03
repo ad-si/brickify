@@ -2,7 +2,8 @@ OptimizedModel = require '../common/OptimizedModel'
 
 ##
 #  ModelCache
-#  Caches models and allows all Plugins to retrieve cached models from the server
+#  Caches models and allows all Plugins to retrieve
+#  cached models from the server
 ##
 
 # The cache of loaded optimized models

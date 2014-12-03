@@ -27,7 +27,6 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~2.1.1",
     "threejs": "*",
     "STLLoader": "https://raw.githubusercontent.com/mrdoob/three.js/2d59713328c421c3edfc3feda1b116af13140b94/examples/js/loaders/STLLoader.js",
     "OrbitControls": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js",

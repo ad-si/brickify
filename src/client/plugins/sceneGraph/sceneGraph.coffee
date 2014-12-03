@@ -48,10 +48,6 @@ renderUi = (elements) ->
 	else
 		$treeContainer.tree 'loadData', treeData
 
-
-module.exports.pluginName = 'Scene Graph'
-module.exports.category = common.CATEGORY_RENDERER
-
 # Store the global configuration for later use by init3d
 module.exports.init = (globalConfig, state, ui) ->
 	@globalConfig = globalConfig

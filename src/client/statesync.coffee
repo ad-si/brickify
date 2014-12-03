@@ -53,11 +53,20 @@ class Statesync
 			@sync()
 
 	handleUpdatedState: (curstate) ->
-		#Client plugins maybe modify state...
-		pluginHooks.onStateUpdate curstate
+		self = @
+		numCallbacks = pluginHooks.get('onStateUpdate').length
+		numCalledDone = 0
 
-		#sync back as long client plugins modify state
-		@sync()
+		done = () ->
+			#if all plugins finished modifying their state, synchronize
+			numCalledDone++
+			if numCallbacks == numCalledDone
+				# sync as long client plugins modify the state
+				self.sync()
+
+		#Client plugins maybe modify state...
+		pluginHooks.onStateUpdate curstate, done
+		
 
 	sync: (force = false) ->
 		# if we shall not sync with the server, run the loop internally as long as

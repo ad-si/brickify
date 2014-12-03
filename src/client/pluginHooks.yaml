@@ -42,7 +42,8 @@
 #  `onStateUpdate` method (if provided) whenever the current state changes
 #  due to user input or calculation results on either server or client side.
 #
-#  The hook provides the new complete state as an argument
+#  The hook provides the new complete state as an argument and a callback that
+#  has to be called when the plugin finished its computations
 
 - onStateUpdate
 

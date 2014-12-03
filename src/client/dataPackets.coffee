@@ -45,7 +45,7 @@ createPacket = (callback) ->
 
 # uploads an updated packet to the server
 updatePacket = (id, packet, callback) ->
-	$.ajax '/datapacket/packet' + id,
+	$.ajax '/datapacket/packet/' + id,
 		data: {id: id, packet: packet}
 		type: 'POST'
 		contentType: 'application/json'

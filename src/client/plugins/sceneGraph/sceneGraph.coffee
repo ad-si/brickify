@@ -4,7 +4,6 @@
   Renders interactive scene graph tree in sceneGraphContainer
 ###
 
-common = require '../../../common/pluginCommon'
 jqtree = require 'jqtree'
 clone = require 'clone'
 state = null

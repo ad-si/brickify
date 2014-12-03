@@ -5,8 +5,6 @@
   navigation inside lowfab.
 ###
 
-common = require '../../../common/pluginCommon'
-
 # Require sub-modules, see [Grid](grid.html) and [Axis](axis.html)
 setupGrid = require './grid'
 setupAxis = require './axis'

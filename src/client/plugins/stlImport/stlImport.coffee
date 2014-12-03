@@ -1,11 +1,8 @@
-common = require '../../../common/pluginCommon'
 stlLoader = require './stlLoader'
 OptimizedModel = require '../../../common/OptimizedModel'
 
 threejsRootNode = null
 globalConfigInstance = null
-
-pluginPropertyName = 'stlImport'
 
 module.exports.init = (globalConfig) ->
 	globalConfigInstance = globalConfig

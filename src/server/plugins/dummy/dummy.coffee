@@ -2,8 +2,6 @@
 winston = require 'winston'
 logger = winston.loggers.get('log')
 
-common = require '../../../common/pluginCommon'
-
 module.exports.init = () ->
 	logger.debug 'Dummy Server Folder-Plugin initialization'
 

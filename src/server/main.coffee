@@ -168,9 +168,9 @@ module.exports.setupRouting = () ->
 	app.get '/model/get/:md5/:extension', urlParser, modelStorageApi.getModel
 	app.post '/model/submit/:md5/:extension', rawParser, modelStorageApi.saveModel
 
-	app.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
+	app.post '/datapacket/packet/', jsonParser, dataPackets.createPacket
 	app.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
-	app.get  '/datapacket/create', jsonParser, dataPackets.createPacket
+	app.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
 
 	app.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?

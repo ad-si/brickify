@@ -20,7 +20,14 @@ module.exports.createPacket = (request, response) ->
 	dpProvider.createPacket (id) ->
 		if id?
 			log.debug "Created packet '#{id}'"
-			response.json {id: id}
+			if request.body.packet?
+				dpProvider.updatePacket id, request.body.packet, (success) ->
+					if success
+						response.json {id: id}
+					else
+						response.status(500).send()
+			else
+				response.json {id: id}
 		else
 			log.warn "Error creating packet '#{id}'"
 			response.status(500).send()

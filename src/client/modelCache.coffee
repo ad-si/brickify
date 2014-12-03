@@ -15,7 +15,10 @@ modelQueries = {}
 # sends the model to the server if the server hasn't got a file
 # with the same hash value
 submitDataToServer = (hash, data, success) ->
-	$.get('/model/exists/' + hash).fail () ->
+	$.get('/model/exists/' + hash)
+	.success () ->
+		success?(hash)
+	.fail () ->
 		#server doesn't have the model, send it
 		$.ajax '/model/submit/' + hash,
 			data: data
@@ -23,7 +26,7 @@ submitDataToServer = (hash, data, success) ->
 			contentType: 'application/octet-stream'
 			success: () ->
 				console.log 'sent model to the server'
-				success?()
+				success?(hash)
 			error: () -> console.error 'unable to send model to the server'
 
 module.exports.store = (optimizedModel, success) ->

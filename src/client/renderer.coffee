@@ -5,14 +5,8 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
-#TrackballControls = require 'Three.trackball'
-#TrackballControls = require('../../../TrackballControls/index.js')(Three)
-#OrbitControls = require('three-orbit-controls')(Three)
-#OrbitControls = require('../../../OrbitControls/index.js')(Three)
 
-#TrackballControls.prototype = Object.create(Three.EventDispatcher.prototype)
-#OrbitControls.prototype = Object.create(Three.EventDispatcher.prototype )
-class Renderer
+module.exports = class Renderer
 	constructor: (pluginHooksInstance) ->
 		@scene = null
 		@camera = null
@@ -124,6 +118,3 @@ class Renderer
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, 0, 30
 		@scene.add directionalLight
-
-module.exports = Renderer
-

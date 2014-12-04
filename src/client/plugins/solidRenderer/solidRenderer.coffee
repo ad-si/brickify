@@ -19,7 +19,7 @@ module.exports.init3d = (threejsNode) ->
 
 # check if there are any threejs objects that haven't been loaded yet
 # if so, load the referenced model from the server
-module.exports.onStateUpdate = (delta, state) ->
+module.exports.onStateUpdate = (state) ->
 	objectTree.forAllSubnodes state.rootNode, loadModelIfNeeded, false
 
 loadModelIfNeeded = (node) ->

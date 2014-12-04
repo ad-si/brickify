@@ -48,7 +48,7 @@ renderUi = (elements) ->
 	else
 		$treeContainer.tree 'loadData', treeData
 
-module.exports.onStateUpdate = (delta, _state) ->
+module.exports.onStateUpdate = (_state) ->
 	state = _state
 	if uiInitialized
 		renderUi htmlElements

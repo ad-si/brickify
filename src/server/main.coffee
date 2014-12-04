@@ -1,3 +1,5 @@
+require('es6-promise').polyfill()
+
 http = require 'http'
 path = require 'path'
 url = require 'url'

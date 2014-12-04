@@ -1,3 +1,5 @@
+require('es6-promise').polyfill()
+
 path = require 'path'
 r = require 'react'
 

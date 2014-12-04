@@ -44,7 +44,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
-	init3d: (threejsNode) ->
+	init3d: (threejsNode) =>
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
@@ -55,7 +55,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
-	initUi: (domElements) ->
+	initUi: (domElements) =>
 		console.log 'Dummy Client Plugin initializes UI'
 
 	###
@@ -69,7 +69,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see stateSynchronization
 	###
-	onStateUpdate: (state, done) ->
+	onStateUpdate: (state, done) =>
 		console.log 'Dummy Client Plugin state change'
 		done()
 
@@ -83,7 +83,7 @@ module.exports = class DummyPlugin
 	# @see renderer
 	# @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
 	###
-	on3dUpdate: (timestamp) ->
+	on3dUpdate: (timestamp) =>
 		return undefined
 
 	###

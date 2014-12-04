@@ -2,11 +2,10 @@ path = require 'path'
 r = require 'react'
 
 globalConfig = require './globals.yaml'
-ui = require('./ui')(globalConfig)
-pluginLoader = require './pluginLoader'
-statesync = require './statesync'
+Bundle = require './bundle'
+Statesync = require './statesync'
 objectTree = require '../common/objectTree'
-
+renderer = require './renderer'
 
 menuItems = [
 	{
@@ -107,8 +106,6 @@ r.render(
 )
 
 
-ui.init()
-
 
 ### TODO: move somewhere where it is needed
 # geometry functions
@@ -123,7 +120,10 @@ normalFormToParamterForm = ( n, p, u, v) ->
 String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
-statesync.init globalConfig, (state) ->
+
+bundle = new Bundle(Statesync.defaultInstance, globalConfig, true)
+
+Statesync.defaultInstance.init globalConfig, (state) ->
 	objectTree.init state
 	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()
@@ -148,7 +148,7 @@ commandFunctions = {
 		modelLoader = require './modelLoader'
 		p = /^[0-9a-z]{32}/
 		if p.test value
-			modelLoader.loadByHash value
+			modelLoader.loadByHash value, statesync.defaultInstance
 		else
 			console.warn 'Invalid value for initialModel'
 }

@@ -17,8 +17,13 @@ module.exports.init3d = (threejsNode) ->
 
 # check if there are any threejs objects that haven't been loaded yet
 # if so, load the referenced model from the server
-module.exports.onStateUpdate = (state) ->
+module.exports.onStateUpdate = (state, done) ->
 	objectTree.forAllSubnodes state.rootNode, loadModelIfNeeded, false
+
+	#TODO: this is wrong, since loadModelIfneeded can modify the state
+	#TODO: asynchronously. therefore done has to be called when all
+	#TODO: loadModelIfNeeded calls are completed. Solve with promises
+	done()
 
 loadModelIfNeeded = (node) ->
 	if node.pluginData.solidRenderer?
@@ -30,7 +35,7 @@ loadModelIfNeeded = (node) ->
 	else
 		node.pluginData.solidRenderer = {}
 		loadModelFromCache node, node.pluginData.solidRenderer, false
-	# TODO: Remove deleted objects
+# TODO: Remove deleted objects
 
 loadModelFromCache = (node, properties, reload = false) ->
 	#Create object and override name

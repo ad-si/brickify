@@ -68,8 +68,9 @@ module.exports.initUi = (domElements) ->
 # @memberOf dummyClientPlugin
 # @see stateSynchronization
 ###
-module.exports.onStateUpdate = (state) ->
+module.exports.onStateUpdate = (state, done) ->
 	console.log 'Dummy Client Plugin state change'
+	done()
 
 
 ###
@@ -97,4 +98,3 @@ module.exports.on3dUpdate = (timestamp) ->
 module.exports.importFile = (fileName, fileContent) ->
 	console.log 'Dummy Client Plugin imports a file'
 	return undefined
-

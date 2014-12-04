@@ -5,57 +5,65 @@
 # Load the hook list and initialize the pluginHook management
 path = require 'path'
 hooks = require('./pluginHooks.yaml')
-pluginHooks = require('../common/pluginHooks')
-pluginHooks.initHooks(hooks)
-renderer = require './renderer'
+PluginHooks = require('../common/pluginHooks')
 
-globalConfigInstance = null
+class PluginLoader
+	constructor: (globalConfigInstance) ->
+		@pluginHooks = new PluginHooks()
+		@pluginHooks.initHooks(hooks)
+		@globalConfig = globalConfigInstance
+	initPlugin: (PluginClass, packageData) ->
+		instance = new PluginClass()
 
-initPlugin = (instance, packageData) ->
-	for own key,value of packageData
-		instance[key] = value
+		for own key,value of packageData
+			instance[key] = value
 
-	instance.init? globalConfigInstance
-	instance.init3d? threeNode = new THREE.Object3D()
-	instance.initUi? {
-		menuBar: document.getElementById('navbarToggle')
-		toolsContainer: document.getElementById('toolsContainer')
-		sceneGraphContainer: document.getElementById('sceneGraphContainer')
-	}
+		instance.init? @globalConfig
 
-	pluginHooks.register instance
+		if @renderer?
+			instance.init3d? threeNode = new THREE.Object3D()
 
-	if threeNode?
-		renderer.addToScene threeNode
+		instance.initUi? {
+			menuBar: document.getElementById('navbarToggle')
+			toolsContainer: document.getElementById('toolsContainer')
+			sceneGraphContainer: document.getElementById('sceneGraphContainer')
+		}
 
+		@pluginHooks.register instance
 
-module.exports.init = (globalConfig) ->
-	globalConfigInstance = globalConfig
+		if @renderer? and threeNode?
+			@renderer.addToScene threeNode
 
-# Since browserify.js does not support dynamic require
-# all plugins must be explicitly written down
-module.exports.loadPlugins = () ->
-	initPlugin(
-		require('./plugins/dummy'),
-		require('./plugins/dummy/package.json')
-	)
-	initPlugin(
-		require('./plugins/coordinateSystem'),
-		require('./plugins/coordinateSystem/package.json')
-	)
-	initPlugin(
-		require('./plugins/solidRenderer'),
-		require('./plugins/solidRenderer/package.json')
-	)
-	initPlugin(
-		require('./plugins/stlImport'),
-		require('./plugins/stlImport/package.json')
-	)
-	initPlugin(
-		require('./plugins/stlExport'),
-		require('./plugins/stlExport/package.json')
-	)
-	initPlugin(
-		require('./plugins/sceneGraph'),
-		require('./plugins/sceneGraph/package.json')
-	)
+		return instance
+
+	# Since browserify.js does not support dynamic require
+	# all plugins must be explicitly written down
+	loadPlugins: (@renderer) ->
+		pluginInstances = []
+
+		pluginInstances.push initPlugin(
+			require('./plugins/dummy'),
+			require('./plugins/dummy/package.json')
+		)
+		pluginInstances.push initPlugin(
+			require('./plugins/coordinateSystem'),
+			require('./plugins/coordinateSystem/package.json')
+		)
+		pluginInstances.push initPlugin(
+			require('./plugins/solidRenderer'),
+			require('./plugins/solidRenderer/package.json')
+		)
+		pluginInstances.push initPlugin(
+			require('./plugins/stlImport'),
+			require('./plugins/stlImport/package.json')
+		)
+		pluginInstances.push initPlugin(
+			require('./plugins/stlExport'),
+			require('./plugins/stlExport/package.json')
+		)
+		pluginInstances.push initPlugin(
+			require('./plugins/sceneGraph'),
+			require('./plugins/sceneGraph/package.json')
+		)
+
+		return pluginInstances

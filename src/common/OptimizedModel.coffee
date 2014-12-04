@@ -7,7 +7,7 @@ class OptimizedModel
 		@indices = []
 		@vertexNormals = []
 		@faceNormals = []
-		@originalFileName = 'unknown file'
+		@originalFileName = 'Unknown file'
 
 	# Checks whether the model is 2-manifold, meaning that each edge is connected
 	# to exactly two faces. This also implies that the mesh is a closed body

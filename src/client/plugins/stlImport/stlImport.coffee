@@ -9,7 +9,7 @@ module.exports.init = (globalConfig) ->
 
 # Imports the stl, optimizes it,
 # sends it to the server (if not cached there)
-# and adds it to the scene as a THREE.Geometry
+# and adds it to the scene as a Three.Geometry
 module.exports.importFile = (fileName, fileContent) ->
 	errorCallback = (errors) ->
 		console.error 'Errors occured while importing the stl file:'

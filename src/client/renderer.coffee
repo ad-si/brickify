@@ -4,6 +4,14 @@
 
 pluginHooks = require '../common/pluginHooks'
 Stats = require 'stats-js'
+#TrackballControls = require 'Three.trackball'
+#TrackballControls = require('../../../TrackballControls/index.js')(Three)
+#OrbitControls = require('three-orbit-controls')(Three)
+#OrbitControls = require('../../../OrbitControls/index.js')(Three)
+
+#TrackballControls.prototype = Object.create(Three.EventDispatcher.prototype)
+#OrbitControls.prototype = Object.create(Three.EventDispatcher.prototype )
+
 
 renderer = null
 scene = null
@@ -30,7 +38,7 @@ module.exports.windowResizeHandler = () ->
 	camera.aspect = window.innerWidth / window.innerHeight
 	camera.updateProjectionMatrix()
 
-	renderer.setSize( window.innerWidth, window.innerHeight )
+	renderer.setSize(window.innerWidth, window.innerHeight)
 	renderer.render(scene, camera)
 
 module.exports.init = (globalConfig) ->
@@ -41,6 +49,7 @@ module.exports.init = (globalConfig) ->
 	setupControls globalConfig
 	setupFPSCounter() if process.env.NODE_ENV is 'development'
 	requestAnimationFrame localRenderer
+
 
 setupRenderer = (globalConfig) ->
 	renderer = new THREE.WebGLRenderer(
@@ -55,16 +64,19 @@ setupRenderer = (globalConfig) ->
 	.getElementById('renderArea')
 	.appendChild renderer.domElement
 
+
 setupScene = (globalConfig) ->
 	scene = new THREE.Scene()
+
 	# Scene rotation because orbit controls only works
 	# with up vector of 0, 1, 0
 	sceneRotation = new THREE.Matrix4()
 	sceneRotation.makeRotationAxis(
-		new THREE.Vector3( 1, 0, 0 ),
+		new THREE.Vector3(1, 0, 0),
 		(-Math.PI / 2)
 	)
 	scene.applyMatrix(sceneRotation)
+
 
 setupLighting = (globalConfig) ->
 	ambientLight = new THREE.AmbientLight(0x404040)
@@ -76,7 +88,7 @@ setupLighting = (globalConfig) ->
 
 	directionalLight = new THREE.DirectionalLight(0x808080)
 	directionalLight.position.set 20, 0, 30
-	scene.add( directionalLight )
+	scene.add(directionalLight)
 
 setupCamera = (globalConfig) ->
 	camera = new THREE.PerspectiveCamera(

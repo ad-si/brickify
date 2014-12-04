@@ -9,14 +9,12 @@ objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
 
 module.exports = class SolidRenderer
-	@threejsRootNode = null
-	@globalConfigInstance = null
 
-	init: (globalConfig) ->
-		@globalConfigInstance = globalConfig
+	init: (@globalConfig) ->
+		return
 
-	init3d: (threejsNode) ->
-		@threejsRootNode = threejsNode
+	init3d: (@threejsNode) ->
+		return
 
 	# check if there are any threejs objects that haven't been loaded yet
 	# if so, load the referenced model from the server
@@ -32,7 +30,7 @@ module.exports = class SolidRenderer
 		if node.pluginData.solidRenderer?
 			properties = node.pluginData.solidRenderer
 			storedUuid = properties.threeObjectUuid
-			threeObject = @threejsRootNode.getObjectByName storedUuid, true
+			threeObject = @threejsNode.getObjectByName storedUuid, true
 			if not threeObject?
 				@loadModelFromCache node, properties, true
 		else
@@ -59,14 +57,14 @@ module.exports = class SolidRenderer
 		geometry = optimizedModel.convertToThreeGeometry()
 		objectMaterial = new THREE.MeshLambertMaterial(
 			{
-				color: @globalConfigInstance.defaultObjectColor
-				ambient: @globalConfigInstance.defaultObjectColor
+				color: @globalConfig.defaultObjectColor
+				ambient: @globalConfig.defaultObjectColor
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
 		object.name = object.uuid
 
-		@threejsRootNode.add object
+		@threejsNode.add object
 		return object
 
 	# copys stored transforms to the tree object.

@@ -4,7 +4,6 @@
   Renders interactive scene graph tree in sceneGraphContainer
 ###
 
-common = require '../../../common/pluginCommon'
 jqtree = require 'jqtree'
 clone = require 'clone'
 state = null
@@ -23,8 +22,7 @@ renderUi = (elements) ->
 
 	writeToObject = (treeNode, node) ->
 
-		treeNode.label = treeNode.title = node
-			.pluginData['stlImport']?.fileName or treeNode.label or ''
+		treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
 		treeNode.id = idCounter++
 
 		if node.children
@@ -48,15 +46,7 @@ renderUi = (elements) ->
 	else
 		$treeContainer.tree 'loadData', treeData
 
-
-module.exports.pluginName = 'Scene Graph'
-module.exports.category = common.CATEGORY_RENDERER
-
-# Store the global configuration for later use by init3d
-module.exports.init = (globalConfig, state, ui) ->
-	@globalConfig = globalConfig
-
-module.exports.onStateUpdate = (delta, _state) ->
+module.exports.onStateUpdate = (_state) ->
 	state = _state
 	if uiInitialized
 		renderUi htmlElements

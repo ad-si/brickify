@@ -10,9 +10,8 @@ html
 
 body
 	height 100%
-	padding-top 50px
+	padding-top 50px // Make space for navbar
 
-// Make space for navbar
 
 canvas
 	position fixed
@@ -25,8 +24,8 @@ a
 	cursor pointer
 
 
-#sceneGraphContainer
-#toolsContainer
+#leftSidebar,
+#rightSidebar
 	background-color rgb(200,200,200)
 	display inline-block
 	width 150px
@@ -37,14 +36,14 @@ a
 	border-color rgb(150,150,150)
 	border-style solid
 
-#sceneGraphContainer
+#leftSidebar
 	border-right-width 1px
 	left 0
 	top 0
 	&:hover
 		overflow visible
 
-#toolsContainer
+#rightSidebar
 	border-left-width 1px
 	right 0
 	top 0

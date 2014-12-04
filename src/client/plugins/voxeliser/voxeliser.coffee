@@ -8,7 +8,6 @@
 #
 ###
 
-common = require '../../../common/pluginCommon'
 objectTree = require '../../../common/objectTree'
 statesync = require '../../statesync'
 modelCache = require '../../modelCache'
@@ -26,7 +25,6 @@ voxeliser = null
 lego = null
 
 module.exports.pluginName = 'Voxeliser Plugin'
-module.exports.category = common.CATEGORY_CONVERTER
 pluginPropertyName = 'voxeliser'
 
 module.exports.init = () ->
@@ -73,7 +71,8 @@ voxeliseAllModels = () ->
 voxelise = (optimizedModel, node) ->
 	# check if model was already voxelised
 	for data in voxelisedModels
-		if data.node.pluginData.stlImport.meshHash is node.pluginData.stlImport.meshHash
+		if data.node.pluginData.stlImport.meshHash is
+					node.pluginData.stlImport.meshHash
 			console.warn 'already voxelised this model'
 			return
 
@@ -112,5 +111,7 @@ layout = () ->
 # contains the voxelised grid, it's ThreeJS representation
 # and the ThreeJs
 class VoxeliserData
-	constructor: (@node, @grid, @gridForThree, @layout = null, @layoutForThree = null) -> return
+	constructor: (@node, @grid, @gridForThree,
+	        @layout = null, @layoutForThree = null) ->
+	    return
 	addLayout: (@layout, @layoutForThree) -> return

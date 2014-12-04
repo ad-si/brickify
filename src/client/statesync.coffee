@@ -18,20 +18,19 @@ module.exports = class Statesync
 		@initialStateLoadedCallbacks = []
 
 	init: (globalConfig, stateInitializedCallback) ->
-		self = @
 		@globalConfig = globalConfig
-		$.get '/statesync/get', {}, (data, textStatus, jqXHR) ->
-			self.state = data
-			self.oldState = JSON.parse JSON.stringify self.state
+		$.get '/statesync/get', {}, (data, textStatus, jqXHR) =>
+			@state = data
+			@oldState = JSON.parse JSON.stringify @state
 
-			console.log "Got initial state from server: #{JSON.stringify(self.state)}"
+			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
-			stateInitializedCallback self.state if stateInitializedCallback?
+			stateInitializedCallback @state if stateInitializedCallback?
 
 			initialStateIsLoaded = true
-			self.initialStateLoadedCallbacks.forEach (callback) ->
+			@initialStateLoadedCallbacks.forEach (callback) ->
 				callback(state)
-			self.handleUpdatedState self.state
+			@handleUpdatedState @state
 
 	getState: (callback) ->
 		if @initialStateIsLoaded
@@ -53,16 +52,15 @@ module.exports = class Statesync
 			@sync()
 
 	handleUpdatedState: (curstate) ->
-		self = @
 		numCallbacks = @pluginHooks.get('onStateUpdate').length
 		numCalledDone = 0
 
-		done = () ->
+		done = () =>
 			#if all plugins finished modifying their state, synchronize
 			numCalledDone++
 			if numCallbacks == numCalledDone
 				# sync as long client plugins modify the state
-				self.sync()
+				@sync()
 
 		#Client plugins maybe modify state...
 		@pluginHooks.onStateUpdate curstate, done

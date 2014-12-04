@@ -3,11 +3,7 @@ OptimizedModel = require '../../../common/OptimizedModel'
 
 module.exports = class StlImport
 	constructor: () ->
-		@threejsRootNode = null
-		@globalConfigInstance = null
-
-	init: (globalConfig) ->
-		@globalConfigInstance = globalConfig
+		return
 
 	# Imports the stl, optimizes it,
 	# sends it to the server (if not cached there)

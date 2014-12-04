@@ -1,6 +1,9 @@
 # An optimized model structure with indexed faces / vertices
 # and cached vertex and face normals
 # Created by the stlImportPlugin
+
+THREE = require 'three'
+
 class OptimizedModel
 	constructor: () ->
 		@positions = []

@@ -2,6 +2,9 @@
 # @module renderer
 ###
 
+THREE = require 'three'
+OrbitControls = require('three-orbit-controls')(THREE)
+
 pluginHooks = require '../common/pluginHooks'
 Stats = require 'stats-js'
 #TrackballControls = require 'Three.trackball'
@@ -106,7 +109,7 @@ setupCamera = (globalConfig) ->
 	camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 setupControls = (globalConfig) ->
-	controls = new THREE.OrbitControls(camera, renderer.domElement)
+	controls = new OrbitControls(camera, renderer.domElement)
 	controls.target.set(0, 0, 0)
 
 setupFPSCounter = () ->

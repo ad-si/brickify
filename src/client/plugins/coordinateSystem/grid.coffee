@@ -4,6 +4,9 @@
   Creates a grid inside a threejs node with a provided global config,
   but leaves spaces for the coordinate system
 ###
+
+THREE = require 'three'
+
 module.exports = (threejsNode, globalConfig) ->
 	setupMaterials(globalConfig)
 	axisLines(threejsNode, globalConfig)

@@ -4,6 +4,7 @@
 
 # Load the hook list and initialize the pluginHook management
 path = require 'path'
+THREE = require 'three'
 hooks = require('./pluginHooks.yaml')
 pluginHooks = require('../common/pluginHooks')
 pluginHooks.initHooks(hooks)

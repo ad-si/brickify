@@ -102,22 +102,6 @@ r.render(
 	document.querySelector '#navbarToggle'
 )
 
-
-
-### TODO: move somewhere where it is needed
-# geometry functions
-degToRad = ( deg ) -> deg * ( Math.PI / 180.0 )
-radToDeg = ( rad ) -> deg * ( 180.0 / Math.PI )
-
-normalFormToParamterForm = ( n, p, u, v) ->
-	u.set( 0, -n.z, n.y ).normalize()
-	v.set( n.y, -n.x, 0 ).normalize()
-
-# utility
-String::contains = (str) -> -1 isnt this.indexOf str
-###
-
-
 bundle = new Bundle(globalConfig)
 bundle.postInitCallback (state) ->
 	#look at url hash and run commands
@@ -136,7 +120,6 @@ bundle.postInitCallback (state) ->
 bundle.init true, true
 
 commandFunctions = {
-	# TODO use modelLoader instance from UI or extract to bundle
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
 		p = /^[0-9a-z]{32}/

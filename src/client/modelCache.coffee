@@ -32,11 +32,11 @@ submitDataToServer = (hash, data) ->
 		)
 	return exists(hash).catch(send)
 
-module.exports.store = (optimizedModel, success) ->
+module.exports.store = (optimizedModel) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
 	cache hash, optimizedModel
-	submitDataToServer(hash, modelData).then success
+	return submitDataToServer hash, modelData
 
 # requests a mesh with the given hash from the server
 # if it is cached locally, the local reference is returned

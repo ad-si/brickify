@@ -38,8 +38,8 @@ module.exports = class ModelLoader
 		modelCache.store optimizedModel
 		@addModelToState fileName, hash
 
-	loadByHash: (hash) ->
-		loadCallback = (optimizedModel) ->
+	loadByHash: (hash) =>
+		loadCallback = (optimizedModel) =>
 			@load optimizedModel
 
 		modelCache.request hash, loadCallback,

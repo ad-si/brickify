@@ -139,10 +139,9 @@ commandFunctions = {
 	# TODO use modelLoader instance from UI or extract to bundle
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
-		modelLoader = require './modelLoader'
 		p = /^[0-9a-z]{32}/
 		if p.test value
-			modelLoader.loadByHash value, statesync.defaultInstance
+			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
 }

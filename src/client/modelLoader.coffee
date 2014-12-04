@@ -31,7 +31,7 @@ module.exports = class ModelLoader
 			optimizedModel = loader filename, fileContent
 			return optimizedModel if optimizedModel?
 
-	load: (optimizedModel) ->
+	load: (optimizedModel) =>
 		modelData = optimizedModel.toBase64()
 		hash = md5(modelData)
 		fileName = optimizedModel.originalFileName
@@ -39,10 +39,7 @@ module.exports = class ModelLoader
 		@addModelToState fileName, hash
 
 	loadByHash: (hash) =>
-		loadCallback = (optimizedModel) =>
-			@load optimizedModel
-
-		modelCache.request hash, loadCallback,
+		modelCache.request hash, @load,
 			() -> console.error "Could not load model from hash #{hash}"
 
 	# adds a new model to the state

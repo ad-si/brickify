@@ -1,8 +1,11 @@
 ###
-  #Axis constructor#
+  # Axis constructor
 
   Creates colored axis inside a threejs node with a provided global config
 ###
+
+THREE = require 'three'
+
 module.exports = (threejsNode, globalConfig) ->
 	# **Create and add x-axis**
 	geometryXAxis = new THREE.Geometry()

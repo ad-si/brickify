@@ -48,13 +48,13 @@ module.exports = class SceneGraph
 		else
 			$treeContainer.tree 'loadData', treeData
 
-	onStateUpdate: (_state, done) ->
+	onStateUpdate: (_state, done) =>
 		@state = _state
 		if @uiInitialized
 			@renderUi @htmlElements
 		done()
 
-	initUi: (elements) ->
+	initUi: (elements) =>
 		@htmlElements = elements
 		@uiInitialized = true
 		if @state

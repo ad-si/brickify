@@ -36,8 +36,10 @@ load = (optimizedModel) ->
 module.exports.load = load
 
 module.exports.loadByHash = (hash) ->
-	modelCache.request hash, load,
+	modelCache.request(hash).then(
+		load
 		() -> console.error "Could not load model from hash #{hash}"
+	)
 
 # adds a new model to the state
 addModelToState = (fileName, hash) ->

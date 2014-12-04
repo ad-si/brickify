@@ -44,7 +44,7 @@ loadModelFromCache = (node, properties, reload = false) ->
 	failure = () ->
 		console.error "Unable to get model #{node.meshHash}"
 
-	modelCache.request node.meshHash, success, failure
+	modelCache.request(node.meshHash).then(success, failure)
 
 # parses the binary geometry and adds it to the three scene
 addModelToThree = (optimizedModel) ->

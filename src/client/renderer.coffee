@@ -7,22 +7,17 @@ OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
 
 module.exports = class Renderer
-	constructor: (pluginHooksInstance) ->
+	constructor: (@pluginHooks) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
-		@pluginHooks = pluginHooksInstance
 
-	# this structure is needed because 'this' or '@' points to the wrong
-	# object when calling the render-Callback from WebGL
-	renderLoopCreator: (instanceReference) ->
-		return (timestamp) ->
-			i = instanceReference
-			i.stats?.begin()
-			i.threeRenderer.render i.scene, i.camera
-			i.pluginHooks.on3dUpdate timestamp
-			i.stats?.end()
-			requestAnimationFrame i.renderLoopCreator(i)
+	localRenderer: (timestamp) =>
+			@stats?.begin()
+			@threeRenderer.render @.scene, @.camera
+			@pluginHooks.on3dUpdate timestamp
+			@stats?.end()
+			requestAnimationFrame @localRenderer
 
 	addToScene: (node) ->
 		@scene.add node
@@ -45,7 +40,7 @@ module.exports = class Renderer
 		@setupCamera globalConfig
 		@setupControls globalConfig
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
-		requestAnimationFrame @renderLoopCreator(@)
+		requestAnimationFrame @localRenderer
 
 	setupRenderer: (globalConfig) ->
 		@threeRenderer = new THREE.WebGLRenderer(

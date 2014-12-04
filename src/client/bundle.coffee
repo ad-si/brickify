@@ -2,25 +2,30 @@ PluginLoader = require '../client/pluginLoader'
 objectTree = require '../common/objectTree'
 Ui = require './ui'
 Renderer = require './renderer'
+Statesync = require './statesync'
 
 module.exports = class Bundle
-	constructor: (@stateInstance, @globalConfig) ->
+	constructor: (@globalConfig) ->
 		return
 	postInitCallback: (callback) ->
 		@postInitCb = callback
-	init: (createRendererAndUi) ->
+	init: (createRendererAndUi, syncStateWithServer = true) ->
+		self = @
+		@pluginLoader = new PluginLoader(@globalConfigInstance)
+		@stateInstance = new Statesync(@pluginLoader.pluginHooks,
+			syncStateWithServer)
+
 		@stateInstance.init @globalConfigInstance, (state) ->
 			objectTree.init state
-			@pluginLoader = new PluginLoader(@globalConfigInstance)
-
 			if createRendererAndUi
-				@renderer = new Renderer(@pluginLoader.pluginHooks)
-				@uiInstance = new Ui(@globalConfig, @renderer, @stateInstance)
-				@uiInstance.init()
-				@pluginInstances = @pluginLoader.loadPlugins(@renderer)
+				self.renderer = new Renderer(self.pluginLoader.pluginHooks)
+				self.uiInstance = new Ui(self.globalConfig, self.renderer,
+					self.stateInstance)
+				self.uiInstance.init()
+				self.pluginInstances = self.pluginLoader.loadPlugins(self.renderer)
 			else
-				@pluginInstances = @pluginLoader.loadPlugins()
+				self.pluginInstances = self.pluginLoader.loadPlugins()
 
-			@postInitCb? state
+			self.postInitCb? state
 
 

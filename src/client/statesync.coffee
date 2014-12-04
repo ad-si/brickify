@@ -7,10 +7,8 @@ jsondiffpatch = require 'jsondiffpatch'
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
 
-pluginHooks = require '../common/pluginHooks'
-
-class Statesync
-	constructor: (@syncWithServer = true) ->
+module.exports = class Statesync
+	constructor: (@pluginHooks, @syncWithServer = true) ->
 		@state = {}
 		@oldState = {}
 		@globalConfig = null
@@ -54,7 +52,7 @@ class Statesync
 
 	handleUpdatedState: (curstate) ->
 		self = @
-		numCallbacks = pluginHooks.get('onStateUpdate').length
+		numCallbacks = @pluginHooks.get('onStateUpdate').length
 		numCalledDone = 0
 
 		done = () ->
@@ -65,7 +63,7 @@ class Statesync
 				self.sync()
 
 		#Client plugins maybe modify state...
-		pluginHooks.onStateUpdate curstate, done
+		@pluginHooks.onStateUpdate curstate, done
 
 
 	sync: (force = false) ->
@@ -118,15 +116,3 @@ class Statesync
 				@oldState = JSON.parse JSON.stringify @state
 
 				@handleUpdatedState @state
-
-module.exports.Statesync = Statesync
-
-defaultInstance = new Statesync()
-
-# backwards compatibility for plugins that use statesync.performStateAction
-# directly
-module.exports.defaultInstance = defaultInstance
-module.exports.performStateAction = (callback, updatedStateEvent = false) ->
-	console.warn 'performStateAction should not be used anymore, use async code
-and done() in onStateUpdate instead'
-	defaultInstance.performStateAction(callback, updatedStateEvent)

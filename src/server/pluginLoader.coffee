@@ -14,6 +14,8 @@ yaml = require 'js-yaml'
 
 PluginHooks = require '../common/pluginHooks'
 pluginHooks = new PluginHooks()
+module.exports.pluginHooksInstance = pluginHooks
+
 hooks = yaml.load fs.readFileSync path.join __dirname, 'pluginHooks.yaml'
 pluginHooks.initHooks(hooks)
 

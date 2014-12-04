@@ -2,10 +2,11 @@
 # @module ui
 ###
 
-statesync = require './statesync'
 objectTree = require '../common/objectTree'
 renderer = require './renderer'
 modelLoader = require './modelLoader'
+interactionManager = require './interactionHelper'
+pluginHooks = require '../common/pluginHooks'
 
 module.exports = (globalConfig) ->
 	return {
@@ -20,6 +21,12 @@ module.exports = (globalConfig) ->
 			event.stopPropagation()
 			event.preventDefault()
 			event.dataTransfer.dropEffect = 'copy'
+
+		clickHandler: (event) ->
+			event.stopPropagation()
+			event.preventDefault()
+			for onClickHandler in pluginHooks.get 'onClick'
+				onClickHandler(event)
 
 		# Bound to updates to the window size:
 		# Called whenever the window is resized.
@@ -45,5 +52,11 @@ module.exports = (globalConfig) ->
 				'resize',
 				@windowResizeHandler.bind @,
 				false
+			)
+
+			renderer.getDomElement().addEventListener(
+				'mousedown'
+				@clickHandler.bind @
+			false
 			)
 	}

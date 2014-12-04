@@ -68,3 +68,9 @@
 #  The file's name and its content are provided as arguments.
 
 - importFile
+
+#  ## On click handling
+#
+#  TODO
+
+- onClick

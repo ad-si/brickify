@@ -17,6 +17,7 @@ BrickLayout = require './bricks/BrickLayout'
 BrickLayouter = require './bricks/BrickLayouter'
 Voxeliser = require './geometry/Voxeliser'
 voxelRenderer = require './rendering/voxelRenderer'
+interactionHelper = require '../../interactionHelper'
 
 threejsRootNode = null
 stateInstance = null
@@ -51,6 +52,13 @@ module.exports.initUi = (elements) ->
 		layout()
 		)
 	return
+
+module.exports.onClick = (event) ->
+	intersects =
+		interactionHelper.getPolygonClickedOn(event, threejsRootNode.children)
+	if (intersects.length > 0)
+		intersects[0].object.material.color.set(new THREE.Color(1, 0, 0))
+	console.log intersects
 
 # Traverses the state and start the voxelisation of all stlImported Models
 voxeliseAllModels = () ->

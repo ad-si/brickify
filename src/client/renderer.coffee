@@ -26,6 +26,9 @@ module.exports.addToScene = (node) ->
 module.exports.getDomElement = () ->
 	renderer.domElement
 
+module.exports.getCamera = () ->
+	camera
+
 module.exports.windowResizeHandler = () ->
 	camera.aspect = window.innerWidth / window.innerHeight
 	camera.updateProjectionMatrix()

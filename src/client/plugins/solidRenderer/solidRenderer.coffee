@@ -6,74 +6,75 @@
 objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
 
-threejsRootNode = null
-globalConfigInstance = null
+module.exports = class SolidRenderer
+	@threejsRootNode = null
+	@globalConfigInstance = null
 
-module.exports.init = (globalConfig) ->
-	globalConfigInstance = globalConfig
+	init: (globalConfig) ->
+		@globalConfigInstance = globalConfig
 
-module.exports.init3d = (threejsNode) ->
-	threejsRootNode = threejsNode
+	init3d: (threejsNode) ->
+		@threejsRootNode = threejsNode
 
-# check if there are any threejs objects that haven't been loaded yet
-# if so, load the referenced model from the server
-module.exports.onStateUpdate = (state, done) ->
-	objectTree.forAllSubnodes state.rootNode, loadModelIfNeeded, false
+	# check if there are any threejs objects that haven't been loaded yet
+	# if so, load the referenced model from the server
+	onStateUpdate: (state, done) ->
+		objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
 
-	#TODO: this is wrong, since loadModelIfneeded can modify the state
-	#TODO: asynchronously. therefore done has to be called when all
-	#TODO: loadModelIfNeeded calls are completed. Solve with promises
-	done()
+		#TODO: this is wrong, since loadModelIfneeded can modify the state
+		#TODO: asynchronously. therefore done has to be called when all
+		#TODO: loadModelIfNeeded calls are completed. Solve with promises
+		done()
 
-loadModelIfNeeded = (node) ->
-	if node.pluginData.solidRenderer?
-		properties = node.pluginData.solidRenderer
-		storedUuid = properties.threeObjectUuid
-		threeObject = threejsRootNode.getObjectByName storedUuid, true
-		if not threeObject?
-			loadModelFromCache node, properties, true
-	else
-		node.pluginData.solidRenderer = {}
-		loadModelFromCache node, node.pluginData.solidRenderer, false
-# TODO: Remove deleted objects
-
-loadModelFromCache = (node, properties, reload = false) ->
-	#Create object and override name
-	success = (optimizedModel) ->
-		console.log "Got model #{node.meshHash}"
-		threeObj = addModelToThree optimizedModel
-		if reload
-			threeObj.name = properties.threeObjectUuid
+	loadModelIfNeeded: (node) ->
+		if node.pluginData.solidRenderer?
+			properties = node.pluginData.solidRenderer
+			storedUuid = properties.threeObjectUuid
+			threeObject = @threejsRootNode.getObjectByName storedUuid, true
+			if not threeObject?
+				loadModelFromCache node, properties, true
 		else
-			properties.threeObjectUuid = threeObj.name
-	failure = () ->
-		console.error "Unable to get model #{node.meshHash}"
+			node.pluginData.solidRenderer = {}
+			loadModelFromCache node, node.pluginData.solidRenderer, false
+	# TODO: Remove deleted objects
 
-	modelCache.request node.meshHash, success, failure
+	loadModelFromCache: (node, properties, reload = false) ->
+		#Create object and override name
+		success = (optimizedModel) ->
+			console.log "Got model #{node.meshHash}"
+			threeObj = @addModelToThree optimizedModel
+			if reload
+				threeObj.name = properties.threeObjectUuid
+			else
+				properties.threeObjectUuid = threeObj.name
+		failure = () ->
+			console.error "Unable to get model #{node.meshHash}"
 
-# parses the binary geometry and adds it to the three scene
-addModelToThree = (optimizedModel) ->
-	geometry = optimizedModel.convertToThreeGeometry()
-	objectMaterial = new THREE.MeshLambertMaterial(
-		{
-			color: globalConfigInstance.defaultObjectColor
-			ambient: globalConfigInstance.defaultObjectColor
-		}
-	)
-	object = new THREE.Mesh(geometry, objectMaterial)
-	object.name = object.uuid
+		modelCache.request node.meshHash, success, failure
 
-	threejsRootNode.add object
-	return object
+	# parses the binary geometry and adds it to the three scene
+	addModelToThree: (optimizedModel) ->
+		geometry = optimizedModel.convertToThreeGeometry()
+		objectMaterial = new THREE.MeshLambertMaterial(
+			{
+				color: @globalConfigInstance.defaultObjectColor
+				ambient: @globalConfigInstance.defaultObjectColor
+			}
+		)
+		object = new THREE.Mesh(geometry, objectMaterial)
+		object.name = object.uuid
 
-# copys stored transforms to the tree object.
-# TODO: use
-copyTransformDataToThree = (node, threeObject) ->
-	posd = node.positionData
-	threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
-	threeObject.rotation.set(
-		posd.rotation._x,
-		posd.rotation._y,
-		posd.rotation._z
-	)
-	threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)
+		@threejsRootNode.add object
+		return object
+
+	# copys stored transforms to the tree object.
+	# TODO: use
+	copyTransformDataToThree: (node, threeObject) ->
+		posd = node.positionData
+		threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
+		threeObject.rotation.set(
+			posd.rotation._x,
+			posd.rotation._y,
+			posd.rotation._z
+		)
+		threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)

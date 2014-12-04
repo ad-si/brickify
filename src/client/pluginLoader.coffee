@@ -7,7 +7,7 @@ path = require 'path'
 hooks = require('./pluginHooks.yaml')
 PluginHooks = require('../common/pluginHooks')
 
-class PluginLoader
+module.exports = class PluginLoader
 	constructor: (globalConfigInstance) ->
 		@pluginHooks = new PluginHooks()
 		@pluginHooks.initHooks(hooks)
@@ -41,27 +41,27 @@ class PluginLoader
 	loadPlugins: (@renderer) ->
 		pluginInstances = []
 
-		pluginInstances.push initPlugin(
+		pluginInstances.push @initPlugin(
 			require('./plugins/dummy'),
 			require('./plugins/dummy/package.json')
 		)
-		pluginInstances.push initPlugin(
+		pluginInstances.push @initPlugin(
 			require('./plugins/coordinateSystem'),
 			require('./plugins/coordinateSystem/package.json')
 		)
-		pluginInstances.push initPlugin(
+		pluginInstances.push @initPlugin(
 			require('./plugins/solidRenderer'),
 			require('./plugins/solidRenderer/package.json')
 		)
-		pluginInstances.push initPlugin(
+		pluginInstances.push @initPlugin(
 			require('./plugins/stlImport'),
 			require('./plugins/stlImport/package.json')
 		)
-		pluginInstances.push initPlugin(
+		pluginInstances.push @initPlugin(
 			require('./plugins/stlExport'),
 			require('./plugins/stlExport/package.json')
 		)
-		pluginInstances.push initPlugin(
+		pluginInstances.push @initPlugin(
 			require('./plugins/sceneGraph'),
 			require('./plugins/sceneGraph/package.json')
 		)

@@ -11,9 +11,11 @@ winston = require 'winston'
 log = winston.loggers.get('log')
 # Load the hook list and initialize the pluginHook management
 yaml = require 'js-yaml'
-pluginHooks = require '../common/pluginHooks'
-hooks = yaml.load fs.readFileSync path.join __dirname, 'pluginHooks.yaml'
 
+PluginHooks = require '../common/pluginHooks'
+pluginHooks = new PluginHooks()
+hooks = yaml.load fs.readFileSync path.join __dirname, 'pluginHooks.yaml'
+pluginHooks.initHooks(hooks)
 
 initPluginInstance = (pluginInstance) ->
 	pluginInstance.init?()
@@ -21,10 +23,11 @@ initPluginInstance = (pluginInstance) ->
 
 loadPlugin = (entry) ->
 	try
-		instance = require entry.fullPath
+		pluginFile = path.join(entry.fullPath, entry.name)
+		instance = require pluginFile
 
 	catch error
-		log.error "Plugin #{pluginMain} could not be found.
+		log.error "Plugin #{entry.name} could not be found.
 				Maybe the plugin's filename does not match its folder name?"
 		return
 
@@ -45,6 +48,3 @@ module.exports.loadPlugins = (stateSync, directory) ->
 	.on 'data', (entry) -> loadPlugin entry
 	.on 'error', (error) -> log.error error
 	.on 'warn', (warning) -> log.warn warning
-
-
-pluginHooks.initHooks(hooks)

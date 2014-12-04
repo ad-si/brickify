@@ -3,9 +3,12 @@ objectTree = require '../common/objectTree'
 Ui = require './ui'
 Renderer = require './renderer'
 
-class Bundle
-	constructor: (@stateInstance, @globalConfig,
-								createRendererAndUi = false) ->
+module.exports = class Bundle
+	constructor: (@stateInstance, @globalConfig) ->
+		return
+	postInitCallback: (callback) ->
+		@postInitCb = callback
+	init: (createRendererAndUi) ->
 		@stateInstance.init @globalConfigInstance, (state) ->
 			objectTree.init state
 			@pluginLoader = new PluginLoader(@globalConfigInstance)
@@ -17,5 +20,7 @@ class Bundle
 				@pluginInstances = @pluginLoader.loadPlugins(@renderer)
 			else
 				@pluginInstances = @pluginLoader.loadPlugins()
+
+			@postInitCb? state
 
 

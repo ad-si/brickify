@@ -122,12 +122,7 @@ String::contains = (str) -> -1 isnt this.indexOf str
 
 
 bundle = new Bundle(Statesync.defaultInstance, globalConfig, true)
-
-Statesync.defaultInstance.init globalConfig, (state) ->
-	objectTree.init state
-	pluginLoader.init globalConfig
-	pluginLoader.loadPlugins()
-
+bundle.postInitCallback (state) ->
 	#look at url hash and run commands
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
@@ -141,6 +136,7 @@ Statesync.defaultInstance.init globalConfig, (state) ->
 	#clear url hash after executing commands
 	window.location.hash = ''
 
+bundle.init()
 
 commandFunctions = {
 	initialModel: (state, value) ->

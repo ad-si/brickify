@@ -2,7 +2,7 @@
   #Plugin Hook implementation#
 ###
 
-class PluginHooks
+module.exports = class PluginHooks
 	constructor: ->
 		# list of all hooks
 		@hooks = []
@@ -62,4 +62,3 @@ class PluginHooks
 			index = @lists[hook].indexOf plugin[hook]
 			@lists[hook].splice index, 1 if index != -1
 
-module.exports = PluginHooks

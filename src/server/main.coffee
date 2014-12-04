@@ -60,7 +60,6 @@ sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
 
 links = {}
 sortedDependencies = [
-	'JavaScript-MD5',
 	'FileSaver',
 	'Blob'
 ]

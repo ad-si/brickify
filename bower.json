@@ -27,7 +27,6 @@
     "tests"
   ],
   "dependencies": {
-    "JavaScript-MD5": "~1.1.0",
     "FileSaver": "*",
     "Blob": "*"
   }

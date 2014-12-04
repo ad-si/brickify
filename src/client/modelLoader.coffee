@@ -2,6 +2,7 @@
 # @module fileLoader
 ###
 
+md5 = require('blueimp-md5').md5
 pluginHooks = require '../common/pluginHooks'
 modelCache = require './modelCache'
 stateSync = require './statesync'

@@ -1,5 +1,5 @@
 modelStorage = require '../src/server/modelStorage'
-md5Calc = require 'MD5'
+md5 = require('blueimp-md5').md5
 logger = require 'winston'
 
 module.exports.modelExists = (request, response) ->
@@ -33,7 +33,7 @@ module.exports.getModel = (request, response) ->
 module.exports.saveModel = (request, response) ->
 	hash = request.params.hash
 	content = request.body
-	calculatedMd5 = md5Calc content
+	calculatedMd5 = md5 content
 
 	if hash isnt calculatedMd5
 		response.status(500).send 'Calculated MD5 value does not match'

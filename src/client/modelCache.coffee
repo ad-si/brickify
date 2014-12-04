@@ -12,28 +12,31 @@ modelCache = {}
 # currently running model queries
 modelQueries = {}
 
+exists = (hash) ->
+	return Promise.resolve $.get('/model/exists/' + hash)
+
 # sends the model to the server if the server hasn't got a file
 # with the same hash value
-submitDataToServer = (hash, data, success) ->
-	$.get('/model/exists/' + hash)
-	.success () ->
-		success?(hash)
-	.fail () ->
-		#server doesn't have the model, send it
-		$.ajax '/model/submit/' + hash,
-			data: data
-			type: 'POST'
-			contentType: 'application/octet-stream'
-			success: () ->
-				console.log 'sent model to the server'
-				success?(hash)
-			error: () -> console.error 'unable to send model to the server'
+submitDataToServer = (hash, data) ->
+	send = () ->
+		Promise.resolve(
+			$.ajax(
+				'/model/submit/' + hash
+				data: data
+				type: 'POST'
+				contentType: 'application/octet-stream'
+			)
+		).then(
+			() -> console.log 'sent model to the server'
+			() -> console.error 'unable to send model to the server'
+		)
+	return exists(hash).catch(send)
 
 module.exports.store = (optimizedModel, success) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
 	cache hash, optimizedModel
-	submitDataToServer(hash, modelData, success)
+	submitDataToServer(hash, modelData).then success
 
 # requests a mesh with the given hash from the server
 # if it is cached locally, the local reference is returned

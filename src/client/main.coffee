@@ -3,9 +3,6 @@ r = require 'react'
 
 globalConfig = require './globals.yaml'
 Bundle = require './bundle'
-Statesync = require './statesync'
-objectTree = require '../common/objectTree'
-renderer = require './renderer'
 
 menuItems = [
 	{
@@ -121,7 +118,7 @@ String::contains = (str) -> -1 isnt this.indexOf str
 ###
 
 
-bundle = new Bundle(Statesync.defaultInstance, globalConfig, true)
+bundle = new Bundle(globalConfig)
 bundle.postInitCallback (state) ->
 	#look at url hash and run commands
 	hash = window.location.hash
@@ -136,9 +133,10 @@ bundle.postInitCallback (state) ->
 	#clear url hash after executing commands
 	window.location.hash = ''
 
-bundle.init()
+bundle.init true, true
 
 commandFunctions = {
+	# TODO use modelLoader instance from UI or extract to bundle
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
 		modelLoader = require './modelLoader'

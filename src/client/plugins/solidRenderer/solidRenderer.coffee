@@ -20,7 +20,7 @@ module.exports = class SolidRenderer
 
 	# check if there are any threejs objects that haven't been loaded yet
 	# if so, load the referenced model from the server
-	onStateUpdate: (state, done) ->
+	onStateUpdate: (state, done) =>
 		objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
 
 		#TODO: this is wrong, since loadModelIfneeded can modify the state
@@ -28,21 +28,21 @@ module.exports = class SolidRenderer
 		#TODO: loadModelIfNeeded calls are completed. Solve with promises
 		done()
 
-	loadModelIfNeeded: (node) ->
+	loadModelIfNeeded: (node) =>
 		if node.pluginData.solidRenderer?
 			properties = node.pluginData.solidRenderer
 			storedUuid = properties.threeObjectUuid
 			threeObject = @threejsRootNode.getObjectByName storedUuid, true
 			if not threeObject?
-				loadModelFromCache node, properties, true
+				@loadModelFromCache node, properties, true
 		else
 			node.pluginData.solidRenderer = {}
-			loadModelFromCache node, node.pluginData.solidRenderer, false
+			@loadModelFromCache node, node.pluginData.solidRenderer, false
 	# TODO: Remove deleted objects
 
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name
-		success = (optimizedModel) ->
+		success = (optimizedModel) =>
 			console.log "Got model #{node.meshHash}"
 			threeObj = @addModelToThree optimizedModel
 			if reload

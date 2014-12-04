@@ -11,16 +11,16 @@ module.exports = class Bundle
 		@postInitCb = callback
 	init: (createRendererAndUi, syncStateWithServer = true) ->
 		self = @
-		@pluginLoader = new PluginLoader(@globalConfigInstance)
+		@pluginLoader = new PluginLoader(@globalConfig)
 		@stateInstance = new Statesync(@pluginLoader.pluginHooks,
 			syncStateWithServer)
 
-		@stateInstance.init @globalConfigInstance, (state) ->
+		@stateInstance.init @globalConfig, (state) ->
 			objectTree.init state
 			if createRendererAndUi
 				self.renderer = new Renderer(self.pluginLoader.pluginHooks)
 				self.uiInstance = new Ui(self.globalConfig, self.renderer,
-					self.stateInstance)
+					self.stateInstance, self.pluginLoader.pluginHooks)
 				self.uiInstance.init()
 				self.pluginInstances = self.pluginLoader.loadPlugins(self.renderer)
 			else

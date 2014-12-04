@@ -4,19 +4,20 @@
 
 statesync = require './statesync'
 objectTree = require '../common/objectTree'
-modelLoader = require './modelLoader'
+ModelLoader = require './modelLoader'
 
 module.exports = class Ui
-	constructor: (globalConfigInstance, rendererInstance, statesyncInstance) ->
+	constructor: (globalConfigInstance, rendererInstance,
+								statesyncInstance, pluginHooks) ->
 		@globalConfig = globalConfigInstance
 		@renderer = rendererInstance
 		@statesync = statesyncInstance
-
+		@modelLoader = new ModelLoader(statesyncInstance, pluginHooks)
 	dropHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
-		modelLoader.readFiles files, @statesync if files?
+		@modelLoader.readFiles files if files?
 
 	dragOverHandler: (event) ->
 		event.stopPropagation()

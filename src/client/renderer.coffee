@@ -20,7 +20,7 @@ module.exports = class Renderer
 			i = instanceReference
 			i.stats?.begin()
 			i.threeRenderer.render i.scene, i.camera
-			@pluginHooks.on3dUpdate timestamp
+			i.pluginHooks.on3dUpdate timestamp
 			i.stats?.end()
 			requestAnimationFrame i.renderLoopCreator(i)
 
@@ -95,7 +95,7 @@ module.exports = class Renderer
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 	setupControls: (globalConfig) ->
-		@controls = new THREE.OrbitControls(@camera, @threeRenderer.domElement)
+		@controls = new OrbitControls(@camera, @threeRenderer.domElement)
 		@controls.target.set(0, 0, 0)
 
 	setupFPSCounter: () ->

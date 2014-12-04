@@ -16,18 +16,17 @@ module.exports = class Bundle
 			syncStateWithServer)
 		@modelLoader = new ModelLoader(@stateInstance, @pluginLoader.pluginHooks)
 
-		self = @
-		@stateInstance.init @globalConfig, (state) ->
+		@stateInstance.init @globalConfig, (state) =>
 			objectTree.init state
 			if createRendererAndUi
-				self.renderer = new Renderer(self.pluginLoader.pluginHooks)
-				self.uiInstance = new Ui(self.globalConfig, self.renderer,
-					self.stateInstance, self.modelLoader)
-				self.uiInstance.init()
-				self.pluginInstances = self.pluginLoader.loadPlugins(self.renderer)
+				@renderer = new Renderer(@pluginLoader.pluginHooks)
+				@uiInstance = new Ui(@globalConfig, @renderer,
+					@stateInstance, @modelLoader)
+				@uiInstance.init()
+				@pluginInstances = @pluginLoader.loadPlugins(@renderer)
 			else
-				self.pluginInstances = self.pluginLoader.loadPlugins()
+				@pluginInstances = @pluginLoader.loadPlugins()
 
-			self.postInitCb? state
+			@postInitCb? state
 
 

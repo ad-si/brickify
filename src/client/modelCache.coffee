@@ -37,10 +37,8 @@ module.exports.store = (optimizedModel, success) ->
 
 # requests a mesh with the given hash from the server
 # if it is cached locally, the local reference is returned
-requestDataFromServer = (hash, successCallback, failCallback) ->
-	requestUrl = '/model/get/' + hash
-	$.get(requestUrl, '', successCallback).fail () ->
-		failCallback() if failCallback?
+requestDataFromServer = (hash) ->
+	return Promise.resolve $.get('/model/get/' + hash)
 
 # Request an optimized mesh with the given hash
 # The mesh will be provided by the cache if present or loaded from the server
@@ -58,8 +56,7 @@ module.exports.request = (hash, success, fail) ->
 			failCallbacks: [fail]
 		}
 		modelQueries[hash] = query
-		requestDataFromServer(
-			hash
+		requestDataFromServer(hash).then(
 			requestOptimizedModelSuccess query
 			requestOptimizedModelFail query
 		)

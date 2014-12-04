@@ -3,6 +3,8 @@
 
   Renders loaded models with default color inside the scene
 ###
+
+THREE = require 'three'
 objectTree = require '../../../common/objectTree'
 modelCache = require '../../modelCache'
 

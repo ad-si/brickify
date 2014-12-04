@@ -43,8 +43,9 @@ Following scripts are currently available:
 
 ## Package management
 
-We use [bower](http://bower.io/) for frontend package management
-and [npm](https://npmjs.org/) for backend package management.
+We use [npm](https://npmjs.org) for package management.
+In order to bundle the modules for the browser we use [browserify](http://browserify.org)
+The usage of bower is deprecated and we will remove the remaining libraries in the future.
 
 
 ## Documentation

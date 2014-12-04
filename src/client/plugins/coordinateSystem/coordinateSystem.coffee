@@ -5,6 +5,8 @@
   navigation inside lowfab.
 ###
 
+THREE = require 'three'
+
 # Require sub-modules, see [Grid](grid.html) and [Axis](axis.html)
 setupGrid = require './grid'
 setupAxis = require './axis'

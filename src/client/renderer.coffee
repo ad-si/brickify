@@ -2,9 +2,16 @@
 # @module renderer
 ###
 
-
+THREE = require 'three'
+OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
+#TrackballControls = require 'Three.trackball'
+#TrackballControls = require('../../../TrackballControls/index.js')(Three)
+#OrbitControls = require('three-orbit-controls')(Three)
+#OrbitControls = require('../../../OrbitControls/index.js')(Three)
 
+#TrackballControls.prototype = Object.create(Three.EventDispatcher.prototype)
+#OrbitControls.prototype = Object.create(Three.EventDispatcher.prototype )
 class Renderer
 	constructor: (pluginHooksInstance) ->
 		@scene = null

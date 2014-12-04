@@ -55,15 +55,16 @@ module.exports.initUi = (elements) ->
 # Traverses the state and start the voxelisation of all stlImported Models
 voxeliseAllModels = () ->
 	if stateInstance
-		onSuccess = (node) ->
-			modelCache.requestOptimizedMeshFromServer(
-				node.pluginData.stlImport.meshHash,
-				(modelInstance) -> voxelise modelInstance, node
-			)
 
-		objectTree.forAllSubnodesWithProperty(
+		onSuccess = (node) ->
+			modelCache.request(
+				node.meshHash
+				(model) ->
+					voxelise model, node
+				() -> console.warn 'could no get model')
+
+		objectTree.forAllSubnodes(
 			stateInstance.rootNode
-			'stlImport' #todo: remove string literal
 			onSuccess
 		)
 
@@ -71,8 +72,7 @@ voxeliseAllModels = () ->
 voxelise = (optimizedModel, node) ->
 	# check if model was already voxelised
 	for data in voxelisedModels
-		if data.node.pluginData.stlImport.meshHash is
-					node.pluginData.stlImport.meshHash
+		if data.node.meshHash is node.meshHash
 			console.warn 'already voxelised this model'
 			return
 

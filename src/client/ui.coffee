@@ -2,17 +2,12 @@
 # @module ui
 ###
 
-statesync = require './statesync'
-objectTree = require '../common/objectTree'
-ModelLoader = require './modelLoader'
-
 module.exports = class Ui
 	constructor: (globalConfigInstance, rendererInstance,
-								statesyncInstance, pluginHooks) ->
+								statesyncInstance, @modelLoader) ->
 		@globalConfig = globalConfigInstance
 		@renderer = rendererInstance
 		@statesync = statesyncInstance
-		@modelLoader = new ModelLoader(statesyncInstance, pluginHooks)
 	dropHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()

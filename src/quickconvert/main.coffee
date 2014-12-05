@@ -1,33 +1,32 @@
 globalConfig = require '../client/globals.yaml'
-_renderer = require '../client/renderer'
-pluginLoader = require '../client/pluginLoader'
-statesync = require '../client/statesync'
 objectTree = require '../common/objectTree'
-coordinateSystem = require '../client/plugins/coordinateSystem/coordinateSystem'
+Bundle = require '../client/bundle'
 
+# Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 388
 
-renderer = _renderer.defaultInstance
-renderer.init globalConfig
+#clone global config 3 times
+configString = JSON.stringify(globalConfig)
+config1 = JSON.parse configString
+config2 = JSON.parse configString
+config3 = JSON.parse configString
 
-coordinateSystem.init globalConfig
+# instanciate 3 lowfab bundles
+config1.renderAreaId = 'renderArea1'
+bundle1 = new Bundle(config1)
+bundle1.init true, false
 
-globalConfig.renderAreaId = 'renderArea2'
-renderer2 = new _renderer.Renderer()
-renderer2.init globalConfig
-obj = new THREE.Object3D()
-renderer2.addToScene obj
-coordinateSystem.init3d obj
+config2.renderAreaId = 'renderArea2'
+bundle2 = new Bundle(config2)
+bundle2.init true, false
 
-globalConfig.renderAreaId = 'renderArea3'
-renderer3 = new _renderer.Renderer()
-renderer3.init globalConfig
-obj2 = new THREE.Object3D()
-renderer3.addToScene obj2
-coordinateSystem.init3d obj2
+config3.renderAreaId = 'renderArea3'
+bundle3 = new Bundle(config3)
+bundle3.init true, false
 
+###
 #get model from url
 hash = window.location.hash
 
@@ -49,3 +48,4 @@ statesync.defaultInstance.init globalConfig, (state) ->
 	objectTree.init state
 	pluginLoader.init globalConfig
 	pluginLoader.loadPlugins()
+###

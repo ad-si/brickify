@@ -48,13 +48,14 @@ module.exports = class VoxeliserPlugin
 			class="btn btn-default">Voxelise</button>
 			<button id="layoutButton" type="button"
 			class="btn btn-default">Layout</button>'
-		$('#voxeliseButton').click((event) ->
+		$('#voxeliseButton').click((event) =>
 			event.stopPropagation()
-			@.voxeliseAllModels()
+			console.log @
+			@voxeliseAllModels()
 			)
-		$('#layoutButton').click((event) ->
+		$('#layoutButton').click((event) =>
 			event.stopPropagation()
-			@.layout()
+			@layout()
 			)
 		return
 
@@ -75,10 +76,10 @@ module.exports = class VoxeliserPlugin
 	voxeliseAllModels: () =>
 		if @stateInstance
 
-			onSuccess = (node) ->
+			onSuccess = (node) =>
 				modelCache.request(
 					node.meshHash
-					(model) ->
+					(model) =>
 						@voxelise model, node
 					() -> console.warn 'could no get model')
 

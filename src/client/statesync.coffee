@@ -19,18 +19,28 @@ module.exports = class Statesync
 
 	init: (globalConfig, stateInitializedCallback) ->
 		@globalConfig = globalConfig
+
+		if not @syncWithServer
+			@state = {}
+			stateInitializedCallback? @state
+			@performInitialStateLoadedAction()
+			return
+
 		$.get '/statesync/get', {}, (data, textStatus, jqXHR) =>
 			@state = data
 			@oldState = JSON.parse JSON.stringify @state
 
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
-			stateInitializedCallback @state if stateInitializedCallback?
+			stateInitializedCallback? @state
 
-			initialStateIsLoaded = true
-			@initialStateLoadedCallbacks.forEach (callback) ->
-				callback(state)
-			@handleUpdatedState @state
+			@performInitialStateLoadedAction()
+
+	performInitialStateLoadedAction: () ->
+		@initialStateIsLoaded = true
+		@initialStateLoadedCallbacks.forEach (callback) ->
+			callback(state)
+		@handleUpdatedState @state
 
 	getState: (callback) ->
 		if @initialStateIsLoaded
@@ -79,7 +89,7 @@ module.exports = class Statesync
 			@oldState = JSON.parse JSON.stringify @state
 			@handleUpdatedState @state
 			return
-			
+
 		# deep copy
 		@oldState = JSON.parse JSON.stringify @state
 

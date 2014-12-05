@@ -26,7 +26,6 @@ config3.renderAreaId = 'renderArea3'
 bundle3 = new Bundle(config3)
 bundle3.init true, false
 
-###
 #get model from url
 hash = window.location.hash
 
@@ -44,8 +43,7 @@ vanillaLink = $('.applink').attr('href')
 vanillaLink += 'initialModel=' + hash
 $('.applink').attr('href', vanillaLink)
 
-statesync.defaultInstance.init globalConfig, (state) ->
-	objectTree.init state
-	pluginLoader.init globalConfig
-	pluginLoader.loadPlugins()
-###
+#load model into all bundles
+bundle1.modelLoader.loadByHash hash
+bundle2.modelLoader.loadByHash hash
+bundle3.modelLoader.loadByHash hash

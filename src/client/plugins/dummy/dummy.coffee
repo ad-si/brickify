@@ -66,6 +66,7 @@ module.exports = class DummyPlugin
 	# The hook provides the new complete state as an arguments.
 	#
 	# @param {Object} state the complete current state
+	# @param {Callback} done callback to be called when finished state modification
 	# @memberOf dummyClientPlugin
 	# @see stateSynchronization
 	###

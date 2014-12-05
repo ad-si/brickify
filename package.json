@@ -28,6 +28,7 @@
     "express": "^4.9.8",
     "express-session": "^1.9.1",
     "font-awesome": "^4.2.0",
+    "git-rev": "^0.2.1",
     "jade": "^1.7.0",
     "jqtree": "^0.22.0",
     "jquery": "^2.1.1",

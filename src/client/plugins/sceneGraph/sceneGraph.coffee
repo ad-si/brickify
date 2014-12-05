@@ -8,53 +8,53 @@
 global.$ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
-state = null
-uiInitialized = false
-htmlElements = null
 
-renderUi = (elements) ->
+module.exports = class SceneGraph
+	constructor: () ->
+		@state = null
+		@uiInitialized = false
+		@htmlElements = null
 
-	$treeContainer = $(elements.sceneGraphContainer)
-	idCounter = 1
-	treeData = [{
-		label: 'Scene',
-		id: idCounter,
-		children: []
-	}]
+	renderUi: (elements) ->
+		$treeContainer = $(elements.sceneGraphContainer)
+		idCounter = 1
+		treeData = [{
+			label: 'Scene',
+			id: idCounter,
+			children: []
+		}]
 
-	writeToObject = (treeNode, node) ->
+		writeToObject = (treeNode, node) ->
+			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
+			treeNode.id = idCounter++
 
-		treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
-		treeNode.id = idCounter++
+			if node.children
+				treeNode.children = []
+				node.children.forEach (subNode, index) ->
+					treeNode.children[index] = {}
+					writeToObject treeNode.children[index], subNode
 
-		if node.children
-			treeNode.children = []
-			node.children.forEach (subNode, index) ->
-				treeNode.children[index] = {}
-				writeToObject treeNode.children[index], subNode
+		writeToObject(treeData[0], @state.rootNode)
+		if $treeContainer.is(':empty')
+			$treeContainer.tree {
+				autoOpen: 0
+				data: treeData
+				dragAndDrop: true
+				keyboardSupport: false
+				useContextMenu: false
+				onCreateLi: (node, $li) -> $li.attr('title', node.title)
+			}
 
-	writeToObject(treeData[0], state.rootNode)
+		else
+			$treeContainer.tree 'loadData', treeData
 
-	if $treeContainer.is(':empty')
-		$treeContainer.tree {
-			autoOpen: 0
-			data: treeData
-			dragAndDrop: true
-			keyboardSupport: false
-			useContextMenu: false
-			onCreateLi: (node, $li) -> $li.attr('title', node.title)
-		}
+	onStateUpdate: (@state, done) =>
+		if @uiInitialized
+			@renderUi @htmlElements
+		done()
 
-	else
-		$treeContainer.tree 'loadData', treeData
-
-module.exports.onStateUpdate = (_state) ->
-	state = _state
-	if uiInitialized
-		renderUi htmlElements
-
-module.exports.initUi = (elements) ->
-	htmlElements = elements
-	uiInitialized = true
-	if state
-		renderUi htmlElements
+	initUi: (elements) =>
+		@htmlElements = elements
+		@uiInitialized = true
+		if @state
+			@renderUi @htmlElements

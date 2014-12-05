@@ -2,15 +2,15 @@
 # @module stateSynchronization
 ###
 
+
+$ = require 'jquery'
 jsondiffpatch = require 'jsondiffpatch'
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
 
-pluginHooks = require '../common/pluginHooks'
-
-class Statesync
-	constructor: (@syncWithServer = true) ->
+module.exports = class Statesync
+	constructor: (@pluginHooks, @syncWithServer = true) ->
 		@state = {}
 		@oldState = {}
 		@globalConfig = null
@@ -18,20 +18,19 @@ class Statesync
 		@initialStateLoadedCallbacks = []
 
 	init: (globalConfig, stateInitializedCallback) ->
-		self = @
 		@globalConfig = globalConfig
-		$.get '/statesync/get', {}, (data, textStatus, jqXHR) ->
-			self.state = data
-			self.oldState = JSON.parse JSON.stringify self.state
+		$.get '/statesync/get', {}, (data, textStatus, jqXHR) =>
+			@state = data
+			@oldState = JSON.parse JSON.stringify @state
 
-			console.log "Got initial state from server: #{JSON.stringify(self.state)}"
+			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
-			stateInitializedCallback self.state if stateInitializedCallback?
+			stateInitializedCallback @state if stateInitializedCallback?
 
 			initialStateIsLoaded = true
-			self.initialStateLoadedCallbacks.forEach (callback) ->
+			@initialStateLoadedCallbacks.forEach (callback) ->
 				callback(state)
-			self.handleUpdatedState self.state
+			@handleUpdatedState @state
 
 	getState: (callback) ->
 		if @initialStateIsLoaded
@@ -53,20 +52,19 @@ class Statesync
 			@sync()
 
 	handleUpdatedState: (curstate) ->
-		self = @
-		numCallbacks = pluginHooks.get('onStateUpdate').length
+		numCallbacks = @pluginHooks.get('onStateUpdate').length
 		numCalledDone = 0
 
-		done = () ->
+		done = () =>
 			#if all plugins finished modifying their state, synchronize
 			numCalledDone++
 			if numCallbacks == numCalledDone
 				# sync as long client plugins modify the state
-				self.sync()
+				@sync()
 
 		#Client plugins maybe modify state...
-		pluginHooks.onStateUpdate curstate, done
-		
+		@pluginHooks.onStateUpdate curstate, done
+
 
 	sync: (force = false) ->
 		# if we shall not sync with the server, run the loop internally as long as
@@ -95,12 +93,12 @@ class Statesync
 		$.ajax '/statesync/set',
 			type: 'POST'
 			data: JSON.stringify({deltaState: delta})
-			# what jquery expects as an answer
+		# what jquery expects as an answer
 			dataType: 'json'
-			# what is sent in the post request as a header
+		# what is sent in the post request as a header
 			contentType: 'application/json; charset=utf-8'
-			# check whether client modified its local state
-			# since the post request was sent
+		# check whether client modified its local state
+		# since the post request was sent
 			success: (data, textStatus, jqXHR) ->
 				delta = data
 				console.log "Got delta from server: #{JSON.stringify(delta)}"
@@ -118,15 +116,3 @@ class Statesync
 				@oldState = JSON.parse JSON.stringify @state
 
 				@handleUpdatedState @state
-
-module.exports.Statesync = Statesync
-
-defaultInstance = new Statesync()
-
-# backwards compatibility for plugins that use statesync.performStateAction
-# directly
-module.exports.defaultInstance = defaultInstance
-module.exports.performStateAction = (callback, updatedStateEvent = false) ->
-	console.warn 'performStateAction should not be used anymore, use async code
-and done() in onStateUpdate instead'
-	defaultInstance.performStateAction(callback, updatedStateEvent)

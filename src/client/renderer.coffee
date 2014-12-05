@@ -2,25 +2,22 @@
 # @module renderer
 ###
 
-pluginHooks = require '../common/pluginHooks'
+THREE = require 'three'
+OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
 
-class Renderer
-	constructor: () ->
+module.exports = class Renderer
+	constructor: (@pluginHooks) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
 
-	# this structure is needed because 'this' or '@' points to the wrong
-	# object when calling the render-Callback from WebGL
-	renderLoopCreator: (instanceReference) ->
-		return (timestamp) ->
-			i = instanceReference
-			i.stats?.begin()
-			i.threeRenderer.render i.scene, i.camera
-			pluginHooks.on3dUpdate timestamp
-			i.stats?.end()
-			requestAnimationFrame i.renderLoopCreator(i)
+	localRenderer: (timestamp) =>
+			@stats?.begin()
+			@threeRenderer.render @.scene, @.camera
+			@pluginHooks.on3dUpdate timestamp
+			@stats?.end()
+			requestAnimationFrame @localRenderer
 
 	addToScene: (node) ->
 		@scene.add node
@@ -43,7 +40,7 @@ class Renderer
 		@setupCamera globalConfig
 		@setupControls globalConfig
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
-		requestAnimationFrame @renderLoopCreator(@)
+		requestAnimationFrame @localRenderer
 
 	setupRenderer: (globalConfig) ->
 		@threeRenderer = new THREE.WebGLRenderer(
@@ -93,7 +90,7 @@ class Renderer
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 	setupControls: (globalConfig) ->
-		@controls = new THREE.OrbitControls(@camera, @threeRenderer.domElement)
+		@controls = new OrbitControls(@camera, @threeRenderer.domElement)
 		@controls.target.set(0, 0, 0)
 
 	setupFPSCounter: () ->
@@ -116,8 +113,3 @@ class Renderer
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, 0, 30
 		@scene.add directionalLight
-
-module.exports.Renderer = Renderer
-
-defaultInstance = new Renderer()
-module.exports.defaultInstance = defaultInstance

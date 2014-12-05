@@ -47,8 +47,6 @@ block content
                 a(href='../') Go back to lowfab.net
 block scripts
     //include all general scripts
-    if scripts
-        each path in scripts
-            script(src=path)
+    script(src='/libs/Blob/Blob.js')
     //load quickconvert script
     script(src='quickconvert.js')

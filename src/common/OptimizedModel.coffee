@@ -1,13 +1,16 @@
 # An optimized model structure with indexed faces / vertices
 # and cached vertex and face normals
 # Created by the stlImportPlugin
+
+THREE = require 'three'
+
 class OptimizedModel
 	constructor: () ->
 		@positions = []
 		@indices = []
 		@vertexNormals = []
 		@faceNormals = []
-		@originalFileName = 'unknown file'
+		@originalFileName = 'Unknown file'
 
 	# Checks whether the model is 2-manifold, meaning that each edge is connected
 	# to exactly two faces. This also implies that the mesh is a closed body

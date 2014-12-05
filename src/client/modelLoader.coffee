@@ -2,51 +2,51 @@
 # @module fileLoader
 ###
 
-pluginHooks = require '../common/pluginHooks'
+md5 = require('blueimp-md5').md5
 modelCache = require './modelCache'
-stateSync = require './statesync'
 objectTree = require '../common/objectTree'
 
-module.exports.readFiles = (files, stateInstance) ->
-		readFile file, stateInstance for file in files
+module.exports = class ModelLoader
+	constructor: (@stateInstance, @pluginHooks) ->
+		return
 
-readFile = (file, stateInstance) ->
-	reader = new FileReader()
-	# TODO: remove extension check
-	if file.name.toLowerCase().search '.stl' >= 0
-		reader.onload = loadFile file.name, stateInstance
-		reader.readAsBinaryString file
+	readFiles: (files) ->
+		@readFile file for file in files
 
-loadFile = (filename, stateInstance) -> (event) ->
-	fileContent = event.target.result
-	optimizedModel = importFile filename, fileContent
-	load optimizedModel, stateInstance if optimizedModel?
+	readFile: (file) ->
+		reader = new FileReader()
+		# TODO: remove extension check
+		if file.name.toLowerCase().search '.stl' >= 0
+			reader.onload = @loadFile file.name
+			reader.readAsBinaryString file
 
-importFile = (filename, fileContent) ->
-	for loader in pluginHooks.get 'importFile'
-		optimizedModel = loader filename, fileContent
-		return optimizedModel if optimizedModel?
+	loadFile: (filename) =>
+		return (event) =>
+			fileContent = event.target.result
+			optimizedModel = @importFile filename, fileContent
+			@load optimizedModel if optimizedModel?
 
-load = (optimizedModel, stateInstance) ->
-	modelData = optimizedModel.toBase64()
-	hash = md5(modelData)
-	fileName = optimizedModel.originalFileName
-	modelCache.store optimizedModel
-	addModelToState fileName, hash, stateInstance
-module.exports.load = load
+	importFile: (filename, fileContent) ->
+		for loader in @pluginHooks.get 'importFile'
+			optimizedModel = loader filename, fileContent
+			return optimizedModel if optimizedModel?
 
-module.exports.loadByHash = (hash, stateInstance) ->
-	loadCallback = (optimizedModel) ->
-		load optimizedModel, stateInstance
+	load: (optimizedModel) =>
+		modelData = optimizedModel.toBase64()
+		hash = md5(modelData)
+		fileName = optimizedModel.originalFileName
+		modelCache.store optimizedModel
+		@addModelToState fileName, hash
 
-	modelCache.request hash, loadCallback,
-		() -> console.error "Could not load model from hash #{hash}"
+	loadByHash: (hash) =>
+		modelCache.request hash, @load,
+			() -> console.error "Could not load model from hash #{hash}"
 
-# adds a new model to the state
-addModelToState = (fileName, hash, stateInstance) ->
-	loadModelCallback = (state) ->
-		node = objectTree.addChild state.rootNode
-		node.fileName = fileName
-		node.meshHash = hash
-	# call updateState on all client plugins and sync
-	stateInstance.performStateAction loadModelCallback, true
+	# adds a new model to the state
+	addModelToState: (fileName, hash) ->
+		loadModelCallback = (state) ->
+			node = objectTree.addChild state.rootNode
+			node.fileName = fileName
+			node.meshHash = hash
+		# call updateState on all client plugins and sync
+		@stateInstance.performStateAction loadModelCallback, true

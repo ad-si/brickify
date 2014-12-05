@@ -4,9 +4,9 @@ html
 		meta(charset='utf-8')
 		title Lowfab
 		meta(viewport='width=device-width, initial-scale=1')
-		if styles
-			each path in styles
-				link(rel='stylesheet', href=path)
+		link(rel='stylesheet', href='/node_modules/bootstrap/dist/css/bootstrap.css')
+		link(rel='stylesheet', href='/node_modules/font-awesome/css/font-awesome.css')
+		link(rel='stylesheet', href='/styles/screen.css')
 	body
 		block content
 		block scripts

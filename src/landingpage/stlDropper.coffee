@@ -62,7 +62,11 @@ handleLoadedFile = (filename) ->
 		uploadFinishedCallback = (md5hash) ->
 			if importErrors
 				modelhash += '+errors'
-			document.location.href += 'quickconvert#' + md5hash
+			document.location.hash = ''
+			dhref = document.location.href
+			dhref = dhref.substring(0, dhref.length - 1)
+			dhref += 'quickconvert#' + md5hash
+			document.location.href = dhref
 			return
 
 		modelCache.store optimizedModel, uploadFinishedCallback

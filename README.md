@@ -2,9 +2,9 @@
 
 ## Installation
 
-`$ git clone https://bitbucket.org/hpihci/fab3d-lowfab.git`
+`$ git clone https://github.com/stuikomma/lowfab.git`
 
-`$ cd fab3d-lowfab`
+`$ cd lowfab`
 
 Install dependencies: `$ npm install`
 

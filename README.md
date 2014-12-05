@@ -55,3 +55,11 @@ and [CroJSDoc](http://croquiscom.github.io/crojsdoc/) for api documentation.
 
 Call `$ npm run documentation` and
 `$ npm run apiDocumentation` respectively.
+
+## Server
+
+The server currently serves:
+
+- [lowfab.net](http://lowfab.net): current master-branch
+- [dev.lowfab.net](http://dev.lowfab.net): current develop-branch
+- [batchtests.lowfab.net](http://batchtests.lowfab.net): results of batchTesting (performed on develop)

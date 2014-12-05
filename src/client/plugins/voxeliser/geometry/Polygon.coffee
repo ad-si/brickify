@@ -1,6 +1,8 @@
 require '../Helpers'
 Tag = require './Tag'
 Vector3D = require './Vector3D'
+THREE = require 'three'
+
 
 class Polygon
 	constructor: (@points, @plane, @edges) ->

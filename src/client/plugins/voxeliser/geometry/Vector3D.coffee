@@ -2,6 +2,8 @@
 #class Matrix4x4
 
 Tolerances = require './Tolerances'
+THREE = require 'three'
+
 
 class Vector3D
 	constructor: (@x, @y, @z) ->

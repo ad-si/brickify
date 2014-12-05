@@ -1,3 +1,4 @@
+THREE = require 'three'
 ColorPalette = require './ColorPalette'
 baseColor = ColorPalette.orange()
 

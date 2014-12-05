@@ -3,6 +3,8 @@ Plane = require './Plane'
 Polygon = require './Polygon'
 Edge = require './Edge'
 Point = require './Point'
+THREE = require 'three'
+
 
 class Object3D
 	constructor: () ->

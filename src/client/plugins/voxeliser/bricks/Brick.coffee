@@ -1,4 +1,5 @@
 BrickLayouter = require './BrickLayouter'
+THREE = require 'three'
 
 SelectType =
   brick: 'brick'

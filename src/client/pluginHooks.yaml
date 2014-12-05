@@ -1,21 +1,19 @@
-#  # Plugin API
+# # Plugin API
 #
-#  Client-side plugins can provide the following hooks to interact with lowfab.
+# Client-side plugins can provide the following hooks to interact with lowfab.
 #
-#  The hooks must exist at load-time. Hooks that are added later during
-#  run-time will not be called.
+# The hooks must exist at load-time. Hooks that are added later during
+# run-time will not be called.
 #
-#  See [dummyPlugin](plugins/dummy/dummy.html) for a example implementation
-#  and further documentation of the plugin API.
+# See [dummyPlugin](plugins/dummy/dummy.html) for a example implementation
+# and further documentation of the plugin API.
 
-
-#  ## Plugin Initialization
-#  The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
-#  (if provided) after loading the plugin. It is the first method to be called
-#  and provides access to the [global configuration](globals.html).
+# ## Plugin Initialization
+# The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
+# (if provided) after loading the plugin. It is the first method to be called
+# and provides access to the [global configuration](globals.html).
 
 - init
-
 
 #  ## 3D scene initialization
 #
@@ -42,7 +40,8 @@
 #  `onStateUpdate` method (if provided) whenever the current state changes
 #  due to user input or calculation results on either server or client side.
 #
-#  The hook provides the new complete state as an argument
+#  The hook provides the new complete state as an argument and a callback that
+#  has to be called when the plugin finished its computations
 
 - onStateUpdate
 

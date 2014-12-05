@@ -1,3 +1,5 @@
+THREE = require 'three'
+
 class BrickGroup
   constructor: (@brick_spaces = []) ->
     

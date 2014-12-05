@@ -1,3 +1,5 @@
+THREE = require 'three'
+
 class Ray
 	constructor: (@origin, @direction) ->
 		return

@@ -1,3 +1,5 @@
+THREE = require 'three'
+
 class ColorPalette
   constructor: (@hue, @saturation, @lightness) ->
     @base = new THREE.Color().setHSL @hue, @saturation, @lightness

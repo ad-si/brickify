@@ -7,6 +7,8 @@ Edge = require './Edge'
 BoundaryBox = require './BoundaryBox'
 Vector3D = require './Vector3D'
 ColorPalette = require '../rendering/ColorPalette'
+THREE = require 'three'
+
 
 # Base class for all three-dimentional Objects.
 class SolidObject3D extends Object3D

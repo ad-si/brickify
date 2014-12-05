@@ -1,5 +1,6 @@
 Brick = require './Brick'
 Vector3D = require '../geometry/Vector3D'
+THREE = require 'three'
 
 
 class BrickLayout

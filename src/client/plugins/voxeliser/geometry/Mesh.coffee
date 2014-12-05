@@ -1,4 +1,6 @@
 Object3D = require './Object3D'
+THREE = require 'three'
+
 
 class Mesh extends Object3D
 	constructor: (triangles) ->

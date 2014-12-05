@@ -2,6 +2,7 @@ BrickSpace = require './BrickSpace'
 Object3D = require '../geometry/Object3D'
 Vector3D = require '../geometry/Vector3D'
 ColorPalette = require '../rendering/ColorPalette'
+THREE = require 'three'
 
 
 class BrickSpaceGrid

@@ -5,7 +5,8 @@ diffpatch = jsondiffpatch.create objectHash: (obj) ->
 
 logger = require 'winston'
 
-pluginHooks = require('../src/common/pluginHooks')
+pluginLoader = require('./../src/server/pluginLoader')
+pluginHooks = pluginLoader.pluginHooksInstance
 
 diffCallbacks = []
 

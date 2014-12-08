@@ -64,8 +64,8 @@ handleLoadedFile = (filename) ->
 				modelhash += '+errors'
 			document.location.hash = ''
 			dhref = document.location.href
-			dhref = dhref.substring(0, dhref.length - 1) if dhref.endsWith('#')
-			dhref += '/' unless dhref.endsWith('/')
+			dhref = dhref.substring(0, dhref.length - 1) if endsWith(dhref, '#')
+			dhref += '/' unless endsWith(dhref, '/')
 			dhref += 'quickconvert#' + md5hash
 			document.location.href = dhref
 			return
@@ -73,4 +73,8 @@ handleLoadedFile = (filename) ->
 		modelCache.store optimizedModel, uploadFinishedCallback
 
 		return
+
+endsWith = (str, suffix) ->
+	str.indexOf(suffix, str.length - suffix.length) is not - 1
+
 	return loadCallback

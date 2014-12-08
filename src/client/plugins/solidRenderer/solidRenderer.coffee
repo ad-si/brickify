@@ -50,7 +50,9 @@ module.exports = class SolidRenderer
 		failure = () ->
 			console.error "Unable to get model #{node.meshHash}"
 
-		modelCache.request(node.meshHash).then(success, failure)
+		prom = modelCache.request node.meshHash
+		prom.catch failure
+		return prom.then success
 
 	# parses the binary geometry and adds it to the three scene
 	addModelToThree: (optimizedModel) ->

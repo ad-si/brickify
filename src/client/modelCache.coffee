@@ -17,17 +17,19 @@ exists = (hash) ->
 # with the same hash value
 submitDataToServer = (hash, data) ->
 	send = () ->
-		Promise.resolve(
+		prom = Promise.resolve(
 			$.ajax(
 				'/model/submit/' + hash
 				data: data
 				type: 'POST'
 				contentType: 'application/octet-stream'
 			)
-		).then(
+		)
+		prom.then(
 			() -> console.log 'sent model to the server'
 			() -> console.error 'unable to send model to the server'
 		)
+		return prom
 	return exists(hash).catch(send)
 
 module.exports.store = (optimizedModel) ->

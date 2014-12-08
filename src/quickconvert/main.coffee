@@ -29,9 +29,8 @@ bundle3.init true, false
 #get model from url
 hash = window.location.hash
 
-if hash.indexOf('+error') < 0
-	$('#importerrors').hide()
-else
+if hash.indexOf('+error') >= 0
+	$('#importerrors').show()
 	#remove error note from hash
 	hash = hash.substring 0, hash.length - 7
 

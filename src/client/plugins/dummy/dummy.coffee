@@ -44,7 +44,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
-	init3d: (threejsNode) =>
+	init3d: (threejsNode, renderer) =>
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###

@@ -39,8 +39,7 @@ module.exports = class VoxeliserPlugin
 		# statesync.getState(setState)
 		# console.log 'after'
 
-	init3d: (threejsNode) =>
-		@threejsRootNode = threejsNode
+	init3d: (@threejsRootNode, @renderer) => return
 
 	initUi: (domElements) =>
 		domElements.toolsContainer.innerHTML =
@@ -65,12 +64,12 @@ module.exports = class VoxeliserPlugin
 
 
 	onClick: (event) =>
-		console.log interactionHelper
 		intersects =
-			interactionHelper.getPolygonClickedOn(event, @threejsRootNode.children)
+			interactionHelper.getPolygonClickedOn(event
+				@threejsRootNode.children
+				@renderer)
 		if (intersects.length > 0)
 			intersects[0].object.material.color.set(new THREE.Color(1, 0, 0))
-		console.log intersects
 
 	# Traverses the state and start the voxelisation of all stlImported Models
 	voxeliseAllModels: () =>

@@ -22,7 +22,7 @@ module.exports = class PluginLoader
 		instance.init? @globalConfig
 
 		if @renderer?
-			instance.init3d? threeNode = new THREE.Object3D()
+			instance.init3d?(threeNode = new THREE.Object3D(), @renderer)
 
 		instance.initUi? {
 			menuBar: document.getElementById('navbarToggle')

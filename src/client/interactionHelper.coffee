@@ -1,27 +1,15 @@
-renderer = require './renderer'
 THREE = require 'three'
 canvas = null
 
-module.exports.onMouseEvent = (event) ->
-	canvas ?= renderer.getDomElement()
-	intersects = getPolygonClickedOn(event)
-
-	###switch 1
-		when 1 then currentInteraction.onLeftClick?(intersects)
-		when 2 then currentInteraction.onMiddleClick?(intersects)
-		when 3 then currentInteraction.onRightClick?(intersects)###
-
-module.exports.getPolygonClickedOn = (event, objects) ->
+module.exports.getPolygonClickedOn = (event, objects, renderer) ->
 	camera = renderer.getCamera()
 	raycaster = new THREE.Raycaster()
 	[x,y] = getRelativeCursorPosition event
-	console.log 'here first'
 	vector = new THREE.Vector3()
 	relativeX = x / window.innerWidth * 2 - 1
 	relativeY = y / window.innerHeight
 	vector.set relativeX, -relativeY * 2 + 1, 0.5
 	vector.unproject camera
-	console.log 'here'
 	raycaster.ray.set(camera.position, vector.sub(camera.position).normalize())
 	raycaster.intersectObjects objects, true
 

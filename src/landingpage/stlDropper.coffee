@@ -1,6 +1,7 @@
 stlLoader = require '../client/plugins/stlImport/stlLoader.coffee'
 md5 = require 'md5'
 modelCache = require '../client/modelCache'
+require 'string.prototype.endswith'
 
 droptext = null
 readingString = 'Reading file
@@ -64,8 +65,8 @@ handleLoadedFile = (filename) ->
 				modelhash += '+errors'
 			document.location.hash = ''
 			dhref = document.location.href
-			dhref = dhref.substring(0, dhref.length - 1) if endsWith(dhref, '#')
-			dhref += '/' unless endsWith(dhref, '/')
+			dhref = dhref.substring(0, dhref.length - 1) if dhref.endsWith('#')
+			dhref += '/' unless dhref.endsWith('/')
 			dhref += 'quickconvert#' + md5hash
 			document.location.href = dhref
 			return
@@ -73,8 +74,5 @@ handleLoadedFile = (filename) ->
 		modelCache.store optimizedModel, uploadFinishedCallback
 
 		return
-
-endsWith = (str, suffix) ->
-	str.indexOf(suffix, str.length - suffix.length) is not - 1
 
 	return loadCallback

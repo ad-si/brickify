@@ -29,7 +29,7 @@ module.exports = class Renderer
 		if not @staticRendererSize
 			@camera.aspect = @size().width / @size().height
 			@camera.updateProjectionMatrix()
-			@threeRenderer.setSize @size().width, @size().heigth
+			@threeRenderer.setSize @size().width, @size().height
 
 		@threeRenderer.render @scene, @camera
 

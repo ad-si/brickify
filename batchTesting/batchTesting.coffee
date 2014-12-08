@@ -9,6 +9,9 @@ modelPath = path.join 'batchTesting', 'models'
 outputPath = path.join 'batchTesting', 'results'
 reportFile = 'batchTestResults'
 
+# save temporary batch test report all X models
+resultSavingFrequency = 15
+
 logger = new (winston.Logger)({
 	transports: [
 		new winston.transports.Console { level: 'debug' }
@@ -28,6 +31,7 @@ module.exports.startTesting = () ->
 	models = parseModelFiles()
 	logger.info "Testing #{models.length} models"
 	results = []
+	modelCounter = 0
 	for i in [0..models.length - 1] by 1
 		model = models[i]
 
@@ -38,6 +42,12 @@ module.exports.startTesting = () ->
 		result = testModel model
 		result.fileName = model
 		results.push result
+
+		modelCounter++
+		if modelCounter == (resultSavingFrequency - 1)
+			logger.debug 'Saving temporary test report'
+			modelCounter = 0
+			reportGenerator.generateReport results, outputPath, reportFile
 
 	if results.length == 0
 		logger.warn 'No models where processed, test report can\'t be created'

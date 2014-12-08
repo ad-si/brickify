@@ -37,5 +37,3 @@ getGitInfo = (callback) ->
 	git.long (commit) ->
 		git.branch (branch) ->
 			callback(branch, commit)
-
-

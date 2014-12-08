@@ -64,7 +64,8 @@ handleLoadedFile = (filename) ->
 				modelhash += '+errors'
 			document.location.hash = ''
 			dhref = document.location.href
-			dhref = dhref.substring(0, dhref.length - 1)
+			dhref = dhref.substring(0, dhref.length - 1) if dhref.endsWith('#')
+			dhref += '/' unless dhref.endsWith('/')
 			dhref += 'quickconvert#' + md5hash
 			document.location.href = dhref
 			return

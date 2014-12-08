@@ -19,12 +19,10 @@ module.exports = class SolidRenderer
 	# check if there are any threejs objects that haven't been loaded yet
 	# if so, load the referenced model from the server
 	onStateUpdate: (state, done) =>
-		objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
-
-		#TODO: this is wrong, since loadModelIfneeded can modify the state
-		#TODO: asynchronously. therefore done has to be called when all
-		#TODO: loadModelIfNeeded calls are completed. Solve with promises
-		done()
+		subnodepromises = []
+		addToPromises = (node) => subnodepromises.push @loadModelIfNeeded(node)
+		objectTree.forAllSubnodes state.rootNode, addToPromises, false
+		Promise.all(subnodepromises).then(done)
 
 	loadModelIfNeeded: (node) =>
 		if node.pluginData.solidRenderer?
@@ -32,10 +30,12 @@ module.exports = class SolidRenderer
 			storedUuid = properties.threeObjectUuid
 			threeObject = @threejsNode.getObjectByName storedUuid, true
 			if not threeObject?
-				@loadModelFromCache node, properties, true
+				return @loadModelFromCache node, properties, true
+			else
+				return Promise.resolve()
 		else
 			node.pluginData.solidRenderer = {}
-			@loadModelFromCache node, node.pluginData.solidRenderer, false
+			return @loadModelFromCache node, node.pluginData.solidRenderer, false
 	# TODO: Remove deleted objects
 
 	loadModelFromCache: (node, properties, reload = false) ->
@@ -47,6 +47,7 @@ module.exports = class SolidRenderer
 				threeObj.name = properties.threeObjectUuid
 			else
 				properties.threeObjectUuid = threeObj.name
+			return optimizedModel
 		failure = () ->
 			console.error "Unable to get model #{node.meshHash}"
 

@@ -30,14 +30,7 @@ module.exports = class VoxeliserPlugin
 		@voxeliser = null
 		@lego = null
 
-	init: () ->
-		return
-		# setState = (state) =>
-		# 	@stateInstance = state
-		# console.log statesync
-		# console.log statesync.getState
-		# statesync.getState(setState)
-		# console.log 'after'
+	init: () => return
 
 	init3d: (@threejsRootNode, @renderer) => return
 
@@ -49,7 +42,6 @@ module.exports = class VoxeliserPlugin
 			class="btn btn-default">Layout</button>'
 		$('#voxeliseButton').click((event) =>
 			event.stopPropagation()
-			console.log @
 			@voxeliseAllModels()
 			)
 		$('#layoutButton').click((event) =>

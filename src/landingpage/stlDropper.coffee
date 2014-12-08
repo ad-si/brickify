@@ -62,7 +62,7 @@ handleLoadedFile = (filename) ->
 
 		uploadFinishedCallback = (md5hash) ->
 			if importErrors
-				modelhash += '+errors'
+				md5hash += '+errors'
 			document.location.hash = ''
 			dhref = document.location.href
 			dhref = dhref.substring(0, dhref.length - 1) if dhref.endsWith('#')

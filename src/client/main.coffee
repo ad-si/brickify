@@ -104,8 +104,17 @@ r.render(
 	document.querySelector '#navbarToggle'
 )
 
-bundle = new Bundle(globalConfig)
-bundle.postInitCallback (state) ->
+commandFunctions = {
+	initialModel: (value) ->
+		console.log 'loading initial model'
+		p = /^[0-9a-z]{32}/
+		if p.test value
+			bundle.modelLoader.loadByHash value
+		else
+			console.warn 'Invalid value for initialModel'
+}
+
+postInitCallback = () ->
 	#look at url hash and run commands
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
@@ -114,19 +123,10 @@ bundle.postInitCallback (state) ->
 		key = cmd.split('=')[0]
 		value = cmd.split('=')[1]
 		if commandFunctions[key]?
-			commandFunctions[key](state, value)
+			commandFunctions[key](value)
 
 	#clear url hash after executing commands
 	window.location.hash = ''
 
-bundle.init true, true
-
-commandFunctions = {
-	initialModel: (state, value) ->
-		console.log 'loading initial model'
-		p = /^[0-9a-z]{32}/
-		if p.test value
-			bundle.modelLoader.loadByHash value
-		else
-			console.warn 'Invalid value for initialModel'
-}
+bundle = new Bundle(globalConfig)
+bundle.init(true, true).then(postInitCallback)

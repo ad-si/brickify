@@ -8,8 +8,6 @@ ModelLoader = require './modelLoader'
 module.exports = class Bundle
 	constructor: (@globalConfig) ->
 		return
-	postInitCallback: (callback) ->
-		@postInitCb = callback
 	init: (createRendererAndUi, syncStateWithServer = true) ->
 		@pluginLoader = new PluginLoader(@globalConfig)
 		pluginHooks = @pluginLoader.pluginHooks
@@ -26,7 +24,3 @@ module.exports = class Bundle
 				@pluginInstances = @pluginLoader.loadPlugins(@renderer)
 			else
 				@pluginInstances = @pluginLoader.loadPlugins()
-
-			@postInitCb? state
-
-

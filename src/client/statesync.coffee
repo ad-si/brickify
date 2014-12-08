@@ -17,9 +17,8 @@ module.exports = class Statesync
 		@initialStateIsLoaded = false
 		@initialStateLoadedCallbacks = []
 
-	init: (globalConfig, stateInitializedCallback) ->
-		@globalConfig = globalConfig
-		$.get '/statesync/get', {}, (data, textStatus, jqXHR) =>
+	init: (@globalConfig, stateInitializedCallback) ->
+		Promise.resolve($.get '/statesync/get').then((data) =>
 			@state = data
 			@oldState = JSON.parse JSON.stringify @state
 
@@ -31,6 +30,7 @@ module.exports = class Statesync
 			@initialStateLoadedCallbacks.forEach (callback) ->
 				callback(state)
 			@handleUpdatedState @state
+		)
 
 	getState: (callback) ->
 		if @initialStateIsLoaded

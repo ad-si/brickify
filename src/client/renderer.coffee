@@ -2,106 +2,114 @@
 # @module renderer
 ###
 
-pluginHooks = require '../common/pluginHooks'
+THREE = require 'three'
+OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
 
-renderer = null
-scene = null
-camera = null
-controls = null
-stats = null
+module.exports = class Renderer
+	constructor: (@pluginHooks) ->
+		@scene = null
+		@camera = null
+		@threeRenderer = null
 
+	localRenderer: (timestamp) =>
+			@stats?.begin()
+			@threeRenderer.render @.scene, @.camera
+			@pluginHooks.on3dUpdate timestamp
+			@stats?.end()
+			requestAnimationFrame @localRenderer
 
-localRenderer = (timestamp) ->
-	stats?.begin()
-	renderer.render scene, camera
-	pluginHooks.on3dUpdate timestamp
-	stats?.end()
+	addToScene: (node) ->
+		@scene.add node
 
-	requestAnimationFrame localRenderer
+	getDomElement: () ->
+		return @threeRenderer.domElement
 
-module.exports.addToScene = (node) ->
-	scene.add node
+	windowResizeHandler: () ->
+		if not @staticRendererSize
+			@camera.aspect = window.innerWidth / window.innerHeight
+			@camera.updateProjectionMatrix()
+			@threeRenderer.setSize window.innerWidth, window.innerHeight
 
-module.exports.getDomElement = () ->
-	renderer.domElement
+		@threeRenderer.render @scene, @camera
 
-module.exports.windowResizeHandler = () ->
-	camera.aspect = window.innerWidth / window.innerHeight
-	camera.updateProjectionMatrix()
+	init: (globalConfig) ->
+		@setupRenderer globalConfig
+		@setupScene globalConfig
+		@setupLighting globalConfig
+		@setupCamera globalConfig
+		@setupControls globalConfig
+		@setupFPSCounter() if process.env.NODE_ENV is 'development'
+		requestAnimationFrame @localRenderer
 
-	renderer.setSize( window.innerWidth, window.innerHeight )
-	renderer.render(scene, camera)
+	setupRenderer: (globalConfig) ->
+		@threeRenderer = new THREE.WebGLRenderer(
+			alpha: true
+			antialias: true
+			preserveDrawingBuffer: true
+		)
 
-module.exports.init = (globalConfig) ->
-	setupRenderer globalConfig
-	setupScene globalConfig
-	setupLighting globalConfig
-	setupCamera globalConfig
-	setupControls globalConfig
-	setupFPSCounter() if process.env.NODE_ENV is 'development'
-	requestAnimationFrame localRenderer
+		if not globalConfig.staticRendererSize
+			@staticRendererSize = false
+			@threeRenderer.setSize window.innerWidth, window.innerHeight
+		else
+			@staticRendererSize = true
+			@threeRenderer.setSize globalConfig.staticRendererWidth,
+				globalConfig.staticRendererHeight
 
-setupRenderer = (globalConfig) ->
-	renderer = new THREE.WebGLRenderer(
-		alpha: true
-		antialias: true
-		preserveDrawingBuffer: true
-	)
-	renderer.setSize window.innerWidth, window.innerHeight
-	renderer.setClearColor 0xf6f6f6, 1
-	renderer.domElement.setAttribute 'id', 'canvas'
-	document
-	.getElementById('renderArea')
-	.appendChild renderer.domElement
+		@threeRenderer.setClearColor 0xf6f6f6, 1
+		@threeRenderer.domElement.setAttribute 'id', 'canvas'
+		document
+		.getElementById(globalConfig.renderAreaId)
+		.appendChild @threeRenderer.domElement
 
-setupScene = (globalConfig) ->
-	scene = new THREE.Scene()
-	# Scene rotation because orbit controls only works
-	# with up vector of 0, 1, 0
-	sceneRotation = new THREE.Matrix4()
-	sceneRotation.makeRotationAxis(
-		new THREE.Vector3( 1, 0, 0 ),
-		(-Math.PI / 2)
-	)
-	scene.applyMatrix(sceneRotation)
+	setupScene: (globalConfig) ->
+		@scene = new THREE.Scene()
+		# Scene rotation because orbit controls only works
+		# with up vector of 0, 1, 0
+		sceneRotation = new THREE.Matrix4()
+		sceneRotation.makeRotationAxis(
+			new THREE.Vector3( 1, 0, 0 ),
+			(-Math.PI / 2)
+		)
+		@scene.applyMatrix(sceneRotation)
 
-setupLighting = (globalConfig) ->
-	ambientLight = new THREE.AmbientLight(0x404040)
-	scene.add(ambientLight)
+	setupCamera: (globalConfig) ->
+		@camera = new THREE.PerspectiveCamera(
+			globalConfig.fov,
+			window.innerWidth / window.innerHeight,
+			globalConfig.cameraNearPlane,
+			globalConfig.cameraFarPlane
+		)
+		@camera.position.set(
+			globalConfig.axisLength
+			globalConfig.axisLength + 10
+			globalConfig.axisLength / 2
+		)
+		@camera.up.set(0, 1, 0)
+		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-	directionalLight = new THREE.DirectionalLight(0xffffff)
-	directionalLight.position.set 0, 20, 30
-	scene.add(directionalLight)
+	setupControls: (globalConfig) ->
+		@controls = new OrbitControls(@camera, @threeRenderer.domElement)
+		@controls.target.set(0, 0, 0)
 
-	directionalLight = new THREE.DirectionalLight(0x808080)
-	directionalLight.position.set 20, 0, 30
-	scene.add( directionalLight )
+	setupFPSCounter: () ->
+		@stats = new Stats()
+		# 0 means FPS, 1 means ms per frame
+		@stats.setMode(0)
+		@stats.domElement.style.position = 'absolute'
+		@stats.domElement.style.right = '0px'
+		@stats.domElement.style.bottom = '0px'
+		document.body.appendChild(@stats.domElement)
 
-setupCamera = (globalConfig) ->
-	camera = new THREE.PerspectiveCamera(
-		globalConfig.fov,
-		window.innerWidth / window.innerHeight,
-		globalConfig.cameraNearPlane,
-		globalConfig.cameraFarPlane
-	)
-	camera.position.set(
-		globalConfig.axisLength
-		globalConfig.axisLength + 10
-		globalConfig.axisLength / 2
-	)
-	camera.up.set(0, 1, 0)
-	camera.lookAt(new THREE.Vector3(0, 0, 0))
+	setupLighting: (globalConfig) ->
+		ambientLight = new THREE.AmbientLight(0x404040)
+		@scene.add ambientLight
 
-setupControls = (globalConfig) ->
-	controls = new THREE.OrbitControls(camera, renderer.domElement)
-	controls.target.set(0, 0, 0)
+		directionalLight = new THREE.DirectionalLight(0xffffff)
+		directionalLight.position.set 0, 20, 30
+		@scene.add directionalLight
 
-setupFPSCounter = () ->
-	stats = new Stats()
-	# 0 means FPS, 1 means ms per frame
-	stats.setMode(0)
-	stats.domElement.style.position = 'absolute'
-	stats.domElement.style.right = '0px'
-	stats.domElement.style.bottom = '0px'
-	document.body.appendChild(stats.domElement)
+		directionalLight = new THREE.DirectionalLight(0x808080)
+		directionalLight.position.set 20, 0, 30
+		@scene.add directionalLight

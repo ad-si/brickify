@@ -4,11 +4,7 @@ path = require 'path'
 r = require 'react'
 
 globalConfig = require './globals.yaml'
-ui = require('./ui')(globalConfig)
-pluginLoader = require './pluginLoader'
-statesync = require './statesync'
-objectTree = require '../common/objectTree'
-
+Bundle = require './bundle'
 
 menuItems = [
 	{
@@ -108,28 +104,8 @@ r.render(
 	document.querySelector '#navbarToggle'
 )
 
-
-ui.init()
-
-
-### TODO: move somewhere where it is needed
-# geometry functions
-degToRad = ( deg ) -> deg * ( Math.PI / 180.0 )
-radToDeg = ( rad ) -> deg * ( 180.0 / Math.PI )
-
-normalFormToParamterForm = ( n, p, u, v) ->
-	u.set( 0, -n.z, n.y ).normalize()
-	v.set( n.y, -n.x, 0 ).normalize()
-
-# utility
-String::contains = (str) -> -1 isnt this.indexOf str
-###
-
-statesync.init globalConfig, (state) ->
-	objectTree.init state
-	pluginLoader.init globalConfig
-	pluginLoader.loadPlugins()
-
+bundle = new Bundle(globalConfig)
+bundle.postInitCallback (state) ->
 	#look at url hash and run commands
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
@@ -143,14 +119,14 @@ statesync.init globalConfig, (state) ->
 	#clear url hash after executing commands
 	window.location.hash = ''
 
+bundle.init true, true
 
 commandFunctions = {
 	initialModel: (state, value) ->
 		console.log 'loading initial model'
-		modelLoader = require './modelLoader'
 		p = /^[0-9a-z]{32}/
 		if p.test value
-			modelLoader.loadByHash value
+			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
 }

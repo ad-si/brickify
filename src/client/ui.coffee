@@ -2,48 +2,46 @@
 # @module ui
 ###
 
-statesync = require './statesync'
-objectTree = require '../common/objectTree'
-renderer = require './renderer'
-modelLoader = require './modelLoader'
+module.exports = class Ui
+	constructor: (globalConfigInstance, rendererInstance,
+								statesyncInstance, @modelLoader) ->
+		@globalConfig = globalConfigInstance
+		@renderer = rendererInstance
+		@statesync = statesyncInstance
+	dropHandler: (event) ->
+		event.stopPropagation()
+		event.preventDefault()
+		files = event.target.files ? event.dataTransfer.files
+		@modelLoader.readFiles files if files?
 
-module.exports = (globalConfig) ->
-	return {
+	dragOverHandler: (event) ->
+		event.stopPropagation()
+		event.preventDefault()
+		event.dataTransfer.dropEffect = 'copy'
 
-		dropHandler: (event) ->
-			event.stopPropagation()
-			event.preventDefault()
-			files = event.target.files ? event.dataTransfer.files
-			modelLoader.readFiles files if files?
+	# Bound to updates to the window size:
+	# Called whenever the window is resized.
+	windowResizeHandler: (event) ->
+		@renderer.windowResizeHandler()
 
-		dragOverHandler: (event) ->
-			event.stopPropagation()
-			event.preventDefault()
-			event.dataTransfer.dropEffect = 'copy'
+	init: ->
+		@renderer.init(@globalConfig)
 
-		# Bound to updates to the window size:
-		# Called whenever the window is resized.
-		windowResizeHandler: (event) ->
-			renderer.windowResizeHandler()
+		# event listener
+		@renderer.getDomElement().addEventListener(
+			'dragover'
+			@dragOverHandler.bind @
+			false
+		)
+		@renderer.getDomElement().addEventListener(
+			'drop'
+			@dropHandler.bind @
+			false
+		)
 
-		init: ->
-			renderer.init(globalConfig)
-
-			# event listener
-			renderer.getDomElement().addEventListener(
-				'dragover'
-				@dragOverHandler.bind @
+		window.addEventListener(
+			'resize',
+			@windowResizeHandler.bind @,
 				false
-			)
-			renderer.getDomElement().addEventListener(
-				'drop'
-				@dropHandler.bind @
-				false
-			)
+		)
 
-			window.addEventListener(
-				'resize',
-				@windowResizeHandler.bind @,
-				false
-			)
-	}

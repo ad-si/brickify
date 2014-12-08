@@ -62,13 +62,6 @@ sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
 
 links = {}
 sortedDependencies = [
-	'jquery',
-	'bootstrap',
-	'threejs',
-	'JavaScript-MD5',
-	'STLLoader',
-	'TrackballControls',
-	'OrbitControls',
 	'FileSaver',
 	'Blob'
 ]

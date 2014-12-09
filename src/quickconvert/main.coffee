@@ -38,9 +38,11 @@ if hash.indexOf('+error') >= 0
 hash = hash.substring 1,hash.length
 
 #adjust links to editor according to model hash
-vanillaLink = $('.applink').attr('href')
-vanillaLink += 'initialModel=' + hash
-$('.applink').attr('href', vanillaLink)
+applinks = $('.applink')
+for link in applinks
+	vanillaLink = link.href
+	vanillaLink += 'initialModel=' + hash
+	link.href = vanillaLink
 
 #load model into all bundles
 bundle1.modelLoader.loadByHash hash

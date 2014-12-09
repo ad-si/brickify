@@ -64,14 +64,16 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 			# add our current batch to existing results
 			accumulatedResults.push r
 
+		thisIsLastBatch = true if modelArray.length == 0
+
 		# genrate a report
 		logger.info "Generating temporary test report for #{perc}%-batch"
 		reportPromise = reportGenerator.generateReport accumulatedResults,
-			outputPath, reportFile
+			outputPath, reportFile, thisIsLastBatch
 		reportPromise.then () ->
 			# after report generation: if there are models left, test the next
 			# batch
-			if modelArray.length > 0
+			if not thisIsLastBatch
 				testNextBatch numModels, modelArray, accumulatedResults
 
 

@@ -8,7 +8,7 @@ require('es6-promise').polyfill()
 
 templateFile = path.join 'batchTesting', 'reportTemplate', 'report.jade'
 
-module.exports.generateReport = (data, outPath, outFileName) ->
+module.exports.generateReport = (data, outPath, outFileName, isLastReport) ->
 	return new Promise (resolve, reject) ->
 		fs.readFile templateFile, (error, template) ->
 			if error
@@ -22,6 +22,9 @@ module.exports.generateReport = (data, outPath, outFileName) ->
 				html = fn {results: data, stats: stats, gitinfo: gitinfo}
 				mkdirp path.dirname outFileName
 				mergedFilename = generateDateTimeString() + ' ' + outFileName
+				if not isLastReport
+					mergedFilename += ' WIP'
+
 				fs.writeFileSync path.join(outPath, mergedFilename + '.html'), html
 
 				fileContent =

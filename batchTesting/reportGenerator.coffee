@@ -8,7 +8,8 @@ require('es6-promise').polyfill()
 
 templateFile = path.join 'batchTesting', 'reportTemplate', 'report.jade'
 
-module.exports.generateReport = (data, outPath, outFileName, isLastReport) ->
+module.exports.generateReport = (data, outPath, outFileName,
+																 isLastReport, beginDate) ->
 	return new Promise (resolve, reject) ->
 		fs.readFile templateFile, (error, template) ->
 			if error
@@ -19,17 +20,19 @@ module.exports.generateReport = (data, outPath, outFileName, isLastReport) ->
 			fn = jade.compile template, {pretty: true}
 			getGitInfo (branch, commit) ->
 				gitinfo = {branch: branch, commit: commit}
-				html = fn {results: data, stats: stats, gitinfo: gitinfo}
-				mkdirp path.dirname outFileName
-				mergedFilename = generateDateTimeString() + ' ' + outFileName
-				if not isLastReport
-					mergedFilename += ' WIP'
+				html = fn {
+					results: data
+					stats: stats
+					gitinfo: gitinfo
+					isWorkInProgress: !isLastReport}
 
+				mkdirp path.dirname outFileName
+				mergedFilename = generateDateTimeString(beginDate) + ' ' + outFileName
 				fs.writeFileSync path.join(outPath, mergedFilename + '.html'), html
 
 				fileContent =
 					gitinfo: gitinfo
-					datetime: generateDateTimeString()
+					datetime: generateDateTimeString(beginDate)
 					testResults: data
 					statistics: stats
 
@@ -38,8 +41,8 @@ module.exports.generateReport = (data, outPath, outFileName, isLastReport) ->
 
 				resolve()
 
-generateDateTimeString = () ->
-	new Date()
+generateDateTimeString = (d) ->
+	return d
 		.toJSON()
 		.slice(0,-8)
 		.replace(':','') + 'Z'

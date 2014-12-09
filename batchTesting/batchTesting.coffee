@@ -13,6 +13,8 @@ reportFile = 'batchTestResults'
 # save temporary batch test report all X models
 resultSavingFrequency = 15
 
+beginDate = new Date()
+
 logger = new (winston.Logger)({
 	transports: [
 		new winston.transports.Console { level: 'debug' }
@@ -69,7 +71,7 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 		# genrate a report
 		logger.info "Generating temporary test report for #{perc}%-batch"
 		reportPromise = reportGenerator.generateReport accumulatedResults,
-			outputPath, reportFile, thisIsLastBatch
+			outputPath, reportFile, thisIsLastBatch, beginDate
 		reportPromise.then () ->
 			# after report generation: if there are models left, test the next
 			# batch

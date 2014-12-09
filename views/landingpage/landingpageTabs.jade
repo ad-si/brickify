@@ -1,43 +1,18 @@
-#landingtabs.container(role='tabpanel')
-	ul.nav.nav-tabs.nav-tabs-centered
-		li(role='presentation').active
-			a(href='#whatislowfab' aria-controls='whatislowfab' role='tab' data-toggle='tab') What is Lowfab?
-		li(role='presentation')
-			a(href='#features' aria-controls='features' role='tab' data-toggle='tab') Features
-		li(role='presentation')
-			a(href='#examples' aria-controls='examples' role='tab' data-toggle='tab') Examples
-		li(role='presentation')
-			a(href='#contribute' aria-controls='contribute' role='tab' data-toggle='tab') Contribute
-		li(role='presentation')
-			a(href='#team' aria-controls='team' role='tab' data-toggle='tab') Team
-
-	.tab-content
-		#whatislowfab(role='tabpanel').tab-pane.active
-			p Lowfab process description
-			img(src='/img/lowfabProcess.jpg')
-		#features(role='tabpanel').tab-pane
-			p What are features?
-			.row
-				.col-lg-2
-					img(src='/img/placeholder180.png')
-				.col-lg-4
-					p Feature 1
-				.col-lg-2
-					img(src='/img/placeholder180.png')
-				.col-lg-4
-					p Feature 2
-		#examples(role='tabpanel').tab-pane
-			p Examples
-		#contribute(role='tabpanel').tab-pane
-			p Contribute
-		#team(role='tabpanel').tab-pane
-			br
-			img(src='img/bp.png')
-			p.
-				Lowfab is developed by Johannes, Stefan, Arthur, Adrian and
-				Yannis, a team of bachelor
-				students at the chair of human computer interaction
-				at the Hasso-Plattner-Institute in Potsdam, Germany.
-			a(href='mailto:arthur.silber@student.hpi.de').
-				Contact us
-
+.container
+	h2 What is lowfab?
+	p Lowfab process description
+	img(src='/img/lowfabProcess.jpg')
+.container
+	h2 Features
+	p What are features?
+	.row
+		.col-lg-2
+			img(src='/img/placeholder180.png')
+		.col-lg-4
+			p Feature 1
+		.col-lg-2
+			img(src='/img/placeholder180.png')
+		.col-lg-4
+			p Feature 2
+.container
+	h3 (Examples)

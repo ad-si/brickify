@@ -2,9 +2,9 @@
 
 ## Installation
 
-`$ git clone https://bitbucket.org/hpihci/fab3d-lowfab.git`
+`$ git clone https://github.com/stuikomma/lowfab.git`
 
-`$ cd fab3d-lowfab`
+`$ cd lowfab`
 
 Install dependencies: `$ npm install`
 
@@ -20,6 +20,7 @@ In order to continuously rebuild the project and restart the server
 when source files change you can use supervisor.
 Install it globally with `$ npm install -g supervisor` and use it like this:
 `$ supervisor -i build -e node,coffee -- node_modules/coffee-script/bin/cake start`
+(Only necessary for server-side scripts as front-end gets build on the fly.)
 
 
 ## Scripts
@@ -36,13 +37,15 @@ Following scripts are currently available:
 - `apiDocumentation`: Generates API documentation
 - `documentation`: Generates code documentation
 - `test`: Executes tests
+- `batchTest`: Batch test all models and create a HTML report
 - `prepublish`: Prepares publication of project
 
 
 ## Package management
 
-We use [bower](http://bower.io/) for frontend package management
-and [npm](https://npmjs.org/) for backend package management.
+We use [npm](https://npmjs.org) for package management.
+In order to bundle the modules for the browser we use [browserify](http://browserify.org)
+The usage of bower is deprecated and we will remove the remaining libraries in the future.
 
 
 ## Documentation
@@ -52,3 +55,11 @@ and [CroJSDoc](http://croquiscom.github.io/crojsdoc/) for api documentation.
 
 Call `$ npm run documentation` and
 `$ npm run apiDocumentation` respectively.
+
+## Server
+
+The server currently serves:
+
+- [lowfab.net](http://lowfab.net): current master-branch
+- [dev.lowfab.net](http://dev.lowfab.net): current develop-branch
+- [batchtests.lowfab.net](http://batchtests.lowfab.net): results of batchTesting (performed on develop)

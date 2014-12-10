@@ -28,7 +28,7 @@ winston.loggers.add 'buildLog',
 
 # *CakeUtilities* provides the build and start functions called below.<br>
 # See [cakeUtilities](src/server/cakeUtilities.html)
-cakeUtilities = require './src/server/cakeUtilities'
+cakeUtilities = require './cakeUtilities'
 
 # *Lowfab* is the main server part which is responsible for delivering the
 # website and for server-side plugin integration and model processing
@@ -36,8 +36,6 @@ lowfab = require './src/server/main'
 
 # Makes it possible to directly require coffee modules
 coffeeScript.register()
-
-sourceDir = 'src'
 
 ###
   #Tasks
@@ -47,27 +45,25 @@ sourceDir = 'src'
 task 'linkHooks', 'Links git hooks into .git/hooks', ->
 	cakeUtilities.linkHooks()
 
-# Build the client javascript files from all coffee-script files inside
-# `src/client`<br>
-# See [cakeUtilities](src/server/cakeUtilities.html)
-task 'buildClient', 'Builds the client js files', ->
-	cakeUtilities.buildClient()
-
 # Build the server javascript files from all coffee-script files inside
 # `src/server`<br>
 # See [cakeUtilities](src/server/cakeUtilities.html)
 task 'buildServer', 'Builds the server js files', ->
-	cakeUtilities.buildServer(sourceDir)
+	cakeUtilities.buildServer()
 
 # Delete old javascript files from previous builds
 task 'clean', 'Removes js files from src directory', ->
-    cakeUtilities.buildServer(sourceDir, true)
+    cakeUtilities.buildServer(true)
 
 # Build the client and the server
 task 'build', 'Builds client and server js files', ->
 	cakeUtilities
-	.buildClient()
-	.buildServer(sourceDir)
+	.buildServer()
+
+# Run all batch tests on models
+task 'batchTest', 'Runs batch tests on models', ->
+    batchTester = require './batchTesting/batchTesting'
+    batchTester.startTesting()
 
 ###
   ##Building and starting

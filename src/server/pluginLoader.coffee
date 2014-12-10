@@ -1,36 +1,52 @@
+# File system support
 fs = require 'fs'
-pluginInstances = []
+# Manipulate platform-independent path strings
+path = require 'path'
+# Recursively process folders and files
+readdirp = require 'readdirp'
+# Server-side plugins
 stateSyncModule = null
+# Colorful logger for console
 winston = require 'winston'
 log = winston.loggers.get('log')
+# Load the hook list and initialize the pluginHook management
+yaml = require 'js-yaml'
 
-String.prototype.endsWith = (suffix) ->
-	return this.indexOf(suffix, this.length - suffix.length) != -1
+PluginHooks = require '../common/pluginHooks'
+pluginHooks = new PluginHooks()
+module.exports.pluginHooksInstance = pluginHooks
+
+hooks = yaml.load fs.readFileSync path.join __dirname, 'pluginHooks.yaml'
+pluginHooks.initHooks(hooks)
+
+initPluginInstance = (pluginInstance) ->
+	pluginInstance.init?()
+	pluginHooks.register pluginInstance
+
+loadPlugin = (entry) ->
+	try
+		pluginFile = path.join(entry.fullPath, entry.name)
+		instance = require pluginFile
+
+	catch error
+		log.error "Plugin #{entry.name} could not be found.
+				Maybe the plugin's filename does not match its folder name?"
+		return
+
+	for own key,value of require path.join entry.fullPath, 'package.json'
+		instance[key] = value
+
+	initPluginInstance instance
+	log.info "Plugin #{instance.name} loaded"
+
 
 module.exports.loadPlugins = (stateSync, directory) ->
 	stateSyncModule = stateSync
-
-	files = fs.readdirSync directory
-	for file in files
-		if not file.endsWith('.js')
-			continue
-
-		instance = require (directory + file)
-		if checkForPluginMethods instance
-			pluginInstances.push instance
-			initPluginInstance instance
-			log.info "Plugin '#{instance.pluginName}' (#{file}) loaded"
-		else
-			log.warn "Plugin '#{file}' does not contain
-							all necessary methods and will not be loaded"
-
-checkForPluginMethods = (object) ->
-	hasAllMethods = true
-	hasAllMethods = object.hasOwnProperty('pluginName') and hasAllMethods
-	hasAllMethods = object.hasOwnProperty('init') and hasAllMethods
-	hasAllMethods = object.hasOwnProperty('handleStateChange') and hasAllMethods
-	return hasAllMethods
-
-initPluginInstance = (pluginInstance) ->
-	pluginInstance.init()
-	stateSyncModule.addUpdateCallback pluginInstance.handleStateChange
+	readdirp(
+		root: directory,
+		depth: 0,
+		entryType: 'directories'
+	)
+	.on 'data', (entry) -> loadPlugin entry
+	.on 'error', (error) -> log.error error
+	.on 'warn', (warning) -> log.warn warning

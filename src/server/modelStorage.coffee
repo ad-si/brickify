@@ -1,25 +1,47 @@
 fs = require 'fs'
 mkdirp = require 'mkdirp'
-logger = require 'winston'
 path = require 'path'
+
+winston = require 'winston'
+log = winston.loggers.get('log')
 
 modelCacheDir = ''
 
 module.exports.init = (cacheDir = 'modelCache') ->
 	modelCacheDir = cacheDir
 	mkdirp cacheDir, (err) ->
-		logger.warn 'Unable to create model cache dir: ' + err if err?
+		log.warn 'Unable to create model cache dir: ' + err if err?
 
-module.exports.hasModel = (md5hash, fileEnding, callback) ->
-	fs.exists buildFileName(md5hash, fileEnding), (exists) ->
+module.exports.hasModel = (hash, callback) ->
+	if not checkHash hash
+		callback false
+		return
+
+	fs.exists buildFileName(hash), (exists) ->
 		callback(exists)
 
-module.exports.loadModel = (md5hash, fileEnding, callback) ->
-	fs.readFile buildFileName(md5hash, fileEnding), (error, data) ->
+module.exports.loadModel = (hash, callback) ->
+	if not checkHash hash
+		callback 'invalid hash', null
+		return
+
+	fs.readFile buildFileName(hash), (error, data) ->
 		callback(error, data)
 
-module.exports.saveModel = (md5hash, fileEnding, data, callback) ->
-	fs.writeFile buildFileName(md5hash, fileEnding), data, callback
+module.exports.saveModel = (hash, data, callback) ->
+	if not checkHash hash
+		callback 'invalid hash', null
+		return
 
-buildFileName = (md5hash, fileEnding) ->
-	return path.normalize modelCacheDir + '/' + md5hash + '.' + fileEnding
+	fs.writeFile buildFileName(hash), data, callback
+
+buildFileName = (hash) ->
+	return path.normalize modelCacheDir + '/' + hash
+
+# checks if the hash and fileEnding are in a valid format
+checkHash = (hash) ->
+	p = /^[0-9a-z]{32}$/
+	if p.test hash
+		return true
+	log.warn "Requested model #{hash} is no valid hash"
+	return false

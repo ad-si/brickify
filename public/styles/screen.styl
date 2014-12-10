@@ -5,8 +5,13 @@
 	font-size 100%
 	box-sizing border-box
 
+html
+	height 100%
+
 body
+	height 100%
 	padding-top 50px // Make space for navbar
+
 
 canvas
 	position fixed
@@ -14,3 +19,38 @@ canvas
 	left 0
 	width 100%
 	height 100%
+
+a
+	cursor pointer
+
+
+#leftSidebar,
+#rightSidebar
+	background-color rgb(200,200,200)
+	display inline-block
+	width 150px
+	height 100%
+	overflow hidden
+	position absolute
+	padding-top 50px
+	border-color rgb(150,150,150)
+	border-style solid
+
+#leftSidebar
+	border-right-width 1px
+	left 0
+	top 0
+	&:hover
+		overflow visible
+
+#rightSidebar
+	border-left-width 1px
+	right 0
+	top 0
+
+#webGlWarning
+	width: 100%
+	height: 100%
+	padding-top 4em
+	padding-left 170px
+	padding-right 170px

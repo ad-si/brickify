@@ -1,0 +1,69 @@
+# # Plugin API
+#
+# Client-side plugins can provide the following hooks to interact with lowfab.
+#
+# The hooks must exist at load-time. Hooks that are added later during
+# run-time will not be called.
+#
+# See [dummyPlugin](plugins/dummy/dummy.html) for a example implementation
+# and further documentation of the plugin API.
+
+# ## Plugin Initialization
+# The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
+# (if provided) after loading the plugin. It is the first method to be called
+# and provides access to the [global configuration](globals.html).
+
+- init
+
+#  ## 3D scene initialization
+#
+#  Each plugin that provides a `init3d` method is able to initialize its 3D
+#  rendering there and receives a three.js node as argument.
+#
+#  If the plugin needs its node for later use it has to store it in `init3d`
+#  because it won't be handed the node again later.
+
+- init3d
+
+
+# ## UI Initalization
+#
+# `initUi` provides the plugins the possibility to add elements to the UI.
+# Receives a object with DOM elements to insert itself into.
+
+- initUi
+
+
+#  ## State synchronization
+#
+#  The [state synchronization module](statesync.html) will call each plugin's
+#  `onStateUpdate` method (if provided) whenever the current state changes
+#  due to user input or calculation results on either server or client side.
+#
+#  The hook provides the new complete state as an argument and a callback that
+#  has to be called when the plugin finished its computations
+
+- onStateUpdate
+
+
+#  ## 3D scene update and animation
+#
+#  On each render frame the [renderer](render.html) will call the `on3dUpdate`
+#  method of all plugins that provide it.
+#
+#  The callback has one single argument, a DOMHighResTimeStamp, which indicates
+#  the current time for when requestAnimationFrame starts to fire callbacks.
+#  (according to
+#  https://developer.mozilla.org/en/docs/Web/API/window.requestAnimationFrame)
+
+- on3dUpdate
+
+
+#  ## File import
+#
+#  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
+#  try to import it with every plugin that implements `importFile` until one
+#  succeeds and returns an [OptimizedModel](../common/OptimizedModel.html).
+#  The file's name and its content are provided as arguments.
+
+- importFile

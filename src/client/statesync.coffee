@@ -1,77 +1,122 @@
+###
+# @module stateSynchronization
+###
+
+
+$ = require 'jquery'
 jsondiffpatch = require 'jsondiffpatch'
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
 
-state = {}
-oldState = {}
+module.exports = class Statesync
+	constructor: (@pluginHooks, @syncWithServer = true) ->
+		@state = {}
+		@oldState = {}
+		@globalConfig = null
+		@initialStateIsLoaded = false
+		@initialStateLoadedCallbacks = []
 
-globalConfigInstance = null
-stateUpdateCallbacks = []
+	init: (globalConfig, stateInitializedCallback) ->
+		@globalConfig = globalConfig
 
-exports.getState = () ->
-	return state
-
-exports.performStateAction = (callback) ->
-	callback(state)
-	sync()
-
-exports.init = (globalConfig, stateInitializedCallback) ->
-	globalConfigInstance = globalConfig
-	$.get "/statesync/get", {}, (data, textStatus, jqXHR) ->
-		state = data
-		oldState = JSON.parse JSON.stringify state
-		console.log "Got initial state from server: " + JSON.stringify(state)
-		stateInitializedCallback state if stateInitializedCallback?
-		handleUpdatedState({}, state)
-
-sync = (force = false) ->
-	delta = diffpatch.diff oldState, state
-
-	if not force
-		if not delta?
+		if not @syncWithServer
+			@state = {}
+			stateInitializedCallback? @state
+			@performInitialStateLoadedAction()
 			return
 
-	# deep copy
-	oldState = JSON.parse JSON.stringify state
+		$.get '/statesync/get', {}, (data, textStatus, jqXHR) =>
+			@state = data
+			@oldState = JSON.parse JSON.stringify @state
 
-	console.log "Sending delta to server:" + JSON.stringify(delta)
+			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
-	$.ajax '/statesync/set',
-		type: 'POST'
-		data: JSON.stringify({deltaState: delta})
+			stateInitializedCallback? @state
+
+			@performInitialStateLoadedAction()
+
+	performInitialStateLoadedAction: () ->
+		@initialStateIsLoaded = true
+		@initialStateLoadedCallbacks.forEach (callback) ->
+			callback(state)
+		@handleUpdatedState @state
+
+	getState: (callback) ->
+		if @initialStateIsLoaded
+			callback(@state)
+		else
+			@initialStateLoadedCallbacks.push(callback)
+
+	# executes callback(state) and then synchronizes the state with the server.
+	# if updatedStateEvent is set to true, the updateState hook of all client
+	# plugins will be called before synchronization with the server
+	performStateAction: (callback, updatedStateEvent = false) ->
+		callback(@state)
+
+		# let every plugin do something with the updated state
+		# before syncing it to the server
+		if updatedStateEvent
+			@handleUpdatedState @state
+		else
+			@sync()
+
+	handleUpdatedState: (curstate) ->
+		numCallbacks = @pluginHooks.get('onStateUpdate').length
+		numCalledDone = 0
+
+		done = () =>
+			#if all plugins finished modifying their state, synchronize
+			numCalledDone++
+			if numCallbacks == numCalledDone
+				# sync as long client plugins modify the state
+				@sync()
+
+		#Client plugins maybe modify state...
+		@pluginHooks.onStateUpdate curstate, done
+
+
+	sync: (force = false) ->
+		delta = diffpatch.diff @oldState, @state
+
+		if not force
+			if not delta?
+				return
+
+		# if we shall not sync with the server, run the loop internally as long as
+		# plugins change the state
+		if not @syncWithServer
+			@oldState = JSON.parse JSON.stringify @state
+			@handleUpdatedState @state
+			return
+
+		# deep copy
+		@oldState = JSON.parse JSON.stringify @state
+
+		console.log "Sending delta to server: #{JSON.stringify(delta)}"
+		$.ajax '/statesync/set',
+			type: 'POST'
+			data: JSON.stringify({deltaState: delta})
 		# what jquery expects as an answer
-		dataType: 'json'
+			dataType: 'json'
 		# what is sent in the post request as a header
-		contentType: 'application/json; charset=utf-8'
+			contentType: 'application/json; charset=utf-8'
 		# check whether client modified its local state
 		# since the post request was sent
-		success: (data, textStatus, jqXHR) ->
-			delta = data
-			console.log "Got delta from server: " + JSON.stringify(delta)
+			success: (data, textStatus, jqXHR) ->
+				delta = data
+				console.log "Got delta from server: #{JSON.stringify(delta)}"
 
-			clientDelta = diffpatch.diff oldState, state
-			if clientDelta?
-				console.log 'The client modified its state' +
-					'while the server worked, this should not happen!'
+				clientDelta = diffpatch.diff @oldState, @state
 
-			#patch state with server changes
-			diffpatch.patch state, delta
+				if clientDelta?
+					console.log 'The client modified its state
+						while the server worked, this should not happen!'
 
-			#deep copy current state
-			oldState = JSON.parse JSON.stringify state
+				#patch state with server changes
+				diffpatch.patch @state, delta
 
-			handleUpdatedState(delta, state)
+				#deep copy current state
+				@oldState = JSON.parse JSON.stringify @state
 
-exports.sync = sync
-
-exports.addUpdateCallback = (callback) ->
-	stateUpdateCallbacks.push callback
-
-handleUpdatedState = (delta, curstate) ->
-	#Client plugins maybe modify state...
-	for callback in stateUpdateCallbacks
-		callback(delta, curstate)
-
-	#sync back as long client plugins modify state
-	sync()
+				@handleUpdatedState @state

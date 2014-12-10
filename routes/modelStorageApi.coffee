@@ -1,48 +1,49 @@
 modelStorage = require '../src/server/modelStorage'
-md5Calc = require 'MD5'
+md5 = require('blueimp-md5').md5
 logger = require 'winston'
 
 module.exports.modelExists = (request, response) ->
-	md5 = request.params.md5
-	fileEnding = request.params.extension
-	modelStorage.hasModel md5, fileEnding, (hasModel) ->
+	hash = request.params.hash
+	modelStorage.hasModel hash, (hasModel) ->
 		if hasModel
-			logger.debug 'Model ' + md5 + '.' + fileEnding + ' exists'
+			logger.debug 'Model ' + hash + ' exists'
 			response.status(200).send('Model exists')
 		else
-			logger.debug 'Model ' + md5 + '.' + fileEnding + ' does not exist'
+			logger.debug 'Model ' + hash + ' does not exist'
 			response.status(404).send('Model does not exist')
 
 module.exports.getModel = (request, response) ->
-	md5 = request.params.md5
-	fileEnding = request.params.extension
-	modelStorage.hasModel md5, fileEnding, (hasModel) ->
+	hash = request.params.hash
+	modelStorage.hasModel hash, (hasModel) ->
 		if hasModel
-			modelStorage.loadModel md5, fileEnding, (error, data) ->
+			modelStorage.loadModel hash, (error, data) ->
 				if error?
 					logger.warn 'Unable to load model ' +
-						md5 + '.' + fileEnding + ': ' + JSON.stringify(error)
+						hash + ': ' + JSON.stringify(error)
 					response.status(500).send error
 				else
-					logger.debug 'Sending model ' + md5 + '.' + fileEnding
+					logger.debug 'Sending model ' + hash
 					response.set 'Content-Type', 'application/octet-stream'
 					response.send data
+		else
+			logger.warn 'Unable to load model ' +
+				hash + ': model not found'
+			response.status(404).send 'Model not found'
 
 module.exports.saveModel = (request, response) ->
-	md5 = request.params.md5
-	fileEnding = request.params.extension
+	hash = request.params.hash
 	content = request.body
-	calculatedMd5 = md5Calc content
+	calculatedMd5 = md5 content
 
-	if not md5 == calculatedMd5
-		response.status(500).send "Calculated MD5 value does not match"
+	if hash isnt calculatedMd5
+		response.status(500).send 'Calculated MD5 value does not match'
 	else
-		console.log 'Saving model ' + md5
-		modelStorage.saveModel calculatedMd5, fileEnding, content, (error) ->
+		console.log 'Saving model ' + hash
+		modelStorage.saveModel hash, content, (error) ->
 			if err?
-				response.status(500).send "Error while saving the file"
+				response.status(500).send 'Error while saving the file'
 			else
-				response.send "Saved model"
+				response.send 'Saved model'
 
 
 

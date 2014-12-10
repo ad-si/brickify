@@ -4,13 +4,21 @@ block content
 
 	div#renderArea
 
-	aside#leftSidebar.col-lg-1
-		#sceneGraphContainer
-		#propertiesContainer
-
-	aside#rightSidebar.col-lg-offset-9.col-lg-2
-		#pluginsContainer
-		#toolsContainer
+	#controls.row
+		aside#leftSidebar.col-lg-2
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Scenegraph
+				.panel-body
+					#sceneGraphContainer
+					#propertiesContainer
+		aside#rightSidebar.col-lg-offset-8.col-lg-2
+			.panel.panel-default
+				.panel-heading
+					h3.panel-title Plugins
+				.panel-body
+					#pluginsContainer
+					#toolsContainer
 
 
 	div#webGlWarning

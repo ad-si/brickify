@@ -95,29 +95,29 @@ module.exports = class Statesync
 		@oldState = JSON.parse JSON.stringify @state
 
 		console.log "Sending delta to server: #{JSON.stringify(delta)}"
-		$.ajax '/statesync/set',
+		Promise.resolve($.ajax '/statesync/set',
 			type: 'POST'
 			data: JSON.stringify({deltaState: delta})
 		# what jquery expects as an answer
 			dataType: 'json'
 		# what is sent in the post request as a header
 			contentType: 'application/json; charset=utf-8'
-		# check whether client modified its local state
-		# since the post request was sent
-			success: (data, textStatus, jqXHR) ->
-				delta = data
-				console.log "Got delta from server: #{JSON.stringify(delta)}"
+		).then((data) ->
+			delta = data
+			console.log "Got delta from server: #{JSON.stringify(delta)}"
 
-				clientDelta = diffpatch.diff @oldState, @state
-
-				if clientDelta?
-					console.log 'The client modified its state
+			clientDelta = diffpatch.diff @oldState, @state
+			# check whether client modified its local state
+			# since the post request was sent
+			if clientDelta?
+				console.log 'The client modified its state
 						while the server worked, this should not happen!'
 
-				#patch state with server changes
-				diffpatch.patch @state, delta
+			#patch state with server changes
+			diffpatch.patch @state, delta
 
-				#deep copy current state
-				@oldState = JSON.parse JSON.stringify @state
+			#deep copy current state
+			@oldState = JSON.parse JSON.stringify @state
 
-				@handleUpdatedState @state
+			@handleUpdatedState @state
+		)

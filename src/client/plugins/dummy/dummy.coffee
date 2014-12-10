@@ -71,7 +71,10 @@ module.exports = class DummyPlugin
 	# `onStateUpdate` method (if provided) whenever the current state changes
 	# due to user input or calculation results on either server or client side.
 	#
-	# The hook provides the new complete state as an arguments.
+	# The hook provides the new complete state as an argument.
+    #
+    # `state.toolsValues` contains the values of the associated ui-elements
+    # in the tools-container.
 	#
 	# @param {Object} state the complete current state
 	# @param {Callback} done callback to be called when finished state modification

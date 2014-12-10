@@ -9,11 +9,21 @@ $ = require 'jquery'
 hooks = require './pluginHooks.yaml'
 PluginHooks = require '../common/pluginHooks'
 
+jsonEditorConfiguration = {
+	theme: 'bootstrap3'
+	disable_array_add: true
+	disable_array_delete: true
+	disable_array_reorder: true
+	disable_collapse: true
+	disable_edit_json: true
+	disable_properties: true
+}
+
 module.exports = class PluginLoader
-	constructor: (globalConfigInstance) ->
+	constructor: (@bundle) ->
 		@pluginHooks = new PluginHooks()
 		@pluginHooks.initHooks(hooks)
-		@globalConfig = globalConfigInstance
+		@globalConfig = @bundle.globalConfig
 
 	initPlugin: (PluginClass, packageData) ->
 		instance = new PluginClass()
@@ -32,24 +42,21 @@ module.exports = class PluginLoader
 			sceneGraphContainer: document.getElementById 'sceneGraphContainer'
 		}
 
-		schema = instance.getUiSchema?()
+		if instance.getUiSchema?()?
 
-		if schema?
+			jsonEditorConfiguration.schema = instance.getUiSchema()
+
 			$pluginsContainer = $('#pluginsContainer')
 			$pluginContainer = $("<div id='#{instance.name}'></div>")
 
 			$pluginsContainer.append($pluginContainer)
 
-			editor = new JSONEditor($pluginContainer[0], {
-				theme: 'bootstrap3',
-				schema: schema,
-				disable_array_add: true,
-				disable_array_delete: true,
-				disable_array_reorder: true,
-				disable_collapse: true,
-				disable_edit_json: true,
-				disable_properties: true
-			})
+			editor = new JSONEditor $pluginContainer[0], jsonEditorConfiguration
+
+			editor.on 'change',() =>
+				action = (state) ->
+					state.toolbarValues = editor.getValue()
+				@bundle.statesync.performStateAction action, true
 
 		@pluginHooks.register instance
 

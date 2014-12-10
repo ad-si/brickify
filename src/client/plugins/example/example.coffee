@@ -3,13 +3,13 @@ module.exports = class Example
 	init: (globalConfig) ->
 		console.log 'Example Plugin initialization'
 
-	init3d: (threejsNode) =>
+	init3d: (threejsNode) ->
 		console.log 'Example Plugin initializes 3d'
 
-	initUi: (domElements) =>
+	initUi: (domElements) ->
 		console.log 'Example Plugin initializes UI'
 
-	getUiSchema: () =>
+	getUiSchema: () ->
 		console.log('Example Plugin returns the UI schema.')
 
 		return {
@@ -28,13 +28,19 @@ module.exports = class Example
 			color:
 				description: 'Color in hex'
 				type: 'string'
+				format: 'color'
+
+			items:
+				type: 'string'
+				enum: ['item 1', 'item 2', 'item 3']
 		}
 
-	onStateUpdate: (state, done) =>
+	onStateUpdate: (state, done) ->
 		console.log 'Dummy Client Plugin state change'
+		console.log state.toolbarValues
 		done()
 
-	on3dUpdate: (timestamp) =>
+	on3dUpdate: (timestamp) ->
 		return undefined
 
 	importFile: (fileName, fileContent) ->

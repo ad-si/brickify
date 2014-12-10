@@ -7,8 +7,8 @@ winston = require 'winston'
 express = require 'express'
 
 webapp = express()
-developmentMode = if webapp.get('env') is 'development' then true else false
-testMode = if webapp.get('env') is 'test' then true else false
+developmentMode = webapp.get('env') is 'development'
+testMode = webapp.get('env') is 'test'
 
 loggingLevel = if developmentMode then 'debug' else 'warn'
 loggingLevel = 'error' if testMode

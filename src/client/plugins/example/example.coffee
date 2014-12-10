@@ -37,7 +37,7 @@ module.exports = class Example
 
 	onStateUpdate: (state, done) ->
 		console.log 'Dummy Client Plugin state change'
-		console.log state.toolbarValues
+		console.log state.toolsValues
 		done()
 
 	on3dUpdate: (timestamp) ->

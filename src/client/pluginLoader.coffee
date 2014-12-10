@@ -43,24 +43,31 @@ module.exports = class PluginLoader
 			instance.initUi {
 				menuBar: document.getElementById 'navbarToggle'
 				toolsContainer: document.getElementById 'toolsContainer'
-				sceneGraphContainer: document.getElementById 'sceneGraphContainer'
+				sceneGraphContainer: document.getElementById(
+					'sceneGraphContainer'
+				)
 			}
 
-		if instance.getUiSchema?()?
+		if @pluginHooks.hasHook(instance, 'getUiSchema')
 
 			jsonEditorConfiguration.schema = instance.getUiSchema()
 
-			$pluginsContainer = $('#pluginsContainer')
-			$pluginContainer = $("<div id='#{instance.name}'></div>")
+			if jsonEditorConfiguration.schema
 
-			$pluginsContainer.append($pluginContainer)
+				$pluginsContainer = $('#pluginsContainer')
+				$pluginContainer = $("<div id='#{instance.name}'></div>")
 
-			editor = new JSONEditor $pluginContainer[0], jsonEditorConfiguration
+				$pluginsContainer.append($pluginContainer)
 
-			editor.on 'change',() =>
-				action = (state) ->
-					state.toolbarValues = editor.getValue()
-				@bundle.statesync.performStateAction action, true
+				editor = new JSONEditor(
+					$pluginContainer[0]
+					jsonEditorConfiguration
+				)
+
+				editor.on 'change',() =>
+					action = (state) ->
+						state.toolsValues = editor.getValue()
+					@bundle.statesync.performStateAction action, true
 
 		@pluginHooks.register instance
 

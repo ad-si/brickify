@@ -8,10 +8,12 @@ ModelLoader = require './modelLoader'
 module.exports = class Bundle
 	constructor: (@globalConfig) ->
 		return
+
 	postInitCallback: (callback) ->
 		@postInitCb = callback
-	init: (createRendererAndUi, syncStateWithServer = true) ->
-		@pluginLoader = new PluginLoader(@globalConfig)
+
+	init: (createRendererAndUi, syncStateWithServer = true) =>
+		@pluginLoader = new PluginLoader(@)
 		pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(pluginHooks, syncStateWithServer)

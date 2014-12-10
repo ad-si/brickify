@@ -12,6 +12,9 @@ html
             code= gitinfo.branch
             span &nbsp; and commit &nbsp;
             code= gitinfo.commit
+            p
+            if isWorkInProgress
+                .alert.alert-warning This report is work in progress, reload the page to check for updates
             h2 General Statistics
             table.table.table-hover
                 thead

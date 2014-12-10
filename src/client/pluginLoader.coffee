@@ -31,16 +31,20 @@ module.exports = class PluginLoader
 		for own key,value of packageData
 			instance[key] = value
 
-		instance.init? @globalConfig
+		if @pluginHooks.hasHook(instance, 'init')
+			instance.init @globalConfig
 
 		if @renderer?
-			instance.init3d? threeNode = new THREE.Object3D()
+			if @pluginHooks.hasHook(instance, 'init3d')
+				threeNode = new THREE.Object3D()
+				instance.init3d threeNode
 
-		instance.initUi? {
-			menuBar: document.getElementById 'navbarToggle'
-			toolsContainer: document.getElementById 'toolsContainer'
-			sceneGraphContainer: document.getElementById 'sceneGraphContainer'
-		}
+		if @pluginHooks.hasHook(instance, 'initUi')
+			instance.initUi {
+				menuBar: document.getElementById 'navbarToggle'
+				toolsContainer: document.getElementById 'toolsContainer'
+				sceneGraphContainer: document.getElementById 'sceneGraphContainer'
+			}
 
 		if instance.getUiSchema?()?
 

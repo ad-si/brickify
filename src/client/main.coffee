@@ -6,6 +6,9 @@ r = require 'react'
 globalConfig = require './globals.yaml'
 Bundle = require './bundle'
 
+window.jQuery = require 'jquery'
+bootstrap = require 'bootstrap'
+
 menuItems = [
 	{
 		name: 'Import'

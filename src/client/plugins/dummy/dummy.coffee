@@ -58,11 +58,11 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin initializes UI'
 
 	###
-    # Returns a json-schema which describes the json
-    # the ui-elements of the plugin are supposed to create.
-    # [json-editor](https://github.com/jdorn/json-editor) then creates the
-    # html elements accordingly.
-    ###
+	# Returns a json-schema which describes the json
+	# the ui-elements of the plugin are supposed to create.
+	# [json-editor](https://github.com/jdorn/json-editor) then creates the
+	# html elements accordingly.
+	###
 	getUiSchema: () =>
 		console.log('Dummy Client Plugin returns the UI schema.')
 
@@ -72,9 +72,9 @@ module.exports = class DummyPlugin
 	# due to user input or calculation results on either server or client side.
 	#
 	# The hook provides the new complete state as an argument.
-    #
-    # `state.toolsValues` contains the values of the associated ui-elements
-    # in the tools-container.
+	#
+	# `state.toolsValues` contains the values of the associated ui-elements
+	# in the tools-container.
 	#
 	# @param {Object} state the complete current state
 	# @param {Callback} done callback to be called when finished state modification
@@ -84,7 +84,6 @@ module.exports = class DummyPlugin
 	onStateUpdate: (state, done) =>
 		console.log 'Dummy Client Plugin state change'
 		done()
-
 
 	###
 	# On each render frame the renderer will call the `on3dUpdate`
@@ -100,8 +99,8 @@ module.exports = class DummyPlugin
 
 	###
 	# When a file is loaded into lowfab, the `fileLoader` will try to import
-  # it with every plugin that implements importFile until one succeeds.
-  # The file's name and its content are provided as arguments.
+	# it with every plugin that implements importFile until one succeeds.
+	# The file's name and its content are provided as arguments.
 	#
 	# @param {String} fileName the name of the file to import
 	# @param {String} fileContent the content of the file to import

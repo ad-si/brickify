@@ -1,5 +1,4 @@
 stlLoader = require '../client/plugins/stlImport/stlLoader.coffee'
-md5 = require 'md5'
 modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 

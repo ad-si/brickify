@@ -2,34 +2,8 @@ http = require 'http'
 path = require 'path'
 url = require 'url'
 fs = require 'fs'
-
 winston = require 'winston'
 express = require 'express'
-
-webapp = express()
-developmentMode = webapp.get('env') is 'development'
-testMode = webapp.get('env') is 'test'
-
-loggingLevel = if developmentMode then 'debug' else 'warn'
-loggingLevel = 'error' if testMode
-
-# Make logger available to other modules
-winston.loggers.add 'log',
-	console:
-		level: loggingLevel
-		colorize: true
-
-log = winston.loggers.get('log')
-
-# Support mixing .coffee and .js files in lowfab-project
-coffeeify = require 'coffeeify'
-# Load yaml configuration into javascript file
-browserifyData = require 'browserify-data'
-envify = require 'envify'
-browserify = require 'browserify-middleware'
-browserify.settings({
-	transform: [coffeeify, browserifyData, envify]
-})
 bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
@@ -49,6 +23,38 @@ modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
 exec = require 'exec'
 http = require 'http'
+# Support mixing .coffee and .js files in lowfab-project
+coffeeify = require 'coffeeify'
+# Load yaml configuration into javascript file
+browserifyData = require 'browserify-data'
+envify = require 'envify'
+browserify = require 'browserify-middleware'
+
+# Make logger available to other modules
+winston.loggers.add 'log',
+	console:
+		level: loggingLevel
+		colorize: true
+log = winston.loggers.get('log')
+
+webapp = express()
+# express assumes that no env means develop. therefore override it to make it
+# clear for all
+developmentMode = webapp.get('env') is 'development'
+if developmentMode
+	process.env.NODE_ENV = 'development'
+	log.info 'development mode activated'
+else
+	log.info 'production mode activated'
+
+testMode = webapp.get('env') is 'test'
+
+loggingLevel = if developmentMode then 'debug' else 'warn'
+loggingLevel = 'error' if testMode
+
+browserify.settings({
+	transform: [coffeeify, browserifyData, envify]
+})
 
 server = http.createServer(webapp)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
@@ -60,7 +66,6 @@ sortedDependencies = [
 	'FileSaver',
 	'Blob'
 ]
-
 
 module.exports.loadFrontendDependencies = (callback) ->
 	allDependencies = []
@@ -204,11 +209,9 @@ module.exports.setupRouting = () ->
 		.render '404', links
 	return module.exports
 
-
 module.exports.startServer = (_port, _ip) ->
 	port = _port || port
 	ip = _ip || ip
-
 
 	server.on 'error', (error) ->
 		if error.code is 'EADDRINUSE'

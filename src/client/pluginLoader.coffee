@@ -49,25 +49,21 @@ module.exports = class PluginLoader
 			}
 
 		if @pluginHooks.hasHook(instance, 'getUiSchema')
-
 			jsonEditorConfiguration.schema = instance.getUiSchema()
-
 			if jsonEditorConfiguration.schema
-
 				$pluginsContainer = $('#pluginsContainer')
-				$pluginContainer = $("<div id='#{instance.name}'></div>")
+				if $pluginsContainer.length > 0
+					$pluginContainer = $("<div id='#{instance.name}'></div>")
+					$pluginsContainer.append($pluginContainer)
+					editor = new JSONEditor(
+						$pluginContainer[0]
+						jsonEditorConfiguration
+					)
 
-				$pluginsContainer.append($pluginContainer)
-
-				editor = new JSONEditor(
-					$pluginContainer[0]
-					jsonEditorConfiguration
-				)
-
-				editor.on 'change',() =>
-					action = (state) ->
-						state.toolsValues = editor.getValue()
-					@bundle.statesync.performStateAction action, true
+					editor.on 'change',() =>
+						action = (state) ->
+							state.toolsValues = editor.getValue()
+						@bundle.statesync.performStateAction action, true
 
 		@pluginHooks.register instance
 

@@ -5,30 +5,69 @@
 # Load the hook list and initialize the pluginHook management
 path = require 'path'
 THREE = require 'three'
-hooks = require('./pluginHooks.yaml')
-PluginHooks = require('../common/pluginHooks')
+$ = require 'jquery'
+hooks = require './pluginHooks.yaml'
+PluginHooks = require '../common/pluginHooks'
+
+jsonEditorConfiguration = {
+	theme: 'bootstrap3'
+	disable_array_add: true
+	disable_array_delete: true
+	disable_array_reorder: true
+	disable_collapse: true
+	disable_edit_json: true
+	disable_properties: true
+}
 
 module.exports = class PluginLoader
-	constructor: (globalConfigInstance) ->
+	constructor: (@bundle) ->
 		@pluginHooks = new PluginHooks()
 		@pluginHooks.initHooks(hooks)
-		@globalConfig = globalConfigInstance
+		@globalConfig = @bundle.globalConfig
+
 	initPlugin: (PluginClass, packageData) ->
 		instance = new PluginClass()
 
 		for own key,value of packageData
 			instance[key] = value
 
-		instance.init? @globalConfig
+		if @pluginHooks.hasHook(instance, 'init')
+			instance.init @globalConfig
 
 		if @renderer?
-			instance.init3d? threeNode = new THREE.Object3D()
+			if @pluginHooks.hasHook(instance, 'init3d')
+				threeNode = new THREE.Object3D()
+				instance.init3d threeNode
 
-		instance.initUi? {
-			menuBar: document.getElementById('navbarToggle')
-			toolsContainer: document.getElementById('toolsContainer')
-			sceneGraphContainer: document.getElementById('sceneGraphContainer')
-		}
+		if @pluginHooks.hasHook(instance, 'initUi')
+			instance.initUi {
+				menuBar: document.getElementById 'navbarToggle'
+				toolsContainer: document.getElementById 'toolsContainer'
+				sceneGraphContainer: document.getElementById(
+					'sceneGraphContainer'
+				)
+			}
+
+		if @pluginHooks.hasHook(instance, 'getUiSchema')
+
+			jsonEditorConfiguration.schema = instance.getUiSchema()
+
+			if jsonEditorConfiguration.schema
+
+				$pluginsContainer = $('#pluginsContainer')
+				$pluginContainer = $("<div id='#{instance.name}'></div>")
+
+				$pluginsContainer.append($pluginContainer)
+
+				editor = new JSONEditor(
+					$pluginContainer[0]
+					jsonEditorConfiguration
+				)
+
+				editor.on 'change',() =>
+					action = (state) ->
+						state.toolsValues = editor.getValue()
+					@bundle.statesync.performStateAction action, true
 
 		@pluginHooks.register instance
 
@@ -45,6 +84,10 @@ module.exports = class PluginLoader
 		pluginInstances.push @initPlugin(
 			require('./plugins/dummy'),
 			require('./plugins/dummy/package.json')
+		)
+		pluginInstances.push @initPlugin(
+			require('./plugins/example'),
+			require('./plugins/example/package.json')
 		)
 		pluginInstances.push @initPlugin(
 			require('./plugins/coordinateSystem'),

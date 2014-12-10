@@ -1,0 +1,9 @@
+{
+  "name": "Example",
+  "version": "0.1.0",
+  "description": "Example plugin",
+  "lowfab": {
+    "type": "example"
+  },
+  "main": "./example.coffee"
+}

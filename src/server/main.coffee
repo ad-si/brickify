@@ -8,9 +8,9 @@ fs = require 'fs'
 winston = require 'winston'
 express = require 'express'
 
-app = express()
-developmentMode = if app.get('env') is 'development' then true else false
-testMode = if app.get('env') is 'test' then true else false
+webapp = express()
+developmentMode = webapp.get('env') is 'development'
+testMode = webapp.get('env') is 'test'
 
 loggingLevel = if developmentMode then 'debug' else 'warn'
 loggingLevel = 'error' if testMode
@@ -43,19 +43,16 @@ stylus = require 'stylus'
 nib = require 'nib'
 bower = require 'bower'
 pluginLoader = require './pluginLoader'
-index = require '../../routes/index'
-statesync = require '../../routes/statesync'
-exec = require 'exec'
-http = require 'http'
-
-pluginLoader = require './pluginLoader'
-index = require '../../routes/index'
+app = require '../../routes/app'
+landingPage = require '../../routes/landingpage'
 statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
+exec = require 'exec'
+http = require 'http'
 
-server = http.createServer(app)
+server = http.createServer(webapp)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
 sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
@@ -97,24 +94,23 @@ module.exports.loadFrontendDependencies = (callback) ->
 				getDependencyPath dependencies[element].filter(isJs)[0]
 			else
 				getDependencyPath dependencies[element]
-		links.scripts.push('index.js')
-
 		callback()
 
 
 module.exports.setupRouting = () ->
-	app.set 'hostname', if developmentMode then "localhost:#{port}" else
+	webapp.set 'hostname', if developmentMode then "localhost:#{port}" else
 		process.env.HOSTNAME or 'lowfab.net'
 
 
-	app.set 'views', path.normalize 'views'
-	app.set 'view engine', 'jade'
+	webapp.set 'views', path.normalize 'views'
+	webapp.locals.pretty = true
+	webapp.set 'view engine', 'jade'
 
-	app.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
+	webapp.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
 
-	app.use compress()
+	webapp.use compress()
 
-	app.use stylus.middleware(
+	webapp.use stylus.middleware(
 		src: 'public',
 		compile: (string, path) ->
 			stylus string
@@ -124,25 +120,31 @@ module.exports.setupRouting = () ->
 			.import 'nib'
 	)
 
-	app.get '/index.js', browserify('src/client/main.coffee', {
+	webapp.get '/app.js', browserify('src/client/main.coffee', {
 		extensions: ['.coffee']
 	})
-	app.use express.static('public')
-	app.use('/node_modules', express.static('node_modules'))
+	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
+		extensions: ['.coffee']
+	})
+	webapp.get '/quickconvert.js', browserify('src/quickconvert/main.coffee', {
+		extensions: ['.coffee']
+	})
+	webapp.use express.static('public')
+	webapp.use('/node_modules', express.static('node_modules'))
 
 	if developmentMode
-		app.use morgan 'dev',
+		webapp.use morgan 'dev',
 			stream:
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 	else
-		app.use morgan 'combined',
+		webapp.use morgan 'combined',
 			stream:
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
 
-	app.use session {
+	webapp.use session {
 		secret: sessionSecret
 		resave: true
 		saveUninitialized: true
@@ -154,20 +156,26 @@ module.exports.setupRouting = () ->
 	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
 	rawParser = bodyParser.raw({limit: '100mb'})
 
+	landingPage.setLinks links
 
-	app.get '/', index(links)
-	app.get '/statesync/get', jsonParser, statesync.getState
-	app.post '/statesync/set', jsonParser, statesync.setState
-	app.get '/statesync/reset', jsonParser, statesync.resetState
-	app.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists
-	app.get '/model/get/:hash', urlParser, modelStorageApi.getModel
-	app.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
+	webapp.get '/', landingPage.getLandingpage
+	webapp.get '/contribute', landingPage.getContribute
+	webapp.get '/team', landingPage.getTeam
+	webapp.get '/quickconvert', urlParser, landingPage.getQuickConvertPage
+	webapp.get '/app', app(links)
+	webapp.get '/statesync/get', jsonParser, statesync.getState
+	webapp.post '/statesync/set', jsonParser, statesync.setState
+	webapp.get '/statesync/reset', jsonParser, statesync.resetState
+	webapp.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists
+	webapp.get '/model/get/:hash', urlParser, modelStorageApi.getModel
+	webapp.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
 
-	app.post '/datapacket/packet/undefined', jsonParser, dataPackets.createPacket
-	app.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
-	app.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
+	webapp.post '/datapacket/packet/undefined',
+		jsonParser, dataPackets.createPacket
+	webapp.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
+	webapp.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
 
-	app.post '/updateGitAndRestart', jsonParser, (request, response) ->
+	webapp.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?
 			ref = request.body.ref
 			if not (ref.indexOf('develop') >= 0 or ref.indexOf('master') >= 0)
@@ -190,13 +198,12 @@ module.exports.setupRouting = () ->
 		path.join __dirname, 'plugins/'
 
 	if developmentMode
-		app.use errorHandler()
+		webapp.use errorHandler()
 
-	app.use (req, res) ->
+	webapp.use (req, res) ->
 		res
 		.status(404)
 		.render '404', links
-
 	return module.exports
 
 

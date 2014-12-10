@@ -27,13 +27,14 @@ module.exports = class Renderer
 
 	windowResizeHandler: () ->
 		if not @staticRendererSize
-			@camera.aspect = window.innerWidth / window.innerHeight
+			@camera.aspect = @size().width / @size().height
 			@camera.updateProjectionMatrix()
-			@threeRenderer.setSize window.innerWidth, window.innerHeight
+			@threeRenderer.setSize @size().width, @size().height
 
 		@threeRenderer.render @scene, @camera
 
 	init: (globalConfig) ->
+		@setupSize globalConfig
 		@setupRenderer globalConfig
 		@setupScene globalConfig
 		@setupLighting globalConfig
@@ -42,6 +43,20 @@ module.exports = class Renderer
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
 		requestAnimationFrame @localRenderer
 
+	setupSize: (globalConfig) ->
+		if not globalConfig.staticRendererSize
+			@staticRendererSize = false
+		else
+			@staticRendererSize = true
+			@staticRendererWidth = globalConfig.staticRendererWidth
+			@staticRendererHeight = globalConfig.staticRendererHeight
+
+	size: ->
+		if @staticRendererSize
+			return {width: @staticRendererWidth, height: @staticRendererHeight}
+		else
+			return {width: window.innerWidth, height: window.innerHeight}
+
 	setupRenderer: (globalConfig) ->
 		@threeRenderer = new THREE.WebGLRenderer(
 			alpha: true
@@ -49,14 +64,7 @@ module.exports = class Renderer
 			preserveDrawingBuffer: true
 		)
 
-		if not globalConfig.staticRendererSize
-			@staticRendererSize = false
-			@threeRenderer.setSize window.innerWidth, window.innerHeight
-		else
-			@staticRendererSize = true
-			@threeRenderer.setSize globalConfig.staticRendererWidth,
-				globalConfig.staticRendererHeight
-
+		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.setClearColor 0xf6f6f6, 1
 		@threeRenderer.domElement.setAttribute 'id', 'canvas'
 		document
@@ -77,7 +85,7 @@ module.exports = class Renderer
 	setupCamera: (globalConfig) ->
 		@camera = new THREE.PerspectiveCamera(
 			globalConfig.fov,
-			window.innerWidth / window.innerHeight,
+			(@size().width / @size().height),
 			globalConfig.cameraNearPlane,
 			globalConfig.cameraFarPlane
 		)

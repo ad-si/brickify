@@ -17,20 +17,31 @@ module.exports = class Statesync
 		@initialStateIsLoaded = false
 		@initialStateLoadedCallbacks = []
 
-	init: (@globalConfig, stateInitializedCallback) ->
+	init: (globalConfig, stateInitializedCallback) ->
+		@globalConfig = globalConfig
+
+		if not @syncWithServer
+			@state = {}
+			stateInitializedCallback? @state
+			@performInitialStateLoadedAction()
+			return
+
 		Promise.resolve($.get '/statesync/get').then((data) =>
 			@state = data
 			@oldState = JSON.parse JSON.stringify @state
 
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
-			stateInitializedCallback @state if stateInitializedCallback?
+			stateInitializedCallback? @state
 
-			initialStateIsLoaded = true
-			@initialStateLoadedCallbacks.forEach (callback) ->
-				callback(state)
-			@handleUpdatedState @state
+			@performInitialStateLoadedAction()
 		)
+
+	performInitialStateLoadedAction: () ->
+		@initialStateIsLoaded = true
+		@initialStateLoadedCallbacks.forEach (callback) ->
+			callback(state)
+		@handleUpdatedState @state
 
 	getState: (callback) ->
 		if @initialStateIsLoaded
@@ -67,24 +78,18 @@ module.exports = class Statesync
 
 
 	sync: (force = false) ->
-		# if we shall not sync with the server, run the loop internally as long as
-		# plugins change the state
-		if not @syncWithServer
-			@oldState = JSON.parse JSON.stringify @state
-			@handleUpdatedState @state
-
-			delta = diffpatch.diff @oldState, @state
-			while delta != null
-				@handleUpdatedState @state
-				delta = diffpatch.diff @oldState, @state
-				@oldState = JSON.parse JSON.stringify @state
-			return
-
 		delta = diffpatch.diff @oldState, @state
 
 		if not force
 			if not delta?
 				return
+
+		# if we shall not sync with the server, run the loop internally as long as
+		# plugins change the state
+		if not @syncWithServer
+			@oldState = JSON.parse JSON.stringify @state
+			@handleUpdatedState @state
+			return
 
 		# deep copy
 		@oldState = JSON.parse JSON.stringify @state

@@ -62,11 +62,14 @@ module.exports = class PluginUiGenerator
 
 	saveUiToCurrentNode: () =>
 		if @currentlySelectedNode
-			action = () =>
-				for key of @editors
-					@currentlySelectedNode.toolsValues[key] = @editors[key].getValue()
+			for key of @editors
+				oldValues = @currentlySelectedNode.toolsValues[key]
+				newValues = @editors[key].getValue()
 
-			@bundle.statesync.performStateAction action, true
+				if JSON.stringify(oldValues) != JSON.stringify(newValues)
+					updateNewValues = () =>
+						@currentlySelectedNode.toolsValues[key] = newValues
+					@bundle.statesync.performStateAction updateNewValues, true
 
 	saveDefaultValues: (node) =>
 		if not node.toolsValues

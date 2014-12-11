@@ -43,7 +43,7 @@ module.exports = class PluginUiGenerator
 	selectNode: (modelName) ->
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left. allows to make plugin values relative to objects
-		console.log "Selecting node #{modelName}"
+		# console.log "Selecting node #{modelName}"
 
 		@bundle.statesync.getState (state) =>
 			objectTree.getNodeByFileName modelName, state.rootNode, (node) =>
@@ -52,8 +52,8 @@ module.exports = class PluginUiGenerator
 				@applyNodeValuesToUi()
 
 	deselectNodes: () ->
-		#called when all nodes are deselected
-		console.log 'all nodes deselected'
+		# called when all nodes are deselected
+		#console.log 'all nodes deselected'
 		@currentlySelectedNode = null
 
 	applyNodeValuesToUi: () =>

@@ -32,7 +32,7 @@ module.exports = class PluginLoader
 			instance[key] = value
 
 		if @pluginHooks.hasHook(instance, 'init')
-			instance.init @globalConfig
+			instance.init @bundle
 
 		if @renderer?
 			if @pluginHooks.hasHook(instance, 'init3d')

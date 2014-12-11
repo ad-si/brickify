@@ -15,6 +15,9 @@ module.exports = class SceneGraph
 		@uiInitialized = false
 		@htmlElements = null
 
+	init: (@bundle) ->
+		return
+
 	renderUi: (elements) ->
 		$treeContainer = $(elements.sceneGraphContainer)
 		idCounter = 1
@@ -39,9 +42,9 @@ module.exports = class SceneGraph
 			$treeContainer.tree {
 				autoOpen: 0
 				data: treeData
-				dragAndDrop: true
+				dragAndDrop: false
 				keyboardSupport: false
-				useContextMenu: false
+				useContextMenu: true
 				onCreateLi: (node, $li) -> $li.attr('title', node.title)
 			}
 
@@ -53,8 +56,18 @@ module.exports = class SceneGraph
 			@renderUi @htmlElements
 		done()
 
+	onNodeSelect: (event) ->
+		nodeLabel = event.node.name
+		# console.log "selected node '#{nodeLabel}'"
+
+
+	bindEvents: () ->
+		$treeContainer = $(@htmlElements.sceneGraphContainer)
+		$treeContainer.bind 'tree.select', @onNodeSelect
+
 	initUi: (elements) =>
 		@htmlElements = elements
+		@bindEvents()
 		@uiInitialized = true
 		if @state
 			@renderUi @htmlElements

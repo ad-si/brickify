@@ -1,6 +1,6 @@
 module.exports = class Example
 
-	init: (globalConfig) ->
+	init: (bundle) ->
 		console.log 'Example Plugin initialization'
 
 	init3d: (threejsNode) ->

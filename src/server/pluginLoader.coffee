@@ -2,8 +2,6 @@
 fs = require 'fs'
 # Manipulate platform-independent path strings
 path = require 'path'
-# Recursively process folders and files
-readdirp = require 'readdirp'
 # Server-side plugins
 stateSyncModule = null
 # Colorful logger for console

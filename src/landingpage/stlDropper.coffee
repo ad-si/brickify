@@ -1,4 +1,4 @@
-stlLoader = require './stlLoader.coffee'
+stlLoader = require '../plugins/stlImport/stlLoader'
 modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 

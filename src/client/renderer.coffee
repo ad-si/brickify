@@ -81,6 +81,11 @@ module.exports = class Renderer
 			(-Math.PI / 2)
 		)
 		@scene.applyMatrix(sceneRotation)
+		@scene.fog = new THREE.Fog(
+			0xffffff
+			globalConfig.cameraNearPlane
+			globalConfig.cameraFarPlane
+		)
 
 	setupCamera: (globalConfig) ->
 		@camera = new THREE.PerspectiveCamera(

@@ -16,6 +16,8 @@ module.exports = class Statesync
 		@globalConfig = null
 		@initialStateIsLoaded = false
 		@initialStateLoadedCallbacks = []
+		@stateIsLocked = false
+		@stateActionWaitingCallbacks = []
 
 	init: (globalConfig, stateInitializedCallback) ->
 		@globalConfig = globalConfig
@@ -51,7 +53,13 @@ module.exports = class Statesync
 	# executes callback(state) and then synchronizes the state with the server.
 	# if updatedStateEvent is set to true, the updateState hook of all client
 	# plugins will be called before synchronization with the server
-	performStateAction: (callback, updatedStateEvent = false) ->
+	performStateAction: (callback, updatedStateEvent = false) =>
+		# add callbacks to a waiting list if state is currently
+		# being synced to the server
+		if @stateIsLocked
+			@stateActionWaitingCallbacks.push callback
+			return
+
 		callback(@state)
 
 		# let every plugin do something with the updated state
@@ -90,6 +98,9 @@ module.exports = class Statesync
 			@handleUpdatedState @state
 			return
 
+		# lock state until a response from the server arrives
+		@stateIsLocked = true
+
 		# deep copy
 		@oldState = JSON.parse JSON.stringify @state
 
@@ -118,5 +129,13 @@ module.exports = class Statesync
 
 				#deep copy current state
 				@oldState = JSON.parse JSON.stringify @state
+
+				# unlock state
+				@stateIsLocked = false
+
+				#run all waiting callbacks
+				for cb in @stateActionWaitingCallbacks
+					cb @state
+				@stateActionWaitingCallbacks = []
 
 				@handleUpdatedState @state

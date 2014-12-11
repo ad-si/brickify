@@ -5,8 +5,8 @@
 ###
 
 THREE = require 'three'
-objectTree = require '../../../common/objectTree'
-modelCache = require '../../modelCache'
+objectTree = require '../../common/objectTree'
+modelCache = require '../../client/modelCache'
 
 module.exports = class SolidRenderer
 

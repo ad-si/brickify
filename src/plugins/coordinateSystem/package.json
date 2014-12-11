@@ -5,5 +5,5 @@
   "lowfab": {
     "type": "renderer"
   },
-  "main": "./coordinateSystem.coffee"
+  "browser": "./coordinateSystem.coffee"
 }

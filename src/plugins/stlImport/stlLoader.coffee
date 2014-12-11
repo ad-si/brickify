@@ -1,5 +1,5 @@
-OptimizedModel = require '../../../common/OptimizedModel'
-Vec3 = require '../../../common/Vec3'
+OptimizedModel = require '../../common/OptimizedModel'
+Vec3 = require '../../common/Vec3'
 
 # Parses the content of a stl file.
 # if optimize is set to true, an optimized mesh is returned

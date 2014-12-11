@@ -5,5 +5,5 @@
   "lowfab": {
     "type": "user-inteface"
   },
-  "main": "./sceneGraph.coffee"
+  "browser": "./sceneGraph.coffee"
 }

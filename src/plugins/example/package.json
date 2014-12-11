@@ -5,5 +5,5 @@
   "lowfab": {
     "type": "example"
   },
-  "main": "./example.coffee"
+  "browser": "./example.coffee"
 }

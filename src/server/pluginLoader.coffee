@@ -23,17 +23,16 @@ initPluginInstance = (pluginInstance) ->
 	pluginInstance.init?()
 	pluginHooks.register pluginInstance
 
-loadPlugin = (entry) ->
+loadPlugin = (directory) ->
 	try
-		pluginFile = path.join(entry.fullPath, entry.name)
-		instance = require pluginFile
+		instance = require directory
 
 	catch error
-		log.error "Plugin #{entry.name} could not be found.
-				Maybe the plugin's filename does not match its folder name?"
+		if error.code != 'MODULE_NOT_FOUND'
+			log.error error
 		return
 
-	for own key,value of require path.join entry.fullPath, 'package.json'
+	for own key,value of require path.join directory, 'package.json'
 		instance[key] = value
 
 	initPluginInstance instance
@@ -42,11 +41,9 @@ loadPlugin = (entry) ->
 
 module.exports.loadPlugins = (stateSync, directory) ->
 	stateSyncModule = stateSync
-	readdirp(
-		root: directory,
-		depth: 0,
-		entryType: 'directories'
-	)
-	.on 'data', (entry) -> loadPlugin entry
-	.on 'error', (error) -> log.error error
-	.on 'warn', (warning) -> log.warn warning
+
+	fs.readdir directory, (error, dirs) ->
+		if error
+			throw error
+		dirs.forEach (dir) ->
+			loadPlugin path.resolve(__dirname, '../plugins/' + dir)

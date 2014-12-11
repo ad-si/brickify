@@ -27,7 +27,7 @@ loadPlugin = (directory) ->
 
 	catch error
 		if error.code != 'MODULE_NOT_FOUND'
-			log.error error
+			throw error
 		return
 
 	for own key,value of require path.join directory, 'package.json'

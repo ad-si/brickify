@@ -1,7 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 winston = require 'winston'
-stlLoader = require '../src/client/plugins/stlImport/stlLoader'
+stlLoader = require '../src/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
 mkdirp = require 'mkdirp'
 require('es6-promise').polyfill()

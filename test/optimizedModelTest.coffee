@@ -1,5 +1,5 @@
 expect = require('chai').expect
-stlLoader = require '../src/client/plugins/stlImport/stlLoader'
+stlLoader = require '../src/plugins/stlImport/stlLoader'
 fs = require 'fs'
 
 OptimizedModel = require '../src/common/OptimizedModel'

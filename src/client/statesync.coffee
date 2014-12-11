@@ -40,6 +40,7 @@ module.exports = class Statesync
 
 	performInitialStateLoadedAction: () ->
 		@initialStateIsLoaded = true
+		@unlockState()
 		@initialStateLoadedCallbacks.forEach (callback) ->
 			callback(state)
 		@handleUpdatedState @state
@@ -84,7 +85,7 @@ module.exports = class Statesync
 		@pluginHooks.onStateUpdate curstate, done
 
 
-	sync: (force = false) ->
+	sync: (force = false) =>
 		delta = diffpatch.diff @oldState, @state
 
 		if not force
@@ -99,7 +100,7 @@ module.exports = class Statesync
 			return
 
 		# lock state until a response from the server arrives
-		@stateIsLocked = true
+		@lockState()
 
 		# deep copy
 		@oldState = JSON.parse JSON.stringify @state
@@ -114,28 +115,50 @@ module.exports = class Statesync
 			contentType: 'application/json; charset=utf-8'
 		# check whether client modified its local state
 		# since the post request was sent
-			success: (data, textStatus, jqXHR) ->
+			success: (data, textStatus, jqXHR) =>
 				delta = data
-				console.log "Got delta from server: #{JSON.stringify(delta)}"
 
-				clientDelta = diffpatch.diff @oldState, @state
+				if delta.emptyDiff == true
+					delta = null
 
-				if clientDelta?
-					console.log 'The client modified its state
-						while the server worked, this should not happen!'
+				if delta
+					# handle modified state from server
+					console.log "Got delta from server: #{JSON.stringify(delta)}"
 
-				#patch state with server changes
-				diffpatch.patch @state, delta
+					clientDelta = diffpatch.diff @oldState, @state
 
-				#deep copy current state
-				@oldState = JSON.parse JSON.stringify @state
+					if clientDelta?
+						console.log 'The client modified its state
+							while the server worked, this should not happen!'
 
-				# unlock state
-				@stateIsLocked = false
+					#patch state with server changes
+					diffpatch.patch @state, delta
 
-				#run all waiting callbacks
-				for cb in @stateActionWaitingCallbacks
-					cb @state
-				@stateActionWaitingCallbacks = []
+					#deep copy current state
+					@oldState = JSON.parse JSON.stringify @state
 
-				@handleUpdatedState @state
+					@unlockState()
+
+					#run all waiting callbacks
+					for cb in @stateActionWaitingCallbacks
+						cb @state
+					@stateActionWaitingCallbacks = []
+
+					@handleUpdatedState @state
+				else
+					# state was not modified, but there may be waiting callbacks
+					@unlockState()
+
+					if @stateActionWaitingCallbacks.length > 0
+						for cb in @stateActionWaitingCallbacks
+							cb @state
+						@stateActionWaitingCallbacks = []
+						@handleUpdatedState @state
+
+	lockState: () ->
+		@stateIsLocked = true
+		$('#spinnerContainer').show()
+
+	unlockState: () ->
+		@stateIsLocked = false
+		$('#spinnerContainer').hide()

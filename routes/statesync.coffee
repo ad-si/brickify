@@ -35,7 +35,10 @@ exports.setState = (request, response) ->
 	serverDiff = diffpatch.diff oldState, state
 
 	logger.debug 'Sending delta to client: ' + JSON.stringify(serverDiff)
-	response.json serverDiff
+	if not serverDiff
+		response.json {emptyDiff: true}
+	else
+		response.json serverDiff
 
 exports.resetState = (request, response) ->
 	request.session.state = {empty: true}

@@ -1,5 +1,5 @@
 fs = require 'fs'
-stlLoader = require '../src/plugins/stlImport/stlLoader.coffee'
+stlLoader = require '../src/plugins/stlImport/stlLoader'
 expect = require('chai').expect
 
 process.env.NODE_ENV = 'test'

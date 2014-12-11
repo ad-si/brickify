@@ -65,7 +65,7 @@ module.exports = class Renderer
 		)
 
 		@threeRenderer.setSize @size().width, @size().height
-		@threeRenderer.setClearColor 0xf6f6f6, 1
+		@threeRenderer.setClearColor globalConfig.clearColor, 1
 		@threeRenderer.domElement.setAttribute 'id', 'canvas'
 		document
 		.getElementById(globalConfig.renderAreaId)
@@ -82,7 +82,7 @@ module.exports = class Renderer
 		)
 		@scene.applyMatrix(sceneRotation)
 		@scene.fog = new THREE.Fog(
-			0xffffff
+			globalConfig.clearColor
 			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)

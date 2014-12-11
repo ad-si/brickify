@@ -57,12 +57,12 @@ module.exports = class PluginUiGenerator
 		@currentlySelectedNode = null
 
 	applyNodeValuesToUi: () =>
-		for key of @editors
+		for own key of @editors
 			@editors[key].setValue(@currentlySelectedNode.toolsValues[key])
 
 	saveUiToCurrentNode: () =>
 		if @currentlySelectedNode
-			for key of @editors
+			for own key of @editors
 				oldValues = @currentlySelectedNode.toolsValues[key]
 				newValues = @editors[key].getValue()
 

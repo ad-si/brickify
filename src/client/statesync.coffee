@@ -22,6 +22,7 @@ module.exports = class Statesync
 
 	init: (globalConfig, stateInitializedCallback) ->
 		@globalConfig = globalConfig
+		@$spinnerContainer = $('#spinnerContainer')
 
 		if not @syncWithServer
 			@state = {}
@@ -129,8 +130,8 @@ module.exports = class Statesync
 					clientDelta = diffpatch.diff @oldState, @state
 
 					if clientDelta?
-						console.log 'The client modified its state
-							while the server worked, this should not happen!'
+						throw new Error('The client modified its state
+							while the server worked, this should not happen!')
 
 					#patch state with server changes
 					diffpatch.patch @state, delta
@@ -158,8 +159,8 @@ module.exports = class Statesync
 
 	lockState: () ->
 		@stateIsLocked = true
-		$('#spinnerContainer').show()
+		@$spinnerContainer.show()
 
 	unlockState: () ->
 		@stateIsLocked = false
-		$('#spinnerContainer').fadeOut()
+		@$spinnerContainer.fadeOut()

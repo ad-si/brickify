@@ -16,6 +16,11 @@ module.exports = class Renderer
 			@stats?.begin()
 			@threeRenderer.render @.scene, @.camera
 			@pluginHooks.on3dUpdate timestamp
+			results = @pluginHooks.newBoundingSphere()
+			for r in results
+				if r?
+					@adjustCameraToObject (r)
+
 			@stats?.end()
 			requestAnimationFrame @localRenderer
 
@@ -32,6 +37,30 @@ module.exports = class Renderer
 			@threeRenderer.setSize @size().width, @size().height
 
 		@threeRenderer.render @scene, @camera
+
+	adjustCameraToObject: (radiusAndPosition) ->
+		# zooms out/in the camera so that the object is fully visible
+		radius = radiusAndPosition.radius
+		center = radiusAndPosition.center
+		center = new THREE.Vector3(center.x, center.y, center.z)
+
+		alpha = @camera.fov
+		distanceToObject = radius / Math.sin(alpha)
+
+		rv = @camera.position.clone().sub(@controls.target)
+		rv = rv.normalize().multiplyScalar(distanceToObject)
+		rv = rv.multiplyScalar(2)
+
+		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
+		multCenter = center.clone().applyMatrix4(@scene.matrix)
+		position = multCenter.clone().add(rv)
+
+		@controls.update()
+		@controls.target = @controls.target0 =
+			new THREE.Vector3(multCenter.x, multCenter.y, multCenter.z)
+		@controls.position = @controls.position0 =
+			new THREE.Vector3(position.x, position.y, position.z)
+		@controls.reset()
 
 	init: (globalConfig) ->
 		@setupSize globalConfig

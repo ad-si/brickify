@@ -63,9 +63,21 @@ module.exports = class SolidRenderer
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
 		object.name = object.uuid
+		@latestAddedObject = object
 
 		@threejsNode.add object
 		return object
+
+	newBoundingSphere: () =>
+		if @latestAddedObject
+			@latestAddedObject.geometry.computeBoundingSphere()
+			result =
+				radius: @latestAddedObject.geometry.boundingSphere.radius
+				center: @latestAddedObject.geometry.boundingSphere.center
+			@latestAddedObject = null
+			return result
+		else
+			return null
 
 	# copys stored transforms to the tree object.
 	# TODO: use

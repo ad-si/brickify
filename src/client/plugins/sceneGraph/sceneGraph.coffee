@@ -56,10 +56,14 @@ module.exports = class SceneGraph
 			@renderUi @htmlElements
 		done()
 
-	onNodeSelect: (event) ->
-		nodeLabel = event.node.name
-		# console.log "selected node '#{nodeLabel}'"
-
+	onNodeSelect: (event) =>
+		if event.node
+			nodeLabel = event.node.name
+			# console.log "selected node '#{nodeLabel}'"
+			@bundle.pluginUiGenerator.selectNode nodeLabel
+		else
+			# no node = deselected
+			@bundle.pluginUiGenerator.deselectNodes()
 
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)

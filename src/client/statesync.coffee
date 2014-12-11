@@ -5,6 +5,7 @@
 
 $ = require 'jquery'
 jsondiffpatch = require 'jsondiffpatch'
+clone = require 'clone'
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
@@ -30,7 +31,7 @@ module.exports = class Statesync
 
 		$.get '/statesync/get', {}, (data, textStatus, jqXHR) =>
 			@state = data
-			@oldState = JSON.parse JSON.stringify @state
+			@oldState = clone(@state)
 
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
@@ -95,7 +96,7 @@ module.exports = class Statesync
 		# if we shall not sync with the server, run the loop internally as long as
 		# plugins change the state
 		if not @syncWithServer
-			@oldState = JSON.parse JSON.stringify @state
+			@oldState = clone(@state)
 			@handleUpdatedState @state
 			return
 
@@ -103,7 +104,7 @@ module.exports = class Statesync
 		@lockState()
 
 		# deep copy
-		@oldState = JSON.parse JSON.stringify @state
+		@oldState = clone(@state)
 
 		console.log "Sending delta to server: #{JSON.stringify(delta)}"
 		$.ajax '/statesync/set',
@@ -135,7 +136,7 @@ module.exports = class Statesync
 					diffpatch.patch @state, delta
 
 					#deep copy current state
-					@oldState = JSON.parse JSON.stringify @state
+					@oldState = clone(@state)
 
 					@unlockState()
 

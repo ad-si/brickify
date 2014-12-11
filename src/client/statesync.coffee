@@ -161,4 +161,4 @@ module.exports = class Statesync
 
 	unlockState: () ->
 		@stateIsLocked = false
-		$('#spinnerContainer').hide()
+		$('#spinnerContainer').fadeOut()

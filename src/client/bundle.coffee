@@ -4,6 +4,7 @@ Ui = require './ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
+PluginUiGenerator = require './pluginUiGenerator'
 
 module.exports = class Bundle
 	constructor: (@globalConfig) ->
@@ -25,6 +26,7 @@ module.exports = class Bundle
 				@renderer = new Renderer(pluginHooks)
 				@ui = new Ui(@globalConfig, @renderer, @statesync, @modelLoader)
 				@ui.init()
+				@pluginUiGenerator = new PluginUiGenerator(@)
 				@pluginInstances = @pluginLoader.loadPlugins(@renderer)
 			else
 				@pluginInstances = @pluginLoader.loadPlugins()

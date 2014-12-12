@@ -11,34 +11,50 @@ jsonEditorConfiguration = {
 	disable_properties: true
 }
 
+pluginUiTemplate = '
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="collapseTitle panel-title" data-toggle="collapse" data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
+				</div>
+				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse in">
+					<div class="panel-body">
+						<div id="pcontainer%PLUGINKEY%"></div>
+					</div>
+				</div>
+			</div>
+'
+
 module.exports = class PluginUiGenerator
 	constructor: (@bundle) ->
-		@pluginContainers = {}
 		@editors = {}
 		@defaultValues = {}
 		@currentlySelectedNode = null
+		@$pluginsContainer = $('#pluginsContainer')
 		return
 
 	createPluginUi: (pluginInstance) ->
 		# creates the UI for a plugin if it returns a valid ui schema
 		jsonEditorConfiguration.schema = pluginInstance.getUiSchema()
-		if jsonEditorConfiguration.schema
-			$pluginsContainer = $('#pluginsContainer')
-			if $pluginsContainer.length > 0
-				key = pluginInstance.name
+		if jsonEditorConfiguration.schema && @$pluginsContainer.length > 0
+			pluginName = pluginInstance.name
+			pluginKey = pluginName.toLowerCase().replace(/// ///g,'')
 
-				$pluginContainer = $("<div id='#{key}'></div>")
-				$pluginsContainer.append($pluginContainer)
+			pluginLayout = pluginUiTemplate
+			pluginLayout = pluginLayout.replace(///%PLUGINKEY%///g,pluginKey)
+			pluginLayout = pluginLayout.replace(///%PLUGINNAME%///g,pluginName)
 
-				@pluginContainers[key] = $pluginContainer
-				@editors[key] = new JSONEditor(
-					$pluginContainer[0]
-					jsonEditorConfiguration
-				)
-				@defaultValues[key] = @editors[key].getValue()
+			$pluginLayout = $(pluginLayout)
+			@$pluginsContainer.append($pluginLayout)
+			$pluginContainer = $('#pcontainer' + pluginKey)
 
-				@editors[key].on 'change',() =>
-					@saveUiToCurrentNode()
+			@editors[pluginKey] = new JSONEditor(
+				$pluginContainer[0]
+				jsonEditorConfiguration
+			)
+			@defaultValues[pluginKey] = @editors[pluginKey].getValue()
+
+			@editors[pluginKey].on 'change',() =>
+				@saveUiToCurrentNode()
 
 	selectNode: (modelName) ->
 		# is called by the scenegraph plugin when the user selects a model on the

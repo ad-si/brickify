@@ -15,6 +15,8 @@ block content
 						#sceneGraphContainer
 						#propertiesContainer
 		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
+			div#pluginsContainer
+		//
 			.panel.panel-default
 				.panel-heading
 					h3.collapseTitle.panel-title(data-toggle='collapse'
@@ -23,6 +25,14 @@ block content
 					.panel-body
 						#pluginsContainer
 						#toolsContainer
+
+		//
+			.panel.panel-default
+				.panel-heading
+					h3.collapseTitle.panel-title(data-toggle='collapse' data-target='#collapseTest') Test
+				#collapseTest.panel-collapse.collapse.in
+					.panel-body
+						p Test content
 
 
 	div#webGlWarning

@@ -19,6 +19,7 @@ data-toggle="collapse" data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
 				</div>
 				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse">
 					<div class="panel-body">
+						<div id="pactions%PLUGINKEY%" class="pluginActionsContainer"></div>
 						<div id="pcontainer%PLUGINKEY%" class="pluginSettingsContainer"></div>
 					</div>
 				</div>
@@ -46,10 +47,12 @@ module.exports = class PluginUiGenerator
 
 			$pluginLayout = $(pluginLayout)
 			@$pluginsContainer.append($pluginLayout)
-			$pluginContainer = $('#pcontainer' + pluginKey)
+			$pluginSettingsContainer = $('#pcontainer' + pluginKey)
+			$pluginActionContainer = $('#pcontainer' + pluginKey)
 
+			@generateActionUi jsonEditorConfiguration.schema, $pluginActionContainer
 			@editors[pluginKey] = new JSONEditor(
-				$pluginContainer[0]
+				$pluginSettingsContainer[0]
 				jsonEditorConfiguration
 			)
 			@defaultValues[pluginKey] = @editors[pluginKey].getValue()
@@ -66,6 +69,17 @@ module.exports = class PluginUiGenerator
 			$pluginLayout.on 'shown.bs.collapse', (event) ->
 				if pluginInstance.uiEnabled?
 					pluginInstance.uiEnabled @currentlySelectedNode
+
+	generateActionUi: (schema, $container) ->
+		if schema.actions?
+			for own key of schema.actions
+				title = schema.actions[key].title
+				$btn = $('<div class="btn btn-primary">' + title + '</div>')
+				$btn.click (event) ->
+					schema.actions[key].callback @currentlySelectedNode, event
+				$container.append $btn
+			$container.append $('<br><br>')
+
 
 	selectNode: (modelName) ->
 		# is called by the scenegraph plugin when the user selects a model on the

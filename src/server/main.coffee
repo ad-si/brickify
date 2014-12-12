@@ -127,6 +127,7 @@ module.exports.setupRouting = () ->
 			stylus string
 			.set 'filename', path
 			.set 'compress', !developmentMode
+			.set 'include css', true
 			.use nib()
 			.import 'nib'
 	)

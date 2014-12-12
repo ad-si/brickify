@@ -29,7 +29,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
-	init: (globalConfig) ->
+	init: (bundle) ->
 		console.log 'Dummy Client Plugin initialization'
 
 	###

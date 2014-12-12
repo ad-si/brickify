@@ -10,8 +10,8 @@ modelCache = require '../../client/modelCache'
 
 module.exports = class SolidRenderer
 
-	init: (@globalConfig) ->
-		return
+	init: (bundle) ->
+		@globalConfig = bundle.globalConfig
 
 	init3d: (@threejsNode) ->
 		return

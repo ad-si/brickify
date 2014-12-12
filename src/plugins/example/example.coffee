@@ -1,6 +1,6 @@
 module.exports = class Example
 
-	init: (globalConfig) ->
+	init: (bundle) ->
 		console.log 'Example Plugin initialization'
 
 	init3d: (threejsNode) ->
@@ -36,13 +36,12 @@ module.exports = class Example
 		}
 
 	onStateUpdate: (state, done) ->
-		console.log 'Dummy Client Plugin state change'
-		console.log state.toolsValues
+		console.log 'Exmaple Client Plugin state change'
 		done()
 
 	on3dUpdate: (timestamp) ->
 		return undefined
 
 	importFile: (fileName, fileContent) ->
-		console.log 'Dummy Client Plugin imports a file'
+		console.log 'Example Client Plugin imports a file'
 		return undefined

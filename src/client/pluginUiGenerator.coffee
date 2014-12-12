@@ -19,7 +19,7 @@ data-toggle="collapse" data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
 				</div>
 				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse">
 					<div class="panel-body">
-						<div id="pcontainer%PLUGINKEY%"></div>
+						<div id="pcontainer%PLUGINKEY%" class="pluginSettingsContainer"></div>
 					</div>
 				</div>
 			</div>

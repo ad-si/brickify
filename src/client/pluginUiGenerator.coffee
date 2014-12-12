@@ -48,7 +48,7 @@ module.exports = class PluginUiGenerator
 			$pluginLayout = $(pluginLayout)
 			@$pluginsContainer.append($pluginLayout)
 			$pluginSettingsContainer = $('#pcontainer' + pluginKey)
-			$pluginActionContainer = $('#pcontainer' + pluginKey)
+			$pluginActionContainer = $('#pactions' + pluginKey)
 
 			@generateActionUi jsonEditorConfiguration.schema, $pluginActionContainer
 			@editors[pluginKey] = new JSONEditor(
@@ -74,11 +74,12 @@ module.exports = class PluginUiGenerator
 		if schema.actions?
 			for own key of schema.actions
 				title = schema.actions[key].title
-				$btn = $('<div class="btn btn-primary">' + title + '</div>')
+				type = schema.actions[key].type or 'primary'
+				$btn =
+					$('<div class="actionbutton btn btn-' + type + '">' + title + '</div>')
 				$btn.click (event) ->
 					schema.actions[key].callback @currentlySelectedNode, event
 				$container.append $btn
-			$container.append $('<br><br>')
 
 
 	selectNode: (modelName) ->

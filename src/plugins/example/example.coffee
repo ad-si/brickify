@@ -13,7 +13,7 @@ module.exports = class Example
 		console.log('Example Plugin returns the UI schema.')
 
 		actioncallback = () ->
-			console.log 'Example Plugin performs Action 1'
+			console.log 'Example Plugin performs an action!'
 
 		return {
 		title: 'Example Plugin'
@@ -39,6 +39,10 @@ module.exports = class Example
 		actions:
 			a1:
 				title: 'Action 1'
+				callback: actioncallback
+			a2:
+				title: 'Action 2'
+				type: 'danger'
 				callback: actioncallback
 		}
 

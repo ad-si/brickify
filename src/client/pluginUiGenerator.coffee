@@ -14,9 +14,10 @@ jsonEditorConfiguration = {
 pluginUiTemplate = '
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="collapseTitle panel-title" data-toggle="collapse" data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
+					<h3 class="collapseTitle panel-title"
+data-toggle="collapse" data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
 				</div>
-				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse in">
+				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse">
 					<div class="panel-body">
 						<div id="pcontainer%PLUGINKEY%"></div>
 					</div>
@@ -56,6 +57,16 @@ module.exports = class PluginUiGenerator
 			@editors[pluginKey].on 'change',() =>
 				@saveUiToCurrentNode()
 
+			# when the panel is collapsed
+			$pluginLayout.on 'hidden.bs.collapse', (event) =>
+				if pluginInstance.uiDisabled?
+					pluginInstance.uiDisabled @currentlySelectedNode
+
+			# when the panel is opened
+			$pluginLayout.on 'shown.bs.collapse', (event) ->
+				if pluginInstance.uiEnabled?
+					pluginInstance.uiEnabled @currentlySelectedNode
+
 	selectNode: (modelName) ->
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left. allows to make plugin values relative to objects
@@ -66,11 +77,13 @@ module.exports = class PluginUiGenerator
 				@currentlySelectedNode = node
 				@saveDefaultValues node
 				@applyNodeValuesToUi()
+				@$pluginsContainer.show()
 
 	deselectNodes: () ->
 		# called when all nodes are deselected
 		#console.log 'all nodes deselected'
 		@currentlySelectedNode = null
+		@$pluginsContainer.hide()
 
 	applyNodeValuesToUi: () =>
 		for own key of @editors

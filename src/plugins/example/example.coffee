@@ -35,6 +35,12 @@ module.exports = class Example
 				enum: ['item 1', 'item 2', 'item 3']
 		}
 
+	uiEnabled: (node) ->
+		console.log 'Enabled Example Ui'
+
+	uiDisabled: (node) ->
+		console.log 'Disabled Example Ui'
+
 	onStateUpdate: (state, done) ->
 		console.log 'Exmaple Client Plugin state change'
 		done()

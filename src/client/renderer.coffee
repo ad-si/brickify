@@ -49,7 +49,8 @@ module.exports = class Renderer
 
 		rv = @camera.position.clone().sub(@controls.target)
 		rv = rv.normalize().multiplyScalar(distanceToObject)
-		rv = rv.multiplyScalar(2)
+		zoomAdjustmentFactor = 2.5
+		rv = rv.multiplyScalar(zoomAdjustmentFactor)
 
 		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
 		multCenter = center.clone().applyMatrix4(@scene.matrix)

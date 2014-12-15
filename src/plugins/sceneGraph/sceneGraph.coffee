@@ -8,6 +8,7 @@
 global.$ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
+objectTree = require '../../common/objectTree'
 
 module.exports = class SceneGraph
 	constructor: () ->
@@ -74,6 +75,23 @@ module.exports = class SceneGraph
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)
 		$treeContainer.bind 'tree.select', @onNodeSelect
+		$(document).keydown (event) =>
+			if event.keyCode == 46 #Delete
+				@deleteObject()
+
+	deleteObject: () ->
+		if not @selectedNode
+			return
+
+		question = "Really delete #{@selectedNode.name}?"
+		if confirm question
+			delNode = (state) =>
+				objectTree.getNodeByFileName @selectedNode.name, state.rootNode,
+					(node) =>
+						objectTree.removeNode state.rootNode, node
+			@bundle.statesync.performStateAction delNode, true
+
+
 
 	initUi: (elements) =>
 		@htmlElements = elements

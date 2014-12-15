@@ -6,8 +6,6 @@ forAllSubnodes = (node, callback, recursive = true) ->
 			if recursive
 				forAllSubnodes child, callback, recursive
 
-
-
 # Executes callback(childPluginData) for all subnodes
 # that have a pluginData entry matching to key
 forAllSubnodeProperties = (node, key, callback, recursive = true) ->
@@ -16,7 +14,6 @@ forAllSubnodeProperties = (node, key, callback, recursive = true) ->
 			callback (child.pluginData[key])
 		if recursive
 			forAllSubnodeProperties child, key, callback, recursive
-
 
 #Adds an dataset which can be accessed with the specified key
 addPluginData = (node, key, data) ->
@@ -34,6 +31,18 @@ getNodeByFileName = (modelName, rootNode, callback) ->
 		return
 
 	forAllSubnodes(rootNode,checkname, callback)
+
+removeNode = (rootNode, nodeToBeDeleted) ->
+	if Array.isArray(rootNode.children)
+		for i in [0..rootNode.children.length] by 1
+			if rootNode.children[i] == nodeToBeDeleted
+				rootNode.children.splice i,1
+				return true
+
+		for c in rootNode.children
+			if removeNode c, nodeToBeDeleted
+				return true
+	return false
 
 #The node structure is the base structure for all nodes
 class NodeStructure
@@ -53,6 +62,7 @@ module.exports = {
 	forAllSubnodeProperties: forAllSubnodeProperties
 	addPluginData: addPluginData
 	getNodeByFileName: getNodeByFileName
+	removeNode: removeNode
 	NodeStructure: NodeStructure
 
 	init: (state) ->

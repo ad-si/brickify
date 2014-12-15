@@ -14,8 +14,9 @@ jsonEditorConfiguration = {
 pluginUiTemplate = '
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="collapseTitle panel-title"
-data-toggle="collapse" data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
+					<h3 class="collapseTitle collapsed panel-title"
+data-toggle="collapse" data-parent="#pluginsContainer"
+data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
 				</div>
 				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse">
 					<div class="panel-body">

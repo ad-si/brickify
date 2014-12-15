@@ -12,6 +12,9 @@ module.exports = class Example
 	getUiSchema: () ->
 		console.log('Example Plugin returns the UI schema.')
 
+		actioncallback = () ->
+			console.log 'Example Plugin performs an action!'
+
 		return {
 		title: 'Example Plugin'
 		type: 'object'
@@ -33,7 +36,21 @@ module.exports = class Example
 			items:
 				type: 'string'
 				enum: ['item 1', 'item 2', 'item 3']
+		actions:
+			a1:
+				title: 'Action 1'
+				callback: actioncallback
+			a2:
+				title: 'Action 2'
+				type: 'danger'
+				callback: actioncallback
 		}
+
+	uiEnabled: (node) ->
+		console.log 'Enabled Example Ui'
+
+	uiDisabled: (node) ->
+		console.log 'Disabled Example Ui'
 
 	onStateUpdate: (state, done) ->
 		console.log 'Exmaple Client Plugin state change'

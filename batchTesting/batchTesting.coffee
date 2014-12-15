@@ -64,7 +64,8 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 	p.then (results) ->
 		for r in results
 			# add our current batch to existing results
-			accumulatedResults.push r
+			if r
+				accumulatedResults.push r
 
 		thisIsLastBatch = true if modelArray.length == 0
 
@@ -115,7 +116,7 @@ testModel = (filename) ->
 
 			if not stlModel
 				logger.warn "Model '#{filename}' was not properly loaded"
-				resolve(testResult)
+				resolve(null)
 				return
 
 			testResult.stlParsingTime = new Date() - begin

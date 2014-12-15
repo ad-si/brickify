@@ -22,6 +22,7 @@ module.exports = class SceneGraph
 
 	renderUi: (elements) =>
 		$treeContainer = $(elements.sceneGraphContainer)
+		$treeContainer.empty()
 		idCounter = 1
 		treeData = [{
 			label: 'Scene',
@@ -40,6 +41,7 @@ module.exports = class SceneGraph
 					writeToObject treeNode.children[index], subNode
 
 		writeToObject(treeData[0], @state.rootNode)
+
 		if $treeContainer.is(':empty')
 			$treeContainer.tree {
 				autoOpen: 0
@@ -50,11 +52,10 @@ module.exports = class SceneGraph
 				onCreateLi: (node, $li) -> $li.attr('title', node.title)
 			}
 
+		$treeContainer.tree 'loadData', treeData
+
 		if @selectedNode
 			$treeContainer.tree 'selectNode', @selected_node
-
-		else
-			$treeContainer.tree 'loadData', treeData
 
 	onStateUpdate: (@state, done) =>
 		if @uiInitialized
@@ -89,6 +90,7 @@ module.exports = class SceneGraph
 				objectTree.getNodeByFileName @selectedNode.name, state.rootNode,
 					(node) =>
 						objectTree.removeNode state.rootNode, node
+						@selectedNode = null
 			@bundle.statesync.performStateAction delNode, true
 
 

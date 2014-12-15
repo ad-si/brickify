@@ -28,14 +28,16 @@ module.exports = class SolidRenderer
 		done()
 
 	removeDeletedObjects: (state) ->
-		nodeUuids = {}
+		nodeUuids = []
 		collectUuid = (node) =>
 			if node.pluginData.solidrenderer?
 				nodeUuids.push node.pluginData.solidRenderer.threeObjectUuid
 		objectTree.forAllSubnodes state.rootNode, collectUuid, false
 		threeUuids = @threejsNode.children.map (threenode) -> threenode.name
 		deleted = threeUuids.filter (uuid) => uuid not in nodeUuids
-		@threejsNode.remove d for d in deleted
+		for d in deleted
+			obj =  @threejsNode.getObjectByName d
+			@threejsNode.remove obj
 
 	loadModelIfNeeded: (node) =>
 		if node.pluginData.solidRenderer?

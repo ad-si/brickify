@@ -48,7 +48,7 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 	if modelArray.length < resultSavingFrequency
 		for m in modelArray
 			testModels.push m
-			modelArray = []
+		modelArray = []
 	else
 		for i in [0..resultSavingFrequency - 1]
 			testModels.push modelArray[i]
@@ -69,7 +69,11 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 		thisIsLastBatch = true if modelArray.length == 0
 
 		# genrate a report
-		logger.info "Generating temporary test report for #{perc}%-batch"
+		if thisIsLastBatch
+			logger.info 'Generating final test report'
+		else
+			logger.info "Generating temporary test report for #{perc}%-batch"
+
 		reportPromise = reportGenerator.generateReport accumulatedResults,
 			outputPath, reportFile, thisIsLastBatch, beginDate
 		reportPromise.then () ->

@@ -19,12 +19,23 @@ module.exports = class SolidRenderer
 	# check if there are any threejs objects that haven't been loaded yet
 	# if so, load the referenced model from the server
 	onStateUpdate: (state, done) =>
+		@removeDeletedObjects state
 		objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
 
 		#TODO: this is wrong, since loadModelIfneeded can modify the state
 		#TODO: asynchronously. therefore done has to be called when all
 		#TODO: loadModelIfNeeded calls are completed. Solve with promises
 		done()
+
+	removeDeletedObjects: (state) ->
+		nodeUuids = {}
+		collectUuid = (node) =>
+			if node.pluginData.solidrenderer?
+				nodeUuids.push node.pluginData.solidRenderer.threeObjectUuid
+		objectTree.forAllSubnodes state.rootNode, collectUuid, false
+		threeUuids = @threejsNode.children.map (threenode) -> threenode.name
+		deleted = threeUuids.filter (uuid) => uuid not in nodeUuids
+		@threejsNode.remove d for d in deleted
 
 	loadModelIfNeeded: (node) =>
 		if node.pluginData.solidRenderer?

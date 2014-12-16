@@ -5,5 +5,5 @@
   "lowfab": {
     "type": "converter"
   },
-  "main": "./voxeliser.coffee"
+  "browser": "./voxeliser.coffee"
 }

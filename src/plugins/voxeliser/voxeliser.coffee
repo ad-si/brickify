@@ -8,15 +8,15 @@
 #
 ###
 
-objectTree = require '../../../common/objectTree'
-modelCache = require '../../modelCache'
-OptimizedModel = require '../../../common/OptimizedModel'
+objectTree = require '../../common/objectTree'
+modelCache = require '../../client/modelCache'
+OptimizedModel = require '../../common/OptimizedModel'
 BrickSystem = require './bricks/BrickSystem'
 BrickLayout = require './bricks/BrickLayout'
 BrickLayouter = require './bricks/BrickLayouter'
 Voxeliser = require './geometry/Voxeliser'
 voxelRenderer = require './rendering/voxelRenderer'
-interactionHelper = require '../../interactionHelper'
+interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 global.$ = require 'jquery'
 
@@ -49,6 +49,8 @@ module.exports = class VoxeliserPlugin
 			@layout()
 			)
 		return
+
+
 
 	onStateUpdate: (state, done) =>
 		@stateInstance = state

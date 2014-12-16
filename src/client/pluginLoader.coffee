@@ -80,8 +80,10 @@ module.exports = class PluginLoader
 		pluginInstances.push @initPlugin(
 			require('../plugins/sceneGraph'),
 			require('../plugins/sceneGraph/package.json')
-			require('./plugins/voxeliser'),
-			require('./plugins/voxeliser/package.json')
+		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/voxeliser'),
+			require('../plugins/voxeliser/package.json')
 		)
 
 		return pluginInstances

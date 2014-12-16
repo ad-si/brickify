@@ -81,7 +81,7 @@ module.exports = class SceneGraph
 				@deleteObject()
 
 	deleteObject: () ->
-		if not @selectedNode
+		if not @selectedNode or @selectedNode.name == 'Scene'
 			return
 
 		question = "Really delete #{@selectedNode.name}?"

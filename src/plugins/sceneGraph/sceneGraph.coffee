@@ -33,6 +33,7 @@ module.exports = class SceneGraph
 		writeToObject = (treeNode, node) ->
 			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
 			treeNode.id = idCounter++
+			objectTree.addPluginData node, 'SceneGraph', {linkedId: treeNode.id}
 
 			if node.children
 				treeNode.children = []
@@ -65,13 +66,17 @@ module.exports = class SceneGraph
 	onNodeSelect: (event) =>
 		if event.node
 			@selectedNode = event.node
-			nodeLabel = event.node.name
-			# console.log "selected node '#{nodeLabel}'"
-			@bundle.pluginUiGenerator.selectNode nodeLabel
+
+			@bundle.statesync.performStateAction (state) =>
+				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
+					@selectedStateNode = stateNode
+					@bundle.pluginUiGenerator.selectNode stateNode
+
 		else
 			# no node = deselected
 			@bundle.pluginUiGenerator.deselectNodes()
 			@selectedNode = null
+			@selectedStateNode = null
 
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)
@@ -80,6 +85,12 @@ module.exports = class SceneGraph
 			if event.keyCode == 46 #Delete
 				@deleteObject()
 
+	getStateNodeForTreeNode: (treeNode, stateRootNode, callback) ->
+		objectTree.forAllSubnodes stateRootNode, (node) ->
+			if node.pluginData['SceneGraph']?
+				if node.pluginData['SceneGraph'].linkedId == treeNode.id
+					callback node
+
 	deleteObject: () ->
 		if not @selectedNode or @selectedNode.name == 'Scene'
 			return
@@ -87,13 +98,11 @@ module.exports = class SceneGraph
 		question = "Really delete #{@selectedNode.name}?"
 		if confirm question
 			delNode = (state) =>
-				objectTree.getNodeByFileName @selectedNode.name, state.rootNode,
-					(node) =>
-						objectTree.removeNode state.rootNode, node
-						@selectedNode = null
+					objectTree.removeNode state.rootNode, @selectedStateNode
+					@selectedNode = null
+					@selectedStateNode = null
+
 			@bundle.statesync.performStateAction delNode, true
-
-
 
 	initUi: (elements) =>
 		@htmlElements = elements

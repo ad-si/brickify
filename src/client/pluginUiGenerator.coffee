@@ -72,7 +72,7 @@ module.exports = class PluginUiGenerator
 				if pluginInstance.uiEnabled?
 					pluginInstance.uiEnabled @currentlySelectedNode
 
-	generateActionUi: (schema, pluginKey, $container) ->
+	generateActionUi: (schema, pluginKey, $container) =>
 		if schema.actions?
 			for own key of schema.actions
 				title = schema.actions[key].title
@@ -81,14 +81,14 @@ module.exports = class PluginUiGenerator
 				@generateButton title,
 					type, id, schema.actions[key].callback, $container
 
-	generateButton: (title, type, id, callback, $container) ->
+	generateButton: (title, type, id, callback, $container) =>
 		# extra method necessary because
 		# else all buttons will bind to last callback
 		$btn =
 			$('<div id="' + id +
 				'" class="actionbutton btn btn-' + type +
 				'">' + title + '</div>')
-		$btn.click (event) ->
+		$btn.click (event) =>
 			callback @currentlySelectedNode, event
 
 		$container.append $btn

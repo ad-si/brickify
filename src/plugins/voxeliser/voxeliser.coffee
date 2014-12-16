@@ -38,11 +38,17 @@ module.exports = class VoxeliserPlugin
 		return
 
 	getUiSchema: () =>
-		voxelCallback = () =>
-			@voxeliseAllModels()
+		voxelCallback = (selectedNode) =>
+			modelCache.request selectedNode.meshHash, (optimizedModel) =>
+				@voxelise optimizedModel, selectedNode
 
-		layoutCallback = () =>
-			@layout()
+		layoutCallback = (selectedNode) =>
+			for data in @voxelisedModels
+				if data.node.meshHash is selectedNode.meshHash
+					if data.layout == null
+						@layout data
+					else
+						console.warn 'Already created a layout for this model'
 
 		return {
 			title: 'Fabrickator'
@@ -110,19 +116,26 @@ module.exports = class VoxeliserPlugin
 		@threejsRootNode.add voxelisedData.gridForThree
 
 	#layouts all voxelised Models
-	layout: () =>
+	layoutAll: () =>
 		if not @voxelisedModels.length > 0
 			console.warn 'trying to layout, but no voxelisedModels available'
 		else
 			for data in @voxelisedModels when data.layout is null
-				legoLayout = new BrickLayout(data.grid)
-				layouter = new BrickLayouter(legoLayout)
-				layouter.layoutAll()
-				legoMesh = legoLayout.get_SceneModel()
-				data.addLayout(legoLayout, legoMesh)
+				@layout data
 
-				@threejsRootNode.remove data.gridForThree
-				@threejsRootNode.add data.layoutForThree
+	layout: (voxelizedModel) ->
+		if voxelizedModel.layout
+			console.warn 'Model is already layouted'
+			return
+
+		legoLayout = new BrickLayout(voxelizedModel.grid)
+		layouter = new BrickLayouter(legoLayout)
+		layouter.layoutAll()
+		legoMesh = legoLayout.get_SceneModel()
+		voxelizedModel.addLayout(legoLayout, legoMesh)
+
+		@threejsRootNode.remove voxelizedModel.gridForThree
+		@threejsRootNode.add voxelizedModel.layoutForThree
 
 # Helper Class that - after voxelising and layouting -
 # contains the voxelised grid, it's ThreeJS representation

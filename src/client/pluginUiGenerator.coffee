@@ -33,6 +33,7 @@ module.exports = class PluginUiGenerator
 		@defaultValues = {}
 		@currentlySelectedNode = null
 		@$pluginsContainer = $('#pluginsContainer')
+		@$pluginsContainer.hide()
 		return
 
 	createPluginUi: (pluginInstance) ->
@@ -87,6 +88,11 @@ module.exports = class PluginUiGenerator
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left. allows to make plugin values relative to objects
 		# console.log "Selecting node #{modelName}"
+
+		if modelName == 'Scene'
+			@$pluginsContainer.hide()
+			@currentlySelectedNode = null
+			return
 
 		@bundle.statesync.getState (state) =>
 			objectTree.getNodeByFileName modelName, state.rootNode, (node) =>

@@ -9,6 +9,7 @@ global.$ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
 objectTree = require '../../common/objectTree'
+pluginKey = 'SceneGraph'
 
 module.exports = class SceneGraph
 	constructor: () ->
@@ -33,7 +34,7 @@ module.exports = class SceneGraph
 		writeToObject = (treeNode, node) ->
 			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
 			treeNode.id = idCounter++
-			objectTree.addPluginData node, 'SceneGraph', {linkedId: treeNode.id}
+			objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
 
 			if node.children
 				treeNode.children = []
@@ -87,8 +88,8 @@ module.exports = class SceneGraph
 
 	getStateNodeForTreeNode: (treeNode, stateRootNode, callback) ->
 		objectTree.forAllSubnodes stateRootNode, (node) ->
-			if node.pluginData['SceneGraph']?
-				if node.pluginData['SceneGraph'].linkedId == treeNode.id
+			if node.pluginData[pluginKey]?
+				if node.pluginData[pluginKey].linkedId == treeNode.id
 					callback node
 
 	deleteObject: () ->

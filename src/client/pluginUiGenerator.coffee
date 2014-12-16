@@ -33,6 +33,7 @@ module.exports = class PluginUiGenerator
 		@defaultValues = {}
 		@currentlySelectedNode = null
 		@$pluginsContainer = $('#pluginsContainer')
+		@$pluginsContainer.hide()
 		return
 
 	createPluginUi: (pluginInstance) ->

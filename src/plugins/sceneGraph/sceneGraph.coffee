@@ -66,6 +66,10 @@ module.exports = class SceneGraph
 
 	onNodeSelect: (event) =>
 		if event.node
+			if event.node.name == 'Scene'
+				@callNodeDeselect()
+				return
+
 			@selectedNode = event.node
 
 			@bundle.statesync.performStateAction (state) =>
@@ -74,10 +78,12 @@ module.exports = class SceneGraph
 					@bundle.pluginUiGenerator.selectNode stateNode
 
 		else
-			# no node = deselected
-			@bundle.pluginUiGenerator.deselectNodes()
-			@selectedNode = null
-			@selectedStateNode = null
+			@callNodeDeselect()
+
+	callNodeDeselect: () ->
+		@bundle.pluginUiGenerator.deselectNodes()
+		@selectedNode = null
+		@selectedStateNode = null
 
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)

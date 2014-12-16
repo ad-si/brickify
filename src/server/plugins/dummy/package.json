@@ -1,9 +1,0 @@
-{
-  "name": "dummy-server-plugin",
-  "version": "0.1.0",
-  "description": "Demo implementation of a server-side plugin.",
-  "lowfab": {
-    "type": "example"
-  },
-  "main": "./dummy.coffee"
-}

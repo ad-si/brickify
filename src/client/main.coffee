@@ -1,8 +1,13 @@
+require('es6-promise').polyfill()
+
 path = require 'path'
 r = require 'react'
 
 globalConfig = require './globals.yaml'
 Bundle = require './bundle'
+
+window.jQuery = require 'jquery'
+bootstrap = require 'bootstrap'
 
 menuItems = [
 	{

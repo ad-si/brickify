@@ -4,13 +4,18 @@ block content
 
 	div#renderArea
 
-	aside#leftSidebar
-		#sceneGraphContainer
-		#propertiesContainer
-
-	aside#rightSidebar
-		#pluginsContainer
-		#toolsContainer
+	#controls.row
+		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
+			.panel.panel-default
+				.panel-heading
+					h3.collapseTitle.panel-title(data-toggle='collapse'
+						data-target='#collapseScenegraph') Scenegraph
+				#collapseScenegraph.panel-collapse.collapse.in
+					.panel-body
+						#sceneGraphContainer
+						#propertiesContainer
+		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
+			div.panel-group(role='tablist' aria-multiselectable='true')#pluginsContainer
 
 
 	div#webGlWarning
@@ -18,8 +23,13 @@ block content
 			= ' '
 			a(href='http://get.webgl.org') get.webgl.org
 
+	div#spinnerContainer
+		.spinner
+			div Loading...
+
 block scripts
 	script(src='/libs/FileSaver/FileSaver.js')
 	script(src='/libs/Blob/Blob.js')
-	//include app script
+	script(src='/node_modules/json-editor/dist/jsoneditor.js')
+	// Include app script
 	script(src='app.js')

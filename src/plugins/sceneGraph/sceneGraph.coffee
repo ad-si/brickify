@@ -14,8 +14,12 @@ module.exports = class SceneGraph
 		@state = null
 		@uiInitialized = false
 		@htmlElements = null
+		@selectedNode = null
 
-	renderUi: (elements) ->
+	init: (@bundle) ->
+		return
+
+	renderUi: (elements) =>
 		$treeContainer = $(elements.sceneGraphContainer)
 		idCounter = 1
 		treeData = [{
@@ -39,11 +43,14 @@ module.exports = class SceneGraph
 			$treeContainer.tree {
 				autoOpen: 0
 				data: treeData
-				dragAndDrop: true
+				dragAndDrop: false
 				keyboardSupport: false
-				useContextMenu: false
+				useContextMenu: true
 				onCreateLi: (node, $li) -> $li.attr('title', node.title)
 			}
+
+		if @selectedNode
+			$treeContainer.tree 'selectNode', @selected_node
 
 		else
 			$treeContainer.tree 'loadData', treeData
@@ -53,8 +60,24 @@ module.exports = class SceneGraph
 			@renderUi @htmlElements
 		done()
 
+	onNodeSelect: (event) =>
+		if event.node
+			@selectedNode = event.node
+			nodeLabel = event.node.name
+			# console.log "selected node '#{nodeLabel}'"
+			@bundle.pluginUiGenerator.selectNode nodeLabel
+		else
+			# no node = deselected
+			@bundle.pluginUiGenerator.deselectNodes()
+			@selectedNode = null
+
+	bindEvents: () ->
+		$treeContainer = $(@htmlElements.sceneGraphContainer)
+		$treeContainer.bind 'tree.select', @onNodeSelect
+
 	initUi: (elements) =>
 		@htmlElements = elements
+		@bindEvents()
 		@uiInitialized = true
 		if @state
 			@renderUi @htmlElements

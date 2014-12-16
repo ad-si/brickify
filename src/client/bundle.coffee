@@ -4,14 +4,17 @@ Ui = require './ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
+PluginUiGenerator = require './pluginUiGenerator'
 
 module.exports = class Bundle
 	constructor: (@globalConfig) ->
 		return
+
 	postInitCallback: (callback) ->
 		@postInitCb = callback
-	init: (createRendererAndUi, syncStateWithServer = true) ->
-		@pluginLoader = new PluginLoader(@globalConfig)
+
+	init: (createRendererAndUi, syncStateWithServer = true) =>
+		@pluginLoader = new PluginLoader(@)
 		pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(pluginHooks, syncStateWithServer)
@@ -24,6 +27,7 @@ module.exports = class Bundle
 				@ui = new Ui(@globalConfig, @renderer,
 							@statesync, @modelLoader, @pluginLoader.pluginHooks)
 				@ui.init()
+				@pluginUiGenerator = new PluginUiGenerator(@)
 				@pluginInstances = @pluginLoader.loadPlugins(@renderer)
 			else
 				@pluginInstances = @pluginLoader.loadPlugins()

@@ -1,5 +1,5 @@
 stlLoader = require './stlLoader'
-OptimizedModel = require '../../../common/OptimizedModel'
+OptimizedModel = require '../../common/OptimizedModel'
 
 module.exports = class StlImport
 	constructor: () ->

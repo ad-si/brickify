@@ -30,6 +30,18 @@ addPluginData = (node, key, data) ->
 	node.pluginData[key] = data
 	return data
 
+# Finds a node with the given file name. For 'Scene', the root node is returned
+getNodeByFileName = (modelName, rootNode, callback) ->
+	checkname = (node) ->
+		if node.fileName == modelName
+			callback node
+
+	if modelName == 'Scene'
+		callback rootNode
+		return
+
+	forAllSubnodes(rootNode,checkname, callback)
+
 #The node structure is the base structure for all nodes
 class NodeStructure
 	constructor: () ->
@@ -48,6 +60,7 @@ module.exports = {
 	forAllSubnodeProperties: forAllSubnodeProperties
 	forAllSubnodesWithProperty: forAllSubnodesWithProperty
 	addPluginData: addPluginData
+	getNodeByFileName: getNodeByFileName
 	NodeStructure: NodeStructure
 
 	init: (state) ->

@@ -1,13 +1,19 @@
 fs = require 'fs'
 path = require 'path'
 winston = require 'winston'
-stlLoader = require '../src/client/plugins/stlImport/stlLoader'
+stlLoader = require '../src/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
 mkdirp = require 'mkdirp'
+require('es6-promise').polyfill()
 
 modelPath = path.join 'batchTesting', 'models'
 outputPath = path.join 'batchTesting', 'results'
 reportFile = 'batchTestResults'
+
+# save temporary batch test report all X models
+resultSavingFrequency = 15
+
+beginDate = new Date()
 
 logger = new (winston.Logger)({
 	transports: [
@@ -28,21 +34,55 @@ module.exports.startTesting = () ->
 	models = parseModelFiles()
 	logger.info "Testing #{models.length} models"
 	results = []
-	for i in [0..models.length - 1] by 1
-		model = models[i]
+	modelCounter = 0
 
-		perc = (i + 1) / models.length * 100
-		perc = perc.toFixed(1)
+	testNextBatch models.length, models,results
 
-		logger.info "#{perc}% Testing model '#{model}'"
-		result = testModel model
-		result.fileName = model
-		results.push result
+testNextBatch = (numModels, modelArray, accumulatedResults) ->
+	perc = (1.0 - (modelArray.length / numModels)) * 100
+	perc = perc.toFixed 1
+	logger.info "#{perc}%, testing next batch..."
 
-	if results.length == 0
-		logger.warn 'No models where processed, test report can\'t be created'
+	# get the next array of #resultSavingFrequency models
+	testModels = []
+	if modelArray.length < resultSavingFrequency
+		for m in modelArray
+			testModels.push m
+		modelArray = []
 	else
-		reportGenerator.generateReport results, outputPath, reportFile
+		for i in [0..resultSavingFrequency - 1]
+			testModels.push modelArray[i]
+		modelArray.splice(0,resultSavingFrequency)
+
+	# test All
+	testpromises = []
+	for m in testModels
+		testpromises.push testModel m
+
+	# wait for all tests to complete
+	p = Promise.all(testpromises)
+	p.then (results) ->
+		for r in results
+			# add our current batch to existing results
+			if r
+				accumulatedResults.push r
+
+		thisIsLastBatch = true if modelArray.length == 0
+
+		# genrate a report
+		if thisIsLastBatch
+			logger.info 'Generating final test report'
+		else
+			logger.info "Generating temporary test report for #{perc}%-batch"
+
+		reportPromise = reportGenerator.generateReport accumulatedResults,
+			outputPath, reportFile, thisIsLastBatch, beginDate
+		reportPromise.then () ->
+			# after report generation: if there are models left, test the next
+			# batch
+			if not thisIsLastBatch
+				testNextBatch numModels, modelArray, accumulatedResults
+
 
 # parses all models in the modelPath directory
 parseModelFiles = () ->
@@ -61,44 +101,56 @@ parseModelFiles = () ->
 
 # performs various tests on a single model
 testModel = (filename) ->
-	testResult = new ModelTestResult()
-	filepath = path.join(modelPath, filename)
-	fileContent = fs.readFileSync filepath, {encoding: 'utf8'}
+	return new Promise (resolve, reject) ->
+		testResult = new ModelTestResult()
+		testResult.fileName = filename
+		filepath = path.join(modelPath, filename)
 
-	begin = new Date()
-	stlModel = stlLoader.parse fileContent,null,false,false
-	testResult.stlParsingTime = new Date() - begin
-	testResult.numStlParsingErrors = stlModel.importErrors.length
-	logger.debug "model parsed in
-	#{testResult.stlParsingTime}ms with
-	#{testResult.numStlParsingErrors} Errors"
+		fs.readFile filepath, {encoding: 'utf8'}, (error, fileContent) ->
+			if error
+				reject(error)
+				return
 
-	begin = new Date()
-	cleanseResult = stlModel.cleanse true
-	testResult.stlCleansingTime = new Date() - begin
-	testResult.stlDeletedPolygons = cleanseResult.deletedPolygons
-	testResult.stlRecalculatedNormals = cleanseResult.recalculatedNormals
-	logger.debug "model cleansed in
-	#{testResult.stlCleansingTime}ms,
-	#{cleanseResult.deletedPolygons} deleted Polygons and
-	#{cleanseResult.recalculatedNormals} fixedNormals"
+			begin = new Date()
+			stlModel = stlLoader.parse fileContent,null,false,false
 
-	begin = new Date()
-	optimizedModel = stlLoader.optimizeModel stlModel
-	testResult.optimizationTime  = new Date() - begin
-	testResult.numPolygons = optimizedModel.indices.length / 3
-	testResult.numPoints = optimizedModel.positions.length / 3
-	logger.debug "model optimized in #{testResult.optimizationTime}ms"
+			if not stlModel
+				logger.warn "Model '#{filename}' was not properly loaded"
+				resolve(null)
+				return
 
-	begin = new Date()
-	if optimizedModel.isTwoManifold()
-		testResult.isTwoManifold = 1
-	else
-		testResult.isTwoManifold = 0
-	testResult.twoManifoldCheckTime = new Date() - begin
-	logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
+			testResult.stlParsingTime = new Date() - begin
+			testResult.numStlParsingErrors = stlModel.importErrors.length
+			logger.debug "model parsed in
+			#{testResult.stlParsingTime}ms with
+			#{testResult.numStlParsingErrors} Errors"
 
-	return testResult
+			begin = new Date()
+			cleanseResult = stlModel.cleanse true
+			testResult.stlCleansingTime = new Date() - begin
+			testResult.stlDeletedPolygons = cleanseResult.deletedPolygons
+			testResult.stlRecalculatedNormals = cleanseResult.recalculatedNormals
+			logger.debug "model cleansed in
+			#{testResult.stlCleansingTime}ms,
+			#{cleanseResult.deletedPolygons} deleted Polygons and
+			#{cleanseResult.recalculatedNormals} fixedNormals"
+
+			begin = new Date()
+			optimizedModel = stlLoader.optimizeModel stlModel
+			testResult.optimizationTime  = new Date() - begin
+			testResult.numPolygons = optimizedModel.indices.length / 3
+			testResult.numPoints = optimizedModel.positions.length / 3
+			logger.debug "model optimized in #{testResult.optimizationTime}ms"
+
+			begin = new Date()
+			if optimizedModel.isTwoManifold()
+				testResult.isTwoManifold = 1
+			else
+				testResult.isTwoManifold = 0
+			testResult.twoManifoldCheckTime = new Date() - begin
+			logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
+
+			resolve(testResult)
 
 # This class holds all test results for one model and is
 # saved (with other results) to the testResultFile

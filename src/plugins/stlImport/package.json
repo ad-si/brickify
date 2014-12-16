@@ -5,5 +5,5 @@
   "lowfab": {
     "type": "import"
   },
-  "main": "./stlImport.coffee"
+  "browser": "./stlImport.coffee"
 }

@@ -1,35 +1,11 @@
+require('es6-promise').polyfill()
+
 http = require 'http'
 path = require 'path'
 url = require 'url'
 fs = require 'fs'
-
 winston = require 'winston'
 express = require 'express'
-
-webapp = express()
-developmentMode = webapp.get('env') is 'development'
-testMode = webapp.get('env') is 'test'
-
-loggingLevel = if developmentMode then 'debug' else 'warn'
-loggingLevel = 'error' if testMode
-
-# Make logger available to other modules
-winston.loggers.add 'log',
-	console:
-		level: loggingLevel
-		colorize: true
-
-log = winston.loggers.get('log')
-
-# Support mixing .coffee and .js files in lowfab-project
-coffeeify = require 'coffeeify'
-# Load yaml configuration into javascript file
-browserifyData = require 'browserify-data'
-envify = require 'envify'
-browserify = require 'browserify-middleware'
-browserify.settings({
-	transform: [coffeeify, browserifyData, envify]
-})
 bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
@@ -40,6 +16,25 @@ compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
 bower = require 'bower'
+exec = require 'exec'
+http = require 'http'
+# Support mixing .coffee and .js files in lowfab-project
+coffeeify = require 'coffeeify'
+# Load yaml configuration into javascript file
+browserifyData = require 'browserify-data'
+envify = require 'envify'
+browserify = require 'browserify-middleware'
+
+
+# Make logger available to other modules.
+# Must be instantiated before requiring bundled modules
+winston.loggers.add 'log',
+	console:
+		level: loggingLevel
+		colorize: true
+log = winston.loggers.get('log')
+
+
 pluginLoader = require './pluginLoader'
 app = require '../../routes/app'
 landingPage = require '../../routes/landingpage'
@@ -47,8 +42,27 @@ statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
-exec = require 'exec'
-http = require 'http'
+
+
+webapp = express()
+
+# Express assumes that no env means develop.
+# Therefore override it to make it clear for all
+developmentMode = webapp.get('env') is 'development'
+if developmentMode
+	process.env.NODE_ENV = 'development'
+	log.info 'development mode activated'
+else
+	log.info 'production mode activated'
+
+testMode = webapp.get('env') is 'test'
+
+loggingLevel = if developmentMode then 'debug' else 'warn'
+loggingLevel = 'error' if testMode
+
+browserify.settings({
+	transform: [coffeeify, browserifyData, envify]
+})
 
 server = http.createServer(webapp)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
@@ -60,7 +74,6 @@ sortedDependencies = [
 	'FileSaver',
 	'Blob'
 ]
-
 
 module.exports.loadFrontendDependencies = (callback) ->
 	allDependencies = []
@@ -114,6 +127,7 @@ module.exports.setupRouting = () ->
 			stylus string
 			.set 'filename', path
 			.set 'compress', !developmentMode
+			.set 'include css', true
 			.use nib()
 			.import 'nib'
 	)
@@ -192,8 +206,7 @@ module.exports.setupRouting = () ->
 			if error
 				log.warn "Error while updating server: #{error}"
 
-	pluginLoader.loadPlugins statesync,
-		path.join __dirname, 'plugins/'
+	pluginLoader.loadPlugins statesync, path.resolve(__dirname, '../plugins')
 
 	if developmentMode
 		webapp.use errorHandler()
@@ -204,11 +217,9 @@ module.exports.setupRouting = () ->
 		.render '404', links
 	return module.exports
 
-
 module.exports.startServer = (_port, _ip) ->
 	port = _port || port
 	ip = _ip || ip
-
 
 	server.on 'error', (error) ->
 		if error.code is 'EADDRINUSE'

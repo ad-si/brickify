@@ -1,6 +1,9 @@
 # unit - all units are in mm (do not change...)
 mm: 1
 
+# scene
+clearColor: 0xf6f6f6
+
 # camera adjustments
 fov: 40
 cameraNearPlane: 0.1

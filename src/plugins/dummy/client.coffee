@@ -1,19 +1,18 @@
 ###
-  #Dummy Plugin#
+# Dummy Plugin
 ###
 
 ###
 # A demo plugin implementation for client-side
 #
 # We encourage plugin developers to split their plugins in several modules.
-# In the end, the coffescript file named like the plugins folder (as in
-# `/dummy/` and `/dummy/dummy.coffee`) will be loaded by the lowfab framework.
+# The main file referenced in the module's `package.json`
+# will be loaded by the lowfab framework.
 #
-# This file must provide **hook-properties** and **hook-methods** that specify
-# the interaction between the lowfab framework and the plugin.
-#
-# Those **hooks** have to be defined in `module.exports`, e.g.
-# `module.exports.pluginName` or `module.exports.on3dUpdate()`.
+# This file must return a class which provides **hook-properties** and
+# **hook-methods** that specify the interaction between the lowfab framework
+# and the plugin.
+# E.g. `dummyPlugin.pluginName` or `dummyPlugin.on3dUpdate()`.#
 #
 # @module dummyClientPlugin
 ###
@@ -30,7 +29,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
-	init: (globalConfig) ->
+	init: (bundle) ->
 		console.log 'Dummy Client Plugin initialization'
 
 	###
@@ -49,7 +48,7 @@ module.exports = class DummyPlugin
 
 	###
 	# Provides the plugins the possibility to add elements to the UI.
-	# Receives a DOM element to insert itself into.
+	# Receives several DOM elements to insert itself into.
 	#
 	# @param {Object} domElements an object of DOM elements to insert itself into
 	# @memberOf dummyClientPlugin
@@ -59,11 +58,41 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin initializes UI'
 
 	###
+	# Returns a json-schema which describes the json
+	# the ui-elements of the plugin are supposed to create.
+	# [json-editor](https://github.com/jdorn/json-editor) then creates the
+	# html elements accordingly.
+	###
+	getUiSchema: () =>
+		console.log('Dummy Client Plugin returns the UI schema.')
+
+		console.log('Example Plugin returns the UI schema.')
+
+		actioncallback = () ->
+			console.log 'Dummy Plugin performs an action!'
+
+		return {
+		title: 'Dummy Plugin'
+		type: 'object'
+		properties:
+			size:
+				description: 'Size of the elements'
+				type: 'number'
+		actions:
+			a1:
+				title: 'Derp'
+				callback: actioncallback
+		}
+
+	###
 	# The state synchronization module will call each plugin's
 	# `onStateUpdate` method (if provided) whenever the current state changes
 	# due to user input or calculation results on either server or client side.
 	#
-	# The hook provides the new complete state as an arguments.
+	# The hook provides the new complete state as an argument.
+	#
+	# `state.toolsValues` contains the values of the associated ui-elements
+	# in the tools-container.
 	#
 	# @param {Object} state the complete current state
 	# @param {Callback} done callback to be called when finished state modification
@@ -74,9 +103,8 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin state change'
 		done()
 
-
 	###
-	# On each render frame the renderer will call the `update3D`
+	# On each render frame the renderer will call the `on3dUpdate`
 	# method of all plugins that provide it.
 	#
 	# @memberOf dummyClientPlugin
@@ -89,8 +117,8 @@ module.exports = class DummyPlugin
 
 	###
 	# When a file is loaded into lowfab, the `fileLoader` will try to import
-  # it with every plugin that implements importFile until one succeeds.
-  # The file's name and its content are provided as arguments.
+	# it with every plugin that implements importFile until one succeeds.
+	# The file's name and its content are provided as arguments.
 	#
 	# @param {String} fileName the name of the file to import
 	# @param {String} fileContent the content of the file to import

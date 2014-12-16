@@ -1,5 +1,5 @@
 expect = (chai && chai.expect) || require('chai').expect
-stlImport = require '../../src/client/plugins/stlImport/stlImport'
+stlImport = require '../../src/plugins/stlImport'
 
 # Helper method to read files from the local file system
 readFile = (filename, callBack) ->

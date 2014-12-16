@@ -35,22 +35,26 @@ module.exports = class VoxeliserPlugin
 	init3d: (@threejsRootNode, @renderer) => return
 
 	initUi: (domElements) =>
-		domElements.toolsContainer.innerHTML =
-			'<button id="voxeliseButton" type="button"
-			class="btn btn-default">Voxelise</button>
-			<button id="layoutButton" type="button"
-			class="btn btn-default">Layout</button>'
-		$('#voxeliseButton').click((event) =>
-			event.stopPropagation()
-			@voxeliseAllModels()
-			)
-		$('#layoutButton').click((event) =>
-			event.stopPropagation()
-			@layout()
-			)
 		return
 
+	getUiSchema: () =>
+		voxelCallback = () =>
+			@voxeliseAllModels()
 
+		layoutCallback = () =>
+			@layout()
+
+		return {
+			title: 'Fabrickator'
+			type: 'object'
+			actions:
+				a1:
+					title: 'Voxelize'
+					callback: voxelCallback
+				a2:
+					title: 'Layout'
+					callback: layoutCallback
+		}
 
 	onStateUpdate: (state, done) =>
 		@stateInstance = state

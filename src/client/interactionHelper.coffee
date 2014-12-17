@@ -1,5 +1,4 @@
 THREE = require 'three'
-canvas = null
 
 module.exports.getPolygonClickedOn = (event, objects, renderer) ->
 	camera = renderer.getCamera()
@@ -12,16 +11,6 @@ module.exports.getPolygonClickedOn = (event, objects, renderer) ->
 	vector.unproject camera
 	raycaster.ray.set(camera.position, vector.sub(camera.position).normalize())
 	raycaster.intersectObjects objects, true
-
-getCastingVector = (x, y) ->
-	viewVector = getViewingVector x, y
-	viewVector.unproject(renderer.getCamera())
-	viewVector.normalize()
-
-getViewingVector = (x, y) ->
-	x = (x / canvas.clientWidth) * 2 - 1
-	y = -(y / canvas.clientHeight) * 2 + 1
-	new THREE.Vector3(x, y, 0.5)
 
 getRelativeCursorPosition = (event) ->
 	###

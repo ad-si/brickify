@@ -2,8 +2,6 @@
 # @module ui
 ###
 
-interactionManager = require './interactionHelper'
-
 module.exports = class Ui
 	constructor: (globalConfigInstance, rendererInstance,
 					statesyncInstance, @modelLoader, @pluginHooks) ->

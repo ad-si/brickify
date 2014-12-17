@@ -63,6 +63,8 @@ module.exports = class SceneGraph
 		if @selectedNode
 			$treeContainer.tree 'selectNode', @selected_node
 
+		@tree = $treeContainer
+
 	onStateUpdate: (@state, done) =>
 		if @uiInitialized
 			@renderUi @htmlElements
@@ -84,8 +86,12 @@ module.exports = class SceneGraph
 		else
 			@callNodeDeselect()
 
-	callNodeDeselect: () ->
+	callNodeDeselect: () =>
 		@bundle.pluginUiGenerator.deselectNodes()
+
+		if @tree.tree 'getSelectedNode'
+			@tree.tree 'selectNode', null
+
 		@selectedNode = null
 		@selectedStateNode = null
 

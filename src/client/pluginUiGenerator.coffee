@@ -112,22 +112,22 @@ module.exports = class PluginUiGenerator
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left. allows to make plugin values relative to objects
 		# console.log "Selecting node #{modelName}"
-
-		if @currentlySelectedNode
-			@currentlySelectedNode.pluginData.uiGen = {}
-			if @currentlyEnabledPlugin?
-				@currentlySelectedNode.pluginData.uiGen.selectedPluginName =
-					@currentlyEnabledPlugin.name
-			else
-				@currentlySelectedNode.pluginData.uiGen.selectedPluginName =
-					''
+		oldNode = @currentlySelectedNode
 
 		if modelName == 'Scene'
 			@$pluginsContainer.hide()
 			@currentlySelectedNode = null
 			return
 
-		@bundle.statesync.getState (state) =>
+		@bundle.statesync.performStateAction (state) =>
+			if oldNode
+				oldNode.pluginData.uiGen = {}
+				if @currentlyEnabledPlugin?
+					oldNode.pluginData.uiGen.selectedPluginName =
+						@currentlyEnabledPlugin.name
+				else
+					oldNode.pluginData.uiGen.selectedPluginName = ''
+
 			objectTree.getNodeByFileName modelName, state.rootNode, (node) =>
 				@currentlySelectedNode = node
 				@saveDefaultValues node

@@ -113,6 +113,7 @@ module.exports = class SceneGraph
 						objectTree.removeNode state.rootNode, @selectedStateNode
 						@selectedNode = null
 						@selectedStateNode = null
+						@callNodeDeselect()
 
 				@bundle.statesync.performStateAction delNode, true
 

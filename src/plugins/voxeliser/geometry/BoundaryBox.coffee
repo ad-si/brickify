@@ -1,7 +1,7 @@
 Object3D = require './Object3D'
 
 # require CSG lib !!
-CSG = require './csg'
+CSG = require '../csg'
 
 class BoundaryBox
 	constructor: (@minPoint, @maxPoint) ->

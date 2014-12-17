@@ -13,7 +13,8 @@ setupAxis = require './axis'
 
 module.exports = class CoordinateSystem
 	# Store the global configuration for later use by init3d
-	init: (@globalConfig) ->
+	init: (bundle) ->
+		@globalConfig = bundle.globalConfig
 		return
 
 	# Generate the grid and the axis on 3d scene initialization

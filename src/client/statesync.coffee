@@ -5,6 +5,7 @@
 
 $ = require 'jquery'
 jsondiffpatch = require 'jsondiffpatch'
+clone = require 'clone'
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
@@ -16,9 +17,12 @@ module.exports = class Statesync
 		@globalConfig = null
 		@initialStateIsLoaded = false
 		@initialStateLoadedCallbacks = []
+		@stateIsLocked = false
+		@stateActionWaitingCallbacks = []
 
 	init: (globalConfig, stateInitializedCallback) ->
 		@globalConfig = globalConfig
+		@$spinnerContainer = $('#spinnerContainer')
 
 		if not @syncWithServer
 			@state = {}
@@ -28,7 +32,7 @@ module.exports = class Statesync
 
 		Promise.resolve($.get '/statesync/get').then((data) =>
 			@state = data
-			@oldState = JSON.parse JSON.stringify @state
+			@oldState = clone(@state)
 
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 
@@ -39,6 +43,7 @@ module.exports = class Statesync
 
 	performInitialStateLoadedAction: () ->
 		@initialStateIsLoaded = true
+		@unlockState()
 		@initialStateLoadedCallbacks.forEach (callback) ->
 			callback(state)
 		@handleUpdatedState @state
@@ -52,7 +57,13 @@ module.exports = class Statesync
 	# executes callback(state) and then synchronizes the state with the server.
 	# if updatedStateEvent is set to true, the updateState hook of all client
 	# plugins will be called before synchronization with the server
-	performStateAction: (callback, updatedStateEvent = false) ->
+	performStateAction: (callback, updatedStateEvent = false) =>
+		# add callbacks to a waiting list if state is currently
+		# being synced to the server
+		if @stateIsLocked
+			@stateActionWaitingCallbacks.push callback
+			return
+
 		callback(@state)
 
 		# let every plugin do something with the updated state
@@ -77,7 +88,7 @@ module.exports = class Statesync
 		@pluginHooks.onStateUpdate curstate, done
 
 
-	sync: (force = false) ->
+	sync: (force = false) =>
 		delta = diffpatch.diff @oldState, @state
 
 		if not force
@@ -87,12 +98,15 @@ module.exports = class Statesync
 		# if we shall not sync with the server, run the loop internally as long as
 		# plugins change the state
 		if not @syncWithServer
-			@oldState = JSON.parse JSON.stringify @state
+			@oldState = clone(@state)
 			@handleUpdatedState @state
 			return
 
+		# lock state until a response from the server arrives
+		@lockState()
+
 		# deep copy
-		@oldState = JSON.parse JSON.stringify @state
+		@oldState = clone(@state)
 
 		console.log "Sending delta to server: #{JSON.stringify(delta)}"
 		Promise.resolve($.ajax '/statesync/set',
@@ -102,22 +116,53 @@ module.exports = class Statesync
 			dataType: 'json'
 		# what is sent in the post request as a header
 			contentType: 'application/json; charset=utf-8'
-		).then((data) ->
-			delta = data
-			console.log "Got delta from server: #{JSON.stringify(delta)}"
+		# check whether client modified its local state
+		# since the post request was sent
+		).then((data) =>
+				delta = data
 
-			clientDelta = diffpatch.diff @oldState, @state
-			# check whether client modified its local state
-			# since the post request was sent
-			if clientDelta?
-				console.log 'The client modified its state
-						while the server worked, this should not happen!'
+				if delta.emptyDiff == true
+					delta = null
 
-			#patch state with server changes
-			diffpatch.patch @state, delta
+				if delta
+					# handle modified state from server
+					console.log "Got delta from server: #{JSON.stringify(delta)}"
 
-			#deep copy current state
-			@oldState = JSON.parse JSON.stringify @state
+					clientDelta = diffpatch.diff @oldState, @state
 
-			@handleUpdatedState @state
+					if clientDelta?
+						throw new Error('The client modified its state
+							while the server worked, this should not happen!')
+
+					#patch state with server changes
+					diffpatch.patch @state, delta
+
+					#deep copy current state
+					@oldState = clone(@state)
+
+					@unlockState()
+
+					#run all waiting callbacks
+					for cb in @stateActionWaitingCallbacks
+						cb @state
+					@stateActionWaitingCallbacks = []
+
+					@handleUpdatedState @state
+				else
+					# state was not modified, but there may be waiting callbacks
+					@unlockState()
+
+					if @stateActionWaitingCallbacks.length > 0
+						for cb in @stateActionWaitingCallbacks
+							cb @state
+						@stateActionWaitingCallbacks = []
+						@handleUpdatedState @state
 		)
+
+	lockState: () ->
+		@stateIsLocked = true
+		@$spinnerContainer.show()
+
+	unlockState: () ->
+		@stateIsLocked = false
+		@$spinnerContainer.fadeOut()

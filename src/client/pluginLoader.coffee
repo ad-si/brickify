@@ -5,19 +5,8 @@
 # Load the hook list and initialize the pluginHook management
 path = require 'path'
 THREE = require 'three'
-$ = require 'jquery'
 hooks = require './pluginHooks.yaml'
 PluginHooks = require '../common/pluginHooks'
-
-jsonEditorConfiguration = {
-	theme: 'bootstrap3'
-	disable_array_add: true
-	disable_array_delete: true
-	disable_array_reorder: true
-	disable_collapse: true
-	disable_edit_json: true
-	disable_properties: true
-}
 
 module.exports = class PluginLoader
 	constructor: (@bundle) ->
@@ -32,7 +21,7 @@ module.exports = class PluginLoader
 			instance[key] = value
 
 		if @pluginHooks.hasHook(instance, 'init')
-			instance.init @globalConfig
+			instance.init @bundle
 
 		if @renderer?
 			if @pluginHooks.hasHook(instance, 'init3d')
@@ -49,21 +38,8 @@ module.exports = class PluginLoader
 			}
 
 		if @pluginHooks.hasHook(instance, 'getUiSchema')
-			jsonEditorConfiguration.schema = instance.getUiSchema()
-			if jsonEditorConfiguration.schema
-				$pluginsContainer = $('#pluginsContainer')
-				if $pluginsContainer.length > 0
-					$pluginContainer = $("<div id='#{instance.name}'></div>")
-					$pluginsContainer.append($pluginContainer)
-					editor = new JSONEditor(
-						$pluginContainer[0]
-						jsonEditorConfiguration
-					)
-
-					editor.on 'change',() =>
-						action = (state) ->
-							state.toolsValues = editor.getValue()
-						@bundle.statesync.performStateAction action, true
+			if @bundle.pluginUiGenerator?
+				@bundle.pluginUiGenerator.createPluginUi instance
 
 		@pluginHooks.register instance
 
@@ -78,32 +54,32 @@ module.exports = class PluginLoader
 		pluginInstances = []
 
 		pluginInstances.push @initPlugin(
-			require('./plugins/dummy'),
-			require('./plugins/dummy/package.json')
+			require('../plugins/dummy'),
+			require('../plugins/dummy/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('./plugins/example'),
-			require('./plugins/example/package.json')
+			require('../plugins/example'),
+			require('../plugins/example/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('./plugins/coordinateSystem'),
-			require('./plugins/coordinateSystem/package.json')
+			require('../plugins/coordinateSystem'),
+			require('../plugins/coordinateSystem/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('./plugins/solidRenderer'),
-			require('./plugins/solidRenderer/package.json')
+			require('../plugins/solidRenderer'),
+			require('../plugins/solidRenderer/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('./plugins/stlImport'),
-			require('./plugins/stlImport/package.json')
+			require('../plugins/stlImport'),
+			require('../plugins/stlImport/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('./plugins/stlExport'),
-			require('./plugins/stlExport/package.json')
+			require('../plugins/stlExport'),
+			require('../plugins/stlExport/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('./plugins/sceneGraph'),
-			require('./plugins/sceneGraph/package.json')
+			require('../plugins/sceneGraph'),
+			require('../plugins/sceneGraph/package.json')
 		)
 
 		return pluginInstances

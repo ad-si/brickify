@@ -15,20 +15,17 @@ block content
 						#sceneGraphContainer
 						#propertiesContainer
 		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
-			.panel.panel-default
-				.panel-heading
-					h3.collapseTitle.panel-title(data-toggle='collapse'
-						data-target='#collapsePlugins') Plugins
-				#collapsePlugins.panel-collapse.collapse.in
-					.panel-body
-						#pluginsContainer
-						#toolsContainer
+			div.panel-group(role='tablist' aria-multiselectable='true')#pluginsContainer
 
 
 	div#webGlWarning
 		p You should not see this text! Do you use a webGL ready browser?
 			= ' '
 			a(href='http://get.webgl.org') get.webgl.org
+
+	div#spinnerContainer
+		.spinner
+			div Loading...
 
 block scripts
 	script(src='/libs/FileSaver/FileSaver.js')

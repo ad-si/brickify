@@ -1,6 +1,6 @@
 module.exports = class Example
 
-	init: (globalConfig) ->
+	init: (bundle) ->
 		console.log 'Example Plugin initialization'
 
 	init3d: (threejsNode) ->
@@ -11,6 +11,9 @@ module.exports = class Example
 
 	getUiSchema: () ->
 		console.log('Example Plugin returns the UI schema.')
+
+		actioncallback = () ->
+			console.log 'Example Plugin performs an action!'
 
 		return {
 		title: 'Example Plugin'
@@ -33,16 +36,29 @@ module.exports = class Example
 			items:
 				type: 'string'
 				enum: ['item 1', 'item 2', 'item 3']
+		actions:
+			a1:
+				title: 'Action 1'
+				callback: actioncallback
+			a2:
+				title: 'Action 2'
+				type: 'danger'
+				callback: actioncallback
 		}
 
+	uiEnabled: (node) ->
+		console.log 'Enabled Example Ui'
+
+	uiDisabled: (node) ->
+		console.log 'Disabled Example Ui'
+
 	onStateUpdate: (state, done) ->
-		console.log 'Dummy Client Plugin state change'
-		console.log state.toolsValues
+		console.log 'Exmaple Client Plugin state change'
 		done()
 
 	on3dUpdate: (timestamp) ->
 		return undefined
 
 	importFile: (fileName, fileContent) ->
-		console.log 'Dummy Client Plugin imports a file'
+		console.log 'Example Client Plugin imports a file'
 		return undefined

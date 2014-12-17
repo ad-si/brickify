@@ -1,10 +1,10 @@
 ###
-	#Voxeliser Plugin#
+	#FaBrickatorPlugin Plugin#
 ###
 
 ###
 #
-# a voxelising plugin imported from the faBrickator projekt
+# a plugin using imported code from the faBrickator projekt
 #
 ###
 
@@ -22,7 +22,7 @@ global.$ = require 'jquery'
 
 pluginPropertyName = 'voxeliser'
 
-module.exports = class VoxeliserPlugin
+module.exports = class FaBrickatorPlugin
 	constructor: () ->
 		@threejsRootNode = null
 		@stateInstance = null

@@ -82,8 +82,8 @@ module.exports = class PluginLoader
 			require('../plugins/sceneGraph/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('../plugins/voxeliser'),
-			require('../plugins/voxeliser/package.json')
+			require('../plugins/faBrickator'),
+			require('../plugins/faBrickator/package.json')
 		)
 
 		return pluginInstances

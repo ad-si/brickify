@@ -66,7 +66,7 @@ module.exports = class PluginUiGenerator
 
 			# when the panel is collapsed
 			$pluginLayout.on 'hidden.bs.collapse', (event) =>
-				# @currentlyEnabledPlugin = null
+				@currentlyEnabledPlugin = null
 
 				if pluginInstance.uiDisabled?
 					pluginInstance.uiDisabled @currentlySelectedNode
@@ -102,17 +102,11 @@ module.exports = class PluginUiGenerator
 		for l in @pluginLayouts
 			if l.pluginInstance.name == pluginName
 				l.collapse.collapse 'show'
-				if @currentlySelectedNode
-					if l.pluginInstance.uiEnabled?
-						l.pluginInstance.uiEnabled @currentlySelectedNode
 			else
 					if l.collapse.hasClass 'in'
 						pluginsToHide.push l
-
 		for l in pluginsToHide
 			l.collapse.collapse 'hide'
-			if l.pluginInstance.uiDisabled?
-				l.pluginInstance.uiDisabled @currentlySelectedNode
 
 	selectNode: (modelName) ->
 		# is called by the scenegraph plugin when the user selects a model on the

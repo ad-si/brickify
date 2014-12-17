@@ -92,11 +92,12 @@ module.exports = class Renderer
 			alpha: true
 			antialias: true
 			preserveDrawingBuffer: true
+			canvas: document.getElementById 'canvas'
 		)
 
 		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.setClearColor globalConfig.clearColor, 1
-		@threeRenderer.domElement.setAttribute 'id', 'canvas'
+
 		document
 		.getElementById(globalConfig.renderAreaId)
 		.appendChild @threeRenderer.domElement

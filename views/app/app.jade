@@ -3,6 +3,7 @@ extends ../layout
 block content
 
 	#renderArea
+		canvas#canvas
 
 	#controls.row
 		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
@@ -26,7 +27,9 @@ block content
 		.spinner
 			div Loading...
 
+
 block scripts
+	script(src='/libs/webglCheck.js')
 	script(src='/libs/FileSaver/FileSaver.js')
 	script(src='/libs/Blob/Blob.js')
 	script(src='/node_modules/json-editor/dist/jsoneditor.js')

@@ -107,13 +107,14 @@ module.exports = class SceneGraph
 			return
 
 		question = "Really delete #{@selectedNode.name}?"
-		if confirm question
-			delNode = (state) =>
-					objectTree.removeNode state.rootNode, @selectedStateNode
-					@selectedNode = null
-					@selectedStateNode = null
+		bootbox.confirm question, (result) =>
+			if result
+				delNode = (state) =>
+						objectTree.removeNode state.rootNode, @selectedStateNode
+						@selectedNode = null
+						@selectedStateNode = null
 
-			@bundle.statesync.performStateAction delNode, true
+				@bundle.statesync.performStateAction delNode, true
 
 	initUi: (elements) =>
 		@htmlElements = elements

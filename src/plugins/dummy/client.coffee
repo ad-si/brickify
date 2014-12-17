@@ -25,7 +25,7 @@ module.exports = class DummyPlugin
 	# It is the first method to be called and provides access to the global
 	# configuration.
 	#
-	# @param {Object} globalConfig A key=>value-mapping of the global configuration
+	# @param {Bundle} bundle the bundle this plugin is loaded for
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###

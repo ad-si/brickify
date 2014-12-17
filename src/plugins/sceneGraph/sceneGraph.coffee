@@ -32,9 +32,13 @@ module.exports = class SceneGraph
 		}]
 
 		writeToObject = (treeNode, node) ->
+			if node.pluginData[pluginKey]?
+				treeNode.id = node.pluginData[pluginKey].linkedId
+			else
+				treeNode.id = idCounter++
+				objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
+
 			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
-			treeNode.id = idCounter++
-			objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
 
 			if node.children
 				treeNode.children = []

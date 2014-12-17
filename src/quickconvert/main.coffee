@@ -15,16 +15,16 @@ config3 = JSON.parse configString
 
 # instanciate 3 lowfab bundles
 config1.renderAreaId = 'renderArea1'
-bundle1 = new Bundle(config1)
-bundle1.init true, false
+bundle1 = new Bundle(config1, false)
+bundle1.init()
 
 config2.renderAreaId = 'renderArea2'
-bundle2 = new Bundle(config2)
-bundle2.init true, false
+bundle2 = new Bundle(config2, false)
+bundle2.init()
 
 config3.renderAreaId = 'renderArea3'
-bundle3 = new Bundle(config3)
-bundle3.init true, false
+bundle3 = new Bundle(config3, false)
+bundle3.init()
 
 #get model from url
 hash = window.location.hash

@@ -132,4 +132,4 @@ postInitCallback = () ->
 	window.location.hash = ''
 
 bundle = new Bundle(globalConfig)
-bundle.init(true, true).then(postInitCallback)
+bundle.init().then(postInitCallback)

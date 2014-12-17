@@ -31,9 +31,11 @@ module.exports = class PluginUiGenerator
 	constructor: (@bundle) ->
 		@editors = {}
 		@defaultValues = {}
+		@pluginLayouts = []
 		@currentlySelectedNode = null
 		@$pluginsContainer = $('#pluginsContainer')
 		@$pluginsContainer.hide()
+		@currentlyEnabledPlugin = null
 		return
 
 	createPluginUi: (pluginInstance) ->
@@ -64,13 +66,22 @@ module.exports = class PluginUiGenerator
 
 			# when the panel is collapsed
 			$pluginLayout.on 'hidden.bs.collapse', (event) =>
+				# @currentlyEnabledPlugin = null
+
 				if pluginInstance.uiDisabled?
 					pluginInstance.uiDisabled @currentlySelectedNode
 
 			# when the panel is opened
-			$pluginLayout.on 'shown.bs.collapse', (event) ->
+			$pluginLayout.on 'shown.bs.collapse', (event) =>
+				@currentlyEnabledPlugin = pluginInstance
+
 				if pluginInstance.uiEnabled?
 					pluginInstance.uiEnabled @currentlySelectedNode
+
+			@pluginLayouts.push {
+				collapse: $('#collapse' + pluginKey)
+				pluginInstance: pluginInstance
+			}
 
 	generateActionUi: (schema, $container) ->
 		if schema.actions?
@@ -83,11 +94,39 @@ module.exports = class PluginUiGenerator
 					schema.actions[key].callback @currentlySelectedNode, event
 				$container.append $btn
 
+	selectPluginUi: (pluginName) ->
+		# for whatever reason, accordion items first have to be shown, then
+		# other items have to be hidden. mixed actions cause bugs
+		pluginsToHide = []
+
+		for l in @pluginLayouts
+			if l.pluginInstance.name == pluginName
+				l.collapse.collapse 'show'
+				if @currentlySelectedNode
+					if l.pluginInstance.uiEnabled?
+						l.pluginInstance.uiEnabled @currentlySelectedNode
+			else
+					if l.collapse.hasClass 'in'
+						pluginsToHide.push l
+
+		for l in pluginsToHide
+			l.collapse.collapse 'hide'
+			if l.pluginInstance.uiDisabled?
+				l.pluginInstance.uiDisabled @currentlySelectedNode
 
 	selectNode: (modelName) ->
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left. allows to make plugin values relative to objects
 		# console.log "Selecting node #{modelName}"
+
+		if @currentlySelectedNode
+			@currentlySelectedNode.pluginData.uiGen = {}
+			if @currentlyEnabledPlugin?
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginName =
+					@currentlyEnabledPlugin.name
+			else
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginName =
+					''
 
 		if modelName == 'Scene'
 			@$pluginsContainer.hide()
@@ -99,6 +138,14 @@ module.exports = class PluginUiGenerator
 				@currentlySelectedNode = node
 				@saveDefaultValues node
 				@applyNodeValuesToUi()
+
+				if node.pluginData.uiGen?
+					@selectPluginUi node.pluginData.uiGen.selectedPluginName
+				else
+					node.pluginData.uiGen = {}
+					node.pluginData.uiGen.selectedPluginName = ''
+					@selectPluginUi null
+
 				@$pluginsContainer.show()
 
 	deselectNodes: () ->

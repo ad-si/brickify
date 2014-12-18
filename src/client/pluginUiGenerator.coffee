@@ -13,12 +13,15 @@ jsonEditorConfiguration = {
 
 pluginUiTemplate = '
 			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="collapseTitle collapsed panel-title"
-data-toggle="collapse" data-parent="#pluginsContainer"
-data-target="#collapse%PLUGINKEY%">%PLUGINNAME%</h3>
+				<div class="panel-heading" role="tab">
+					<h3 class="panel-title collapsed collapseTitle" data-toggle="collapse"
+							data-parent="#pluginsContainer"
+							data-target="#collapse%PLUGINKEY%">
+						%PLUGINNAME%
+					</h3>
 				</div>
-				<div id="collapse%PLUGINKEY%" class="panel-collapse collapse">
+				<div id="collapse%PLUGINKEY%"
+						 class="panel-collapse collapse plugincollapse" role="tabpanel">
 					<div class="panel-body">
 						<div id="pactions%PLUGINKEY%" class="pluginActionsContainer"></div>
 						<div id="pcontainer%PLUGINKEY%" class="pluginSettingsContainer"></div>
@@ -31,9 +34,12 @@ module.exports = class PluginUiGenerator
 	constructor: (@bundle) ->
 		@editors = {}
 		@defaultValues = {}
+		@pluginLayouts = []
 		@currentlySelectedNode = null
 		@$pluginsContainer = $('#pluginsContainer')
 		@$pluginsContainer.hide()
+		@tabStates = {}
+		@pluginInstances = {}
 		return
 
 	createPluginUi: (pluginInstance) ->
@@ -62,15 +68,32 @@ module.exports = class PluginUiGenerator
 			@editors[pluginKey].on 'change',() =>
 				@saveUiToCurrentNode()
 
+			@bindPluginUiEvents $pluginLayout, pluginInstance, pluginKey
+
+			@pluginLayouts.push {
+				collapse: $('#collapse' + pluginKey)
+				pluginInstance: pluginInstance
+			}
+
+			@tabStates[pluginKey] = false
+			@pluginInstances[pluginKey] = pluginInstance
+
+	bindPluginUiEvents: ($pluginLayout, pluginInstance, pluginKey) =>
 			# when the panel is collapsed
 			$pluginLayout.on 'hidden.bs.collapse', (event) =>
-				if pluginInstance.uiDisabled?
-					pluginInstance.uiDisabled @currentlySelectedNode
+				@tabStates[pluginKey] = false
+				@updateSelectedPlugin()
+
+				#if pluginInstance.uiDisabled?
+				#	pluginInstance.uiDisabled @currentlySelectedNode
 
 			# when the panel is opened
-			$pluginLayout.on 'shown.bs.collapse', (event) ->
-				if pluginInstance.uiEnabled?
-					pluginInstance.uiEnabled @currentlySelectedNode
+			$pluginLayout.on 'shown.bs.collapse', (event) =>
+				@tabStates[pluginKey] = true
+				@updateSelectedPlugin()
+
+				#if pluginInstance.uiEnabled?
+				#	pluginInstance.uiEnabled @currentlySelectedNode
 
 	generateActionUi: (schema, $container) ->
 		if schema.actions?
@@ -83,18 +106,104 @@ module.exports = class PluginUiGenerator
 					schema.actions[key].callback @currentlySelectedNode, event
 				$container.append $btn
 
+	selectPluginUi: (pluginKey) ->
+		# collapse all if key is empty
+		if not pluginKey or pluginKey.length == 0
+			$('#pluginsContainer .collapse.in').collapse 'hide'
 
-	selectNode: (stateNode) ->
+		data = $('#collapse' + pluginKey).data('bs.collapse')
+		if data
+			data.show()
+		else
+			$('#collapse' + pluginKey).collapse({
+				parent: $('#pluginsContainer')
+				toggle: true
+			})
+
+		# call updatedSelectedPlugin to make sure it is called at least once
+		# if there are animations (collapsing in/out), only the last
+		# call to updateSelectedPlugin will perform anything
+		@updateSelectedPlugin()
+
+
+	updateSelectedPlugin: () ->
+		# don't do anything if we aren't the last panel to close/open
+		# (else: redundant state updates)
+		if $('#pluginsContainer .collapsing').length > 0
+			return
+
+		@disablePluginsIfNecessary()
+
+		# search for the newly activated (=true) plugin
+		currentPlugin = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
+		newPlugin = null
+
+		for own pluginKey of @tabStates
+			if @tabStates[pluginKey]
+				newPlugin = pluginKey
+				break
+
+		switchedNode = true if @oldNode != @currentlySelectedNode
+		selectedNewPlugin = true if newPlugin and newPlugin != currentPlugin
+
+		if selectedNewPlugin or switchedNode
+			@bundle.statesync.performStateAction () =>
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = newPlugin
+				# send activate event
+				@callPluginEnabled @currentlySelectedNode
+		else if not newPlugin
+			@bundle.statesync.performStateAction () =>
+				# console.log "Deselected any plugin"
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
+				# disable event was already sent earlier
+
+		@oldNode = @currentlySelectedNode
+
+	disablePluginsIfNecessary: () ->
+		# either: the user switched the node:
+		# send close event to the last active plugin (from the old selected node)
+		if @oldNode and @oldNode != @currentlySelectedNode
+			@callPluginDisabled @oldNode
+			# or he has the same node, but selected another plugin:
+			# send close event to the currently selected plugin
+		else if @oldNode == @currentlySelectedNode
+			@callPluginDisabled @currentlySelectedNode
+		# or he selected a node without a node being selected before
+		# but then no disabled call has to be made
+
+	callPluginDisabled: (node) ->
+		# calls the uiDisabled method on the selected plugin of this node
+		pluginKey = node.pluginData.uiGen.selectedPluginKey
+
+		if pluginKey and pluginKey.length > 0
+			if @pluginInstances[pluginKey].uiDisabled
+				@pluginInstances[pluginKey].uiDisabled node
+
+	callPluginEnabled: (node) ->
+		#calls the uiEnabled method on the selected plugin of this node
+		pluginKey = node.pluginData.uiGen.selectedPluginKey
+
+		if pluginKey and pluginKey.length > 0
+			if @pluginInstances[pluginKey].uiEnabled
+				@pluginInstances[pluginKey].uiEnabled node
+
+	onSelectNode: (stateNode) ->
 		# is called by the scenegraph plugin when the user selects a model on the
-		# left. allows to make plugin values relative to objects
+		# left.
+		@saveUiToCurrentNode()
+		@oldNode = @currentlySelectedNode
 		@currentlySelectedNode = stateNode
 		@saveDefaultValues stateNode
 		@applyNodeValuesToUi()
 		@$pluginsContainer.show()
 
-	deselectNodes: () ->
+		@selectPluginUi @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
+
+	onDeselectNode: () ->
 		# called when all nodes are deselected
 		#console.log 'all nodes deselected'
+		@saveUiToCurrentNode()
+		@callPluginDisabled @currentlySelectedNode
 		@currentlySelectedNode = null
 		@$pluginsContainer.hide()
 
@@ -119,3 +228,7 @@ module.exports = class PluginUiGenerator
 		for key of @editors
 			if not node.toolsValues[key]
 				node.toolsValues[key] = @defaultValues[key]
+		if not node.pluginData.uiGen
+			node.pluginData.uiGen = {
+				selectedPluginKey: ''
+			}

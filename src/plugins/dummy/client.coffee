@@ -84,6 +84,12 @@ module.exports = class DummyPlugin
 				callback: actioncallback
 		}
 
+	uiEnabled: (node) ->
+		console.log "Enabled Dummy Ui with node #{node.fileName}"
+
+	uiDisabled: (node) ->
+		console.log "Disabled Dummy Ui with node #{node.fileName}"
+
 	###
 	# The state synchronization module will call each plugin's
 	# `onStateUpdate` method (if provided) whenever the current state changes

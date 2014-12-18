@@ -131,14 +131,7 @@ module.exports = class PluginUiGenerator
 		if $('#pluginsContainer .collapsing').length > 0
 			return
 
-		# either: the user switched the node:
-		# send close event to the last active plugin (from the old selected node)
-		if @oldNode and @oldNode != @currentNode
-			@callPluginDisabled @oldNode
-		# or he has the same node, but selected another plugin:
-		# send close event to the currently selected plugin
-		else
-			@callPluginDisabled @currentlySelectedNode
+		@disablePluginsIfNecessary()
 
 		# search for the newly activated (=true) plugin
 		currentPlugin = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
@@ -164,6 +157,18 @@ module.exports = class PluginUiGenerator
 				# disable event was already sent earlier
 
 		@oldNode = @currentlySelectedNode
+
+	disablePluginsIfNecessary: () ->
+		# either: the user switched the node:
+		# send close event to the last active plugin (from the old selected node)
+		if @oldNode and @oldNode != @currentlySelectedNode
+			@callPluginDisabled @oldNode
+			# or he has the same node, but selected another plugin:
+			# send close event to the currently selected plugin
+		else if @oldNode == @currentlySelectedNode
+			@callPluginDisabled @currentlySelectedNode
+		# or he selected a node without a node being selected before
+		# but then no disabled call has to be made
 
 	callPluginDisabled: (node) ->
 		pluginKey = node.pluginData.uiGen.selectedPluginKey
@@ -195,6 +200,7 @@ module.exports = class PluginUiGenerator
 		# called when all nodes are deselected
 		#console.log 'all nodes deselected'
 		@saveUiToCurrentNode()
+		@callPluginDisabled @currentlySelectedNode
 		@currentlySelectedNode = null
 		@$pluginsContainer.hide()
 

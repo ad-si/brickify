@@ -71,26 +71,34 @@ module.exports = class SceneGraph
 		done()
 
 	onNodeSelect: (event) =>
+		event.stopPropagation()
+
 		if event.node
 			if event.node.name == 'Scene'
-				@callNodeDeselect()
+				@callNodeDeselect('Scene')
 				return
 
+			# console.log "Selecting " + event.node.title
 			@selectedNode = event.node
 
 			@bundle.statesync.performStateAction (state) =>
 				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
 					@selectedStateNode = stateNode
 					@bundle.pluginUiGenerator.selectNode stateNode
-
 		else
-			@callNodeDeselect()
+			# console.log "Deselecting " + @selectedNode.name
+			@callNodeDeselect(@selectedNode.name)
 
-	callNodeDeselect: () =>
+	callNodeDeselect: (title) =>
 		@bundle.pluginUiGenerator.deselectNodes()
 
+		#definitively deselect any node
 		if @tree.tree 'getSelectedNode'
 			@tree.tree 'selectNode', null
+
+		# remove selected style from node
+		if title
+			$(".jqtree_common [title='" + title + "']").removeClass 'jqtree-selected'
 
 		@selectedNode = null
 		@selectedStateNode = null

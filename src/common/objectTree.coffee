@@ -1,10 +1,12 @@
 # Executes callback(child) for all subnodes
 forAllSubnodes = (node, callback, recursive = true) ->
+	_results = []
 	if Array.isArray(node.children)
 		for child in node.children
-			callback child
+			_results.push(callback child)
 			if recursive
-				forAllSubnodes child, callback, recursive
+				_results.push.apply _results, forAllSubnodes(child, callback, recursive)
+	return _results
 
 # Executes callback(childPluginData) for all subnodes
 # that have a pluginData entry matching to key

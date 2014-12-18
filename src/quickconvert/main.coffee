@@ -16,15 +16,15 @@ config3 = JSON.parse configString
 # instanciate 3 lowfab bundles
 config1.renderAreaId = 'renderArea1'
 bundle1 = new Bundle(config1, false)
-bundle1.init()
+b1 = bundle1.init()
 
 config2.renderAreaId = 'renderArea2'
 bundle2 = new Bundle(config2, false)
-bundle2.init()
+b2 = bundle2.init()
 
 config3.renderAreaId = 'renderArea3'
 bundle3 = new Bundle(config3, false)
-bundle3.init()
+b3 = bundle3.init()
 
 #get model from url
 hash = window.location.hash
@@ -45,6 +45,6 @@ for link in applinks
 	link.href = vanillaLink
 
 #load model into all bundles
-bundle1.modelLoader.loadByHash hash
-bundle2.modelLoader.loadByHash hash
-bundle3.modelLoader.loadByHash hash
+b1.then(() -> bundle1.modelLoader.loadByHash hash)
+b2.then(() -> bundle2.modelLoader.loadByHash hash)
+b3.then(() -> bundle3.modelLoader.loadByHash hash)

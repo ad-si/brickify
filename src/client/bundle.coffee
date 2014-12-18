@@ -15,7 +15,7 @@ module.exports = class Bundle
 		@modelLoader = new ModelLoader(@statesync, pluginHooks)
 
 		@renderer = new Renderer(pluginHooks)
-		@ui = new Ui(@globalConfig, @renderer, @statesync, @modelLoader)
+		@ui = new Ui(@)
 		@ui.init()
 		@pluginUiGenerator = new PluginUiGenerator(@)
 

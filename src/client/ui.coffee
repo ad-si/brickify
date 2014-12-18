@@ -3,11 +3,12 @@
 ###
 
 module.exports = class Ui
-	constructor: (globalConfigInstance, rendererInstance,
-								statesyncInstance, @modelLoader) ->
-		@globalConfig = globalConfigInstance
-		@renderer = rendererInstance
-		@statesync = statesyncInstance
+	constructor: (bundle) ->
+		@globalConfig = bundle.globalConfig
+		@renderer = bundle.renderer
+		@statesync = bundle.statesync
+		@modelLoader = bundle.modelLoader
+
 	dropHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()

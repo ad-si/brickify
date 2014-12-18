@@ -5,7 +5,6 @@
 
 	try {
 		canvas = document.getElementById('canvas')
-		console.log(canvas)
 		gl = canvas.getContext('webgl')
 	}
 	catch (error) {

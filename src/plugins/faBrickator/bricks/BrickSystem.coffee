@@ -69,67 +69,39 @@ class BrickSystem
     object
 
   add_Brick_Sides: (object, position, extent) ->
-    normal_xp = object.get_Normal 1, 0, 0
-    normal_xn = object.get_Normal -1, 0, 0
-    normal_yp = object.get_Normal 0, 1, 0
-    normal_yn = object.get_Normal 0, -1, 0
+    width = extent.x * @width
+    depth = extent.y * @depth
+    height = extent.z * @height
 
-    for y in [0...extent.y] by 1
-      for z in [0...extent.z] by 1
-        vector = new Vector3D((extent.x - 1) * @width, y * @depth, z * @height)
-        @.add_Brick_Side object, position.plus(vector), normal_xp
-        vector2 = new Vector3D(0, y * @depth, z * @height)
-        @.add_Brick_Side object, position.plus(vector2), normal_xn
+    @add_Rectangular_Side object,
+      position.plus(new Vector3D(width, 0, 0)),
+      position.plus(new Vector3D(width, depth, height)),
+      object.get_Normal(1, 0, 0)
 
-    for x in [0...extent.x] by 1
-      for z in [0...extent.z] by 1
-        vector = new Vector3D( x * @width, (extent.y - 1) * @depth, z * @height)
-        @.add_Brick_Side object, position.plus(vector), normal_yp
-        vector2 = new Vector3D( x * @width, 0, z * @height)
-        @.add_Brick_Side object, position.plus(vector2), normal_yn
+    @add_Rectangular_Side object,
+      position,
+      position.plus(new Vector3D(0, depth, height)),
+      object.get_Normal(-1, 0, 0),
+      true
 
+    @add_Rectangular_Side object,
+      position,
+      position.plus(new Vector3D(width, 0, height)),
+      object.get_Normal(0, 1, 0)
 
-  add_Brick_Side: (object, position, normal) ->
-    reverse = yes
-    if normal.x == 1
-      factor_x = 1
-      reverse = no
-    if normal.y == 1
-      factor_y = 1
-      reverse = no
-    factor_x ?= 0
-    factor_y ?= 0
+    @add_Rectangular_Side object,
+      position.plus(new Vector3D(0, depth, 0)),
+      position.plus(new Vector3D(width, depth, height)),
+      object.get_Normal(0, -1, 0),
+      true
 
-    side_x = 1 if normal.x == 0
-    side_x ?= 0
-    side_y = 1 if normal.y == 0
-    side_y ?= 0
-
-    points = [object.get_Point(factor_x * @width + side_x * @width + position.x,
-                               factor_y * @depth + position.y,
-                               position.z),
-              object.get_Point(factor_x * @width + position.x,
-                               factor_y * @depth + side_y * @depth + position.y,
-                               position.z),
-              object.get_Point(factor_x * @width + position.x,
-                               factor_y * @depth + side_y * @depth + position.y,
-                               @height + position.z),
-              object.get_Point(factor_x * @width + side_x * @width + position.x,
-                               factor_y * @depth + position.y,
-                               @height + position.z) ]
-
+  add_Rectangular_Side: (object, startPoint, endPoint, normal, reverse) ->
+    points = [object.get_Point(startPoint.x, startPoint.y, startPoint.z),
+              object.get_Point(endPoint.x, endPoint.y, startPoint.z),
+              object.get_Point(endPoint.x, endPoint.y, endPoint.z),
+              object.get_Point(startPoint.x, startPoint.y, endPoint.z)]
     points.reverse() if reverse
-
-    if normal.x == -1
-      side = '-x'
-    if normal.x == 1
-      side = '+x'
-    if normal.y == -1
-      side = '-y'
-    if normal.y == 1
-      side = '+y'
-
-    object.add_Polygon_for( points, normal, {origin: ['brick'], side: side} )
+    object.add_Polygon_for(points, normal)
 
   add_Brick_top_Cap_to: (object, position) ->
     middle_point = new Vector3D(@width / 2, @depth / 2, @height).add position

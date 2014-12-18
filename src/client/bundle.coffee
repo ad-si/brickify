@@ -19,6 +19,7 @@ module.exports = class Bundle
 		@pluginUiGenerator = new PluginUiGenerator(@)
 
 	init: =>
-		@statesync.init (state) =>
+		@statesync.init().then(() =>
 			@pluginInstances = @pluginLoader.loadPlugins()
 			@statesync.handleUpdatedState()
+		)

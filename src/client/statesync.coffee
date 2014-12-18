@@ -27,7 +27,7 @@ module.exports = class Statesync
 
 		@$spinnerContainer = $('#spinnerContainer')
 
-	init: (stateInitializedCallback) ->
+	init: ->
 		@statePromise.then((data) =>
 			@state = data
 			@oldState = clone(@state)
@@ -35,8 +35,6 @@ module.exports = class Statesync
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 			objectTree.init @state
 			@unlockState()
-
-			stateInitializedCallback? @state
 		)
 
 	getState: ->

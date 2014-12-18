@@ -127,6 +127,7 @@ module.exports = class Statesync
 
 					#patch state with server changes
 					diffpatch.patch @state, delta
+					@statePromise = Promise.resolve(@state)
 
 					#deep copy current state
 					@oldState = clone(@state)

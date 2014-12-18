@@ -14,46 +14,11 @@ THREE = require 'three'
 class SolidObject3D extends Object3D
 	constructor: () ->
 		super()
-		@model = null
-		@hyperplanes = []
-		@hyperplanes_lookup = {}
-		@sides = {}
 		@boundaryBox = null
 		@color = ColorPalette.default()
 		@reverse_Scene_Model = null
 		@edge_threshold = null
 		@selection_group = []
-
-#################################################
-#                                               #
-#                  HYPERPLANE                   #
-#                                               #
-#################################################
-
-	check_Hyperplane: (x, y, z, w) ->
-		if @hyperplanes_lookup[x] and
-		@hyperplanes_lookup[x][y] and
-		@hyperplanes_lookup[x][y][z]
-			@hyperplanes_lookup[x][y][z][w]
-		else
-			undefined
-
-	get_Hyperplane: (x, y, z, w) ->
-		if plane = @check_Hyperplane x, y, z, w
-			plane = @check_Hyperplane
-		else
-			@set_Hyperplane x, y, z, w
-
-	set_Hyperplane: (x, y, z, w) ->
-		normal = @get_Normal x, y, z
-
-		@hyperplanes_lookup[normal] ?= {}
-		@hyperplanes_lookup[normal][w] = new Plane(normal, w)
-
-	check_Model: () ->
-		for edge in @edges
-			edge.check_Visibility()
-
 
 #################################################
 #                                               #

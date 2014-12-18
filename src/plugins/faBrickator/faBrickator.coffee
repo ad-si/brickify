@@ -46,7 +46,7 @@ module.exports = class FaBrickatorPlugin
 			for data in @voxelisedModels
 				if data.node.meshHash is selectedNode.meshHash
 					if data.layout == null
-						@layout data
+						@layout data, selectedNode
 					else
 						console.warn 'Already created a layout for this model'
 
@@ -98,8 +98,10 @@ module.exports = class FaBrickatorPlugin
 		voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
 		@voxelisedModels.push voxelisedData
 		@threejsRootNode.add voxelisedData.gridForThree
+		node.pluginData.faBrickator = {
+			'threeObjectId': voxelisedData.gridForThree.uuid}
 
-	layout: (voxelizedModel) ->
+	layout: (voxelizedModel, node) ->
 		if voxelizedModel.layout
 			console.warn 'Model is already layouted'
 			return
@@ -112,6 +114,27 @@ module.exports = class FaBrickatorPlugin
 
 		@threejsRootNode.remove voxelizedModel.gridForThree
 		@threejsRootNode.add voxelizedModel.layoutForThree
+		node.pluginData.faBrickator = {
+			'threeObjectId': voxelizedModel.layoutForThree.uuid}
+
+	uiEnabled: (node) ->
+		console.log node
+		return unless node?
+		if node.pluginData.faBrickator?
+			threeJsNode = getObjectByNode(@threejsRootNode, node)
+			threeJsNode?.visible = true
+
+	uiDisabled: (node) ->
+		console.log node
+		return unless node?
+		if node.pluginData.faBrickator?
+			threeJsNode = getObjectByNode(@threejsRootNode, node)
+			threeJsNode?.visible = false
+
+	getObjectByNode = (threeJsNode, node) ->
+		uuid = node.pluginData.faBrickator.threeObjectId
+		for node in threeJsNode.children
+			return node if node.uuid == uuid
 
 # Helper Class that - after voxelising and layouting -
 # contains the voxelised grid, it's ThreeJS representation

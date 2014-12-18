@@ -69,10 +69,10 @@ class BrickSystem
     object
 
   add_Brick_Sides: (object, position, extent) ->
-    normal_xp = object.get_Normal 1,0,0
-    normal_xn = object.get_Normal -1,0,0
-    normal_yp = object.get_Normal 0,1,0
-    normal_yn = object.get_Normal 0,-1,0
+    normal_xp = object.get_Normal 1, 0, 0
+    normal_xn = object.get_Normal -1, 0, 0
+    normal_yp = object.get_Normal 0, 1, 0
+    normal_yn = object.get_Normal 0, -1, 0
 
     for y in [0...extent.y] by 1
       for z in [0...extent.z] by 1

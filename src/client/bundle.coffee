@@ -1,5 +1,4 @@
 PluginLoader = require '../client/pluginLoader'
-objectTree = require '../common/objectTree'
 Ui = require './ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
@@ -21,5 +20,4 @@ module.exports = class Bundle
 
 	init: =>
 		@statesync.init (state) =>
-			objectTree.init state
 			@pluginInstances = @pluginLoader.loadPlugins()

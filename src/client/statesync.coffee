@@ -4,6 +4,7 @@
 
 
 $ = require 'jquery'
+objectTree = require '../common/objectTree'
 jsondiffpatch = require 'jsondiffpatch'
 clone = require 'clone'
 #compare objects in arrays by using json.stringify
@@ -32,6 +33,8 @@ module.exports = class Statesync
 			@oldState = clone(@state)
 
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
+			objectTree.init @state
+			@unlockState()
 
 			stateInitializedCallback? @state
 
@@ -39,7 +42,6 @@ module.exports = class Statesync
 		)
 
 	performInitialStateLoadedAction: () ->
-		@unlockState()
 		@handleUpdatedState @state
 
 	getState: ->

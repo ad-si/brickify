@@ -171,6 +171,7 @@ module.exports = class PluginUiGenerator
 		# but then no disabled call has to be made
 
 	callPluginDisabled: (node) ->
+		# calls the uiDisabled method on the selected plugin of this node
 		pluginKey = node.pluginData.uiGen.selectedPluginKey
 
 		if pluginKey and pluginKey.length > 0
@@ -178,13 +179,14 @@ module.exports = class PluginUiGenerator
 				@pluginInstances[pluginKey].uiDisabled node
 
 	callPluginEnabled: (node) ->
+		#calls the uiEnabled method on the selected plugin of this node
 		pluginKey = node.pluginData.uiGen.selectedPluginKey
 
 		if pluginKey and pluginKey.length > 0
 			if @pluginInstances[pluginKey].uiEnabled
 				@pluginInstances[pluginKey].uiEnabled node
 
-	selectNode: (stateNode) ->
+	onSelectNode: (stateNode) ->
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left.
 		@saveUiToCurrentNode()
@@ -196,7 +198,7 @@ module.exports = class PluginUiGenerator
 
 		@selectPluginUi @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
 
-	deselectNodes: () ->
+	onDeselectNode: () ->
 		# called when all nodes are deselected
 		#console.log 'all nodes deselected'
 		@saveUiToCurrentNode()

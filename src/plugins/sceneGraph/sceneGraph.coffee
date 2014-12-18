@@ -86,13 +86,13 @@ module.exports = class SceneGraph
 			@bundle.statesync.performStateAction (state) =>
 				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
 					@selectedStateNode = stateNode
-					@bundle.pluginUiGenerator.selectNode stateNode
+					@bundle.pluginUiGenerator.onSelectNode stateNode
 		else
 			# console.log "Deselecting " + @selectedNode.name
 			@callNodeDeselect(@selectedNode.name)
 
 	callNodeDeselect: (title) =>
-		@bundle.pluginUiGenerator.deselectNodes()
+		@bundle.pluginUiGenerator.onDeselectNode()
 
 		#definitively deselect any node
 		if @tree.tree 'getSelectedNode'

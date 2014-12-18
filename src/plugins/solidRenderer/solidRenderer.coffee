@@ -30,7 +30,7 @@ module.exports = class SolidRenderer
 	removeDeletedObjects: (state) ->
 		nodeUuids = []
 		collectUuid = (node) =>
-			if node.pluginData.solidrenderer?
+			if node.pluginData.solidRenderer?
 				nodeUuids.push node.pluginData.solidRenderer.threeObjectUuid
 		objectTree.forAllSubnodes state.rootNode, collectUuid, false
 		threeUuids = @threejsNode.children.map (threenode) -> threenode.name

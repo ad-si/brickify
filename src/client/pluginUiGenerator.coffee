@@ -117,16 +117,22 @@ module.exports = class PluginUiGenerator
 				toggle: true
 			})
 
-
-
 	updateSelectedPlugin: () ->
 		# search for the activated (=true) plugin
+		currentPlugin = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
+		newPlugin = null
+
 		for own pluginKey of @tabStates
 			if @tabStates[pluginKey]
-				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = pluginKey
-				return
+				newPlugin = pluginKey
+				break
 
-		@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
+		if newPlugin and newPlugin != currentPlugin
+			@bundle.statesync.performStateAction () =>
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = pluginKey
+		else if not newPlugin
+			@bundle.statesync.performStateAction () =>
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
 
 	selectNode: (stateNode) ->
 		# is called by the scenegraph plugin when the user selects a model on the

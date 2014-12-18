@@ -23,36 +23,17 @@ module.exports = class SceneGraph
 		return
 
 	renderUi: (elements) =>
-		$treeContainer = $(elements.sceneGraphContainer)
-		$treeContainer.empty()
+		@tree = $(elements.sceneGraphContainer)
+
 		treeData = [{
 			label: 'Scene',
 			id: @idCounter,
 			children: []
 		}]
+		@createTreeDataStructure(treeData[0], @state.rootNode)
 
-		writeToObject = (treeNode, node) =>
-			if node.pluginData[pluginKey]?
-				treeNode.id = node.pluginData[pluginKey].linkedId
-				# if reloading the state, get highest assigned id to prevent
-				# giving objects the same id
-				@idCounter = treeNode.id + 1 if treeNode.id >= @idCounter
-			else
-				treeNode.id = @idCounter++
-				objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
-
-			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
-
-			if node.children
-				treeNode.children = []
-				node.children.forEach (subNode, index) ->
-					treeNode.children[index] = {}
-					writeToObject treeNode.children[index], subNode
-
-		writeToObject(treeData[0], @state.rootNode)
-
-		if $treeContainer.is(':empty')
-			$treeContainer.tree {
+		if @tree.is(':empty')
+			@tree.tree {
 				autoOpen: 0
 				data: treeData
 				dragAndDrop: false
@@ -60,13 +41,28 @@ module.exports = class SceneGraph
 				useContextMenu: true
 				onCreateLi: (node, $li) -> $li.attr('title', node.title)
 			}
-
-		$treeContainer.tree 'loadData', treeData
+		@tree.tree 'loadData', treeData
 
 		if @selectedNode
-			$treeContainer.tree 'selectNode', @selected_node
+			@tree.tree 'selectNode', @selectedNode
 
-		@tree = $treeContainer
+	createTreeDataStructure: (treeNode, node) =>
+		if node.pluginData[pluginKey]?
+			treeNode.id = node.pluginData[pluginKey].linkedId
+			# if reloading the state, get highest assigned id to prevent
+			# giving objects the same id
+			@idCounter = treeNode.id + 1 if treeNode.id >= @idCounter
+		else
+			treeNode.id = @idCounter++
+			objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
+
+		treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
+
+		if node.children
+			treeNode.children = []
+			node.children.forEach (subNode, index) =>
+				treeNode.children[index] = {}
+				@createTreeDataStructure treeNode.children[index], subNode
 
 	onStateUpdate: (@state, done) =>
 		if @uiInitialized

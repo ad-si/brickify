@@ -17,6 +17,7 @@ module.exports = class SceneGraph
 		@uiInitialized = false
 		@htmlElements = null
 		@selectedNode = null
+		@idCounter = 1
 
 	init: (@bundle) ->
 		return
@@ -24,18 +25,17 @@ module.exports = class SceneGraph
 	renderUi: (elements) =>
 		$treeContainer = $(elements.sceneGraphContainer)
 		$treeContainer.empty()
-		idCounter = 1
 		treeData = [{
 			label: 'Scene',
-			id: idCounter,
+			id: @idCounter,
 			children: []
 		}]
 
-		writeToObject = (treeNode, node) ->
+		writeToObject = (treeNode, node) =>
 			if node.pluginData[pluginKey]?
 				treeNode.id = node.pluginData[pluginKey].linkedId
 			else
-				treeNode.id = idCounter++
+				treeNode.id = @idCounter++
 				objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
 
 			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''

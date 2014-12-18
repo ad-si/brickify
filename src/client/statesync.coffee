@@ -37,12 +37,7 @@ module.exports = class Statesync
 			@unlockState()
 
 			stateInitializedCallback? @state
-
-			@performInitialStateLoadedAction()
 		)
-
-	performInitialStateLoadedAction: () ->
-		@handleUpdatedState @state
 
 	getState: ->
 		return @statePromise
@@ -62,11 +57,11 @@ module.exports = class Statesync
 		# let every plugin do something with the updated state
 		# before syncing it to the server
 		if updatedStateEvent
-			@handleUpdatedState @state
+			@handleUpdatedState()
 		else
 			@sync()
 
-	handleUpdatedState: (curstate) ->
+	handleUpdatedState: ->
 		numCallbacks = @pluginHooks.get('onStateUpdate').length
 		numCalledDone = 0
 
@@ -78,7 +73,7 @@ module.exports = class Statesync
 				@sync()
 
 		#Client plugins maybe modify state...
-		@pluginHooks.onStateUpdate curstate, done
+		@pluginHooks.onStateUpdate @state, done
 
 
 	sync: (force = false) =>
@@ -92,7 +87,7 @@ module.exports = class Statesync
 		# plugins change the state
 		if not @syncWithServer
 			@oldState = clone(@state)
-			@handleUpdatedState @state
+			@handleUpdatedState()
 			return
 
 		# lock state until a response from the server arrives
@@ -141,7 +136,7 @@ module.exports = class Statesync
 						cb @state
 					@stateActionWaitingCallbacks = []
 
-					@handleUpdatedState @state
+					@handleUpdatedState()
 				else
 					# state was not modified, but there may be waiting callbacks
 					@unlockState()
@@ -150,7 +145,7 @@ module.exports = class Statesync
 						for cb in @stateActionWaitingCallbacks
 							cb @state
 						@stateActionWaitingCallbacks = []
-						@handleUpdatedState @state
+						@handleUpdatedState()
 		)
 
 	lockState: () ->

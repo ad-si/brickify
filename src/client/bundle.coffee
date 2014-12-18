@@ -21,3 +21,4 @@ module.exports = class Bundle
 	init: =>
 		@statesync.init (state) =>
 			@pluginInstances = @pluginLoader.loadPlugins()
+			@statesync.handleUpdatedState()

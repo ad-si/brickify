@@ -35,7 +35,7 @@ gridSize: 200
 gridStepSize: 10
 
 # render DOM
-renderAreaId: 'renderArea'
+renderAreaId: 'canvas'
 staticRendererSize: false
 staticRendererWidth: 100
 staticRendererHeight: 100

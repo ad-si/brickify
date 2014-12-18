@@ -134,17 +134,13 @@ module.exports = class PluginUiGenerator
 		# either: the user switched the node:
 		# send close event to the last active plugin (from the old selected node)
 		if @oldNode and @oldNode != @currentNode
-			pluginKey = @oldNode.pluginData.uiGen.selectedPluginKey
-			@callPluginDisabled pluginKey, @oldNode
+			@callPluginDisabled @oldNode
 		# or he has the same node, but selected another plugin:
 		# send close event to the currently selected plugin
 		else
-			pluginKey = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
-			@callPluginDisabled pluginKey, @currentlySelectedNode
+			@callPluginDisabled @currentlySelectedNode
 
 		# search for the newly activated (=true) plugin
-		#@oldNode = @currentlySelectedNode if not @oldNode
-		#currentPlugin = @oldNode.pluginData.uiGen.selectedPluginKey
 		currentPlugin = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
 		newPlugin = null
 
@@ -152,29 +148,36 @@ module.exports = class PluginUiGenerator
 			if @tabStates[pluginKey]
 				newPlugin = pluginKey
 				break
-				
+
 		switchedNode = true if @oldNode != @currentlySelectedNode
 		selectedNewPlugin = true if newPlugin and newPlugin != currentPlugin
 
 		if selectedNewPlugin or switchedNode
 			@bundle.statesync.performStateAction () =>
-				# console.log "selected new plugin " + newPlugin
 				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = newPlugin
 				# send activate event
-				if newPlugin and newPlugin.length > 0
-					if @pluginInstances[newPlugin].uiEnabled
-						@pluginInstances[newPlugin].uiEnabled @currentlySelectedNode
+				@callPluginEnabled @currentlySelectedNode
 		else if not newPlugin
 			@bundle.statesync.performStateAction () =>
 				# console.log "Deselected any plugin"
 				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
+				# disable event was already sent earlier
 
 		@oldNode = @currentlySelectedNode
 
-	callPluginDisabled: (pluginKey, node) ->
+	callPluginDisabled: (node) ->
+		pluginKey = node.pluginData.uiGen.selectedPluginKey
+
 		if pluginKey and pluginKey.length > 0
 			if @pluginInstances[pluginKey].uiDisabled
 				@pluginInstances[pluginKey].uiDisabled node
+
+	callPluginEnabled: (node) ->
+		pluginKey = node.pluginData.uiGen.selectedPluginKey
+
+		if pluginKey and pluginKey.length > 0
+			if @pluginInstances[pluginKey].uiEnabled
+				@pluginInstances[pluginKey].uiEnabled node
 
 	selectNode: (stateNode) ->
 		# is called by the scenegraph plugin when the user selects a model on the

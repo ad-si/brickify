@@ -53,7 +53,7 @@ module.exports = class Example
 		console.log "Disabled Example Ui with node #{node.fileName}"
 
 	onStateUpdate: (state) ->
-		console.log 'Exmaple Client Plugin state change'
+		console.log 'Example Client Plugin state change'
 
 	on3dUpdate: (timestamp) ->
 		return undefined

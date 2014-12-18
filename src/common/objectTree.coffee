@@ -11,20 +11,17 @@ forAllSubnodes = (node, callback, recursive = true) ->
 # Executes callback(childPluginData) for all subnodes
 # that have a pluginData entry matching to key
 forAllSubnodeProperties = (node, key, callback, recursive = true) ->
-	forAllSubnodes node, (child) ->
-		if child.pluginData[key]?
-			callback (child.pluginData[key])
-		if recursive
-			forAllSubnodeProperties child, key, callback, recursive
+	propertyCallback = (child) ->
+		callback(child.pluginData[key]) if child.pluginData[key]?
+	forAllSubnodes node, propertyCallback, recursive
+
 
 # Executes callback(child) for all subnodes
 # that have a pluginData entry matching to key
 forAllSubnodesWithProperty = (node, key, callback, recursive = true) ->
-	forAllSubnodes node, (child) ->
-		if child.pluginData[key]?
-			callback (child)
-		if recursive
-			forAllSubnodesWithProperty child, key, callback, recursive
+	propertyCallback = (child) ->
+		callback(child) if child.pluginData[key]?
+	forAllSubnodes node, propertyCallback, recursive
 
 #Adds an dataset which can be accessed with the specified key
 addPluginData = (node, key, data) ->

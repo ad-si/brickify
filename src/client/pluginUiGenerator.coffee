@@ -118,6 +118,11 @@ module.exports = class PluginUiGenerator
 			})
 
 	updateSelectedPlugin: () ->
+		# don't do anything if we aren't the last panel to close
+		# (else: redundant state updates)
+		if $('#pluginsContainer .collapsing').length > 0
+			return
+
 		# search for the activated (=true) plugin
 		currentPlugin = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
 		newPlugin = null
@@ -129,9 +134,11 @@ module.exports = class PluginUiGenerator
 
 		if newPlugin and newPlugin != currentPlugin
 			@bundle.statesync.performStateAction () =>
+				# console.log "selected new plugin " + newPlugin
 				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = pluginKey
 		else if not newPlugin
 			@bundle.statesync.performStateAction () =>
+				# console.log "Deselected any plugin"
 				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
 
 	selectNode: (stateNode) ->

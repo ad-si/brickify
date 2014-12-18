@@ -11,17 +11,17 @@ diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
 
 module.exports = class Statesync
-	constructor: (@pluginHooks, @syncWithServer = true) ->
+	constructor: (bundle, @syncWithServer = true) ->
 		@state = {}
 		@oldState = {}
-		@globalConfig = null
+		@globalConfig = bundle.globalConfig
+		@pluginHooks = bundle.pluginHooks
 		@initialStateIsLoaded = false
 		@initialStateLoadedCallbacks = []
 		@stateIsLocked = false
 		@stateActionWaitingCallbacks = []
 
-	init: (globalConfig, stateInitializedCallback) ->
-		@globalConfig = globalConfig
+	init: (stateInitializedCallback) ->
 		@$spinnerContainer = $('#spinnerContainer')
 
 		if not @syncWithServer

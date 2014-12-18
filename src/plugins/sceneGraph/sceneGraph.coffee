@@ -39,12 +39,15 @@ module.exports = class SceneGraph
 				dragAndDrop: false
 				keyboardSupport: false
 				useContextMenu: true
-				onCreateLi: (node, $li) -> $li.attr('title', node.title)
+				onCreateLi: (node, $li) ->
+					$li.attr('title', node.title)
+					$li.attr('id', 'sgn' + node.id)
 			}
 		@tree.tree 'loadData', treeData
 
 		if @selectedNode
 			@tree.tree 'selectNode', @selectedNode
+			$('#sgn' + @selectedNode.id).addClass 'jqtree-selected'
 
 	createTreeDataStructure: (treeNode, node) =>
 		if node.pluginData[pluginKey]?

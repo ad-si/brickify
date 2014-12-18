@@ -86,12 +86,6 @@ module.exports = class PluginUiGenerator
 
 			# when the panel is opened
 			$pluginLayout.on 'shown.bs.collapse', (event) =>
-				# close all other panels, but prevent their hidden event from changing
-				# the selected plugin
-				$('#pluginsContainer .collapse.in')
-				.not('#collapse' + pluginKey)
-				.collapse 'toggle'
-
 				@tabStates[pluginKey] = true
 				@updateSelectedPlugin()
 
@@ -114,11 +108,16 @@ module.exports = class PluginUiGenerator
 		if not pluginKey or pluginKey.length == 0
 			$('#pluginsContainer .collapse.in').collapse 'hide'
 
-		# if not opened, open the selectedPlugin
-		# console.log "... but show " + pluginKey
-		toBeShown = $('#collapse' + pluginKey)
-		if toBeShown.length > 0
-			toBeShown.collapse('show')
+		data = $('#collapse' + pluginKey).data('bs.collapse')
+		if data
+			data.show()
+		else
+			$('#collapse' + pluginKey).collapse({
+				parent: $('#pluginsContainer')
+				toggle: true
+			})
+
+
 
 	updateSelectedPlugin: () ->
 		# search for the activated (=true) plugin

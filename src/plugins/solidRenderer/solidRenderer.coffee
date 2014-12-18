@@ -18,12 +18,12 @@ module.exports = class SolidRenderer
 
 	# check if there are any threejs objects that haven't been loaded yet
 	# if so, load the referenced model from the server
-	onStateUpdate: (state, done) =>
+	onStateUpdate: (state) =>
 		@removeDeletedObjects state
 		subnodepromises = []
 		addToPromises = (node) => subnodepromises.push @loadModelIfNeeded(node)
 		objectTree.forAllSubnodes state.rootNode, addToPromises, false
-		Promise.all(subnodepromises).then(done)
+		return Promise.all(subnodepromises)
 
 	removeDeletedObjects: (state) ->
 		nodeUuids = []
@@ -49,7 +49,6 @@ module.exports = class SolidRenderer
 		else
 			node.pluginData.solidRenderer = {}
 			return @loadModelFromCache node, node.pluginData.solidRenderer, false
-	# TODO: Remove deleted objects
 
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name

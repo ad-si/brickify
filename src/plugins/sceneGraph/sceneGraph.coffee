@@ -67,10 +67,9 @@ module.exports = class SceneGraph
 				treeNode.children[index] = {}
 				@createTreeDataStructure treeNode.children[index], subNode
 
-	onStateUpdate: (@state, done) =>
+	onStateUpdate: (@state) =>
 		if @uiInitialized
 			@renderUi @htmlElements
-		done()
 
 	onNodeSelect: (event) =>
 		event.stopPropagation()

@@ -52,9 +52,8 @@ module.exports = class Example
 	uiDisabled: (node) ->
 		console.log "Disabled Example Ui with node #{node.fileName}"
 
-	onStateUpdate: (state, done) ->
+	onStateUpdate: (state) ->
 		console.log 'Exmaple Client Plugin state change'
-		done()
 
 	on3dUpdate: (timestamp) ->
 		return undefined

@@ -60,21 +60,9 @@ module.exports = class Statesync
 			@sync()
 
 	handleUpdatedState: ->
-		numCallbacks = @pluginHooks.get('onStateUpdate').length
-		numCalledDone = 0
+		Promise.all(@pluginHooks.onStateUpdate @state).then(@sync)
 
-		done = () =>
-			#if all plugins finished modifying their state, synchronize
-			numCalledDone++
-			if numCallbacks == numCalledDone
-				# sync as long client plugins modify the state
-				@sync()
-
-		#Client plugins maybe modify state...
-		@pluginHooks.onStateUpdate @state, done
-
-
-	sync: () =>
+	sync: =>
 		if not @syncWithServer
 			@oldState = clone(@state)
 			return

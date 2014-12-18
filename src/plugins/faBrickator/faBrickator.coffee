@@ -25,7 +25,6 @@ pluginPropertyName = 'voxeliser'
 module.exports = class FaBrickatorPlugin
 	constructor: () ->
 		@threejsRootNode = null
-		@stateInstance = null
 		@voxelisedModels = []
 		@voxeliser = null
 		@lego = null
@@ -62,11 +61,6 @@ module.exports = class FaBrickatorPlugin
 					title: 'Layout'
 					callback: layoutCallback
 		}
-
-	onStateUpdate: (state, done) =>
-		@stateInstance = state
-		done()
-
 
 	onClick: (event) =>
 		intersects =

@@ -79,7 +79,7 @@ class BrickSystem
         vector = new Vector3D((extent.x - 1) * @width, y * @depth, z * @height)
         @.add_Brick_Side object, position.plus(vector), normal_xp
         vector2 = new Vector3D(0, y * @depth, z * @height)
-        @.add_Brick_Side object, position.plus(vector), normal_xn
+        @.add_Brick_Side object, position.plus(vector2), normal_xn
 
     for x in [0...extent.x] by 1
       for z in [0...extent.z] by 1

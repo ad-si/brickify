@@ -34,6 +34,9 @@ module.exports = class SceneGraph
 		writeToObject = (treeNode, node) =>
 			if node.pluginData[pluginKey]?
 				treeNode.id = node.pluginData[pluginKey].linkedId
+				# if reloading the state, get highest assigned id to prevent
+				# giving objects the same id
+				@idCounter = treeNode.id + 1 if treeNode.id >= @idCounter
 			else
 				treeNode.id = @idCounter++
 				objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}

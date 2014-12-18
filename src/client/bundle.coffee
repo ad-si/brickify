@@ -6,6 +6,9 @@ Statesync = require './statesync'
 ModelLoader = require './modelLoader'
 PluginUiGenerator = require './pluginUiGenerator'
 
+###
+# @class Bundle
+###
 module.exports = class Bundle
 	constructor: (@globalConfig) ->
 		return

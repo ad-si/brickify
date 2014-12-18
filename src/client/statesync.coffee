@@ -12,25 +12,22 @@ diffpatch = jsondiffpatch.create objectHash: (obj) ->
 
 module.exports = class Statesync
 	constructor: (bundle, @syncWithServer = true) ->
+		if(@syncWithServer)
+			@statePromise = Promise.resolve($.get '/statesync/get')
+		else
+			@statePromise = Promise.resolve {}
+
 		@state = {}
 		@oldState = {}
 		@globalConfig = bundle.globalConfig
 		@pluginHooks = bundle.pluginHooks
-		@initialStateIsLoaded = false
-		@initialStateLoadedCallbacks = []
 		@stateIsLocked = false
 		@stateActionWaitingCallbacks = []
 
-	init: (stateInitializedCallback) ->
 		@$spinnerContainer = $('#spinnerContainer')
 
-		if not @syncWithServer
-			@state = {}
-			stateInitializedCallback? @state
-			@performInitialStateLoadedAction()
-			return
-
-		Promise.resolve($.get '/statesync/get').then((data) =>
+	init: (stateInitializedCallback) ->
+		@statePromise.then((data) =>
 			@state = data
 			@oldState = clone(@state)
 
@@ -42,17 +39,11 @@ module.exports = class Statesync
 		)
 
 	performInitialStateLoadedAction: () ->
-		@initialStateIsLoaded = true
 		@unlockState()
-		@initialStateLoadedCallbacks.forEach (callback) ->
-			callback(state)
 		@handleUpdatedState @state
 
-	getState: (callback) ->
-		if @initialStateIsLoaded
-			callback(@state)
-		else
-			@initialStateLoadedCallbacks.push(callback)
+	getState: ->
+		return @statePromise
 
 	# executes callback(state) and then synchronizes the state with the server.
 	# if updatedStateEvent is set to true, the updateState hook of all client

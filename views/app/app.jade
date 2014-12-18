@@ -2,7 +2,8 @@ extends ../layout
 
 block content
 
-	div#renderArea
+	#canvasContainer
+		canvas#canvas.appCanvas
 
 	#controls.row
 		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
@@ -17,17 +18,18 @@ block content
 		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
 			div.panel-group#pluginsContainer(role='tablist')
 
-
-	div#webGlWarning
+	#webGlWarning
 		p You should not see this text! Do you use a webGL ready browser?
 			= ' '
 			a(href='http://get.webgl.org') get.webgl.org
 
-	div#spinnerContainer
+	#spinnerContainer
 		.spinner
 			div Loading...
 
+
 block scripts
+	script(src='/libs/webglCheck.js')
 	script(src='/libs/FileSaver/FileSaver.js')
 	script(src='/libs/Blob/Blob.js')
 	script(src='/node_modules/json-editor/dist/jsoneditor.js')

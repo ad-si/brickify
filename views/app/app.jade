@@ -15,7 +15,7 @@ block content
 						#sceneGraphContainer
 						#propertiesContainer
 		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
-			div.panel-group#pluginsContainer
+			div.panel-group#pluginsContainer(role='tablist')
 
 
 	div#webGlWarning
@@ -31,5 +31,8 @@ block scripts
 	script(src='/libs/FileSaver/FileSaver.js')
 	script(src='/libs/Blob/Blob.js')
 	script(src='/node_modules/json-editor/dist/jsoneditor.js')
+
 	// Include app script
 	script(src='app.js')
+	script(src='/libs/bootbox/bootbox.min.js')
+

@@ -75,22 +75,6 @@ module.exports = class FaBrickatorPlugin
 		if (intersects.length > 0)
 			intersects[0].object.material.color.set(new THREE.Color(1, 0, 0))
 
-	# Traverses the state and start the voxelisation of all stlImported Models
-	voxeliseAllModels: () =>
-		if @stateInstance
-
-			onSuccess = (node) =>
-				modelCache.request(
-					node.meshHash
-					(model) =>
-						@voxelise model, node
-					() -> console.warn 'could no get model')
-
-			objectTree.forAllSubnodes(
-				@stateInstance.rootNode
-				onSuccess
-			)
-
 	# voxelises a single model
 	voxelise: (optimizedModel, node) =>
 		# check if model was already voxelised
@@ -114,14 +98,6 @@ module.exports = class FaBrickatorPlugin
 		voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
 		@voxelisedModels.push voxelisedData
 		@threejsRootNode.add voxelisedData.gridForThree
-
-	#layouts all voxelised Models
-	layoutAll: () =>
-		if not @voxelisedModels.length > 0
-			console.warn 'trying to layout, but no voxelisedModels available'
-		else
-			for data in @voxelisedModels when data.layout is null
-				@layout data
 
 	layout: (voxelizedModel) ->
 		if voxelizedModel.layout

@@ -30,6 +30,9 @@ module.exports = class Renderer
 	getDomElement: () ->
 		return @threeRenderer.domElement
 
+	getCamera: () ->
+		return @camera
+
 	windowResizeHandler: () ->
 		if not @staticRendererSize
 			@camera.aspect = @size().width / @size().height
@@ -92,14 +95,11 @@ module.exports = class Renderer
 			alpha: true
 			antialias: true
 			preserveDrawingBuffer: true
+			canvas: document.getElementById globalConfig.renderAreaId
 		)
 
 		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.setClearColor globalConfig.clearColor, 1
-		@threeRenderer.domElement.setAttribute 'id', 'canvas'
-		document
-		.getElementById(globalConfig.renderAreaId)
-		.appendChild @threeRenderer.domElement
 
 	setupScene: (globalConfig) ->
 		@scene = new THREE.Scene()

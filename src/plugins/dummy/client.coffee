@@ -25,7 +25,7 @@ module.exports = class DummyPlugin
 	# It is the first method to be called and provides access to the global
 	# configuration.
 	#
-	# @param {Object} globalConfig A key=>value-mapping of the global configuration
+	# @param {Bundle} bundle the bundle this plugin is loaded for
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
@@ -83,6 +83,12 @@ module.exports = class DummyPlugin
 				title: 'Derp'
 				callback: actioncallback
 		}
+
+	uiEnabled: (node) ->
+		console.log "Enabled Dummy Ui with node #{node.fileName}"
+
+	uiDisabled: (node) ->
+		console.log "Disabled Dummy Ui with node #{node.fileName}"
 
 	###
 	# The state synchronization module will call each plugin's

@@ -80,5 +80,9 @@ module.exports = class PluginLoader
 			require('../plugins/sceneGraph'),
 			require('../plugins/sceneGraph/package.json')
 		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/faBrickator'),
+			require('../plugins/faBrickator/package.json')
+		)
 
 		return pluginInstances

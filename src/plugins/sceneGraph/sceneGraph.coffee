@@ -8,6 +8,8 @@
 global.$ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
+objectTree = require '../../common/objectTree'
+pluginKey = 'SceneGraph'
 
 module.exports = class SceneGraph
 	constructor: () ->
@@ -15,45 +17,55 @@ module.exports = class SceneGraph
 		@uiInitialized = false
 		@htmlElements = null
 		@selectedNode = null
+		@idCounter = 1
 
 	init: (@bundle) ->
 		return
 
 	renderUi: (elements) =>
-		$treeContainer = $(elements.sceneGraphContainer)
-		idCounter = 1
+		@tree = $(elements.sceneGraphContainer)
+
 		treeData = [{
 			label: 'Scene',
-			id: idCounter,
+			id: @idCounter,
 			children: []
 		}]
+		@createTreeDataStructure(treeData[0], @state.rootNode)
 
-		writeToObject = (treeNode, node) ->
-			treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
-			treeNode.id = idCounter++
-
-			if node.children
-				treeNode.children = []
-				node.children.forEach (subNode, index) ->
-					treeNode.children[index] = {}
-					writeToObject treeNode.children[index], subNode
-
-		writeToObject(treeData[0], @state.rootNode)
-		if $treeContainer.is(':empty')
-			$treeContainer.tree {
+		if @tree.is(':empty')
+			@tree.tree {
 				autoOpen: 0
 				data: treeData
 				dragAndDrop: false
 				keyboardSupport: false
 				useContextMenu: true
-				onCreateLi: (node, $li) -> $li.attr('title', node.title)
+				onCreateLi: (node, $li) ->
+					$li.attr('title', node.title)
+					$li.attr('id', 'sgn' + node.id)
 			}
+		@tree.tree 'loadData', treeData
 
 		if @selectedNode
-			$treeContainer.tree 'selectNode', @selected_node
+			@tree.tree 'selectNode', @selectedNode
+			$('#sgn' + @selectedNode.id).addClass 'jqtree-selected'
 
+	createTreeDataStructure: (treeNode, node) =>
+		if node.pluginData[pluginKey]?
+			treeNode.id = node.pluginData[pluginKey].linkedId
+			# if reloading the state, get highest assigned id to prevent
+			# giving objects the same id
+			@idCounter = treeNode.id + 1 if treeNode.id >= @idCounter
 		else
-			$treeContainer.tree 'loadData', treeData
+			treeNode.id = @idCounter++
+			objectTree.addPluginData node, pluginKey, {linkedId: treeNode.id}
+
+		treeNode.label = treeNode.title = node.fileName or treeNode.label or ''
+
+		if node.children
+			treeNode.children = []
+			node.children.forEach (subNode, index) =>
+				treeNode.children[index] = {}
+				@createTreeDataStructure treeNode.children[index], subNode
 
 	onStateUpdate: (@state, done) =>
 		if @uiInitialized
@@ -61,19 +73,68 @@ module.exports = class SceneGraph
 		done()
 
 	onNodeSelect: (event) =>
+		event.stopPropagation()
+
 		if event.node
+			if event.node.name == 'Scene'
+				@callNodeDeselect('Scene')
+				return
+
+			# console.log "Selecting " + event.node.title
 			@selectedNode = event.node
-			nodeLabel = event.node.name
-			# console.log "selected node '#{nodeLabel}'"
-			@bundle.pluginUiGenerator.selectNode nodeLabel
+
+			@bundle.statesync.performStateAction (state) =>
+				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
+					@selectedStateNode = stateNode
+					@bundle.pluginUiGenerator.onSelectNode stateNode
 		else
-			# no node = deselected
-			@bundle.pluginUiGenerator.deselectNodes()
-			@selectedNode = null
+			# console.log "Deselecting " + @selectedNode.name
+			@callNodeDeselect(@selectedNode.name)
+
+	callNodeDeselect: (title) =>
+		@bundle.pluginUiGenerator.onDeselectNode()
+
+		#definitively deselect any node
+		if @tree.tree 'getSelectedNode'
+			@tree.tree 'selectNode', null
+
+		# remove selected style from node
+		if title
+			$(".jqtree_common [title='" + title + "']").removeClass 'jqtree-selected'
+
+		@selectedNode = null
+		@selectedStateNode = null
 
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)
 		$treeContainer.bind 'tree.select', @onNodeSelect
+		$(document).keydown (event) =>
+			if event.keyCode == 46 #Delete
+				@deleteObject()
+
+	getStateNodeForTreeNode: (treeNode, stateRootNode, callback) ->
+		objectTree.forAllSubnodes stateRootNode, (node) ->
+			if node.pluginData[pluginKey]?
+				if node.pluginData[pluginKey].linkedId == treeNode.id
+					callback node
+
+	deleteObject: () ->
+		return if @bootboxOpen
+		@bootboxOpen = true
+		if not @selectedNode or @selectedNode.name == 'Scene'
+			return
+
+		question = "Do you really want to delete #{@selectedNode.name}?"
+		bootbox.confirm question, (result) =>
+			@bootboxOpen = false
+			if result
+				delNode = (state) =>
+						objectTree.removeNode state.rootNode, @selectedStateNode
+						@selectedNode = null
+						@selectedStateNode = null
+						@callNodeDeselect()
+
+				@bundle.statesync.performStateAction delNode, true
 
 	initUi: (elements) =>
 		@htmlElements = elements

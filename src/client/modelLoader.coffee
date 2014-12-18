@@ -1,5 +1,5 @@
 ###
-# @module fileLoader
+# @module modelLoader
 ###
 
 md5 = require('blueimp-md5').md5

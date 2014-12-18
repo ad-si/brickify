@@ -76,10 +76,7 @@ module.exports = {
 	NodeStructure: NodeStructure
 
 	init: (state) ->
-		if not state.objectTreeInitialized
-			state.rootNode = new NodeStructure()
-			state.objectTreeInitialized = true
-			return state.rootNode
+		return state.rootNode ?= new NodeStructure()
 
 	addChild: (node) ->
 		newNode = new NodeStructure()

@@ -20,10 +20,9 @@ module.exports = class SolidRenderer
 	# if so, load the referenced model from the server
 	onStateUpdate: (state) =>
 		@removeDeletedObjects state
-		subnodepromises = []
-		addToPromises = (node) => subnodepromises.push @loadModelIfNeeded(node)
-		objectTree.forAllSubnodes state.rootNode, addToPromises, false
-		return Promise.all(subnodepromises)
+		return Promise.all(
+			objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
+		)
 
 	removeDeletedObjects: (state) ->
 		nodeUuids = []

@@ -47,10 +47,10 @@ module.exports = class Example
 		}
 
 	uiEnabled: (node) ->
-		console.log 'Enabled Example Ui'
+		console.log "Enabled Example Ui with node #{node.fileName}"
 
 	uiDisabled: (node) ->
-		console.log 'Disabled Example Ui'
+		console.log "Disabled Example Ui with node #{node.fileName}"
 
 	onStateUpdate: (state, done) ->
 		console.log 'Exmaple Client Plugin state change'

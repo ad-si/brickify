@@ -38,6 +38,7 @@ module.exports = class PluginUiGenerator
 		@$pluginsContainer = $('#pluginsContainer')
 		@$pluginsContainer.hide()
 		@tabStates = {}
+		@pluginInstances = {}
 		return
 
 	createPluginUi: (pluginInstance) ->
@@ -74,6 +75,7 @@ module.exports = class PluginUiGenerator
 			}
 
 			@tabStates[pluginKey] = false
+			@pluginInstances[pluginKey] = pluginInstance
 
 	bindPluginUiEvents: ($pluginLayout, pluginInstance, pluginKey) =>
 			# when the panel is collapsed
@@ -81,16 +83,16 @@ module.exports = class PluginUiGenerator
 				@tabStates[pluginKey] = false
 				@updateSelectedPlugin()
 
-				if pluginInstance.uiDisabled?
-					pluginInstance.uiDisabled @currentlySelectedNode
+				#if pluginInstance.uiDisabled?
+				#	pluginInstance.uiDisabled @currentlySelectedNode
 
 			# when the panel is opened
 			$pluginLayout.on 'shown.bs.collapse', (event) =>
 				@tabStates[pluginKey] = true
 				@updateSelectedPlugin()
 
-				if pluginInstance.uiEnabled?
-					pluginInstance.uiEnabled @currentlySelectedNode
+				#if pluginInstance.uiEnabled?
+				#	pluginInstance.uiEnabled @currentlySelectedNode
 
 	generateActionUi: (schema, $container) ->
 		if schema.actions?
@@ -117,13 +119,32 @@ module.exports = class PluginUiGenerator
 				toggle: true
 			})
 
+		# call updatedSelectedPlugin to make sure it is called at least once
+		# if there are animations (collapsing in/out), only the last
+		# call to updateSelectedPlugin will perform anything
+		@updateSelectedPlugin()
+
+
 	updateSelectedPlugin: () ->
-		# don't do anything if we aren't the last panel to close
+		# don't do anything if we aren't the last panel to close/open
 		# (else: redundant state updates)
 		if $('#pluginsContainer .collapsing').length > 0
 			return
 
-		# search for the activated (=true) plugin
+		# either: the user switched the node:
+		# send close event to the last active plugin (from the old selected node)
+		if @oldNode and @oldNode != @currentNode
+			pluginKey = @oldNode.pluginData.uiGen.selectedPluginKey
+			@callPluginDisabled pluginKey, @oldNode
+		# or he has the same node, but selected another plugin:
+		# send close event to the currently selected plugin
+		else
+			pluginKey = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
+			@callPluginDisabled pluginKey, @currentlySelectedNode
+
+		# search for the newly activated (=true) plugin
+		#@oldNode = @currentlySelectedNode if not @oldNode
+		#currentPlugin = @oldNode.pluginData.uiGen.selectedPluginKey
 		currentPlugin = @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
 		newPlugin = null
 
@@ -131,25 +152,39 @@ module.exports = class PluginUiGenerator
 			if @tabStates[pluginKey]
 				newPlugin = pluginKey
 				break
+				
+		switchedNode = true if @oldNode != @currentlySelectedNode
+		selectedNewPlugin = true if newPlugin and newPlugin != currentPlugin
 
-		if newPlugin and newPlugin != currentPlugin
+		if selectedNewPlugin or switchedNode
 			@bundle.statesync.performStateAction () =>
 				# console.log "selected new plugin " + newPlugin
-				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = pluginKey
+				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = newPlugin
+				# send activate event
+				if newPlugin and newPlugin.length > 0
+					if @pluginInstances[newPlugin].uiEnabled
+						@pluginInstances[newPlugin].uiEnabled @currentlySelectedNode
 		else if not newPlugin
 			@bundle.statesync.performStateAction () =>
 				# console.log "Deselected any plugin"
 				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
 
+		@oldNode = @currentlySelectedNode
+
+	callPluginDisabled: (pluginKey, node) ->
+		if pluginKey and pluginKey.length > 0
+			if @pluginInstances[pluginKey].uiDisabled
+				@pluginInstances[pluginKey].uiDisabled node
+
 	selectNode: (stateNode) ->
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left.
 		@saveUiToCurrentNode()
+		@oldNode = @currentlySelectedNode
 		@currentlySelectedNode = stateNode
 		@saveDefaultValues stateNode
 		@applyNodeValuesToUi()
 		@$pluginsContainer.show()
-		oldNode = @currentlySelectedNode
 
 		@selectPluginUi @currentlySelectedNode.pluginData.uiGen.selectedPluginKey
 

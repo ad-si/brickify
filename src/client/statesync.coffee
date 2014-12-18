@@ -74,19 +74,17 @@ module.exports = class Statesync
 		@pluginHooks.onStateUpdate @state, done
 
 
-	sync: (force = false) =>
-		delta = diffpatch.diff @oldState, @state
-
-		if not force
-			if not delta?
-				return
-
-		# if we shall not sync with the server, run the loop internally as long as
-		# plugins change the state
+	sync: () =>
 		if not @syncWithServer
 			@oldState = clone(@state)
-			@handleUpdatedState()
 			return
+		@syncToServer().then(@syncFromServer)
+
+	syncToServer: () =>
+		delta = diffpatch.diff @oldState, @state
+
+		if not delta?
+			return Promise.resolve({emptyDiff: true})
 
 		# lock state until a response from the server arrives
 		@lockState()
@@ -96,60 +94,56 @@ module.exports = class Statesync
 
 		console.log "Sending delta to server: #{JSON.stringify(delta)}"
 		Promise.resolve($.ajax '/statesync/set',
-			type: 'POST'
-			data: JSON.stringify({deltaState: delta})
-		# what jquery expects as an answer
-			dataType: 'json'
-		# what is sent in the post request as a header
-			contentType: 'application/json; charset=utf-8'
-		# check whether client modified its local state
-		# since the post request was sent
-		).then((data) =>
-				delta = data
-
-				if delta.emptyDiff == true
-					delta = null
-
-				if delta
-					# handle modified state from server
-					console.log "Got delta from server: #{JSON.stringify(delta)}"
-
-					clientDelta = diffpatch.diff @oldState, @state
-
-					if clientDelta?
-						throw new Error('The client modified its state
-							while the server worked, this should not happen!')
-
-					#patch state with server changes
-					diffpatch.patch @state, delta
-					@statePromise = Promise.resolve(@state)
-
-					#deep copy current state
-					@oldState = clone(@state)
-
-					@unlockState()
-
-					#run all waiting callbacks
-					for cb in @stateActionWaitingCallbacks
-						cb @state
-					@stateActionWaitingCallbacks = []
-
-					@handleUpdatedState()
-				else
-					# state was not modified, but there may be waiting callbacks
-					@unlockState()
-
-					if @stateActionWaitingCallbacks.length > 0
-						for cb in @stateActionWaitingCallbacks
-							cb @state
-						@stateActionWaitingCallbacks = []
-						@handleUpdatedState()
+				type: 'POST'
+				data: JSON.stringify({deltaState: delta})
+			# what jquery expects as an answer
+				dataType: 'json'
+			# what is sent in the post request as a header
+				contentType: 'application/json; charset=utf-8'
+			# check whether client modified its local state
+			# since the post request was sent
 		)
 
-	lockState: () ->
+	syncFromServer: (delta) =>
+		unless delta.emptyDiff
+			# handle modified state from server
+			console.log "Got delta from server: #{JSON.stringify(delta)}"
+
+			clientDelta = diffpatch.diff @oldState, @state
+
+			if clientDelta?
+				throw new Error('The client modified its state
+							while the server worked, this should not happen!')
+
+			#patch state with server changes
+			diffpatch.patch @state, delta
+			@statePromise = Promise.resolve(@state)
+
+			#deep copy current state
+			@oldState = clone(@state)
+
+			@unlockState()
+
+			#run all waiting callbacks
+			for cb in @stateActionWaitingCallbacks
+				cb @state
+			@stateActionWaitingCallbacks = []
+
+			@handleUpdatedState()
+		else
+			# state was not modified, but there may be waiting callbacks
+			@unlockState()
+
+			if @stateActionWaitingCallbacks.length > 0
+				for cb in @stateActionWaitingCallbacks
+					cb @state
+				@stateActionWaitingCallbacks = []
+				@handleUpdatedState()
+
+	lockState: () =>
 		@stateIsLocked = true
 		@$spinnerContainer.show()
 
-	unlockState: () ->
+	unlockState: () =>
 		@stateIsLocked = false
 		@$spinnerContainer.fadeOut()

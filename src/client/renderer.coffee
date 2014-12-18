@@ -30,6 +30,9 @@ module.exports = class Renderer
 	getDomElement: () ->
 		return @threeRenderer.domElement
 
+	getCamera: () ->
+		return @camera
+
 	windowResizeHandler: () ->
 		if not @staticRendererSize
 			@camera.aspect = @size().width / @size().height

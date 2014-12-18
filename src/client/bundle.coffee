@@ -27,7 +27,8 @@ module.exports = class Bundle
 			objectTree.init state
 			if createRendererAndUi
 				@renderer = new Renderer(pluginHooks)
-				@ui = new Ui(@globalConfig, @renderer, @statesync, @modelLoader)
+				@ui = new Ui(@globalConfig, @renderer,
+							@statesync, @modelLoader, @pluginLoader.pluginHooks)
 				@ui.init()
 				@pluginUiGenerator = new PluginUiGenerator(@)
 				@pluginInstances = @pluginLoader.loadPlugins(@renderer)

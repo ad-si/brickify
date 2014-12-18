@@ -26,7 +26,7 @@ module.exports = class PluginLoader
 		if @renderer?
 			if @pluginHooks.hasHook(instance, 'init3d')
 				threeNode = new THREE.Object3D()
-				instance.init3d threeNode
+				instance.init3d threeNode, @renderer
 
 		if @pluginHooks.hasHook(instance, 'initUi')
 			instance.initUi {
@@ -80,6 +80,10 @@ module.exports = class PluginLoader
 		pluginInstances.push @initPlugin(
 			require('../plugins/sceneGraph'),
 			require('../plugins/sceneGraph/package.json')
+		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/faBrickator'),
+			require('../plugins/faBrickator/package.json')
 		)
 
 		return pluginInstances

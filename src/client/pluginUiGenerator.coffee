@@ -46,8 +46,8 @@ module.exports = class PluginUiGenerator
 		# creates the UI for a plugin if it returns a valid ui schema
 		jsonEditorConfiguration.schema = pluginInstance.getUiSchema()
 		if jsonEditorConfiguration.schema && @$pluginsContainer.length > 0
-			pluginName = pluginInstance.name
-			pluginKey = pluginName.toLowerCase().replace(/// ///g,'')
+			pluginName = jsonEditorConfiguration.schema.title || pluginInstance.name
+			pluginKey = pluginName.toLowerCase().replace(' ','')
 
 			pluginLayout = pluginUiTemplate
 			pluginLayout = pluginLayout.replace(///%PLUGINKEY%///g,pluginKey)
@@ -58,7 +58,8 @@ module.exports = class PluginUiGenerator
 			$pluginSettingsContainer = $('#pcontainer' + pluginKey)
 			$pluginActionContainer = $('#pactions' + pluginKey)
 
-			@generateActionUi jsonEditorConfiguration.schema, $pluginActionContainer
+			@generateActionUi jsonEditorConfiguration.schema,
+				pluginKey, $pluginActionContainer
 			@editors[pluginKey] = new JSONEditor(
 				$pluginSettingsContainer[0]
 				jsonEditorConfiguration
@@ -95,16 +96,26 @@ module.exports = class PluginUiGenerator
 				#if pluginInstance.uiEnabled?
 				#	pluginInstance.uiEnabled @currentlySelectedNode
 
-	generateActionUi: (schema, $container) ->
+	generateActionUi: (schema, pluginKey, $container) =>
 		if schema.actions?
 			for own key of schema.actions
 				title = schema.actions[key].title
 				type = schema.actions[key].type or 'primary'
-				$btn =
-					$('<div class="actionbutton btn btn-' + type + '">' + title + '</div>')
-				$btn.click (event) ->
-					schema.actions[key].callback @currentlySelectedNode, event
-				$container.append $btn
+				id = 'abtn' + pluginKey + key
+				@generateButton title,
+					type, id, schema.actions[key].callback, $container
+
+	generateButton: (title, type, id, callback, $container) =>
+		# extra method necessary because
+		# else all buttons will bind to last callback
+		$btn =
+			$('<div id="' + id +
+				'" class="actionbutton btn btn-' + type +
+				'">' + title + '</div>')
+		$btn.click (event) =>
+			callback @currentlySelectedNode, event
+
+		$container.append $btn
 
 	selectPluginUi: (pluginKey) ->
 		# collapse all if key is empty

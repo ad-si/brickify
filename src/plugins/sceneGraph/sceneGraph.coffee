@@ -120,11 +120,14 @@ module.exports = class SceneGraph
 					callback node
 
 	deleteObject: () ->
+		return if @bootboxOpen
+		@bootboxOpen = true
 		if not @selectedNode or @selectedNode.name == 'Scene'
 			return
 
 		question = "Really delete #{@selectedNode.name}?"
 		bootbox.confirm question, (result) =>
+			@bootboxOpen = false
 			if result
 				delNode = (state) =>
 						objectTree.removeNode state.rootNode, @selectedStateNode

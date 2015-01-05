@@ -42,6 +42,7 @@ statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
+sharelinkGen = require '../../routes/share'
 
 webapp = express()
 
@@ -157,7 +158,7 @@ module.exports.setupRouting = () ->
 	modelStorage.init()
 
 	webapp.use cookieParser()
-	webapp.use urlSessions
+	webapp.use urlSessions.middleware
 
 	jsonParser = bodyParser.json {limit: '100mb'}
 	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
@@ -170,6 +171,7 @@ module.exports.setupRouting = () ->
 	webapp.get '/team', landingPage.getTeam
 	webapp.get '/quickconvert', urlParser, landingPage.getQuickConvertPage
 	webapp.get '/app', app(links)
+	webapp.get '/share', sharelinkGen
 	webapp.get '/statesync/get', jsonParser, statesync.getState
 	webapp.post '/statesync/set', jsonParser, statesync.setState
 	webapp.get '/statesync/reset', jsonParser, statesync.resetState

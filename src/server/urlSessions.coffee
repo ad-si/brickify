@@ -1,7 +1,7 @@
 sessions = {}
 shareLinks = {}
 
-module.exports = (request, response, next) ->
+module.exports.middleware = (request, response, next) ->
 	# if in /app, do we have a url parameter that indicates a session?
 	if request.path == '/app' and request.query.s?
 		sessionId = request.query.s
@@ -12,6 +12,11 @@ module.exports = (request, response, next) ->
 			checkSession sessionId, request, response, next
 		else
 			newSession request, response, next
+
+module.exports.generateShareId = (sid) ->
+	id = 'Share-' + generateId()
+	shareLinks[id] = sid
+	return id
 
 checkSession = (sessionId, request, response, next) ->
 	if sessions[sessionId]?

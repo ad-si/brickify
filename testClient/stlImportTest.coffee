@@ -12,7 +12,7 @@ describe 'stl import tests', () ->
 				readFile name, (fileContent) ->
 					optimizedModel = new StlImport().importFile(name, fileContent)
 					threeGeometry = optimizedModel.convertToThreeGeometry()
-					expect(threeGeometry).not.toBeNull()
+					expect(threeGeometry).not.to.be.null
 					done()
 
 readFile = (filename, callBack) ->

@@ -23,10 +23,9 @@ module.exports = class PluginLoader
 		if @pluginHooks.hasHook(instance, 'init')
 			instance.init @bundle
 
-		if @renderer?
-			if @pluginHooks.hasHook(instance, 'init3d')
-				threeNode = new THREE.Object3D()
-				instance.init3d threeNode, @renderer
+		if @pluginHooks.hasHook(instance, 'init3d')
+			threeNode = new THREE.Object3D()
+			instance.init3d threeNode
 
 		if @pluginHooks.hasHook(instance, 'initUi')
 			instance.initUi {
@@ -43,14 +42,14 @@ module.exports = class PluginLoader
 
 		@pluginHooks.register instance
 
-		if @renderer? and threeNode?
-			@renderer.addToScene threeNode
+		if threeNode?
+			@bundle.renderer.addToScene threeNode
 
 		return instance
 
 	# Since browserify.js does not support dynamic require
 	# all plugins must be explicitly written down
-	loadPlugins: (@renderer) ->
+	loadPlugins: () ->
 		pluginInstances = []
 
 		pluginInstances.push @initPlugin(

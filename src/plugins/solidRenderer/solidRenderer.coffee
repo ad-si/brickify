@@ -18,14 +18,11 @@ module.exports = class SolidRenderer
 
 	# check if there are any threejs objects that haven't been loaded yet
 	# if so, load the referenced model from the server
-	onStateUpdate: (state, done) =>
+	onStateUpdate: (state) =>
 		@removeDeletedObjects state
-		objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
-
-		#TODO: this is wrong, since loadModelIfneeded can modify the state
-		#TODO: asynchronously. therefore done has to be called when all
-		#TODO: loadModelIfNeeded calls are completed. Solve with promises
-		done()
+		return Promise.all(
+			objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
+		)
 
 	removeDeletedObjects: (state) ->
 		nodeUuids = []
@@ -45,11 +42,12 @@ module.exports = class SolidRenderer
 			storedUuid = properties.threeObjectUuid
 			threeObject = @threejsNode.getObjectByName storedUuid, true
 			if not threeObject?
-				@loadModelFromCache node, properties, true
+				return @loadModelFromCache node, properties, true
+			else
+				return Promise.resolve()
 		else
 			node.pluginData.solidRenderer = {}
-			@loadModelFromCache node, node.pluginData.solidRenderer, false
-	# TODO: Remove deleted objects
+			return @loadModelFromCache node, node.pluginData.solidRenderer, false
 
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name
@@ -60,10 +58,13 @@ module.exports = class SolidRenderer
 				threeObj.name = properties.threeObjectUuid
 			else
 				properties.threeObjectUuid = threeObj.name
+			return optimizedModel
 		failure = () ->
 			console.error "Unable to get model #{node.meshHash}"
 
-		modelCache.request node.meshHash, success, failure
+		prom = modelCache.request node.meshHash
+		prom.catch failure
+		return prom.then success
 
 	# parses the binary geometry and adds it to the three scene
 	addModelToThree: (optimizedModel) ->

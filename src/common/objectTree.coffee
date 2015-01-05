@@ -1,28 +1,27 @@
 # Executes callback(child) for all subnodes
 forAllSubnodes = (node, callback, recursive = true) ->
+	_results = []
 	if Array.isArray(node.children)
 		for child in node.children
-			callback child
+			_results.push(callback child)
 			if recursive
-				forAllSubnodes child, callback, recursive
+				_results.push.apply _results, forAllSubnodes(child, callback, recursive)
+	return _results
 
 # Executes callback(childPluginData) for all subnodes
 # that have a pluginData entry matching to key
 forAllSubnodeProperties = (node, key, callback, recursive = true) ->
-	forAllSubnodes node, (child) ->
-		if child.pluginData[key]?
-			callback (child.pluginData[key])
-		if recursive
-			forAllSubnodeProperties child, key, callback, recursive
+	propertyCallback = (child) ->
+		callback(child.pluginData[key]) if child.pluginData[key]?
+	forAllSubnodes node, propertyCallback, recursive
+
 
 # Executes callback(child) for all subnodes
 # that have a pluginData entry matching to key
 forAllSubnodesWithProperty = (node, key, callback, recursive = true) ->
-	forAllSubnodes node, (child) ->
-		if child.pluginData[key]?
-			callback (child)
-		if recursive
-			forAllSubnodesWithProperty child, key, callback, recursive
+	propertyCallback = (child) ->
+		callback(child) if child.pluginData[key]?
+	forAllSubnodes node, propertyCallback, recursive
 
 #Adds an dataset which can be accessed with the specified key
 addPluginData = (node, key, data) ->
@@ -76,10 +75,7 @@ module.exports = {
 	NodeStructure: NodeStructure
 
 	init: (state) ->
-		if not state.objectTreeInitialized
-			state.rootNode = new NodeStructure()
-			state.objectTreeInitialized = true
-			return state.rootNode
+		return state.rootNode ?= new NodeStructure()
 
 	addChild: (node) ->
 		newNode = new NodeStructure()

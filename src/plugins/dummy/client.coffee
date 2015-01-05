@@ -43,7 +43,7 @@ module.exports = class DummyPlugin
 	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
-	init3d: (threejsNode, renderer) =>
+	init3d: (threejsNode) =>
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
@@ -100,14 +100,16 @@ module.exports = class DummyPlugin
 	# `state.toolsValues` contains the values of the associated ui-elements
 	# in the tools-container.
 	#
+	# If the plugin does asynchronous work, it has to return a thenable (promise
+	# or promise like)object that resolves on completion of the plugins work.
+	#
 	# @param {Object} state the complete current state
-	# @param {Callback} done callback to be called when finished state modification
 	# @memberOf dummyClientPlugin
 	# @see stateSynchronization
 	###
-	onStateUpdate: (state, done) =>
+	onStateUpdate: (state) =>
 		console.log 'Dummy Client Plugin state change'
-		done()
+		return Promise.resolve()
 
 	###
 	# On each render frame the renderer will call the `on3dUpdate`

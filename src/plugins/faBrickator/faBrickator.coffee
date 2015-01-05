@@ -4,7 +4,7 @@
 
 ###
 #
-# a plugin using imported code from the faBrickator projekt
+# a plugin using imported code from the faBrickator project
 #
 ###
 
@@ -25,22 +25,22 @@ pluginPropertyName = 'voxeliser'
 module.exports = class FaBrickatorPlugin
 	constructor: () ->
 		@threejsRootNode = null
-		@stateInstance = null
 		@voxelisedModels = []
 		@voxeliser = null
 		@lego = null
 
-	init: () => return
+	init: (@bundle) => return
 
-	init3d: (@threejsRootNode, @renderer) => return
+	init3d: (@threejsRootNode) => return
 
 	initUi: (domElements) =>
 		return
 
 	getUiSchema: () =>
 		voxelCallback = (selectedNode) =>
-			modelCache.request selectedNode.meshHash, (optimizedModel) =>
-				@voxelise optimizedModel, selectedNode
+			modelCache.request(selectedNode.meshHash).then(
+				(optimizedModel) => @voxelise optimizedModel, selectedNode
+			)
 
 		layoutCallback = (selectedNode) =>
 			for data in @voxelisedModels
@@ -62,16 +62,11 @@ module.exports = class FaBrickatorPlugin
 					callback: layoutCallback
 		}
 
-	onStateUpdate: (state, done) =>
-		@stateInstance = state
-		done()
-
-
 	onClick: (event) =>
 		intersects =
 			interactionHelper.getPolygonClickedOn(event
 				@threejsRootNode.children
-				@renderer)
+				@bundle.renderer)
 		if (intersects.length > 0)
 			intersects[0].object.material.color.set(new THREE.Color(1, 0, 0))
 

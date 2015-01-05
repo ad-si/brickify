@@ -1,3 +1,5 @@
+clone = require 'clone'
+
 sessions = {}
 shareLinks = {}
 
@@ -5,7 +7,11 @@ module.exports.middleware = (request, response, next) ->
 	# if in /app, do we have a url parameter that indicates a session?
 	if request.path == '/app' and request.query.s?
 		sessionId = request.query.s
-		checkSession sessionId, request, response, next
+
+		if sessionId.indexOf('Share-') == 0
+			resolveShare sessionId, request, response, next
+		else
+			checkSession sessionId, request, response, next
 	else
 		if request.cookies.s?
 			sessionId = request.cookies.s
@@ -33,8 +39,20 @@ checkSession = (sessionId, request, response, next) ->
 		#create a new session for invalid Ids and redirect
 		newSession request, response, next
 
-newSession = (request, response, next) ->
-	request.session = generateSession()
+resolveShare = (shareId, request, response, next) ->
+
+	if shareLinks[shareId]?
+		#create a copy of original state
+		sid = shareLinks[shareId]
+		session = sessions[sid]
+		cloned = clone(session)
+		newSession(request, response, next, cloned)
+	else
+		#invalid share id - generate new state
+		newSession request, response, next
+
+newSession = (request, response, next, sessionData = null) ->
+	request.session = generateSession(sessionData)
 	response.cookie('s', request.session.id)
 
 	# only redirect if already in /app (but maybe with wrong session id)
@@ -44,11 +62,16 @@ newSession = (request, response, next) ->
 	else
 		next()
 
-generateSession = () ->
+generateSession = (sessionData = null) ->
 	id = generateId()
-	sessions[id] = {
-		id: id
-	}
+	if sessionData?
+		#take data, but override with new session id
+		sessions[id] = sessionData
+		sessions[id].id = id
+	else
+		sessions[id] = {
+			id: id
+		}
 	return sessions[id]
 
 generateId = (length = 10) ->

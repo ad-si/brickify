@@ -1,0 +1,9 @@
+{
+  "name": "solid-renderer-plugin",
+  "version": "0.1.0",
+  "description": "Solid mesh renderer for the unconverted model.",
+  "lowfab": {
+    "type": "renderer"
+  },
+  "browser": "./solidRenderer.coffee"
+}

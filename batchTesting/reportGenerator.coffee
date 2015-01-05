@@ -24,7 +24,7 @@ module.exports.generateReport = (data, outPath, outFileName,
 					results: data
 					stats: stats
 					gitinfo: gitinfo
-					isWorkInProgress: !isLastReport}
+					isWorkInProgress: (not isLastReport)}
 
 				mkdirp path.dirname outFileName
 				mergedFilename = generateDateTimeString(beginDate) + ' ' + outFileName

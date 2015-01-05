@@ -1,4 +1,6 @@
 jsondiffpatch = require 'jsondiffpatch'
+clone = require 'clone'
+
 #compare objects in arrays by using json.stringify
 diffpatch = jsondiffpatch.create objectHash: (obj) ->
 	return JSON.stringify(obj)
@@ -21,7 +23,7 @@ exports.setState = (request, response) ->
 	diffpatch.patch(state,clientDiff)
 	#state now contains the current state of both client and server
 
-	oldState = JSON.parse JSON.stringify state
+	oldState = clone(state)
 
 	#check functionality of jsondiffpatch
 	#ToDo: could cause performance problems, maybe replace in the future?
@@ -35,7 +37,10 @@ exports.setState = (request, response) ->
 	serverDiff = diffpatch.diff oldState, state
 
 	logger.debug 'Sending delta to client: ' + JSON.stringify(serverDiff)
-	response.json serverDiff
+	if not serverDiff
+		response.json {emptyDiff: true}
+	else
+		response.json serverDiff
 
 exports.resetState = (request, response) ->
 	request.session.state = {empty: true}

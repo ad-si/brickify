@@ -1,0 +1,10 @@
+{
+  "name": "dummy-client-plugin",
+  "version": "0.1.0",
+  "description": "Demo implementation of a client-side plugin.",
+  "lowfab": {
+    "type": "example"
+  },
+  "main": "./server.coffee",
+  "browser": "./client.coffee"
+}

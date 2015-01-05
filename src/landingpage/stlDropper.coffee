@@ -1,4 +1,4 @@
-stlLoader = require '../client/plugins/stlImport/stlLoader.coffee'
+stlLoader = require '../plugins/stlImport/stlLoader'
 modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 
@@ -70,7 +70,7 @@ handleLoadedFile = (filename) ->
 			document.location.href = dhref
 			return
 
-		modelCache.store optimizedModel, uploadFinishedCallback
+		modelCache.store(optimizedModel).then(uploadFinishedCallback)
 
 		return
 

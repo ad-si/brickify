@@ -1,0 +1,9 @@
+{
+  "name": "stl-export",
+  "version": "0.1.0",
+  "description": "Converts the ThreeJS geometry to ASCII-stl file.",
+  "lowfab": {
+    "type": "export"
+  },
+  "browser": "./stlExport.coffee"
+}

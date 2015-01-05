@@ -3,11 +3,13 @@
 ###
 
 module.exports = class Ui
-	constructor: (globalConfigInstance, rendererInstance,
-								statesyncInstance, @modelLoader) ->
-		@globalConfig = globalConfigInstance
-		@renderer = rendererInstance
-		@statesync = statesyncInstance
+	constructor: (bundle) ->
+		@globalConfig = bundle.globalConfig
+		@renderer = bundle.renderer
+		@statesync = bundle.statesync
+		@modelLoader = bundle.modelLoader
+		@pluginHooks = bundle.pluginHooks
+
 	dropHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()
@@ -19,12 +21,18 @@ module.exports = class Ui
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
+	clickHandler: (event) ->
+		event.stopPropagation()
+		event.preventDefault()
+		for onClickHandler in @pluginHooks.get 'onClick'
+			onClickHandler(event)
+
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
 	windowResizeHandler: (event) ->
 		@renderer.windowResizeHandler()
 
-	init: ->
+	init: =>
 		@renderer.init(@globalConfig)
 
 		# event listener
@@ -42,6 +50,12 @@ module.exports = class Ui
 		window.addEventListener(
 			'resize',
 			@windowResizeHandler.bind @,
-				false
+			false
+		)
+
+		@renderer.getDomElement().addEventListener(
+			'mousedown'
+			@clickHandler.bind @
+		false
 		)
 

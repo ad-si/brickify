@@ -1,7 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 winston = require 'winston'
-stlLoader = require '../src/client/plugins/stlImport/stlLoader'
+stlLoader = require '../src/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
 mkdirp = require 'mkdirp'
 require('es6-promise').polyfill()
@@ -48,7 +48,7 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 	if modelArray.length < resultSavingFrequency
 		for m in modelArray
 			testModels.push m
-			modelArray = []
+		modelArray = []
 	else
 		for i in [0..resultSavingFrequency - 1]
 			testModels.push modelArray[i]
@@ -64,12 +64,17 @@ testNextBatch = (numModels, modelArray, accumulatedResults) ->
 	p.then (results) ->
 		for r in results
 			# add our current batch to existing results
-			accumulatedResults.push r
+			if r
+				accumulatedResults.push r
 
 		thisIsLastBatch = true if modelArray.length == 0
 
 		# genrate a report
-		logger.info "Generating temporary test report for #{perc}%-batch"
+		if thisIsLastBatch
+			logger.info 'Generating final test report'
+		else
+			logger.info "Generating temporary test report for #{perc}%-batch"
+
 		reportPromise = reportGenerator.generateReport accumulatedResults,
 			outputPath, reportFile, thisIsLastBatch, beginDate
 		reportPromise.then () ->
@@ -111,7 +116,7 @@ testModel = (filename) ->
 
 			if not stlModel
 				logger.warn "Model '#{filename}' was not properly loaded"
-				resolve(testResult)
+				resolve(null)
 				return
 
 			testResult.stlParsingTime = new Date() - begin

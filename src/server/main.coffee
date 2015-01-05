@@ -16,13 +16,6 @@ compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
 bower = require 'bower'
-pluginLoader = require './pluginLoader'
-app = require '../../routes/app'
-landingPage = require '../../routes/landingpage'
-statesync = require '../../routes/statesync'
-modelStorage = require './modelStorage'
-modelStorageApi = require '../../routes/modelStorageApi'
-dataPackets = require '../../routes/dataPackets'
 exec = require 'exec'
 http = require 'http'
 # Support mixing .coffee and .js files in lowfab-project
@@ -32,16 +25,29 @@ browserifyData = require 'browserify-data'
 envify = require 'envify'
 browserify = require 'browserify-middleware'
 
-# Make logger available to other modules
+
+# Make logger available to other modules.
+# Must be instantiated before requiring bundled modules
 winston.loggers.add 'log',
 	console:
 		level: loggingLevel
 		colorize: true
 log = winston.loggers.get('log')
 
+
+pluginLoader = require './pluginLoader'
+app = require '../../routes/app'
+landingPage = require '../../routes/landingpage'
+statesync = require '../../routes/statesync'
+modelStorage = require './modelStorage'
+modelStorageApi = require '../../routes/modelStorageApi'
+dataPackets = require '../../routes/dataPackets'
+
+
 webapp = express()
-# express assumes that no env means develop. therefore override it to make it
-# clear for all
+
+# Express assumes that no env means develop.
+# Therefore override it to make it clear for all
 developmentMode = webapp.get('env') is 'development'
 if developmentMode
 	process.env.NODE_ENV = 'development'
@@ -121,6 +127,7 @@ module.exports.setupRouting = () ->
 			stylus string
 			.set 'filename', path
 			.set 'compress', !developmentMode
+			.set 'include css', true
 			.use nib()
 			.import 'nib'
 	)
@@ -199,8 +206,7 @@ module.exports.setupRouting = () ->
 			if error
 				log.warn "Error while updating server: #{error}"
 
-	pluginLoader.loadPlugins statesync,
-		path.join __dirname, 'plugins/'
+	pluginLoader.loadPlugins statesync, path.resolve(__dirname, '../plugins')
 
 	if developmentMode
 		webapp.use errorHandler()

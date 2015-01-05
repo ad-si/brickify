@@ -1,5 +1,5 @@
 ###
-# @module fileLoader
+# @module modelLoader
 ###
 
 md5 = require('blueimp-md5').md5
@@ -39,8 +39,10 @@ module.exports = class ModelLoader
 		@addModelToState fileName, hash
 
 	loadByHash: (hash) =>
-		modelCache.request hash, @load,
+		modelCache.request(hash).then(
+			@load
 			() -> console.error "Could not load model from hash #{hash}"
+		)
 
 	# adds a new model to the state
 	addModelToState: (fileName, hash) ->

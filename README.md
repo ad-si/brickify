@@ -36,7 +36,8 @@ Following scripts are currently available:
 - `checkStyle`: Checks code-style of coffeescript files
 - `apiDocumentation`: Generates API documentation
 - `documentation`: Generates code documentation
-- `test`: Executes tests
+- `test`: Executes headless tests
+- `testFrontend`: Executes frontend tests
 - `batchTest`: Batch test all models and create a HTML report
 - `prepublish`: Prepares publication of project
 

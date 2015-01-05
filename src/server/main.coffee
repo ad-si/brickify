@@ -4,6 +4,8 @@ http = require 'http'
 path = require 'path'
 url = require 'url'
 fs = require 'fs'
+
+bootstrap = require 'bootstrap-styl'
 winston = require 'winston'
 express = require 'express'
 bodyParser = require 'body-parser'
@@ -129,7 +131,7 @@ module.exports.setupRouting = () ->
 			.set 'compress', !developmentMode
 			.set 'include css', true
 			.use nib()
-			.import 'nib'
+			.use bootstrap()
 	)
 
 	webapp.get '/app.js', browserify('src/client/main.coffee', {

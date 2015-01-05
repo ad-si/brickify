@@ -121,10 +121,10 @@ module.exports = class SceneGraph
 
 	deleteObject: () ->
 		return if @bootboxOpen
-		@bootboxOpen = true
 		if not @selectedNode or @selectedNode.name == 'Scene'
 			return
 
+		@bootboxOpen = true
 		question = "Do you really want to delete #{@selectedNode.name}?"
 		bootbox.confirm question, (result) =>
 			@bootboxOpen = false

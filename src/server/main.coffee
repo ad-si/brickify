@@ -24,7 +24,8 @@ coffeeify = require 'coffeeify'
 browserifyData = require 'browserify-data'
 envify = require 'envify'
 browserify = require 'browserify-middleware'
-
+urlSessions = require './urlSessions'
+cookieParser = require 'cookie-parser'
 
 # Make logger available to other modules.
 # Must be instantiated before requiring bundled modules
@@ -34,7 +35,6 @@ winston.loggers.add 'log',
 		colorize: true
 log = winston.loggers.get('log')
 
-
 pluginLoader = require './pluginLoader'
 app = require '../../routes/app'
 landingPage = require '../../routes/landingpage'
@@ -42,7 +42,6 @@ statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
-
 
 webapp = express()
 
@@ -155,14 +154,10 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-
-	webapp.use session {
-		secret: sessionSecret
-		resave: true
-		saveUninitialized: true
-	}
-
 	modelStorage.init()
+
+	webapp.use cookieParser()
+	webapp.use urlSessions
 
 	jsonParser = bodyParser.json {limit: '100mb'}
 	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}

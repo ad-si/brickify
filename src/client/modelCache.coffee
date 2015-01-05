@@ -7,78 +7,50 @@ OptimizedModel = require '../common/OptimizedModel'
 #  cached models from the server
 ##
 
-# The cache of loaded optimized models
+# The cache of optimized model promises
 modelCache = {}
 
-# currently running model queries
-modelQueries = {}
+exists = (hash) ->
+	return Promise.resolve $.get('/model/exists/' + hash)
 
 # sends the model to the server if the server hasn't got a file
 # with the same hash value
-submitDataToServer = (hash, data, success) ->
-	$.get('/model/exists/' + hash)
-	.success () ->
-		success?(hash)
-	.fail () ->
-		#server doesn't have the model, send it
-		$.ajax '/model/submit/' + hash,
-			data: data
-			type: 'POST'
-			contentType: 'application/octet-stream'
-			success: () ->
-				console.log 'sent model to the server'
-				success?(hash)
-			error: () -> console.error 'unable to send model to the server'
+submitDataToServer = (hash, data) ->
+	send = () ->
+		prom = Promise.resolve(
+			$.ajax(
+				'/model/submit/' + hash
+				data: data
+				type: 'POST'
+				contentType: 'application/octet-stream'
+			)
+		)
+		prom.then(
+			() -> console.log 'sent model to the server'
+			() -> console.error 'unable to send model to the server'
+		)
+		return prom
+	return exists(hash).catch(send)
 
-module.exports.store = (optimizedModel, success) ->
+module.exports.store = (optimizedModel) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
-	cache hash, optimizedModel
-	submitDataToServer(hash, modelData, success)
+	modelCache[hash] = Promise.resolve optimizedModel
+	return submitDataToServer(hash, modelData).then(() -> hash)
 
 # requests a mesh with the given hash from the server
-# if it is cached locally, the local reference is returned
-requestDataFromServer = (hash, successCallback, failCallback) ->
-	requestUrl = '/model/get/' + hash
-	$.get(requestUrl, '', successCallback).fail () ->
-		failCallback() if failCallback?
+requestDataFromServer = (hash) ->
+	return Promise.resolve $.get('/model/get/' + hash)
+
+buildModelPromise = (hash) ->
+	return requestDataFromServer(hash).then((data) ->
+		model = new OptimizedModel()
+		model.fromBase64 data
+		return model
+	)
 
 # Request an optimized mesh with the given hash
 # The mesh will be provided by the cache if present or loaded from the server
-# if available. Otherwise, `fail` will be called
-module.exports.request = (hash, success, fail) ->
-	if (model = modelCache[hash])?
-		success model
-	else if (query = modelQueries[hash])?
-		query.successCallbacks.push success
-		query.failCallbacks.push fail
-	else
-		query = {
-			hash: hash
-			successCallbacks: [success]
-			failCallbacks: [fail]
-		}
-		modelQueries[hash] = query
-		requestDataFromServer(
-			hash
-			requestOptimizedModelSuccess query
-			requestOptimizedModelFail query
-		)
-
-requestOptimizedModelSuccess = (query) -> (data) ->
-	model = new OptimizedModel()
-	model.fromBase64 data
-	hash = md5(data)
-	cache hash, model
-	successCallback model for successCallback in query.successCallbacks
-	deleteQuery query
-
-requestOptimizedModelFail = (query) -> () ->
-	failCallback() for failCallback in query.failCallbacks
-	deleteQuery query
-
-deleteQuery = (query) ->
-	delete modelQueries[query.hash]
-
-cache = (hash, model) ->
-	modelCache[hash] = model
+# if available.
+module.exports.request = (hash) ->
+	return modelCache[hash] ?= buildModelPromise(hash)

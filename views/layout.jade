@@ -4,32 +4,24 @@ html
 		meta(charset='utf-8')
 		title Lowfab
 		meta(viewport='width=device-width, initial-scale=1')
-		link(rel='stylesheet', href='/node_modules/jqtree/jqtree.css')
+
 		link(rel='stylesheet', href='/node_modules/bootstrap/dist/css/bootstrap.css')
-		link(rel='stylesheet', href='/node_modules/font-awesome/css/font-awesome.css')
 		link(rel='stylesheet', href='/styles/screen.css')
-		//if styles
-			each path in styles
-				link(rel='stylesheet', href=path)
+
+		block head
 
 	body
-
-		nav#navBar.navbar.navbar-default.navbar-fixed-top.navbar-inverse(
-		role='navigation'
-		)
-			.container-fluid
-				.navbar-header
-					button.navbar-toggle.collapsed(data-toggle='collapse',
-					data-target='#navbarToggle')
-						span.sr-only Toggle navigation
-						span.icon-bar
-						span.icon-bar
-						span.icon-bar
-					a.navbar-brand(href='/') Lowfab
-
-				#navbarToggle.collapse.navbar-collapse
-
 		#wrapper.container-fluid
+
+			h1#logo Lowfab
+
+			noscript
+				| For full functionality of this site it is necessary to enable JavaScript.
+				| Here are the
+				= ' '
+				a(href="http://enable-javascript.com", target="_blank")
+					| instructions how to enable JavaScript in your web browser
+
 			block content
 
 		block scripts

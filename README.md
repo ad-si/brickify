@@ -11,9 +11,6 @@ Install dependencies: `$ npm install`
 Link git hooks for automatic code tests and style checks:
 `$ npm run linkHooks`
 
-To run karma frontend tests install [karma-cli](https://www.npmjs.com/package/karma-cli) globally:
-`$ npm install -g karma-cli`
-
 
 ## Start Server
 
@@ -40,7 +37,7 @@ Following scripts are currently available:
 - `apiDocumentation`: Generates API documentation
 - `documentation`: Generates code documentation
 - `test`: Executes headless tests
-- `testFrontend`: Executes frontend tests (requires [karma-cli](https://www.npmjs.com/package/karma-cli)) in the browser
+- `testFrontend`: Executes frontend tests in the browser
 - `batchTest`: Batch test all models and create a HTML report
 - `prepublish`: Prepares publication of project
 

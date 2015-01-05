@@ -70,7 +70,7 @@ handleLoadedFile = (filename) ->
 			document.location.href = dhref
 			return
 
-		modelCache.store optimizedModel, uploadFinishedCallback
+		modelCache.store(optimizedModel).then(uploadFinishedCallback)
 
 		return
 

@@ -4,14 +4,15 @@ sessions = {}
 shareLinks = {}
 
 module.exports.middleware = (request, response, next) ->
-	# if in /app, do we have a url parameter that indicates a session?
-	if request.path == '/app' and request.query.s?
-		sessionId = request.query.s
+	#check for share urls
+	if request.path == '/app' and request.query.share?
+		sessionId = request.query.share
+		resolveShare sessionId, request, response, next
 
-		if sessionId.indexOf('Share-') == 0
-			resolveShare sessionId, request, response, next
-		else
-			checkSession sessionId, request, response, next
+	# if in /app, do we have a url parameter that indicates a session?
+	else if request.path == '/app' and request.query.s?
+		sessionId = request.query.s
+		checkSession sessionId, request, response, next
 	else
 		if request.cookies.s?
 			sessionId = request.cookies.s
@@ -26,7 +27,7 @@ module.exports.generateShareId = (sid) ->
 			return key
 
 	#create new one
-	id = 'Share-' + generateId()
+	id = generateId()
 	shareLinks[id] = sid
 	return id
 
@@ -46,7 +47,6 @@ checkSession = (sessionId, request, response, next) ->
 		newSession request, response, next
 
 resolveShare = (shareId, request, response, next) ->
-
 	if shareLinks[shareId]?
 		#create a copy of original state
 		sid = shareLinks[shareId]

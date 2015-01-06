@@ -40,7 +40,7 @@ bundle.init().then(postInitCallback)
 #init share logic
 $.get '/share', '', (data) ->
 	url = document.location.origin
-	url = url + '/app?s=' + data
+	url = url + '/app?share=' + data
 
 	$('#cmdShare').popover {
 		title: 'Share'

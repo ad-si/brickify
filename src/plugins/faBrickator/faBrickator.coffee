@@ -73,21 +73,13 @@ module.exports = class FaBrickatorPlugin
 
 	# voxelises a single model
 	voxelise: (optimizedModel, node) =>
+		@initVoxelizerPrerequesites()
+
 		# check if model was already voxelised
 		for modelData in @voxelisedModels
 			if modelData.node.meshHash is node.meshHash
 				console.warn 'already voxelised this model'
 				return
-
-		@voxeliser ?= new Voxeliser
-		if not @lego
-			@lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
-			@lego.add_BrickTypes [
-					[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],
-					[2,4,1],[2,6,1],[2,8,1],[2,10,1],[1,1,3],[1,2,3],[1,3,3],[1,4,3],
-					[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],
-					[2,6,3],[2,8,3],[2,10,3]
-				]
 
 		grid = @voxeliser.voxelise(optimizedModel, @lego)
 
@@ -100,6 +92,19 @@ module.exports = class FaBrickatorPlugin
 		node.pluginData.faBrickator = {
 			'threeObjectId': modelData.gridForThree.uuid}
 
+	# initializes classes and instances that are needed to voxelize models
+	initVoxelizerPrerequesites: () ->
+		@voxelizer ?= new Voxeliser()
+
+		if not @lego
+			@lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
+			@lego.add_BrickTypes [
+				[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],
+				[2,4,1],[2,6,1],[2,8,1],[2,10,1],[1,1,3],[1,2,3],[1,3,3],[1,4,3],
+				[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],
+				[2,6,3],[2,8,3],[2,10,3]
+			]
+
 	layout: (voxelizedModel, node) ->
 		if voxelizedModel.layout
 			console.warn 'Model is already layouted'
@@ -109,7 +114,7 @@ module.exports = class FaBrickatorPlugin
 		layouter = new BrickLayouter(legoLayout)
 		layouter.layoutAll()
 		legoMesh = legoLayout.get_SceneModel()
-		voxelizedModel.addLayout(legoLayout, legoMesh)
+		voxelizedModel.setLayout(legoLayout, legoMesh)
 
 		@threejsRootNode.remove voxelizedModel.gridForThree
 		@threejsRootNode.add voxelizedModel.layoutForThree

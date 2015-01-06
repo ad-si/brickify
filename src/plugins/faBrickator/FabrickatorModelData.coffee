@@ -5,4 +5,4 @@ module.exports = class FabrickatorModelData
 	constructor: (@node, @grid, @gridForThree,
 								@layout = null, @layoutForThree = null) ->
 		return
-	addLayout: (@layout, @layoutForThree) => return
+	setLayout: (@layout, @layoutForThree) => return

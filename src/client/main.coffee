@@ -2,7 +2,7 @@ require('es6-promise').polyfill()
 
 path = require 'path'
 r = require 'react'
-
+$ = require 'jquery'
 globalConfig = require './globals.yaml'
 Bundle = require './bundle'
 
@@ -36,3 +36,14 @@ postInitCallback = () ->
 
 bundle = new Bundle(globalConfig)
 bundle.init().then(postInitCallback)
+
+#init share logic
+$.get '/share', '', (data) ->
+	url = document.location.origin
+	url = url + '/app?s=' + data
+
+	$('#cmdShare').popover {
+		title: 'Share'
+		content: url
+		placement: 'bottom'
+	}

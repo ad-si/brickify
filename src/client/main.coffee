@@ -42,8 +42,13 @@ $.get '/share', '', (data) ->
 	url = document.location.origin
 	url = url + '/app?share=' + data
 
+	popoverContent = '<input type="text" class="form-control"
+		style="width: 320px" value="' + url + '" onClick="this.select();" readonly>'
+
 	$('#cmdShare').popover {
 		title: 'Share'
-		content: url
+		content: popoverContent
+		html: true
+		container: 'body'
 		placement: 'bottom'
 	}

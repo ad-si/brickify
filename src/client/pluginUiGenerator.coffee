@@ -183,6 +183,8 @@ module.exports = class PluginUiGenerator
 		# but then no disabled call has to be made
 
 	callPluginDisabled: (node) ->
+		return unless node
+
 		# calls the uiDisabled method on the selected plugin of this node
 		pluginKey = node.pluginData.uiGen.selectedPluginKey
 

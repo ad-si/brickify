@@ -20,6 +20,12 @@ module.exports.middleware = (request, response, next) ->
 			newSession request, response, next
 
 module.exports.generateShareId = (sid) ->
+	# check if share id exists
+	for own key of shareLinks
+		if shareLinks[key] == sid
+			return key
+
+	#create new one
 	id = 'Share-' + generateId()
 	shareLinks[id] = sid
 	return id

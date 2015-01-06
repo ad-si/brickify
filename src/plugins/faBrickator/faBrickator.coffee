@@ -17,6 +17,7 @@ BrickLayouter = require './bricks/BrickLayouter'
 Voxeliser = require './geometry/Voxeliser'
 voxelRenderer = require './rendering/voxelRenderer'
 interactionHelper = require '../../client/interactionHelper'
+FabrickatorModelData = require './FabrickatorModelData'
 THREE = require 'three'
 global.$ = require 'jquery'
 
@@ -73,8 +74,8 @@ module.exports = class FaBrickatorPlugin
 	# voxelises a single model
 	voxelise: (optimizedModel, node) =>
 		# check if model was already voxelised
-		for data in @voxelisedModels
-			if data.node.meshHash is node.meshHash
+		for modelData in @voxelisedModels
+			if modelData.node.meshHash is node.meshHash
 				console.warn 'already voxelised this model'
 				return
 
@@ -90,11 +91,14 @@ module.exports = class FaBrickatorPlugin
 
 		grid = @voxeliser.voxelise(optimizedModel, @lego)
 
-		voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
-		@voxelisedModels.push voxelisedData
-		@threejsRootNode.add voxelisedData.gridForThree
+		modelData = new FabrickatorModelData(
+			node, grid, voxelRenderer grid, null, null
+		)
+
+		@voxelisedModels.push modelData
+		@threejsRootNode.add modelData.gridForThree
 		node.pluginData.faBrickator = {
-			'threeObjectId': voxelisedData.gridForThree.uuid}
+			'threeObjectId': modelData.gridForThree.uuid}
 
 	layout: (voxelizedModel, node) ->
 		if voxelizedModel.layout
@@ -130,12 +134,3 @@ module.exports = class FaBrickatorPlugin
 		uuid = node.pluginData.faBrickator.threeObjectId
 		for node in threeJsNode.children
 			return node if node.uuid == uuid
-
-# Helper Class that - after voxelising and layouting -
-# contains the voxelised grid, it's ThreeJS representation
-# and the ThreeJs
-class VoxeliserData
-	constructor: (@node, @grid, @gridForThree,
-	        @layout = null, @layoutForThree = null) ->
-	    return
-	addLayout: (@layout, @layoutForThree) => return

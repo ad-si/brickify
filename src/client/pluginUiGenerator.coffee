@@ -203,6 +203,11 @@ module.exports = class PluginUiGenerator
 	onSelectNode: (stateNode) ->
 		# is called by the scenegraph plugin when the user selects a model on the
 		# left.
+
+		#skip if we already have selected this node
+		if @currentlySelectedNode == stateNode
+			return
+
 		@saveUiToCurrentNode()
 		@oldNode = @currentlySelectedNode
 		@currentlySelectedNode = stateNode

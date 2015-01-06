@@ -2,14 +2,12 @@
 # @module stateSynchronization
 ###
 
-
 $ = require 'jquery'
 objectTree = require '../common/objectTree'
-jsondiffpatch = require 'jsondiffpatch'
+diffHelper = require '../common/stateDiffHelper'
+diffpatch = diffHelper.createJsonDiffPatch()
 clone = require 'clone'
-#compare objects in arrays by using json.stringify
-diffpatch = jsondiffpatch.create objectHash: (obj) ->
-	return JSON.stringify(obj)
+
 
 module.exports = class Statesync
 	constructor: (bundle, @syncWithServer = true) ->

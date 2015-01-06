@@ -28,7 +28,7 @@ module.exports = class FaBrickatorPlugin
 		@threejsRootNode = null
 		@voxelisedModels = []
 		@voxeliser = null
-		@lego = null
+		@legoBrickSystem = null
 
 	init: (@bundle) => return
 
@@ -81,7 +81,7 @@ module.exports = class FaBrickatorPlugin
 				console.warn 'already voxelised this model'
 				return
 
-		grid = @voxeliser.voxelise(optimizedModel, @lego)
+		grid = @voxeliser.voxelise(optimizedModel, @legoBrickSystem)
 
 		modelData = new FabrickatorModelData(
 			node, grid, voxelRenderer grid, null, null
@@ -93,12 +93,12 @@ module.exports = class FaBrickatorPlugin
 			'threeObjectId': modelData.gridForThree.uuid}
 
 	# initializes classes and instances that are needed to voxelize models
-	initVoxelizerPrerequesites: () ->
-		@voxelizer ?= new Voxeliser()
+	initVoxelizerPrerequesites: () =>
+		@voxeliser ?= new Voxeliser()
 
-		if not @lego
-			@lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
-			@lego.add_BrickTypes [
+		if not @legoBrickSystem
+			@legoBrickSystem = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
+			@legoBrickSystem.add_BrickTypes [
 				[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],
 				[2,4,1],[2,6,1],[2,8,1],[2,10,1],[1,1,3],[1,2,3],[1,3,3],[1,4,3],
 				[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],

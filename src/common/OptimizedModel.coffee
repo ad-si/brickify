@@ -171,6 +171,27 @@ class OptimizedModel
 
 		return geometry
 
+	boundingBox: ->
+		if @_boundingBox
+			return @_boundingBox
+
+		minX = maxX = @positions[0]
+		minY = maxY = @positions[1]
+		minZ = maxZ = @positions[2]
+		for i in [0..@positions.length - 1] by 3
+			minX = @positions[i]     if @positions[i] < minX
+			minY = @positions[i + 1] if @positions[i + 1] < minY
+			minZ = @positions[i + 2] if @positions[i + 2] < minZ
+			maxX = @positions[i]     if @positions[i] > maxX
+			maxY = @positions[i + 1] if @positions[i + 1] > maxY
+			maxZ = @positions[i + 2] if @positions[i + 2] > maxZ
+
+		@_boundingBox = {
+			min: {x: minX, y: minY, z: minZ}
+			max: {x: maxX, y: maxY, z: maxZ}
+		}
+		return @_boundingBox
+
 module.exports = OptimizedModel
 
 base64ByteLength = (base64Length) ->

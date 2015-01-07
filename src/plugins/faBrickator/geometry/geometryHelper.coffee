@@ -5,18 +5,10 @@ Vector3D = require './Vector3D'
 Point = require './Point'
 
 module.exports.getBoundaryBox = (model) ->
-	minX = maxX = model.positions[0]
-	minY = maxY = model.positions[1]
-	minZ = maxZ = model.positions[2]
-	for i in [0..model.positions.length - 1] by 3
-		minX = model.positions[i]     if model.positions[i] < minX
-		minY = model.positions[i + 1] if model.positions[i + 1] < minY
-		minZ = model.positions[i + 2] if model.positions[i + 2] < minZ
-		maxX = model.positions[i]     if model.positions[i] > maxX
-		maxY = model.positions[i + 1] if model.positions[i + 1] > maxY
-		maxZ = model.positions[i + 2] if model.positions[i + 2] > maxZ
-
-	new BoundaryBox(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ))
+	bb = model.boundingBox()
+	new BoundaryBox(
+		new Vector3D(bb.min.x, bb.min.y, bb.min.z),
+		new Vector3D(bb.max.x, bb.max.y, bb.max.x))
 
 module.exports.getPolygons = (model) ->
 	polygons = []

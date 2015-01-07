@@ -18,7 +18,6 @@ Voxeliser = require './geometry/Voxeliser'
 voxelRenderer = require './rendering/voxelRenderer'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
-global.$ = require 'jquery'
 
 pluginPropertyName = 'voxeliser'
 

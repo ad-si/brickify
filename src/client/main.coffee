@@ -6,7 +6,7 @@ r = require 'react'
 globalConfig = require './globals.yaml'
 Bundle = require './bundle'
 
-window.jQuery = require 'jquery'
+window.jQuery = window.$ = require 'jquery'
 bootstrap = require 'bootstrap'
 
 

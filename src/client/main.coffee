@@ -38,17 +38,12 @@ bundle = new Bundle(globalConfig)
 bundle.init().then(postInitCallback)
 
 #init share logic
-$.get '/share', '', (data) ->
-	url = document.location.origin
-	url = url + '/app?share=' + data
-
-	popoverContent = '<input type="text" class="form-control"
-		style="width: 320px" value="' + url + '" onClick="this.select();" readonly>'
-
-	$('#cmdShare').popover {
-		title: 'Share'
-		content: popoverContent
-		html: true
-		container: 'body'
-		placement: 'bottom'
-	}
+Promise.resolve($.get '/share').then((link) ->
+	url = document.location.origin + '/app?share=' + link
+	$('#cmdShare').tooltip({placement: 'bottom'}).click () -> bootbox.dialog({
+		title: 'Share your work!'
+		message: '<label for="shareUrl">Via URL:</label>
+			<input id="#shareUrl" class="form-control not-readonly"
+			type="text" value="' + url + '" onClick="this.select()" readonly>'
+	})
+)

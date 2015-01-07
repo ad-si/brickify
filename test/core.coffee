@@ -10,6 +10,7 @@ describe 'Lowfab', () ->
 	server = {}
 
 	before (done) ->
+		this.timeout(5000)
 		lowfab.loadFrontendDependencies () ->
 			server = lowfab
 				.setupRouting()

@@ -38,3 +38,15 @@ module.exports = class StlExport
 		blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'})
 		saveAs blob, filename
 
+	getUiSchema: () ->
+		exportStl = () ->
+			alert 'Export stl'
+
+		return {
+		type: 'object'
+		actions:
+			exportStl:
+				title: 'Export STL'
+				callback: exportStl
+		}
+

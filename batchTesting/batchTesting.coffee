@@ -167,10 +167,10 @@ testModel = (filename) ->
 			try
 				voxelizer.voxelise optimizedModel, lego
 				testResult.voxelizationTime = new Date() - begin
-				logger.debug "voxelized in #{testResult.voxelizationTime}"
+				logger.debug "voxelized in #{testResult.voxelizationTime}ms"
 			catch
 				logger.warn 'Error while voxelizing'
-				testResult.voxelizationTime = -1
+				testResult.voxelizationTime = null
 
 			resolve(testResult)
 

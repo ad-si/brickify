@@ -27,7 +27,8 @@ class Voxeliser
 		@hull_list = {}
 		@box = geometryHelper.getBoundaryBox(optimizedModel)
 		grid = new BrickSpaceGrid(@box.clone(), @bricksystem)
-		window.grid = grid
+		if window?
+			window.grid = grid
 
 		count = 0
 		# shell bricks

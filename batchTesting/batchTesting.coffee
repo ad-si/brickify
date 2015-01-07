@@ -4,6 +4,19 @@ winston = require 'winston'
 stlLoader = require '../src/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
 mkdirp = require 'mkdirp'
+
+Voxelizer = require '../src/plugins/faBrickator/geometry/Voxeliser'
+BrickSystem = require '../src/plugins/faBrickator/bricks/BrickSystem'
+
+lego = new BrickSystem(8, 8, 3.2, 1.7, 2.512)
+lego.add_BrickTypes [
+	[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],
+	[2,4,1],[2,6,1],[2,8,1],[2,10,1],[1,1,3],[1,2,3],[1,3,3],[1,4,3],
+	[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],
+	[2,6,3],[2,8,3],[2,10,3]
+]
+voxelizer = new Voxelizer()
+
 require('es6-promise').polyfill()
 
 modelPath = path.join 'batchTesting', 'models'
@@ -150,6 +163,15 @@ testModel = (filename) ->
 			testResult.twoManifoldCheckTime = new Date() - begin
 			logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
 
+			begin = new Date()
+			try
+				voxelizer.voxelise optimizedModel, lego
+				testResult.voxelizationTime = new Date() - begin
+				logger.debug "voxelized in #{testResult.voxelizationTime}"
+			catch
+				logger.warn 'Error while voxelizing'
+				testResult.voxelizationTime = -1
+
 			resolve(testResult)
 
 # This class holds all test results for one model and is
@@ -166,3 +188,4 @@ class ModelTestResult
 		@numPoints = 0
 		@isTwoManifold = 0
 		@twoManifoldCheckTime = 0
+		@voxelizationTime = 0

@@ -5,7 +5,7 @@
 ###
 
 # Should not be global but workaround for broken jqtree
-global.$ = require 'jquery'
+$ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
 objectTree = require '../../common/objectTree'

@@ -249,7 +249,15 @@ class OptimizedModel
 				dc = Math.sqrt((c.x - p.x) * (c.x - p.x) + (c.y - p.y) * (c.y - p.y))
 				dsum = da + db + dc
 				z = a.z * (da / dsum) + b.z * (db / dsum) + c.z * (dc / dsum)
-				polyheights.push z
+
+				duplicated = false
+				for h in polyheights
+					if Math.abs(z - h) < 0.00001
+						duplicated = true
+						break
+				if not duplicated
+					polyheights.push z
+
 			if not @polyheightssaved?
 				@polyheightssaved = new Array()
 			if not @polyheightssaved[gridX]?

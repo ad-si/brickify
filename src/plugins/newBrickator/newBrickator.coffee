@@ -37,15 +37,20 @@ module.exports = class NewBrickator
 				color: 0x00ffff
 				ambient: 0x00ffff
 			})
+		# geometrical center of the box geometry is in its middle, therefore we have
+		# to add a delta to make its border align the real grid
+		deltaX = voxelGrid.origin.x + voxelGrid.spacing.x / 2
+		deltaY = voxelGrid.origin.y + voxelGrid.spacing.y / 2
+		deltaZ = voxelGrid.origin.z + voxelGrid.spacing.z / 2
 
 		for x in [0..voxelGrid.numVoxelsX - 1] by 1
 			for y in [0..voxelGrid.numVoxelsY - 1] by 1
 				for z in [0..voxelGrid.numVoxelsZ - 1] by 1
 					if voxelGrid.zLayers[z][x][y] == true
 						cube = new THREE.Mesh( geometry, material )
-						cube.translateX(voxelGrid.origin.x + voxelGrid.spacing.x * x)
-						cube.translateY(voxelGrid.origin.y + voxelGrid.spacing.y * y)
-						cube.translateZ(voxelGrid.origin.z + voxelGrid.spacing.z * z)
+						cube.translateX(deltaX + voxelGrid.spacing.x * x)
+						cube.translateY(deltaY + voxelGrid.spacing.y * y)
+						cube.translateZ(deltaZ + voxelGrid.spacing.z * z)
 						threeNode.add(cube)
 
 	voxelize: (optimizedModel, selectedNode) =>
@@ -61,11 +66,11 @@ module.exports = class NewBrickator
 		bb = optimizedModel.boundingBox()
 		voxelGrid.origin = bb.min
 		voxelGrid.numVoxelsX = Math.ceil ((bb.max.x - bb.min.x) / voxelGrid.spacing.x)
+		voxelGrid.numVoxelsX++
 		voxelGrid.numVoxelsY = Math.ceil ((bb.max.y - bb.min.y) / voxelGrid.spacing.y)
+		voxelGrid.numVoxelsY++
 		voxelGrid.numVoxelsZ = Math.ceil ((bb.max.z - bb.min.z) / voxelGrid.spacing.z)
-		#voxelGrid.numVoxelsZ = 2
-
-		console.log voxelGrid
+		voxelGrid.numVoxelsZ++
 
 		#for each voxel...
 		for z in [0..voxelGrid.numVoxelsZ - 1] by 1
@@ -84,7 +89,6 @@ module.exports = class NewBrickator
 							break
 					layer[x][y] = voxelInsideModel
 
-		console.log voxelGrid
 		return voxelGrid
 
 	voxelEdgePoints: (voxelGrid, voxelX, voxelY, voxelZ) ->

@@ -70,14 +70,8 @@ newSession = (request, response, next, sessionData = null) ->
 
 generateSession = (sessionData = null) ->
 	id = generateId()
-	if sessionData?
-		#take data, but override with new session id
-		sessions[id] = sessionData
-		sessions[id].id = id
-	else
-		sessions[id] = {
-			id: id
-		}
+	sessions[id] = sessionData or {}
+	sessions[id].id = id
 	return sessions[id]
 
 generateId = (length = 10) ->

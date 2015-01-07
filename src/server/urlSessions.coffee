@@ -4,21 +4,21 @@ sessions = {}
 shareLinks = {}
 
 module.exports.middleware = (request, response, next) ->
-	#check for share urls
+	# if in /app, do we have a share url?
 	if request.path == '/app' and request.query.share?
 		sessionId = request.query.share
 		resolveShare sessionId, request, response, next
-
 	# if in /app, do we have a url parameter that indicates a session?
 	else if request.path == '/app' and request.query.s?
 		sessionId = request.query.s
 		checkSession sessionId, request, response, next
+	# do we have a cookie that indicates a session?
+	else if request.cookies.s?
+		sessionId = request.cookies.s
+		checkSession sessionId, request, response, next
+	# no session indication -> create a new session
 	else
-		if request.cookies.s?
-			sessionId = request.cookies.s
-			checkSession sessionId, request, response, next
-		else
-			newSession request, response, next
+		newSession request, response, next
 
 module.exports.generateShareId = (sid) ->
 	# check if share id exists
@@ -26,12 +26,13 @@ module.exports.generateShareId = (sid) ->
 		if shareLinks[key] == sid
 			return key
 
-	#create new one
+	# create new one
 	id = generateId()
 	shareLinks[id] = sid
 	return id
 
 checkSession = (sessionId, request, response, next) ->
+	# Does the session exist?
 	if sessions[sessionId]?
 		# if in /app, redirect to /app?s=id (always show session id)
 		if request.path == '/app' and not (request.query.s?)
@@ -43,12 +44,13 @@ checkSession = (sessionId, request, response, next) ->
 		response.cookie('s', sessionId)
 		next()
 	else
-		#create a new session for invalid Ids and redirect
+		# create a new session for invalid Ids and redirect
 		newSession request, response, next
 
 resolveShare = (shareId, request, response, next) ->
+	# Is this a valid share link?
 	if shareLinks[shareId]?
-		#create a copy of original state
+		#create a new session with a copy of the shared state
 		sid = shareLinks[shareId]
 		session = sessions[sid]
 		cloned = clone(session)
@@ -77,7 +79,7 @@ generateSession = (sessionData = null) ->
 generateId = (length = 10) ->
 	chars = '0123456789abcdefghijklmnopqrstuvwxyz'
 	result = ''
-	for i in [0..length - 1]
+	for i in [0...length] by 1
 		index = Math.floor((Math.random() * chars.length))
 		c = chars[index]
 		result += c

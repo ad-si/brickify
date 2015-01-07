@@ -16,7 +16,6 @@ module.exports = class Example
 			console.log 'Example Plugin performs an action!'
 
 		return {
-		title: 'Example Plugin'
 		type: 'object'
 		properties:
 			size:

@@ -192,10 +192,55 @@ class OptimizedModel
 		}
 		return @_boundingBox
 
-	isInsideModel: (point) ->
+	isInsideModel: (p) =>
 		#determine whether this point is inside of the model
-		#TODO
-		return true
+		#shoot a ray up the z-Axis and look what polygons we intersect
+
+		intersectedPolygons = []
+
+		for i in [0..@indices.length - 1] by 3
+			p0 = {
+				x: @positions[@indices[i] * 3]
+				y: @positions[@indices[i] * 3 + 1]
+				z: @positions[@indices[i] * 3 + 2]
+			}
+			p1 = {
+				x: @positions[@indices[i + 1] * 3]
+				y: @positions[@indices[i + 1] * 3 + 1]
+				z: @positions[@indices[i + 1] * 3 + 2]
+			}
+			p2 = {
+				x: @positions[@indices[i + 2] * 3]
+				y: @positions[@indices[i + 2] * 3 + 1]
+				z: @positions[@indices[i + 2] * 3 + 2]
+			}
+
+			#2d is point in triangle
+			#http://stackoverflow.com/questions/
+			# 2049582/how-to-determine-a-point-in-a-triangle
+			A = 0.5 * (-p1.y * p2.x + p0.y *
+					(-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y)
+			sign = 1
+			sign = -1 if A < 0
+
+			s = (p0.y * p2.x - p0.x * p2.y +
+					(p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
+			t = (p0.x * p1.y - p0.y * p1.x +
+					(p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign;
+
+			if (s >= 0) and (t >= 0) and ((s + t) < (2 * A * sign))
+				# point is in triangle
+				intersectedPolygons.push {a: p0, b: p1, c: p2}
+				#TODO: calculate z list instead
+
+		if intersectedPolygons.length > 0
+			#console.log "Point:"
+			#console.log point
+			#console.log "intersected Polygons:"
+			#console.log intersectedPolygons
+			return true
+		else
+			return false
 
 module.exports = OptimizedModel
 

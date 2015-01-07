@@ -63,6 +63,7 @@ module.exports = class NewBrickator
 		voxelGrid.numVoxelsX = Math.ceil ((bb.max.x - bb.min.x) / voxelGrid.spacing.x)
 		voxelGrid.numVoxelsY = Math.ceil ((bb.max.y - bb.min.y) / voxelGrid.spacing.y)
 		voxelGrid.numVoxelsZ = Math.ceil ((bb.max.z - bb.min.z) / voxelGrid.spacing.z)
+		#voxelGrid.numVoxelsZ = 2
 
 		console.log voxelGrid
 

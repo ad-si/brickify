@@ -44,8 +44,7 @@ Following scripts are currently available:
 ## Package management
 
 We use [npm](https://npmjs.org) for package management.
-In order to bundle the modules for the browser we use [browserify](http://browserify.org)
-The usage of bower is deprecated and we will remove the remaining libraries in the future.
+In order to bundle the modules for the browser we use [browserify](http://browserify.org).
 
 
 ## Documentation

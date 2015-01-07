@@ -17,7 +17,6 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-bower = require 'bower'
 exec = require 'exec'
 http = require 'http'
 # Support mixing .coffee and .js files in lowfab-project

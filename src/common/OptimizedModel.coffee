@@ -192,6 +192,11 @@ class OptimizedModel
 		}
 		return @_boundingBox
 
+	isInsideModel: (point) ->
+		#determine whether this point is inside of the model
+		#TODO
+		return true
+
 module.exports = OptimizedModel
 
 base64ByteLength = (base64Length) ->

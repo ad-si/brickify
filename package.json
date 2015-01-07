@@ -59,6 +59,7 @@
     "karma-browserify": "^1.0.1",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.7",
+    "karma-cli": "0.0.4",
     "karma-mocha": "^0.1.10",
     "mocha": "^2.1.0"
   },
@@ -71,7 +72,7 @@
     "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
-    "testFrontend": "./node_modules/karma/bin/karma start",
+    "testFrontend": "./node_modules/.bin/karma start",
     "batchTest": "./node_modules/.bin/cake batchTest",
     "prepublish": "npm test && npm run checkStyle"
   },

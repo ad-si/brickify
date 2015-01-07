@@ -164,6 +164,8 @@ testModel = (filename) ->
 			logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
 
 			begin = new Date()
+			# disabled because out of memory errors
+			###
 			try
 				voxelizer.voxelise optimizedModel, lego
 				testResult.voxelizationTime = new Date() - begin
@@ -171,7 +173,7 @@ testModel = (filename) ->
 			catch
 				logger.warn 'Error while voxelizing'
 				testResult.voxelizationTime = null
-
+			###
 			resolve(testResult)
 
 # This class holds all test results for one model and is

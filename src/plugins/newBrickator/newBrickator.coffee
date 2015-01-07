@@ -79,7 +79,7 @@ module.exports = class NewBrickator
 					edgepoints = @voxelEdgePoints voxelGrid, x, y, z
 					voxelInsideModel = false
 					for i in [0..7] by 1
-						if optimizedModel.isInsideModel edgepoints[i]
+						if optimizedModel.isInsideModel edgepoints[i], voxelGrid.origin
 							voxelInsideModel = true
 							break
 					layer[x][y] = voxelInsideModel

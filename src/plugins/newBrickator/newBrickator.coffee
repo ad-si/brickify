@@ -1,4 +1,5 @@
 modelCache = require '../../client/modelCache'
+THREE = require 'three'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -15,7 +16,9 @@ module.exports = class NewBrickator
 	getUiSchema: () =>
 		voxelCallback = (selectedNode) =>
 			modelCache.request(selectedNode.meshHash).then(
-				(optimizedModel) => @voxelize optimizedModel, selectedNode
+				(optimizedModel) =>
+					grid = @voxelize optimizedModel, selectedNode
+					@createVisibleVoxels grid, @threejsRootNode
 			)
 
 		return {
@@ -26,6 +29,24 @@ module.exports = class NewBrickator
 				title: 'Voxelize'
 				callback: voxelCallback
 		}
+
+	createVisibleVoxels: (voxelGrid, threeNode) =>
+		geometry = new THREE.BoxGeometry(
+			voxelGrid.spacing.x, voxelGrid.spacing.y, voxelGrid.spacing.z )
+		material = new THREE.MeshLambertMaterial({
+				color: 0x00ffff
+				ambient: 0x00ffff
+			})
+
+		for x in [0..voxelGrid.numVoxelsX - 1] by 1
+			for y in [0..voxelGrid.numVoxelsY - 1] by 1
+				for z in [0..voxelGrid.numVoxelsZ - 1] by 1
+					if voxelGrid.zLayers[z][x][y] == true
+						cube = new THREE.Mesh( geometry, material )
+						cube.translateX(voxelGrid.origin.x + voxelGrid.spacing.x * x)
+						cube.translateY(voxelGrid.origin.y + voxelGrid.spacing.y * y)
+						cube.translateZ(voxelGrid.origin.z + voxelGrid.spacing.z * z)
+						threeNode.add(cube)
 
 	voxelize: (optimizedModel, selectedNode) =>
 		voxelGrid = {

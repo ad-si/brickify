@@ -26,7 +26,7 @@ module.exports = class Bundle
 			@pluginInstances = @pluginLoader.loadPlugins()
 			@statesync.handleUpdatedState()
 		).then(@load).then(() =>
-			window.addEventListener 'unload', @unload
+			window.addEventListener 'beforeunload', @unload
 		)
 
 	load: =>

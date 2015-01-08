@@ -2,7 +2,7 @@ require('es6-promise').polyfill()
 
 path = require 'path'
 r = require 'react'
-
+$ = require 'jquery'
 globalConfig = require './globals.yaml'
 Bundle = require './bundle'
 
@@ -36,3 +36,14 @@ postInitCallback = () ->
 
 bundle = new Bundle(globalConfig)
 bundle.init().then(postInitCallback)
+
+#init share logic
+Promise.resolve($.get '/share').then((link) ->
+	url = document.location.origin + '/app?share=' + link
+	$('#cmdShare').tooltip({placement: 'bottom'}).click () -> bootbox.dialog({
+		title: 'Share your work!'
+		message: '<label for="shareUrl">Via URL:</label>
+			<input id="#shareUrl" class="form-control not-readonly"
+			type="text" value="' + url + '" onClick="this.select()" readonly>'
+	})
+)

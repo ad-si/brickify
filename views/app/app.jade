@@ -1,9 +1,12 @@
 extends ../layout
 
 block content
-
 	#canvasContainer
 		canvas#canvas.appCanvas
+
+	#commandContainer
+		a#cmdShare(href="#", title="Share your work")
+			img(src="/img/share.png", height="40px", alt="share")
 
 	#controls.row
 		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4

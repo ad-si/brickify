@@ -44,11 +44,13 @@ module.exports = class Voxelizer
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
 		# https://gist.github.com/yamamushi/5823518
 		@visitAllPoints a, b, (p) =>
-			@voxelGrid.setRelative p.x, p.y, p.z
+			@voxelGrid.setVoxel p
 
 	visitAllPoints: (a, b, visitor) =>
 		#a,b = math round a,b / math floor a,b
 
+		bvox = @voxelGrid.mapGridRelativeToVoxel b
+		
 		#stepping
 		sx = if b.x > a.x then 1 else (if b.x < a.x then -1 else 0)
 		sy = if b.y > a.y then 1 else (if b.y < a.y then -1 else 0)
@@ -90,11 +92,15 @@ module.exports = class Voxelizer
 		testEscape = 1000
 
 		while (true)
-			visitor g
+			gvox = @voxelGrid.mapGridRelativeToVoxel g
 
-			if (g.x == b.x && g.y == b.y && g.z == b.z) #use >= ?
+			if (sx > 0 && gvox.x > bvox.x) or (sx < 0 && gvox.x < bvox.x) and
+			(sy > 0 && gvox.y > bvox.y) or (sy < 0 && gvox.y < bvox.y) and
+			(sz > 0 && gvox.z > bvox.z) or (sz < 0 && gvox.z < bvox.z)
 				break
 
+			visitor gvox
+			
 			#Which plane do we cross first?
 			xr = Math.abs(errx)
 			yr = Math.abs(erry)

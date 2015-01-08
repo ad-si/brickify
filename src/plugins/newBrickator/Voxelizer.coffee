@@ -1,4 +1,5 @@
 THREE = require 'three'
+Grid = require './Grid'
 
 module.exports = class Voxelizer
 	constructor: (@baseBrick) ->
@@ -41,13 +42,13 @@ module.exports = class Voxelizer
 			@setGrid x, y, z
 
 	visitAllPoints: (gx0, gy0, gz0, gx1, gy1, gz1, visitor) =>
-		gx0idx = Math.floor(gx0)
-		gy0idx = Math.floor(gy0)
-		gz0idx = Math.floor(gz0)
+		gx0idx = gx0 # Math.round(gx0)
+		gy0idx = gy0 # Math.round(gy0)
+		gz0idx = gz0 # Math.round(gz0)
 
-		gx1idx = Math.floor(gx1)
-		gy1idx = Math.floor(gy1)
-		gz1idx = Math.floor(gz1)
+		gx1idx = gx1 # Math.round(gx1)
+		gy1idx = gy1 # Math.round(gy1)
+		gz1idx = gz1 # Math.round(gz1)
 
 		#stepping
 		sx = if gx1idx > gx0idx then 1 else (if gx1idx < gx0idx then -1 else 0)
@@ -85,7 +86,7 @@ module.exports = class Voxelizer
 		derry = sy * vxvz
 		derrz = sz * vxvy
 
-		testEscape = 100
+		testEscape = 1000
 
 		while (true)
 			visitor gx, gy, gz
@@ -124,25 +125,6 @@ module.exports = class Voxelizer
 		@voxelGrid.zLayers[z][x][y] = true
 
 	setupGrid: (optimizedModel) ->
-		@voxelGrid = {
-			origin: {x: 0, y: 0, z: 0}
-			spacing: {x: @baseBrick.length, y: @baseBrick.width, z: @baseBrick.height}
-			numVoxelsX: 0
-			numVoxelsY: 0
-			numVoxelsZ: 0
-			zLayers: []
-		}
-
-		bb = optimizedModel.boundingBox()
-
-		@voxelGrid.origin = bb.min
-		@voxelGrid.numVoxelsX =
-			Math.ceil ((bb.max.x - bb.min.x) / @voxelGrid.spacing.x)
-		@voxelGrid.numVoxelsX++
-		@voxelGrid.numVoxelsY =
-			Math.ceil ((bb.max.y - bb.min.y) / @voxelGrid.spacing.y)
-		@voxelGrid.numVoxelsY++
-		@voxelGrid.numVoxelsZ =
-			Math.ceil ((bb.max.z - bb.min.z) / @voxelGrid.spacing.z)
-		@voxelGrid.numVoxelsZ++
+		@voxelGrid = new Grid(@baseBrick)
+		@voxelGrid.setUpForModel optimizedModel
 		return @voxelGrid

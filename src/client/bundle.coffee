@@ -34,5 +34,8 @@ module.exports = class Bundle
 	load: =>
 		@statesync.performStateAction @renderer.loadCamera
 
+	onStateUpdate: (state) =>
+		@renderer.onStateUpdate state
+
 	unload: =>
 		@statesync.performStateAction @renderer.saveCamera

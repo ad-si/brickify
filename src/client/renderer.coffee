@@ -17,13 +17,13 @@ module.exports = class Renderer
 			@stats?.begin()
 			@threeRenderer.render @.scene, @.camera
 			@pluginHooks.on3dUpdate timestamp
-			results = @pluginHooks.newBoundingSphere()
-			for r in results
-				if r?
-					@adjustCameraToObject (r)
 
 			@stats?.end()
 			requestAnimationFrame @localRenderer
+
+	onStateUpdate: (state) =>
+		for r in @pluginHooks.newBoundingSphere()
+			@adjustCameraToObject r if r?
 
 	addToScene: (node) ->
 		@scene.add node

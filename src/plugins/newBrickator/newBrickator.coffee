@@ -96,13 +96,22 @@ module.exports = class NewBrickator
 		# given voxel coordinates
 		points = []
 
+		# origin
 		voxelOrigin = {
 			x: voxelGrid.origin.x + voxelGrid.spacing.x * voxelX
 			y: voxelGrid.origin.y + voxelGrid.spacing.y * voxelY
 			z: voxelGrid.origin.z + voxelGrid.spacing.z * voxelZ
 		}
-
 		points.push voxelOrigin
+
+		#center
+		points.push {
+			x: voxelOrigin.x + voxelGrid.spacing.x / 2
+			y: voxelOrigin.y + voxelGrid.spacing.y / 2
+			z: voxelOrigin.z + voxelGrid.spacing.z / 2
+		}
+
+		#edge points
 		points.push {
 			x: voxelOrigin.x + voxelGrid.spacing.x
 			y: voxelOrigin.y #+ voxelGrid.spacing.y

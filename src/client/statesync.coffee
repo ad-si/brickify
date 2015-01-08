@@ -10,7 +10,8 @@ clone = require 'clone'
 
 
 module.exports = class Statesync
-	constructor: (bundle, @syncWithServer = true) ->
+	constructor: (bundle) ->
+		@syncWithServer = bundle.globalConfig.syncWithServer
 		if(@syncWithServer)
 			@statePromise = Promise.resolve($.get '/statesync/get')
 		else

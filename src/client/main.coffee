@@ -35,7 +35,7 @@ postInitCallback = () ->
 	#clear url hash after executing commands
 	window.location.hash = ''
 
-bundle = new Bundle(globalConfig)
+bundle = new Bundle globalConfig
 bundle.init().then(postInitCallback)
 
 #init share logic

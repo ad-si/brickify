@@ -11,6 +11,9 @@ modelCache = require '../../client/modelCache'
 
 module.exports = class StlExport
 
+	constructor: () ->
+		@$spinnerContainer = $('#spinnerContainer')
+
 	generateAsciiStl: (optimizedModel) ->
 		{indices, faceNormals, originalFileName, positions} = optimizedModel
 
@@ -41,18 +44,21 @@ module.exports = class StlExport
 
 	saveStl: (optimizedModel) ->
 		stlString = @generateAsciiStl(optimizedModel)
-		blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'})
+		blob = new Blob [stlString], {type: 'text/plain;charset=utf-8'}
 		saveAs blob, optimizedModel.originalFileName
+		@$spinnerContainer.fadeOut()
 
 	uiEnabled: (@node) ->
 		return
 
 	getUiSchema: () =>
 		exportStl = () =>
-			modelCache
-			.request @node.meshHash
-			.then (optimizedModel) =>
-				@saveStl optimizedModel
+			@$spinnerContainer.fadeIn 'fast', () =>
+				modelCache
+					.request @node.meshHash
+					.then (optimizedModel) =>
+						# TODO: Use webworkers to generate stl
+						@saveStl optimizedModel
 
 		type: 'object'
 		actions:

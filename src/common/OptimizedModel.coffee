@@ -192,120 +192,25 @@ class OptimizedModel
 		}
 		return @_boundingBox
 
-	isInsideModel: (p, gridOrigin = {x: 0, y: 0}) =>
-		#determine whether this point is inside of the model
-		#shoot a ray up the z-Axis and look what polygons we intersect
-		gridX = Math.round(p.x - gridOrigin.x)
-		gridY = Math.round(p.y - gridOrigin.y)
+	forEachPolygon: (callback) =>
+		for i in [0..@indices.length - 1] by 3
+			p0 = {
+				x: @positions[@indices[i] * 3]
+				y: @positions[@indices[i] * 3 + 1]
+				z: @positions[@indices[i] * 3 + 2]
+			}
+			p1 = {
+				x: @positions[@indices[i + 1] * 3]
+				y: @positions[@indices[i + 1] * 3 + 1]
+				z: @positions[@indices[i + 1] * 3 + 2]
+			}
+			p2 = {
+				x: @positions[@indices[i + 2] * 3]
+				y: @positions[@indices[i + 2] * 3 + 1]
+				z: @positions[@indices[i + 2] * 3 + 2]
+			}
 
-		if @polyheightssaved?[gridX]?[gridY]?
-			polyheights = @polyheightssaved[gridX][gridY]
-		else
-			intersectedPolygons = []
-
-			for i in [0..@indices.length - 1] by 3
-				p0 = {
-					x: @positions[@indices[i] * 3]
-					y: @positions[@indices[i] * 3 + 1]
-					z: @positions[@indices[i] * 3 + 2]
-				}
-				p1 = {
-					x: @positions[@indices[i + 1] * 3]
-					y: @positions[@indices[i + 1] * 3 + 1]
-					z: @positions[@indices[i + 1] * 3 + 2]
-				}
-				p2 = {
-					x: @positions[@indices[i + 2] * 3]
-					y: @positions[@indices[i + 2] * 3 + 1]
-					z: @positions[@indices[i + 2] * 3 + 2]
-				}
-
-				#2d is point in triangle
-				#http://stackoverflow.com/questions/
-				# 2049582/how-to-determine-a-point-in-a-triangle
-				A = 0.5 * (-p1.y * p2.x + p0.y *
-						(-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y)
-				sign = 1
-				sign = -1 if A < 0
-
-				s = (p0.y * p2.x - p0.x * p2.y +
-						(p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
-				t = (p0.x * p1.y - p0.y * p1.x +
-						(p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign;
-
-				if (s >= 0) and (t >= 0) and ((s + t) < (2 * A * sign))
-					# point is in triangle
-					intersectedPolygons.push {a: p0, b: p1, c: p2, sign: sign}
-
-			#extract polygon heights
-			polyheights = []
-			for poly in intersectedPolygons
-				a = poly.a
-				b = poly.b
-				c = poly.c
-
-				da = Math.sqrt((a.x - p.x) * (a.x - p.x) + (a.y - p.y) * (a.y - p.y))
-				db = Math.sqrt((b.x - p.x) * (b.x - p.x) + (b.y - p.y) * (b.y - p.y))
-				dc = Math.sqrt((c.x - p.x) * (c.x - p.x) + (c.y - p.y) * (c.y - p.y))
-				dsum = da + db + dc
-				z = a.z * (da / dsum) + b.z * (db / dsum) + c.z * (dc / dsum)
-
-				###
-				duplicated = false
-				for h in polyheights
-					if Math.abs(z - h) < 0.0000001
-						duplicated = true
-						break
-				if not duplicated
-					polyheights.push z
-				###
-				polyheights.push {z: z, sign: poly.sign}
-
-			polyheights.sort (a,b) ->
-				if a.z < b.z
-					return -1
-				else if a.z > b.z
-					return 1
-				else
-					return 0
-
-			if not @polyheightssaved?
-				@polyheightssaved = new Array()
-			if not @polyheightssaved[gridX]?
-				@polyheightssaved[gridX] = new Array()
-
-			@polyheightssaved[gridX][gridY] = polyheights
-
-		#go to the z index that is above our height
-		inside = false
-		aboveTestPoint = false
-		polysAboveTestPoint = 0
-		polysBelowTestPoint = 0
-		for ph in polyheights
-			if ph.z > p.z
-				aboveTestPoint = true
-				polysAboveTestPoint++
-			else
-				polysBelowTestPoint++
-
-			if not aboveTestPoint
-				if ph.sign == -1
-					inside = true
-				else
-					inside = false
-			else #if aboveTestPoint
-				if inside and ph.sign == 1
-					# the next polygon is outwards facing and we were inside
-					break
-
-		if inside and polysAboveTestPoint % 2 == 1 and polysBelowTestPoint > 0
-			return true
-		else
-			#if polyheights.length > 0
-			#	console.log "Not in polygon:"
-			#	console.log p
-			#	console.log polyheights
-			return false
+			callback p0, p1, p2
 
 module.exports = OptimizedModel
 

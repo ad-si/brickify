@@ -25,4 +25,12 @@ module.exports = class Bundle
 		@statesync.init().then(() =>
 			@pluginInstances = @pluginLoader.loadPlugins()
 			@statesync.handleUpdatedState()
+		).then(@load).then(() =>
+			window.addEventListener 'unload', @unload
 		)
+
+	load: =>
+		@statesync.performStateAction @renderer.loadCamera
+
+	unload: =>
+		@statesync.performStateAction @renderer.saveCamera

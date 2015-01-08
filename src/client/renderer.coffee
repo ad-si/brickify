@@ -56,12 +56,14 @@ module.exports = class Renderer
 		rv = rv.multiplyScalar(zoomAdjustmentFactor)
 
 		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
-		multCenter = center.clone().applyMatrix4(@scene.matrix)
-		position = multCenter.clone().add(rv)
+		target = center.clone().applyMatrix4(@scene.matrix)
+		position = target.clone().add(rv)
+		@setCamera position, target
 
+	setCamera: (position, target) ->
 		@controls.update()
 		@controls.target = @controls.target0 =
-			new THREE.Vector3(multCenter.x, multCenter.y, multCenter.z)
+			new THREE.Vector3(target.x, target.y, target.z)
 		@controls.position = @controls.position0 =
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
@@ -156,3 +158,15 @@ module.exports = class Renderer
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, 0, 30
 		@scene.add directionalLight
+
+	loadCamera: (state) =>
+		if state.controls?
+			@setCamera state.controls.position, state.controls.target
+
+	saveCamera: (state) =>
+		p = @camera.position
+		t = @controls.target
+		state.controls = {
+			position: { x: p.x, y: p.y, z: p.z }
+			target: { x: t.x, y: t.y, z: t.z }
+		}

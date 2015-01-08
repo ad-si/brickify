@@ -43,39 +43,35 @@ module.exports = class Voxelizer
 	voxelizeLine: (a, b) =>
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
 		# https://gist.github.com/yamamushi/5823518
-		@visitAllPoints a.x, a.y, a.z, b.x, b.y, b.z, (x,y,z) =>
-			@voxelGrid.setRelative x, y, z
+		@visitAllPoints a, b, (p) =>
+			@voxelGrid.setRelative p.x, p.y, p.z
 
-	visitAllPoints: (gx0, gy0, gz0, gx1, gy1, gz1, visitor) =>
-		gx0idx = gx0 # Math.round(gx0)
-		gy0idx = gy0 # Math.round(gy0)
-		gz0idx = gz0 # Math.round(gz0)
-
-		gx1idx = gx1 # Math.round(gx1)
-		gy1idx = gy1 # Math.round(gy1)
-		gz1idx = gz1 # Math.round(gz1)
+	visitAllPoints: (a, b, visitor) =>
+		#a,b = math round a,b / math floor a,b
 
 		#stepping
-		sx = if gx1idx > gx0idx then 1 else (if gx1idx < gx0idx then -1 else 0)
-		sy = if gy1idx > gy0idx then 1 else (if gy1idx < gy0idx then -1 else 0)
-		sz = if gz1idx > gz0idx then 1 else (if gz1idx < gz0idx then -1 else 0)
+		sx = if b.x > a.x then 1 else (if b.x < a.x then -1 else 0)
+		sy = if b.y > a.y then 1 else (if b.y < a.y then -1 else 0)
+		sz = if b.z > a.z then 1 else (if b.z < a.z then -1 else 0)
 		sx = @voxelGrid.spacing.x * sx
 		sy = @voxelGrid.spacing.y * sy
 		sz = @voxelGrid.spacing.z * sz
 
-		gx = gx0idx
-		gy = gy0idx
-		gz = gz0idx
+		g = {
+			x: a.x
+			y: a.y
+			z: a.z
+		}
 
 		#Planes for each axis that we will next cross
-		gxp = gx0idx + (if gx1idx > gx0idx then 1 else 0)
-		gyp = gy0idx + (if gy1idx > gy0idx then 1 else 0)
-		gzp = gz0idx + (if gz1idx > gz0idx then 1 else 0)
+		gxp = a.x + (if b.x > a.x then 1 else 0)
+		gyp = a.y + (if b.y > a.y then 1 else 0)
+		gzp = a.z + (if b.z > a.z then 1 else 0)
 
 		#Only used for multiplying up the error margins
-		vx = if gx1 == gx0 then 1 else (gx1 - gx0)
-		vy = if gy1 == gy0 then 1 else (gy1 - gy0)
-		vz = if gz1 == gz0 then 1 else (gz1 - gz0)
+		vx = if b.x == a.x then 1 else (b.x - a.x)
+		vy = if b.y == a.y then 1 else (b.y - a.y)
+		vz = if b.z == a.z then 1 else (b.z - a.z)
 
 		#Error is normalized to vx * vy * vz so we only have to multiply up
 		vxvy = vx * vy
@@ -83,9 +79,9 @@ module.exports = class Voxelizer
 		vyvz = vy * vz
 
 		#Error from the next plane accumulators, scaled up by vx*vy*vz
-		errx = (gxp - gx0) * vyvz
-		erry = (gyp - gy0) * vxvz
-		errz = (gzp - gz0) * vxvy
+		errx = (gxp - a.x) * vyvz
+		erry = (gyp - a.y) * vxvz
+		errz = (gzp - a.z) * vxvy
 
 		derrx = sx * vyvz
 		derry = sy * vxvz
@@ -94,9 +90,9 @@ module.exports = class Voxelizer
 		testEscape = 1000
 
 		while (true)
-			visitor gx, gy, gz
+			visitor g
 
-			if (gx == gx1idx && gy == gy1idx && gz == gz1idx)
+			if (g.x == b.x && g.y == b.y && g.z == b.z) #use >= ?
 				break
 
 			#Which plane do we cross first?
@@ -105,15 +101,15 @@ module.exports = class Voxelizer
 			zr = Math.abs(errz)
 
 			if (sx != 0 && (sy == 0 || xr < yr) && (sz == 0 || xr < zr))
-				gx += sx
+				g.x += sx
 				errx += derrx
 
 			else if (sy != 0 && (sz == 0 || yr < zr))
-				gy += sy
+				g.y += sy
 				erry += derry
 
 			else if (sz != 0)
-				gz += sz
+				g.z += sz
 				errz += derrz
 
 			break if not (testEscape-- > 0)

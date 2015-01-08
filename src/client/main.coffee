@@ -48,11 +48,9 @@ Promise.resolve($.get '/share').then((link) ->
 			<input id="#shareUrl" class="form-control not-readonly"
 			type="text" value="' + url + '" onClick="this.select()" readonly>
 			<div id="copy-button" class="actionbutton btn btn-primary copy-button"
-			data-clipboard-text="' + url +
-			'">Copy</div>'
+			data-clipboard-text="' + url + '">Copy</div>'
 		})
 		client = new ZeroClipboard document.getElementById('copy-button')
-		console.log document.getElementById('copy-button')
 
 		client.on 'ready', (readyEvent) ->
 			console.log readyEvent

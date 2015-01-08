@@ -14,8 +14,8 @@
     "blueimp-md5": "^1.1.0",
     "body-parser": "^1.9.1",
     "bootbox": "^4.3.0",
-    "bootstrap-styl": "^4.0.0",
-    "bower": "^1.3.12",
+    "bootstrap": "3.3.1",
+    "bootstrap-styl": "4.0.1",
     "browserify-data": "^0.2.0",
     "browserify-middleware": "^4.1.0",
     "clone": "^0.1.18",
@@ -75,7 +75,7 @@
     "url": "bitbucket.org/hpihci/fab3d-lowfab.git"
   },
   "author": "HPI HCI-Bachelorprojekt 2014",
-  "contributors": "Adrian Sieber, Arthur Silber, Dogan Onat Turkcuoglu, Johannes Deselaers, Stefan Neubert, Yannis Kommana",
+  "contributors": "Adrian Sieber, Arthur Silber, Johannes Deselaers, Stefan Neubert, Yannis Kommana",
   "license": "All rights reserved",
   "private": true,
   "engines": {

@@ -16,10 +16,12 @@ module.exports = class Bundle
 		@statesync = new Statesync(@)
 		@modelLoader = new ModelLoader(@statesync, @pluginHooks)
 
-		@renderer = new Renderer(@pluginHooks)
-		@ui = new Ui(@)
-		@ui.init()
-		@pluginUiGenerator = new PluginUiGenerator(@)
+		@renderer = new Renderer(@pluginHooks, @globalConfig)
+
+		if(@globalConfig.buildUi)
+			@ui = new Ui(@)
+			@ui.init()
+			@pluginUiGenerator = new PluginUiGenerator(@)
 
 	init: =>
 		@statesync.init().then(() =>

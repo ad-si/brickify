@@ -11,11 +11,6 @@ module.exports = class Voxelizer
 			color: 0x00ffff
 			ambient: 0x00ffff
 		})
-		# geometrical center of the box geometry is in its middle, therefore we have
-		# to add a delta to make its border align the real grid
-		deltaX = @voxelGrid.origin.x + @voxelGrid.spacing.x / 2
-		deltaY = @voxelGrid.origin.y + @voxelGrid.spacing.y / 2
-		deltaZ = @voxelGrid.origin.z + @voxelGrid.spacing.z / 2
 
 		for x in [0..@voxelGrid.numVoxelsX - 1] by 1
 			for y in [0..@voxelGrid.numVoxelsY - 1] by 1
@@ -23,9 +18,9 @@ module.exports = class Voxelizer
 					if @voxelGrid.zLayers[z]?[x]?[y]?
 						if @voxelGrid.zLayers[z][x][y] == true
 							cube = new THREE.Mesh( geometry, material )
-							cube.translateX(deltaX + @voxelGrid.spacing.x * x)
-							cube.translateY(deltaY + @voxelGrid.spacing.y * y)
-							cube.translateZ(deltaZ + @voxelGrid.spacing.z * z)
+							cube.translateX( @voxelGrid.origin.x + @voxelGrid.spacing.x * x)
+							cube.translateY( @voxelGrid.origin.y + @voxelGrid.spacing.y * y)
+							cube.translateZ( @voxelGrid.origin.z + @voxelGrid.spacing.z * z)
 							threeNode.add(cube)
 
 	voxelize: (optimizedModel) =>
@@ -118,9 +113,9 @@ module.exports = class Voxelizer
 			break if not (testEscape-- > 0)
 
 	setGrid: (x, y, z)  ->
-		x = Math.round(x / @voxelGrid.spacing.x)
-		y = Math.round(y / @voxelGrid.spacing.y)
-		z = Math.round(z / @voxelGrid.spacing.z)
+		x = Math.round((x - @voxelGrid.origin.x) / @voxelGrid.spacing.x)
+		y = Math.round((y - @voxelGrid.origin.y) / @voxelGrid.spacing.y)
+		z = Math.round((z - @voxelGrid.origin.z) / @voxelGrid.spacing.z)
 
 		if not @voxelGrid.zLayers[z]
 			@voxelGrid.zLayers[z] = []

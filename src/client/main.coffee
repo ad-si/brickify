@@ -8,6 +8,7 @@ Bundle = require './bundle'
 
 window.jQuery = window.$ = require 'jquery'
 bootstrap = require 'bootstrap'
+ZeroClipboard = require 'zeroclipboard'
 
 
 commandFunctions = {
@@ -40,10 +41,23 @@ bundle.init().then(postInitCallback)
 #init share logic
 Promise.resolve($.get '/share').then((link) ->
 	url = document.location.origin + '/app?share=' + link
-	$('#cmdShare').tooltip({placement: 'bottom'}).click () -> bootbox.dialog({
-		title: 'Share your work!'
-		message: '<label for="shareUrl">Via URL:</label>
+	$('#cmdShare').tooltip({placement: 'bottom'}).click () ->
+		bootbox.dialog({
+			title: 'Share your work!'
+			message: '<label for="shareUrl">Via URL:</label>
 			<input id="#shareUrl" class="form-control not-readonly"
-			type="text" value="' + url + '" onClick="this.select()" readonly>'
-	})
+			type="text" value="' + url + '" onClick="this.select()" readonly>
+			<div id="copy-button" class="actionbutton btn btn-primary copy-button"
+			data-clipboard-text="' + url +
+			'">Copy</div>'
+		})
+		client = new ZeroClipboard document.getElementById('copy-button')
+		console.log document.getElementById('copy-button')
+
+		client.on 'ready', (readyEvent) ->
+			console.log readyEvent
+			client.on 'aftercopy', (event) ->
+				# `this` === `client`
+				# `event.target` === the element that was clicked
+				alert 'Copied text to clipboard: ' + event.data['text/plain']
 )

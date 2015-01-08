@@ -42,3 +42,6 @@ staticRendererHeight: 100
 
 # sync
 syncWithServer: true
+
+#ui
+buildUi: true

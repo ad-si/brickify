@@ -8,6 +8,7 @@ globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 388
 globalConfig.syncWithServer = false
+globalConfig.buildUi = false
 
 #clone global config 3 times
 config1 = clone globalConfig

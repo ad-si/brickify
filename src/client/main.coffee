@@ -40,6 +40,8 @@ bundle.init().then(postInitCallback)
 
 #init share logic
 Promise.resolve($.get '/share').then((link) ->
+	ZeroClipboard.config(
+		{swfPath: '/node_modules/zeroclipboard/dist/ZeroClipboard.swf'})
 	url = document.location.origin + '/app?share=' + link
 	$('#cmdShare').tooltip({placement: 'bottom'}).click () ->
 		bootbox.dialog({

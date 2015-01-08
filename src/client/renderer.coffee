@@ -7,10 +7,11 @@ OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
 
 module.exports = class Renderer
-	constructor: (@pluginHooks) ->
+	constructor: (@pluginHooks, globalConfig) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
+		@init globalConfig
 
 	localRenderer: (timestamp) =>
 			@stats?.begin()

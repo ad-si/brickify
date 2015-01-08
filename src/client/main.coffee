@@ -57,7 +57,5 @@ Promise.resolve($.get '/share').then((link) ->
 		client.on 'ready', (readyEvent) ->
 			console.log readyEvent
 			client.on 'aftercopy', (event) ->
-				# `this` === `client`
-				# `event.target` === the element that was clicked
-				alert 'Copied text to clipboard: ' + event.data['text/plain']
+				event.target.innerHTML = 'Copied'
 )

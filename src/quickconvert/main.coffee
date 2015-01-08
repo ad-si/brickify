@@ -1,6 +1,7 @@
 globalConfig = require '../client/globals.yaml'
 objectTree = require '../common/objectTree'
 Bundle = require '../client/bundle'
+clone = require 'clone'
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -9,10 +10,9 @@ globalConfig.staticRendererHeight = 388
 globalConfig.syncWithServer = false
 
 #clone global config 3 times
-configString = JSON.stringify(globalConfig)
-config1 = JSON.parse configString
-config2 = JSON.parse configString
-config3 = JSON.parse configString
+config1 = clone globalConfig
+config2 = clone globalConfig
+config3 = clone globalConfig
 
 # instantiate 3 lowfab bundles
 config1.renderAreaId = 'renderArea1'

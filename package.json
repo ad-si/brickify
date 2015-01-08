@@ -50,7 +50,8 @@
     "three": "^0.69.0",
     "three-orbit-controls": "^69.0.0",
     "win-spawn": "^2.0.0",
-    "winston": "^0.8.1"
+    "winston": "^0.8.1",
+    "zeroclipboard": "^2.2.0"
   },
   "devDependencies": {
     "chai": "^1.9.2",

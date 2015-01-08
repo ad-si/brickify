@@ -47,15 +47,16 @@ Promise.resolve($.get '/share').then((link) ->
 		bootbox.dialog({
 			title: 'Share your work!'
 			message: '<label for="shareUrl">Via URL:</label>
-			<input id="#shareUrl" class="form-control not-readonly"
+			<input id="shareUrl" class="form-control not-readonly"
 			type="text" value="' + url + '" onClick="this.select()" readonly>
-			<div id="copy-button" class="actionbutton btn btn-primary copy-button"
+			<div id="copy-button" class="btn btn-primary copy-button"
 			data-clipboard-text="' + url + '">Copy</div>'
 		})
-		client = new ZeroClipboard document.getElementById('copy-button')
+		copyButton = $('#copy-button')
+		client = new ZeroClipboard copyButton
 
 		client.on 'ready', (readyEvent) ->
-			console.log readyEvent
 			client.on 'aftercopy', (event) ->
-				event.target.innerHTML = 'Copied'
+				copyButton.html 'Copied <span class="glyphicon glyphicon-ok"></span>'
+				copyButton.addClass 'btn-success'
 )

@@ -19,3 +19,24 @@ module.exports = class Grid
 
 		@numVoxelsZ = Math.ceil (bb.max.z - bb.min.z) / @spacing.z
 		@numVoxelsZ++
+
+	mapWorldToGridRelative: (point) ->
+		#maps world coordinates to aligned grid coordinates
+		return {
+			x: point.x - @origin.x
+			y: point.y - @origin.y
+			z: point.z - @origin.z
+		}
+
+	setRelative: (x,y,z) ->
+		# transforms relative (-> mapWorldToGridRelative) coordinates in voxel
+		# indices and sets the resulting voxel to true
+		x = Math.round(x / @spacing.x)
+		y = Math.round(y / @spacing.y)
+		z = Math.round(z / @spacing.z)
+
+		if not @zLayers[z]
+			@zLayers[z] = []
+		if not @zLayers[z][x]
+			@zLayers[z][x] = []
+		@zLayers[z][x][y] = true

@@ -31,6 +31,11 @@ module.exports = class Voxelizer
 			@voxelizePolygon p0, p1, p2
 
 	voxelizePolygon: (p0, p1, p2) =>
+		# Align coordinates to grid origin so that we don't have ugly numbers
+		p0 = @voxelGrid.mapWorldToGridRelative p0
+		p1 = @voxelGrid.mapWorldToGridRelative p1
+		p2 = @voxelGrid.mapWorldToGridRelative p2
+
 		@voxelizeLine p0, p1
 		@voxelizeLine p0, p2
 		@voxelizeLine p1, p2
@@ -39,7 +44,7 @@ module.exports = class Voxelizer
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
 		# https://gist.github.com/yamamushi/5823518
 		@visitAllPoints a.x, a.y, a.z, b.x, b.y, b.z, (x,y,z) =>
-			@setGrid x, y, z
+			@voxelGrid.setRelative x, y, z
 
 	visitAllPoints: (gx0, gy0, gz0, gx1, gy1, gz1, visitor) =>
 		gx0idx = gx0 # Math.round(gx0)
@@ -112,17 +117,6 @@ module.exports = class Voxelizer
 				errz += derrz
 
 			break if not (testEscape-- > 0)
-
-	setGrid: (x, y, z)  ->
-		x = Math.round((x - @voxelGrid.origin.x) / @voxelGrid.spacing.x)
-		y = Math.round((y - @voxelGrid.origin.y) / @voxelGrid.spacing.y)
-		z = Math.round((z - @voxelGrid.origin.z) / @voxelGrid.spacing.z)
-
-		if not @voxelGrid.zLayers[z]
-			@voxelGrid.zLayers[z] = []
-		if not @voxelGrid.zLayers[z][x]
-			@voxelGrid.zLayers[z][x] = []
-		@voxelGrid.zLayers[z][x][y] = true
 
 	setupGrid: (optimizedModel) ->
 		@voxelGrid = new Grid(@baseBrick)

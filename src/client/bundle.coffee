@@ -9,11 +9,11 @@ PluginUiGenerator = require './pluginUiGenerator'
 # @class Bundle
 ###
 module.exports = class Bundle
-	constructor: (@globalConfig, syncStateWithServer = true) ->
+	constructor: (@globalConfig) ->
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 
-		@statesync = new Statesync(@, syncStateWithServer)
+		@statesync = new Statesync(@)
 		@modelLoader = new ModelLoader(@statesync, @pluginHooks)
 
 		@renderer = new Renderer(@pluginHooks)

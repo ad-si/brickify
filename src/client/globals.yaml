@@ -39,3 +39,6 @@ renderAreaId: 'canvas'
 staticRendererSize: false
 staticRendererWidth: 100
 staticRendererHeight: 100
+
+# sync
+syncWithServer: true

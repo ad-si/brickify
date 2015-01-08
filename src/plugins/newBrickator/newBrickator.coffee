@@ -83,7 +83,7 @@ module.exports = class NewBrickator
 					#get the 8 edgepoints of this voxel cell
 					edgepoints = @voxelEdgePoints voxelGrid, x, y, z
 					voxelInsideModel = false
-					for i in [0..7] by 1
+					for i in [0.. edgepoints.length - 1] by 1
 						if optimizedModel.isInsideModel edgepoints[i], voxelGrid.origin
 							voxelInsideModel = true
 							break
@@ -92,8 +92,8 @@ module.exports = class NewBrickator
 		return voxelGrid
 
 	voxelEdgePoints: (voxelGrid, voxelX, voxelY, voxelZ) ->
-		# returns the 8 edge points in realWorld coordinates for the voxel with
-		# given voxel coordinates
+		# returns the 8 edge points + center point in realWorld
+		# coordinates for the voxel with given voxel coordinates
 		points = []
 
 		# origin

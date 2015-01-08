@@ -235,7 +235,7 @@ class OptimizedModel
 
 				if (s >= 0) and (t >= 0) and ((s + t) < (2 * A * sign))
 					# point is in triangle
-					intersectedPolygons.push {a: p0, b: p1, c: p2}
+					intersectedPolygons.push {a: p0, b: p1, c: p2, sign: sign}
 
 			#extract polygon heights
 			polyheights = []
@@ -250,13 +250,24 @@ class OptimizedModel
 				dsum = da + db + dc
 				z = a.z * (da / dsum) + b.z * (db / dsum) + c.z * (dc / dsum)
 
+				###
 				duplicated = false
 				for h in polyheights
-					if Math.abs(z - h) < 0.00001
+					if Math.abs(z - h) < 0.0000001
 						duplicated = true
 						break
 				if not duplicated
 					polyheights.push z
+				###
+				polyheights.push {z: z, sign: poly.sign}
+
+			polyheights.sort (a,b) ->
+				if a.z < b.z
+					return -1
+				else if a.z > b.z
+					return 1
+				else
+					return 0
 
 			if not @polyheightssaved?
 				@polyheightssaved = new Array()
@@ -265,16 +276,35 @@ class OptimizedModel
 
 			@polyheightssaved[gridX][gridY] = polyheights
 
-		# if there is an uneven number of polygons above the point (z-wise),
-		# the point is in the model
-		even  = true
-		for h in polyheights
-			if h > p.z
-				even = not even
+		#go to the z index that is above our height
+		inside = false
+		aboveTestPoint = false
+		polysAboveTestPoint = 0
+		polysBelowTestPoint = 0
+		for ph in polyheights
+			if ph.z > p.z
+				aboveTestPoint = true
+				polysAboveTestPoint++
+			else
+				polysBelowTestPoint++
 
-		if not even
+			if not aboveTestPoint
+				if ph.sign == -1
+					inside = true
+				else
+					inside = false
+			else #if aboveTestPoint
+				if inside and ph.sign == 1
+					# the next polygon is outwards facing and we were inside
+					break
+
+		if inside and polysAboveTestPoint % 2 == 1 and polysBelowTestPoint > 0
 			return true
 		else
+			#if polyheights.length > 0
+			#	console.log "Not in polygon:"
+			#	console.log p
+			#	console.log polyheights
 			return false
 
 module.exports = OptimizedModel

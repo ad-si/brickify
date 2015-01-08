@@ -12,3 +12,4 @@ npm-debug.log
 /apidoc
 /batchTesting/models
 /batchTesting/results
+!karma.conf.js

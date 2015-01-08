@@ -32,7 +32,6 @@
 lowfab = require './main'
 
 # Start the server
-lowfab.loadFrontendDependencies () ->
-	lowfab
-	.setupRouting()
-	.startServer()
+lowfab
+.setupRouting()
+.startServer()

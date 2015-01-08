@@ -57,8 +57,6 @@ module.exports = class PluginUiGenerator
 
 			pluginLayout = compilePluginTemplate(pluginKey, pluginName)
 
-			console.log(pluginLayout)
-
 			$pluginLayout = $(pluginLayout)
 			@$pluginsContainer.append($pluginLayout)
 			$pluginSettingsContainer = $('#pcontainer' + pluginKey)

@@ -4,49 +4,58 @@
   Converts any ThreeJS geometry to ASCII-.stl data format
 ###
 
+$ = require 'jquery'
+jqtree = require 'jqtree'
+
+modelCache = require '../../client/modelCache'
+
 module.exports = class StlExport
-	#helper methods
-	stringifyVector: (vec) ->
-		'' + vec.x + ' ' + vec.y + ' ' + vec.z
 
-	stringifyVertex: (vec) ->
-		'vertex ' + @stringifyVector(vec) + ' \n'
+	generateAsciiStl: (optimizedModel) ->
+		{indices, faceNormals, originalFileName, positions} = optimizedModel
 
-	#main method creating an ASCII .stl string from the geometry
-	generateAsciiStl: (threejsGeometry, filename) ->
-		vertices = threejsGeometry.vertices
-		faces = threejsGeometry.faces
+		stringifyFaceNormal = (i) ->
+			faceNormals[(i * 3)] + ' ' +
+			faceNormals[(i * 3) + 1] + ' ' +
+			faceNormals[(i * 3) + 2]
 
-		stl = "solid #{filename}"
+		stringifyVector = (i) ->
+			positions[(i * 3)] + ' ' +
+			positions[(i * 3) + 1] + ' ' +
+			positions[(i * 3) + 2]
 
-		i = 0
-		while i < faces.length
-			stl += ('facet normal ' + @stringifyVector(faces[i].normal) + ' \n')
-			stl += ('outer loop \n')
-			stl += stringifyVertex(vertices[faces[i].a])
-			stl += stringifyVertex(vertices[faces[i].b])
-			stl += stringifyVertex(vertices[faces[i].c])
-			stl += ('endloop \n')
-			stl += ('endfacet \n')
-			i++
-		stl += ('endsolid')
-		stl
 
-	#method to save generated ASCII string to disk
-	saveStl: (threejsGeometry, filename) ->
-		stlString = @generateAsciiStl(threejsGeometry)
+		stl = "solid #{originalFileName}\n"
+
+		for i in [0..indices.length - 1] by 3
+			stl +=
+				"facet normal #{stringifyFaceNormal(i / 3)}\n" +
+				'\touter loop\n' +
+				"\t\tvertex #{stringifyVector(indices[i])}\n" +
+				"\t\tvertex #{stringifyVector(indices[i + 1])}\n" +
+				"\t\tvertex #{stringifyVector(indices[i + 2])}\n" +
+				'\tendloop\n' +
+				'endfacet\n'
+
+		stl += "endsolid #{originalFileName}\n"
+
+	saveStl: (optimizedModel) ->
+		stlString = @generateAsciiStl(optimizedModel)
 		blob = new Blob([stlString], {type: 'text/plain;charset=utf-8'})
-		saveAs blob, filename
+		saveAs blob, optimizedModel.originalFileName
 
-	getUiSchema: () ->
-		exportStl = () ->
-			alert 'Export stl'
+	uiEnabled: (@node) ->
+		return
 
-		return {
+	getUiSchema: () =>
+		exportStl = () =>
+			modelCache
+			.request @node.meshHash
+			.then (optimizedModel) =>
+				@saveStl optimizedModel
+
 		type: 'object'
 		actions:
 			exportStl:
 				title: 'Export STL'
 				callback: exportStl
-		}
-

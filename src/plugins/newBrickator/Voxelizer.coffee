@@ -11,6 +11,8 @@ module.exports = class Voxelizer
 		material = new THREE.MeshLambertMaterial({
 			color: 0x00ffff
 			ambient: 0x00ffff
+			opacity: 0.5
+			transparent: true
 		})
 
 		for x in [0..@voxelGrid.numVoxelsX - 1] by 1
@@ -37,9 +39,9 @@ module.exports = class Voxelizer
 		p2 = @voxelGrid.mapWorldToGridRelative p2
 
 		#voxelize outer lines
-		l0 = @voxelizeLine p0, p1
-		l1 = @voxelizeLine p1, p2
-		l2 = @voxelizeLine p2, p0
+		l0 = @voxelizeLine p0, p1, true
+		l1 = @voxelizeLine p1, p2, true
+		l2 = @voxelizeLine p2, p0, true
 
 		#sort for short and long side
 		if l0.length >= l1.length and l0.length >= l2.length
@@ -59,14 +61,36 @@ module.exports = class Voxelizer
 		#{shortSide1.length + shortSide2.length} voxel,
 		Long side: #{longSide.length} voxel"
 
-	voxelizeLine: (a, b) =>
+		#fill triangle by drawing lines from (short sides combined) --> long side
+		longSideIndex = 0
+		for i in [0..shortSide1.length - 1] by 1
+			if not longSide[longSideIndex]
+				break
+
+			p0 = @voxelGrid.mapVoxelToGridRelative shortSide1[i]
+			p1 = @voxelGrid.mapVoxelToGridRelative longSide[longSideIndex]
+			longSideIndex++
+			@voxelizeLine p0, p1
+
+		for i in [0..shortSide2.length - 1] by 1
+			if not longSide[longSideIndex]
+				break
+
+			p0 = @voxelGrid.mapVoxelToGridRelative shortSide2[i]
+			p1 = @voxelGrid.mapVoxelToGridRelative longSide[longSideIndex]
+			longSideIndex++
+			@voxelizeLine p0, p1
+
+
+	voxelizeLine: (a, b, returnPoints = false) =>
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
 		# https://gist.github.com/yamamushi/5823518
 		lineVoxels = []
 
 		@visitAllPoints a, b, (p) =>
 			@voxelGrid.setVoxel p
-			lineVoxels.push p
+			if returnPoints
+				lineVoxels.push p
 
 		return lineVoxels
 

@@ -21,7 +21,7 @@ module.exports = class Grid
 		@numVoxelsZ++
 
 	mapWorldToGridRelative: (point) =>
-		#maps world coordinates to aligned grid coordinates
+		# maps world coordinates to aligned grid coordinates
 		return {
 			x: point.x - @origin.x
 			y: point.y - @origin.y
@@ -29,13 +29,20 @@ module.exports = class Grid
 		}
 
 	mapGridRelativeToVoxel: (point) =>
-		#maps aligned grid coordinates to voxel indices
+		# maps aligned grid coordinates to voxel indices
 		return {
 			x: Math.round(point.x / @spacing.x)
 			y: Math.round(point.y / @spacing.y)
 			z: Math.round(point.z / @spacing.z)
 		}
 
+	mapVoxelToGridRelative: (point) =>
+		# maps voxel indices to aligned grid coordinates
+		return {
+			x: point.x * @spacing.x
+			y: point.y * @spacing.y
+			z: point.z * @spacing.z
+		}
 
 	setVoxel: (voxel) =>
 		#sets the voxel with the given indices

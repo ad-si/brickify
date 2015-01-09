@@ -11,14 +11,47 @@ module.exports = class NewBrickator
 			width: 8
 			height: 3.2
 		}
+		# default voxel resolution
+		@voxelResolution = 1
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
 	getUiSchema: () =>
-		voxelCallback = (selectedNode) =>
+		voxelCallback1 = (selectedNode) =>
 			modelCache.request(selectedNode.meshHash).then(
 				(optimizedModel) =>
+					@voxelResolution = 1
+					@voxelize optimizedModel, selectedNode
+			)
+		voxelCallback2 = (selectedNode) =>
+			modelCache.request(selectedNode.meshHash).then(
+				(optimizedModel) =>
+					@voxelResolution = 2
+					@voxelize optimizedModel, selectedNode
+			)
+		voxelCallback4 = (selectedNode) =>
+			modelCache.request(selectedNode.meshHash).then(
+				(optimizedModel) =>
+					@voxelResolution = 4
+					@voxelize optimizedModel, selectedNode
+			)
+		voxelCallback8 = (selectedNode) =>
+			modelCache.request(selectedNode.meshHash).then(
+				(optimizedModel) =>
+					@voxelResolution = 8
+					@voxelize optimizedModel, selectedNode
+			)
+		voxelCallback16 = (selectedNode) =>
+			modelCache.request(selectedNode.meshHash).then(
+				(optimizedModel) =>
+					@voxelResolution = 16
+					@voxelize optimizedModel, selectedNode
+			)
+		voxelCallback64 = (selectedNode) =>
+			modelCache.request(selectedNode.meshHash).then(
+				(optimizedModel) =>
+					@voxelResolution = 64
 					@voxelize optimizedModel, selectedNode
 			)
 
@@ -27,9 +60,33 @@ module.exports = class NewBrickator
 		type: 'object'
 		actions:
 			a1:
-				title: 'Voxelize'
-				callback: voxelCallback
+				title: 'Voxelize r=1'
+				callback: voxelCallback1
+			a2:
+				title: 'Voxelize r=2'
+				callback: voxelCallback2
+			a4:
+				title: 'Voxelize r=4'
+				callback: voxelCallback4
+			a8:
+				title: 'Voxelize r=8'
+				callback: voxelCallback8
+			a16:
+				title: 'Voxelize r=16'
+				callback: voxelCallback16
+			a64:
+				title: 'Voxelize r=64'
+				callback: voxelCallback64
 		}
+
+	uiEnabled: (node) ->
+		@currentNode = node
+
+	uiDisabled: (node) ->
+		@currentNode = null
+
+	onStateUpdate: (state) =>
+		return
 
 	onClick: (event) =>
 		intersects =
@@ -43,14 +100,18 @@ module.exports = class NewBrickator
 				opacity: 0.5
 				transparent: true
 			})
-			
+
 			console.log "Setting debug voxel to:
 			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
 
 			@voxelizer.setDebugVoxel obj.voxelCoords
 
 	voxelize: (optimizedModel, selectedNode) =>
+		#delete eventual visible old voxels
+		@threejsRootNode.children = []
+
 		@voxelizer ?= new Voxelizer(@baseBrick)
+		@voxelizer.voxelResolution = @voxelResolution
 		@voxelizer.voxelize optimizedModel
 		@voxelizer.createVisibleVoxels @threejsRootNode
 

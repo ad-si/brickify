@@ -4,6 +4,7 @@ Grid = require './Grid'
 module.exports = class Voxelizer
 	constructor: (@baseBrick) ->
 		@voxelGrid = null
+		@voxelResolution = 1
 
 	setDebugVoxel: (@debugVoxel) =>
 		# allows for setting a breakpoint when voxelizing and inspecting
@@ -39,10 +40,15 @@ module.exports = class Voxelizer
 
 
 	voxelize: (optimizedModel) =>
+		start = new Date()
+		console.log "Voxelizing model with Resoltuion #{@voxelResolution}"
 		@setupGrid optimizedModel
 
 		optimizedModel.forEachPolygon (p0, p1, p2) =>
 			@voxelizePolygon p0, p1, p2
+
+		fin = new Date() - start
+		console.log "Finished voxelizing in #{fin}ms"
 
 	voxelizePolygon: (p0, p1, p2) =>
 		# Align coordinates to grid origin so that we don't have ugly numbers
@@ -91,22 +97,22 @@ module.exports = class Voxelizer
 			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1
 
-
-
 	voxelizeLine: (a, b, returnPoints = false) =>
-		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
-		# https://gist.github.com/yamamushi/5823518
 		lineVoxels = []
 
-		@visitAllPoints a, b, (p) =>
+		@visitAllPointsBresenham a, b, (p) =>
 			@voxelGrid.setVoxel p
 			if returnPoints
 				lineVoxels.push p
 
 		return lineVoxels
 
-	visitAllPoints: (a, b, visitor) =>
-		#a,b = math round a,b / math floor a,b
+	visitAllPointsBresenham: (a, b, visitor) =>
+		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
+		# https://gist.github.com/yamamushi/5823518
+		# a,b = math round a,b / math floor a,b
+
+		stepDivision = @voxelResolution
 
 		bvox = @voxelGrid.mapGridRelativeToVoxel b
 		
@@ -114,9 +120,9 @@ module.exports = class Voxelizer
 		sx = if b.x > a.x then 1 else (if b.x < a.x then -1 else 0)
 		sy = if b.y > a.y then 1 else (if b.y < a.y then -1 else 0)
 		sz = if b.z > a.z then 1 else (if b.z < a.z then -1 else 0)
-		sx = @voxelGrid.spacing.x * sx
-		sy = @voxelGrid.spacing.y * sy
-		sz = @voxelGrid.spacing.z * sz
+		sx = @voxelGrid.spacing.x * sx * (1 / stepDivision)
+		sy = @voxelGrid.spacing.y * sy * (1 / stepDivision)
+		sz = @voxelGrid.spacing.z * sz * (1 / stepDivision)
 
 		g = {
 			x: a.x
@@ -148,7 +154,11 @@ module.exports = class Voxelizer
 		derry = sy * vxvz
 		derrz = sz * vxvy
 
+		gvox = {x: -2, y: -2, z: -2}
+		gvox_old = {x: -1, y: -1, z: -1}
+
 		while (true)
+			gvox_old = gvox
 			gvox = @voxelGrid.mapGridRelativeToVoxel g
 
 			if @debugVoxel
@@ -167,7 +177,8 @@ module.exports = class Voxelizer
 			((sz > 0 && gvox.z >= bvox.z) or (sz < 0 && gvox.z <= bvox.z)))
 				break
 
-			visitor gvox
+			if (gvox_old.x != gvox.x) or (gvox_old.y != gvox.y) or (gvox_old.z != gvox.z)
+				visitor gvox
 			
 			#Which plane do we cross first?
 			xr = Math.abs(errx)

@@ -15,17 +15,22 @@ module.exports = class Voxelizer
 		geometry = new THREE.BoxGeometry(
 			@voxelGrid.spacing.x, @voxelGrid.spacing.y, @voxelGrid.spacing.z )
 		upMaterial = new THREE.MeshLambertMaterial({
-			color: 0x1e90ff
+			color: 0x46aeff #blue
 			opacity: 0.5
 			transparent: true
 		})
 		downMaterial = new THREE.MeshLambertMaterial({
-			color: 0xff8100
+			color: 0xff40a7 #pink
+			opacity: 0.5
+			transparent: true
+		})
+		neiterMaterial = new THREE.MeshLambertMaterial({
+			color: 0xc8c8c8 #grey
 			opacity: 0.5
 			transparent: true
 		})
 		fillMaterial = new THREE.MeshLambertMaterial({
-			color: 0x48b427
+			color: 0x48b427 #green
 			opacity: 0.5
 			transparent: true
 		})
@@ -35,16 +40,16 @@ module.exports = class Voxelizer
 				for z in [0..@voxelGrid.numVoxelsZ - 1] by 1
 					if @voxelGrid.zLayers[z]?[x]?[y]?
 						if @voxelGrid.zLayers[z][x][y] != false
-							vox = @voxelGrid.zLayers[z][x][y]
+							voxel = @voxelGrid.zLayers[z][x][y]
 
-							if vox.up? and vox.up == true
+							if voxel.definitelyUp? and voxel.definitelyUp
 								m = upMaterial
-							else if vox.up? and vox.up == false
+							else if voxel.definitelyDown? and voxel.definitelyDown
 								m = downMaterial
-							else if vox.inside? and vox.inside == true
+							else if voxel.inside? and voxel.inside == true
 								m = fillMaterial
 							else
-								console.warn 'No fill material for unclear voxel'
+								m = neiterMaterial
 
 							cube = new THREE.Mesh( geometry, m )
 							cube.translateX( @voxelGrid.origin.x + @voxelGrid.spacing.x * x)
@@ -83,7 +88,7 @@ module.exports = class Voxelizer
 		p2 = @voxelGrid.mapWorldToGridRelative p2
 
 		#store information for filling solids
-		if n.z > 0
+		if n.z >= 0
 			upwards = true
 		else
 			upwards = false
@@ -246,11 +251,36 @@ module.exports = class Voxelizer
 				for z in [0..@voxelGrid.numVoxelsZ - 1] by 1
 					if @voxelGrid.zLayers[z]?[x]?[y]?
 						# current voxel already exists (shell voxel)
-						if @voxelGrid.zLayers[z]?[x]?[y].up
+						dataEntrys = @voxelGrid.zLayers[z]?[x]?[y].dataEntrys
+						numUp = 0
+						numDown = 0
+						for e in dataEntrys
+							if e.up? and e.up == true
+								numUp++
+							else if e.up? and e.up == false
+								numDown++
+
+						if numUp > 0 and numDown == 0
+							definitelyUp = true
+						else
+							definitelyUp = false
+
+						if numDown > 0 and numUp == 0
+							definitelyDown = true
+						else
+							definitelyDown = false
+
+						@voxelGrid.zLayers[z][x][y].definitelyUp = definitelyUp
+						@voxelGrid.zLayers[z][x][y].definitelyDown = definitelyDown
+
+						if definitelyUp
 							#leaving model
 							insideModel = false
-						else
+						else if definitelyDown
 							insideModel = true
+						else
+							#if not sure, don't fill space
+							insideModel = false
 					else
 						#voxel does not yet exist. create if inside model
 						if insideModel

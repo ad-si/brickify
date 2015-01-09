@@ -210,9 +210,9 @@ class OptimizedModel
 				z: @positions[@indices[i + 2] * 3 + 2]
 			}
 			n = {
-				x: @faceNormals[i * 3]
-				y: @faceNormals[i * 3 + 1]
-				z: @faceNormals[i * 3 + 2]
+				x: @faceNormals[i]
+				y: @faceNormals[i + 1]
+				z: @faceNormals[i + 2]
 			}
 
 			callback p0, p1, p2, n

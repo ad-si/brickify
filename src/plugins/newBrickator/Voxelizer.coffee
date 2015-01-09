@@ -143,11 +143,11 @@ module.exports = class Voxelizer
 			# if we move in this particular direction, check that we did not exeed our
 			# destination bounds
 			if ((sx == 0) or
-			((sx > 0 && gvox.x > bvox.x) or (sx < 0 && gvox.x < bvox.x))) and
+			((sx > 0 && gvox.x >= bvox.x) or (sx < 0 && gvox.x <= bvox.x))) and
 			((sy == 0) or
-			((sy > 0 && gvox.y > bvox.y) or (sy < 0 && gvox.y < bvox.y))) and
+			((sy > 0 && gvox.y >= bvox.y) or (sy < 0 && gvox.y <= bvox.y))) and
 			((sz == 0) or
-			((sz > 0 && gvox.z > bvox.z) or (sz < 0 && gvox.z < bvox.z)))
+			((sz > 0 && gvox.z >= bvox.z) or (sz < 0 && gvox.z <= bvox.z)))
 				break
 
 			visitor gvox

@@ -5,12 +5,16 @@ module.exports = class Voxelizer
 	constructor: (@baseBrick) ->
 		@voxelGrid = null
 
+	setDebugVoxel: (@debugVoxel) =>
+		# allows for setting a breakpoint when voxelizing and inspecting
+		# a specific voxel
+		return
+
 	createVisibleVoxels: (threeNode) =>
 		geometry = new THREE.BoxGeometry(
 			@voxelGrid.spacing.x, @voxelGrid.spacing.y, @voxelGrid.spacing.z )
 		material = new THREE.MeshLambertMaterial({
-			color: 0x00ffff
-			ambient: 0x00ffff
+			color: 0x1e90ff
 			opacity: 0.5
 			transparent: true
 		})
@@ -24,7 +28,15 @@ module.exports = class Voxelizer
 							cube.translateX( @voxelGrid.origin.x + @voxelGrid.spacing.x * x)
 							cube.translateY( @voxelGrid.origin.y + @voxelGrid.spacing.y * y)
 							cube.translateZ( @voxelGrid.origin.z + @voxelGrid.spacing.z * z)
+
+							cube.voxelCoords  = {
+								x: x
+								y: y
+								z: z
+							}
+
 							threeNode.add(cube)
+
 
 	voxelize: (optimizedModel) =>
 		@setupGrid optimizedModel
@@ -40,46 +52,45 @@ module.exports = class Voxelizer
 
 		#voxelize outer lines
 		l0 = @voxelizeLine p0, p1, true
+		l0len = l0.length
 		l1 = @voxelizeLine p1, p2, true
+		l1len = l1.length
 		l2 = @voxelizeLine p2, p0, true
+		l2len = l2.length
 
 		#sort for short and long side
-		if l0.length >= l1.length and l0.length >= l2.length
+		if l0len >= l1len and l0len >= l2len
 			longSide  = l0
 			shortSide1 = l1
 			shortSide2 = l2
-		else if l1.length >= l0.length and l1.length >= l2.length
+		else if l1len >= l0len and l1len >= l2len
 			longSide = l1
 			shortSide1 = l0.reverse()
 			shortSide2 = l2.reverse()
-		else # if l2.length >= l0.length and l2.length >= l1.length
+		else # if l2len >= l0len and l2len >= l1len
 			longSide = l2
 			shortSide1 = l1.reverse()
 			shortSide2 = l0.reverse()
 
-		console.log "Short sides: #{shortSide1.length} + #{shortSide2.length} =
+		#console.log "Short sides: #{shortSide1.length} + #{shortSide2.length} =
 		#{shortSide1.length + shortSide2.length} voxel,
-		Long side: #{longSide.length} voxel"
+		#Long side: #{longSide.length} voxel"
 
-		#fill triangle by drawing lines from (short sides combined) --> long side
 		longSideIndex = 0
+		longSideDelta =
+			(longSide.length - 1) / (shortSide1.length + shortSide2.length)
 		for i in [0..shortSide1.length - 1] by 1
-			if not longSide[longSideIndex]
-				break
-
 			p0 = @voxelGrid.mapVoxelToGridRelative shortSide1[i]
-			p1 = @voxelGrid.mapVoxelToGridRelative longSide[longSideIndex]
-			longSideIndex++
+			p1 = @voxelGrid.mapVoxelToGridRelative longSide[Math.round(longSideIndex)]
+			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1
 
 		for i in [0..shortSide2.length - 1] by 1
-			if not longSide[longSideIndex]
-				break
-
 			p0 = @voxelGrid.mapVoxelToGridRelative shortSide2[i]
-			p1 = @voxelGrid.mapVoxelToGridRelative longSide[longSideIndex]
-			longSideIndex++
+			p1 = @voxelGrid.mapVoxelToGridRelative longSide[Math.round(longSideIndex)]
+			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1
+
 
 
 	voxelizeLine: (a, b, returnPoints = false) =>
@@ -139,6 +150,12 @@ module.exports = class Voxelizer
 
 		while (true)
 			gvox = @voxelGrid.mapGridRelativeToVoxel g
+
+			if @debugVoxel
+				if @debugVoxel.x == gvox.x and
+			  @debugVoxel.y == gvox.y and
+				@debugVoxel.z == gvox.z
+					console.log 'Voxelizing debug voxel, put your breakpoint *here*'
 
 			# if we move in this particular direction, check that we did not exeed our
 			# destination bounds

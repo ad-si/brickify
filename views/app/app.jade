@@ -1,9 +1,12 @@
 extends ../layout
 
 block content
-
 	#canvasContainer
 		canvas#canvas.appCanvas
+
+	#commandContainer
+		a#cmdShare(href="#", title="Share your work")
+			img(src="/img/share.png", height="40px", alt="share")
 
 	#controls.row
 		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
@@ -30,11 +33,8 @@ block content
 
 block scripts
 	script(src='/libs/webglCheck.js')
-	script(src='/libs/FileSaver/FileSaver.js')
-	script(src='/libs/Blob/Blob.js')
 	script(src='/node_modules/json-editor/dist/jsoneditor.js')
 
 	// Include app script
 	script(src='app.js')
-	script(src='/libs/bootbox/bootbox.min.js')
-
+	script(src='/node_modules/bootbox/bootbox.min.js')

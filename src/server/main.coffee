@@ -17,7 +17,6 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-bower = require 'bower'
 exec = require 'exec'
 http = require 'http'
 # Support mixing .coffee and .js files in lowfab-project
@@ -26,7 +25,8 @@ coffeeify = require 'coffeeify'
 browserifyData = require 'browserify-data'
 envify = require 'envify'
 browserify = require 'browserify-middleware'
-
+urlSessions = require './urlSessions'
+cookieParser = require 'cookie-parser'
 
 # Make logger available to other modules.
 # Must be instantiated before requiring bundled modules
@@ -36,7 +36,6 @@ winston.loggers.add 'log',
 		colorize: true
 log = winston.loggers.get('log')
 
-
 pluginLoader = require './pluginLoader'
 app = require '../../routes/app'
 landingPage = require '../../routes/landingpage'
@@ -44,7 +43,7 @@ statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
-
+sharelinkGen = require '../../routes/share'
 
 webapp = express()
 
@@ -71,49 +70,9 @@ port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
 sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
 
-links = {}
-sortedDependencies = [
-	'FileSaver',
-	'Blob'
-]
-
-module.exports.loadFrontendDependencies = (callback) ->
-	allDependencies = []
-
-	getDependencyPath = (depPath) ->
-		path.join.apply null, depPath.split('/').slice(1)
-
-	bower
-	.commands
-	.list {paths: true}
-	.on 'end', (dependencies) ->
-		for name, depPath of dependencies
-			if Array.isArray depPath
-				for subPath in depPath
-					allDependencies.push getDependencyPath subPath
-			else
-				allDependencies.push getDependencyPath depPath
-
-		isCss = (element) ->
-			path.extname(element) is '.css'
-		isJs = (element) ->
-			path.extname(element) is '.js'
-
-		links.styles = allDependencies.filter(isCss)
-		links.styles.push('styles/screen.css')
-
-		links.scripts = sortedDependencies.map (element, index) ->
-			if Array.isArray dependencies[element]
-				getDependencyPath dependencies[element].filter(isJs)[0]
-			else
-				getDependencyPath dependencies[element]
-		callback()
-
-
 module.exports.setupRouting = () ->
 	webapp.set 'hostname', if developmentMode then "localhost:#{port}" else
 		process.env.HOSTNAME or 'lowfab.net'
-
 
 	webapp.set 'views', path.normalize 'views'
 	webapp.locals.pretty = true
@@ -157,26 +116,21 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-
-	webapp.use session {
-		secret: sessionSecret
-		resave: true
-		saveUninitialized: true
-	}
-
 	modelStorage.init()
+
+	webapp.use cookieParser()
+	webapp.use urlSessions.middleware
 
 	jsonParser = bodyParser.json {limit: '100mb'}
 	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
 	rawParser = bodyParser.raw({limit: '100mb'})
 
-	landingPage.setLinks links
-
 	webapp.get '/', landingPage.getLandingpage
 	webapp.get '/contribute', landingPage.getContribute
 	webapp.get '/team', landingPage.getTeam
 	webapp.get '/quickconvert', urlParser, landingPage.getQuickConvertPage
-	webapp.get '/app', app(links)
+	webapp.get '/app', app
+	webapp.get '/share', sharelinkGen
 	webapp.get '/statesync/get', jsonParser, statesync.getState
 	webapp.post '/statesync/set', jsonParser, statesync.setState
 	webapp.get '/statesync/reset', jsonParser, statesync.resetState
@@ -216,7 +170,7 @@ module.exports.setupRouting = () ->
 	webapp.use (req, res) ->
 		res
 		.status(404)
-		.render '404', links
+		.render '404'
 	return module.exports
 
 module.exports.startServer = (_port, _ip) ->

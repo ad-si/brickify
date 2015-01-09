@@ -33,8 +33,6 @@ module.exports = class Ui
 		@renderer.windowResizeHandler()
 
 	init: =>
-		@renderer.init(@globalConfig)
-
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'

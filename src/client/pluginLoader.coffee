@@ -27,7 +27,7 @@ module.exports = class PluginLoader
 			threeNode = new THREE.Object3D()
 			instance.init3d threeNode
 
-		if @pluginHooks.hasHook(instance, 'initUi')
+		if @globalConfig.buildUi and @pluginHooks.hasHook(instance, 'initUi')
 			instance.initUi {
 				menuBar: document.getElementById 'navbarToggle'
 				toolsContainer: document.getElementById 'toolsContainer'

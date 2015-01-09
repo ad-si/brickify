@@ -17,6 +17,7 @@ BrickLayouter = require './bricks/BrickLayouter'
 Voxeliser = require './geometry/Voxeliser'
 voxelRenderer = require './rendering/voxelRenderer'
 interactionHelper = require '../../client/interactionHelper'
+FabrickatorModelData = require './FabrickatorModelData'
 THREE = require 'three'
 
 pluginPropertyName = 'voxeliser'
@@ -26,7 +27,7 @@ module.exports = class FaBrickatorPlugin
 		@threejsRootNode = null
 		@voxelisedModels = []
 		@voxeliser = null
-		@lego = null
+		@legoBrickSystem = null
 
 	init: (@bundle) => return
 
@@ -71,29 +72,37 @@ module.exports = class FaBrickatorPlugin
 
 	# voxelises a single model
 	voxelise: (optimizedModel, node) =>
+		@initVoxelizerPrerequesites()
+
 		# check if model was already voxelised
-		for data in @voxelisedModels
-			if data.node.meshHash is node.meshHash
+		for modelData in @voxelisedModels
+			if modelData.node.meshHash is node.meshHash
 				console.warn 'already voxelised this model'
 				return
 
-		@voxeliser ?= new Voxeliser
-		if not @lego
-			@lego = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
-			@lego.add_BrickTypes [
-					[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],
-					[2,4,1],[2,6,1],[2,8,1],[2,10,1],[1,1,3],[1,2,3],[1,3,3],[1,4,3],
-					[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],
-					[2,6,3],[2,8,3],[2,10,3]
-				]
+		grid = @voxeliser.voxelise(optimizedModel, @legoBrickSystem)
 
-		grid = @voxeliser.voxelise(optimizedModel, @lego)
+		modelData = new FabrickatorModelData(
+			node, grid, voxelRenderer grid, null, null
+		)
 
-		voxelisedData = new VoxeliserData(node, grid, voxelRenderer grid, null, null)
-		@voxelisedModels.push voxelisedData
-		@threejsRootNode.add voxelisedData.gridForThree
+		@voxelisedModels.push modelData
+		@threejsRootNode.add modelData.gridForThree
 		node.pluginData.faBrickator = {
-			'threeObjectId': voxelisedData.gridForThree.uuid}
+			'threeObjectId': modelData.gridForThree.uuid}
+
+	# initializes classes and instances that are needed to voxelize models
+	initVoxelizerPrerequesites: () =>
+		@voxeliser ?= new Voxeliser()
+
+		if not @legoBrickSystem
+			@legoBrickSystem = new BrickSystem( 8, 8, 3.2, 1.7, 2.512)
+			@legoBrickSystem.add_BrickTypes [
+				[1,1,1],[1,2,1],[1,3,1],[1,4,1],[1,6,1],[1,8,1],[2,2,1],[2,3,1],
+				[2,4,1],[2,6,1],[2,8,1],[2,10,1],[1,1,3],[1,2,3],[1,3,3],[1,4,3],
+				[1,6,3],[1,8,3],[1,10,3],[1,12,3],[1,16,3],[2,2,3],[2,3,3],[2,4,3],
+				[2,6,3],[2,8,3],[2,10,3]
+			]
 
 	layout: (voxelizedModel, node) ->
 		if voxelizedModel.layout
@@ -104,7 +113,7 @@ module.exports = class FaBrickatorPlugin
 		layouter = new BrickLayouter(legoLayout)
 		layouter.layoutAll()
 		legoMesh = legoLayout.get_SceneModel()
-		voxelizedModel.addLayout(legoLayout, legoMesh)
+		voxelizedModel.setLayout(legoLayout, legoMesh)
 
 		@threejsRootNode.remove voxelizedModel.gridForThree
 		@threejsRootNode.add voxelizedModel.layoutForThree
@@ -129,12 +138,3 @@ module.exports = class FaBrickatorPlugin
 		uuid = node.pluginData.faBrickator.threeObjectId
 		for node in threeJsNode.children
 			return node if node.uuid == uuid
-
-# Helper Class that - after voxelising and layouting -
-# contains the voxelised grid, it's ThreeJS representation
-# and the ThreeJs
-class VoxeliserData
-	constructor: (@node, @grid, @gridForThree,
-	        @layout = null, @layoutForThree = null) ->
-	    return
-	addLayout: (@layout, @layoutForThree) => return

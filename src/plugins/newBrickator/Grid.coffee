@@ -44,12 +44,17 @@ module.exports = class Grid
 			z: point.z * @spacing.z
 		}
 
-	setVoxel: (voxel) =>
-		#sets the voxel with the given indices
+	setVoxel: (voxel, data = true) =>
+		# sets the voxel with the given indices to true
+		# the voxel may also contain data.
 		if not @zLayers[voxel.z]
 			@zLayers[voxel.z] = []
 		if not @zLayers[voxel.z][voxel.x]
 			@zLayers[voxel.z][voxel.x] = []
-		@zLayers[voxel.z][voxel.x][voxel.y] = true
 
+		if not @zLayers[voxel.z][voxel.x][voxel.y]?
+			@zLayers[voxel.z][voxel.x][voxel.y] = {dataEntrys: [data]}
+		else
+			#if the voxel already exists, push new data to existing array
+			@zLayers[voxel.z][voxel.x][voxel.y].dataEntrys.push data
 

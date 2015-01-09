@@ -95,16 +95,18 @@ module.exports = class NewBrickator
 				@bundle.renderer)
 		if (intersects.length > 0)
 			obj = intersects[0].object
+			@threejsRootNode.remove obj
+			###
 			obj.material = new THREE.MeshLambertMaterial({
 				color: 0xdf004c
 				opacity: 0.5
 				transparent: true
 			})
-
 			console.log "Setting debug voxel to:
 			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
 
 			@voxelizer.setDebugVoxel obj.voxelCoords
+			###
 
 	voxelize: (optimizedModel, selectedNode) =>
 		#delete eventual visible old voxels

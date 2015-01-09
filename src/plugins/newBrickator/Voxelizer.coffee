@@ -14,8 +14,18 @@ module.exports = class Voxelizer
 	createVisibleVoxels: (threeNode) =>
 		geometry = new THREE.BoxGeometry(
 			@voxelGrid.spacing.x, @voxelGrid.spacing.y, @voxelGrid.spacing.z )
-		material = new THREE.MeshLambertMaterial({
+		upMaterial = new THREE.MeshLambertMaterial({
 			color: 0x1e90ff
+			opacity: 0.5
+			transparent: true
+		})
+		downMaterial = new THREE.MeshLambertMaterial({
+			color: 0xff8100
+			opacity: 0.5
+			transparent: true
+		})
+		fillMaterial = new THREE.MeshLambertMaterial({
+			color: 0x48b427
 			opacity: 0.5
 			transparent: true
 		})
@@ -24,8 +34,19 @@ module.exports = class Voxelizer
 			for y in [0..@voxelGrid.numVoxelsY - 1] by 1
 				for z in [0..@voxelGrid.numVoxelsZ - 1] by 1
 					if @voxelGrid.zLayers[z]?[x]?[y]?
-						if @voxelGrid.zLayers[z][x][y] == true
-							cube = new THREE.Mesh( geometry, material )
+						if @voxelGrid.zLayers[z][x][y] != false
+							vox = @voxelGrid.zLayers[z][x][y]
+
+							if vox.up? and vox.up == true
+								m = upMaterial
+							else if vox.up? and vox.up == false
+								m = downMaterial
+							else if vox.inside? and vox.inside == true
+								m = fillMaterial
+							else
+								console.warn 'No fill material for unclear voxel'
+
+							cube = new THREE.Mesh( geometry, m )
 							cube.translateX( @voxelGrid.origin.x + @voxelGrid.spacing.x * x)
 							cube.translateY( @voxelGrid.origin.y + @voxelGrid.spacing.y * y)
 							cube.translateZ( @voxelGrid.origin.z + @voxelGrid.spacing.z * z)
@@ -44,24 +65,39 @@ module.exports = class Voxelizer
 		console.log "Voxelizing model with Resoltuion #{@voxelResolution}"
 		@setupGrid optimizedModel
 
-		optimizedModel.forEachPolygon (p0, p1, p2) =>
-			@voxelizePolygon p0, p1, p2
+		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
+			@voxelizePolygon p0, p1, p2, n
 
 		fin = new Date() - start
-		console.log "Finished voxelizing in #{fin}ms"
+		console.log "Finished voxelizing the shell in #{fin}ms. Filling volumes..."
 
-	voxelizePolygon: (p0, p1, p2) =>
+		start = new Date()
+		@fillGrid()
+		fillEnd = new Date() - start
+		console.log "Filled volumes in #{fillEnd}ms. Total time #{fin + fillEnd}ms"
+
+	voxelizePolygon: (p0, p1, p2, n) =>
 		# Align coordinates to grid origin so that we don't have ugly numbers
 		p0 = @voxelGrid.mapWorldToGridRelative p0
 		p1 = @voxelGrid.mapWorldToGridRelative p1
 		p2 = @voxelGrid.mapWorldToGridRelative p2
 
+		#store information for filling solids
+		if n.z > 0
+			upwards = true
+		else
+			upwards = false
+
+		voxelData = {
+			up: upwards
+		}
+
 		#voxelize outer lines
-		l0 = @voxelizeLine p0, p1, true
+		l0 = @voxelizeLine p0, p1, voxelData, true
 		l0len = l0.length
-		l1 = @voxelizeLine p1, p2, true
+		l1 = @voxelizeLine p1, p2, voxelData, true
 		l1len = l1.length
-		l2 = @voxelizeLine p2, p0, true
+		l2 = @voxelizeLine p2, p0, voxelData, true
 		l2len = l2.length
 
 		#sort for short and long side
@@ -78,10 +114,6 @@ module.exports = class Voxelizer
 			shortSide1 = l1.reverse()
 			shortSide2 = l0.reverse()
 
-		#console.log "Short sides: #{shortSide1.length} + #{shortSide2.length} =
-		#{shortSide1.length + shortSide2.length} voxel,
-		#Long side: #{longSide.length} voxel"
-
 		longSideIndex = 0
 		longSideDelta =
 			(longSide.length - 1) / (shortSide1.length + shortSide2.length)
@@ -89,20 +121,25 @@ module.exports = class Voxelizer
 			p0 = @voxelGrid.mapVoxelToGridRelative shortSide1[i]
 			p1 = @voxelGrid.mapVoxelToGridRelative longSide[Math.round(longSideIndex)]
 			longSideIndex += longSideDelta
-			@voxelizeLine p0, p1
+			@voxelizeLine p0, p1, voxelData
 
 		for i in [0..shortSide2.length - 1] by 1
 			p0 = @voxelGrid.mapVoxelToGridRelative shortSide2[i]
 			p1 = @voxelGrid.mapVoxelToGridRelative longSide[Math.round(longSideIndex)]
 			longSideIndex += longSideDelta
-			@voxelizeLine p0, p1
+			@voxelizeLine p0, p1, voxelData
 
-	voxelizeLine: (a, b, returnPoints = false) =>
+	voxelizeLine: (a, b, voxelData = true, returnVoxel = false) =>
+		# voxelizes the line from a to b
+		# voxel data = something to store in the voxel grid for each voxel.
+		# can be true for 'there is a voxel' or
+		# a complex object with more information
+
 		lineVoxels = []
 
 		@visitAllPointsBresenham a, b, (p) =>
-			@voxelGrid.setVoxel p
-			if returnPoints
+			@voxelGrid.setVoxel p, voxelData
+			if returnVoxel
 				lineVoxels.push p
 
 		return lineVoxels
@@ -197,7 +234,31 @@ module.exports = class Voxelizer
 				g.z += sz
 				errz += derrz
 
+	fillGrid: () ->
+		# fills spaces in the grid. Goes up from z=0 to z=max and looks for
+		# voxels facing downwards (start filling), stops when it sees voxels
+		# facing upwards
+
+		for x in [0..@voxelGrid.numVoxelsX - 1] by 1
+			for y in [0..@voxelGrid.numVoxelsY - 1] by 1
+				insideModel = false
+
+				for z in [0..@voxelGrid.numVoxelsZ - 1] by 1
+					if @voxelGrid.zLayers[z]?[x]?[y]?
+						# current voxel already exists (shell voxel)
+						if @voxelGrid.zLayers[z]?[x]?[y].up
+							#leaving model
+							insideModel = false
+						else
+							insideModel = true
+					else
+						#voxel does not yet exist. create if inside model
+						if insideModel
+							@voxelGrid.setVoxel {x: x, y: y, z: z}, {inside: true}
+
+
 	setupGrid: (optimizedModel) ->
 		@voxelGrid = new Grid(@baseBrick)
 		@voxelGrid.setUpForModel optimizedModel
 		return @voxelGrid
+

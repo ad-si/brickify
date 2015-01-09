@@ -209,8 +209,13 @@ class OptimizedModel
 				y: @positions[@indices[i + 2] * 3 + 1]
 				z: @positions[@indices[i + 2] * 3 + 2]
 			}
+			n = {
+				x: @faceNormals[i * 3]
+				y: @faceNormals[i * 3 + 1]
+				z: @faceNormals[i * 3 + 2]
+			}
 
-			callback p0, p1, p2
+			callback p0, p1, p2, n
 
 module.exports = OptimizedModel
 

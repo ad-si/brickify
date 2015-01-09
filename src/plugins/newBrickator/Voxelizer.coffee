@@ -46,7 +46,8 @@ module.exports = class Voxelizer
 								m = upMaterial
 							else if voxel.definitelyDown? and voxel.definitelyDown
 								m = downMaterial
-							else if voxel.inside? and voxel.inside == true
+							else if voxel.dataEntrys[0].inside? and
+							voxel.dataEntrys[0].inside == true
 								m = fillMaterial
 							else
 								m = neiterMaterial
@@ -247,8 +248,10 @@ module.exports = class Voxelizer
 		for x in [0..@voxelGrid.numVoxelsX - 1] by 1
 			for y in [0..@voxelGrid.numVoxelsY - 1] by 1
 				insideModel = false
+				z = 0
+				currentFillVoxelQueue = []
 
-				for z in [0..@voxelGrid.numVoxelsZ - 1] by 1
+				while z < @voxelGrid.numVoxelsZ
 					if @voxelGrid.zLayers[z]?[x]?[y]?
 						# current voxel already exists (shell voxel)
 						dataEntrys = @voxelGrid.zLayers[z]?[x]?[y].dataEntrys
@@ -274,17 +277,30 @@ module.exports = class Voxelizer
 						@voxelGrid.zLayers[z][x][y].definitelyDown = definitelyDown
 
 						if definitelyUp
-							#leaving model
+							#fill up voxels
+							for v in currentFillVoxelQueue
+								@voxelGrid.setVoxel v, {inside: true}
+							#leave model
 							insideModel = false
 						else if definitelyDown
+							# re-entering model if inside?
+							# that seems odd. empty current fill queue
+							if insideModel
+								currentFillVoxelQueue = []
+							#entering model
 							insideModel = true
 						else
-							#if not sure, don't fill space
+							#if not sure, fill up (precautious people might leave this out?)
+							for v in currentFillVoxelQueue
+								@voxelGrid.setVoxel v, {inside: true}
+							currentFillVoxelQueue = []
+
 							insideModel = false
 					else
 						#voxel does not yet exist. create if inside model
 						if insideModel
-							@voxelGrid.setVoxel {x: x, y: y, z: z}, {inside: true}
+							currentFillVoxelQueue.push {x: x, y: y, z: z}
+					z++
 
 
 	setupGrid: (optimizedModel) ->

@@ -36,15 +36,39 @@ module.exports = class Voxelizer
 		p1 = @voxelGrid.mapWorldToGridRelative p1
 		p2 = @voxelGrid.mapWorldToGridRelative p2
 
-		@voxelizeLine p0, p1
-		@voxelizeLine p0, p2
-		@voxelizeLine p1, p2
+		#voxelize outer lines
+		l0 = @voxelizeLine p0, p1
+		l1 = @voxelizeLine p1, p2
+		l2 = @voxelizeLine p2, p0
+
+		#sort for short and long side
+		if l0.length >= l1.length and l0.length >= l2.length
+			longSide  = l0
+			shortSide1 = l1
+			shortSide2 = l2
+		else if l1.length >= l0.length and l1.length >= l2.length
+			longSide = l1
+			shortSide1 = l0.reverse()
+			shortSide2 = l2.reverse()
+		else # if l2.length >= l0.length and l2.length >= l1.length
+			longSide = l2
+			shortSide1 = l1.reverse()
+			shortSide2 = l0.reverse()
+
+		console.log "Short sides: #{shortSide1.length} + #{shortSide2.length} =
+		#{shortSide1.length + shortSide2.length} voxel,
+		Long side: #{longSide.length} voxel"
 
 	voxelizeLine: (a, b) =>
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
 		# https://gist.github.com/yamamushi/5823518
+		lineVoxels = []
+
 		@visitAllPoints a, b, (p) =>
 			@voxelGrid.setVoxel p
+			lineVoxels.push p
+
+		return lineVoxels
 
 	visitAllPoints: (a, b, visitor) =>
 		#a,b = math round a,b / math floor a,b
@@ -89,14 +113,17 @@ module.exports = class Voxelizer
 		derry = sy * vxvz
 		derrz = sz * vxvy
 
-		testEscape = 1000
-
 		while (true)
 			gvox = @voxelGrid.mapGridRelativeToVoxel g
 
-			if (sx > 0 && gvox.x > bvox.x) or (sx < 0 && gvox.x < bvox.x) and
-			(sy > 0 && gvox.y > bvox.y) or (sy < 0 && gvox.y < bvox.y) and
-			(sz > 0 && gvox.z > bvox.z) or (sz < 0 && gvox.z < bvox.z)
+			# if we move in this particular direction, check that we did not exeed our
+			# destination bounds
+			if ((sx == 0) or
+			((sx > 0 && gvox.x > bvox.x) or (sx < 0 && gvox.x < bvox.x))) and
+			((sy == 0) or
+			((sy > 0 && gvox.y > bvox.y) or (sy < 0 && gvox.y < bvox.y))) and
+			((sz == 0) or
+			((sz > 0 && gvox.z > bvox.z) or (sz < 0 && gvox.z < bvox.z)))
 				break
 
 			visitor gvox
@@ -117,8 +144,6 @@ module.exports = class Voxelizer
 			else if (sz != 0)
 				g.z += sz
 				errz += derrz
-
-			break if not (testEscape-- > 0)
 
 	setupGrid: (optimizedModel) ->
 		@voxelGrid = new Grid(@baseBrick)

@@ -1,17 +1,19 @@
-Voxelizer = require './Voxelizer'
+HullVoxelizer = require './HullVoxelizer'
+VolumeFiller = require './VolumeFiller'
 
 module.exports = class LegoPipeline
 	constructor: (baseBrick) ->
-		@voxelizer = new Voxelizer(baseBrick)
+		@voxelizer = new HullVoxelizer(baseBrick)
+		@volumeFiller = new VolumeFiller()
 
 		@pipelineSteps = []
 		@pipelineSteps.push (lastResult, options) =>
 			@voxelizer.voxelize lastResult, options
 		@pipelineSteps.push (lastResult, options) =>
-			@voxelizer.fillGrid lastResult, options
+			@volumeFiller.fillGrid lastResult, options
 
 		@humanReadableStepNames = []
-		@humanReadableStepNames.push 'Voxelizing'
+		@humanReadableStepNames.push 'Hull voxelizing'
 		@humanReadableStepNames.push 'Volume filling'
 
 

@@ -1,4 +1,3 @@
-THREE = require 'three'
 Grid = require './Grid'
 
 module.exports = class Voxelizer
@@ -11,79 +10,16 @@ module.exports = class Voxelizer
 		# a specific voxel
 		return
 
-	createVisibleVoxels: (threeNode) =>
-		geometry = new THREE.BoxGeometry(
-			@voxelGrid.spacing.x, @voxelGrid.spacing.y, @voxelGrid.spacing.z )
-		upMaterial = new THREE.MeshLambertMaterial({
-			color: 0x46aeff #blue
-			opacity: 0.5
-			transparent: true
-		})
-		downMaterial = new THREE.MeshLambertMaterial({
-			color: 0xff40a7 #pink
-			opacity: 0.5
-			transparent: true
-		})
-		neiterMaterial = new THREE.MeshLambertMaterial({
-			color: 0xc8c8c8 #grey
-			opacity: 0.5
-			transparent: true
-		})
-		fillMaterial = new THREE.MeshLambertMaterial({
-			color: 0x48b427 #green
-			opacity: 0.5
-			transparent: true
-		})
-
-		for x in [0..@voxelGrid.numVoxelsX - 1] by 1
-			for y in [0..@voxelGrid.numVoxelsY - 1] by 1
-				for z in [0..@voxelGrid.numVoxelsZ - 1] by 1
-					if @voxelGrid.zLayers[z]?[x]?[y]?
-						if @voxelGrid.zLayers[z][x][y] != false
-							voxel = @voxelGrid.zLayers[z][x][y]
-
-							if voxel.definitelyUp? and voxel.definitelyUp
-								m = upMaterial
-							else if voxel.definitelyDown? and voxel.definitelyDown
-								m = downMaterial
-							else if voxel.dataEntrys[0].inside? and
-							voxel.dataEntrys[0].inside == true
-								m = fillMaterial
-							else
-								m = neiterMaterial
-
-							cube = new THREE.Mesh( geometry, m )
-							cube.translateX( @voxelGrid.origin.x + @voxelGrid.spacing.x * x)
-							cube.translateY( @voxelGrid.origin.y + @voxelGrid.spacing.y * y)
-							cube.translateZ( @voxelGrid.origin.z + @voxelGrid.spacing.z * z)
-
-							cube.voxelCoords  = {
-								x: x
-								y: y
-								z: z
-							}
-
-							threeNode.add(cube)
-
-
 	voxelize: (optimizedModel, options = {}) =>
 		if options.voxelResolution?
 			@voxelResolution = options.voxelResolution
 
-		start = new Date()
-		console.log "Voxelizing model with Resoltuion #{@voxelResolution}"
 		@setupGrid optimizedModel
 
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
 			@voxelizePolygon p0, p1, p2, n
 
-		fin = new Date() - start
-		console.log "Finished voxelizing the shell in #{fin}ms. Filling volumes..."
-
-		start = new Date()
-		@fillGrid()
-		fillEnd = new Date() - start
-		console.log "Filled volumes in #{fillEnd}ms. Total time #{fin + fillEnd}ms"
+		return @voxelGrid
 
 	voxelizePolygon: (p0, p1, p2, n) =>
 		# Align coordinates to grid origin so that we don't have ugly numbers
@@ -304,6 +240,7 @@ module.exports = class Voxelizer
 						if insideModel
 							currentFillVoxelQueue.push {x: x, y: y, z: z}
 					z++
+		return @voxelGrid
 
 
 	setupGrid: (optimizedModel) ->

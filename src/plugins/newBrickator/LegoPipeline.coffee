@@ -5,39 +5,53 @@ module.exports = class LegoPipeline
 		@voxelizer = new Voxelizer(baseBrick)
 
 		@pipelineSteps = []
-		@pipelineSteps.push (model, options) =>
-			@voxelizer.voxelize model, options
+		@pipelineSteps.push (lastResult, options) =>
+			@voxelizer.voxelize lastResult, options
+		@pipelineSteps.push (lastResult, options) =>
+			@voxelizer.fillGrid lastResult, options
 
 		@humanReadableStepNames = []
-		@humanReadableStepNames.push 'Voxelizer'
+		@humanReadableStepNames.push 'Voxelizing'
+		@humanReadableStepNames.push 'Volume filling'
 
 
 	run: (optimizedModel, options = null, profiling = false) =>
 		if profiling
 			console.log 'Starting Lego Pipeline'
+			profilingResults = []
+
+		lastResult = optimizedModel
 
 		for i in [0..@pipelineSteps.length - 1] by 1
-			res = []
 			if profiling
-				res.push @runStepProfiled i, optimizedModel, options
+				r = @runStepProfiled i, lastResult, options
+				profilingResults.push r.time
+				lastResult = r.result
 			else
-				res.push @runStep i, optimizedModel, options
+				 lastResult = @runStep i, lastResult, options
 
 		if profiling
 			sum = 0
-			for s in res
+			for s in profilingResults
 				sum += s
 			console.log "Finished Lego Pipeline in #{sum}ms"
 
-		return res
+		return {
+			profilingResults: profilingResults
+			lastResult: lastResult
+		}
 
-	runStep: (i, optimizedModel, options) ->
-		return @pipelineSteps[i](optimizedModel, options)
+	runStep: (i, lastResult, options) ->
+		return @pipelineSteps[i](lastResult, options)
 
-	runStepProfiled: (i, optimizedModel, options) ->
+	runStepProfiled: (i, lastResult, options) ->
 		console.log "Running step #{@humanReadableStepNames[i]}"
 		start = new Date()
-		@runStep i, optimizedModel, options
+		result = @runStep i, lastResult, options
 		stop = new Date() - start
 		console.log "Step #{@humanReadableStepNames[i]} finished in #{stop}ms"
-		return stop
+
+		return {
+			time: stop
+			result: result
+		}

@@ -2,6 +2,7 @@ modelCache = require '../../client/modelCache'
 LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
+VoxelVisualizer = require './VoxelVisualizer'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -110,11 +111,13 @@ module.exports = class NewBrickator
 			###
 
 	voxelize: (optimizedModel, selectedNode) =>
-		#delete eventual visible old voxels
-		@threejsRootNode.children = []
+		@voxelVisualizer ?= new VoxelVisualizer(@threejsRootNode)
 
-		@pipeline.run optimizedModel, {voxelResolution: @voxelResolution}, true
-		@pipeline.voxelizer.createVisibleVoxels @threejsRootNode
+		@voxelVisualizer.clear()
+		results = @pipeline.run optimizedModel,
+			{voxelResolution: @voxelResolution}, true
+		grid = results.lastResult
+		@voxelVisualizer.createVisibleVoxel grid
 
 
 

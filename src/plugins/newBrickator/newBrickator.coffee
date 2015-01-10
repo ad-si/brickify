@@ -1,5 +1,5 @@
 modelCache = require '../../client/modelCache'
-Voxelizer  = require './Voxelizer'
+LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 
@@ -13,6 +13,7 @@ module.exports = class NewBrickator
 		}
 		# default voxel resolution
 		@voxelResolution = 1
+		@pipeline = new LegoPipeline(@baseBrick)
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -112,10 +113,8 @@ module.exports = class NewBrickator
 		#delete eventual visible old voxels
 		@threejsRootNode.children = []
 
-		@voxelizer ?= new Voxelizer(@baseBrick)
-		@voxelizer.voxelResolution = @voxelResolution
-		@voxelizer.voxelize optimizedModel
-		@voxelizer.createVisibleVoxels @threejsRootNode
+		@pipeline.run optimizedModel, {voxelResolution: @voxelResolution}, true
+		@pipeline.voxelizer.createVisibleVoxels @threejsRootNode
 
 
 

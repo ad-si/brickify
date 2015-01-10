@@ -66,7 +66,10 @@ module.exports = class Voxelizer
 							threeNode.add(cube)
 
 
-	voxelize: (optimizedModel) =>
+	voxelize: (optimizedModel, options = {}) =>
+		if options.voxelResolution?
+			@voxelResolution = options.voxelResolution
+
 		start = new Date()
 		console.log "Voxelizing model with Resoltuion #{@voxelResolution}"
 		@setupGrid optimizedModel

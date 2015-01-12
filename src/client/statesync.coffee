@@ -10,8 +10,8 @@ clone = require 'clone'
 
 
 module.exports = class Statesync
-	constructor: (bundle) ->
-		@syncWithServer = bundle.globalConfig.syncWithServer
+	constructor: (@bundle) ->
+		@syncWithServer = @bundle.globalConfig.syncWithServer
 		if(@syncWithServer)
 			@statePromise = Promise.resolve($.get '/statesync/get')
 		else
@@ -19,8 +19,6 @@ module.exports = class Statesync
 
 		@state = {}
 		@oldState = {}
-		@globalConfig = bundle.globalConfig
-		@pluginHooks = bundle.pluginHooks
 
 		@$spinnerContainer = $('#spinnerContainer')
 
@@ -43,7 +41,8 @@ module.exports = class Statesync
 		@statePromise = prom.then(@sync)
 
 	handleUpdatedState: =>
-		Promise.all(@pluginHooks.onStateUpdate @state)
+		Promise.all(@bundle.pluginHooks.onStateUpdate @state)
+			.then(() => @bundle.onStateUpdate @state)
 
 	sync: =>
 		# do we need to sync?

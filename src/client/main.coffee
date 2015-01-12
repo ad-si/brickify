@@ -44,14 +44,16 @@ Promise.resolve($.get '/share').then((link) ->
 		{swfPath: '/node_modules/zeroclipboard/dist/ZeroClipboard.swf'})
 	url = document.location.origin + '/app?share=' + link
 	$('#cmdShare').tooltip({placement: 'bottom'}).click () ->
-		bootbox.dialog({
-			title: 'Share your work!'
-			message: '<label for="shareUrl">Via URL:</label>
-			<input id="shareUrl" class="form-control not-readonly"
-			type="text" value="' + url + '" onClick="this.select()" readonly>
-			<div id="copy-button" class="btn btn-primary copy-button"
-			data-clipboard-text="' + url + '">Copy</div>'
-		})
+		bundle.saveChanges().then(
+			bootbox.dialog({
+				title: 'Share your work!'
+				message: '<label for="shareUrl">Via URL:</label>
+				<input id="shareUrl" class="form-control not-readonly"
+				type="text" value="' + url + '" onClick="this.select()" readonly>
+				<div id="copy-button" class="btn btn-primary copy-button"
+				data-clipboard-text="' + url + '">Copy</div>'
+			})
+		)
 		copyButton = $('#copy-button')
 		client = new ZeroClipboard copyButton
 

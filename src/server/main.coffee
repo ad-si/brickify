@@ -112,6 +112,7 @@ module.exports.setupRouting = () ->
 	webapp.get '/app.js', browserify('src/client/main.coffee', {
 		extensions: ['.coffee']
 		external: shared
+		insertGlobals: developmentMode
 	})
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']

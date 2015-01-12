@@ -9,6 +9,7 @@ saveAs = require 'filesaver.js'
 
 modelCache = require '../../client/modelCache'
 
+
 module.exports = class StlExport
 
 	constructor: () ->
@@ -42,25 +43,46 @@ module.exports = class StlExport
 
 		stl += "endsolid #{originalFileName}\n"
 
-	saveStl: (optimizedModel) =>
-		stlString = @generateAsciiStl(optimizedModel)
+
+	generateBinaryStl: (optimizedModel) ->
+		isLittleEndian = true
+
+
+	saveStl: (stlString, fileName) =>
+		console.log(saveAs)
 		blob = new Blob [stlString], {type: 'text/plain;charset=utf-8'}
-		saveAs blob, optimizedModel.originalFileName
+		saveAs blob, fileName
 		@$spinnerContainer.fadeOut()
+
+
+	exportStl: (format) =>
+
+		if format is 'ascii'
+			generatorFunc = @generateAsciiStl
+
+		else if format is 'binary'
+			generatorFunc = @generateBinaryStl
+
+		else
+			throw new Error("Format '#{format}}' is not supported")
+
+		@$spinnerContainer.fadeIn 'fast', () =>
+			modelCache
+			.request @node.meshHash
+			.then (optimizedModel) =>
+				@saveStl generatorFunc(optimizedModel),
+					optimizedModel.originalFileName
+
 
 	uiEnabled: (@node) ->
 		return
 
 	getUiSchema: () =>
-		exportStl = () =>
-			@$spinnerContainer.fadeIn 'fast', () =>
-				modelCache
-					.request @node.meshHash
-					.then @saveStl
-						# TODO: Use webworkers to generate stl
-
 		type: 'object'
 		actions:
-			exportStl:
-				title: 'Export STL'
-				callback: exportStl
+			exportAsciiStl:
+				title: 'Export ASCII STL'
+				callback: () => @exportStl('ascii')
+			exportBinaryStl:
+				title: 'Export Binary STL'
+				callback: () => @exportStl('binary')

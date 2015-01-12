@@ -182,12 +182,12 @@ module.exports = class PluginUiGenerator
 		# send close event to the last active plugin (from the old selected node)
 		if @oldNode and @oldNode != @currentlySelectedNode
 			@callPluginDisabled @oldNode
-			# or he has the same node, but selected another plugin:
-			# send close event to the currently selected plugin
+		# or he has the same node, but selected another plugin:
+		# send close event to the currently selected plugin
 		else if @oldNode == @currentlySelectedNode
 			@callPluginDisabled @currentlySelectedNode
-	# or he selected a node without a node being selected before
-	# but then no disabled call has to be made
+		# or he selected a node without a node being selected before
+		# but then no disabled call has to be made
 
 	callPluginDisabled: (node) ->
 		return unless node

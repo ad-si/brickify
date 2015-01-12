@@ -93,14 +93,21 @@ module.exports.setupRouting = () ->
 			.use bootstrap()
 	)
 
-	shared = ['blueimp-md5', 'bootstrap', 'clone', 'jquery', 'jsondiffpatch',
-						'path', 'react', 'stats-js', 'three', 'three-orbit-controls',
-						'zeroclipboard']
-	webapp.get '/shared.js', browserify(shared, {
-		cache: true
-		precompile: true
-		noParse: shared
-	})
+	webapp.use (req, res, next) ->
+		res.locals.app = webapp
+		next()
+
+	if developmentMode
+		shared = ['blueimp-md5', 'bootstrap', 'clone', 'jquery', 'jsondiffpatch',
+							'path', 'react', 'stats-js', 'three', 'three-orbit-controls',
+							'zeroclipboard']
+		webapp.get '/shared.js', browserify(shared, {
+			cache: true
+			precompile: true
+			noParse: shared
+		})
+	else
+		webapp.get '/shared.js', (request, response) -> response.send ''
 
 	webapp.get '/app.js', browserify('src/client/main.coffee', {
 		extensions: ['.coffee']

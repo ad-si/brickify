@@ -98,9 +98,19 @@ module.exports.setupRouting = () ->
 		next()
 
 	if developmentMode
-		shared = ['blueimp-md5', 'bootstrap', 'clone', 'jquery', 'jsondiffpatch',
-							'path', 'react', 'stats-js', 'three', 'three-orbit-controls',
-							'zeroclipboard']
+		shared = [
+			'blueimp-md5'
+			'bootstrap'
+			'clone'
+			'jquery'
+			'jsondiffpatch'
+			'path'
+			'react'
+			'stats-js'
+			'three'
+			'three-orbit-controls'
+			'zeroclipboard'
+		]
 		webapp.get '/shared.js', browserify(shared, {
 			cache: true
 			precompile: true

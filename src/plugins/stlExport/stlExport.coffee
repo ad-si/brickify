@@ -18,9 +18,9 @@ module.exports = class StlExport
 		{indices, faceNormals, originalFileName, positions} = optimizedModel
 
 		stringifyFaceNormal = (i) ->
-			faceNormals[(i * 3)] + ' ' +
-			faceNormals[(i * 3) + 1] + ' ' +
-			faceNormals[(i * 3) + 2]
+			faceNormals[i] + ' ' +
+			faceNormals[i + 1] + ' ' +
+			faceNormals[i + 2]
 
 		stringifyVector = (i) ->
 			positions[(i * 3)] + ' ' +
@@ -30,9 +30,9 @@ module.exports = class StlExport
 
 		stl = "solid #{originalFileName}\n"
 
-		for i in [0..indices.length - 1] by 3
+		for i in [0...indices.length] by 3
 			stl +=
-				"facet normal #{stringifyFaceNormal(i / 3)}\n" +
+				"facet normal #{stringifyFaceNormal(i)}\n" +
 				'\touter loop\n' +
 				"\t\tvertex #{stringifyVector(indices[i])}\n" +
 				"\t\tvertex #{stringifyVector(indices[i + 1])}\n" +

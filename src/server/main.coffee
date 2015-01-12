@@ -106,8 +106,6 @@ module.exports.setupRouting = () ->
 			precompile: true
 			noParse: shared
 		})
-	else
-		webapp.get '/shared.js', (request, response) -> response.send ''
 
 	webapp.get '/app.js', browserify('src/client/main.coffee', {
 		extensions: ['.coffee']

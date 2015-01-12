@@ -13,6 +13,8 @@ module.exports = class Voxelizer
 	voxelize: (optimizedModel, options = {}) =>
 		if options.voxelResolution?
 			@voxelResolution = options.voxelResolution
+		if options.debugVoxel?
+			@debugVoxel = options.debugVoxel
 
 		@setupGrid optimizedModel
 
@@ -92,30 +94,47 @@ module.exports = class Voxelizer
 	visitAllPointsBresenham: (a, b, visitor) =>
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
 		# https://gist.github.com/yamamushi/5823518
+		# http://stackoverflow.com/questions/16505905/
+		# walk-a-line-between-two-points-in-a-3d-voxel-space-visiting-all-cells
 		# a,b = math round a,b / math floor a,b
 
 		stepDivision = @voxelResolution
+		resx = @voxelGrid.spacing.x * (1 / stepDivision)
+		resy = @voxelGrid.spacing.y * (1 / stepDivision)
+		resz = @voxelGrid.spacing.z * (1 / stepDivision)
+
+		afl = {
+			x: Math.floor(a.x / resx) * resx
+			y: Math.floor(a.y / resy) * resy
+			z: Math.floor(a.z / resz) * resz
+		}
+
+		bfl = {
+			x: Math.floor(b.x / resx) * resx
+			y: Math.floor(b.y / resy) * resy
+			z: Math.floor(b.z / resz) * resz
+		}
 
 		bvox = @voxelGrid.mapGridRelativeToVoxel b
-		
+
 		#stepping
-		sx = if b.x > a.x then 1 else (if b.x < a.x then -1 else 0)
-		sy = if b.y > a.y then 1 else (if b.y < a.y then -1 else 0)
-		sz = if b.z > a.z then 1 else (if b.z < a.z then -1 else 0)
-		sx = @voxelGrid.spacing.x * sx * (1 / stepDivision)
-		sy = @voxelGrid.spacing.y * sy * (1 / stepDivision)
-		sz = @voxelGrid.spacing.z * sz * (1 / stepDivision)
+		sx = if bfl.x > afl.x then 1 else (if bfl.x < afl.x then -1 else 0)
+		sy = if bfl.y > afl.y then 1 else (if bfl.y < afl.y then -1 else 0)
+		sz = if bfl.z > afl.z then 1 else (if bfl.z < afl.z then -1 else 0)
+		sx = sx * resx
+		sy = sy * resy
+		sz = sz * resz
 
 		g = {
-			x: a.x
-			y: a.y
-			z: a.z
+			x: afl.x
+			y: afl.y
+			z: afl.z
 		}
 
 		#Planes for each axis that we will next cross
-		gxp = a.x + (if b.x > a.x then 1 else 0)
-		gyp = a.y + (if b.y > a.y then 1 else 0)
-		gzp = a.z + (if b.z > a.z then 1 else 0)
+		gxp = afl.x + (if bfl.x > afl.x then 1 else 0)
+		gyp = afl.y + (if bfl.y > afl.y then 1 else 0)
+		gzp = afl.z + (if bfl.z > afl.z then 1 else 0)
 
 		#Only used for multiplying up the error margins
 		vx = if b.x == a.x then 1 else (b.x - a.x)

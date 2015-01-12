@@ -97,6 +97,7 @@ module.exports = class NewBrickator
 				@bundle.renderer)
 		if (intersects.length > 0)
 			obj = intersects[0].object
+			###
 			@threejsRootNode.remove obj
 			###
 			obj.material = new THREE.MeshLambertMaterial({
@@ -107,15 +108,14 @@ module.exports = class NewBrickator
 			console.log "Setting debug voxel to:
 			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
 
-			@voxelizer.setDebugVoxel obj.voxelCoords
-			###
+			@debugVoxel = obj.voxelCoords
 
 	voxelize: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer(@threejsRootNode)
 
 		@voxelVisualizer.clear()
 		results = @pipeline.run optimizedModel,
-			{voxelResolution: @voxelResolution}, true
+			{voxelResolution: @voxelResolution, debugVoxel: @debugVoxel}, true
 		grid = results.lastResult
 		@voxelVisualizer.createVisibleVoxel grid
 

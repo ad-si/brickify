@@ -156,6 +156,7 @@ testModel = (filename) ->
 			testResult.hullVoxelizationTime = results.profilingResults[0]
 			testResult.volumeFillTime = results.profilingResults[1]
 
+			global.gc()
 			resolve(testResult)
 
 # This class holds all test results for one model and is

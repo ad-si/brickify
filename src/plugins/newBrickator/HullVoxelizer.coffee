@@ -139,7 +139,13 @@ module.exports = class Voxelizer
 		gvox = {x: -2, y: -2, z: -2}
 		gvox_old = {x: -1, y: -1, z: -1}
 
+		securityBreak = 100000
+
 		while (true)
+			securityBreak--
+			if securityBreak == 0
+				break
+
 			gvox_old = gvox
 			gvox = @voxelGrid.mapGridRelativeToVoxel g
 

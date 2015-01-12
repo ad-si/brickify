@@ -5,7 +5,6 @@
 ###
 
 $ = require 'jquery'
-jqtree = require 'jqtree'
 saveAs = require 'filesaver.js'
 
 modelCache = require '../../client/modelCache'

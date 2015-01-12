@@ -118,6 +118,7 @@ module.exports.setupRouting = () ->
 	})
 	webapp.get '/quickconvert.js', browserify('src/quickconvert/main.coffee', {
 		extensions: ['.coffee']
+		external: shared
 	})
 	webapp.use express.static('public')
 	webapp.use('/node_modules', express.static('node_modules'))

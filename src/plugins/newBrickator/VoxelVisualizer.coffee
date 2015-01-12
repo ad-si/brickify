@@ -30,12 +30,19 @@ module.exports = class VoxelVisualizer
 		@voxelGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z )
 
+		for z in [0..grid.numVoxelsZ - 1] by 1
+				window.setTimeout @zLayerCallback(grid, z), 10 * z
+
+	zLayerCallback: (grid, z) =>
+		return () =>
+			@createZLayer grid, z
+
+	createZLayer: (grid, z) =>
 		for x in [0..grid.numVoxelsX - 1] by 1
 			for y in [0..grid.numVoxelsY - 1] by 1
-				for z in [0..grid.numVoxelsZ - 1] by 1
-					if grid.zLayers[z]?[x]?[y]?
-						if grid.zLayers[z][x][y] != false
-							@createVoxel grid, x, y, z
+				if grid.zLayers[z]?[x]?[y]?
+					if grid.zLayers[z][x][y] != false
+						@createVoxel grid, x, y, z
 
 	createVoxel: (grid, x, y, z) =>
 		voxel = grid.zLayers[z][x][y]

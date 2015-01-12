@@ -100,9 +100,6 @@ module.exports = class PluginUiGenerator
 			@tabStates[pluginKey] = true
 			@updateSelectedPlugin()
 
-	#if pluginInstance.uiEnabled?
-	#	pluginInstance.uiEnabled @currentlySelectedNode
-
 	generateActionUi: (schema, pluginKey, $container) =>
 		if schema.actions?
 			for own key of schema.actions

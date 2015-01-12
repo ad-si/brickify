@@ -47,6 +47,8 @@ block content
 block scripts
 	script(src='/node_modules/jquery/dist/jquery.js')
 	script(src='/node_modules/bootstrap/dist/js/bootstrap.js')
+	if app.get('env') === 'development'
+		script(src='/shared.js')
 
 	//load quickconvert script
 	script(src='quickconvert.js')

@@ -40,7 +40,7 @@ exports.setState = (request, response) ->
 		response.json serverDiff
 
 exports.resetState = (request, response) ->
-	request.session.state = {empty: true}
+	request.session.state = {}
 	response.json request.session.state
 
 getInitializedState = (request) ->
@@ -50,6 +50,6 @@ getInitializedState = (request) ->
 	if stateInitialized == true
 		return state
 	else
-		request.session.state = {empty: true}
+		request.session.state = {}
 		request.session.stateIsInitialized = true
 		return request.session.state

@@ -13,7 +13,7 @@ module.exports = class Voxelizer
 		if options.debugVoxel?
 			@debugVoxel = options.debugVoxel
 
-		@setupGrid optimizedModel
+		@setupGrid optimizedModel, options.gridDelta
 
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
 			@voxelizePolygon p0, p1, p2, n
@@ -186,8 +186,8 @@ module.exports = class Voxelizer
 				g.z += sz
 				errz += derrz
 
-	setupGrid: (optimizedModel) ->
+	setupGrid: (optimizedModel, gridDelta = null) ->
 		@voxelGrid = new Grid(@baseBrick)
-		@voxelGrid.setUpForModel optimizedModel
+		@voxelGrid.setUpForModel optimizedModel, gridDelta
 		return @voxelGrid
 

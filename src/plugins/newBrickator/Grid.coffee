@@ -7,9 +7,14 @@ module.exports = class Grid
 		@numVoxelsZ = 0
 		@zLayers = []
 
-	setUpForModel: (optimizedModel) =>
+	setUpForModel: (optimizedModel, gridDelta = null) =>
 		bb = optimizedModel.boundingBox()
+
 		@origin = bb.min
+		if gridDelta
+			@origin.x -= gridDelta.x
+			@origin.y -= gridDelta.y
+			@origin.z -= gridDelta.z
 
 		@numVoxelsX = Math.ceil (bb.max.x - bb.min.x) / @spacing.x
 		@numVoxelsX++

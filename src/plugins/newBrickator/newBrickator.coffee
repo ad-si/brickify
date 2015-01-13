@@ -33,7 +33,6 @@ module.exports = class NewBrickator
 			a1:
 				title: 'Voxelize'
 				callback: voxelCallback
-		###
 		properties:
 			gridDeltaX:
 				description: 'Voxelgrid dx'
@@ -44,7 +43,6 @@ module.exports = class NewBrickator
 			gridDeltaZ:
 				description: 'Voxelgrid dz'
 				type: 'number'
-		###
 		}
 
 	uiEnabled: (node) ->
@@ -89,12 +87,21 @@ module.exports = class NewBrickator
 
 	voxelize: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
+		uiSettings = selectedNode.toolsValues.newbrickator
 
 		threenode = @getThreeRootForNode selectedNode
 		@voxelVisualizer.clear(threenode)
 
-		results = @pipeline.run optimizedModel,
-			{debugVoxel: @debugVoxel}, true
+		settings = {
+			debugVoxel: @debugVoxel
+			gridDelta: {
+				x: uiSettings.gridDeltaX
+				y: uiSettings.gridDeltaY
+				z: uiSettings.gridDeltaZ
+			}
+		}
+
+		results = @pipeline.run optimizedModel, settings, true
 		grid = results.lastResult
 
 		@voxelVisualizer.createVisibleVoxel grid, threenode

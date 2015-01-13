@@ -98,32 +98,24 @@ module.exports = class Voxelizer
 		# walk-a-line-between-two-points-in-a-3d-voxel-space-visiting-all-cells
 		# a,b = math round a,b / math floor a,b
 
-		stepDivision = @voxelResolution
-		resx = @voxelGrid.spacing.x * (1 / stepDivision)
-		resy = @voxelGrid.spacing.y * (1 / stepDivision)
-		resz = @voxelGrid.spacing.z * (1 / stepDivision)
-
 		afl = {
-			x: Math.floor(a.x / resx) * resx
-			y: Math.floor(a.y / resy) * resy
-			z: Math.floor(a.z / resz) * resz
+			x: Math.floor a.x
+			y: Math.floor a.y
+			z: Math.floor a.z
 		}
 
 		bfl = {
-			x: Math.floor(b.x / resx) * resx
-			y: Math.floor(b.y / resy) * resy
-			z: Math.floor(b.z / resz) * resz
+			x: Math.floor b.x
+			y: Math.floor b.y
+			z: Math.floor b.z
 		}
 
-		bvox = @voxelGrid.mapGridRelativeToVoxel b
+		bvox = @voxelGrid.mapGridRelativeToVoxel bfl
 
 		#stepping
 		sx = if bfl.x > afl.x then 1 else (if bfl.x < afl.x then -1 else 0)
 		sy = if bfl.y > afl.y then 1 else (if bfl.y < afl.y then -1 else 0)
 		sz = if bfl.z > afl.z then 1 else (if bfl.z < afl.z then -1 else 0)
-		sx = sx * resx
-		sy = sy * resy
-		sz = sz * resz
 
 		g = {
 			x: afl.x
@@ -158,13 +150,7 @@ module.exports = class Voxelizer
 		gvox = {x: -2, y: -2, z: -2}
 		gvox_old = {x: -1, y: -1, z: -1}
 
-		securityBreak = 100000
-
 		while (true)
-			securityBreak--
-			if securityBreak == 0
-				break
-
 			gvox_old = gvox
 			gvox = @voxelGrid.mapGridRelativeToVoxel g
 
@@ -175,7 +161,7 @@ module.exports = class Voxelizer
 					console.log 'Voxelizing debug voxel, put your breakpoint *here*'
 
 			# if we move in this particular direction, check that we did not exeed our
-			# destination bounds
+			# destination bounds: check if we reached the destination voxel
 			if ((sx == 0) or
 			((sx > 0 && gvox.x >= bvox.x) or (sx < 0 && gvox.x <= bvox.x))) and
 			((sy == 0) or
@@ -186,7 +172,7 @@ module.exports = class Voxelizer
 
 			if (gvox_old.x != gvox.x) or (gvox_old.y != gvox.y) or (gvox_old.z != gvox.z)
 				visitor gvox
-			
+
 			#Which plane do we cross first?
 			xr = Math.abs(errx)
 			yr = Math.abs(erry)

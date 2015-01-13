@@ -26,22 +26,27 @@ module.exports = class VoxelVisualizer
 	clear: (@threeNode) =>
 		@threeNode.children = []
 		
-	createVisibleVoxel: (grid, threeNode) =>
+	createVisibleVoxel: (grid, threeNode, drawInnerVoxels = true) =>
 		@voxelGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z )
 
 		for z in [0..grid.numVoxelsZ - 1] by 1
-				window.setTimeout @zLayerCallback(grid, threeNode, z), 10 * z
+				window.setTimeout @zLayerCallback(grid, threeNode, drawInnerVoxels, z),
+					10 * z
 
-	zLayerCallback: (grid, threeNode, z) =>
+	zLayerCallback: (grid, threeNode, drawInnerVoxels, z) =>
 		return () =>
-			@createZLayer grid, threeNode, z
+			@createZLayer grid, threeNode, drawInnerVoxels, z
 
-	createZLayer: (grid, threeNode, z) =>
+	createZLayer: (grid, threeNode, drawInnerVoxels, z) =>
 		for x in [0..grid.numVoxelsX - 1] by 1
 			for y in [0..grid.numVoxelsY - 1] by 1
 				if grid.zLayers[z]?[x]?[y]?
 					if grid.zLayers[z][x][y] != false
+						if not drawInnerVoxels
+							if grid.zLayers[z][x][y].dataEntrys[0].inside == true
+								continue
+
 						@createVoxel grid, threeNode, x, y, z
 
 	createVoxel: (grid, threeNode, x, y, z) =>

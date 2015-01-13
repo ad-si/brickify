@@ -104,7 +104,7 @@ module.exports = class NewBrickator
 		results = @pipeline.run optimizedModel, settings, true
 		grid = results.lastResult
 
-		@voxelVisualizer.createVisibleVoxel grid, threenode
+		@voxelVisualizer.createVisibleVoxel grid, threenode, false
 
 	getThreeRootForNode: (selectedNode) =>
 		id = selectedNode.pluginData.solidRenderer.threeObjectUuid

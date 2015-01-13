@@ -3,7 +3,6 @@ Grid = require './Grid'
 module.exports = class Voxelizer
 	constructor: (@baseBrick) ->
 		@voxelGrid = null
-		@voxelResolution = 1
 
 	setDebugVoxel: (@debugVoxel) =>
 		# allows for setting a breakpoint when voxelizing and inspecting
@@ -11,8 +10,6 @@ module.exports = class Voxelizer
 		return
 
 	voxelize: (optimizedModel, options = {}) =>
-		if options.voxelResolution?
-			@voxelResolution = options.voxelResolution
 		if options.debugVoxel?
 			@debugVoxel = options.debugVoxel
 
@@ -96,7 +93,6 @@ module.exports = class Voxelizer
 		# https://gist.github.com/yamamushi/5823518
 		# http://stackoverflow.com/questions/16505905/
 		# walk-a-line-between-two-points-in-a-3d-voxel-space-visiting-all-cells
-		# a,b = math round a,b / math floor a,b
 
 		afl = {
 			x: Math.floor a.x

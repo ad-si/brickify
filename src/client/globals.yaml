@@ -45,3 +45,6 @@ syncWithServer: true
 
 #ui
 buildUi: true
+
+#editor
+defaultPlugin: 'fabrickator'

@@ -35,13 +35,13 @@ module.exports = class NewBrickator
 				callback: voxelCallback
 		properties:
 			gridDeltaX:
-				description: 'Voxelgrid dx'
+				description: 'Voxelgrid dx (0..7)'
 				type: 'number'
 			gridDeltaY:
-				description: 'Voxelgrid dy'
+				description: 'Voxelgrid dy (0..7)'
 				type: 'number'
 			gridDeltaZ:
-				description: 'Voxelgrid dz'
+				description: 'Voxelgrid dz (0..3)'
 				type: 'number'
 		}
 

@@ -7,7 +7,7 @@ modelCache = require './modelCache'
 objectTree = require '../common/objectTree'
 
 module.exports = class ModelLoader
-	constructor: (@stateInstance, @pluginHooks) ->
+	constructor: (@stateInstance, @pluginHooks, @globalConfig) ->
 		return
 
 	readFiles: (files) ->
@@ -46,9 +46,11 @@ module.exports = class ModelLoader
 
 	# adds a new model to the state
 	addModelToState: (fileName, hash) ->
-		loadModelCallback = (state) ->
+		loadModelCallback = (state) =>
 			node = objectTree.addChild state.rootNode
 			node.fileName = fileName
 			node.meshHash = hash
+			node.pluginData = {
+				uiGen: {selectedPluginKey: @globalConfig.defaultPlugin}}
 		# call updateState on all client plugins and sync
 		@stateInstance.performStateAction loadModelCallback, true

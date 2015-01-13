@@ -3,6 +3,7 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
+objectTree = require '../../common/objectTree'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -13,6 +14,7 @@ module.exports = class NewBrickator
 			height: 3.2
 		}
 		@pipeline = new LegoPipeline(@baseBrick)
+		@threeObjects = {}
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -31,6 +33,18 @@ module.exports = class NewBrickator
 			a1:
 				title: 'Voxelize'
 				callback: voxelCallback
+		###
+		properties:
+			gridDeltaX:
+				description: 'Voxelgrid dx'
+				type: 'number'
+			gridDeltaY:
+				description: 'Voxelgrid dy'
+				type: 'number'
+			gridDeltaZ:
+				description: 'Voxelgrid dz'
+				type: 'number'
+		###
 		}
 
 	uiEnabled: (node) ->
@@ -38,9 +52,6 @@ module.exports = class NewBrickator
 
 	uiDisabled: (node) ->
 		@currentNode = null
-
-	onStateUpdate: (state) =>
-		return
 
 	onClick: (event) =>
 		intersects =
@@ -62,19 +73,41 @@ module.exports = class NewBrickator
 
 			@debugVoxel = obj.voxelCoords
 
+	onStateUpdate: (state) =>
+		#delete voxel visualizations for deleted objects
+		availableObjects = []
+		objectTree.forAllSubnodeProperties state.rootNode,
+			'solidRenderer',
+			(property) ->
+				availableObjects.push property.threeObjectUuid
+
+		for own key of @threeObjects
+			if not (availableObjects.indexOf(key) >= 0)
+				@voxelVisualizer.clear @threeObjects[key]
+				@threejsRootNode.remove @threeObjects[key]
+				@threeObjects[key] = undefined
+
 	voxelize: (optimizedModel, selectedNode) =>
-		@voxelVisualizer ?= new VoxelVisualizer(@threejsRootNode)
-		@voxelVisualizer.clear()
+		@voxelVisualizer ?= new VoxelVisualizer()
+
+		threenode = @getThreeRootForNode selectedNode
+		@voxelVisualizer.clear(threenode)
 
 		results = @pipeline.run optimizedModel,
 			{debugVoxel: @debugVoxel}, true
 		grid = results.lastResult
 
-		@voxelVisualizer.createVisibleVoxel grid
+		@voxelVisualizer.createVisibleVoxel grid, threenode
 
-
-
-
+	getThreeRootForNode: (selectedNode) =>
+		id = selectedNode.pluginData.solidRenderer.threeObjectUuid
+		if @threeObjects[id]?
+			return @threeObjects[id]
+		else
+			tn = new THREE.Object3D()
+			@threeObjects[id] = tn
+			@threejsRootNode.add tn
+			return tn
 
 
 

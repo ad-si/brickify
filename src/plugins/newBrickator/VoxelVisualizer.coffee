@@ -1,7 +1,7 @@
 THREE = require 'three'
 
 module.exports = class VoxelVisualizer
-	constructor: (@threejsRootNode) ->
+	constructor: () ->
 		@upMaterial = new THREE.MeshLambertMaterial({
 			color: 0x46aeff #blue
 			opacity: 0.5
@@ -23,28 +23,28 @@ module.exports = class VoxelVisualizer
 			transparent: true
 		})
 		
-	clear: () =>
-		@threejsRootNode.children = []
+	clear: (@threeNode) =>
+		@threeNode.children = []
 		
-	createVisibleVoxel: (grid) =>
+	createVisibleVoxel: (grid, threeNode) =>
 		@voxelGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z )
 
 		for z in [0..grid.numVoxelsZ - 1] by 1
-				window.setTimeout @zLayerCallback(grid, z), 10 * z
+				window.setTimeout @zLayerCallback(grid, threeNode, z), 10 * z
 
-	zLayerCallback: (grid, z) =>
+	zLayerCallback: (grid, threeNode, z) =>
 		return () =>
-			@createZLayer grid, z
+			@createZLayer grid, threeNode, z
 
-	createZLayer: (grid, z) =>
+	createZLayer: (grid, threeNode, z) =>
 		for x in [0..grid.numVoxelsX - 1] by 1
 			for y in [0..grid.numVoxelsY - 1] by 1
 				if grid.zLayers[z]?[x]?[y]?
 					if grid.zLayers[z][x][y] != false
-						@createVoxel grid, x, y, z
+						@createVoxel grid, threeNode, x, y, z
 
-	createVoxel: (grid, x, y, z) =>
+	createVoxel: (grid, threeNode, x, y, z) =>
 		voxel = grid.zLayers[z][x][y]
 
 		if voxel.definitelyUp? and voxel.definitelyUp
@@ -68,4 +68,4 @@ module.exports = class VoxelVisualizer
 			z: z
 		}
 
-		@threejsRootNode.add(cube)
+		threeNode.add(cube)

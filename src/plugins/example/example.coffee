@@ -1,3 +1,5 @@
+operative = require 'operative'
+
 module.exports = class Example
 
 	init: (bundle) ->
@@ -12,8 +14,9 @@ module.exports = class Example
 	getUiSchema: () ->
 		console.log('Example Plugin returns the UI schema.')
 
-		actioncallback = () ->
+		actioncallback = () =>
 			console.log 'Example Plugin performs an action!'
+			@useWebWorker()
 
 		return {
 		title: 'Example Plugin'
@@ -45,6 +48,32 @@ module.exports = class Example
 				type: 'danger'
 				callback: actioncallback
 		}
+
+	useWebWorker: () =>
+		console.log 'task setup'
+		fibWorker = (fibN) ->
+			console.log "operative #{fibN} start"
+			deferred = @deferred()
+			fib = (n) -> if n > 1 then fib(n - 1) + fib(n - 2) else 1
+			dofib = do(fibN) -> ->
+				if fibN <= 40
+					deferred.fulfill fib(fibN)
+				else
+					deferred.reject "fib(#{fibN}) is too big for me!"
+			setTimeout dofib, 2000
+
+		longTask1 = operative(fibWorker)
+		longTask2 = operative(fibWorker)
+
+		console.log 'execute 40'
+		longTask1(40)
+			.then (res) -> console.log "fib(40) is #{res}"
+			.catch (err) -> console.error err
+		console.log 'execute 50'
+		longTask2(50)
+			.then (res) -> console.log "fib(50) is #{res}"
+			.catch (err) -> console.error err
+		console.log 'execution done'
 
 	uiEnabled: (node) ->
 		console.log "Enabled Example Ui with node #{node.fileName}"

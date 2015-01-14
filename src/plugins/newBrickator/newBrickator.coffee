@@ -47,9 +47,15 @@ module.exports = class NewBrickator
 
 	uiEnabled: (node) ->
 		@currentNode = node
+		if node.pluginData.newBrickator?
+			threeJsNode = getObjectByNode(@threejsRootNode, node)
+			threeJsNode?.visible = true
 
 	uiDisabled: (node) ->
 		@currentNode = null
+		if node.pluginData.newBrickator?
+			threeJsNode = getObjectByNode(@threejsRootNode, node)
+			threeJsNode?.visible = false
 
 	onClick: (event) =>
 		intersects =
@@ -89,7 +95,7 @@ module.exports = class NewBrickator
 		@voxelVisualizer ?= new VoxelVisualizer()
 		uiSettings = selectedNode.toolsValues.newbrickator
 
-		threenode = @getThreeRootForNode selectedNode
+		threenode = getObjectByNode(@threejsRootNode, selectedNode)
 		@voxelVisualizer.clear(threenode)
 
 		settings = {
@@ -106,16 +112,12 @@ module.exports = class NewBrickator
 
 		@voxelVisualizer.createVisibleVoxel grid, threenode, false
 
-	getThreeRootForNode: (selectedNode) =>
-		id = selectedNode.pluginData.solidRenderer.threeObjectUuid
-		if @threeObjects[id]?
-			return @threeObjects[id]
-		else
-			tn = new THREE.Object3D()
-			@threeObjects[id] = tn
-			@threejsRootNode.add tn
-			return tn
-
-
-
-
+	getObjectByNode = (threeJsNode, node) ->
+		if node.pluginData.newBrickator?
+			uuid = node.pluginData.newBrickator.threeObjectId
+			for node in threeJsNode.children
+				return node if node.uuid == uuid
+		object = new THREE.Object3D()
+		threeJsNode.add object
+		node.pluginData.newBrickator = {'threeObjectId': object.uuid}
+		object

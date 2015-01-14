@@ -30,6 +30,7 @@
     "exec": "^0.1.2",
     "express": "^4.9.8",
     "express-session": "^1.9.1",
+    "filesaver.js": "^0.1.1",
     "font-awesome": "^4.2.0",
     "git-rev": "^0.2.1",
     "jade": "^1.7.0",

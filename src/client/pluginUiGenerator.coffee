@@ -11,24 +11,28 @@ jsonEditorConfiguration = {
 	disable_properties: true
 }
 
-pluginUiTemplate = '
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab">
-					<h3 class="panel-title collapsed collapseTitle" data-toggle="collapse"
-							data-parent="#pluginsContainer"
-							data-target="#collapse%PLUGINKEY%">
-						%PLUGINNAME%
-					</h3>
-				</div>
-				<div id="collapse%PLUGINKEY%"
-						 class="panel-collapse collapse plugincollapse" role="tabpanel">
-					<div class="panel-body">
-						<div id="pactions%PLUGINKEY%" class="pluginActionsContainer"></div>
-						<div id="pcontainer%PLUGINKEY%" class="pluginSettingsContainer"></div>
-					</div>
-				</div>
+compilePluginTemplate = (pluginKey, pluginName) ->
+	return "<div class='panel panel-default'>
+		<div class='panel-heading' role='tab'>
+			<h3 class='panel-title collapsed collapseTitle'
+				data-toggle='collapse'
+					data-parent='#pluginsContainer'
+					data-target='#collapse#{pluginKey}'>
+				#{pluginName}
+			</h3>
+		</div>
+		<div id='collapse#{pluginKey}'
+			class='panel-collapse collapse plugincollapse'
+			role='tabpanel'>
+			<div class='panel-body'>
+				<div id='pactions#{pluginKey}'
+					class='pluginActionsContainer'></div>
+				<div id='pcontainer#{pluginKey}'
+					class='pluginSettingsContainer'></div>
 			</div>
-'
+		</div>
+	</div>"
+
 
 module.exports = class PluginUiGenerator
 	constructor: (@bundle) ->
@@ -45,13 +49,13 @@ module.exports = class PluginUiGenerator
 	createPluginUi: (pluginInstance) ->
 		# creates the UI for a plugin if it returns a valid ui schema
 		jsonEditorConfiguration.schema = pluginInstance.getUiSchema()
-		if jsonEditorConfiguration.schema && @$pluginsContainer.length > 0
-			pluginName = jsonEditorConfiguration.schema.title || pluginInstance.name
-			pluginKey = pluginName.toLowerCase().replace(' ','')
 
-			pluginLayout = pluginUiTemplate
-			pluginLayout = pluginLayout.replace(///%PLUGINKEY%///g,pluginKey)
-			pluginLayout = pluginLayout.replace(///%PLUGINNAME%///g,pluginName)
+		if jsonEditorConfiguration.schema && @$pluginsContainer.length > 0
+			pluginName = jsonEditorConfiguration.schema.title ||
+					pluginInstance.name
+			pluginKey = pluginName.toLowerCase().replace(' ', '')
+
+			pluginLayout = compilePluginTemplate(pluginKey, pluginName)
 
 			$pluginLayout = $(pluginLayout)
 			@$pluginsContainer.append($pluginLayout)
@@ -60,14 +64,17 @@ module.exports = class PluginUiGenerator
 
 			@generateActionUi jsonEditorConfiguration.schema,
 				pluginKey, $pluginActionContainer
-			@editors[pluginKey] = new JSONEditor(
-				$pluginSettingsContainer[0]
-				jsonEditorConfiguration
-			)
-			@defaultValues[pluginKey] = @editors[pluginKey].getValue()
 
-			@editors[pluginKey].on 'change',() =>
-				@saveUiToCurrentNode()
+			if jsonEditorConfiguration.schema.properties
+				@editors[pluginKey] = new JSONEditor(
+					$pluginSettingsContainer[0]
+					jsonEditorConfiguration
+				)
+
+				@defaultValues[pluginKey] = @editors[pluginKey].getValue()
+
+				@editors[pluginKey].on 'change', () =>
+					@saveUiToCurrentNode()
 
 			@bindPluginUiEvents $pluginLayout, pluginInstance, pluginKey
 
@@ -80,21 +87,18 @@ module.exports = class PluginUiGenerator
 			@pluginInstances[pluginKey] = pluginInstance
 
 	bindPluginUiEvents: ($pluginLayout, pluginInstance, pluginKey) =>
-			# when the panel is collapsed
-			$pluginLayout.on 'hidden.bs.collapse', (event) =>
-				@tabStates[pluginKey] = false
-				@updateSelectedPlugin()
+		# when the panel is collapsed
+		$pluginLayout.on 'hidden.bs.collapse', (event) =>
+			@tabStates[pluginKey] = false
+			@updateSelectedPlugin()
 
-				#if pluginInstance.uiDisabled?
-				#	pluginInstance.uiDisabled @currentlySelectedNode
+		#if pluginInstance.uiDisabled?
+		#	pluginInstance.uiDisabled @currentlySelectedNode
 
-			# when the panel is opened
-			$pluginLayout.on 'shown.bs.collapse', (event) =>
-				@tabStates[pluginKey] = true
-				@updateSelectedPlugin()
-
-				#if pluginInstance.uiEnabled?
-				#	pluginInstance.uiEnabled @currentlySelectedNode
+		# when the panel is opened
+		$pluginLayout.on 'shown.bs.collapse', (event) =>
+			@tabStates[pluginKey] = true
+			@updateSelectedPlugin()
 
 	generateActionUi: (schema, pluginKey, $container) =>
 		if schema.actions?
@@ -166,7 +170,7 @@ module.exports = class PluginUiGenerator
 			@bundle.statesync.performStateAction () =>
 				# console.log "Deselected any plugin"
 				@currentlySelectedNode.pluginData.uiGen.selectedPluginKey = ''
-				# disable event was already sent earlier
+		# disable event was already sent earlier
 
 		@oldNode = @currentlySelectedNode
 
@@ -175,8 +179,8 @@ module.exports = class PluginUiGenerator
 		# send close event to the last active plugin (from the old selected node)
 		if @oldNode and @oldNode != @currentlySelectedNode
 			@callPluginDisabled @oldNode
-			# or he has the same node, but selected another plugin:
-			# send close event to the currently selected plugin
+		# or he has the same node, but selected another plugin:
+		# send close event to the currently selected plugin
 		else if @oldNode == @currentlySelectedNode
 			@callPluginDisabled @currentlySelectedNode
 		# or he selected a node without a node being selected before

@@ -10,6 +10,8 @@ describe 'Lowfab', () ->
 	server = {}
 
 	before (done) ->
+		this.timeout(5000)
+
 		server = lowfab
 			.setupRouting()
 			.startServer(3001)

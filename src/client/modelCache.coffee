@@ -1,3 +1,4 @@
+$ = require 'jquery'
 md5 = require('blueimp-md5').md5
 OptimizedModel = require '../common/OptimizedModel'
 

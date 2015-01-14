@@ -66,22 +66,19 @@ module.exports = class DummyPlugin
 	getUiSchema: () =>
 		console.log('Dummy Client Plugin returns the UI schema.')
 
-		console.log('Example Plugin returns the UI schema.')
-
 		actioncallback = () ->
 			console.log 'Dummy Plugin performs an action!'
 
 		return {
-		title: 'Dummy Plugin'
-		type: 'object'
-		properties:
-			size:
-				description: 'Size of the elements'
-				type: 'number'
-		actions:
-			a1:
-				title: 'Derp'
-				callback: actioncallback
+			type: 'object'
+			properties:
+				size:
+					description: 'Size of the elements'
+					type: 'number'
+			actions:
+				a1:
+					title: 'Derp'
+					callback: actioncallback
 		}
 
 	uiEnabled: (node) ->

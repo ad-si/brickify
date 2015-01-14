@@ -24,7 +24,8 @@ module.exports = class VoxelVisualizer
 		})
 		
 	clear: (@threeNode) =>
-		@threeNode.children = []
+		if @threeNode?
+			@threeNode.children = []
 		
 	createVisibleVoxel: (grid, threeNode, drawInnerVoxels = true) =>
 		@voxelGeometry = new THREE.BoxGeometry(

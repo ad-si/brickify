@@ -43,7 +43,7 @@ module.exports = class StlExport
 
 		stl += "endsolid #{originalFileName}\n"
 
-		return new Blob [stl], {type: 'text/plain;charset=utf-8'}
+		new Blob [stl], {type: 'text/plain;charset=utf-8'}
 
 
 	generateBinaryStl: (optimizedModel) ->
@@ -62,7 +62,7 @@ module.exports = class StlExport
 		dataView = new DataView(buffer, headerLength)
 		le = true # little-endian
 
-		dataView.setUint32(0, indices.length / 3, le)
+		dataView.setUint32(0, (indices.length / 3), le)
 		offset = facetsCounterLength
 
 		for i in [0...indices.length] by 3
@@ -87,7 +87,7 @@ module.exports = class StlExport
 			dataView.setUint16(offset += 4, 0, le)
 			offset += 2
 
-		return new Blob [buffer]
+		new Blob [buffer]
 
 
 	saveStl: (blob, fileName) =>

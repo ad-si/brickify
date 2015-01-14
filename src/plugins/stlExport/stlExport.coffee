@@ -62,7 +62,7 @@ module.exports = class StlExport
 		dataView = new DataView(buffer, headerLength)
 		le = true # little-endian
 
-		dataView.setUint32(0, indices.length, le)
+		dataView.setUint32(0, (indices.length / 3), le)
 		offset = facetsCounterLength
 
 		for i in [0...indices.length] by 3

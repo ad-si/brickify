@@ -193,6 +193,7 @@ module.exports.setupRouting = () ->
 
 	if developmentMode
 		webapp.use errorHandler()
+		require('express-debug')(webapp, {})
 
 	webapp.use (req, res) ->
 		res

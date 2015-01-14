@@ -46,13 +46,11 @@ module.exports = class NewBrickator
 		}
 
 	uiEnabled: (node) ->
-		@currentNode = node
 		if node.pluginData.newBrickator?
 			threeJsNode = getObjectByNode(@threejsRootNode, node)
 			threeJsNode?.visible = true
 
 	uiDisabled: (node) ->
-		@currentNode = null
 		if node.pluginData.newBrickator?
 			threeJsNode = getObjectByNode(@threejsRootNode, node)
 			threeJsNode?.visible = false

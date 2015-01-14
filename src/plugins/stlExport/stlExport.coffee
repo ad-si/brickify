@@ -43,7 +43,7 @@ module.exports = class StlExport
 
 		stl += "endsolid #{originalFileName}\n"
 
-		new Blob [stl], {type: 'text/plain;charset=utf-8'}
+		return new Blob [stl], {type: 'text/plain;charset=utf-8'}
 
 
 	generateBinaryStl: (optimizedModel) ->
@@ -87,7 +87,7 @@ module.exports = class StlExport
 			dataView.setUint16(offset += 4, 0, le)
 			offset += 2
 
-		new Blob [buffer]
+		return new Blob [buffer]
 
 
 	saveStl: (blob, fileName) =>

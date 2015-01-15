@@ -108,7 +108,7 @@ module.exports = class NewBrickator
 		results = @pipeline.run optimizedModel, settings, true
 		grid = results.lastResult
 
-		@voxelVisualizer.createVisibleVoxel grid, threenode, false
+		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
 
 	getObjectByNode = (threeJsNode, node) ->
 		if node.pluginData.newBrickator?

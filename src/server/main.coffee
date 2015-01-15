@@ -193,7 +193,7 @@ module.exports.setupRouting = () ->
 
 	if developmentMode
 		webapp.use errorHandler()
-		require('express-debug')(webapp, {})
+		require('express-debug')(webapp, {extra_panels: ['nav', 'other_requests']})
 
 	webapp.use (req, res) ->
 		res

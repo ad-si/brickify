@@ -10,7 +10,6 @@ jqtree = require 'jqtree'
 clone = require 'clone'
 objectTree = require '../../common/objectTree'
 pluginKey = 'SceneGraph'
-key = require 'keymaster'
 
 module.exports = class SceneGraph
 	constructor: () ->
@@ -108,7 +107,7 @@ module.exports = class SceneGraph
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)
 		$treeContainer.bind 'tree.select', @onNodeSelect
-		key 'del', () =>
+		Mousetrap.bind 'del', () =>
 				@deleteObject()
 
 	getStateNodeForTreeNode: (treeNode, stateRootNode, callback) ->

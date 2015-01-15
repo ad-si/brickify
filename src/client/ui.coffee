@@ -57,3 +57,9 @@ module.exports = class Ui
 		false
 		)
 
+		Mousetrap.bind '?', () ->
+			bootbox.dialog({
+				title: 'Keyboard shortcuts'
+				message: ''
+			})
+

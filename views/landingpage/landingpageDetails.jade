@@ -1,3 +1,22 @@
+.container#quickConvert
+	h2 Quickconvert
+	p We think that you might like this conversion. You can download it directly or refine it using our online editor
+
+	.row
+		.col-lg-4
+			h3
+				center Original Model
+			canvas#renderArea1.quickConvertCanvas
+		.col-lg-4
+		.col-lg-4
+			h3
+				center To LEGO bricks
+			canvas#renderArea2.quickConvertCanvas
+			p
+				center
+					a.btn.btn-primary Download
+					|&nbsp;
+					a.btn.btn-success.applink(href='app#legofy+') Customize
 .container
 	h2 What is lowfab?
 	p Instad of creating one design and 3d-printing one high-fidelity prototype, Lowfab allows you to replace less important parts with lego, and only create critical parts with your 3d-printer. This allows you to iterate faster.

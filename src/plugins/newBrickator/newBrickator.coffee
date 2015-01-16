@@ -93,8 +93,8 @@ module.exports = class NewBrickator
 		@voxelVisualizer ?= new VoxelVisualizer()
 		uiSettings = selectedNode.toolsValues.newbrickator
 
-		threenode = getObjectByNode(@threejsRootNode, selectedNode)
-		@voxelVisualizer.clear(threenode)
+		threeNode = getObjectByNode(@threejsRootNode, selectedNode)
+		@voxelVisualizer.clear(threeNode)
 
 		settings = {
 			debugVoxel: @debugVoxel

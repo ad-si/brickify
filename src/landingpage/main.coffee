@@ -3,6 +3,9 @@ $ = require 'jquery'
 
 $('#quickConvert').hide()
 
+#fade in action buttons when javascript is ready
+$('#buttonContainer').fadeTo(500, 1)
+
 $('#qcExampleLink').click (event) ->
 	$('#quickConvert').slideDown 'slow', () ->
 		b1.then(() ->

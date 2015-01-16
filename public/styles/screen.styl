@@ -1,4 +1,9 @@
 $icon-font-path ?= '/node_modules/bootstrap-styl/fonts/'
+
+$body-bg = #202020
+$text-color = #fff
+$hr-border = #000
+
 @import bootstrap
 @import '../../node_modules/jqtree/jqtree.css'
 @import '../../node_modules/font-awesome/css/font-awesome.css'
@@ -99,3 +104,19 @@ input[readonly].not-readonly
 
 #quickConvert
 	display none
+
+.quickConvertBackground
+	width 100%
+	background #404040
+	padding-bottom 15px
+
+.afterQuickConvertBackground
+	width 100%
+	background #606060
+	padding-bottom 20px
+	margin-bottom -20px
+
+.footerBackground
+	width 100%
+	background #606060
+	margin-bottom -10px

@@ -1,16 +1,20 @@
+require('es6-promise').polyfill()
 $ = require 'jquery'
 
 $('#quickConvert').hide()
 
 $('#qcExampleLink').click (event) ->
-	$('#quickConvert').fadeIn()
+	$('#quickConvert').slideDown 'slow', () ->
+		b1.then(() ->
+			bundle1.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
+		b2.then(() ->
+			bundle2.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
 
 stlDropper = require './stlDropper'
 
 stlDropper.init document.getElementById('dropzone'), $('#droptext')
 
 # Init quickconvert after basic page functionality has been initialized
-
 globalConfig = require '../client/globals.yaml'
 objectTree = require '../common/objectTree'
 Bundle = require '../client/bundle'

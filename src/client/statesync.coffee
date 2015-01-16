@@ -35,7 +35,7 @@ module.exports = class Statesync
 	# if updatedStateEvent is set to true, the updateState hook of all client
 	# plugins will be called before synchronization with the server
 	performStateAction: (callback, updatedStateEvent = false) =>
-		prom = @statePromise.then(callback)
+		prom = @statePromise.then(() => callback(@state))
 		if(updatedStateEvent)
 			prom = prom.then(@handleUpdatedState)
 		@statePromise = prom.then(@sync)
@@ -53,7 +53,7 @@ module.exports = class Statesync
 		# are we supposed to sync?
 		if not @syncWithServer
 			@oldState = clone(@state)
-			return handleUpdatedState().then(Promise.resolve @state)
+			return @handleUpdatedState().then(Promise.resolve @state)
 
 		# both yes -> sync!
 		@lockState()

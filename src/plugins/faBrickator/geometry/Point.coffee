@@ -3,8 +3,8 @@ Vector3D = require './Vector3D'
 class Point extends Vector3D
 
 	# specifies in which object this point is contained
-	# @param object [Object3D] the containing object
-	# @param index [int] the index of this point in @object.points
+	# @param {Object3D} object the containing object
+	# @param {int} index the index of this point in @object.points
 	set_Object: (@object, @index) ->
 		return
 

@@ -84,5 +84,9 @@ module.exports = class PluginLoader
 			require('../plugins/faBrickator'),
 			require('../plugins/faBrickator/package.json')
 		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/newBrickator'),
+			require('../plugins/newBrickator/package.json')
+		)
 
 		return pluginInstances

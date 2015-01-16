@@ -51,7 +51,6 @@ module.exports = class FaBrickatorPlugin
 						console.warn 'Already created a layout for this model'
 
 		return {
-			title: 'Fabrickator'
 			type: 'object'
 			actions:
 				a1:

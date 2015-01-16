@@ -171,6 +171,52 @@ class OptimizedModel
 
 		return geometry
 
+	boundingBox: ->
+		if @_boundingBox
+			return @_boundingBox
+
+		minX = maxX = @positions[0]
+		minY = maxY = @positions[1]
+		minZ = maxZ = @positions[2]
+		for i in [0..@positions.length - 1] by 3
+			minX = @positions[i]     if @positions[i] < minX
+			minY = @positions[i + 1] if @positions[i + 1] < minY
+			minZ = @positions[i + 2] if @positions[i + 2] < minZ
+			maxX = @positions[i]     if @positions[i] > maxX
+			maxY = @positions[i + 1] if @positions[i + 1] > maxY
+			maxZ = @positions[i + 2] if @positions[i + 2] > maxZ
+
+		@_boundingBox = {
+			min: {x: minX, y: minY, z: minZ}
+			max: {x: maxX, y: maxY, z: maxZ}
+		}
+		return @_boundingBox
+
+	forEachPolygon: (callback) =>
+		for i in [0..@indices.length - 1] by 3
+			p0 = {
+				x: @positions[@indices[i] * 3]
+				y: @positions[@indices[i] * 3 + 1]
+				z: @positions[@indices[i] * 3 + 2]
+			}
+			p1 = {
+				x: @positions[@indices[i + 1] * 3]
+				y: @positions[@indices[i + 1] * 3 + 1]
+				z: @positions[@indices[i + 1] * 3 + 2]
+			}
+			p2 = {
+				x: @positions[@indices[i + 2] * 3]
+				y: @positions[@indices[i + 2] * 3 + 1]
+				z: @positions[@indices[i + 2] * 3 + 2]
+			}
+			n = {
+				x: @faceNormals[i]
+				y: @faceNormals[i + 1]
+				z: @faceNormals[i + 2]
+			}
+
+			callback p0, p1, p2, n
+
 module.exports = OptimizedModel
 
 base64ByteLength = (base64Length) ->

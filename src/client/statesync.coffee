@@ -101,7 +101,7 @@ module.exports = class Statesync
 		return @handleUpdatedState()
 
 	lockState: () =>
-		@$spinnerContainer.show()
+		@$spinnerContainer.fadeIn('fast')
 
 	unlockState: () =>
-		@$spinnerContainer.fadeOut()
+		@$spinnerContainer.fadeOut('fast')

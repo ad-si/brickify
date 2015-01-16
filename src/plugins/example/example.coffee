@@ -19,7 +19,6 @@ module.exports = class Example
 			@useWebWorker()
 
 		return {
-		title: 'Example Plugin'
 		type: 'object'
 		properties:
 			size:

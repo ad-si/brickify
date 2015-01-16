@@ -9,6 +9,10 @@ $('#qcExampleLink').click (event) ->
 			bundle1.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
 		b2.then(() ->
 			bundle2.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
+		b2.then(() ->
+			nb = bundle2.getPlugin 'newbrickator'
+			##still missing - newBrickator needs to be merged
+		)
 
 stlDropper = require './stlDropper'
 
@@ -39,3 +43,4 @@ b1 = bundle1.init()
 config2.renderAreaId = 'renderArea2'
 bundle2 = new Bundle config2
 b2 = bundle2.init()
+

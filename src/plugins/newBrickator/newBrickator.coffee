@@ -14,7 +14,6 @@ module.exports = class NewBrickator
 			height: 3.2
 		}
 		@pipeline = new LegoPipeline(@baseBrick)
-		@threeObjects = {}
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -47,12 +46,12 @@ module.exports = class NewBrickator
 
 	uiEnabled: (node) ->
 		if node.pluginData.newBrickator?
-			threeJsNode = getObjectByNode(@threejsRootNode, node)
+			threeJsNode =  @getThreeObjectByNode node
 			threeJsNode?.visible = true
 
 	uiDisabled: (node) ->
 		if node.pluginData.newBrickator?
-			threeJsNode = getObjectByNode(@threejsRootNode, node)
+			threeJsNode = @getThreeObjectByNode node
 			threeJsNode?.visible = false
 
 	onClick: (event) =>
@@ -79,21 +78,19 @@ module.exports = class NewBrickator
 		#delete voxel visualizations for deleted objects
 		availableObjects = []
 		objectTree.forAllSubnodeProperties state.rootNode,
-			'solidRenderer',
+			'newBrickator',
 			(property) ->
 				availableObjects.push property.threeObjectUuid
 
-		for own key of @threeObjects
-			if not (availableObjects.indexOf(key) >= 0)
-				@voxelVisualizer.clear @threeObjects[key]
-				@threejsRootNode.remove @threeObjects[key]
-				@threeObjects[key] = undefined
+		for child in @threejsRootNode.children
+				if availableObjects.indexOf(child.uuid) < 0
+					@threejsRootNode.remove @threeObjects[key]
 
 	voxelize: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
 		uiSettings = selectedNode.toolsValues.newbrickator
 
-		threeNode = getObjectByNode(@threejsRootNode, selectedNode)
+		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
 
 		settings = {
@@ -110,12 +107,12 @@ module.exports = class NewBrickator
 
 		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
 
-	getObjectByNode = (threeJsNode, node) ->
+	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?
-			uuid = node.pluginData.newBrickator.threeObjectId
-			for node in threeJsNode.children
+			uuid = node.pluginData.newBrickator.threeObjectUuid
+			for node in @threejsRootNode.children
 				return node if node.uuid == uuid
 		object = new THREE.Object3D()
-		threeJsNode.add object
-		node.pluginData.newBrickator = {'threeObjectId': object.uuid}
+		@threejsRootNode.add object
+		node.pluginData.newBrickator = {'threeObjectUuid': object.uuid}
 		object

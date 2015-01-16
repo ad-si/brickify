@@ -10,7 +10,11 @@ module.exports = class Grid
 	setUpForModel: (optimizedModel, gridDelta = null) =>
 		bb = optimizedModel.boundingBox()
 
-		@origin = bb.min
+		@origin ={
+			x: bb.min.x
+			y: bb.min.y
+			z: bb.min.z
+		}
 		if gridDelta
 			@origin.x -= gridDelta.x
 			@origin.y -= gridDelta.y

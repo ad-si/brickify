@@ -12,9 +12,9 @@ $('#qcExampleLink').click (event) ->
 			bundle1.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
 		b2.then(() ->
 			bundle2.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
-		b2.then(() ->
-			nb = bundle2.getPlugin 'newbrickator'
-			##still missing - newBrickator needs to be merged
+		.then(() ->
+			nb = bundle2.getPlugin 'newBrickator'
+			nb.voxelizeFirstObject()
 		)
 
 stlDropper = require './stlDropper'

@@ -20,10 +20,7 @@ module.exports = class NewBrickator
 
 	getUiSchema: () =>
 		voxelCallback = (selectedNode) =>
-			modelCache.request(selectedNode.meshHash).then(
-				(optimizedModel) =>
-					@voxelize optimizedModel, selectedNode
-			)
+			@voxelizeNode selectedNode
 
 		return {
 		title: 'NewBrickator'
@@ -86,9 +83,36 @@ module.exports = class NewBrickator
 				if availableObjects.indexOf(child.uuid) < 0
 					@threejsRootNode.remove @threeObjects[key]
 
+	voxelizeFirstObject: () =>
+		@bundle.statesync.performStateAction (state) =>
+			console.log state
+			node = state.rootNode.children[0]
+			@voxelizeNode node
+
+	voxelizeNode: (selectedNode) =>
+		modelCache.request(selectedNode.meshHash).then(
+			(optimizedModel) =>
+				@voxelize optimizedModel, selectedNode
+		)
+
+	getUiSettings: (selectedNode) =>
+		if selectedNode.toolsValues?.newbrickator?
+			return selectedNode.toolsValues.newbrickator
+		else
+			if !(selectedNode.toolsValues?)
+				selectedNode.toolsValues = {}
+
+			selectedNode.toolsValues.newbrickator = {
+				gridDeltaX: 0
+				gridDeltaY: 0
+				gridDeltaZ: 0
+			}
+			return selectedNode.toolsValues.newbrickator
+
 	voxelize: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
-		uiSettings = selectedNode.toolsValues.newbrickator
+
+		uiSettings = @getUiSettings selectedNode
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)

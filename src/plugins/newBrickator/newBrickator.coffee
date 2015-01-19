@@ -3,6 +3,8 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
+#BrickVisualizer = require './BrickVisualizer'
+BrickLayouter = require './BrickLayouter'
 objectTree = require '../../common/objectTree'
 
 module.exports = class NewBrickator
@@ -14,6 +16,7 @@ module.exports = class NewBrickator
 			height: 3.2
 		}
 		@pipeline = new LegoPipeline(@baseBrick)
+		@brickLayouter = new BrickLayouter()
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -106,6 +109,13 @@ module.exports = class NewBrickator
 		grid = results.lastResult
 
 		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
+
+		@layoutForGrid grid, threeNode, true
+
+	layoutForGrid: (grid, threeNode, profiling) =>
+		bricks = @brickLayouter.layoutForGrid grid, true
+		console.log 'here too'
+	#@brickVisualizer.createBricks()
 
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

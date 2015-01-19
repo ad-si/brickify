@@ -56,10 +56,3 @@ module.exports = class Ui
 			@clickHandler.bind @
 		false
 		)
-
-		Mousetrap.bind '?', () ->
-			bootbox.dialog({
-				title: 'Keyboard shortcuts'
-				message: ''
-			})
-

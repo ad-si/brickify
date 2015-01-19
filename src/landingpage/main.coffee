@@ -7,6 +7,12 @@ $('#quickConvert').hide()
 $('#buttonContainer').fadeTo(500, 1)
 
 $('#qcExampleLink').click (event) ->
+	#update link to editor
+	lnk = $('.applink').attr('href')
+	lnk += 'initialModel=1c2395a3145ad77aee7479020b461ddf'
+	$('.applink').attr('href', lnk)
+
+	#open quickconvert, load and process model
 	$('#quickConvert').slideDown 'slow', () ->
 		b1.then(() ->
 			bundle1.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')

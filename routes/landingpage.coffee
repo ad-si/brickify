@@ -8,3 +8,6 @@ module.exports.getContribute = (request, response) ->
 
 module.exports.getTeam = (request, response) ->
 	response.render path.join('landingpage','team')
+
+module.exports.getImprint = (request, response) ->
+	response.render path.join('landingpage','imprint')

@@ -1,34 +1,48 @@
-extends ../layout
+extends ../rootLayout
 
-block content
-	#canvasContainer
-		canvas#canvas.appCanvas
+block styles
+	link(rel='stylesheet', href='/styles/screen.css')
 
-	#commandContainer
-		a#cmdShare(href="#", title="Share your work")
-			img(src="/img/share.png", height="40px", alt="share")
+block body
+	#wrapper.container-fluid
 
-	#controls.row
-		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-			.panel.panel-default
-				.panel-heading
-					h3.collapseTitle.panel-title(data-toggle='collapse'
-						data-target='#collapseScenegraph') Scenegraph
-				#collapseScenegraph.panel-collapse.collapse.in
-					.panel-body
-						#sceneGraphContainer
-						#propertiesContainer
-		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
-			div.panel-group#pluginsContainer(role='tablist')
+		h1#logo Lowfab
 
-	#webGlWarning
-		p You should not see this text! Do you use a webGL ready browser?
+		noscript
+			| For full functionality of this site it is necessary to enable JavaScript.
+			| Here are the
 			= ' '
-			a(href='http://get.webgl.org') get.webgl.org
+			a(href="http://enable-javascript.com", target="_blank")
+				| instructions how to enable JavaScript in your web browser
 
-	#spinnerContainer
-		.spinner
-			div Loading...
+		#canvasContainer
+			canvas#canvas.appCanvas
+
+		#commandContainer
+			a#cmdShare(href="#", title="Share your work")
+				img(src="/img/share.png", height="40px", alt="share")
+
+		#controls.row
+			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
+				.panel.panel-default
+					.panel-heading
+						h3.collapseTitle.panel-title(data-toggle='collapse'
+							data-target='#collapseScenegraph') Scenegraph
+					#collapseScenegraph.panel-collapse.collapse.in
+						.panel-body
+							#sceneGraphContainer
+							#propertiesContainer
+			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
+				div.panel-group#pluginsContainer(role='tablist')
+
+		#webGlWarning
+			p You should not see this text! Do you use a webGL ready browser?
+				= ' '
+				a(href='http://get.webgl.org') get.webgl.org
+
+		#spinnerContainer
+			.spinner
+				div Loading...
 
 
 block scripts

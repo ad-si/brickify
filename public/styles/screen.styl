@@ -1,41 +1,14 @@
 $icon-font-path ?= '/node_modules/bootstrap-styl/fonts/'
 
-@import 'dark.styl'
+@import 'dark'
 
 @import bootstrap
 @import '../../node_modules/jqtree/jqtree.css'
 @import '../../node_modules/font-awesome/css/font-awesome.css'
 @import nib
 
-
-*
-	margin 0
-	padding 0
-	border 0
-	font-size 100%
-	box-sizing border-box
-
-html
-	height 100%
-
-body
-	height 100%
-
-.appCanvas
-	position fixed
-	top 0
-	left 0
-	width 100%
-	height 100%
-
-.quickConvertCanvas
-	width 388px
-	max-width 388px
-	height 388px
-	max-heigth 388px
-
-a
-	cursor pointer
+@import 'app/app'
+@import 'landingpage/landingpage'
 
 #logo
 	position relative
@@ -100,9 +73,6 @@ input[readonly].not-readonly
 	margin-left 5px
 	margin-right 5px
 
-#quickConvert
-	display none
-
 #buttonContainer
 	width 100%
 	text-align center
@@ -132,12 +102,3 @@ input[readonly].not-readonly
 
 ul
 	margin-left 25px
-
-ul.jqtree-tree li.jqtree-selected > .jqtree-element,
-ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover
-	text-shadow none
-	background #c8c8c8
-	border-radius 5px
-
-.jqtree-tree .jqtree-title
-	color #333

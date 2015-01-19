@@ -13,19 +13,26 @@ $('#qcExampleLink').click (event) ->
 	$('.applink').attr('href', lnk)
 
 	#open quickconvert, load and process model
+	loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
+
+loadAndConvert = (hash) =>
 	$('#quickConvert').slideDown 'slow', () ->
+		$('body,html').animate({scrollTop: 200}, 400)
+
 		b1.then(() ->
-			bundle1.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
+			bundle1.modelLoader.loadByHash hash)
 		b2.then(() ->
-			bundle2.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
+			bundle2.modelLoader.loadByHash hash)
 		.then(() ->
 			nb = bundle2.getPlugin 'newBrickator'
 			nb.processFirstObject()
 		)
 
-stlDropper = require './stlDropper'
+loadModel = (hash, errors) =>
+	loadAndConvert(hash)
 
-stlDropper.init document.getElementById('dropzone'), $('#droptext')
+stlDropper = require './stlDropper'
+stlDropper.init document.getElementById('dropzone'), $('#droptext'), loadModel
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../client/globals.yaml'

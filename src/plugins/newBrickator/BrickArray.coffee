@@ -7,11 +7,23 @@ module.exports = class BrickArray
 
   initializeForGrid: (grid) =>
     for z in [0..grid.numVoxelsZ - 1] by 1
-      @data[z] ?= []
       for x in [0..grid.numVoxelsX - 1] by 1
-        @data[z][x] ?= []
         for y in [0..grid.numVoxelsY - 1] by 1
-          @data[z][x][y] = {id: -1}
+          if grid.zLayers[z]?[x]?[y]?
+            if grid.zLayers[z][x][y] != false
+              @initializeBrickPosition x, y, z
+
+  initializeBrickPosition: (x, y, z) =>
+    if not @data[z]
+      @data[z] = []
+    if not @data[z][x]
+      @data[z][x] = []
+
+    if not @data[z][x][y]?
+      @data[z][x][y] = {id: 0}
+    else
+      #if the brick already exists, push new data to existing array
+     console.warn 'visiting brick at x=#{x} y=#{y} z=#{z}'
 
   availableBrickSizes: () ->
     return [

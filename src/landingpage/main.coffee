@@ -14,7 +14,7 @@ $('#qcExampleLink').click (event) ->
 			bundle2.modelLoader.loadByHash '1c2395a3145ad77aee7479020b461ddf')
 		.then(() ->
 			nb = bundle2.getPlugin 'newBrickator'
-			nb.voxelizeFirstObject()
+			nb.processFirstObject()
 		)
 
 stlDropper = require './stlDropper'

@@ -45,11 +45,14 @@ module.exports = class PluginLoader
 		if threeNode?
 			@bundle.renderer.addToScene threeNode
 
+		if @hotkeys? and @pluginHooks.hasHook(instance, 'getHotkeys')
+			@hotkeys.addEvent(instance.getHotkeys())
+
 		return instance
 
 	# Since browserify.js does not support dynamic require
 	# all plugins must be explicitly written down
-	loadPlugins: () ->
+	loadPlugins: (@hotkeys) ->
 		pluginInstances = []
 
 		###pluginInstances.push @initPlugin(
@@ -83,6 +86,10 @@ module.exports = class PluginLoader
 		pluginInstances.push @initPlugin(
 			require('../plugins/faBrickator'),
 			require('../plugins/faBrickator/package.json')
+		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/newBrickator'),
+			require('../plugins/newBrickator/package.json')
 		)
 
 		return pluginInstances

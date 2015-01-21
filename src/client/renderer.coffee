@@ -160,6 +160,10 @@ module.exports = class Renderer
 		directionalLight.position.set 20, 0, 30
 		@scene.add directionalLight
 
+		directionalLight = new THREE.DirectionalLight(0x808080)
+		directionalLight.position.set 20, -20, -30
+		@scene.add directionalLight
+
 	loadCamera: (state) =>
 		if state.controls?
 			@setCamera state.controls.position, state.controls.target

@@ -125,10 +125,7 @@ module.exports.setupRouting = () ->
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
-	webapp.get '/quickconvert.js', browserify('src/quickconvert/main.coffee', {
-		extensions: ['.coffee']
-		external: shared
-	})
+
 	webapp.use express.static('public')
 	webapp.use('/node_modules', express.static('node_modules'))
 
@@ -155,7 +152,7 @@ module.exports.setupRouting = () ->
 	webapp.get '/', landingPage.getLandingpage
 	webapp.get '/contribute', landingPage.getContribute
 	webapp.get '/team', landingPage.getTeam
-	webapp.get '/quickconvert', urlParser, landingPage.getQuickConvertPage
+	webapp.get '/imprint', landingPage.getImprint
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
 	webapp.get '/statesync/get', jsonParser, statesync.getState
@@ -193,6 +190,7 @@ module.exports.setupRouting = () ->
 
 	if developmentMode
 		webapp.use errorHandler()
+		require('express-debug')(webapp, {extra_panels: ['nav']})
 
 	webapp.use (req, res) ->
 		res

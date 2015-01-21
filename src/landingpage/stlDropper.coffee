@@ -3,14 +3,18 @@ modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 
 droptext = null
+uploadFinishedCallback = null
+
 readingString = 'Reading file
 <img src="img/spinner.gif" style="height: 1.2em;">'
 uploadString = 'Uploading file
 <img src="img/spinner.gif" style="height: 1.2em;">'
+loadedString = 'File loaded!'
 
-module.exports.init = (targetDomObject, text) ->
+module.exports.init = (targetDomObject, text, finishedCallback) ->
 	bindDropHandler targetDomObject
 	droptext = text
+	uploadFinishedCallback = finishedCallback
 
 bindDropHandler = (target) ->
 	target.addEventListener 'drop', onModelDrop, false
@@ -59,18 +63,13 @@ handleLoadedFile = (filename) ->
 
 		droptext.html uploadString
 
-		uploadFinishedCallback = (md5hash) ->
-			if importErrors
-				md5hash += '+errors'
-			document.location.hash = ''
-			dhref = document.location.href
-			dhref = dhref.substring(0, dhref.length - 1) if dhref.endsWith('#')
-			dhref += '/' unless dhref.endsWith('/')
-			dhref += 'quickconvert#' + md5hash
-			document.location.href = dhref
-			return
+		ufc = (md5hash) ->
+			droptext.html loadedString
+			if uploadFinishedCallback?
+				uploadFinishedCallback(md5hash, importErrors)
 
-		modelCache.store(optimizedModel).then(uploadFinishedCallback)
+
+		modelCache.store(optimizedModel).then(ufc)
 
 		return
 

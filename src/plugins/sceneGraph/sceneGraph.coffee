@@ -107,9 +107,6 @@ module.exports = class SceneGraph
 	bindEvents: () ->
 		$treeContainer = $(@htmlElements.sceneGraphContainer)
 		$treeContainer.bind 'tree.select', @onNodeSelect
-		$(document).keydown (event) =>
-			if event.keyCode == 46 #Delete
-				@deleteObject()
 
 	getStateNodeForTreeNode: (treeNode, stateRootNode, callback) ->
 		objectTree.forAllSubnodes stateRootNode, (node) ->
@@ -117,7 +114,7 @@ module.exports = class SceneGraph
 				if node.pluginData[pluginKey].linkedId == treeNode.id
 					callback node
 
-	deleteObject: () ->
+	deleteObject: () =>
 		return if @bootboxOpen
 		if not @selectedNode or @selectedNode.name == 'Scene'
 			return
@@ -141,3 +138,15 @@ module.exports = class SceneGraph
 		@uiInitialized = true
 		if @state
 			@renderUi @htmlElements
+
+	getHotkeys: =>
+		return {
+			title: 'Scenegraph'
+			events: [
+				{
+					hotkey: 'del'
+					description: 'delete selected model'
+					callback: @deleteObject
+				}
+			]
+		}

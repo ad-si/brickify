@@ -3,6 +3,8 @@ path = require 'path'
 winston = require 'winston'
 stlLoader = require '../src/plugins/stlImport/stlLoader'
 reportGenerator = require './reportGenerator'
+LegoPipeline = require '../src/plugins/newBrickator/LegoPipeline'
+legoPipeline = new LegoPipeline({length: 8, width: 8, height: 3.2})
 mkdirp = require 'mkdirp'
 require('es6-promise').polyfill()
 
@@ -118,7 +120,7 @@ testModel = (filename) ->
 				logger.warn "Model '#{filename}' was not properly loaded"
 				resolve(null)
 				return
-
+			logger.debug "Testing model '#{filename}'"
 			testResult.stlParsingTime = new Date() - begin
 			testResult.numStlParsingErrors = stlModel.importErrors.length
 			logger.debug "model parsed in
@@ -150,6 +152,10 @@ testModel = (filename) ->
 			testResult.twoManifoldCheckTime = new Date() - begin
 			logger.debug "checked 2-manifoldness in #{testResult.twoManifoldCheckTime}ms"
 
+			results = legoPipeline.run optimizedModel, {voxelResolution: 8}, true
+			testResult.hullVoxelizationTime = results.profilingResults[0]
+			testResult.volumeFillTime = results.profilingResults[1]
+
 			resolve(testResult)
 
 # This class holds all test results for one model and is
@@ -166,3 +172,5 @@ class ModelTestResult
 		@numPoints = 0
 		@isTwoManifold = 0
 		@twoManifoldCheckTime = 0
+		@hullVoxelizationTime = 0
+		@volumeFillTime = 0

@@ -27,10 +27,10 @@ class Object3D
 	# checks whether a point is contained in the object. If so the point is
 	# returned.
 	# If not undefined.
-	# @param x [float] the x coordinate
-	# @param y [float] the y coordinate
-	# @param z [float] the z coordinate
-	# @return [Point] the requested point or undefined
+	# @param {float} x the x coordinate
+	# @param {float} y the y coordinate
+	# @param {float} z the z coordinate
+	# @return {Point} the requested point or undefined
 	check_Point: (x, y, z) ->
 		if @point_lookup[x] and @point_lookup[x][y]
 			@point_lookup[x][y][z]
@@ -39,10 +39,10 @@ class Object3D
 
 	# Gets the specified point from the Object. If the Object doesn't contain
 	# this point, the point is added and returned
-	# @param x [float] the x coordinate
-	# @param y [float] the y coordinate
-	# @param z [float] the z coordinate
-	# @return [Point] the requested point
+	# @param {float} x the x coordinate
+	# @param {float} y the y coordinate
+	# @param {float} z the z coordinate
+	# @return {Point} the requested point
 	get_Point: (x, y, z) ->
 		if point = @check_Point x, y, z
 			point
@@ -50,10 +50,10 @@ class Object3D
 			@set_Point x, y, z
 
 	# Adds the specific point to the Object
-	# @param x [float] the x coordinate
-	# @param y [float] the y coordinate
-	# @param z [float] the z coordinate
-	# @return [Point] the requested point
+	# @param {float} x the x coordinate
+	# @param {float} y the y coordinate
+	# @param {float} z the z coordinate
+	# @return {Point} the requested point
 	set_Point: (x, y, z) ->
 		point = new Point x, y, z
 

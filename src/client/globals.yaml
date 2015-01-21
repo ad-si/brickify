@@ -2,7 +2,7 @@
 mm: 1
 
 # scene
-clearColor: 0xf6f6f6
+clearColor: 0x202020
 
 # camera adjustments
 fov: 40
@@ -26,8 +26,8 @@ meshes: []
 
 # grid
 gridColorNormal: 0xcccccc
-gridColor5: 0x999999
-gridColor10: 0x666666
+gridColor5: 0xffffff
+gridColor10: 0xffffff
 gridLineWidthNormal: 1
 gridLineWidth5: 1
 gridLineWidth10: 1

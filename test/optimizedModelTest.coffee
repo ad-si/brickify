@@ -11,7 +11,7 @@ describe 'OptimizedMesh', () ->
 
 	describe 'Manifoldness', () ->
 		it 'should be two-manifold', (done) ->
-			m = loadOptimizedModel('test/models/unitCube.stl')
+			m = loadOptimizedModel('test/models/unitCube.bin.stl')
 			expect(m.isTwoManifold()).to.equal(true)
 			done()
 		it 'should not be two-manifold', (done) ->

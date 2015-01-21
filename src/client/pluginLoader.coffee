@@ -45,11 +45,14 @@ module.exports = class PluginLoader
 		if threeNode?
 			@bundle.renderer.addToScene threeNode
 
+		if @hotkeys? and @pluginHooks.hasHook(instance, 'getHotkeys')
+			@hotkeys.addEvent(instance.getHotkeys())
+
 		return instance
 
 	# Since browserify.js does not support dynamic require
 	# all plugins must be explicitly written down
-	loadPlugins: () ->
+	loadPlugins: (@hotkeys) ->
 		pluginInstances = []
 
 		###pluginInstances.push @initPlugin(

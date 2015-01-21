@@ -93,3 +93,13 @@
 #  TODO
 
 - onClick
+
+# ## Hotkeys
+#
+# Plugins should return an object with a title property (String) that is
+# displayed in the help and an array of events. These should have an event
+# (String) according to [Mousetrap]{https://github.com/ccampbell/mousetrap},
+# a description (String) that is shown in the help dialog and a callback
+# function.
+
+- getHotkeys

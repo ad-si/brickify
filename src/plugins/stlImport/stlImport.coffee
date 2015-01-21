@@ -1,22 +1,15 @@
-stlLoader = require './stlLoader'
-OptimizedModel = require '../../common/OptimizedModel'
+meshlib = require '../../../modules/meshlib'
 
 module.exports = class StlImport
-	constructor: () ->
-		return
 
 	# Imports the stl, optimizes it,
 	# sends it to the server (if not cached there)
 	# and adds it to the scene as a THREE.Geometry
-	importFile: (fileName, fileContent) ->
-		errorCallback = (errors) ->
-			console.error 'Errors occured while importing the stl file:'
-			console.error '-> ' + error for error in errors
-		optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
+	importFile: (fileName, fileContent, callback) ->
 
-		# happens with empty files
-		if !optimizedModel
-			return
-
-		optimizedModel.originalFileName = fileName
-		return optimizedModel
+		meshlib.parse fileContent, null, (error, model) ->
+			if error or not model
+				callback error
+			else
+				model.originalFileName = fileName
+				callback null, model

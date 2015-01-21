@@ -15,34 +15,40 @@ module.exports = class ModelLoader
 
 	readFile: (file) ->
 		reader = new FileReader()
-		# TODO: remove extension check
-		if file.name.toLowerCase().search '.stl' >= 0
-			reader.onload = @loadFile file.name
-			reader.readAsBinaryString file
-
-	loadFile: (filename) =>
-		return (event) =>
+		reader.onload = (event) =>
 			fileContent = event.target.result
-			optimizedModel = @importFile filename, fileContent
-			@load optimizedModel if optimizedModel?
+			@importFile file.name, fileContent, (error, model) =>
+				if error or not model
+					throw error
+				else
+					@load model
+		reader.readAsText file
 
-	importFile: (filename, fileContent) ->
-		for loader in @pluginHooks.get 'importFile'
-			optimizedModel = loader filename, fileContent
-			return optimizedModel if optimizedModel?
+	importFile: (filename, fileContent, callback) ->
 
-	load: (optimizedModel) =>
-		modelData = optimizedModel.toBase64()
+		# Load with first plugin capable of loading
+		loader = @pluginHooks.get('importFile')[0]
+
+		loader filename, fileContent, (error, model) ->
+			if error or not model
+				callback error
+			else
+				callback null, model
+
+	load: (model) =>
+		modelData = model.toBase64()
 		hash = md5(modelData)
-		fileName = optimizedModel.originalFileName
-		modelCache.store optimizedModel
+		fileName = model.originalFileName
+		modelCache.store model
 		@addModelToState fileName, hash
 
 	loadByHash: (hash) =>
-		modelCache.request(hash).then(
-			@load
-			() -> console.error "Could not load model from hash #{hash}"
-		)
+		modelCache
+		.request(hash)
+		.then(@load)
+		.catch (error) ->
+			console.error "Could not load model from hash #{hash}"
+			console.error error
 
 	# adds a new model to the state
 	addModelToState: (fileName, hash) ->
@@ -51,6 +57,7 @@ module.exports = class ModelLoader
 			node.fileName = fileName
 			node.meshHash = hash
 			node.pluginData = {
-				uiGen: {selectedPluginKey: @globalConfig.defaultPlugin}}
+				uiGen: {selectedPluginKey: @globalConfig.defaultPlugin}
+			}
 		# call updateState on all client plugins and sync
 		@stateInstance.performStateAction loadModelCallback, true

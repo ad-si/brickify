@@ -133,3 +133,29 @@ module.exports = class DummyPlugin
 	importFile: (fileName, fileContent) ->
 		console.log 'Dummy Client Plugin imports a file'
 		return undefined
+
+	###
+	# Plugins should return an object with a title property (String) that is
+	# displayed in the help and an array of events. These should have an event
+	# (String) according to [Mousetrap]{https://github.com/ccampbell/mousetrap},
+	# a description (String) that is shown in the help dialog and a callback
+	# function.
+	###
+	getHotkeys: =>
+		return {
+		title: 'Dummy'
+		events: [
+			{
+				hotkey: '+'
+				description: 'display alert'
+				callback: ->
+					alert 'Dummy client plugin reports: \'+\' was pressed'
+			},
+			{
+				hotkey: '-'
+				description: 'display alert'
+				callback: ->
+					alert 'Dummy client plugin reports: \'-\' was pressed'
+			}
+		]
+		}

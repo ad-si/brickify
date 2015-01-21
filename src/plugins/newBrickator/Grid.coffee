@@ -10,7 +10,7 @@ module.exports = class Grid
 	setUpForModel: (optimizedModel, gridDelta = null) =>
 		bb = optimizedModel.boundingBox()
 
-		@origin ={
+		@origin = {
 			x: bb.min.x
 			y: bb.min.y
 			z: bb.min.z

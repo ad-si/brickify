@@ -19,19 +19,16 @@ module.exports = class NewBrickator
 	init3d: (@threejsRootNode) => return
 
 	getUiSchema: () =>
-		voxelCallback = (selectedNode) =>
-			modelCache.request(selectedNode.meshHash).then(
-				(optimizedModel) =>
-					@voxelize optimizedModel, selectedNode
-			)
+		legoCallback = (selectedNode) =>
+			@runLegoPipelineOnNode selectedNode
 
 		return {
 		title: 'NewBrickator'
 		type: 'object'
 		actions:
 			a1:
-				title: 'Voxelize'
-				callback: voxelCallback
+				title: 'Legofy'
+				callback: legoCallback
 		properties:
 			gridDeltaX:
 				description: 'Voxelgrid dx (0..7)'
@@ -86,9 +83,36 @@ module.exports = class NewBrickator
 				if availableObjects.indexOf(child.uuid) < 0
 					@threejsRootNode.remove @threeObjects[key]
 
-	voxelize: (optimizedModel, selectedNode) =>
+	processFirstObject: () =>
+		@bundle.statesync.performStateAction (state) =>
+			console.log state
+			node = state.rootNode.children[0]
+			@runLegoPipelineOnNode node
+
+	runLegoPipelineOnNode: (selectedNode) =>
+		modelCache.request(selectedNode.meshHash).then(
+			(optimizedModel) =>
+				@runLegoPipeline optimizedModel, selectedNode
+		)
+
+	getUiSettings: (selectedNode) =>
+		if selectedNode.toolsValues?.newbrickator?
+			return selectedNode.toolsValues.newbrickator
+		else
+			if !(selectedNode.toolsValues?)
+				selectedNode.toolsValues = {}
+
+			selectedNode.toolsValues.newbrickator = {
+				gridDeltaX: 0
+				gridDeltaY: 0
+				gridDeltaZ: 0
+			}
+			return selectedNode.toolsValues.newbrickator
+
+	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
-		uiSettings = selectedNode.toolsValues.newbrickator
+
+		uiSettings = @getUiSettings selectedNode
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)

@@ -44,3 +44,9 @@ module.exports = class Bundle
 
 	saveChanges: =>
 		@statesync.performStateAction @renderer.saveCamera
+
+	getPlugin: (name) =>
+		for p in @pluginInstances
+			if p.name == name
+				return p
+		return null

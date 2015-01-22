@@ -4,7 +4,7 @@ Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
 PluginUiGenerator = require './pluginUiGenerator'
-Hotkeys = require './Hotkeys'
+Hotkeys = require './hotkeys'
 
 ###
 # @class Bundle

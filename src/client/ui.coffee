@@ -54,5 +54,5 @@ module.exports = class Ui
 		@renderer.getDomElement().addEventListener(
 			'mousedown'
 			@clickHandler.bind @
-		false
+			false
 		)

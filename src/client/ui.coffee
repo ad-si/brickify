@@ -71,5 +71,4 @@ module.exports = class Ui
 		return
 
 	_initHotkeys: =>
-		hotkeys = new Hotkeys()
-		hotkeys.addEvent event for event in @pluginHooks.getHotkeys()
+		hotkeys = new Hotkeys(@pluginHooks)

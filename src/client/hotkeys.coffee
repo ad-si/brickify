@@ -3,12 +3,14 @@
 ###
 
 module.exports = class Hotkeys
-	constructor: ->
+	constructor: (pluginHooks) ->
 		@events = []
 		@bind '?', 'General', 'Show this help', () =>
 			@showHelp()
 		@bind 'esc', 'General', 'Close modal window', () =>
 			bootbox.hideAll()
+
+		@addEvent event for event in pluginHooks.getHotkeys()
 
 	showHelp: =>
 		message = ''
@@ -36,6 +38,5 @@ module.exports = class Hotkeys
 		@events[titlegroup].push {hotkey: hotkey, description: description}
 
 	addEvent: (eventSpecs) ->
-		console.log eventSpecs
 		for event in eventSpecs.events
 			@bind(event.hotkey, eventSpecs.title, event.description, event.callback)

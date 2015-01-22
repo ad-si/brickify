@@ -1,4 +1,3 @@
-jbinary = require 'jbinary'
 Stl = require './Stl'
 
 meshlib = {}

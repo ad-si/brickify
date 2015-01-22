@@ -5,11 +5,8 @@ Hotkeys = require './hotkeys'
 ###
 
 module.exports = class Ui
-	constructor: (bundle) ->
-		@globalConfig = bundle.globalConfig
+	constructor: (@bundle) ->
 		@renderer = bundle.renderer
-		@statesync = bundle.statesync
-		@modelLoader = bundle.modelLoader
 		@pluginHooks = bundle.pluginHooks
 		@_init()
 
@@ -17,7 +14,7 @@ module.exports = class Ui
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
-		@modelLoader.readFiles files if files?
+		@bundle.modelLoader.readFiles files if files?
 
 	dragOverHandler: (event) ->
 		event.stopPropagation()

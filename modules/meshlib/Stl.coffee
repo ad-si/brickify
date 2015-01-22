@@ -1,26 +1,44 @@
 require 'string.prototype.startswith'
 require 'string.prototype.includes'
 
+textEncoding = require 'text-encoding'
+
 Vec3 = require './Vector'
 optimizeModel = require './optimizeModel'
 
 
-toArrayBuffer = (buf) ->
-	if typeof buf is 'string'
-		array_buffer = new Uint8Array(buf.length)
-		i = 0
+FileError = (message, calcDataLength, dataLength) ->
+	this.name = 'FileError'
+	this.message = message or "Calculated length of #{calcDataLength}
+					does not match specified file-size of #{dataLength}.
+					Triangles might be missing!"
+FileError.prototype = new Error
 
-		while i < buf.length
-			array_buffer[i] = buf.charCodeAt(i) & 0xff # implicitly assumes little-endian
-			i++
-		return array_buffer.buffer or array_buffer
-	else
-		return buf
+FacetError = (message) ->
+	this.name = 'FacetError'
+	this.message = message or 'Previous facet was not completed!'
+FacetError.prototype = new Error
+
+NormalError = (message) ->
+	this.name = 'NormalError'
+	this.message = message or "Invalid normal definition: (#{nx}, #{ny}, #{nz})"
+NormalError.prototype = new Error
+
+VertexError = (message) ->
+	this.name = 'VertexError'
+	this.message = message or "Invalid vertex definition: (#{nx}, #{ny}, #{nz})"
+VertexError.prototype = new Error
+
+
 
 
 parseAscii = (fileContent) ->
 	astl = new Ascii(fileContent)
 	stl = new Binary()
+
+	# TODO:
+	# if calcDataLength > dataLength
+	#   throw new FileError null, calcDataLength, dataLength
 
 	currentPoly = null
 
@@ -31,68 +49,69 @@ parseAscii = (fileContent) ->
 		switch cmd
 			when 'solid'
 				astl.nextText() #skip description of model
+
 			when 'facet'
 				if (currentPoly?)
-					console.error 'Beginning a facet without
-										ending the previous one'
+					throw new FacetError
 					stl.addPolygon currentPoly
 					currentPoly = null
 				currentPoly = new Poly()
+
 			when 'endfacet'
 				if !(currentPoly?)
-					console.error 'Ending a facet without beginning it'
+					throw new FacetError 'Facet was ended without beginning it!'
 				else
 					stl.addPolygon currentPoly
 					currentPoly = null
+
 			when 'normal'
 				nx = parseFloat astl.nextText()
 				ny = parseFloat astl.nextText()
 				nz = parseFloat astl.nextText()
 
-				if (!(nx?) || !(ny?) || !(nz?))
-					console.error "Invalid normal definition:
-										(#{nx}, #{ny}, #{nz})"
+				if (!(nx?) or !(ny?) or !(nz?))
+					throw new NormalError
 				else
 					if not (currentPoly?)
-						console.error 'normal definition
-									without an existing polygon'
+						throw new NormalError 'Normal definition
+									without an existing polygon!'
 						currentPoly = new Poly()
 					currentPoly.setNormal new Vec3(nx, ny, nz)
+
 			when 'vertex'
 				vx = parseFloat astl.nextText()
 				vy = parseFloat astl.nextText()
 				vz = parseFloat astl.nextText()
 
-				if (!(vx?) || !(vy?) || !(vz?))
-					console.error "Invalid vertex definition:
-							(#{nx}, #{ny}, #{nz})"
+				if (!(vx?) or !(vy?) or !(vz?))
+					throw new VertexError
 
 				else
 					if not (currentPoly?)
-						console.error 'point definition without
-											an existing polygon'
+						throw new VertexError 'Point definition without
+											an existing polygon!'
 						currentPoly = new Poly()
 					currentPoly.addPoint new Vec3(vx, vy, vz)
 
 	return stl
 
 # Parses a binary stl file to the internal representation
-parseBinary = (fileContent) ->
+parseBinary = (stlBuffer) ->
+
 	stl = new Binary()
-	reader = new DataView(fileContent, 80)
+	reader = new DataView stlBuffer, 80
 	numTriangles = reader.getUint32 0, true
 
 	#check if file size matches with numTriangles
-	datalength = fileContent.byteLength - 80 - 4
+	dataLength = stlBuffer.byteLength - 80 - 4
 	polyLength = 50
 	calcDataLength = polyLength * numTriangles
 
-	if (calcDataLength > datalength)
-		stl.addError 'Calculated length of triangle data does not match filesize,
-		triangles might be missing'
+	if calcDataLength > dataLength
+		throw new FileError null, calcDataLength, dataLength
 
 	binaryIndex = 4
-	while (binaryIndex - 4) + polyLength <= datalength
+	while (binaryIndex - 4) + polyLength <= dataLength
 		poly = new Poly()
 		nx = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
@@ -222,7 +241,7 @@ class Poly
 
 
 class Stl
-	constructor: (stlString, options) ->
+	constructor: (stlBuffer, options) ->
 
 		@modelObject = {}
 
@@ -230,25 +249,28 @@ class Stl
 		options.optimize ?= true
 		options.cleanse ?= true
 
-		if !stlString
-			throw new Error 'STL string is empty'
+		if Buffer
+			stlString = new Buffer(new Uint8Array(stlBuffer)).toString()
 
 		else
-			stlString = stlString.toString()
+			stlString = textEncoding
+				.TextDecoder 'utf-8'
+				.decode new Uint8Array stlBuffer
 
-			# TODO: Just try to parse as Ascii and handle possible errors
-			if stlString.startsWith('solid') and stlString.includes('facet') and
-			stlString.includes ('vertex')
-				try
-					@modelObject = parseAscii stlString
-				catch error
-					console.error error
-					# model = parseBinary toArrayBuffer stlString
 
-			else @modelObject = parseBinary toArrayBuffer stlString
+		# TODO: Just try to parse as Ascii and handle possible errors
+		if stlString.startsWith('solid') and stlString.includes('facet') and
+		stlString.includes ('vertex')
+			try
+				@modelObject = parseAscii stlString
+			catch error
+				console.error error
+				@modelObject = parseBinary stlBuffer
 
-			if options.optimize
-				@modelObject = optimizeModel @modelObject, options
+		else @modelObject = parseBinary stlBuffer
+
+		if options.optimize
+			@modelObject = optimizeModel @modelObject, options
 
 	model: () ->
 		return @modelObject

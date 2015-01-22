@@ -3,8 +3,6 @@ Ui = require './ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
-PluginUiGenerator = require './pluginUiGenerator'
-Hotkeys = require './hotkeys'
 
 ###
 # @class Bundle
@@ -19,15 +17,10 @@ module.exports = class Bundle
 
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 
-		if(@globalConfig.buildUi)
-			@hotkeys = new Hotkeys()
-			@ui = new Ui(@)
-			@ui.init()
-			@pluginUiGenerator = new PluginUiGenerator(@)
-
 	init: =>
 		@statesync.init().then(() =>
-			@pluginInstances = @pluginLoader.loadPlugins(@hotkeys)
+			@pluginInstances = @pluginLoader.loadPlugins()
+			@ui = new Ui(@) if(@globalConfig.buildUi)
 			@statesync.handleUpdatedState()
 		).then(@load).then(() =>
 			window.addEventListener 'beforeunload', @unload

@@ -9,6 +9,7 @@ module.exports = class Ui
 		@statesync = bundle.statesync
 		@modelLoader = bundle.modelLoader
 		@pluginHooks = bundle.pluginHooks
+		@_init()
 
 	dropHandler: (event) ->
 		event.stopPropagation()
@@ -32,7 +33,13 @@ module.exports = class Ui
 	windowResizeHandler: (event) ->
 		@renderer.windowResizeHandler()
 
-	init: =>
+	_init: =>
+		@_initListeners()
+		@_initScenegraph()
+		@_initWorkflow()
+		@_initHotkeys()
+
+	_initListeners: =>
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'
@@ -56,3 +63,12 @@ module.exports = class Ui
 			@clickHandler.bind @
 			false
 		)
+
+	_initScenegraph: =>
+		return
+
+	_initWorkflow: =>
+		return
+
+	_initHotkeys: =>
+		return

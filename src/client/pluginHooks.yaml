@@ -35,13 +35,6 @@
 
 - newBoundingSphere
 
-# ## UI Initalization
-#
-# `initUi` provides the plugins the possibility to add elements to the UI.
-# Receives a object with DOM elements to insert itself into.
-
-- initUi
-
 # if provided, a UI to configure the plugins convertion will be created. changed
 # values are always stored in the state, relative to the currently selected node
 # Must (only) be provided by converter plugins

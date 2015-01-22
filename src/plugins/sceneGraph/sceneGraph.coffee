@@ -84,13 +84,13 @@ module.exports = class SceneGraph
 			@bundle.statesync.performStateAction (state) =>
 				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
 					@selectedStateNode = stateNode
-					@bundle.pluginUiGenerator.onSelectNode stateNode
+					@bundle.ui.selection.select stateNode
 		else
 			# console.log "Deselecting " + @selectedNode.name
 			@callNodeDeselect(@selectedNode.name)
 
 	callNodeDeselect: (title) =>
-		@bundle.pluginUiGenerator.onDeselectNode()
+		@bundle.ui.selection.deselect()
 
 		#definitively deselect any node
 		if @tree.tree 'getSelectedNode'
@@ -108,33 +108,3 @@ module.exports = class SceneGraph
 			if node.pluginData[pluginKey]?
 				if node.pluginData[pluginKey].linkedId == treeNode.id
 					callback node
-
-	deleteObject: () =>
-		return if @bootboxOpen
-		if not @selectedNode or @selectedNode.name == 'Scene'
-			return
-
-		@bootboxOpen = true
-		question = "Do you really want to delete #{@selectedNode.name}?"
-		bootbox.confirm question, (result) =>
-			@bootboxOpen = false
-			if result
-				delNode = (state) =>
-						objectTree.removeNode state.rootNode, @selectedStateNode
-						@selectedNode = null
-						@selectedStateNode = null
-						@callNodeDeselect()
-
-				@bundle.statesync.performStateAction delNode, true
-
-	getHotkeys: =>
-		return {
-			title: 'Scenegraph'
-			events: [
-				{
-					hotkey: 'del'
-					description: 'delete selected model'
-					callback: @deleteObject
-				}
-			]
-		}

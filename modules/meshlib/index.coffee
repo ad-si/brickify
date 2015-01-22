@@ -1,8 +1,24 @@
+jbinary = require 'jbinary'
 Stl = require './Stl'
 
 meshlib = {}
 meshData = {}
 model = {}
+
+
+toArrayBuffer = (buffer) ->
+
+	if Buffer && Buffer.isBuffer buffer
+		tempArrayBuffer = new ArrayBuffer buffer.length
+		view = new Uint8Array tempArrayBuffer
+
+		for i in [0...buffer.length]
+			view[i] = buffer[i]
+
+		return tempArrayBuffer
+
+	else
+		return buffer
 
 
 meshlib.meshData = () ->
@@ -11,16 +27,17 @@ meshlib.meshData = () ->
 meshlib.model = () ->
 	return model
 
-meshlib.parse = (fileContentString, options, callback) ->
+meshlib.parse = (fileBuffer, options, callback) ->
+
+	if not fileBuffer
+		throw new Error 'STL buffer is empty'
 
 	options ?= {}
-
-	options.encoding ?= 'utf-8'
 	options.format ?= 'stl'
 
 	if options.format is 'stl'
 		try
-			stl = new Stl(fileContentString)
+			stl = new Stl toArrayBuffer fileBuffer
 			model = stl.model()
 		catch error
 			return callback error

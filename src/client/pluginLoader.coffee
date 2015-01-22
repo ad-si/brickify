@@ -76,6 +76,10 @@ module.exports = class PluginLoader
 			require('../plugins/stlImport/package.json')
 		)
 		pluginInstances.push @initPlugin(
+			require('../plugins/stlExport'),
+			require('../plugins/stlExport/package.json')
+		)
+		pluginInstances.push @initPlugin(
 			require('../plugins/sceneGraph'),
 			require('../plugins/sceneGraph/package.json')
 		)

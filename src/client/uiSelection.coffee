@@ -23,7 +23,7 @@ class UiSelection
 			@bootboxOpen = false
 			if result
 				@bundle.statesync.performStateAction @_delete(@selectedNode), true
-				@selectedNode = null
+				@deselect()
 
 	_delete: (node) => (state) =>
 		objectTree.removeNode state.rootNode, node

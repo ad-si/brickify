@@ -71,7 +71,7 @@ module.exports = class Ui
 		return
 
 	_initWorkflow: =>
-		workflow = new UiWorkflow(@bundle)
+		@workflow = new UiWorkflow(@bundle)
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)

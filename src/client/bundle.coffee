@@ -43,3 +43,6 @@ module.exports = class Bundle
 			if p.name == name
 				return p
 		return null
+
+	getPlugins: (type) =>
+		@pluginInstances.filter (instance) -> instance.lowfab.type == type

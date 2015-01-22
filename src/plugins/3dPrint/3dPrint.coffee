@@ -8,3 +8,6 @@ module.exports = class ThreeDPrint
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
+
+	getConvertUiSchema: () =>
+		return ''

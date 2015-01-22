@@ -1,4 +1,5 @@
 Hotkeys = require './hotkeys'
+UiWorkflow = require './uiWorkflow'
 
 ###
 # @module ui
@@ -68,7 +69,7 @@ module.exports = class Ui
 		return
 
 	_initWorkflow: =>
-		return
+		workflow = new UiWorkflow(@bundle)
 
 	_initHotkeys: =>
 		hotkeys = new Hotkeys(@pluginHooks)

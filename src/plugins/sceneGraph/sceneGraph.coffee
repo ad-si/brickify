@@ -13,24 +13,24 @@ pluginKey = 'SceneGraph'
 
 module.exports = class SceneGraph
 	constructor: () ->
-		@state = null
 		@uiInitialized = false
-		@htmlElements = null
 		@selectedNode = null
 		@idCounter = 1
 
 	init: (@bundle) ->
 		return
 
-	renderUi: (elements) =>
-		@tree = $(elements.sceneGraphContainer)
+	initUi: (sceneGraphContainer) ->
+		@tree = $(sceneGraphContainer)
+		@tree.bind 'tree.select', @onNodeSelect
 
+	renderUi: (state) =>
 		treeData = [{
 			label: 'Scene',
 			id: @idCounter,
 			children: []
 		}]
-		@createTreeDataStructure(treeData[0], @state.rootNode)
+		@createTreeDataStructure(treeData[0], state.rootNode)
 
 		if @tree.is(':empty')
 			@tree.tree {
@@ -67,9 +67,8 @@ module.exports = class SceneGraph
 				treeNode.children[index] = {}
 				@createTreeDataStructure treeNode.children[index], subNode
 
-	onStateUpdate: (@state) =>
-		if @uiInitialized
-			@renderUi @htmlElements
+	onStateUpdate: (state) =>
+		@renderUi state
 
 	onNodeSelect: (event) =>
 		event.stopPropagation()
@@ -104,10 +103,6 @@ module.exports = class SceneGraph
 		@selectedNode = null
 		@selectedStateNode = null
 
-	bindEvents: () ->
-		$treeContainer = $(@htmlElements.sceneGraphContainer)
-		$treeContainer.bind 'tree.select', @onNodeSelect
-
 	getStateNodeForTreeNode: (treeNode, stateRootNode, callback) ->
 		objectTree.forAllSubnodes stateRootNode, (node) ->
 			if node.pluginData[pluginKey]?
@@ -131,13 +126,6 @@ module.exports = class SceneGraph
 						@callNodeDeselect()
 
 				@bundle.statesync.performStateAction delNode, true
-
-	initUi: (elements) =>
-		@htmlElements = elements
-		@bindEvents()
-		@uiInitialized = true
-		if @state
-			@renderUi @htmlElements
 
 	getHotkeys: =>
 		return {

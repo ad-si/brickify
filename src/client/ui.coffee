@@ -64,6 +64,7 @@ module.exports = class Ui
 		)
 
 	_initScenegraph: =>
+		@bundle.getPlugin('scene-graph').initUi $('#sceneGraphContainer')
 		return
 
 	_initWorkflow: =>

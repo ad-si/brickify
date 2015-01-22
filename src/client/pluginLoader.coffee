@@ -29,7 +29,6 @@ module.exports = class PluginLoader
 
 		if @globalConfig.buildUi and @pluginHooks.hasHook(instance, 'initUi')
 			instance.initUi {
-				menuBar: document.getElementById 'navbarToggle'
 				toolsContainer: document.getElementById 'toolsContainer'
 				sceneGraphContainer: document.getElementById(
 					'sceneGraphContainer'

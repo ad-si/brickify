@@ -15,21 +15,21 @@ module.exports = class ModelLoader
 
 	readFile: (file) ->
 		reader = new FileReader()
-		reader.onload = (event) =>
-			fileContent = event.target.result
-			@importFile file.name, fileContent, (error, model) =>
+		reader.readAsArrayBuffer file
+		reader.onload = () =>
+			fileBuffer = reader.result
+			@importFile file.name, fileBuffer, (error, model) =>
 				if error or not model
 					throw error
 				else
 					@load model
-		reader.readAsText file
 
-	importFile: (filename, fileContent, callback) ->
+	importFile: (filename, fileBuffer, callback) ->
 
 		# Load with first plugin capable of loading
 		loader = @pluginHooks.get('importFile')[0]
 
-		loader filename, fileContent, (error, model) ->
+		loader filename, fileBuffer, (error, model) ->
 			if error or not model
 				callback error
 			else

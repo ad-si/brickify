@@ -87,5 +87,9 @@ module.exports = class PluginLoader
 			require('../plugins/newBrickator'),
 			require('../plugins/newBrickator/package.json')
 		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/3dPrint'),
+			require('../plugins/3dPrint/package.json')
+		)
 
 		return pluginInstances

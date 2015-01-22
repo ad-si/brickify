@@ -1,3 +1,5 @@
+Hotkeys = require './hotkeys'
+
 ###
 # @module ui
 ###
@@ -71,4 +73,5 @@ module.exports = class Ui
 		return
 
 	_initHotkeys: =>
-		return
+		hotkeys = new Hotkeys()
+		hotkeys.addEvent event for event in @pluginHooks.getHotkeys()

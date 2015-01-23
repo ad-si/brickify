@@ -1,5 +1,62 @@
+require('es6-promise').polyfill()
 $ = require 'jquery'
 
-stlDropper = require './stlDropper'
+$('#quickConvert').hide()
 
-stlDropper.init document.getElementById('dropzone'), $('#droptext')
+#fade in action buttons when javascript is ready
+$('#buttonContainer').fadeTo(500, 1)
+
+$('#qcExampleLink').click (event) ->
+	#update link to editor
+	lnk = $('.applink').attr('href')
+	lnk += 'initialModel=1c2395a3145ad77aee7479020b461ddf'
+	$('.applink').attr('href', lnk)
+
+	#open quickconvert, load and process model
+	loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
+
+loadAndConvert = (hash) =>
+	$('#quickConvert').slideDown 'slow', () ->
+		$('body,html').animate({scrollTop: 200}, 400)
+
+		b1.then(() ->
+			bundle1.modelLoader.loadByHash hash)
+		b2.then(() ->
+			bundle2.modelLoader.loadByHash hash)
+		.then(() ->
+			nb = bundle2.getPlugin 'newBrickator'
+			nb.processFirstObject()
+		)
+
+loadModel = (hash, errors) =>
+	loadAndConvert(hash)
+
+stlDropper = require './stlDropper'
+stlDropper.init document.getElementById('dropzone'), $('#droptext'), loadModel
+
+# Init quickconvert after basic page functionality has been initialized
+globalConfig = require '../client/globals.yaml'
+objectTree = require '../common/objectTree'
+Bundle = require '../client/bundle'
+clone = require 'clone'
+
+# Set renderer size to fit to 3 bootstrap columns
+globalConfig.staticRendererSize = true
+globalConfig.staticRendererWidth = 388
+globalConfig.staticRendererHeight = 388
+globalConfig.syncWithServer = false
+globalConfig.buildUi = false
+
+#clone global config 3 times
+config1 = clone globalConfig
+config2 = clone globalConfig
+
+# instantiate 2 lowfab bundles
+config1.renderAreaId = 'renderArea1'
+bundle1 = new Bundle config1
+b1 = bundle1.init()
+
+config2.renderAreaId = 'renderArea2'
+bundle2 = new Bundle config2
+b2 = bundle2.init()
+

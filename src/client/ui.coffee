@@ -56,4 +56,3 @@ module.exports = class Ui
 			@clickHandler.bind @
 		false
 		)
-

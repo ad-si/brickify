@@ -138,8 +138,7 @@ module.exports = class NewBrickator
 
 	layoutForGrid: (grid, threeNode, profiling) =>
 		bricks = @brickLayouter.layoutForGrid grid, true
-		console.log 'here too'
-	#@brickVisualizer.createBricks()
+		#@brickVisualizer.createBricks()
 
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

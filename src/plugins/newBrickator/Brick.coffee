@@ -1,7 +1,15 @@
 module.exports = class Brick
   constructor: (@position, @size) ->
+    console.log 'creating brick'
     @upperSlots = []
-    @loweSlots = []
+    @lowerSlots = []
+
+    for xx in [0..@size.x-1] by 1
+      @upperSlots[xx] = []
+      @lowerSlots[xx] = []
+      for yy in [0..@size.y-1] by 1
+        @upperSlots[xx][yy] = {}
+        @lowerSlots[xx][yy] = {}
 
     @initializeSlots()
 

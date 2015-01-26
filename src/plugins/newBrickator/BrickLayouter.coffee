@@ -66,20 +66,37 @@ module.exports = class BrickLayouter
               brick = new Brick position, size
               grid.zLayers[z][x][y].brick = brick
 
-              # create connection to and from the brick
-              # below the current brick (if one exists)
-              if z > 0 and grid.zLayers[z-1]?[x]?[y]? and
-                           grid.zLayers[z-1][x][y] != false
-                brickBelow = grid.zLayers[z-1][x][y].brick
-                if brickBelow != false
-                  brick.lowerSlots[0][0] = brickBelow
-                  brickBelow.upperSlots[0][0] = brick
+              @connectToBrickBelow brick, x,y,z, grid
+              @connectToBrickXm brick, x,y,z, grid
+              @connectToBrickYm brick, x,y,z, grid
 
               bricks[z].push brick
 
     console.log bricks
     return bricks
 
+  connectToBrickBelow: (brick, x, y, z, grid) =>
+    if z > 0 and grid.zLayers[z-1]?[x]?[y]? and
+        grid.zLayers[z-1][x][y] != false
+      brickBelow = grid.zLayers[z-1][x][y].brick
+      if brickBelow != false
+        brick.lowerSlots[0][0] = brickBelow
+        brickBelow.upperSlots[0][0] = brick
+    return
+
+  connectToBrickXm: (brick, x, y, z, grid) =>
+    if x > 0 and grid.zLayers[z]?[x-1]?[y]? and
+        grid.zLayers[z][x-1][y] != false
+      brick.neighbours.xm = [grid.zLayers[z][x-1][y].brick]
+      grid.zLayers[z][x-1][y].brick.neighbours.xp = [brick]
+    return
+
+  connectToBrickYm: (brick, x, y, z, grid) =>
+    if y > 0 and grid.zLayers[z]?[x]?[y-1]? and
+        grid.zLayers[z][x][y-1] != false
+      brick.neighbours.ym = [grid.zLayers[z][x][y-1].brick]
+      grid.zLayers[z][x][y-1].brick.neighbours.yp = [brick]
+    return
 
   # main while loop condition:
   # any brick can still merge --> use heuristic:
@@ -116,6 +133,7 @@ module.exports = class BrickLayouter
     return brick
 
   findMergeableNeighbours: (brick, bricks) =>
+
     mergeableNeighbours = []
     return mergeableNeighbours
 

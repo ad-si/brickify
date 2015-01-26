@@ -1,5 +1,8 @@
 module.exports = class Brick
   constructor: (@position, @size) ->
+    # position always contains smalles x & smallest y
+
+    #initialize slots
     @upperSlots = []
     @lowerSlots = []
 
@@ -10,11 +13,7 @@ module.exports = class Brick
         @upperSlots[xx][yy] = false
         @lowerSlots[xx][yy] = false
 
-    @initializeSlots()
-
-    return
-
-  initializeSlots: () =>
+    @neighbours = {xp:[], xm:[], yp:[], ym:[]}
     return
 
   availableBrickSizes: () =>

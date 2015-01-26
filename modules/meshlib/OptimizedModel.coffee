@@ -34,7 +34,7 @@ class OptimizedModel
 
 		# adds the edge to the edges list. if it already exists in the list,
 		# the counter in numEdges is increased
-		addEdge = (a,b) ->
+		addEdge = (a, b) ->
 			for i in [0..edges.length - 1] by 1
 				aeb = (edges[i].a == a and edges[i].b == b)
 				bea = (edges[i].a == b and edges[i].b == a)
@@ -52,9 +52,9 @@ class OptimizedModel
 			a = @indices[i]
 			b = @indices[i + 1]
 			c = @indices[i + 2]
-			r = addEdge a,b
-			r = addEdge(b,c) and r
-			r = addEdge(c,a) and r
+			r = addEdge a, b
+			r = addEdge(b, c) and r
+			r = addEdge(c, a) and r
 
 			if not r
 				@_isTwoManifold = false
@@ -111,7 +111,7 @@ class OptimizedModel
 		@originalFileName = strArray[4]
 
 	base64ToFloat32Array: (b64) ->
-		numFloats =  (base64ByteLength b64.length) / 4
+		numFloats = (base64ByteLength b64.length) / 4
 		result = new Float32Array(numFloats)
 		decoded = stringToUint8Array atob(b64)
 		pview = new DataView(decoded.buffer)
@@ -120,7 +120,7 @@ class OptimizedModel
 		return result
 
 	base64ToInt32Array: (b64) ->
-		numInts =  (base64ByteLength b64.length) / 4
+		numInts = (base64ByteLength b64.length) / 4
 		result = new Int32Array(numInts)
 		decoded = stringToUint8Array atob(b64)
 		pview = new DataView(decoded.buffer)
@@ -130,10 +130,10 @@ class OptimizedModel
 
 	arrayBufferToBase64: (buffer) ->
 		binary = ''
-		bytes = new Uint8Array( buffer )
+		bytes = new Uint8Array(buffer)
 		len = bytes.byteLength
 		for i in [0..len - 1]
-			binary += String.fromCharCode( bytes[ i ] )
+			binary += String.fromCharCode(bytes[i])
 		return window.btoa binary
 
 	# Creates a ThreeGeometry out of an optimized model
@@ -184,5 +184,52 @@ class OptimizedModel
 					@faceNormals[fi + 2]))
 
 		return geometry
+
+
+	boundingBox: ->
+		if @_boundingBox
+			return @_boundingBox
+
+		minX = maxX = @positions[0]
+		minY = maxY = @positions[1]
+		minZ = maxZ = @positions[2]
+		for i in [0..@positions.length - 1] by 3
+			minX = @positions[i]     if @positions[i] < minX
+			minY = @positions[i + 1] if @positions[i + 1] < minY
+			minZ = @positions[i + 2] if @positions[i + 2] < minZ
+			maxX = @positions[i]     if @positions[i] > maxX
+			maxY = @positions[i + 1] if @positions[i + 1] > maxY
+			maxZ = @positions[i + 2] if @positions[i + 2] > maxZ
+
+		@_boundingBox = {
+			min: {x: minX, y: minY, z: minZ}
+			max: {x: maxX, y: maxY, z: maxZ}
+		}
+		return @_boundingBox
+
+	forEachPolygon: (callback) =>
+		for i in [0..@indices.length - 1] by 3
+			p0 = {
+				x: @positions[@indices[i] * 3]
+				y: @positions[@indices[i] * 3 + 1]
+				z: @positions[@indices[i] * 3 + 2]
+			}
+			p1 = {
+				x: @positions[@indices[i + 1] * 3]
+				y: @positions[@indices[i + 1] * 3 + 1]
+				z: @positions[@indices[i + 1] * 3 + 2]
+			}
+			p2 = {
+				x: @positions[@indices[i + 2] * 3]
+				y: @positions[@indices[i + 2] * 3 + 1]
+				z: @positions[@indices[i + 2] * 3 + 2]
+			}
+			n = {
+				x: @faceNormals[i]
+				y: @faceNormals[i + 1]
+				z: @faceNormals[i + 2]
+			}
+
+			callback p0, p1, p2, n
 
 module.exports = OptimizedModel

@@ -1,4 +1,6 @@
 Stl = require './Stl'
+optimizeModel = require './optimizeModel'
+
 
 meshlib = {}
 meshData = {}
@@ -23,8 +25,12 @@ toArrayBuffer = (buffer) ->
 meshlib.meshData = () ->
 	return meshData
 
-meshlib.model = () ->
-	return model
+meshlib.model = (newModel) ->
+	model = newModel
+
+meshlib.optimize = () ->
+	# TODO: fix
+	model = optimizeModel model
 
 meshlib.parse = (fileBuffer, options, callback) ->
 

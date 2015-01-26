@@ -1,15 +1,16 @@
+require('es6-promise').polyfill()
+
 jade = require 'jade'
 fs = require 'fs'
 path = require 'path'
 mkdirp = require 'mkdirp'
 statcalc = require './statisticsCalculator'
 git = require 'git-rev'
-require('es6-promise').polyfill()
 
 templateFile = path.join 'batchTesting', 'reportTemplate', 'report.jade'
 
 module.exports.generateReport = (data, outPath, outFileName,
-																 isLastReport, beginDate) ->
+                                 isLastReport, beginDate) ->
 	return new Promise (resolve, reject) ->
 		fs.readFile templateFile, (error, template) ->
 			if error

@@ -79,9 +79,8 @@ module.exports = class BrickLayouter
     if z > 0 and grid.zLayers[z-1]?[x]?[y]? and
         grid.zLayers[z-1][x][y] != false
       brickBelow = grid.zLayers[z-1][x][y].brick
-      if brickBelow != false
-        brick.lowerSlots[0][0] = brickBelow
-        brickBelow.upperSlots[0][0] = brick
+      brick.lowerSlots[0][0] = brickBelow
+      brickBelow.upperSlots[0][0] = brick
     return
 
   connectToBrickXm: (brick, x, y, z, grid) =>
@@ -110,7 +109,7 @@ module.exports = class BrickLayouter
     while(true)
       brick = @chooseRandomBrick bricks
       numberOfRandomChoices++
-      mergeableNeighbours = @findMergeableNeighbours brick, bricks
+      mergeableNeighbours = @findMergeableNeighbours brick
       if mergeableNeighbours.length == 0
         numberOfRandomChoicesWithoutMerge++
         if numberOfRandomChoicesWithoutMerge > 20
@@ -120,7 +119,8 @@ module.exports = class BrickLayouter
         else
           continue # randomly choose a new brick
 
-      while(mergeableNeighbours.length > 0)
+      while(mergeableNeighbours.length > 5)
+        console.log mergeableNeighbours.length
         mergeNeighbours = @chooseNeighboursToMergeWith brick mergeableNeighbours
         @mergeBricksAndUpdateGraphConnections brick, mergeNeighbours
         mergeableNeighbours = @findMergeableNeighbours brick, bricks
@@ -129,13 +129,65 @@ module.exports = class BrickLayouter
 
   chooseRandomBrick: (bricks) =>
     brickLayer = bricks[Math.floor(Math.random() * bricks.length)]
-    brick = brickLayer[Math.floor(Math.random() * bricks.length)]
+    brick = brickLayer[Math.floor(Math.random() * brickLayer.length)]
     return brick
 
-  findMergeableNeighbours: (brick, bricks) =>
-
+  findMergeableNeighbours: (brick) =>
     mergeableNeighbours = []
+    console.log brick
+    mergeableNeighbours.push @findMergeableNeighboursXm brick
+    #console.log mergeableNeighbours
+    mergeableNeighbours.push @findMergeableNeighboursXp brick
+    #console.log mergeableNeighbours
+    mergeableNeighbours.push @findMergeableNeighboursYm brick
+    #console.log mergeableNeighbours
+    mergeableNeighbours.push @findMergeableNeighboursYp brick
+    console.log mergeableNeighbours
+
     return mergeableNeighbours
+
+  findMergeableNeighboursXp: (brick) =>
+    xDim = 0
+    for neighbour in brick.neighbours.xp
+      xDim += neighbour.size.x
+      if neighbour.size.y != 1
+        return
+    if xDim == brick.size.x
+      return brick.neighbours.xp
+    return
+
+  findMergeableNeighboursXm: (brick) =>
+    xDim = 0
+    console.log brick.neighbours
+    for neighbour in brick.neighbours.xm
+      xDim += neighbour.size.x
+      if neighbour.size.y != 1
+        return
+    if xDim == brick.size.x
+      return brick.neighbours.xm
+    return
+
+  findMergeableNeighboursYp: (brick) =>
+    yDim = 0
+    console.log brick.neighbours
+    for neighbour in brick.neighbours.yp
+      yDim += neighbour.size.y
+      if neighbour.size.x != 1
+        return
+    if yDim == brick.size.y
+      return brick.neighbours.yp
+    return
+
+  findMergeableNeighboursYm: (brick) =>
+    yDim = 0
+    console.log brick.neighbours
+    for neighbour in brick.neighbours.ym
+      yDim += neighbour.size.y
+      if neighbour.size.x != 1
+        return
+    if yDim == brick.size.y
+      return brick.neighbours.ym
+    return
 
   chooseNeighboursToMergeWith: (brick, mergeableNeighbours) =>
     mergeNeighbours = []

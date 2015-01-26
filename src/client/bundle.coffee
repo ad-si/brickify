@@ -13,7 +13,7 @@ module.exports = class Bundle
 		@pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(@)
-		@modelLoader = new ModelLoader(@statesync, @pluginHooks, @globalConfig)
+		@modelLoader = new ModelLoader(@)
 
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 

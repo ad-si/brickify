@@ -66,6 +66,36 @@
 
 - on3dUpdate
 
+#  ## scene interaction and administration
+
+#  ### New nodes
+#
+#  Each time a new node is added to the scene, the scene will inform plugins
+#  by calling onNodeAdd
+
+- onNodeAdd
+
+#  ### Node selection
+#
+#  Each time a scene's node is selected, the scene will inform plugins by
+#  calling onNodeSelect
+
+- onNodeSelect
+
+#  ### Node deselection
+#
+#  Each time a scene's node is deselected, the scene will inform plugins by
+#  calling onNodeDeselect
+
+- onNodeDeselect
+
+#  ### Node deletion
+#
+#  When a node is removed from the scene, the scene will inform plugins by
+#  calling onNodeRemove
+
+- onNodeRemove
+
 
 #  ## File import
 #

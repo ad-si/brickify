@@ -52,7 +52,13 @@ removeNode = (rootNode, nodeToBeDeleted) ->
 				return true
 	return false
 
-#The node structure is the base structure for all nodes
+###
+# The NodeStructure is the base structure for all nodes
+# A Scene description has a NodeStructure as root node as well.
+#
+# @class NodeStructure
+###
+
 class NodeStructure
 	constructor: () ->
 		# DO NOT use as identifier

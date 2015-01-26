@@ -7,7 +7,7 @@ modelCache = require './modelCache'
 objectTree = require '../common/objectTree'
 
 module.exports = class ModelLoader
-	constructor: (@stateInstance, @pluginHooks, @globalConfig) ->
+	constructor: (@bundle) ->
 		return
 
 	readFiles: (files) ->
@@ -27,7 +27,7 @@ module.exports = class ModelLoader
 			@load optimizedModel if optimizedModel?
 
 	importFile: (filename, fileContent) ->
-		for loader in @pluginHooks.get 'importFile'
+		for loader in @bundle.pluginHooks.get 'importFile'
 			optimizedModel = loader filename, fileContent
 			return optimizedModel if optimizedModel?
 
@@ -51,6 +51,7 @@ module.exports = class ModelLoader
 			node.fileName = fileName
 			node.meshHash = hash
 			node.pluginData = {
-				uiGen: {selectedPluginKey: @globalConfig.defaultPlugin}}
+				uiGen: {selectedPluginKey: @bundle.globalConfig.defaultPlugin}}
+			@bundle.ui?.scene.add node
 		# call updateState on all client plugins and sync
-		@stateInstance.performStateAction loadModelCallback, true
+		@bundle.statesync.performStateAction loadModelCallback, true

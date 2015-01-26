@@ -3,6 +3,7 @@ objectTree = require '../common/objectTree'
 class Scene
 	constructor: (@bundle) ->
 		@selectedNode = null
+		@pluginHooks = @bundle.pluginHooks
 
 	getHotkeys: =>
 		return {
@@ -13,15 +14,29 @@ class Scene
 		}
 
 #
+# Administration of nodes
+#
+
+	add: (node) =>
+		@pluginHooks.onNodeAdd node
+		return
+
+	remove: (node) =>
+		@pluginHooks.onNodeRemove node
+		return
+
+#
 # Selection of nodes
 #
 
 	select: (@selectedNode) =>
 		@bundle.ui.workflow.showCurrent @selectedNode
+		@pluginHooks.onNodeSelect @selectedNode
 		return
 
-	deselect: (node) =>
-		if not node? or node is @selectedNode
+	deselect: =>
+		if @selectedNode?
+			@pluginHooks.onNodeDeselect @selectedNode
 			@selectedNode = null
 		return
 
@@ -43,6 +58,7 @@ class Scene
 
 	_delete: (node) => (state) =>
 		objectTree.removeNode state.rootNode, node
+		@pluginHooks.onNodeRemove node
 
 	_getDeleteHotkey: ->
 		return {

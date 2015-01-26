@@ -18,7 +18,7 @@ module.exports = class NewBrickator
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
-	getUiSchema: () =>
+	getConvertUiSchema: () =>
 		legoCallback = (selectedNode) =>
 			@runLegoPipelineOnNode selectedNode
 
@@ -40,16 +40,6 @@ module.exports = class NewBrickator
 				description: 'Voxelgrid dz (0..3)'
 				type: 'number'
 		}
-
-	uiEnabled: (node) ->
-		if node.pluginData.newBrickator?
-			threeJsNode =  @getThreeObjectByNode node
-			threeJsNode?.visible = true
-
-	uiDisabled: (node) ->
-		if node.pluginData.newBrickator?
-			threeJsNode = @getThreeObjectByNode node
-			threeJsNode?.visible = false
 
 	onClick: (event) =>
 		intersects =

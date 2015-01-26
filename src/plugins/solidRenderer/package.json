@@ -1,5 +1,5 @@
 {
-  "name": "solid-renderer-plugin",
+  "name": "solid-renderer",
   "version": "0.1.0",
   "description": "Solid mesh renderer for the unconverted model.",
   "lowfab": {

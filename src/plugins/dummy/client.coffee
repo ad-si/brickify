@@ -104,6 +104,15 @@ module.exports = class DummyPlugin
 		return undefined
 
 	###
+	# Each time a new model is added to the scene, the uiSelection
+	###
+	onModelAdded: (model) =>
+		return
+
+	onModelRemoved: (model) =>
+		return
+
+	###
 	# When a file is loaded into lowfab, the `fileLoader` will try to import
 	# it with every plugin that implements importFile until one succeeds.
 	# The file's name and its content are provided as arguments.

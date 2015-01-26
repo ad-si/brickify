@@ -1,8 +1,20 @@
 objectTree = require '../common/objectTree'
 
-class UiSelection
+class Scene
 	constructor: (@bundle) ->
 		@selectedNode = null
+
+	getHotkeys: =>
+		return {
+			title: 'Scenegraph'
+			events: [
+				@_getDeleteHotkey()
+			]
+		}
+
+#
+# Selection of nodes
+#
 
 	select: (@selectedNode) =>
 		@bundle.ui.workflow.showCurrent @selectedNode
@@ -13,7 +25,11 @@ class UiSelection
 			@selectedNode = null
 		return
 
-	_deleteCurrentNode: () =>
+#
+# Deletion of nodes
+#
+
+	_deleteCurrentNode: =>
 		return if @bootboxOpen
 		return if not @selectedNode or @selectedNode.name == 'Scene'
 
@@ -28,16 +44,11 @@ class UiSelection
 	_delete: (node) => (state) =>
 		objectTree.removeNode state.rootNode, node
 
-	getHotkeys: =>
+	_getDeleteHotkey: ->
 		return {
-			title: 'Scenegraph'
-			events: [
-				{
-					hotkey: 'del'
-					description: 'delete selected model'
-					callback: @_deleteCurrentNode
-				}
-			]
+			hotkey: 'del'
+			description: 'delete selected model'
+			callback: @_deleteCurrentNode
 		}
 
-module.exports = UiSelection
+module.exports = Scene

@@ -25,6 +25,7 @@ module.exports = class SceneGraph
 		@tree.bind 'tree.select', @onNodeSelect
 
 	renderUi: (state) =>
+		return if not @tree?
 		treeData = [{
 			label: 'Scene',
 			id: @idCounter,

@@ -9,7 +9,7 @@ git = require 'git-rev'
 statcalc = require './statisticsCalculator'
 
 
-templateFile = path.join __dirname, 'reportTemplate', 'report.jade'
+templateFile = path.join __dirname, 'templates', 'report.jade'
 
 
 module.exports.generateReport = (outputFile) ->

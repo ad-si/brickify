@@ -3,27 +3,35 @@ html
 	head
 		meta(charset='utf-8')
 		title BatchTest Report
+		link(
+		rel='stylesheet',
+		href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css'
+		)
 
 	body
 		.container
-			h1 Test Report
+			h1 Performance Report
+
+			hr
 
 			p
 				| This report was generated from commit
 				= ' '
-				code= gitInfo.commit.substr(0,6)
+				code= gitInfo.commit.substr(0, 8)
 				= ' '
 				| on branch
 				= ' '
 				code= gitInfo.branch
 				| .
 
-			.alert.alert-warning
-				p.
-					This report is work in progress,
-					reload the page to check for updates
+			.alert.alert-warning.clearfix
+				p.pull-left
+					strong Attention:
+					|  This report is a work in progress.
+					| Use the button to update the tables.
 
-				button#reloadStatistics Reload
+				button(type='button')#updateStatistics.btn.btn-warning.pull-right
+					| ⟳ Update
 
 			h2 General Statistics
 
@@ -60,7 +68,11 @@ html
 						each s in stats
 							td= s.avgPer1000Polys.toFixed(3)
 
-			h2 Individual Models - absolute values
+
+			h2 Individual Models
+
+			h3 Absolute values
+
 			table.table.table-striped.table-hover
 				thead
 					tr
@@ -75,6 +87,7 @@ html
 						th #Points
 						th is 2-manifold
 						th 2-mnf check Time
+
 				tbody
 					//each result in results
 						tr
@@ -90,8 +103,10 @@ html
 							td= result.isTwoManifold
 							td= result.twoManifoldCheckTime  + ' ms'
 
-			h2 Individual Models - values relative to model size
-			p All metrics are relative to 1000 polygons
+			h3 Relative values
+
+			p All metrics are per 1000 polygons.
+
 			table.table.table-striped.table-hover
 				thead
 					tr

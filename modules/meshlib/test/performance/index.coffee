@@ -162,40 +162,39 @@ testModel = (number, callback) ->
 # the folder and models on your own.
 # The (debug) output is saved to the debugLogFile, the test results are saved as
 # as JSON in the testResultFile for further processing
-module.exports.startTesting = () ->
 
-	dateTime = getDateTimeString()
+dateTime = getDateTimeString()
 
-	reportDirectory = path.join outputPath, dateTime
+reportDirectory = path.join outputPath, dateTime
 
-	mkdirp.sync reportDirectory
+mkdirp.sync reportDirectory
 
-	logger.add winston.transports.File, {
-		level: 'silly'
-		json: false,
-		filename: path.join reportDirectory, 'debug.log'
-	}
-
-
-	htmlPath = path.join reportDirectory, 'report.html'
-
-	jsonPath = path.join reportDirectory, 'data.json'
-	jsonStream = fs.createWriteStream jsonPath, {encoding: 'utf-8'}
-	jsonStream.on 'error', (error) ->
-		throw error
-
-	jsonStream.on 'open', () ->
-		logger.info 'Starting batch-test'
-
-		models = fs
-			.readdirSync(modelPath)
-			.filter (file) -> file.endsWith('.stl')
-
-		logger.info "Testing #{models.length} models"
+logger.add winston.transports.File, {
+	level: 'silly'
+	json: false,
+	filename: path.join reportDirectory, 'debug.log'
+}
 
 
-		tester = new Tester()
+htmlPath = path.join reportDirectory, 'report.html'
 
-		tester.pipe(jsonStream)
+jsonPath = path.join reportDirectory, 'data.json'
+jsonStream = fs.createWriteStream jsonPath, {encoding: 'utf-8'}
+jsonStream.on 'error', (error) ->
+	throw error
 
-		#reportGenerator.generateReport(htmlPath)
+jsonStream.on 'open', () ->
+	logger.info 'Starting batch-test'
+
+	models = fs
+		.readdirSync(modelPath)
+		.filter (file) -> file.endsWith('.stl')
+
+	logger.info "Testing #{models.length} models"
+
+
+	tester = new Tester()
+
+	tester.pipe(jsonStream)
+
+	reportGenerator.generateReport(htmlPath)

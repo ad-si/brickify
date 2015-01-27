@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "coffee ./test/index.coffee",
-    "performanceReport": "coffee ./test/index.coffee"
+    "performanceTest": "coffee ./test/performance/index.coffee"
   },
   "keywords": [
     "3d",

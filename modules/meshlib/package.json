@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "coffee ./test/index.coffee"
+    "test": "coffee ./test/index.coffee",
+    "performanceReport": "coffee ./test/index.coffee"
   },
   "keywords": [
     "3d",

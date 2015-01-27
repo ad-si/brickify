@@ -10,7 +10,7 @@ fsp = require 'fs-promise'
 winston = require 'winston'
 mkdirp = require 'mkdirp'
 
-meshlib = require '../modules/meshlib'
+meshlib = require '../../index'
 reportGenerator = require './reportGenerator',
 #LegoPipeline = require '../src/plugins/newBrickator/LegoPipeline'
 

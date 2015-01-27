@@ -1,13 +1,12 @@
 module.exports = class Grid
-	constructor: (baseBrick = {length: 0, width: 0, height: 0}) ->
+	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
 		@origin = {x: 0, y: 0, z: 0}
-		@spacing = {x: baseBrick.length, y: baseBrick.width, z: baseBrick.height}
 		@numVoxelsX = 0
 		@numVoxelsY = 0
 		@numVoxelsZ = 0
 		@zLayers = []
 
-	setUpForModel: (optimizedModel, gridDelta = null) =>
+	setUpForModel: (optimizedModel, gridOffset = null) =>
 		bb = optimizedModel.boundingBox()
 
 		@origin = {
@@ -15,10 +14,10 @@ module.exports = class Grid
 			y: bb.min.y
 			z: bb.min.z
 		}
-		if gridDelta
-			@origin.x -= gridDelta.x
-			@origin.y -= gridDelta.y
-			@origin.z -= gridDelta.z
+		if gridOffset
+			@origin.x -= gridOffset.x
+			@origin.y -= gridOffset.y
+			@origin.z -= gridOffset.z
 
 		@numVoxelsX = Math.ceil (bb.max.x - bb.min.x) / @spacing.x
 		@numVoxelsX++

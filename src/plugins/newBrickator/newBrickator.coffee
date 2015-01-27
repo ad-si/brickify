@@ -4,18 +4,12 @@ interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
 BrickVisualizer = require './BrickVisualizer'
+PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
 
 module.exports = class NewBrickator
 	constructor: () ->
-		# smallest lego brick
-		@baseBrick = {
-			length: 8
-			width: 8
-			height: 3.2
-		}
-		@pipeline = new LegoPipeline(@baseBrick)
-
+		@pipeline = new LegoPipeline()
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
@@ -86,7 +80,7 @@ module.exports = class NewBrickator
 				@runLegoPipeline optimizedModel, selectedNode
 		)
 
-	getUiSettings: (selectedNode) =>
+	getUiSettings: (selectedNode) ->
 		if selectedNode.toolsValues?.newbrickator?
 			return selectedNode.toolsValues.newbrickator
 		else
@@ -107,15 +101,10 @@ module.exports = class NewBrickator
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
-
-		settings = {
-			debugVoxel: @debugVoxel
-			gridDelta: {
-				x: uiSettings.gridDeltaX
-				y: uiSettings.gridDeltaY
-				z: uiSettings.gridDeltaZ
-			}
-		}
+		
+		settings = new PipelineSettings()
+		settings.setGridOffset uiSettings.gridDeltaX,
+			uiSettings.gridDeltaY, uiSettings.gridDeltaZ
 
 		results = @pipeline.run optimizedModel, settings, true
 		grid = results.lastResult
@@ -127,11 +116,9 @@ module.exports = class NewBrickator
 			{x: 0, y: 0, z: 0}
 		]
 
-		@brickVisualizer ?= new BrickVisualizer(
-			{x: @baseBrick.length, y: @baseBrick.width, z: @baseBrick.height}
-		)
+		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(
-			threeNode, brickTestData, settings.gridDelta
+			threeNode, brickTestData, settings
 		)
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

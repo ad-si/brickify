@@ -2,8 +2,8 @@ HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
 
 module.exports = class LegoPipeline
-	constructor: (baseBrick) ->
-		@voxelizer = new HullVoxelizer(baseBrick)
+	constructor: () ->
+		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
 
 		@pipelineSteps = []

@@ -18,7 +18,7 @@ module.exports = class Voxelizer
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
 			@voxelizePolygon p0, p1, p2, n
 
-		return @voxelGrid
+		return {grid: @voxelGrid}
 
 	voxelizePolygon: (p0, p1, p2, n) =>
 		# Align coordinates to grid origin so that we don't have ugly numbers

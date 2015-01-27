@@ -10,7 +10,7 @@ module.exports = class LegoPipeline
 		@pipelineSteps.push (lastResult, options) =>
 			@voxelizer.voxelize lastResult, options
 		@pipelineSteps.push (lastResult, options) =>
-			@volumeFiller.fillGrid lastResult, options
+			@volumeFiller.fillGrid lastResult.grid, options
 
 		@humanReadableStepNames = []
 		@humanReadableStepNames.push 'Hull voxelizing'
@@ -22,6 +22,8 @@ module.exports = class LegoPipeline
 			console.log 'Starting Lego Pipeline'
 			profilingResults = []
 
+		accumulatedResults = {}
+
 		lastResult = optimizedModel
 
 		for i in [0..@pipelineSteps.length - 1] by 1
@@ -30,7 +32,10 @@ module.exports = class LegoPipeline
 				profilingResults.push r.time
 				lastResult = r.result
 			else
-				 lastResult = @runStep i, lastResult, options
+				lastResult = @runStep i, lastResult, options
+
+			for own key of lastResult
+				accumulatedResults[key] = lastResult[key]
 
 		if profiling
 			sum = 0
@@ -40,7 +45,7 @@ module.exports = class LegoPipeline
 
 		return {
 			profilingResults: profilingResults
-			lastResult: lastResult
+			accumulatedResults: accumulatedResults
 		}
 
 	runStep: (i, lastResult, options) ->

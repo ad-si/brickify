@@ -6,6 +6,7 @@ VoxelVisualizer = require './VoxelVisualizer'
 BrickVisualizer = require './BrickVisualizer'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
+Brick = require './Brick'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -107,18 +108,26 @@ module.exports = class NewBrickator
 			uiSettings.gridDeltaY, uiSettings.gridDeltaZ
 
 		results = @pipeline.run optimizedModel, settings, true
-		grid = results.lastResult
+		grid = results.accumulatedResults.grid
 
 		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
 
 		#test dataset (remove with real data if layouter is ready)
 		brickTestData = [
-			{x: 0, y: 0, z: 0}
+			[
+				new Brick({x: 0, y: -0}, {x: 1, y: 1})
+				new Brick({x: 2, y: -0}, {x: 2, y: 1})
+			]
+			[]
+			[
+				new Brick({x: 0, y: -0}, {x: 2, y: 2})
+				new Brick({x: 5, y: -0}, {x: 2, y: 4})
+			]
 		]
 
 		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(
-			threeNode, brickTestData, settings
+			threeNode, brickTestData, grid
 		)
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

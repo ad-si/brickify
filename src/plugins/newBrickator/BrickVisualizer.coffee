@@ -2,7 +2,7 @@ THREE = require 'three'
 
 module.exports = class BrickVisualizer
 	constructor: () ->
-		@createBrickMaterials()
+		@_createBrickMaterials()
 
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
@@ -12,50 +12,68 @@ module.exports = class BrickVisualizer
 
 		for gridZ in [0..brickData.length - 1] by 1
 			for brick in brickData[gridZ]
-				brickSizeX = @gridSpacing.x * brick.size.x
-				brickSizeY = @gridSpacing.y * brick.size.y
-				# currently, the layouter only supports platees with h=1
-				brickSizeZ = @gridSpacing.z * 1.0
+				cube = @_createBrickGeometry @gridSpacing, brick.size
 
-				@brickGeometry = new THREE.BoxGeometry(
-					brickSizeX,
-					brickSizeY,
-					brickSizeZ
-				)
-
-				cube = new THREE.Mesh( @brickGeometry, @getRandomMaterial() )
-
-				#translate so that the x:0 y:0 z:0 coordinate matches the models corner
-				#(center of model is physical center of box)
-				cube.translateX brickSizeX / 2.0
-				cube.translateY brickSizeY / 2.0
-				cube.translateX brickSizeZ / 2.0
-
-				# normal voxels have their origin in the middle, so translate the brick
-				# to match the center of a voxel
-				cube.translateX @gridSpacing.x / -2.0
-				cube.translateY @gridSpacing.y / -2.0
-				cube.translateX @gridSpacing.z / -2.0
-				
 				#move the bricks to their position in the grid
 				cube.translateX( @gridOrigin.x + @gridSpacing.x * brick.position.x)
 				cube.translateY( @gridOrigin.y + @gridSpacing.y * brick.position.y)
 				cube.translateZ( @gridOrigin.z + @gridSpacing.z * gridZ)
 
 				threeNode.add(cube)
+	_createBrickGeometry: (gridSpacing, brickSize) =>
+		brickSizeX = gridSpacing.x * brickSize.x
+		brickSizeY = gridSpacing.y * brickSize.y
+		# currently, the layouter only supports platees with h=1
+		brickSizeZ = gridSpacing.z * 1.0
 
-	getRandomMaterial: () =>
-		i = Math.floor(Math.random() * @brickMaterials.length)
-		return @brickMaterials[i]
+		brickGeometry = new THREE.BoxGeometry(
+			brickSizeX,
+			brickSizeY,
+			brickSizeZ
+		)
 
-	createBrickMaterials: () =>
-		@brickMaterials = []
-		@brickMaterials.push @createMaterial 0xff9900
-		@brickMaterials.push @createMaterial 0xcc7a00
-		@brickMaterials.push @createMaterial 0xffad32
-		@brickMaterials.push @createMaterial 0xe58900
+		mat = @_getRandomMaterial()
+		cube = new THREE.Mesh(brickGeometry, mat)
 
-	createMaterial: (color) =>
+		#add noppen
+		for x in [0..brickSize.x - 1] by 1
+			for y in [0..brickSize.y - 1] by 1
+				noppe = new THREE.CylinderGeometry(
+					gridSpacing.x * 0.3, gridSpacing.y * 0.3, gridSpacing.z * 2
+				)
+				noppeMesh = new THREE.Mesh(noppe, mat)
+
+				noppeMesh.translateX gridSpacing.x * x
+				noppeMesh.translateY gridSpacing.y * y
+				noppeMesh.rotation.x += 1.571
+				cube.add noppeMesh
+
+		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
+		#(center of model is physical center of box)
+		cube.translateX brickSizeX / 2.0
+		cube.translateY brickSizeY / 2.0
+		cube.translateX brickSizeZ / 2.0
+
+		# normal voxels have their origin in the middle, so translate the brick
+		# to match the center of a voxel
+		cube.translateX @gridSpacing.x / -2.0
+		cube.translateY @gridSpacing.y / -2.0
+		cube.translateX @gridSpacing.z / -2.0
+
+		return cube
+
+	_getRandomMaterial: () =>
+		i = Math.floor(Math.random() * @_brickMaterials.length)
+		return @_brickMaterials[i]
+
+	_createBrickMaterials: () =>
+		@_brickMaterials = []
+		@_brickMaterials.push @_createMaterial 0xff9900
+		@_brickMaterials.push @_createMaterial 0xcc7a00
+		@_brickMaterials.push @_createMaterial 0xffad32
+		@_brickMaterials.push @_createMaterial 0xe58900
+
+	_createMaterial: (color) =>
 		return new THREE.MeshLambertMaterial({
 			color: color
 			#opacity: 0.8

@@ -30,6 +30,23 @@ logger = new winston.Logger({
 	]
 })
 
+modelCounter = 0
+
+Tester = (options) ->
+	options = options or {}
+	options.objectMode = true
+	stream.Readable.call(@, options)
+
+util.inherits(Tester, stream.Readable)
+
+Tester.prototype._read = () ->
+	testModel modelCounter++, (testResult) =>
+		if modelCounter < (models.length - 1)
+			@push(JSON.stringify testResult)
+			@push(',\n')
+		else
+			@push(null)
+
 
 getDateTimeString = () ->
 	return (new Date)
@@ -68,7 +85,7 @@ tryToWrite = (testResult) ->
 		jsonStream.once 'drain', -> tryToWrite(testResult)
 
 
-testModel = (number) ->
+testModel = (number, callback) ->
 	logger.info models[number]
 
 	fileContent = fs.readFileSync path.join(__dirname, 'models', models[number])
@@ -76,6 +93,7 @@ testModel = (number) ->
 	begin = new Date()
 
 	meshlib.parse fileContent, null, (error, meshModel) ->
+
 		if error
 			throw error
 
@@ -102,7 +120,8 @@ testModel = (number) ->
 		logger.debug "Testing model '#{modelPath}'"
 		#testResult.numStlParsingErrors = meshModel.importErrors.length
 		logger.debug "model parsed in #{testResult.stlParsingTime}ms with"
-		#{testResult.numStlParsingErrors} Errors"
+
+		# #{testResult.numStlParsingErrors} Errors"
 
 		#	begin = new Date()
 		#	cleanseResult = meshModel.cleanse true
@@ -136,8 +155,7 @@ testModel = (number) ->
 
 		# Don't really know why this timeout is necessary
 		# TODO: Fix this with write.cork & uncork in next version of node
-		setTimeout -> tryToWrite(testResult)
-
+		setTimeout -> callback(testResult)
 
 # Tests all models that are in the modelPath directory. Since there may be
 # various models to test where the copyright state is unknown, you have to add
@@ -145,33 +163,39 @@ testModel = (number) ->
 # The (debug) output is saved to the debugLogFile, the test results are saved as
 # as JSON in the testResultFile for further processing
 module.exports.startTesting = () ->
-	mkdirp.sync(outputPath)
 
 	dateTime = getDateTimeString()
+
+	reportDirectory = path.join outputPath, dateTime
+
+	mkdirp.sync reportDirectory
 
 	logger.add winston.transports.File, {
 		level: 'silly'
 		json: false,
-		filename: path.join outputPath, dateTime + '.log'
+		filename: path.join reportDirectory, 'debug.log'
 	}
 
 
-	htmlPath = path.join __dirname, 'results', dateTime + '.html'
-	htmlStream = fs.createWriteStream htmlPath, {encoding: 'utf-8'}
-	htmlStream.on 'error', (error) ->
-		throw error
+	htmlPath = path.join reportDirectory, 'report.html'
 
-	jsonPath = path.join __dirname, 'results', dateTime + '.json'
+	jsonPath = path.join reportDirectory, 'data.json'
 	jsonStream = fs.createWriteStream jsonPath, {encoding: 'utf-8'}
 	jsonStream.on 'error', (error) ->
 		throw error
+
 	jsonStream.on 'open', () ->
 		logger.info 'Starting batch-test'
 
 		models = fs
-		.readdirSync(modelPath)
-		.filter (file) -> file.endsWith('.stl')
+			.readdirSync(modelPath)
+			.filter (file) -> file.endsWith('.stl')
 
 		logger.info "Testing #{models.length} models"
 
-		testModel(0)
+
+		tester = new Tester()
+
+		tester.pipe(jsonStream)
+
+		#reportGenerator.generateReport(htmlPath)

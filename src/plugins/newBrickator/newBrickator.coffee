@@ -115,8 +115,12 @@ module.exports = class NewBrickator
 		#test dataset (remove with real data if layouter is ready)
 		brickTestData = [
 			[
-				new Brick({x: 0, y: -0}, {x: 1, y: 1})
-				new Brick({x: 2, y: -0}, {x: 2, y: 1})
+				new Brick({x: 0, y: -0}, {x: 10, y: 1})
+				new Brick({x: 0, y: 2}, {x: 5, y: 1})
+				new Brick({x: 0, y: 4}, {x: 3, y: 1})
+				new Brick({x: 0, y: 6}, {x: 2, y: 1})
+				new Brick({x: 0, y: 8}, {x: 1, y: 1})
+				#new Brick({x: 2, y: -0}, {x: 2, y: 1})
 			]
 			[]
 			[

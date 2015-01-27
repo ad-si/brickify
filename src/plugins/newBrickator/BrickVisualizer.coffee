@@ -36,16 +36,20 @@ module.exports = class BrickVisualizer
 		cube = new THREE.Mesh(brickGeometry, mat)
 
 		#add noppen
-		for x in [0..brickSize.x - 1] by 1
-			for y in [0..brickSize.y - 1] by 1
-				noppe = new THREE.CylinderGeometry(
-					gridSpacing.x * 0.3, gridSpacing.y * 0.3, gridSpacing.z * 2
-				)
+		noppe = new THREE.CylinderGeometry(
+			#these numbers are made up to look good. don't use for csg operations
+			gridSpacing.x * 0.3, gridSpacing.y * 0.3, gridSpacing.z * 0.7
+		)
+
+		for xi in [0..brickSize.x - 1] by 1
+			for yi in [0..brickSize.y - 1] by 1
 				noppeMesh = new THREE.Mesh(noppe, mat)
 
-				noppeMesh.translateX gridSpacing.x * x
-				noppeMesh.translateY gridSpacing.y * y
+				noppeMesh.translateX (gridSpacing.x * (xi + 0.5)) - (brickSizeX / 2)
+				noppeMesh.translateY (gridSpacing.y * (yi + 0.5)) - (brickSizeY / 2)
+				noppeMesh.translateZ (gridSpacing.z * 0.7)
 				noppeMesh.rotation.x += 1.571
+
 				cube.add noppeMesh
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner

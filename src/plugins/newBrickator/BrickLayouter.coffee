@@ -194,14 +194,19 @@ module.exports = class BrickLayouter
     return
 
   chooseNeighboursToMergeWith: (brick, mergeableNeighbours) =>
+    connections = []
     numConnections = []
 
+    # find unique connections of the theoretical future new brick
     for neighbours, i in mergeableNeighbours
-      numConnections[i] = 0
+      connections[i] = []
       if neighbours
         for neighbour in neighbours
-          numConnections[i] += neighbour.numUniqueConnections()
+          connections[i].push neighbour.uniqueConnectedBricks()
+        connections[i] = removeDuplicates connections[i]
+      numConnections[i] = connections[i].length
 
+    # find the variants with the largest number of connections
     largestNumConnections = 0
     largestIndices = []
     for num, i in numConnections
@@ -212,6 +217,10 @@ module.exports = class BrickLayouter
       if num == largestNumConnections
         largestIndices.push i
 
+    console.log mergeableNeighbours
+    console.log numConnections
+    console.log largestIndices
+
     randomOfLargestIndices = largestIndices[Math.floor(Math.random() *
       largestIndices.length)]
     mergeNeighbours = mergeableNeighbours[randomOfLargestIndices]
@@ -219,7 +228,21 @@ module.exports = class BrickLayouter
 
 
   mergeBricksAndUpdateGraphConnections: (brick, mergeNeighbours) =>
+
     return
 
   findWeakArticulationPointsInGraph: (bricks) =>
     return
+
+  # helper method, to be moved somewhere more appropriate
+  removeDuplicates = (array) ->
+    a = array.concat()
+    i = 0
+
+    while i < a.length
+      j = i + 1
+      while j < a.length
+        a.splice j--, 1  if a[i] is a[j]
+        ++j
+      ++i
+    return a

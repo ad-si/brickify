@@ -25,10 +25,10 @@ module.exports = class Brick
       [2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
     ]
 
-  numUniqueConnections: () =>
+  uniqueConnectedBricks: () =>
     upperBricks = @uniqueBricksInSlots @upperSlots
     lowerBricks = @uniqueBricksInSlots @lowerSlots
-    return upperBricks.length + lowerBricks.length
+    return upperBricks.concat lowerBricks
 
   uniqueBricksInSlots: (upperOrLowerSlots) =>
     bricks = []
@@ -38,7 +38,7 @@ module.exports = class Brick
           bricks.push slotXY
     return removeDuplicates bricks
 
-  # helper method
+  # helper method, to be moved somewhere more appropriate
   removeDuplicates = (array) ->
     a = array.concat()
     i = 0

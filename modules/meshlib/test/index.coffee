@@ -21,7 +21,7 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 for model in models
 	do (model) ->
 		asciiStlBuffer = fs.readFileSync path.join __dirname,
-			model + '.ascii.stl'
+			'models', model + '.ascii.stl'
 
 		console.time('ascii-' + model)
 
@@ -34,7 +34,7 @@ for model in models
 				console.timeEnd('ascii-' + model)
 
 				binaryStlBuffer = fs.readFileSync path.join __dirname,
-					model + '.bin.stl'
+					'models', model + '.bin.stl'
 
 				console.time('binary-' + model)
 				meshlib.parse binaryStlBuffer, null, (error, dataFromBinary) ->

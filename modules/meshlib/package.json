@@ -1,0 +1,19 @@
+{
+  "name": "meshlib",
+  "version": "0.1.0",
+  "description": "Powerful library to handle 3D files",
+  "main": "index.coffee",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "coffee ./test/index.coffee"
+  },
+  "keywords": [
+    "3d",
+    "stl",
+    "mesh"
+  ],
+  "author": "Lowfab",
+  "license": "MIT"
+}

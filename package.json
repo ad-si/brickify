@@ -84,7 +84,6 @@
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
     "testFrontend": "./node_modules/.bin/karma start",
-    "batchTest": "./node_modules/.bin/cake batchTest",
     "prepublish": "npm test && npm run checkStyle"
   },
   "repository": {

@@ -1,52 +1,54 @@
 require('es6-promise').polyfill()
-
-jade = require 'jade'
 fs = require 'fs'
 path = require 'path'
+
+jade = require 'jade'
 mkdirp = require 'mkdirp'
-statcalc = require './statisticsCalculator'
 git = require 'git-rev'
 
-templateFile = path.join 'batchTesting', 'reportTemplate', 'report.jade'
+statcalc = require './statisticsCalculator'
 
-module.exports.generateReport = (data, outPath, outFileName,
-                                 isLastReport, beginDate) ->
+
+templateFile = path.join __dirname, 'reportTemplate', 'report.jade'
+
+
+module.exports.generateReport = (outputFile) ->
+
 	return new Promise (resolve, reject) ->
+
 		fs.readFile templateFile, (error, template) ->
 			if error
 				reject(error)
 				return
 
-			stats = statcalc.calculateNumericStatistics data
-			fn = jade.compile template, {pretty: true}
+			#stats = statcalc.calculateNumericStatistics data
+
+			htmlRenderer = jade.compile template, {pretty: true}
+
 			getGitInfo (branch, commit) ->
-				gitinfo = {branch: branch, commit: commit}
-				html = fn {
-					results: data
-					stats: stats
-					gitinfo: gitinfo
-					isWorkInProgress: (not isLastReport)}
 
-				mkdirp path.dirname outFileName
-				mergedFilename = generateDateTimeString(beginDate) + ' ' + outFileName
-				fs.writeFileSync path.join(outPath, mergedFilename + '.html'), html
+				mkdirp path.dirname outputFile
 
-				fileContent =
-					gitinfo: gitinfo
-					datetime: generateDateTimeString(beginDate)
-					testResults: data
-					statistics: stats
+				fs.writeFileSync outputFile, htmlRenderer({
+					results: [] #data
+					stats: [] #stats
+					gitInfo: {
+						branch: branch,
+						commit: commit
+					}
+					isWorkInProgress: true #(not isLastReport)
+				})
 
-				fs.writeFileSync path.join(outPath, mergedFilename + '.json'),
-					JSON.stringify fileContent
+				# fileContent =
+				# 	gitInfo: gitInfo
+				# 	datetime: generateDateTimeString(beginDate)
+				# 	testResults: data
+				# 	statistics: stats
+
+				# fs.writeFileSync path.join(outPath, mergedFilename + '.json'),
+				# 	JSON.stringify fileContent
 
 				resolve()
-
-generateDateTimeString = (d) ->
-	return d
-		.toJSON()
-		.slice(0,-8)
-		.replace(':','') + 'Z'
 
 getGitInfo = (callback) ->
 	git.long (commit) ->

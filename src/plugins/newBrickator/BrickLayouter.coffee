@@ -41,6 +41,7 @@ module.exports = class BrickLayouter
       if weakPoints.size > weakPointThreshold
         break
     ###
+
     if profiling
       elapsed = new Date() - start
       console.log "Step Layouting finished in #{elapsed}ms"
@@ -107,11 +108,13 @@ module.exports = class BrickLayouter
     numRandomChoices = 0
     numRandomChoicesWithoutMerge = 0
     maxNumRandomChoicesWithoutMerge = 20
-    while(numRandomChoices < 100)
+
+    while(numRandomChoices < 100) #only for debugging, should be while true
       brick = @chooseRandomBrick bricks
       numRandomChoices++
       #console.log numRandomChoices
       mergeableNeighbours = @findMergeableNeighbours brick
+
       if mergeableNeighbours.length == 0
         numRandomChoicesWithoutMerge++
         if numRandomChoicesWithoutMerge > maxNumRandomChoicesWithoutMerge
@@ -154,7 +157,7 @@ module.exports = class BrickLayouter
     xDim = 0
     for neighbour in brick.neighbours.xp
       xDim += neighbour.size.x
-      if neighbour.size.y != 1
+      if neighbour.size.y != brick.size.y
         return
     if xDim == brick.size.x
       return brick.neighbours.xp
@@ -165,7 +168,7 @@ module.exports = class BrickLayouter
     xDim = 0
     for neighbour in brick.neighbours.xm
       xDim += neighbour.size.x
-      if neighbour.size.y != 1
+      if neighbour.size.y != brick.size.y
         return
     if xDim == brick.size.x
       return brick.neighbours.xm
@@ -176,7 +179,7 @@ module.exports = class BrickLayouter
     yDim = 0
     for neighbour in brick.neighbours.yp
       yDim += neighbour.size.y
-      if neighbour.size.x != 1
+      if neighbour.size.x != brick.size.x
         return
     if yDim == brick.size.y
       return brick.neighbours.yp
@@ -187,7 +190,7 @@ module.exports = class BrickLayouter
     yDim = 0
     for neighbour in brick.neighbours.ym
       yDim += neighbour.size.y
-      if neighbour.size.x != 1
+      if neighbour.size.x != brick.size.x
         return
     if yDim == brick.size.y
       return brick.neighbours.ym
@@ -206,7 +209,7 @@ module.exports = class BrickLayouter
         connections[i] = removeDuplicates connections[i]
       numConnections[i] = connections[i].length
 
-    # find the variants with the largest number of connections
+    # find the choice with the largest number of connections
     largestNumConnections = 0
     largestIndices = []
     for num, i in numConnections
@@ -217,9 +220,9 @@ module.exports = class BrickLayouter
       if num == largestNumConnections
         largestIndices.push i
 
-    console.log mergeableNeighbours
-    console.log numConnections
-    console.log largestIndices
+    #console.log mergeableNeighbours
+    #console.log numConnections
+    #console.log largestIndices
 
     randomOfLargestIndices = largestIndices[Math.floor(Math.random() *
       largestIndices.length)]
@@ -227,8 +230,13 @@ module.exports = class BrickLayouter
     return mergeNeighbours
 
 
-  mergeBricksAndUpdateGraphConnections: (brick, mergeNeighbours) =>
+  mergeBricksAndUpdateGraphConnections: (brick, mergeNeighbours, bricks) =>
+    # find minimal and maximal position of brick and mergeNeighbours
+    newBrick = new Brick newPosition, newSize
+    # set new brick connections & neighbours
 
+    # delete outdated bricks from bricks array
+    # add newBrick to bricks array
     return
 
   findWeakArticulationPointsInGraph: (bricks) =>

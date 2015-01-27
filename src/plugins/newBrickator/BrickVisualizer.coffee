@@ -2,11 +2,7 @@ THREE = require 'three'
 
 module.exports = class BrickVisualizer
 	constructor: () ->
-		@brickMaterial = new THREE.MeshLambertMaterial({
-			color: 0xAAAA00
-			opacity: 0.8
-			transparent: true
-		})
+		@createBrickMaterials()
 
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
@@ -27,7 +23,7 @@ module.exports = class BrickVisualizer
 					brickSizeZ
 				)
 
-				cube = new THREE.Mesh( @brickGeometry, @brickMaterial )
+				cube = new THREE.Mesh( @brickGeometry, @getRandomMaterial() )
 
 				#translate so that the x:0 y:0 z:0 coordinate matches the models corner
 				#(center of model is physical center of box)
@@ -47,3 +43,22 @@ module.exports = class BrickVisualizer
 				cube.translateZ( @gridOrigin.z + @gridSpacing.z * gridZ)
 
 				threeNode.add(cube)
+
+	getRandomMaterial: () =>
+		i = Math.floor(Math.random() * @brickMaterials.length)
+		return @brickMaterials[i]
+
+	createBrickMaterials: () =>
+		@brickMaterials = []
+		@brickMaterials.push @createMaterial 0xff9900
+		@brickMaterials.push @createMaterial 0xcc7a00
+		@brickMaterials.push @createMaterial 0xffad32
+		@brickMaterials.push @createMaterial 0xe58900
+
+	createMaterial: (color) =>
+		return new THREE.MeshLambertMaterial({
+			color: color
+			#opacity: 0.8
+			#transparent: true
+			})
+

@@ -140,6 +140,8 @@ module.exports = class BrickLayouter
   findMergeableNeighbours: (brick) =>
     mergeableNeighbours = []
     # should probably be refactored at some point :)
+    # not correct yet! needs to check if merging with the neighbours
+    # results in a valid brick size
     mergeableNeighbours.push @findMergeableNeighboursXm brick
     mergeableNeighbours.push @findMergeableNeighboursXp brick
     mergeableNeighbours.push @findMergeableNeighboursYm brick
@@ -192,7 +194,27 @@ module.exports = class BrickLayouter
     return
 
   chooseNeighboursToMergeWith: (brick, mergeableNeighbours) =>
-    mergeNeighbours = []
+    numConnections = []
+
+    for neighbours, i in mergeableNeighbours
+      numConnections[i] = 0
+      if neighbours
+        for neighbour in neighbours
+          numConnections[i] += neighbour.numUniqueConnections()
+
+    largestNumConnections = 0
+    largestIndices = []
+    for num, i in numConnections
+      if num > largestNumConnections
+        largestNumConnections = num
+        largestIndices = [i]
+        continue
+      if num == largestNumConnections
+        largestIndices.push i
+
+    randomOfLargestIndices = largestIndices[Math.floor(Math.random() *
+      largestIndices.length)]
+    mergeNeighbours = mergeableNeighbours[randomOfLargestIndices]
     return mergeNeighbours
 
 

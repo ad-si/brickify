@@ -24,3 +24,30 @@ module.exports = class Brick
       [1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
       [2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
     ]
+
+  numUniqueConnections: () =>
+    upperBricks = @uniqueBricksInSlots @upperSlots
+    lowerBricks = @uniqueBricksInSlots @lowerSlots
+    return upperBricks.length + lowerBricks.length
+
+  uniqueBricksInSlots: (upperOrLowerSlots) =>
+    bricks = []
+    for slotsX in upperOrLowerSlots
+      for slotXY in slotsX
+        if slotXY != false
+          bricks.push slotXY
+    return removeDuplicates bricks
+
+  # helper method
+  removeDuplicates = (array) ->
+    a = array.concat()
+    i = 0
+
+    while i < a.length
+      j = i + 1
+      while j < a.length
+        a.splice j--, 1  if a[i] is a[j]
+        ++j
+      ++i
+    return a
+

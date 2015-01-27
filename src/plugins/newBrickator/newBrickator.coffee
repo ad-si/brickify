@@ -3,7 +3,7 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
-LegoVisualizer = require './LegoVisualizer'
+BrickVisualizer = require './BrickVisualizer'
 objectTree = require '../../common/objectTree'
 
 module.exports = class NewBrickator
@@ -123,14 +123,15 @@ module.exports = class NewBrickator
 		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
 
 		#test dataset (remove with real data if layouter is ready)
-		legoTestData = [
+		brickTestData = [
 			{x: 0, y: 0, z: 0}
 		]
-		@legoVisualizer ?= new LegoVisualizer(
+
+		@brickVisualizer ?= new BrickVisualizer(
 			{x: @baseBrick.length, y: @baseBrick.width, z: @baseBrick.height}
 		)
-		@legoVisualizer.createVisibleLegos(
-			threeNode, legoTestData, settings.gridDelta
+		@brickVisualizer.createVisibleBricks(
+			threeNode, brickTestData, settings.gridDelta
 		)
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

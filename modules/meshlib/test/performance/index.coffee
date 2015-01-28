@@ -40,10 +40,11 @@ Tester = (options) ->
 util.inherits(Tester, stream.Readable)
 
 Tester.prototype._read = () ->
-	testModel modelCounter++, (testResult) =>
+
+	testModel ++modelCounter, (testResult) =>
 		if modelCounter < (models.length - 1)
 			@push(JSON.stringify testResult)
-			@push(',\n')
+			@push('\n')
 		else
 			@push(null)
 
@@ -86,9 +87,10 @@ tryToWrite = (testResult) ->
 
 
 testModel = (number, callback) ->
+
 	logger.info models[number]
 
-	fileContent = fs.readFileSync path.join(__dirname, 'models', models[number])
+	fileContent = fs.readFileSync path.join __dirname, 'models', models[number]
 
 	begin = new Date()
 
@@ -98,28 +100,28 @@ testModel = (number, callback) ->
 			throw error
 
 		if not meshModel
-			throw new Error "Model '#{modelPath}' was not properly loaded"
+			throw new Error "Model '#{models[number]}' was not properly loaded"
 
 		testResult = {
-			path: modelPath,
-			number: number,
-			stlParsingTime: new Date() - begin,
-			numStlParsingErrors: 0,
-			stlCleansingTime: 0,
-			stlDeletedPolygons: 0,
-			stlRecalculatedNormals: 0,
-			optimizationTime: 0,
-			numPolygons: 0,
-			numPoints: 0,
-			isTwoManifold: 0,
-			twoManifoldCheckTime: 0,
-			hullVoxelizationTime: 0,
+			number: number
+			fileName: path.basename models[number], '.stl'
+			stlParsingTime: new Date() - begin
+			numStlParsingErrors: 0
+			stlCleansingTime: 0
+			stlDeletedPolygons: 0
+			stlRecalculatedNormals: 0
+			optimizationTime: 0
+			numPolygons: 0
+			numPoints: 0
+			isTwoManifold: false
+			twoManifoldCheckTime: 0
+			hullVoxelizationTime: 0
 			volumeFillTime: 0
 		}
 
-		logger.debug "Testing model '#{modelPath}'"
+		logger.debug "Testing model '#{models[number]}'"
 		#testResult.numStlParsingErrors = meshModel.importErrors.length
-		logger.debug "model parsed in #{testResult.stlParsingTime}ms with"
+		logger.debug "model parsed in #{testResult.stlParsingTime} ms with"
 
 		# #{testResult.numStlParsingErrors} Errors"
 
@@ -178,7 +180,7 @@ logger.add winston.transports.File, {
 
 htmlPath = path.join reportDirectory, 'report.html'
 
-jsonPath = path.join reportDirectory, 'data.json'
+jsonPath = path.join reportDirectory, 'data.jsonl' # See http://jsonlines.org
 jsonStream = fs.createWriteStream jsonPath, {encoding: 'utf-8'}
 jsonStream.on 'error', (error) ->
 	throw error

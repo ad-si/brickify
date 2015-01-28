@@ -30,12 +30,12 @@ html
 					|  This report is a work in progress.
 					| Use the button to update the tables.
 
-				button(type='button')#updateStatistics.btn.btn-warning.pull-right
+				button(type='button')#updateButton.btn.btn-warning.pull-right
 					| ⟳ Update
 
 			h2 General Statistics
 
-			table.table.table-hover
+			table#generalStatistics.table.table-hover
 				thead
 					tr
 						th Metric
@@ -73,55 +73,39 @@ html
 
 			h3 Absolute values
 
-			table.table.table-striped.table-hover
+			table#absoluteValues.table.table-striped.table-hover.table-condensed.small
 				thead
 					tr
+						th Nr
 						th Filename
-						th stl Parsing Time
-						th stl Import Errors
-						th stl Invalid Polygons
-						th stl recalculated Normals
-						th stl Cleansing Time
+						th Parsing Time
+						th Errors
+						th Invalid Polygons
+						th Recalculated Normals
+						th Cleansing Time
 						th Optimization Time
-						th #Polygons
-						th #Points
-						th is 2-manifold
-						th 2-mnf check Time
-
+						th Number of Polygons
+						th Number of Points
+						th 2-manifold
+						th 2-manifold check Time
+						th Hull Voxelization Time
+						th Volume Fill Time
 				tbody
-					//each result in results
-						tr
-							td= result.fileName
-							td= result.stlParsingTime + ' ms'
-							td= result.numStlParsingErrors
-							td= result.stlDeletedPolygons
-							td= result.stlRecalculatedNormals
-							td= result.stlCleansingTime + ' ms'
-							td= result.optimizationTime + ' ms'
-							td= result.numPolygons
-							td= result.numPoints
-							td= result.isTwoManifold
-							td= result.twoManifoldCheckTime  + ' ms'
 
 			h3 Relative values
 
 			p All metrics are per 1000 polygons.
 
-			table.table.table-striped.table-hover
+			table#relativeValues.table.table-striped.table-hover.table-condensed.small
 				thead
 					tr
+						th Nr
 						th Filename
-						th #Polygons
-						th stl Parsing Time
-						th stl Cleansing Time
+						th Number of Polygons
+						th Parsing Time
+						th Cleansing Time
 						th Optimization Time
-						th 2-mnf check Time
+						th 2-manifold check Time
 				tbody
-					//each result in results
-						tr
-							td= result.fileName
-							td= result.numPolygons
-							td=  + ' ms'
-							td= ((result.stlCleansingTime / result.numPolygons) * 1000).toFixed(3) + ' ms'
-							td= ((result.optimizationTime / result.numPolygons) * 1000).toFixed(3)+ ' ms'
-							td= ((result.twoManifoldCheckTime/ result.numPolygons) * 1000).toFixed(3)  + ' ms'
+
+		script(src='../../assets/index.js')

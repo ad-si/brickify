@@ -33,41 +33,22 @@ html
 				button(type='button')#updateButton.btn.btn-warning.pull-right
 					| ⟳ Update
 
+			hr
+
 			h2 General Statistics
 
-			table#generalStatistics.table.table-hover
+			table#generalStatistics.table.table-hover.table-condensed.small
 				thead
 					tr
 						th Metric
-						each s in stats
-							th= s.variableName
+						th Min
+						th Max
+						th Sum
+						th Average
+						th Average per 1000 Polygons
 				tbody
-					tr
-						td
-							strong Min
-						each s in stats
-							td= s.min
-					tr
-						td
-							strong Max
-						each s in stats
-							td= s.max
-					tr
-						td
-							strong Sum
-						each s in stats
-							td= s.sum
-					tr
-						td
-							strong Avg
-						each s in stats
-							td= s.avg.toFixed(3)
-					tr
-						td
-							strong Avg per 1000 Polys
-						each s in stats
-							td= s.avgPer1000Polys.toFixed(3)
 
+			hr
 
 			h2 Individual Models
 

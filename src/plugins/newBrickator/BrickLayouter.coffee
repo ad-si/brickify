@@ -177,7 +177,7 @@ module.exports = class BrickLayouter
 
   findMergeableNeighboursInDirection: (brick, directionFn, widthFn, lengthFn,
                                        mergeableNeighbours) =>
-    if brick.neighbours.xp.length > 0
+    if directionFn(brick.neighbours).length > 0
       width = 0
       for neighbour in directionFn brick.neighbours
         width += widthFn neighbour.size

@@ -25,11 +25,29 @@ module.exports = class Ui
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
-	clickHandler: (event) ->
+	mouseDownHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
+
+		@_mouseIsDown = true
+
 		for onClickHandler in @pluginHooks.get 'onClick'
 			onClickHandler(event)
+
+		@toolbar.handleClick event
+
+	mouseUpHandler: (event) =>
+		event.preventDefault()
+
+		@_mouseIsDown = false
+
+	mouseMoveHandler: (event) =>
+		event.preventDefault()
+
+		if @_mouseIsDown
+			if @toolbar.hasBrushSelected()
+				event.stopPropagation()
+				@toolbar.handleMove event
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
@@ -62,7 +80,19 @@ module.exports = class Ui
 
 		@renderer.getDomElement().addEventListener(
 			'mousedown'
-			@clickHandler.bind @
+			@mouseDownHandler.bind @
+			false
+		)
+
+		@renderer.getDomElement().addEventListener(
+			'mouseup'
+			@mouseUpHandler.bind @
+			false
+		)
+
+		@renderer.getDomElement().addEventListener(
+			'mousemove'
+			@mouseMoveHandler.bind @
 			false
 		)
 

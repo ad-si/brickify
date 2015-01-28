@@ -86,32 +86,14 @@ module.exports = class NewBrickator
 			settings.setDebugVoxel @debugVoxel.x, @debugVoxel.y, @debugVoxel.z
 
 		results = @pipeline.run optimizedModel, settings, true
-		grid = results.accumulatedResults.grid
 
-		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
-
-		#test dataset (remove with real data if layouter is ready)
-		brickTestData = [
-			[
-				new Brick({x: 0, y: -0}, {x: 10, y: 1})
-				new Brick({x: 0, y: 2}, {x: 5, y: 1})
-				new Brick({x: 0, y: 4}, {x: 3, y: 1})
-				new Brick({x: 0, y: 6}, {x: 2, y: 1})
-				new Brick({x: 0, y: 8}, {x: 1, y: 1})
-				#new Brick({x: 2, y: -0}, {x: 2, y: 1})
-			]
-			[]
-			[
-				new Brick({x: 0, y: -0}, {x: 2, y: 2})
-				new Brick({x: 5, y: -0}, {x: 2, y: 4})
-			]
-		]
-
-		layoutResult = @brickLayouter.layoutForGrid grid, true
+		#@voxelVisualizer.createVisibleVoxels grid, threeNode, false
 
 		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(
-			threeNode, brickTestData, grid
+			threeNode,
+			results.accumulatedResults.bricks,
+			results.accumulatedResults.grid
 		)
 
 	getThreeObjectByNode: (node) =>

@@ -1,10 +1,12 @@
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class LegoPipeline
 	constructor: () ->
 		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
+		@brickLayouter = new BrickLayouter()
 
 		@pipelineSteps = []
 		@pipelineSteps.push (lastResult, options) =>
@@ -12,9 +14,16 @@ module.exports = class LegoPipeline
 		@pipelineSteps.push (lastResult, options) =>
 			@volumeFiller.fillGrid lastResult.grid, options
 
+		@pipelineSteps.push (lastResult, options) =>
+			@brickLayouter.initializeBrickGraph lastResult.grid
+		@pipelineSteps.push (lastResult, options) =>
+			@brickLayouter.layoutByGreedyMerge lastResult.bricks
+
 		@humanReadableStepNames = []
 		@humanReadableStepNames.push 'Hull voxelizing'
 		@humanReadableStepNames.push 'Volume filling'
+		@humanReadableStepNames.push 'Layout graph initialization'
+		@humanReadableStepNames.push 'Layout greedy merge'
 
 
 	run: (optimizedModel, options = null, profiling = false) =>

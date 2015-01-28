@@ -16,17 +16,31 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		modelCache.request('ee2ce436d924c112de36e2bb6ff3a4cb').then (model) =>
+		material = new THREE.MeshLambertMaterial(
+			{
+				color: 0xababab
+				ambient: 0xbebebe
+			}
+		)
+		knobsMaterial = new THREE.MeshLambertMaterial(
+			{
+				color: 0xa5a5a5
+				ambient: 0xbebebe
+			}
+		)
+
+		#create baseplate
+		box = new THREE.BoxGeometry(400, 400, 8)
+		boxobj = new THREE.Mesh(box, material)
+		boxobj.translateZ -4
+		@threejsNode.add boxobj
+
+		#create noppen
+		modelCache.request('0de1cbfdc2710eeb3604aedb6c8853b7').then (model) =>
 			geo = model.convertToThreeGeometry()
-			material = new THREE.MeshLambertMaterial(
-				{
-					color: 0xababab
-					ambient: 0xbebebe
-				}
-			)
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, material)
+					object = new THREE.Mesh(geo, knobsMaterial)
 					object.translateX x
 					object.translateY y
 					@threejsNode.add object

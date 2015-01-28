@@ -7,10 +7,13 @@ BrickVisualizer = require './BrickVisualizer'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
 Brick = require './Brick'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
+		@brickLayouter = new BrickLayouter()
+
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
@@ -104,10 +107,13 @@ module.exports = class NewBrickator
 			]
 		]
 
+		layoutResult = @brickLayouter.layoutForGrid grid, true
+
 		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(
 			threeNode, brickTestData, grid
 		)
+
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?
 			uuid = node.pluginData.newBrickator.threeObjectUuid

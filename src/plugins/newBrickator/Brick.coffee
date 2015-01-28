@@ -40,9 +40,11 @@ module.exports = class Brick
 
   @isValidSize: (width, length, height) =>
     for validSize in Brick.availableBrickSizes()
-      if validSize[0] == width and validSize[1] == length and validSize[2] == height
+      if validSize[0] == width and validSize[1] == length and
+      validSize[2] == height
         return true
-      if validSize[0] == length and validSize[1] == width and validSize[2] == height
+      if validSize[0] == length and validSize[1] == width and
+      validSize[2] == height
         return true
     return false
 

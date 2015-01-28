@@ -175,7 +175,8 @@ module.exports = class BrickLayouter
 
     return mergeableNeighbours
 
-  findMergeableNeighboursInDirection: (brick, directionFn, widthFn, lengthFn, mergeableNeighbours) =>
+  findMergeableNeighboursInDirection: (brick, directionFn, widthFn, lengthFn,
+                                       mergeableNeighbours) =>
     if brick.neighbours.xp.length > 0
       width = 0
       for neighbour in directionFn brick.neighbours
@@ -187,11 +188,13 @@ module.exports = class BrickLayouter
         for neighbour in directionFn(brick.neighbours)
           if widthFn(neighbour.position) < minWidth
             return
-          else if widthFn(neighbour.position) + widthFn(neighbour.size) - 1 > maxWidth
+          else if widthFn(neighbour.position) +
+          widthFn(neighbour.size) - 1 > maxWidth
             return
           if lengthFn(neighbour.size) != length
             return
-        if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) + length, brick.size.z)
+        if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) +
+        length, brick.size.z)
           mergeableNeighbours.push directionFn(brick.neighbours)
 
 

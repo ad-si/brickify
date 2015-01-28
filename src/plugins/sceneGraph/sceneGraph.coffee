@@ -85,12 +85,12 @@ module.exports = class SceneGraph
 			@bundle.statesync.performStateAction (state) =>
 				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
 					@selectedStateNode = stateNode
-					@bundle.ui.scene.select stateNode
+					@bundle.ui.sceneManager.select stateNode
 		else
 			@_onNodeDeselect(@selectedNode.name)
 
 	_onNodeDeselect: (title) =>
-		@bundle.ui.scene.deselect()
+		@bundle.ui.sceneManager.deselect()
 
 		#definitively deselect any node
 		if @tree.tree 'getSelectedNode'

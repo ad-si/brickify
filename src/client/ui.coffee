@@ -1,6 +1,6 @@
 Hotkeys = require './hotkeys'
 UiWorkflow = require './uiWorkflow'
-Scene = require './scene'
+Scene = require './uiSceneManager'
 
 ###
 # @module ui
@@ -10,7 +10,7 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = bundle.renderer
 		@pluginHooks = bundle.pluginHooks
-		@scene = new Scene(@bundle)
+		@sceneManager = new UiSceneManager(@bundle)
 		@_init()
 
 	dropHandler: (event) ->
@@ -75,4 +75,4 @@ module.exports = class Ui
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)
-		@hotkeys.addEvents @scene.getHotkeys()
+		@hotkeys.addEvents @sceneManager.getHotkeys()

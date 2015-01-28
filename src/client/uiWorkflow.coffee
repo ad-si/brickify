@@ -61,7 +61,7 @@ module.exports = class UiWorkflow
 
 	_buildButton: (title, type, callback) =>
 		$btn = $('<div class="btn btn-' + type + '">' + title + '</div>')
-		$btn.click (event) => callback @bundle.ui.scene.selectedNode, event
+		$btn.click (event) => callback @bundle.ui.sceneManager.selectedNode, event
 		return $btn
 
 	_buildPropertyUi: (plugin, $container) =>

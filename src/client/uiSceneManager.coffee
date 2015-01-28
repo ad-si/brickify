@@ -1,6 +1,6 @@
 objectTree = require '../common/state/objectTree'
 
-class Scene
+class UiSceneManager
 	constructor: (@bundle) ->
 		@selectedNode = null
 		@pluginHooks = @bundle.pluginHooks
@@ -46,7 +46,7 @@ class Scene
 
 	_deleteCurrentNode: =>
 		return if @bootboxOpen
-		return if not @selectedNode or @selectedNode.name == 'Scene'
+		return if not @selectedNode or @selectedNode.name == 'UiSceneManager'
 
 		@bootboxOpen = true
 		question = "Do you really want to delete #{@selectedNode.fileName}?"
@@ -67,4 +67,4 @@ class Scene
 			callback: @_deleteCurrentNode
 		}
 
-module.exports = Scene
+module.exports = UiSceneManager

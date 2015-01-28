@@ -52,6 +52,6 @@ module.exports = class ModelLoader
 			node.meshHash = hash
 			node.pluginData = {
 				uiGen: {selectedPluginKey: @bundle.globalConfig.defaultPlugin}}
-			@bundle.ui?.scene.add node
+			@bundle.ui?.sceneManager.add node
 		# call updateState on all client plugins and sync
 		@bundle.statesync.performStateAction loadModelCallback, true

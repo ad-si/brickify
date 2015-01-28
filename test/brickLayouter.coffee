@@ -38,7 +38,7 @@ describe 'brickLayouter', ->
 		expect(brick.position.z).to.equal(0)
 		done()
 
-	it 'should find mergeable neighbor brick', (done) ->
+	it 'should find mergeable neighbour brick xp and xm', (done) ->
 		grid = new Grid(baseBrick)
 		grid.numVoxelsX = 2
 		grid.numVoxelsY = 2
@@ -49,37 +49,51 @@ describe 'brickLayouter', ->
 		bricks = brickLayouter.initializeBrickGraph(grid)
 
 		brick = bricks[0][0]
-		mergeableNeighbors = brickLayouter.findMergeableNeighbours brick, bricks
-		expect(mergeableNeighbors[0]).to.be.undefined
-		expect(mergeableNeighbors[1][0]).to.not.be.null
-		expect(mergeableNeighbors[2]).to.be.undefined
-		expect(mergeableNeighbors[3]).to.be.undefined
+		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
-		mergeableNeighbors = brickLayouter.findMergeableNeighbours brick, bricks
-		expect(mergeableNeighbors[0][0]).to.not.be.null
-		expect(mergeableNeighbors[1]).to.be.undefined
-		expect(mergeableNeighbors[2]).to.be.undefined
-		expect(mergeableNeighbors[3]).to.be.undefined
+		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
 		done()
 
-
-	it 'should find mergeable neighbor bricks', (done) ->
+	it 'should find mergeable neighbour brick yp and ym', (done) ->
 		grid = new Grid(baseBrick)
-		grid.numVoxelsX = 4
-		grid.numVoxelsY = 1
+		grid.numVoxelsX = 2
+		grid.numVoxelsY = 2
 		grid.numVoxelsZ = 1
 		grid.setVoxel {x: 0, y: 0, z: 0}
-		grid.setVoxel {x: 1, y: 0, z: 0}
-		grid.setVoxel {x: 2, y: 0, z: 0}
-		grid.setVoxel {x: 3, y: 0, z: 0}
+		grid.setVoxel {x: 0, y: 1, z: 0}
 		brickLayouter = new BrickLayouter()
 		bricks = brickLayouter.initializeBrickGraph(grid)
 
 		brick = bricks[0][0]
-		mergeableNeighbors = brickLayouter.findMergeableNeighbours brick, bricks
-		expect(mergeableNeighbors[0]).to.be.undefined
-		#expect(mergeableNeighbors[1]).to.have.length(3)
-		expect(mergeableNeighbors[2]).to.be.undefined
-		expect(mergeableNeighbors[3]).to.be.undefined
+		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][1])
+
+		brick = bricks[0][1]
+		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
+		done()
+
+
+	it 'should find mergeable neighbour bricks in all directions', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 3
+		grid.numVoxelsY = 3
+		grid.numVoxelsZ = 1
+		grid.setVoxel {x: 1, y: 1, z: 0}
+		grid.setVoxel {x: 1, y: 0, z: 0}
+		grid.setVoxel {x: 1, y: 2, z: 0}
+		grid.setVoxel {x: 0, y: 1, z: 0}
+		grid.setVoxel {x: 2, y: 1, z: 0}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid)
+
+		brick = bricks[0][2]
+		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
+		expect(mergeableNeighbours[1][0]).to.equal(bricks[0][4])
+		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][1])
+		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][3])
 		done()

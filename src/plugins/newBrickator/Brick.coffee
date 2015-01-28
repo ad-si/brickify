@@ -13,7 +13,7 @@ module.exports = class Brick
         @upperSlots[xx][yy] = false
         @lowerSlots[xx][yy] = false
 
-    @neighbours = {xp: [], xm: [], yp: [], ym: []}
+    @neighbours = [[], [], [], []]
     return
 
   @availableBrickSizes: () =>

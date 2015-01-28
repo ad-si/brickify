@@ -87,15 +87,15 @@ module.exports = class BrickLayouter
   connectToBrickXm: (brick, x, y, z, grid) =>
     if x > 0 and grid.zLayers[z]?[x - 1]?[y]? and
         grid.zLayers[z][x - 1][y] != false
-      brick.neighbours.xm = [grid.zLayers[z][x - 1][y].brick]
-      grid.zLayers[z][x - 1][y].brick.neighbours.xp = [brick]
+      brick.neighbours[0] = [grid.zLayers[z][x - 1][y].brick]
+      grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
     return
 
   connectToBrickYm: (brick, x, y, z, grid) =>
     if y > 0 and grid.zLayers[z]?[x]?[y - 1]? and
         grid.zLayers[z][x][y - 1] != false
-      brick.neighbours.ym = [grid.zLayers[z][x][y - 1].brick]
-      grid.zLayers[z][x][y - 1].brick.neighbours.yp = [brick]
+      brick.neighbours[2] = [grid.zLayers[z][x][y - 1].brick]
+      grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
     return
 
   # main while loop condition:
@@ -128,7 +128,7 @@ module.exports = class BrickLayouter
         #console.log mergeableNeighbours.length
         mergeNeighbours = @chooseNeighboursToMergeWith brick,
           mergeableNeighbours
-        @mergeBricksAndUpdateGraphConnections brick, mergeNeighbours
+        brick = @mergeBricksAndUpdateGraphConnections brick, mergeNeighbours
         mergeableNeighbours = [] #@findMergeableNeighbours brick, bricks
 
     return bricks
@@ -145,28 +145,28 @@ module.exports = class BrickLayouter
 
     @findMergeableNeighboursInDirection(
       brick
-      (brickNeighbours) -> return brickNeighbours.xm
+      0
       (obj) -> return obj.y
       (obj) -> return obj.x
       mergeableNeighbours
     )
     @findMergeableNeighboursInDirection(
       brick
-      (brickNeighbours) -> return brickNeighbours.xp
+      1
       (obj) -> return obj.y
       (obj) -> return obj.x
       mergeableNeighbours
     )
     @findMergeableNeighboursInDirection(
       brick
-      (brickNeighbours) -> return brickNeighbours.ym
+      2
       (obj) -> return obj.x
       (obj) -> return obj.y
       mergeableNeighbours
     )
     @findMergeableNeighboursInDirection(
       brick
-      (brickNeighbours) -> return brickNeighbours.yp
+      3
       (obj) -> return obj.x
       (obj) -> return obj.y
       mergeableNeighbours
@@ -175,17 +175,17 @@ module.exports = class BrickLayouter
 
     return mergeableNeighbours
 
-  findMergeableNeighboursInDirection: (brick, directionFn, widthFn, lengthFn,
+  findMergeableNeighboursInDirection: (brick, dir, widthFn, lengthFn,
                                        mergeableNeighbours) =>
-    if directionFn(brick.neighbours).length > 0
+    if brick.neighbours[dir].length > 0
       width = 0
-      for neighbour in directionFn brick.neighbours
+      for neighbour in brick.neighbours[dir]
         width += widthFn neighbour.size
       if width == widthFn(brick.size)
         minWidth = widthFn brick.position
         maxWidth = widthFn(brick.position) + widthFn(brick.size) - 1
-        length = lengthFn(directionFn(brick.neighbours)[0].size)
-        for neighbour in directionFn(brick.neighbours)
+        length = lengthFn(brick.neighbours[dir][0].size)
+        for neighbour in brick.neighbours[dir]
           if widthFn(neighbour.position) < minWidth
             return
           else if widthFn(neighbour.position) +
@@ -195,7 +195,7 @@ module.exports = class BrickLayouter
             return
         if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) +
         length, brick.size.z)
-          mergeableNeighbours.push directionFn(brick.neighbours)
+          mergeableNeighbours.push brick.neighbours[dir]
 
 
   chooseNeighboursToMergeWith: (brick, mergeableNeighbours) =>

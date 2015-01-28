@@ -188,6 +188,6 @@ module.exports = class Voxelizer
 
 	setupGrid: (optimizedModel, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)
-		@voxelGrid.setUpForModel optimizedModel, options.gridDelta
+		@voxelGrid.setUpForModel optimizedModel
 		return @voxelGrid
 

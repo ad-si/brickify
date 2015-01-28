@@ -25,16 +25,6 @@ module.exports = class NewBrickator
 			a1:
 				title: 'Legofy'
 				callback: legoCallback
-		properties:
-			gridDeltaX:
-				description: 'Voxelgrid dx (0..7)'
-				type: 'number'
-			gridDeltaY:
-				description: 'Voxelgrid dy (0..7)'
-				type: 'number'
-			gridDeltaZ:
-				description: 'Voxelgrid dz (0..3)'
-				type: 'number'
 		}
 
 	onClick: (event) =>
@@ -81,31 +71,16 @@ module.exports = class NewBrickator
 				@runLegoPipeline optimizedModel, selectedNode
 		)
 
-	getUiSettings: (selectedNode) ->
-		if selectedNode.toolsValues?.newbrickator?
-			return selectedNode.toolsValues.newbrickator
-		else
-			if !(selectedNode.toolsValues?)
-				selectedNode.toolsValues = {}
-
-			selectedNode.toolsValues.newbrickator = {
-				gridDeltaX: 0
-				gridDeltaY: 0
-				gridDeltaZ: 0
-			}
-			return selectedNode.toolsValues.newbrickator
-
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
-
-		uiSettings = @getUiSettings selectedNode
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
 		
 		settings = new PipelineSettings()
-		settings.setGridOffset uiSettings.gridDeltaX,
-			uiSettings.gridDeltaY, uiSettings.gridDeltaZ
+
+		if @debugVoxel?
+			settings.setDebugVoxel @debugVoxel.x, @debugVoxel.y, @debugVoxel.z
 
 		results = @pipeline.run optimizedModel, settings, true
 		grid = results.accumulatedResults.grid

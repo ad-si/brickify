@@ -6,18 +6,20 @@ module.exports = class Grid
 		@numVoxelsZ = 0
 		@zLayers = []
 
-	setUpForModel: (optimizedModel, gridOffset = null) =>
+	setUpForModel: (optimizedModel) =>
 		bb = optimizedModel.boundingBox()
 
+		# align the grid to the nearest visible lego brick on the viewed board
+		xDelta = (Math.floor(bb.min.x) % @spacing.x) + (@spacing.x * 1.5)
+		yDelta = (Math.floor(bb.min.y) % @spacing.y) + (@spacing.y * 1.5)
+		zDelta = (Math.floor(bb.min.z) % @spacing.z) - (@spacing.z * 0.5)
+
 		@origin = {
-			x: bb.min.x
-			y: bb.min.y
-			z: bb.min.z
+			x: Math.floor(bb.min.x) - xDelta
+			y: Math.floor(bb.min.y) - yDelta
+			z: Math.floor(bb.min.z) - zDelta
 		}
-		if gridOffset
-			@origin.x -= gridOffset.x
-			@origin.y -= gridOffset.y
-			@origin.z -= gridOffset.z
+
 
 		@numVoxelsX = Math.ceil (bb.max.x - bb.min.x) / @spacing.x
 		@numVoxelsX++

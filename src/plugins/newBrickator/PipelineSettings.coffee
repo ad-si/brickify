@@ -5,17 +5,16 @@ module.exports  = class PipelineSettings
 			y: 8
 			z: 3.2
 		}
-		@gridOffset = {
-			x: 0
-			y: 0
-			z: 0
-		}
+		@debugVoxel = null
+
 	setGridSpacing: (x, y, z) =>
 		@gridSpacing.x = x
 		@gridSpacing.y = y
 		@gridSpacing.z = z
 
-	setGridOffset: (x, y, z) =>
-		@gridOffset.x = x
-		@gridOffset.y = y
-		@gridOffset.z = z
+	setDebugVoxel: (x, y, z) =>
+		@debugVoxel = {
+			x: x
+			y: y
+			z: z
+		}

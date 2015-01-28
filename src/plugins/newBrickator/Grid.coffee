@@ -54,6 +54,15 @@ module.exports = class Grid
 			z: point.z * @spacing.z
 		}
 
+	mapVoxelToWorld: (point) =>
+		# maps voxel indices to world coordinates
+		relative = @mapVoxelToGridRelative point
+		return {
+			x: relative.x + @origin.x
+			y: relative.y + @origin.y
+			z: relative.z + @origin.z
+		}
+
 	setVoxel: (voxel, data = true) =>
 		# sets the voxel with the given indices to true
 		# the voxel may also contain data.

@@ -7,19 +7,28 @@ module.exports = class BrickVisualizer
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
 	createVisibleBricks: (threeNode, brickData, grid) =>
-		@gridSpacing = grid.spacing
-		@gridOrigin = grid.origin
-
 		for gridZ in [0..brickData.length - 1] by 1
 			for brick in brickData[gridZ]
-				cube = @_createBrickGeometry @gridSpacing, brick.size
+				window.setTimeout @_brickCallback(
+					grid, brick.position, brick.size, threeNode),
+					20 * gridZ
+				#@_createBrickCallback(grid, brick.position, brick.size, threeNode)()
+				
+	_brickCallback: (grid, position, size, threeNode) =>
+		return () =>
+			@_createBrick(grid, position, size, threeNode)
 
-				#move the bricks to their position in the grid
-				cube.translateX( @gridOrigin.x + @gridSpacing.x * brick.position.x)
-				cube.translateY( @gridOrigin.y + @gridSpacing.y * brick.position.y)
-				cube.translateZ( @gridOrigin.z + @gridSpacing.z * gridZ)
+	_createBrick: (grid, position, size, threeNode) =>
+		cube = @_createBrickGeometry grid.spacing, size
 
-				threeNode.add(cube)
+		#move the bricks to their position in the grid
+		world = grid.mapVoxelToWorld position
+		cube.translateX( world.x )
+		cube.translateY( world.y )
+		cube.translateZ( world.z )
+
+		threeNode.add(cube)
+
 	_createBrickGeometry: (gridSpacing, brickSize) =>
 		brickSizeX = gridSpacing.x * brickSize.x
 		brickSizeY = gridSpacing.y * brickSize.y
@@ -60,9 +69,9 @@ module.exports = class BrickVisualizer
 
 		# normal voxels have their origin in the middle, so translate the brick
 		# to match the center of a voxel
-		cube.translateX @gridSpacing.x / -2.0
-		cube.translateY @gridSpacing.y / -2.0
-		cube.translateX @gridSpacing.z / -2.0
+		cube.translateX gridSpacing.x / -2.0
+		cube.translateY gridSpacing.y / -2.0
+		cube.translateX gridSpacing.z / -2.0
 
 		return cube
 

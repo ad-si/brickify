@@ -76,3 +76,20 @@ module.exports = class Ui
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)
 		@hotkeys.addEvents @selection.getHotkeys()
+
+		gridHotkeys = {
+			title: 'UI'
+			events: [
+				{
+					description: 'Toggle coordinate system / lego plate'
+					hotkey: 'g'
+					callback: =>
+						@_toggleGridVisibility()
+				}
+			]
+		}
+		@hotkeys.addEvents gridHotkeys
+
+	_toggleGridVisibility: () =>
+		@bundle.getPlugin('lego-board').toggleVisibility()
+		@bundle.getPlugin('coordinate-system').toggleVisibility()

@@ -1,5 +1,4 @@
 Hotkeys = require './hotkeys'
-UiWorkflow = require './uiWorkflow'
 UiSelection = require './uiSelection'
 
 ###
@@ -38,7 +37,6 @@ module.exports = class Ui
 	_init: =>
 		@_initListeners()
 		@_initScenegraph()
-		@_initWorkflow()
 		@_initHotkeys()
 
 	_initListeners: =>
@@ -69,9 +67,6 @@ module.exports = class Ui
 	_initScenegraph: =>
 		@bundle.getPlugin('scene-graph').initUi $('#sceneGraphContainer')
 		return
-
-	_initWorkflow: =>
-		@workflow = new UiWorkflow(@bundle)
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)

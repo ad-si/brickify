@@ -5,7 +5,6 @@ class UiSelection
 		@selectedNode = null
 
 	select: (@selectedNode) =>
-		@bundle.ui.workflow.showCurrent @selectedNode
 		return
 
 	deselect: (node) =>

@@ -79,5 +79,8 @@ module.exports = class PluginLoader
 			require('../plugins/3dPrint'),
 			require('../plugins/3dPrint/package.json')
 		)
-
+		pluginInstances.push @initPlugin(
+			require('../plugins/legoBoard'),
+			require('../plugins/legoBoard/package.json')
+		)
 		return pluginInstances

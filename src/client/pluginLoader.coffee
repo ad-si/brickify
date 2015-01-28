@@ -47,12 +47,10 @@ module.exports = class PluginLoader
 			require('../plugins/example'),
 			require('../plugins/example/package.json')
 		)###
-		###
 		pluginInstances.push @initPlugin(
 			require('../plugins/coordinateSystem'),
 			require('../plugins/coordinateSystem/package.json')
 		)
-		###
 		pluginInstances.push @initPlugin(
 			require('../plugins/solidRenderer'),
 			require('../plugins/solidRenderer/package.json')

@@ -18,6 +18,10 @@ module.exports = class CoordinateSystem
 		return
 
 	# Generate the grid and the axis on 3d scene initialization
-	init3d: (threejsNode) ->
-		setupGrid(threejsNode, @globalConfig)
-		setupAxis(threejsNode, @globalConfig)
+	init3d: (@threejsNode) =>
+		setupGrid(@threejsNode, @globalConfig)
+		setupAxis(@threejsNode, @globalConfig)
+		@threejsNode.visible = false
+
+	toggleVisibility: =>
+		@threejsNode.visible = !@threejsNode.visible

@@ -15,8 +15,8 @@ module.exports = class LegoBoard
 		return
 
 	# Load the board
-	init3d: (threejsNode) ->
-		modelCache.request('ee2ce436d924c112de36e2bb6ff3a4cb').then (model) ->
+	init3d: (@threejsNode) =>
+		modelCache.request('ee2ce436d924c112de36e2bb6ff3a4cb').then (model) =>
 			geo = model.convertToThreeGeometry()
 			material = new THREE.MeshLambertMaterial(
 				{
@@ -29,4 +29,7 @@ module.exports = class LegoBoard
 					object = new THREE.Mesh(geo, material)
 					object.translateX x
 					object.translateY y
-					threejsNode.add object
+					@threejsNode.add object
+
+	toggleVisibility: () =>
+		@threejsNode.visible = !@threejsNode.visible

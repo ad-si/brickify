@@ -50,7 +50,7 @@ describe 'brickLayouter', ->
 
 		brick = bricks[0][0]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
-		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][1])
+		expect(mergeableNeighbours[1][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
@@ -69,11 +69,11 @@ describe 'brickLayouter', ->
 
 		brick = bricks[0][0]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
-		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][1])
+		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
-		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
+		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][0])
 		done()
 
 

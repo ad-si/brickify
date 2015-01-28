@@ -16,7 +16,7 @@ module.exports = class Brick
     @neighbours = {xp: [], xm: [], yp: [], ym: []}
     return
 
-  availableBrickSizes: () =>
+  @availableBrickSizes: () =>
     return [
       [1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
       [2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
@@ -37,6 +37,14 @@ module.exports = class Brick
         if slotXY != false
           bricks.push slotXY
     return removeDuplicates bricks
+
+  @isValidSize: (width, length, height) =>
+    for validSize in Brick.availableBrickSizes()
+      if validSize[0] == width and validSize[1] == length and validSize[2] == height
+        return true
+      if validSize[0] == length and validSize[1] == width and validSize[2] == height
+        return true
+    return false
 
   # helper method, to be moved somewhere more appropriate
   removeDuplicates = (array) ->

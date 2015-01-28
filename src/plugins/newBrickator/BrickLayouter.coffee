@@ -107,9 +107,9 @@ module.exports = class BrickLayouter
 
     numRandomChoices = 0
     numRandomChoicesWithoutMerge = 0
-    maxNumRandomChoicesWithoutMerge = 20
+    maxNumRandomChoicesWithoutMerge = 1000
 
-    while(numRandomChoices < 100) #only for debugging, should be while true
+    while(numRandomChoices < 1000) #only for debugging, should be while true
       brick = @chooseRandomBrick bricks
       numRandomChoices++
       #console.log numRandomChoices
@@ -142,59 +142,58 @@ module.exports = class BrickLayouter
 
   findMergeableNeighbours: (brick) =>
     mergeableNeighbours = []
-    # should probably be refactored at some point :)
-    # not correct yet! needs to check if merging with the neighbours
-    # results in a valid brick size
-    mergeableNeighbours.push @findMergeableNeighboursXm brick
-    mergeableNeighbours.push @findMergeableNeighboursXp brick
-    mergeableNeighbours.push @findMergeableNeighboursYm brick
-    mergeableNeighbours.push @findMergeableNeighboursYp brick
-    # console.log mergeableNeighbours
+
+    @findMergeableNeighboursInDirection(
+      brick
+      (brickNeighbours) -> return brickNeighbours.xm
+      (obj) -> return obj.y
+      (obj) -> return obj.x
+      mergeableNeighbours
+    )
+    @findMergeableNeighboursInDirection(
+      brick
+      (brickNeighbours) -> return brickNeighbours.xp
+      (obj) -> return obj.y
+      (obj) -> return obj.x
+      mergeableNeighbours
+    )
+    @findMergeableNeighboursInDirection(
+      brick
+      (brickNeighbours) -> return brickNeighbours.ym
+      (obj) -> return obj.x
+      (obj) -> return obj.y
+      mergeableNeighbours
+    )
+    @findMergeableNeighboursInDirection(
+      brick
+      (brickNeighbours) -> return brickNeighbours.yp
+      (obj) -> return obj.x
+      (obj) -> return obj.y
+      mergeableNeighbours
+    )
+
+
     return mergeableNeighbours
 
-  findMergeableNeighboursXp: (brick) =>
-    # console.log 'xp'
-    xDim = 0
-    for neighbour in brick.neighbours.xp
-      xDim += neighbour.size.x
-      if neighbour.size.y != brick.size.y
-        return
-    if xDim == brick.size.x
-      return brick.neighbours.xp
-    return
+  findMergeableNeighboursInDirection: (brick, directionFn, widthFn, lengthFn, mergeableNeighbours) =>
+    if brick.neighbours.xp.length > 0
+      width = 0
+      for neighbour in directionFn brick.neighbours
+        width += widthFn neighbour.size
+      if width == widthFn(brick.size)
+        minWidth = widthFn brick.position
+        maxWidth = widthFn(brick.position) + widthFn(brick.size) - 1
+        length = lengthFn(directionFn(brick.neighbours)[0].size)
+        for neighbour in directionFn(brick.neighbours)
+          if widthFn(neighbour.position) < minWidth
+            return
+          else if widthFn(neighbour.position) + widthFn(neighbour.size) - 1 > maxWidth
+            return
+          if lengthFn(neighbour.size) != length
+            return
+        if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) + length, brick.size.z)
+          mergeableNeighbours.push directionFn(brick.neighbours)
 
-  findMergeableNeighboursXm: (brick) =>
-    # console.log 'xm'
-    xDim = 0
-    for neighbour in brick.neighbours.xm
-      xDim += neighbour.size.x
-      if neighbour.size.y != brick.size.y
-        return
-    if xDim == brick.size.x
-      return brick.neighbours.xm
-    return
-
-  findMergeableNeighboursYp: (brick) =>
-    # console.log 'yp'
-    yDim = 0
-    for neighbour in brick.neighbours.yp
-      yDim += neighbour.size.y
-      if neighbour.size.x != brick.size.x
-        return
-    if yDim == brick.size.y
-      return brick.neighbours.yp
-    return
-
-  findMergeableNeighboursYm: (brick) =>
-    # console.log 'ym'
-    yDim = 0
-    for neighbour in brick.neighbours.ym
-      yDim += neighbour.size.y
-      if neighbour.size.x != brick.size.x
-        return
-    if yDim == brick.size.y
-      return brick.neighbours.ym
-    return
 
   chooseNeighboursToMergeWith: (brick, mergeableNeighbours) =>
     connections = []
@@ -203,10 +202,9 @@ module.exports = class BrickLayouter
     # find unique connections of the theoretical future new brick
     for neighbours, i in mergeableNeighbours
       connections[i] = []
-      if neighbours
-        for neighbour in neighbours
-          connections[i].push neighbour.uniqueConnectedBricks()
-        connections[i] = removeDuplicates connections[i]
+      for neighbour in neighbours
+        connections[i].push neighbour.uniqueConnectedBricks()
+      connections[i] = removeDuplicates connections[i]
       numConnections[i] = connections[i].length
 
     # find the choice with the largest number of connections
@@ -232,7 +230,17 @@ module.exports = class BrickLayouter
 
   mergeBricksAndUpdateGraphConnections: (brick, mergeNeighbours, bricks) =>
     # find minimal and maximal position of brick and mergeNeighbours
-    newBrick = new Brick newPosition, newSize
+    minPosition = brick.position
+    maxPosition = {
+      x: brick.position.x + brick.size.x
+      y: brick.position.y + brick.size.y
+      z: brick.position.z + brick.size.z
+    }
+
+
+    # for anyBrick in brick.concat mergeNeighbours
+
+    #newBrick = new Brick newPosition, newSize
     # set new brick connections & neighbours
 
     # delete outdated bricks from bricks array

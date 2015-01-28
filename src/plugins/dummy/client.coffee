@@ -142,3 +142,9 @@ module.exports = class DummyPlugin
 			}
 		]
 		}
+
+	getBrushes: ->
+		return [{
+			text: 'dummy-brush'
+			icon: 'move'
+		}]

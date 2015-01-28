@@ -1,4 +1,4 @@
-objectTree = require '../common/objectTree'
+objectTree = require '../common/state/objectTree'
 
 class Scene
 	constructor: (@bundle) ->

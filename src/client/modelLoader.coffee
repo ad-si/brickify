@@ -4,7 +4,7 @@
 
 md5 = require('blueimp-md5').md5
 modelCache = require './modelCache'
-objectTree = require '../common/objectTree'
+objectTree = require '../common/state/objectTree'
 
 module.exports = class ModelLoader
 	constructor: (@bundle) ->

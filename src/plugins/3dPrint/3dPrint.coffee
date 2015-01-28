@@ -1,7 +1,7 @@
 modelCache = require '../../client/modelCache'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
-objectTree = require '../../common/objectTree'
+objectTree = require '../../common/state/objectTree'
 
 module.exports = class ThreeDPrint
 	constructor: () -> return

@@ -3,7 +3,7 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
-objectTree = require '../../common/objectTree'
+objectTree = require '../../common/state/objectTree'
 
 module.exports = class NewBrickator
 	constructor: () ->

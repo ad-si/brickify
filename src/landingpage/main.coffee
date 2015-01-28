@@ -36,7 +36,7 @@ stlDropper.init document.getElementById('dropzone'), $('#droptext'), loadModel
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../client/globals.yaml'
-objectTree = require '../common/objectTree'
+objectTree = require '../common/state/objectTree'
 Bundle = require '../client/bundle'
 clone = require 'clone'
 

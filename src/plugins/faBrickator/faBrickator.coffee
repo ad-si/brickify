@@ -8,7 +8,7 @@
 #
 ###
 
-objectTree = require '../../common/objectTree'
+objectTree = require '../../common/state/objectTree'
 modelCache = require '../../client/modelCache'
 OptimizedModel = require '../../common/OptimizedModel'
 BrickSystem = require './bricks/BrickSystem'

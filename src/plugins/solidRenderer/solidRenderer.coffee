@@ -10,8 +10,8 @@ modelCache = require '../../client/modelCache'
 
 module.exports = class SolidRenderer
 
-	init: (bundle) ->
-		@globalConfig = bundle.globalConfig
+	init: (@bundle) ->
+		@globalConfig = @bundle.globalConfig
 
 	init3d: (@threejsNode) ->
 		return
@@ -44,20 +44,24 @@ module.exports = class SolidRenderer
 			if not threeObject?
 				return @loadModelFromCache node, properties, true
 			else
+				@_copyTransformDataToThree node, threeObject
 				return Promise.resolve()
 		else
-			node.pluginData.solidRenderer = {}
+			@_createPluginData node
 			return @loadModelFromCache node, node.pluginData.solidRenderer, false
+
 
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name
 		success = (optimizedModel) =>
 			console.log "Got model #{node.meshHash}"
-			threeObj = @addModelToThree optimizedModel
+			threeObject = @addModelToThree optimizedModel
 			if reload
-				threeObj.name = properties.threeObjectUuid
+				threeObject.name = properties.threeObjectUuid
 			else
-				properties.threeObjectUuid = threeObj.name
+				properties.threeObjectUuid = threeObject.name
+
+			@_copyTransformDataToThree node, threeObject
 			return optimizedModel
 		failure = () ->
 			console.error "Unable to get model #{node.meshHash}"
@@ -93,14 +97,102 @@ module.exports = class SolidRenderer
 		else
 			return null
 
-	# copys stored transforms to the tree object.
-	# TODO: use
-	copyTransformDataToThree: (node, threeObject) ->
+	_copyTransformDataToThree: (node, threeObject) ->
 		posd = node.positionData
-		threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
+		threeObject.position.set posd.position.x, posd.position.y, posd.position.z
 		threeObject.rotation.set(
 			posd.rotation._x,
 			posd.rotation._y,
 			posd.rotation._z
 		)
-		threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)
+		threeObject.scale.set posd.scale.x, posd.scale.y, posd.scale.z
+
+	getBrushes: =>
+		return [{
+			text: 'move'
+			icon: 'move'
+			moveCallback: @_handleMove
+		}]
+
+	_getThreeObjectByName: (name) =>
+		for obj in @threejsNode.children
+			if obj.name == name
+				return obj
+		return null
+
+	_handleMove: (event) =>
+		selectedNode = @bundle.ui.selection.selectedNode
+		if not selectedNode?
+			return
+		@_createPluginData selectedNode
+		pld = selectedNode.pluginData.solidRenderer
+
+		posNew = @_getGridXY event.clientX, event.clientY
+		if not pld.oldPosition?
+			pld.oldPosition = posNew
+			return
+				
+		delta = {
+			x: posNew.x - pld.oldPosition.x
+			y: posNew.y - pld.oldPosition.y
+		}
+		pld.oldPosition = posNew
+
+		pld.realPosition.x += delta.x
+		pld.realPosition.y += delta.y
+
+		rasterPos = @_rasterizeVector pld.realPosition
+		selectedNode.positionData.position.x = rasterPos.x
+		selectedNode.positionData.position.y = rasterPos.y
+		
+		###
+		updateCallback = (state) =>
+			selectedNode.positionData.position.x = rasterPos.x
+			selectedNode.positionData.position.y = rasterPos.y
+			return
+		@bundle.statesync.performStateAction updateCallback
+		###
+
+		threeObject = @_getThreeObjectByName pld.threeObjectUuid
+		@_copyTransformDataToThree selectedNode, threeObject
+
+		#console.log "Mouse moved in 3d: x:#{delta.x}, y:#{delta.y}"
+		console.log "Set raster position to #{rasterPos.x}, #{rasterPos.y}"
+
+	_createPluginData: (node) ->
+		if not node.pluginData.solidRenderer?
+			node.pluginData.solidRenderer = {
+				realPosition: {
+					x: node.positionData.position.x
+					y: node.positionData.position.y
+					z: node.positionData.position.z
+				}
+			}
+
+	_getGridXY: (screenX, screenY) =>
+		# calculates the position on the z=0 plane in 3d space
+		# from given screen (mouse) coordinates
+		# see http://stackoverflow.com/questions/13055214/
+		camera = @bundle.renderer.getCamera()
+		vector = new THREE.Vector3()
+		relativeX = (screenX / window.innerWidth) * 2 - 1
+		relativeY = -(screenY / window.innerHeight) * 2 + 1
+		vector.set relativeX, relativeY, 0.5
+		vector.unproject camera
+		
+		dir = vector.sub( camera.position ).normalize()
+		distance = -camera.position.z / dir.z
+		pos = camera.position.clone().add( dir.multiplyScalar( distance ) )
+
+	_rasterizeVector: (vector, raster = 2) =>
+		vector.x = @_rasterize vector.x, raster
+		vector.y = @_rasterize vector.y, raster
+		return vector
+
+	_rasterize: (value, raster) ->
+		mod = value % raster
+		if mod > (raster / 2)
+			value += (raster - mod)
+		else
+			value -= mod
+		return value

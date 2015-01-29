@@ -1,9 +1,0 @@
-{
-  "name": "object-mover",
-  "version": "0.1.0",
-  "description": "moves around objects",
-  "lowfab": {
-    "type": "ui"
-  },
-  "browser": "./objectMover.coffee"
-}

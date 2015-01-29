@@ -6,32 +6,6 @@ $ = require 'jquery'
 #fade in action buttons when javascript is ready
 $('#buttonContainer').fadeTo(500, 1)
 
-$('#qcExampleLink').click (event) ->
-	#update link to editor
-	lnk = $('.applink').attr('href')
-	lnk += 'initialModel=1c2395a3145ad77aee7479020b461ddf'
-	$('.applink').attr('href', lnk)
-
-	#open quickconvert, load and process model
-	loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
-
-loadAndConvert = (hash) =>
-	#$('#quickConvert').slideDown 'slow', () ->
-	#	$('body,html').animate({scrollTop: 200}, 400)
-
-		b1.then(() -> bundle1.modelLoader.loadByHash hash)
-		b2.then(() -> bundle2.modelLoader.loadByHash hash)
-			.then(() ->
-				nb = bundle2.getPlugin 'newBrickator'
-				nb.processFirstObject()
-			)
-
-loadModel = (hash, errors) =>
-	loadAndConvert(hash)
-
-stlDropper = require './stlDropper'
-stlDropper.init document.getElementById('dropzone'), $('#droptext'), loadModel
-
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../client/globals.yaml'
 objectTree = require '../common/objectTree'
@@ -58,3 +32,25 @@ config2.renderAreaId = 'renderArea2'
 bundle2 = new Bundle config2
 b2 = bundle2.init()
 
+loadAndConvert = (hash) =>
+	#$('#quickConvert').slideDown 'slow', () ->
+	#	$('body,html').animate({scrollTop: 200}, 400)
+
+	b1.then(() -> bundle1.modelLoader.loadByHash hash)
+	b2.then(() -> bundle2.modelLoader.loadByHash hash)
+		.then(() ->
+			nb = bundle2.getPlugin 'newBrickator'
+			nb.processFirstObject()
+		)
+	$('.applink').prop 'href', 'app#legofy+initialModel=' + hash
+
+#open quickconvert, load and process model
+loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
+
+loadModel = (hash, errors) =>
+	b1.then(() -> bundle1.clearScene())
+	b2.then(() -> bundle2.clearScene())
+	loadAndConvert(hash)
+
+stlDropper = require './stlDropper'
+stlDropper.init document.getElementById('dropzone'), $('#droptext'), loadModel

@@ -40,7 +40,7 @@ module.exports = class BrickLayouter
 
   connectToBrickBelow: (brick, x, y, z, grid) =>
     if z > 0 and grid.zLayers[z - 1]?[x]?[y]? and
-        grid.zLayers[z - 1][x][y] != false
+    grid.zLayers[z - 1][x][y] != false
       brickBelow = grid.zLayers[z - 1][x][y].brick
       brick.lowerSlots[0][0] = brickBelow
       brickBelow.upperSlots[0][0] = brick
@@ -48,14 +48,14 @@ module.exports = class BrickLayouter
 
   connectToBrickXm: (brick, x, y, z, grid) =>
     if x > 0 and grid.zLayers[z]?[x - 1]?[y]? and
-        grid.zLayers[z][x - 1][y] != false
+    grid.zLayers[z][x - 1][y] != false
       brick.neighbours[0] = [grid.zLayers[z][x - 1][y].brick]
       grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
     return
 
   connectToBrickYm: (brick, x, y, z, grid) =>
     if y > 0 and grid.zLayers[z]?[x]?[y - 1]? and
-        grid.zLayers[z][x][y - 1] != false
+    grid.zLayers[z][x][y - 1] != false
       brick.neighbours[2] = [grid.zLayers[z][x][y - 1].brick]
       grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
     return
@@ -65,19 +65,17 @@ module.exports = class BrickLayouter
   # keep a counter, break if last number of unsuccessful tries > (some number
   # or some % of total bricks in object)
   layoutByGreedyMerge: (bricks) =>
-    console.log 'merging'
-
     numRandomChoices = 0
     numRandomChoicesWithoutMerge = 0
-    maxNumRandomChoicesWithoutMerge = 1000
+    maxNumRandomChoicesWithoutMerge = 100
 
-    while(numRandomChoices < 100) #only for debugging, should be while true
+    while(true) #only for debugging, should be while true
       brick = @chooseRandomBrick bricks
       numRandomChoices++
       #console.log numRandomChoices
       mergeableNeighbours = @findMergeableNeighbours brick
 
-      if mergeableNeighbours.length == 0
+      if !@anyDefined(mergeableNeighbours)
         numRandomChoicesWithoutMerge++
         if numRandomChoicesWithoutMerge > maxNumRandomChoicesWithoutMerge
           console.log "randomChoices #{numRandomChoices}
@@ -86,14 +84,21 @@ module.exports = class BrickLayouter
         else
           continue # randomly choose a new brick
 
-      while(mergeableNeighbours.length > 0)
+      while(@anyDefined(mergeableNeighbours))
         mergeIndex = @chooseNeighboursToMergeWith brick,
           mergeableNeighbours
         brick = @mergeBricksAndUpdateGraphConnections brick,
           mergeableNeighbours, mergeIndex, bricks
-        mergeableNeighbours = [] #@findMergeableNeighbours brick, bricks
+        mergeableNeighbours = [] #@findMergeableNeighbours brick
+        console.log @anyDefined mergeableNeighbours
 
     return {bricks: bricks}
+
+  anyDefined: (mergeableNeighbours) =>
+    boolean = false
+    for neighbours in mergeableNeighbours
+      boolean = boolean or neighbours?
+    return boolean
 
   chooseRandomBrick: (bricks) =>
     brickLayer = bricks[Math.floor(Math.random() * bricks.length)]
@@ -187,8 +192,9 @@ module.exports = class BrickLayouter
     return randomOfLargestIndices
 
   mergeBricksAndUpdateGraphConnections: (
-  brick, mergeableNeighbours, mergeIndex, bricks ) =>
+    brick, mergeableNeighbours, mergeIndex, bricks ) =>
     mergeNeighbours = mergeableNeighbours[mergeIndex]
+
     if mergeIndex == 1
       position = brick.position
       size = {
@@ -196,7 +202,6 @@ module.exports = class BrickLayouter
         y: brick.size.y
         z: brick.size.z
       }
-
     else if mergeIndex == 0
       position = {
         x: mergeNeighbours[0].position.x
@@ -208,7 +213,6 @@ module.exports = class BrickLayouter
         y: brick.size.y
         z: brick.size.z
       }
-
     else if mergeIndex == 3
       position = brick.position
       size = {
@@ -216,7 +220,6 @@ module.exports = class BrickLayouter
         y: brick.size.y + mergeNeighbours[0].size.y
         z: brick.size.z
       }
-
     else if mergeIndex == 2
       position = {
         x: brick.position.x
@@ -231,25 +234,55 @@ module.exports = class BrickLayouter
 
     newBrick = new Brick(position, size)
 
-    for i in [0..4 - 1]
-      newBrick.neighbours
+    # setting new neighbours
+    ids = @neighbourMergeIndices(mergeIndex)
+    ###
+    newBrick.neighbours[ids.opposite] = brick.neighbours[ids.opposite]
+    newBrick.neighbours[ids.sides[0]] = brick.neighbours[ids.sides[0]]
+    newBrick.neighbours[ids.sides[1]] = brick.neighbours[ids.sides[1]]
+    console.log newBrick.neighbours
+    for mergeBrick in mergeNeighbours
+      newBrick.neighbours[ids.sides[0]].push mergeBrick.neighbours[ids.sides[0]]
+      newBrick.neighbours[ids.sides[1]].push mergeBrick.neighbours[ids.sides[1]]
+      newBrick.neighbours[mergeIndex].push mergeBrick.neighbours[mergeIndex]
+    ###
 
+    # set new brick connections
+    # tbd
 
-
+    # delete outdated bricks from bricks array
+    z = brick.position.z
+    bricks[z] = (x for x in bricks[z] when x != brick)
+    for neighbour in mergeNeighbours
+      bricks[z] = (x for x in bricks[z] when x != neighbour)
+    # add newBrick to bricks array
+    bricks[z].push newBrick
+    ###
     console.log 'MERGE'
     console.log mergeIndex
     console.log brick
     console.log mergeNeighbours
     console.log newBrick
-
-    # set new brick connections & neighbours
-    # delete outdated bricks from bricks array
-    # add newBrick to bricks array
-
+    ###
     return newBrick
 
   findWeakArticulationPointsInGraph: (bricks) =>
     return
+
+  neighbourMergeIndices: (mergeIndex) =>
+    if mergeIndex == 0
+      opposite = 1
+      sides = [2, 3]
+    else if mergeIndex == 1
+      opposite = 0
+      sides = [2, 3]
+    else if mergeIndex == 2
+      opposite = 3
+      sides = [0, 1]
+    else if mergeIndex == 3
+      opposite = 2
+      sides = [0, 1]
+    return {opposite: opposite, sides: sides}
 
   # helper method, to be moved somewhere more appropriate
   removeDuplicates = (array) ->

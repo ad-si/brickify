@@ -56,24 +56,6 @@ getDateTimeString = () ->
 		.replace(':', '') + 'Z'
 
 
-# This class holds all test results for one model and is
-# saved (with other results) to the testResultFile
-class ModelTestResult
-	constructor: ->
-		@stlParsingTime = 0
-		@numStlParsingErrors = 0
-		@stlCleansingTime = 0
-		@stlDeletedPolygons = 0
-		@stlRecalculatedNormals = 0
-		@optimizationTime = 0
-		@numPolygons = 0
-		@numPoints = 0
-		@isTwoManifold = 0
-		@twoManifoldCheckTime = 0
-		@hullVoxelizationTime = 0
-		@volumeFillTime = 0
-
-
 tryToWrite = (testResult) ->
 	if jsonStream.write(JSON.stringify(testResult, null, 2) + ',\n')
 

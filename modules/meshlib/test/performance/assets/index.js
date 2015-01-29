@@ -9,6 +9,29 @@
 		return value
 	}
 
+	function executeOnlyOnNumbers (value1, value2, callback) {
+		if (value1 == null) {
+			if (value2 == null)
+				return null
+			else
+				return value2
+		}
+		else {
+			if (value2 == null)
+				return value1
+			else
+				return callback(value1, value2)
+		}
+	}
+
+	function getMax (value1, value2) {
+		return executeOnlyOnNumbers(value1, value2, Math.max)
+	}
+
+	function getMin (value1, value2) {
+		return executeOnlyOnNumbers(value1, value2, Math.min)
+	}
+
 	function getStatistics (data) {
 
 		return data
@@ -19,9 +42,10 @@
 					.forEach(function (key) {
 
 						var value = {
-							max: Math.max(previous[key].max, current[key]),
-							min: Math.min(previous[key].min, current[key]),
-							sum: previous[key] + current[key]
+							min: getMin(previous[key].min, current[key]),
+							max: getMax(previous[key].max, current[key]),
+							sum: (Number(previous[key].sum) ||
+							0) + (Number(current[key]) || 0)
 						}
 
 						if (index === array.length - 1) {
@@ -40,9 +64,7 @@
 				.reduce(function (previous, current) {
 					previous[current] = {}
 					return previous
-				},
-				{}
-			)
+				}, {})
 		)
 	}
 
@@ -50,7 +72,7 @@
 
 		var tableBody = document.querySelector('#generalStatistics tbody')
 
-		tableBody.innerHTMl = ''
+		tableBody.innerHTML = ''
 
 		Object.keys(statsObject)
 			.forEach(function (metric) {
@@ -68,8 +90,6 @@
 
 				Object.keys(statsObject[metric])
 					.forEach(function (statKey) {
-						console.log(statsObject, metric, statKey)
-
 						var cell = document.createElement('td')
 						cell.textContent = statsObject[metric][statKey]
 						cell.title = statKey

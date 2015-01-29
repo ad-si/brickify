@@ -1,5 +1,6 @@
 expect = require('chai').expect
 BrickLayouter = require '../src/plugins/newBrickator/BrickLayouter'
+Brick = require '../src/plugins/newBrickator/Brick'
 Grid = require '../src/plugins/newBrickator/Grid'
 
 describe 'brickLayouter', ->
@@ -152,3 +153,59 @@ describe 'brickLayouter', ->
 				brickLayouter.chooseNeighboursToMergeWith mergeableNeighbours
 			expect(mergeableNeighbours[mergeDirection][0]).to.equal(bricks[0][2])
 		done()
+
+	it 'should produce correct brick after merge', (done) ->
+		brickLayouter = new BrickLayouter()
+		brick1 = new Brick({x: 0, y: 0, z: 0},{x: 1, y: 1, z: 1})
+		brick2 = new Brick({x: 1, y: 0, z: 0},{x: 1, y: 1, z: 1})
+		brick3 = new Brick({x: 0, y: 1, z: 0},{x: 1, y: 1, z: 1})
+		bricks = [[brick1, brick2, brick3]]
+
+		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+			brick2
+			[[brick1], [], [], []]
+			0
+			bricks
+		)
+		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
+		expect(newBrick.size).to.eql({x: 2, y: 1, z: 1})
+		expect(bricks).to.eql([[brick3, newBrick]])
+
+		bricks = [[brick1, brick2, brick3]]
+		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+			brick1
+			[[], [brick2], [], []]
+			1
+			bricks
+		)
+		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
+		expect(newBrick.size).to.eql({x: 2, y: 1, z: 1})
+		expect(bricks).to.eql([[brick3, newBrick]])
+
+
+		bricks = [[brick1, brick2, brick3]]
+		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+			brick3
+			[[], [], [brick1], []]
+			2
+			bricks
+		)
+		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
+		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
+		expect(bricks).to.eql([[brick2, newBrick]])
+
+
+		bricks = [[brick1, brick2, brick3]]
+		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+			brick1
+			[[], [], [], [brick3]]
+			3
+			bricks
+		)
+		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
+		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
+		expect(bricks).to.eql([[brick2, newBrick]])
+
+
+		done()
+		

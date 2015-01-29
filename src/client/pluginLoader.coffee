@@ -84,4 +84,8 @@ module.exports = class PluginLoader
 			require('../plugins/legoBoard'),
 			require('../plugins/legoBoard/package.json')
 		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/objectMover'),
+			require('../plugins/objectMover/package.json')
+		)
 		return pluginInstances

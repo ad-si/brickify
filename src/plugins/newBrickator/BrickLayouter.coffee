@@ -10,44 +10,6 @@ module.exports = class BrickLayouter
     @nextBrickIndex++
     return temp
 
-  # main method called from outside the module
-  layoutForGrid: (grid, profiling = false) =>
-    if profiling
-      console.log 'Step Layouting'
-      start = new Date()
-
-    bricks = @initializeBrickGraph grid
-
-    if profiling
-      initTime = new Date() - start
-      console.log "Graph initialized in #{initTime}ms"
-
-    @layoutByGreedyMerge bricks
-
-    if profiling
-      initialTime = new Date() - start
-      console.log "InitialLayout finished in #{initialTime}ms"
-    ###
-    # optimize for stability
-    maxIterations = 50
-    weakPointThreshold = 2
-    weakPoints = @findWeakArticulationPointsInGraph bricks
-    for i in [0..maxIterations-1] by 1
-      for wp in weakPoints
-        neighbours = @findAllNeighbours wp
-        @splitIntoSmallestBrick wp, neighbours
-        @layoutByGreedyMerge bricks
-      weakPoints = @findWeakArticulationPointsInGraph bricks
-      if weakPoints.size > weakPointThreshold
-        break
-    ###
-
-    if profiling
-      elapsed = new Date() - start
-      console.log "Step Layouting finished in #{elapsed}ms"
-
-    return bricks
-
   initializeBrickGraph: (grid) =>
     bricks = []
     for z in [0..grid.numVoxelsZ - 1] by 1
@@ -74,7 +36,7 @@ module.exports = class BrickLayouter
               bricks[z].push brick
 
     # console.log bricks
-    return bricks
+    return {bricks: bricks}
 
   connectToBrickBelow: (brick, x, y, z, grid) =>
     if z > 0 and grid.zLayers[z - 1]?[x]?[y]? and
@@ -131,7 +93,7 @@ module.exports = class BrickLayouter
           mergeableNeighbours, mergeIndex, bricks
         mergeableNeighbours = [] #@findMergeableNeighbours brick, bricks
 
-    return bricks
+    return {bricks: bricks}
 
   chooseRandomBrick: (bricks) =>
     brickLayer = bricks[Math.floor(Math.random() * bricks.length)]

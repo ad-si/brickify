@@ -8,10 +8,7 @@ module.exports = class Example
 	init3d: (threejsNode) ->
 		console.log 'Example Plugin initializes 3d'
 
-	initUi: (domElements) ->
-		console.log 'Example Plugin initializes UI'
-
-	getUiSchema: () ->
+	getConvertUiSchema: () ->
 		console.log('Example Plugin returns the UI schema.')
 
 		actioncallback = () =>
@@ -73,12 +70,6 @@ module.exports = class Example
 			.then (res) -> console.log "fib(50) is #{res}"
 			.catch (err) -> console.error err
 		console.log 'execution done'
-
-	uiEnabled: (node) ->
-		console.log "Enabled Example Ui with node #{node.fileName}"
-
-	uiDisabled: (node) ->
-		console.log "Disabled Example Ui with node #{node.fileName}"
 
 	onStateUpdate: (state) ->
 		console.log 'Example Client Plugin state change'

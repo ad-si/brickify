@@ -111,17 +111,3 @@ module.exports = class StlExport
 			.then (optimizedModel) =>
 				@saveStl generatorFunc(optimizedModel),
 					optimizedModel.originalFileName
-
-
-	uiEnabled: (@node) ->
-		return
-
-	getUiSchema: () =>
-		type: 'object'
-		actions:
-			exportAsciiStl:
-				title: 'Export ASCII STL'
-				callback: () => @exportStl('ascii')
-			exportBinaryStl:
-				title: 'Export Binary STL'
-				callback: () => @exportStl('binary')

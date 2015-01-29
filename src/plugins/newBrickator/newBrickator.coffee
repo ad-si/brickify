@@ -3,25 +3,21 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
-#BrickVisualizer = require './BrickVisualizer'
-BrickLayouter = require './BrickLayouter'
+BrickVisualizer = require './BrickVisualizer'
+PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
+Brick = require './Brick'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class NewBrickator
 	constructor: () ->
-		# smallest lego brick
-		@baseBrick = {
-			length: 8
-			width: 8
-			height: 3.2
-		}
-		@pipeline = new LegoPipeline(@baseBrick)
+		@pipeline = new LegoPipeline()
 		@brickLayouter = new BrickLayouter()
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
-	getUiSchema: () =>
+	getConvertUiSchema: () =>
 		legoCallback = (selectedNode) =>
 			@runLegoPipelineOnNode selectedNode
 
@@ -32,27 +28,7 @@ module.exports = class NewBrickator
 			a1:
 				title: 'Legofy'
 				callback: legoCallback
-		properties:
-			gridDeltaX:
-				description: 'Voxelgrid dx (0..7)'
-				type: 'number'
-			gridDeltaY:
-				description: 'Voxelgrid dy (0..7)'
-				type: 'number'
-			gridDeltaZ:
-				description: 'Voxelgrid dz (0..3)'
-				type: 'number'
 		}
-
-	uiEnabled: (node) ->
-		if node.pluginData.newBrickator?
-			threeJsNode =  @getThreeObjectByNode node
-			threeJsNode?.visible = true
-
-	uiDisabled: (node) ->
-		if node.pluginData.newBrickator?
-			threeJsNode = @getThreeObjectByNode node
-			threeJsNode?.visible = false
 
 	onClick: (event) =>
 		intersects =
@@ -98,47 +74,27 @@ module.exports = class NewBrickator
 				@runLegoPipeline optimizedModel, selectedNode
 		)
 
-	getUiSettings: (selectedNode) =>
-		if selectedNode.toolsValues?.newbrickator?
-			return selectedNode.toolsValues.newbrickator
-		else
-			if !(selectedNode.toolsValues?)
-				selectedNode.toolsValues = {}
-
-			selectedNode.toolsValues.newbrickator = {
-				gridDeltaX: 0
-				gridDeltaY: 0
-				gridDeltaZ: 0
-			}
-			return selectedNode.toolsValues.newbrickator
-
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
 
-		uiSettings = @getUiSettings selectedNode
-
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
+		
+		settings = new PipelineSettings()
 
-		settings = {
-			debugVoxel: @debugVoxel
-			gridDelta: {
-				x: uiSettings.gridDeltaX
-				y: uiSettings.gridDeltaY
-				z: uiSettings.gridDeltaZ
-			}
-		}
+		if @debugVoxel?
+			settings.setDebugVoxel @debugVoxel.x, @debugVoxel.y, @debugVoxel.z
 
 		results = @pipeline.run optimizedModel, settings, true
-		grid = results.lastResult
 
-		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
+		#@voxelVisualizer.createVisibleVoxels grid, threeNode, false
 
-		@layoutForGrid grid, threeNode, true
-
-	layoutForGrid: (grid, threeNode, profiling) =>
-		bricks = @brickLayouter.layoutForGrid grid, true
-		#@brickVisualizer.createBricks()
+		@brickVisualizer ?= new BrickVisualizer()
+		@brickVisualizer.createVisibleBricks(
+			threeNode,
+			results.accumulatedResults.bricks,
+			results.accumulatedResults.grid
+		)
 
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

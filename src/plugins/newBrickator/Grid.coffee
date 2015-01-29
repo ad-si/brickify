@@ -1,24 +1,25 @@
 module.exports = class Grid
-	constructor: (baseBrick = {length: 0, width: 0, height: 0}) ->
+	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
 		@origin = {x: 0, y: 0, z: 0}
-		@spacing = {x: baseBrick.length, y: baseBrick.width, z: baseBrick.height}
 		@numVoxelsX = 0
 		@numVoxelsY = 0
 		@numVoxelsZ = 0
 		@zLayers = []
 
-	setUpForModel: (optimizedModel, gridDelta = null) =>
+	setUpForModel: (optimizedModel) =>
 		bb = optimizedModel.boundingBox()
 
+		# align the grid to the nearest visible lego brick on the viewed board
+		xDelta = (Math.floor(bb.min.x) % @spacing.x) + (@spacing.x * 1.5)
+		yDelta = (Math.floor(bb.min.y) % @spacing.y) + (@spacing.y * 1.5)
+		zDelta = (Math.floor(bb.min.z) % @spacing.z) - (@spacing.z * 0.5)
+
 		@origin = {
-			x: bb.min.x
-			y: bb.min.y
-			z: bb.min.z
+			x: Math.floor(bb.min.x) - xDelta
+			y: Math.floor(bb.min.y) - yDelta
+			z: Math.floor(bb.min.z) - zDelta
 		}
-		if gridDelta
-			@origin.x -= gridDelta.x
-			@origin.y -= gridDelta.y
-			@origin.z -= gridDelta.z
+
 
 		@numVoxelsX = Math.ceil (bb.max.x - bb.min.x) / @spacing.x
 		@numVoxelsX++
@@ -51,6 +52,15 @@ module.exports = class Grid
 			x: point.x * @spacing.x
 			y: point.y * @spacing.y
 			z: point.z * @spacing.z
+		}
+
+	mapVoxelToWorld: (point) =>
+		# maps voxel indices to world coordinates
+		relative = @mapVoxelToGridRelative point
+		return {
+			x: relative.x + @origin.x
+			y: relative.y + @origin.y
+			z: relative.z + @origin.z
 		}
 
 	setVoxel: (voxel, data = true) =>

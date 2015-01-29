@@ -1,20 +1,23 @@
+Hotkeys = require './hotkeys'
+UiWorkflow = require './uiWorkflow'
+UiSelection = require './uiSelection'
+
 ###
 # @module ui
 ###
 
 module.exports = class Ui
-	constructor: (bundle) ->
-		@globalConfig = bundle.globalConfig
+	constructor: (@bundle) ->
 		@renderer = bundle.renderer
-		@statesync = bundle.statesync
-		@modelLoader = bundle.modelLoader
 		@pluginHooks = bundle.pluginHooks
+		@selection = new UiSelection(@bundle)
+		@_init()
 
 	dropHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
-		@modelLoader.readFiles files if files?
+		@bundle.modelLoader.readFiles files if files?
 
 	dragOverHandler: (event) ->
 		event.stopPropagation()
@@ -32,7 +35,13 @@ module.exports = class Ui
 	windowResizeHandler: (event) ->
 		@renderer.windowResizeHandler()
 
-	init: =>
+	_init: =>
+		@_initListeners()
+		@_initScenegraph()
+		@_initWorkflow()
+		@_initHotkeys()
+
+	_initListeners: =>
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'
@@ -54,5 +63,33 @@ module.exports = class Ui
 		@renderer.getDomElement().addEventListener(
 			'mousedown'
 			@clickHandler.bind @
-		false
+			false
 		)
+
+	_initScenegraph: =>
+		@bundle.getPlugin('scene-graph').initUi $('#sceneGraphContainer')
+		return
+
+	_initWorkflow: =>
+		@workflow = new UiWorkflow(@bundle)
+
+	_initHotkeys: =>
+		@hotkeys = new Hotkeys(@pluginHooks)
+		@hotkeys.addEvents @selection.getHotkeys()
+
+		gridHotkeys = {
+			title: 'UI'
+			events: [
+				{
+					description: 'Toggle coordinate system / lego plate'
+					hotkey: 'g'
+					callback: =>
+						@_toggleGridVisibility()
+				}
+			]
+		}
+		@hotkeys.addEvents gridHotkeys
+
+	_toggleGridVisibility: () =>
+		@bundle.getPlugin('lego-board').toggleVisibility()
+		@bundle.getPlugin('coordinate-system').toggleVisibility()

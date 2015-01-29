@@ -19,7 +19,7 @@ describe 'brickLayouter', ->
 		grid.numVoxelsZ = 1
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 1, y: 0, z: 0}
-		bricks = brickLayouter.initializeBrickGraph(grid)
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 		expect(bricks[0]).to.have.length(2)
 		done()
 
@@ -31,7 +31,7 @@ describe 'brickLayouter', ->
 		grid.numVoxelsZ = 1
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid)
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 		brick = brickLayouter.chooseRandomBrick(bricks)
 		expect(brick.position.x).to.equal(0)
 		expect(brick.position.y).to.equal(0)
@@ -46,7 +46,7 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 1, y: 0, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid)
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][0]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
@@ -65,7 +65,7 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 0, y: 1, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid)
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][0]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
@@ -88,7 +88,7 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 0, y: 1, z: 0}
 		grid.setVoxel {x: 2, y: 1, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid)
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][2]
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
@@ -98,7 +98,7 @@ describe 'brickLayouter', ->
 		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][3])
 		done()
 
-	it 'should choose the better brick', (done) ->
+	it 'should choose the better brick 10 out of 10 times', (done) ->
 		grid = new Grid(baseBrick)
 		grid.numVoxelsX = 3
 		grid.numVoxelsY = 1
@@ -108,12 +108,12 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 2, y: 0, z: 0}
 		grid.setVoxel {x: 2, y: 0, z: 1}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid)
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][1]
-		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
-		mergeDirection = brickLayouter.chooseNeighboursToMergeWith brick,
-			mergeableNeighbours
-		console.log bricks[0][2]
-		#expect(mergeableNeighbours[mergeDirection]).to.equal(bricks[0][2])
+		for num in [1..10]
+			mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+			mergeDirection = brickLayouter.chooseNeighboursToMergeWith brick,
+				mergeableNeighbours
+			expect(mergeableNeighbours[mergeDirection][0]).to.equal(bricks[0][2])
 		done()

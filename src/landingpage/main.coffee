@@ -48,4 +48,4 @@ loadModel = (hash, errors) =>
 	loadAndConvert(hash)
 
 stlDropper = require './stlDropper'
-stlDropper.init document.getElementById('dropzone'), $('#droptext'), loadModel
+stlDropper.init $('#teaser-carousel .dropper'), loadModel

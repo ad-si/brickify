@@ -1,7 +1,8 @@
 Stl = require './Stl'
+stlExport = require './stlExport'
 optimizeModel = require './optimizeModel'
 
-
+importFileBuffer = ''
 meshlib = {}
 meshData = {}
 model = {}
@@ -32,10 +33,35 @@ meshlib.optimize = () ->
 	# TODO: fix
 	model = optimizeModel model
 
+meshlib.export = (options, callback) ->
+
+	options ?= {}
+	options.format ?= 'stl'
+	options.encoding ?= 'binary'
+
+	if options.format is 'stl'
+		try
+			stl = new Stl toArrayBuffer importFileBuffer
+			if options.encoding is 'ascii'
+				stlFile = stlExport.toAsciiStl stl.model()
+			else
+				stlFile = stlExport.toBinaryStl stl.model()
+		catch error
+			return callback error
+
+		callback(null, stlFile)
+	else
+		throw new Error options.format + ' is no supported file format!'
+
+	return meshlib
+
+
 meshlib.parse = (fileBuffer, options, callback) ->
 
 	if not fileBuffer
 		throw new Error 'STL buffer is empty'
+	else
+		importFileBuffer = fileBuffer
 
 	options ?= {}
 	options.format ?= 'stl'
@@ -45,9 +71,16 @@ meshlib.parse = (fileBuffer, options, callback) ->
 			stl = new Stl toArrayBuffer fileBuffer
 			model = stl.model()
 		catch error
-			return callback error
+			if typeof callback is 'function'
+				callback error
+				return meshlib
+			else
+				throw error
 
-	callback(null, model)
+	if typeof callback is 'function'
+		callback(null, model)
+
+	return meshlib
 
 
 module.exports = meshlib

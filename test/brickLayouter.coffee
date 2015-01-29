@@ -148,7 +148,7 @@ describe 'brickLayouter', ->
 		brick = bricks[0][1]
 		for num in [1..10]
 			mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
-			mergeDirection = brickLayouter.chooseNeighboursToMergeWith brick,
-				mergeableNeighbours
+			mergeDirection =
+				brickLayouter.chooseNeighboursToMergeWith mergeableNeighbours
 			expect(mergeableNeighbours[mergeDirection][0]).to.equal(bricks[0][2])
 		done()

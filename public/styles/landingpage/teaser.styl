@@ -1,17 +1,6 @@
 header
-	.usergroup-link
-		padding 5px 10px
-		a
-			font-size 1.4em
-			background-position top left
-			background-repeat no-repeat
-			padding-left 30px
-
-	#educator-link a
-		background-image url('../img/instructor.png')
-
-	#builder-link a
-		background-image url('../img/lego.png')
+	h1
+		font-weight bold
 
 	.pitch
 		margin-top 6em
@@ -22,6 +11,31 @@ header
 		height 453px
 		&:hover
 			background url('../img/makey-disassembled.png')
+
+	#googles
+		line-height 500px
+
+	.carousel-inner .item
+		min-height 500px
+
+	.carousel-control
+		background-position center
+		&.builders
+			background url('../img/lego.png') no-repeat center right
+			text-align right
+			span
+				right 50px
+		&.educators
+			background url('../img/instructor.png') no-repeat center left
+			text-align left
+			span
+				left 50px
+		span
+			position: absolute
+			top 50%
+			display inline-block
+			line-height 30px
+			margin-top -15px
 
 	#dropzone.btn
 		cursor inherit

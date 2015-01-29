@@ -153,7 +153,6 @@ module.exports.setupRouting = () ->
 	webapp.get '/contribute', landingPage.getContribute
 	webapp.get '/team', landingPage.getTeam
 	webapp.get '/imprint', landingPage.getImprint
-	webapp.get '/edu', landingPage.getEdu
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
 	webapp.get '/statesync/get', jsonParser, statesync.getState

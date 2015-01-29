@@ -157,6 +157,18 @@ describe 'brickLayouter', ->
 		brick1 = new Brick({x: 0, y: 0, z: 0},{x: 1, y: 1, z: 1})
 		brick2 = new Brick({x: 1, y: 0, z: 0},{x: 1, y: 1, z: 1})
 		brick3 = new Brick({x: 0, y: 1, z: 0},{x: 1, y: 1, z: 1})
+		brick1.neighbours[0] = []
+		brick1.neighbours[1] = [brick2]
+		brick1.neighbours[2] = []
+		brick1.neighbours[3] = [brick3]
+		brick2.neighbours[0] = [brick1]
+		brick2.neighbours[1] = []
+		brick2.neighbours[2] = []
+		brick2.neighbours[3] = []
+		brick3.neighbours[0] = []
+		brick3.neighbours[1] = []
+		brick3.neighbours[2] = [brick1]
+		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
 
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
@@ -171,6 +183,18 @@ describe 'brickLayouter', ->
 		expect(newBrick.neighbours[3]).to.eql([brick3])
 		expect(brick3.neighbours[2]).to.eql([newBrick])
 
+		brick1.neighbours[0] = []
+		brick1.neighbours[1] = [brick2]
+		brick1.neighbours[2] = []
+		brick1.neighbours[3] = [brick3]
+		brick2.neighbours[0] = [brick1]
+		brick2.neighbours[1] = []
+		brick2.neighbours[2] = []
+		brick2.neighbours[3] = []
+		brick3.neighbours[0] = []
+		brick3.neighbours[1] = []
+		brick3.neighbours[2] = [brick1]
+		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
 			brick1
@@ -184,6 +208,18 @@ describe 'brickLayouter', ->
 		expect(newBrick.neighbours[3]).to.eql([brick3])
 		expect(brick3.neighbours[2]).to.eql([newBrick])
 
+		brick1.neighbours[0] = []
+		brick1.neighbours[1] = [brick2]
+		brick1.neighbours[2] = []
+		brick1.neighbours[3] = [brick3]
+		brick2.neighbours[0] = [brick1]
+		brick2.neighbours[1] = []
+		brick2.neighbours[2] = []
+		brick2.neighbours[3] = []
+		brick3.neighbours[0] = []
+		brick3.neighbours[1] = []
+		brick3.neighbours[2] = [brick1]
+		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
 			brick3
@@ -197,6 +233,18 @@ describe 'brickLayouter', ->
 		expect(newBrick.neighbours[1]).to.eql([brick2])
 		expect(brick2.neighbours[0]).to.eql([newBrick])
 
+		brick1.neighbours[0] = []
+		brick1.neighbours[1] = [brick2]
+		brick1.neighbours[2] = []
+		brick1.neighbours[3] = [brick3]
+		brick2.neighbours[0] = [brick1]
+		brick2.neighbours[1] = []
+		brick2.neighbours[2] = []
+		brick2.neighbours[3] = []
+		brick3.neighbours[0] = []
+		brick3.neighbours[1] = []
+		brick3.neighbours[2] = [brick1]
+		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
 			brick1
@@ -240,6 +288,41 @@ describe 'brickLayouter', ->
 		expect(bricksObject.bricks[0][0].size).to.eql({x: 1, y: 2, z: 1})
 		done()
 
+	it 'should merge two bricks 2x1 then 2x2 with neighbours', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 10
+		grid.numVoxelsY = 10
+		grid.numVoxelsZ = 1
+		grid.setVoxel {x: 5, y: 5, z: 0}
+		grid.setVoxel {x: 5, y: 6, z: 0}
+		grid.setVoxel {x: 6, y: 5, z: 0}
+		grid.setVoxel {x: 6, y: 6, z: 0}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+			bricks[0][0]
+			bricks[0][0].neighbours
+			1
+			bricks
+		)
+		expect(newBrick.neighbours[0]).to.have.length(0)
+		expect(newBrick.neighbours[1]).to.have.length(0)
+		expect(newBrick.neighbours[2]).to.have.length(0)
+		expect(newBrick.neighbours[3]).to.have.length(2)
+		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+			newBrick
+			newBrick.neighbours
+			3
+			bricks
+		)
+		expect(newBrick.neighbours[0]).to.have.length(0)
+		expect(newBrick.neighbours[1]).to.have.length(0)
+		expect(newBrick.neighbours[2]).to.have.length(0)
+		expect(newBrick.neighbours[3]).to.have.length(0)
+		expect(newBrick.position).to.eql({x:5, y:5, z:0})
+		expect(newBrick.size).to.eql({x:2, y:2, z:0})
+		done()
+
 	it 'should merge four bricks', (done) ->
 		grid = new Grid(baseBrick)
 		grid.numVoxelsX = 10
@@ -252,7 +335,6 @@ describe 'brickLayouter', ->
 		brickLayouter = new BrickLayouter()
 		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
-		console.log bricksObject.bricks[0][0]
 		expect(bricksObject.bricks[0]).to.have.length(1)
 		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
 		expect(bricksObject.bricks[0][0].size).to.eql({x: 2, y: 2, z: 1})

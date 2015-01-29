@@ -1,7 +1,7 @@
 require('es6-promise').polyfill()
 $ = require 'jquery'
 
-$('#quickConvert').hide()
+#$('#quickConvert').hide()
 
 #fade in action buttons when javascript is ready
 $('#buttonContainer').fadeTo(500, 1)
@@ -16,17 +16,15 @@ $('#qcExampleLink').click (event) ->
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
 
 loadAndConvert = (hash) =>
-	$('#quickConvert').slideDown 'slow', () ->
-		$('body,html').animate({scrollTop: 200}, 400)
+	#$('#quickConvert').slideDown 'slow', () ->
+	#	$('body,html').animate({scrollTop: 200}, 400)
 
-		b1.then(() ->
-			bundle1.modelLoader.loadByHash hash)
-		b2.then(() ->
-			bundle2.modelLoader.loadByHash hash)
-		.then(() ->
-			nb = bundle2.getPlugin 'newBrickator'
-			nb.processFirstObject()
-		)
+		b1.then(() -> bundle1.modelLoader.loadByHash hash)
+		b2.then(() -> bundle2.modelLoader.loadByHash hash)
+			.then(() ->
+				nb = bundle2.getPlugin 'newBrickator'
+				nb.processFirstObject()
+			)
 
 loadModel = (hash, errors) =>
 	loadAndConvert(hash)

@@ -52,16 +52,19 @@ module.exports = class NewBrickator
 			@debugVoxel = obj.voxelCoords
 
 	onStateUpdate: (state) =>
+		return unless @voxelizedNodes?
 		#delete voxel visualizations for deleted objects
-		availableObjects = []
-		objectTree.forAllSubnodeProperties state.rootNode,
+		availableNodes = []
+		objectTree.forAllSubnodesWithProperty state.rootNode,
 			'newBrickator',
-			(property) ->
-				availableObjects.push property.threeObjectUuid
+			(node) -> availableNodes.push node
 
-		for child in @threejsRootNode.children
-				if availableObjects.indexOf(child.uuid) < 0
-					@threejsRootNode.remove @threeObjects[key]
+		deletedNodes = @voxelizedNodes.filter(
+			(node) -> availableNodes.indexOf node < 0
+		)
+		for node in deletedNodes
+			threeNode = @getThreeObjectByNode node
+			@voxelVisualizer.clear(threeNode)
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
@@ -77,6 +80,7 @@ module.exports = class NewBrickator
 
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
+		@voxelizedNodes ?= []
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
@@ -89,6 +93,7 @@ module.exports = class NewBrickator
 		grid = results.lastResult
 
 		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
+		@voxelizedNodes.push selectedNode
 
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

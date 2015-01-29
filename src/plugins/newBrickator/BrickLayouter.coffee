@@ -77,7 +77,7 @@ module.exports = class BrickLayouter
 
 			if !@anyDefined(mergeableNeighbours)
 				numRandomChoicesWithoutMerge++
-				if numRandomChoicesWithoutMerge > maxNumRandomChoicesWithoutMerge
+				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					console.log "randomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
 					break # done with initial layout

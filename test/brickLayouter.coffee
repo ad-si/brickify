@@ -97,3 +97,23 @@ describe 'brickLayouter', ->
 		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][1])
 		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][3])
 		done()
+
+	it 'should choose the better brick', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 3
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 2
+		grid.setVoxel {x: 0, y: 0, z: 0}
+		grid.setVoxel {x: 1, y: 0, z: 0}
+		grid.setVoxel {x: 2, y: 0, z: 0}
+		grid.setVoxel {x: 2, y: 0, z: 1}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid)
+
+		brick = bricks[0][1]
+		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		mergeDirection = brickLayouter.chooseNeighboursToMergeWith brick,
+			mergeableNeighbours
+		console.log bricks[0][2]
+		#expect(mergeableNeighbours[mergeDirection]).to.equal(bricks[0][2])
+		done()

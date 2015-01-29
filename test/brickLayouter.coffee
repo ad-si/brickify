@@ -98,6 +98,41 @@ describe 'brickLayouter', ->
 		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][3])
 		done()
 
+	it 'should make the right brick connections', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 1
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 1
+		grid.setVoxel {x: 0, y: 0, z: 0}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		connectedBricks = bricks[0][0].uniqueConnectedBricks()
+		expect(connectedBricks).to.have.length(0)
+
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 1
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 2
+		grid.setVoxel {x: 0, y: 0, z: 0}
+		grid.setVoxel {x: 0, y: 0, z: 1}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		connectedBricks = bricks[0][0].uniqueConnectedBricks()
+		expect(connectedBricks).to.have.length(1)
+
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 1
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 3
+		grid.setVoxel {x: 0, y: 0, z: 0}
+		grid.setVoxel {x: 0, y: 0, z: 1}
+		grid.setVoxel {x: 0, y: 0, z: 2}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		connectedBricks = bricks[1][0].uniqueConnectedBricks()
+		expect(connectedBricks).to.have.length(2)
+		done()
+
 	it 'should choose the better brick 10 out of 10 times', (done) ->
 		grid = new Grid(baseBrick)
 		grid.numVoxelsX = 3
@@ -113,7 +148,7 @@ describe 'brickLayouter', ->
 		brick = bricks[0][1]
 		for num in [1..10]
 			mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
-			mergeDirection = brickLayouter.chooseNeighboursToMergeWith brick,
-				mergeableNeighbours
+			mergeDirection =
+				brickLayouter.chooseNeighboursToMergeWith mergeableNeighbours
 			expect(mergeableNeighbours[mergeDirection][0]).to.equal(bricks[0][2])
 		done()

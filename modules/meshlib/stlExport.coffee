@@ -31,7 +31,7 @@ toAsciiStl = (model) ->
 	new Blob [stl], {type: 'text/plain;charset=utf-8'}
 
 
-toBinaryStl: (model) ->
+toBinaryStl = (model) ->
 	{faceNormals, indices, positions} = model
 
 	# Length in byte
@@ -77,10 +77,16 @@ toBinaryStl: (model) ->
 
 saveAsBinaryStl = (model) =>
 
-	saveAs @toBinaryStl(model), model.fileName
+	saveAs toBinaryStl(model), model.fileName
 
 
 saveAsAsciiStl = (model) =>
 
-	saveAs @toAsciiStl(model), model.fileName
+	saveAs toAsciiStl(model), model.fileName
 
+
+module.exports =
+	toAsciiStl: toAsciiStl
+	toBinaryStl: toBinaryStl
+	saveAsBinaryStl: saveAsBinaryStl
+	saveAsAsciiStl: saveAsAsciiStl

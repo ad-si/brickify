@@ -28,6 +28,7 @@ meshlib.meshData = () ->
 
 meshlib.model = (newModel) ->
 	model = newModel
+	return meshlib
 
 meshlib.optimize = () ->
 	# TODO: fix
@@ -40,14 +41,10 @@ meshlib.export = (options, callback) ->
 	options.encoding ?= 'binary'
 
 	if options.format is 'stl'
-		try
-			stl = new Stl toArrayBuffer importFileBuffer
-			if options.encoding is 'ascii'
-				stlFile = stlExport.toAsciiStl stl.model()
-			else
-				stlFile = stlExport.toBinaryStl stl.model()
-		catch error
-			return callback error
+		if options.encoding is 'ascii'
+			stlFile = stlExport.toAsciiStl model
+		else
+			stlFile = stlExport.toBinaryStl model
 
 		callback(null, stlFile)
 	else

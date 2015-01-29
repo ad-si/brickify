@@ -5,15 +5,20 @@ module.exports = class UiToolbar
 		@_toolbarContainer = $('#toolbar')
 		@_createBrushList()
 
-	handleClick: (event) =>
+	handleMouseDown: (event) =>
 		if @_selectedBrush
-			if @_selectedBrush.clickCallback?
-				@_selectedBrush.clickCallback(event)
+			if @_selectedBrush.mouseDownCallback?
+				@_selectedBrush.mouseDownCallback(event)
 
-	handleMove: (event) =>
+	handleMouseMove: (event) =>
 		if @_selectedBrush
-			if @_selectedBrush.moveCallback?
-				@_selectedBrush.moveCallback(event)
+			if @_selectedBrush.mouseMoveCallback?
+				@_selectedBrush.mouseMoveCallback(event)
+
+	handleMouseUp: (event) =>
+		if @_selectedBrush
+			if @_selectedBrush.mouseUpCallback?
+				@_selectedBrush.mouseUpCallback(event)
 
 	hasBrushSelected: () =>
 		return true if  @_selectedBrush?

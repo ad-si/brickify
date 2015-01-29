@@ -34,12 +34,15 @@ module.exports = class Ui
 		for onClickHandler in @pluginHooks.get 'onClick'
 			onClickHandler(event)
 
-		@toolbar.handleClick event
+		@toolbar.handleMouseDown event
 
 	mouseUpHandler: (event) =>
 		event.preventDefault()
 
 		@_mouseIsDown = false
+
+		if @toolbar.hasBrushSelected()
+			@toolbar.handleMouseUp event
 
 	mouseMoveHandler: (event) =>
 		event.preventDefault()
@@ -47,7 +50,7 @@ module.exports = class Ui
 		if @_mouseIsDown
 			if @toolbar.hasBrushSelected()
 				event.stopPropagation()
-				@toolbar.handleMove event
+				@toolbar.handleMouseMove event
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.

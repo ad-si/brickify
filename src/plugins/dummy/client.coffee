@@ -147,8 +147,9 @@ module.exports = class DummyPlugin
 		return [{
 			text: 'dummy-brush'
 			icon: 'move'
-			clickCallback: -> console.log 'dummy-brush modifies scene (click)'
-			moveCallback: -> console.log 'dumy-brush modifies scene (move)'
+			mouseDownCallback: -> console.log 'dummy-brush modifies scene (mosue down)'
+			mouseMoveCallback: -> console.log 'dumy-brush modifies scene (move)'
+			mouseUpCallback: -> console.log 'dummy-brush modifies scene (mosue up)'
 			selectCallback: -> console.log 'dummy-brush was selected'
 			deselectCallback: -> console.log 'dummy-brush was deselected'
 		}]

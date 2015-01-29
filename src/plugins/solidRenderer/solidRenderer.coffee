@@ -47,7 +47,7 @@ module.exports = class SolidRenderer
 				@_copyTransformDataToThree node, threeObject
 				return Promise.resolve()
 		else
-			@_createPluginData node
+			node.pluginData.solidRenderer = {}
 			return @loadModelFromCache node, node.pluginData.solidRenderer, false
 
 
@@ -111,7 +111,9 @@ module.exports = class SolidRenderer
 		return [{
 			text: 'move'
 			icon: 'move'
-			moveCallback: @_handleMove
+			mouseDownCallback: @_handleMouseDown
+			mouseMoveCallback: @_handleMouseMove
+			mouseUpCallback: @_handleMouseUp
 		}]
 
 	_getThreeObjectByName: (name) =>
@@ -120,30 +122,45 @@ module.exports = class SolidRenderer
 				return obj
 		return null
 
-	_handleMove: (event) =>
+	_handleMouseDown: (event) =>
+		#console.log "Mouse down"
 		selectedNode = @bundle.ui.selection.selectedNode
 		if not selectedNode?
 			return
-		@_createPluginData selectedNode
+
+		@mouseStartPosition = @_getGridXY event.clientX, event.clientY
+		console.log @mouseStartPosition
+
+		@originalObjectPosition = selectedNode.positionData.position
+
+	_handleMouseUp: (event) =>
+		#console.log "Mouse up"
+		@mouseStartPosition = null
+		return
+
+	_handleMouseMove: (event) =>
+		#console.log "Mouse move"
+		selectedNode = @bundle.ui.selection.selectedNode
+		if not selectedNode?
+			return
 		pld = selectedNode.pluginData.solidRenderer
 
-		posNew = @_getGridXY event.clientX, event.clientY
-		if not pld.oldPosition?
-			pld.oldPosition = posNew
-			return
-				
+		mouseCurrent = @_getGridXY event.clientX, event.clientY
 		delta = {
-			x: posNew.x - pld.oldPosition.x
-			y: posNew.y - pld.oldPosition.y
+			x: mouseCurrent.x - @mouseStartPosition.x
+			y: mouseCurrent.y - @mouseStartPosition.y
 		}
-		pld.oldPosition = posNew
+		#console.log delta
 
-		pld.realPosition.x += delta.x
-		pld.realPosition.y += delta.y
+		newPosition = {
+			x: @originalObjectPosition.x + delta.x
+			y: @originalObjectPosition.y + delta.y
+		}
 
-		rasterPos = @_rasterizeVector pld.realPosition
-		selectedNode.positionData.position.x = rasterPos.x
-		selectedNode.positionData.position.y = rasterPos.y
+		rasterPos = @_rasterizeVector newPosition
+
+		selectedNode.positionData.position.x = mouseCurrent.x
+		selectedNode.positionData.position.y = mouseCurrent.y
 		
 		###
 		updateCallback = (state) =>
@@ -157,17 +174,7 @@ module.exports = class SolidRenderer
 		@_copyTransformDataToThree selectedNode, threeObject
 
 		#console.log "Mouse moved in 3d: x:#{delta.x}, y:#{delta.y}"
-		console.log "Set raster position to #{rasterPos.x}, #{rasterPos.y}"
-
-	_createPluginData: (node) ->
-		if not node.pluginData.solidRenderer?
-			node.pluginData.solidRenderer = {
-				realPosition: {
-					x: node.positionData.position.x
-					y: node.positionData.position.y
-					z: node.positionData.position.z
-				}
-			}
+		#console.log "Set raster position to #{rasterPos.x}, #{rasterPos.y}"
 
 	_getGridXY: (screenX, screenY) =>
 		# calculates the position on the z=0 plane in 3d space
@@ -176,13 +183,25 @@ module.exports = class SolidRenderer
 		camera = @bundle.renderer.getCamera()
 		vector = new THREE.Vector3()
 		relativeX = (screenX / window.innerWidth) * 2 - 1
-		relativeY = -(screenY / window.innerHeight) * 2 + 1
+		relativeY = (-screenY / window.innerHeight) * 2 + 1
 		vector.set relativeX, relativeY, 0.5
 		vector.unproject camera
 		
 		dir = vector.sub( camera.position ).normalize()
 		distance = -camera.position.z / dir.z
 		pos = camera.position.clone().add( dir.multiplyScalar( distance ) )
+
+		console.log ''
+		console.log "-> Screen:      #{relativeX.toFixed(3)},
+			#{relativeY.toFixed(3)}, 0.500"
+
+		console.log "-> Unprojected: #{vector.x.toFixed(3)},
+			#{vector.y.toFixed(3)}, #{vector.z.toFixed(3)}"
+			
+		console.log "-> Position:    #{pos.x.toFixed(3)},
+			#{pos.y.toFixed(3)}, #{pos.z.toFixed(3)}"
+
+		return pos
 
 	_rasterizeVector: (vector, raster = 2) =>
 		vector.x = @_rasterize vector.x, raster

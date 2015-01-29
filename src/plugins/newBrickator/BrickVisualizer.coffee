@@ -32,7 +32,7 @@ module.exports = class BrickVisualizer
 	_createBrickGeometry: (gridSpacing, brickSize) =>
 		brickSizeX = gridSpacing.x * brickSize.x
 		brickSizeY = gridSpacing.y * brickSize.y
-		# currently, the layouter only supports platees with h=1
+		# currently, the layouter only supports plates with h=1
 		brickSizeZ = gridSpacing.z * 1.0
 
 		brickGeometry = new THREE.BoxGeometry(

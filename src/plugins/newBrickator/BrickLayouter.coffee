@@ -67,7 +67,7 @@ module.exports = class BrickLayouter
 	layoutByGreedyMerge: (bricks) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
-		maxNumRandomChoicesWithoutMerge = 100
+		maxNumRandomChoicesWithoutMerge = 2000
 
 		while(true) #only for debugging, should be while true
 			brick = @chooseRandomBrick bricks
@@ -88,8 +88,7 @@ module.exports = class BrickLayouter
 				mergeIndex = @chooseNeighboursToMergeWith mergeableNeighbours
 				brick = @mergeBricksAndUpdateGraphConnections brick,
 					mergeableNeighbours, mergeIndex, bricks
-				mergeableNeighbours = [] #@findMergeableNeighbours brick
-				console.log @anyDefined mergeableNeighbours
+				mergeableNeighbours = @findMergeableNeighbours brick
 
 		return {bricks: bricks}
 
@@ -226,27 +225,26 @@ module.exports = class BrickLayouter
 
 		# setting new neighbours
 		ids = @neighbourMergeIndices(mergeIndex)
-		###
-		newBrick.neighbours[ids.opposite] = brick.neighbours[ids.opposite]
-		newBrick.neighbours[ids.sides[0]] = brick.neighbours[ids.sides[0]]
-		newBrick.neighbours[ids.sides[1]] = brick.neighbours[ids.sides[1]]
-		console.log newBrick.neighbours
+		@updateNeighbours newBrick, brick, ids.opposite, mergeIndex
+		@updateNeighbours newBrick, brick, ids.sides[0], ids.sides[1]
+		@updateNeighbours newBrick, brick, ids.sides[1], ids.sides[0]
 		for mergeBrick in mergeNeighbours
-			newBrick.neighbours[ids.sides[0]].push mergeBrick.neighbours[ids.sides[0]]
-			newBrick.neighbours[ids.sides[1]].push mergeBrick.neighbours[ids.sides[1]]
-			newBrick.neighbours[mergeIndex].push mergeBrick.neighbours[mergeIndex]
-		###
+			@updateNeighbours newBrick, mergeBrick, mergeIndex, ids.opposite
+			@updateNeighbours newBrick, mergeBrick, ids.sides[0], ids.sides[1]
+			@updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0]
 
 		# set new brick connections
 		# tbd
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z
-		bricks[z] = (x for x in bricks[z] when x != brick)
+		@removeFirstOccurenceFromArray brick, bricks[z]
 		for neighbour in mergeNeighbours
-			bricks[z] = (x for x in bricks[z] when x != neighbour)
+			@removeFirstOccurenceFromArray neighbour, bricks[z]
+
 		# add newBrick to bricks array
 		bricks[z].push newBrick
+
 		###
 		console.log 'MERGE'
 		console.log mergeIndex
@@ -257,6 +255,13 @@ module.exports = class BrickLayouter
 		return newBrick
 
 	findWeakArticulationPointsInGraph: (bricks) =>
+		return
+
+	updateNeighbours: (newBrick, oldBrick, dir, opp) =>
+		for neighbour in oldBrick.neighbours[dir]
+			newBrick.neighbours[dir].push neighbour
+			@removeFirstOccurenceFromArray oldBrick, neighbour.neighbours[opp]
+			neighbour.neighbours[opp].push newBrick
 		return
 
 	neighbourMergeIndices: (mergeIndex) =>
@@ -274,6 +279,12 @@ module.exports = class BrickLayouter
 			sides = [0, 1]
 		return {opposite: opposite, sides: sides}
 
+	removeFirstOccurenceFromArray: (object, array) =>
+		i = array.indexOf object
+		if i != -1
+			array.splice i, 1
+		return
+
 	# helper method, to be moved somewhere more appropriate
 	removeDuplicates = (array) ->
 		a = array.concat()
@@ -286,4 +297,3 @@ module.exports = class BrickLayouter
 				++j
 			++i
 		return a
-

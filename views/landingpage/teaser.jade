@@ -1,10 +1,10 @@
 .teaserBackground
-	p#educator-link.text-right
+	p#educator-link.text-right.usergroup-link
 		a.text-right(href='/edu').
 			for educators #[span.glyphicon.glyphicon-arrow-right]
 	.container
 		.row
-			.col-lg-8(style='margin-top:8em')
+			.col-lg-8.pitch
 				h1
 					strong Brickolage
 				h2 Unleash your creativity
@@ -12,7 +12,7 @@
 					Take LEGO#[sup &reg;] to the next level and add custom
 					3D-printed parts or convert whole 3D models into building
 					blocks!
+				#buttonContainer
+					a#dropzone.btn.btn-primary(style='width:25em; height:5em;padding-top:1.2em;margin-bottom: 1em')
+						b#droptext(style='color:white; font-size: 1.5em;') Drop a .stl file to start!
 			#makey.col-lg-4
-	.container#buttonContainer
-		a#dropzone.btn.btn-primary(style='width:25em; height:5em;padding-top:1.2em;margin-bottom: 1em')
-			b#droptext(style='color:white; font-size: 1.5em;') Drop a .stl file to start!

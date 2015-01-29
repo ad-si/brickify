@@ -1,0 +1,16 @@
+extends ../rootLayout
+
+block styles
+	link(rel='stylesheet', href='/styles/screen.css')
+
+block body
+	include educationteaser
+
+	include quickconvert
+
+	include footer
+
+block scripts
+	script(src='/node_modules/jquery/dist/jquery.js')
+	script(src='/node_modules/bootstrap/dist/js/bootstrap.js')
+	script(src='landingpage.js')

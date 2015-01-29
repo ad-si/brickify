@@ -25,7 +25,6 @@ describe 'brickLayouter', ->
 		done()
 
 	it 'should choose random brick', (done) ->
-		#this.timeout(10)
 		grid = new Grid(baseBrick)
 		grid.numVoxelsX = 1
 		grid.numVoxelsY = 1
@@ -76,7 +75,6 @@ describe 'brickLayouter', ->
 		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
 		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][0])
 		done()
-
 
 	it 'should find mergeable neighbour bricks in all directions', (done) ->
 		grid = new Grid(baseBrick)
@@ -170,6 +168,8 @@ describe 'brickLayouter', ->
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 2, y: 1, z: 1})
 		expect(bricks).to.eql([[brick3, newBrick]])
+		expect(newBrick.neighbours[3]).to.eql([brick3])
+		expect(brick3.neighbours[2]).to.eql([newBrick])
 
 		bricks = [[brick1, brick2, brick3]]
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
@@ -181,7 +181,8 @@ describe 'brickLayouter', ->
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 2, y: 1, z: 1})
 		expect(bricks).to.eql([[brick3, newBrick]])
-
+		expect(newBrick.neighbours[3]).to.eql([brick3])
+		expect(brick3.neighbours[2]).to.eql([newBrick])
 
 		bricks = [[brick1, brick2, brick3]]
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
@@ -193,7 +194,8 @@ describe 'brickLayouter', ->
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
 		expect(bricks).to.eql([[brick2, newBrick]])
-
+		expect(newBrick.neighbours[1]).to.eql([brick2])
+		expect(brick2.neighbours[0]).to.eql([newBrick])
 
 		bricks = [[brick1, brick2, brick3]]
 		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
@@ -205,6 +207,53 @@ describe 'brickLayouter', ->
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
 		expect(bricks).to.eql([[brick2, newBrick]])
+		expect(newBrick.neighbours[1]).to.eql([brick2])
+		expect(brick2.neighbours[0]).to.eql([newBrick])
 
+		done()
 
+	it 'should not merge a single voxel', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 10
+		grid.numVoxelsY = 10
+		grid.numVoxelsZ = 1
+		grid.setVoxel {x: 5, y: 5, z: 0}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
+		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
+		expect(bricksObject.bricks[0][0].size).to.eql({x: 1, y: 1, z: 1})
+		done()
+
+	it 'should merge two bricks 2x1', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 10
+		grid.numVoxelsY = 10
+		grid.numVoxelsZ = 1
+		grid.setVoxel {x: 5, y: 5, z: 0}
+		grid.setVoxel {x: 5, y: 6, z: 0}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
+		expect(bricksObject.bricks[0]).to.have.length(1)
+		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
+		expect(bricksObject.bricks[0][0].size).to.eql({x: 1, y: 2, z: 1})
+		done()
+
+	it 'should merge four bricks', (done) ->
+		grid = new Grid(baseBrick)
+		grid.numVoxelsX = 10
+		grid.numVoxelsY = 10
+		grid.numVoxelsZ = 1
+		grid.setVoxel {x: 5, y: 5, z: 0}
+		grid.setVoxel {x: 5, y: 6, z: 0}
+		grid.setVoxel {x: 6, y: 5, z: 0}
+		grid.setVoxel {x: 6, y: 6, z: 0}
+		brickLayouter = new BrickLayouter()
+		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
+		console.log bricksObject.bricks[0][0]
+		expect(bricksObject.bricks[0]).to.have.length(1)
+		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
+		expect(bricksObject.bricks[0][0].size).to.eql({x: 2, y: 2, z: 1})
 		done()

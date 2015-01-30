@@ -70,8 +70,9 @@ module.exports = class BrickLayouter
 	layoutByGreedyMerge: (bricks) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
-		lastLayer = bricks[bricks.length - 1]
-		numTotalInitialBricks = lastLayer[lastLayer.length - 1].id
+		numTotalInitialBricks = 0
+		for layer in bricks
+			numTotalInitialBricks += layer.length
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks / 2
 
 		while(true) #only for debugging, should be while true

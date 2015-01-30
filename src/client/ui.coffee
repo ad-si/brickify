@@ -11,7 +11,7 @@ module.exports = class Ui
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
 		@selection = new UiSelection(@bundle)
-		@toolbar = new UiToolbar(@bundle)
+		@toolbar = new UiToolbar(@bundle, @selection)
 		@_init()
 
 	dropHandler: (event) ->

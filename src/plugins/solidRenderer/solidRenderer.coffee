@@ -122,9 +122,7 @@ module.exports = class SolidRenderer
 				return obj
 		return null
 
-	_handleMouseDown: (event) =>
-		#console.log "Mouse down"
-		selectedNode = @bundle.ui.selection.selectedNode
+	_handleMouseDown: (event, selectedNode) =>
 		if not selectedNode?
 			return
 
@@ -132,14 +130,11 @@ module.exports = class SolidRenderer
 
 		@originalObjectPosition = selectedNode.positionData.position
 
-	_handleMouseUp: (event) =>
-		#console.log "Mouse up"
+	_handleMouseUp: (event, selectedNode) =>
 		@mouseStartPosition = null
 		return
 
-	_handleMouseMove: (event) =>
-		#console.log "Mouse move"
-		selectedNode = @bundle.ui.selection.selectedNode
+	_handleMouseMove: (event, selectedNode) =>
 		if not selectedNode?
 			return
 		pld = selectedNode.pluginData.solidRenderer

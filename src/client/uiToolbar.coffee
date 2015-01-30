@@ -1,24 +1,24 @@
 $ = require 'jquery'
 
 module.exports = class UiToolbar
-	constructor: (@bundle) ->
+	constructor: (@bundle, @selection) ->
 		@_toolbarContainer = $('#toolbar')
 		@_createBrushList()
 
 	handleMouseDown: (event) =>
 		if @_selectedBrush
 			if @_selectedBrush.mouseDownCallback?
-				@_selectedBrush.mouseDownCallback(event)
+				@_selectedBrush.mouseDownCallback event, @selection.selectedNode
 
 	handleMouseMove: (event) =>
 		if @_selectedBrush
 			if @_selectedBrush.mouseMoveCallback?
-				@_selectedBrush.mouseMoveCallback(event)
+				@_selectedBrush.mouseMoveCallback event, @selection.selectedNode
 
 	handleMouseUp: (event) =>
 		if @_selectedBrush
 			if @_selectedBrush.mouseUpCallback?
-				@_selectedBrush.mouseUpCallback(event)
+				@_selectedBrush.mouseUpCallback event, @selection.selectedNode
 
 	hasBrushSelected: () =>
 		return true if  @_selectedBrush?
@@ -49,7 +49,7 @@ module.exports = class UiToolbar
 	_handleBrushClicked: (brush, jqueryElement) =>
 		if @_selectedBrush?
 			if @_selectedBrush.deselectCallback?
-				@_selectedBrush.deselectCallback()
+				@_selectedBrush.deselectCallback @selection.selectedNode
 
 			@_selectedBrush.jqueryElement.removeClass 'brushselect'
 
@@ -61,6 +61,6 @@ module.exports = class UiToolbar
 		@_selectedBrush = brush
 		
 		if @_selectedBrush.selectCallback?
-			@_selectedBrush.selectCallback()
+			@_selectedBrush.selectCallback @selection.selectedNode
 
 		@_selectedBrush.jqueryElement.addClass 'brushselect'

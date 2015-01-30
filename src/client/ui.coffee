@@ -8,8 +8,8 @@ UiToolbar = require './UiToolbar'
 
 module.exports = class Ui
 	constructor: (@bundle) ->
-		@renderer = bundle.renderer
-		@pluginHooks = bundle.pluginHooks
+		@renderer = @bundle.renderer
+		@pluginHooks = @bundle.pluginHooks
 		@selection = new UiSelection(@bundle)
 		@toolbar = new UiToolbar(@bundle)
 		@_init()

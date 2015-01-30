@@ -129,7 +129,6 @@ module.exports = class SolidRenderer
 			return
 
 		@mouseStartPosition = @_getGridXY event.clientX, event.clientY
-		console.log @mouseStartPosition
 
 		@originalObjectPosition = selectedNode.positionData.position
 
@@ -180,26 +179,28 @@ module.exports = class SolidRenderer
 		# calculates the position on the z=0 plane in 3d space
 		# from given screen (mouse) coordinates
 		# see http://stackoverflow.com/questions/13055214/
+		canvas = @bundle.renderer.threeRenderer.context.canvas
+
 		camera = @bundle.renderer.getCamera()
 		vector = new THREE.Vector3()
-		relativeX = (screenX / window.innerWidth) * 2 - 1
-		relativeY = (-screenY / window.innerHeight) * 2 + 1
-		vector.set relativeX, relativeY, 0.5
+		relativeX = (screenX / canvas.width) * 2 - 1
+		relativeY = (-screenY / canvas.height) * 2 + 1
+		vector.set relativeX, relativeY, 0.9
 		vector.unproject camera
 		
+		console.log ''
+		console.log "-> Screen:      #{relativeX.toFixed(2)},
+			#{relativeY.toFixed(2)}, 0.500"
+
+		console.log "-> Unprojected: #{vector.x.toFixed(2)},
+			#{vector.y.toFixed(2)}, #{vector.z.toFixed(2)}"
+
 		dir = vector.sub( camera.position ).normalize()
 		distance = -camera.position.z / dir.z
 		pos = camera.position.clone().add( dir.multiplyScalar( distance ) )
 
-		console.log ''
-		console.log "-> Screen:      #{relativeX.toFixed(3)},
-			#{relativeY.toFixed(3)}, 0.500"
-
-		console.log "-> Unprojected: #{vector.x.toFixed(3)},
-			#{vector.y.toFixed(3)}, #{vector.z.toFixed(3)}"
-			
-		console.log "-> Position:    #{pos.x.toFixed(3)},
-			#{pos.y.toFixed(3)}, #{pos.z.toFixed(3)}"
+		console.log "-> Position:    #{pos.x.toFixed(2)},
+			#{pos.y.toFixed(2)}, #{pos.z.toFixed(2)}"
 
 		return pos
 

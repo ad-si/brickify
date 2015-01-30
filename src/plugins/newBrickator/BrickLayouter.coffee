@@ -13,6 +13,7 @@ module.exports = class BrickLayouter
 
 	initializeBrickGraph: (grid) =>
 		bricks = []
+		@nextBrickIndex = 0
 		for z in [0..grid.numVoxelsZ - 1] by 1
 			bricks[z] = []
 
@@ -31,9 +32,9 @@ module.exports = class BrickLayouter
 							brick.id = @nextBrickIdx()
 							grid.zLayers[z][x][y].brick = brick
 
-							@connectToBrickBelow brick, x,y,z, grid
-							@connectToBrickXm brick, x,y,z, grid
-							@connectToBrickYm brick, x,y,z, grid
+							@_connectToBrickBelow brick, x,y,z, grid
+							@_connectToBrickXm brick, x,y,z, grid
+							@_connectToBrickYm brick, x,y,z, grid
 
 							bricks[z].push brick
 
@@ -67,7 +68,7 @@ module.exports = class BrickLayouter
 		# console.log bricks
 		return {bricks: bricks}
 
-	connectToBrickBelow: (brick, x, y, z, grid) =>
+	_connectToBrickBelow: (brick, x, y, z, grid) =>
 		if z > 0 and grid.zLayers[z - 1]?[x]?[y]? and
 		grid.zLayers[z - 1][x][y] != false
 			brickBelow = grid.zLayers[z - 1][x][y].brick
@@ -75,14 +76,14 @@ module.exports = class BrickLayouter
 			brickBelow.upperSlots[0][0] = brick
 		return
 
-	connectToBrickXm: (brick, x, y, z, grid) =>
+	_connectToBrickXm: (brick, x, y, z, grid) =>
 		if x > 0 and grid.zLayers[z]?[x - 1]?[y]? and
 		grid.zLayers[z][x - 1][y] != false
 			brick.neighbours[0] = [grid.zLayers[z][x - 1][y].brick]
 			grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
 		return
 
-	connectToBrickYm: (brick, x, y, z, grid) =>
+	_connectToBrickYm: (brick, x, y, z, grid) =>
 		if y > 0 and grid.zLayers[z]?[x]?[y - 1]? and
 		grid.zLayers[z][x][y - 1] != false
 			brick.neighbours[2] = [grid.zLayers[z][x][y - 1].brick]
@@ -96,66 +97,68 @@ module.exports = class BrickLayouter
 	layoutByGreedyMerge: (bricks) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
-		maxNumRandomChoicesWithoutMerge = 2000
+		lastLayer = bricks[bricks.length - 1]
+		numTotalInitialBricks = lastLayer[lastLayer.length - 1].id
+		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks / 2
 
 		while(true) #only for debugging, should be while true
-			brick = @chooseRandomBrick bricks
+			brick = @_chooseRandomBrick bricks
 			numRandomChoices++
 			#console.log numRandomChoices
-			mergeableNeighbours = @findMergeableNeighbours brick
+			mergeableNeighbours = @_findMergeableNeighbours brick
 
-			if !@anyDefined(mergeableNeighbours)
+			if !@_anyDefined(mergeableNeighbours)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
-					console.log "randomChoices #{numRandomChoices}
+					console.log " - randomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
 					break # done with initial layout
 				else
 					continue # randomly choose a new brick
 
-			while(@anyDefined(mergeableNeighbours))
-				mergeIndex = @chooseNeighboursToMergeWith mergeableNeighbours
-				brick = @mergeBricksAndUpdateGraphConnections brick,
+			while(@_anyDefined(mergeableNeighbours))
+				mergeIndex = @_chooseNeighboursToMergeWith mergeableNeighbours
+				brick = @_mergeBricksAndUpdateGraphConnections brick,
 					mergeableNeighbours, mergeIndex, bricks
-				mergeableNeighbours = @findMergeableNeighbours brick
+				mergeableNeighbours = @_findMergeableNeighbours brick
 
 		return {bricks: bricks}
 
-	anyDefined: (mergeableNeighbours) =>
+	_anyDefined: (mergeableNeighbours) =>
 		boolean = false
 		for neighbours in mergeableNeighbours
 			boolean = boolean or neighbours?
 		return boolean
 
-	chooseRandomBrick: (bricks) =>
+	_chooseRandomBrick: (bricks) =>
 		brickLayer = bricks[Math.floor(Math.random() * bricks.length)]
 		while brickLayer.length is 0 # if a layer has no bricks, retry
 			brickLayer = bricks[Math.floor(Math.random() * bricks.length)]
 		brick = brickLayer[Math.floor(Math.random() * brickLayer.length)]
 		return brick
 
-	findMergeableNeighbours: (brick) =>
+	_findMergeableNeighbours: (brick) =>
 		mergeableNeighbours = []
 
-		mergeableNeighbours.push @findMergeableNeighboursInDirection(
+		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
 			0
 			(obj) -> return obj.y
 			(obj) -> return obj.x
 		)
-		mergeableNeighbours.push @findMergeableNeighboursInDirection(
+		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
 			1
 			(obj) -> return obj.y
 			(obj) -> return obj.x
 		)
-		mergeableNeighbours.push @findMergeableNeighboursInDirection(
+		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
 			2
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
-		mergeableNeighbours.push @findMergeableNeighboursInDirection(
+		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
 			3
 			(obj) -> return obj.x
@@ -164,7 +167,7 @@ module.exports = class BrickLayouter
 
 		return mergeableNeighbours
 
-	findMergeableNeighboursInDirection: (brick, dir, widthFn, lengthFn) =>
+	_findMergeableNeighboursInDirection: (brick, dir, widthFn, lengthFn) =>
 		if brick.neighbours[dir].length > 0
 			width = 0
 			for neighbour in brick.neighbours[dir]
@@ -186,7 +189,7 @@ module.exports = class BrickLayouter
 					return brick.neighbours[dir]
 
 
-	chooseNeighboursToMergeWith: (mergeableNeighbours) =>
+	_chooseNeighboursToMergeWith: (mergeableNeighbours) =>
 		numConnections = []
 		for neighbours, i in mergeableNeighbours
 			connectedBricks = []
@@ -209,7 +212,7 @@ module.exports = class BrickLayouter
 			largestIndices.length)]
 		return randomOfLargestIndices
 
-	mergeBricksAndUpdateGraphConnections: (
+	_mergeBricksAndUpdateGraphConnections: (
 		brick, mergeableNeighbours, mergeIndex, bricks ) =>
 		mergeNeighbours = mergeableNeighbours[mergeIndex]
 
@@ -254,25 +257,25 @@ module.exports = class BrickLayouter
 		newBrick.id = @nextBrickIdx()
 
 		# setting new neighbours
-		ids = @neighbourMergeIndices(mergeIndex)
-		oldBricks = mergeNeighbours.concat [brick, newBrick]
+		ids = @_neighbourMergeIndices(mergeIndex)
+		old = mergeNeighbours.concat [brick, newBrick]
 
-		@updateNeighbours newBrick, brick, ids.opposite, mergeIndex, oldBricks
-		@updateNeighbours newBrick, brick, ids.sides[0], ids.sides[1], oldBricks
-		@updateNeighbours newBrick, brick, ids.sides[1], ids.sides[0], oldBricks
+		@_updateNeighbours newBrick, brick, ids.opposite, mergeIndex, old
+		@_updateNeighbours newBrick, brick, ids.sides[0], ids.sides[1], old
+		@_updateNeighbours newBrick, brick, ids.sides[1], ids.sides[0], old
 		for mergeBrick in mergeNeighbours
-			@updateNeighbours newBrick, mergeBrick, mergeIndex, ids.opposite, oldBricks
-			@updateNeighbours newBrick, mergeBrick, ids.sides[0], ids.sides[1], oldBricks
-			@updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0], oldBricks
+			@_updateNeighbours newBrick, mergeBrick, mergeIndex, ids.opposite, old
+			@_updateNeighbours newBrick, mergeBrick, ids.sides[0], ids.sides[1], old
+			@_updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0], old
 
 		# set new brick connections
 		# tbd
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z
-		@removeFirstOccurenceFromArray brick, bricks[z]
+		@_removeFirstOccurenceFromArray brick, bricks[z]
 		for neighbour in mergeNeighbours
-			@removeFirstOccurenceFromArray neighbour, bricks[z]
+			@_removeFirstOccurenceFromArray neighbour, bricks[z]
 
 		# add newBrick to bricks array
 		bricks[z].push newBrick
@@ -286,19 +289,19 @@ module.exports = class BrickLayouter
 		###
 		return newBrick
 
-	findWeakArticulationPointsInGraph: (bricks) =>
+	_findWeakArticulationPointsInGraph: (bricks) =>
 		return
 
-	updateNeighbours: (newBrick, oldBrick, dir, opp, oldBricks) =>
+	_updateNeighbours: (newBrick, oldBrick, dir, opp, oldBricks) =>
 		for neighbour in oldBrick.neighbours[dir]
 			if neighbour not in oldBricks
 				if neighbour.id < newBrick.id
 					newBrick.neighbours[dir].push neighbour
 					neighbour.neighbours[opp].push newBrick
-			@removeFirstOccurenceFromArray oldBrick, neighbour.neighbours[opp]
+			@_removeFirstOccurenceFromArray oldBrick, neighbour.neighbours[opp]
 		return
 
-	neighbourMergeIndices: (mergeIndex) =>
+	_neighbourMergeIndices: (mergeIndex) =>
 		if mergeIndex == 0
 			opposite = 1
 			sides = [2, 3]
@@ -313,7 +316,7 @@ module.exports = class BrickLayouter
 			sides = [0, 1]
 		return {opposite: opposite, sides: sides}
 
-	removeFirstOccurenceFromArray: (object, array) =>
+	_removeFirstOccurenceFromArray: (object, array) =>
 		i = array.indexOf object
 		if i != -1
 			array.splice i, 1

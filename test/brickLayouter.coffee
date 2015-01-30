@@ -32,7 +32,7 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		brickLayouter = new BrickLayouter()
 		bricks = brickLayouter.initializeBrickGraph(grid).bricks
-		brick = brickLayouter.chooseRandomBrick(bricks)
+		brick = brickLayouter._chooseRandomBrick(bricks)
 		expect(brick.position.x).to.equal(0)
 		expect(brick.position.y).to.equal(0)
 		expect(brick.position.z).to.equal(0)
@@ -49,11 +49,11 @@ describe 'brickLayouter', ->
 		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][0]
-		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
 		expect(mergeableNeighbours[1][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
-		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
 		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
 		done()
 
@@ -68,11 +68,11 @@ describe 'brickLayouter', ->
 		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][0]
-		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
 		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
-		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
 		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][0])
 		done()
 
@@ -90,7 +90,7 @@ describe 'brickLayouter', ->
 		bricks = brickLayouter.initializeBrickGraph(grid).bricks
 
 		brick = bricks[0][2]
-		mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
 		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
 		expect(mergeableNeighbours[1][0]).to.equal(bricks[0][4])
 		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][1])
@@ -146,9 +146,9 @@ describe 'brickLayouter', ->
 
 		brick = bricks[0][1]
 		for num in [1..10]
-			mergeableNeighbours = brickLayouter.findMergeableNeighbours brick, bricks
+			mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
 			mergeDirection =
-				brickLayouter.chooseNeighboursToMergeWith mergeableNeighbours
+				brickLayouter._chooseNeighboursToMergeWith mergeableNeighbours
 			expect(mergeableNeighbours[mergeDirection][0]).to.equal(bricks[0][2])
 		done()
 
@@ -171,7 +171,7 @@ describe 'brickLayouter', ->
 		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
 
-		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
 			brick2
 			[[brick1], [], [], []]
 			0
@@ -196,7 +196,7 @@ describe 'brickLayouter', ->
 		brick3.neighbours[2] = [brick1]
 		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
-		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
 			brick1
 			[[], [brick2], [], []]
 			1
@@ -221,7 +221,7 @@ describe 'brickLayouter', ->
 		brick3.neighbours[2] = [brick1]
 		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
-		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
 			brick3
 			[[], [], [brick1], []]
 			2
@@ -246,7 +246,7 @@ describe 'brickLayouter', ->
 		brick3.neighbours[2] = [brick1]
 		brick3.neighbours[3] = []
 		bricks = [[brick1, brick2, brick3]]
-		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
 			brick1
 			[[], [], [], [brick3]]
 			3
@@ -299,7 +299,7 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 6, y: 6, z: 0}
 		brickLayouter = new BrickLayouter()
 		bricks = brickLayouter.initializeBrickGraph(grid).bricks
-		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
 			bricks[0][0]
 			bricks[0][0].neighbours
 			1
@@ -309,7 +309,7 @@ describe 'brickLayouter', ->
 		expect(newBrick.neighbours[1]).to.have.length(0)
 		expect(newBrick.neighbours[2]).to.have.length(0)
 		expect(newBrick.neighbours[3]).to.have.length(2)
-		newBrick = brickLayouter.mergeBricksAndUpdateGraphConnections(
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
 			newBrick
 			newBrick.neighbours
 			3

@@ -87,7 +87,11 @@ module.exports = class NewBrickator
 
 		results = @pipeline.run optimizedModel, settings, true
 
-		#@voxelVisualizer.createVisibleVoxels grid, threeNode, false
+		#@voxelVisualizer.createVisibleVoxels(
+		#	results.accumulatedResults.grid
+		#	threeNode
+		#	false
+		#	)
 
 		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(

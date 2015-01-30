@@ -8,6 +8,7 @@ module.exports = class BrickLayouter
 	nextBrickIdx: () =>
 		temp = @nextBrickIndex
 		@nextBrickIndex++
+		#console.log temp
 		return temp
 
 	initializeBrickGraph: (grid) =>
@@ -27,6 +28,7 @@ module.exports = class BrickLayouter
 							position = {x: x, y: y, z: z}
 							size = {x: 1,y: 1,z: 1}
 							brick = new Brick position, size
+							brick.id = @nextBrickIdx()
 							grid.zLayers[z][x][y].brick = brick
 
 							@connectToBrickBelow brick, x,y,z, grid
@@ -34,6 +36,33 @@ module.exports = class BrickLayouter
 							@connectToBrickYm brick, x,y,z, grid
 
 							bricks[z].push brick
+
+		###
+		@nextBrickIndex = 0
+		brick1 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick1.id = @nextBrickIdx()
+		brick2 = new Brick {x: 1, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick2.id = @nextBrickIdx()
+		brick3 = new Brick {x: 0, y: 1, z: 0}, {x: 1, y: 1, z: 1}
+		brick3.id = @nextBrickIdx()
+		brick4 = new Brick {x: 1, y: 1, z: 0}, {x: 1, y: 1, z: 1}
+		brick4.id = @nextBrickIdx()
+
+
+		brick1.neighbours[1].push brick2
+		brick1.neighbours[3].push brick3
+
+		brick2.neighbours[0].push brick1
+		brick2.neighbours[3].push brick4
+
+		brick3.neighbours[1].push brick4
+		brick3.neighbours[2].push brick1
+
+		brick4.neighbours[2].push brick2
+		brick4.neighbours[0].push brick3
+
+		bricks = [[brick1, brick2, brick3, brick4]]
+  	###
 
 		# console.log bricks
 		return {bricks: bricks}
@@ -222,16 +251,19 @@ module.exports = class BrickLayouter
 			}
 
 		newBrick = new Brick(position, size)
+		newBrick.id = @nextBrickIdx()
 
 		# setting new neighbours
 		ids = @neighbourMergeIndices(mergeIndex)
-		@updateNeighbours newBrick, brick, ids.opposite, mergeIndex
-		@updateNeighbours newBrick, brick, ids.sides[0], ids.sides[1]
-		@updateNeighbours newBrick, brick, ids.sides[1], ids.sides[0]
+		oldBricks = mergeNeighbours.concat [brick, newBrick]
+
+		@updateNeighbours newBrick, brick, ids.opposite, mergeIndex, oldBricks
+		@updateNeighbours newBrick, brick, ids.sides[0], ids.sides[1], oldBricks
+		@updateNeighbours newBrick, brick, ids.sides[1], ids.sides[0], oldBricks
 		for mergeBrick in mergeNeighbours
-			@updateNeighbours newBrick, mergeBrick, mergeIndex, ids.opposite
-			@updateNeighbours newBrick, mergeBrick, ids.sides[0], ids.sides[1]
-			@updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0]
+			@updateNeighbours newBrick, mergeBrick, mergeIndex, ids.opposite, oldBricks
+			@updateNeighbours newBrick, mergeBrick, ids.sides[0], ids.sides[1], oldBricks
+			@updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0], oldBricks
 
 		# set new brick connections
 		# tbd
@@ -257,11 +289,13 @@ module.exports = class BrickLayouter
 	findWeakArticulationPointsInGraph: (bricks) =>
 		return
 
-	updateNeighbours: (newBrick, oldBrick, dir, opp) =>
+	updateNeighbours: (newBrick, oldBrick, dir, opp, oldBricks) =>
 		for neighbour in oldBrick.neighbours[dir]
-			newBrick.neighbours[dir].push neighbour
+			if neighbour not in oldBricks
+				if neighbour.id < newBrick.id
+					newBrick.neighbours[dir].push neighbour
+					neighbour.neighbours[opp].push newBrick
 			@removeFirstOccurenceFromArray oldBrick, neighbour.neighbours[opp]
-			neighbour.neighbours[opp].push newBrick
 		return
 
 	neighbourMergeIndices: (mergeIndex) =>

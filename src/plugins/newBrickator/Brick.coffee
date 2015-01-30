@@ -5,6 +5,7 @@ module.exports = class Brick
 		#initialize slots
 		@upperSlots = []
 		@lowerSlots = []
+		@id = -1
 
 		for xx in [0..@size.x - 1] by 1
 			@upperSlots[xx] = []

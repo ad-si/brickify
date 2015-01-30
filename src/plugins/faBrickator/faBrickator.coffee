@@ -33,10 +33,7 @@ module.exports = class FaBrickatorPlugin
 
 	init3d: (@threejsRootNode) => return
 
-	initUi: (domElements) =>
-		return
-
-	getUiSchema: () =>
+	getConvertUiSchema: () =>
 		voxelCallback = (selectedNode) =>
 			modelCache.request(selectedNode.meshHash).then(
 				(optimizedModel) => @voxelise optimizedModel, selectedNode
@@ -118,22 +115,3 @@ module.exports = class FaBrickatorPlugin
 		@threejsRootNode.add voxelizedModel.layoutForThree
 		node.pluginData.faBrickator = {
 			'threeObjectId': voxelizedModel.layoutForThree.uuid}
-
-	uiEnabled: (node) ->
-		console.log node
-		return unless node?
-		if node.pluginData.faBrickator?
-			threeJsNode = getObjectByNode(@threejsRootNode, node)
-			threeJsNode?.visible = true
-
-	uiDisabled: (node) ->
-		console.log node
-		return unless node?
-		if node.pluginData.faBrickator?
-			threeJsNode = getObjectByNode(@threejsRootNode, node)
-			threeJsNode?.visible = false
-
-	getObjectByNode = (threeJsNode, node) ->
-		uuid = node.pluginData.faBrickator.threeObjectId
-		for node in threeJsNode.children
-			return node if node.uuid == uuid

@@ -28,7 +28,6 @@ module.exports = class StlExport
 					saveAs buffer, optimizedModel.originalFileName
 					@$spinnerContainer.fadeOut()
 
-
 	uiEnabled: (@node) ->
 		return
 

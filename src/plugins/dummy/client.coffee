@@ -47,23 +47,12 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
-	# Provides the plugins the possibility to add elements to the UI.
-	# Receives several DOM elements to insert itself into.
-	#
-	# @param {Object} domElements an object of DOM elements to insert itself into
-	# @memberOf dummyClientPlugin
-	# @see pluginLoader
-	###
-	initUi: (domElements) =>
-		console.log 'Dummy Client Plugin initializes UI'
-
-	###
 	# Returns a json-schema which describes the json
 	# the ui-elements of the plugin are supposed to create.
 	# [json-editor](https://github.com/jdorn/json-editor) then creates the
 	# html elements accordingly.
 	###
-	getUiSchema: () =>
+	getConvertUiSchema: () =>
 		console.log('Dummy Client Plugin returns the UI schema.')
 
 		actioncallback = () ->
@@ -80,12 +69,6 @@ module.exports = class DummyPlugin
 					title: 'Derp'
 					callback: actioncallback
 		}
-
-	uiEnabled: (node) ->
-		console.log "Enabled Dummy Ui with node #{node.fileName}"
-
-	uiDisabled: (node) ->
-		console.log "Disabled Dummy Ui with node #{node.fileName}"
 
 	###
 	# The state synchronization module will call each plugin's

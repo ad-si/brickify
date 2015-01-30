@@ -18,7 +18,7 @@ module.exports = class NewBrickator
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
-	getUiSchema: () =>
+	getConvertUiSchema: () =>
 		legoCallback = (selectedNode) =>
 			@runLegoPipelineOnNode selectedNode
 
@@ -29,27 +29,7 @@ module.exports = class NewBrickator
 			a1:
 				title: 'Legofy'
 				callback: legoCallback
-		properties:
-			gridDeltaX:
-				description: 'Voxelgrid dx (0..7)'
-				type: 'number'
-			gridDeltaY:
-				description: 'Voxelgrid dy (0..7)'
-				type: 'number'
-			gridDeltaZ:
-				description: 'Voxelgrid dz (0..3)'
-				type: 'number'
 		}
-
-	uiEnabled: (node) ->
-		if node.pluginData.newBrickator?
-			threeJsNode =  @getThreeObjectByNode node
-			threeJsNode?.visible = true
-
-	uiDisabled: (node) ->
-		if node.pluginData.newBrickator?
-			threeJsNode = @getThreeObjectByNode node
-			threeJsNode?.visible = false
 
 	onClick: (event) =>
 		intersects =
@@ -95,35 +75,14 @@ module.exports = class NewBrickator
 				@runLegoPipeline optimizedModel, selectedNode
 		)
 
-	getUiSettings: (selectedNode) =>
-		if selectedNode.toolsValues?.newbrickator?
-			return selectedNode.toolsValues.newbrickator
-		else
-			if !(selectedNode.toolsValues?)
-				selectedNode.toolsValues = {}
-
-			selectedNode.toolsValues.newbrickator = {
-				gridDeltaX: 0
-				gridDeltaY: 0
-				gridDeltaZ: 0
-			}
-			return selectedNode.toolsValues.newbrickator
-
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
-
-		uiSettings = @getUiSettings selectedNode
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
 
 		settings = {
 			debugVoxel: @debugVoxel
-			gridDelta: {
-				x: uiSettings.gridDeltaX
-				y: uiSettings.gridDeltaY
-				z: uiSettings.gridDeltaZ
-			}
 		}
 
 		results = @pipeline.run optimizedModel, settings, true

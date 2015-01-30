@@ -99,3 +99,16 @@ module.exports = class NewBrickator
 		@threejsRootNode.add object
 		node.pluginData.newBrickator = {'threeObjectUuid': object.uuid}
 		object
+
+	getBrushes: =>
+		return [{
+			text: 'Legofy'
+			icon: 'move'
+			mouseDownCallback: @_legofyBrushCallback
+			#mouseMoveCallback: @_handleMouseMove
+			#mouseUpCallback: @_handleMouseUp
+		}]
+
+	_legofyBrushCallback: (event, selectedNode) =>
+		if selectedNode?
+			@runLegoPipelineOnNode selectedNode

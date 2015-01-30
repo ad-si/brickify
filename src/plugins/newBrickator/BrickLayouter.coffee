@@ -38,33 +38,6 @@ module.exports = class BrickLayouter
 
 							bricks[z].push brick
 
-		###
-		@nextBrickIndex = 0
-		brick1 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick1.id = @nextBrickIdx()
-		brick2 = new Brick {x: 1, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick2.id = @nextBrickIdx()
-		brick3 = new Brick {x: 0, y: 1, z: 0}, {x: 1, y: 1, z: 1}
-		brick3.id = @nextBrickIdx()
-		brick4 = new Brick {x: 1, y: 1, z: 0}, {x: 1, y: 1, z: 1}
-		brick4.id = @nextBrickIdx()
-
-
-		brick1.neighbours[1].push brick2
-		brick1.neighbours[3].push brick3
-
-		brick2.neighbours[0].push brick1
-		brick2.neighbours[3].push brick4
-
-		brick3.neighbours[1].push brick4
-		brick3.neighbours[2].push brick1
-
-		brick4.neighbours[2].push brick2
-		brick4.neighbours[0].push brick3
-
-		bricks = [[brick1, brick2, brick3, brick4]]
-  	###
-
 		# console.log bricks
 		return {bricks: bricks}
 

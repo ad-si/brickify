@@ -339,3 +339,59 @@ describe 'brickLayouter', ->
 		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
 		expect(bricksObject.bricks[0][0].size).to.eql({x: 2, y: 2, z: 1})
 		done()
+
+###
+	it 'should have correct upperSlots/lowerSlots after merge', (done) ->
+		brickLayouter = new BrickLayouter()
+		brickLayouter.nextBrickIndex = 0
+		brick1 = new Brick {x: 0, y: 0, z: 1}, {x: 1, y: 1, z: 1}
+		brick1.id = brickLayouter.nextBrickIdx()
+		brick2 = new Brick {x: 0, y: 1, z: 1}, {x: 1, y: 1, z: 1}
+		brick2.id = brickLayouter.nextBrickIdx()
+		brick3 = new Brick {x: 0, y: 0, z: 2}, {x: 1, y: 2, z: 1}
+		brick3.id = brickLayouter.nextBrickIdx()
+		brick4 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick4.id = brickLayouter.nextBrickIdx()
+		brick5 = new Brick {x: 0, y: 1, z: 0}, {x: 1, y: 1, z: 1}
+		brick5.id = brickLayouter.nextBrickIdx()
+
+		brick1.neighbours[3].push brick2
+		brick2.neighbours[2].push brick1
+
+		brick4.neighbours[3].push brick5
+		brick5.neighbours[2].push brick4
+
+		brick4.upperSlots[0][0] = brick1
+		brick1.lowerSlots[0][0] = brick4
+
+		brick5.upperSlots[0][0] = brick2
+		brick2.lowerSlots[0][0] = brick5
+
+		brick1.upperSlots[0][0] = brick3
+		brick2.upperSlots[0][0] = brick3
+		brick3.lowerSlots[0][0] = brick1
+		brick3.lowerSlots[0][1] = brick2
+
+		bricks = [[brick4, brick5],[brick1, brick2],[brick3]]
+
+		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
+			brick1
+			brick1.neighbours
+			3
+			bricks
+		)
+
+		expect(newBrick.position).to.eql({x: 0, y: 0, z: 1})
+		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
+		expect(newBrick.upperSlots[0][0]).to.eql(brick3)
+		expect(newBrick.upperSlots[0][1]).to.eql(brick3)
+		expect(newBrick.lowerSlots[0][0]).to.eql(brick4)
+		expect(newBrick.lowerSlots[0][1]).to.eql(brick5)
+
+		expect(brick5.upperSlots[0][0]).to.eql(newBrick)
+		expect(brick4.upperSlots[0][0]).to.eql(newBrick)
+
+		expect(brick3.lowerSlots[0][0]).to.eql(newBrick)
+		expect(brick3.lowerSlots[0][1]).to.eql(newBrick)
+
+###

@@ -320,7 +320,7 @@ describe 'brickLayouter', ->
 		expect(newBrick.neighbours[2]).to.have.length(0)
 		expect(newBrick.neighbours[3]).to.have.length(0)
 		expect(newBrick.position).to.eql({x:5, y:5, z:0})
-		expect(newBrick.size).to.eql({x:2, y:2, z:0})
+		expect(newBrick.size).to.eql({x:2, y:2, z:1})
 		done()
 
 	it 'should merge four bricks', (done) ->

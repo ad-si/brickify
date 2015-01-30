@@ -7,7 +7,7 @@
 $ = require 'jquery'
 saveAs = require 'filesaver.js'
 
-meshlib = require '../../../modules/meshlib'
+meshlib = require 'meshlib'
 modelCache = require '../../client/modelCache'
 
 

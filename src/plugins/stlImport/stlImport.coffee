@@ -1,4 +1,4 @@
-meshlib = require '../../../modules/meshlib'
+meshlib = require 'meshlib'
 
 module.exports = class StlImport
 

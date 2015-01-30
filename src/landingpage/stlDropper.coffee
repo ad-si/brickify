@@ -1,4 +1,4 @@
-meshlib = require '../../modules/meshlib'
+meshlib = require 'meshlib'
 modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 

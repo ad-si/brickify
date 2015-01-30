@@ -4,6 +4,7 @@ interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
 objectTree = require '../../common/objectTree'
+three = require 'three'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -81,8 +82,15 @@ module.exports = class NewBrickator
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
 
+		#ToDo (future): add rotation and scaling (the same way it's done in three)
+		#to keep visual consistency
+		modelTransform = new THREE.Matrix4()
+		pos = selectedNode.positionData.position
+		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
+
 		settings = {
 			debugVoxel: @debugVoxel
+			modelTransform: modelTransform
 		}
 
 		results = @pipeline.run optimizedModel, settings, true

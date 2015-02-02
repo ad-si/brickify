@@ -1,26 +1,37 @@
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class LegoPipeline
-	constructor: (baseBrick) ->
-		@voxelizer = new HullVoxelizer(baseBrick)
+	constructor: () ->
+		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
+		@brickLayouter = new BrickLayouter()
 
 		@pipelineSteps = []
 		@pipelineSteps.push (lastResult, options) =>
 			@voxelizer.voxelize lastResult, options
 		@pipelineSteps.push (lastResult, options) =>
-			@volumeFiller.fillGrid lastResult, options
+			@volumeFiller.fillGrid lastResult.grid, options
+
+		@pipelineSteps.push (lastResult, options) =>
+			@brickLayouter.initializeBrickGraph lastResult.grid
+		@pipelineSteps.push (lastResult, options) =>
+			@brickLayouter.layoutByGreedyMerge lastResult.bricks
 
 		@humanReadableStepNames = []
 		@humanReadableStepNames.push 'Hull voxelizing'
 		@humanReadableStepNames.push 'Volume filling'
+		@humanReadableStepNames.push 'Layout graph initialization'
+		@humanReadableStepNames.push 'Layout greedy merge'
 
 
 	run: (optimizedModel, options = null, profiling = false) =>
 		if profiling
 			console.log 'Starting Lego Pipeline'
 			profilingResults = []
+
+		accumulatedResults = {}
 
 		lastResult = optimizedModel
 
@@ -30,7 +41,10 @@ module.exports = class LegoPipeline
 				profilingResults.push r.time
 				lastResult = r.result
 			else
-				 lastResult = @runStep i, lastResult, options
+				lastResult = @runStep i, lastResult, options
+
+			for own key of lastResult
+				accumulatedResults[key] = lastResult[key]
 
 		if profiling
 			sum = 0
@@ -40,7 +54,7 @@ module.exports = class LegoPipeline
 
 		return {
 			profilingResults: profilingResults
-			lastResult: lastResult
+			accumulatedResults: accumulatedResults
 		}
 
 	runStep: (i, lastResult, options) ->

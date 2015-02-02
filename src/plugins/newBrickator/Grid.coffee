@@ -1,9 +1,8 @@
 THREE = require 'three'
 
 module.exports = class Grid
-	constructor: (baseBrick = {length: 0, width: 0, height: 0}) ->
+	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
 		@origin = {x: 0, y: 0, z: 0}
-		@spacing = {x: baseBrick.length, y: baseBrick.width, z: baseBrick.height}
 		@numVoxelsX = 0
 		@numVoxelsY = 0
 		@numVoxelsZ = 0
@@ -108,6 +107,15 @@ module.exports = class Grid
 			z: point.z * @spacing.z
 		}
 
+	mapVoxelToWorld: (point) =>
+		# maps voxel indices to world coordinates
+		relative = @mapVoxelToGrid point
+		return {
+			x: relative.x + @origin.x
+			y: relative.y + @origin.y
+			z: relative.z + @origin.z
+		}
+
 	setVoxel: (voxel, data = true) =>
 		# sets the voxel with the given indices to true
 		# the voxel may also contain data.
@@ -117,7 +125,7 @@ module.exports = class Grid
 			@zLayers[voxel.z][voxel.x] = []
 
 		if not @zLayers[voxel.z][voxel.x][voxel.y]?
-			@zLayers[voxel.z][voxel.x][voxel.y] = {dataEntrys: [data]}
+			@zLayers[voxel.z][voxel.x][voxel.y] = {dataEntrys: [data], brick: false}
 		else
 			#if the voxel already exists, push new data to existing array
 			@zLayers[voxel.z][voxel.x][voxel.y].dataEntrys.push data

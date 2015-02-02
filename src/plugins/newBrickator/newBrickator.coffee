@@ -3,18 +3,17 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
+BrickVisualizer = require './BrickVisualizer'
+PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
 three = require 'three'
+Brick = require './Brick'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class NewBrickator
 	constructor: () ->
-		# smallest lego brick
-		@baseBrick = {
-			length: 8
-			width: 8
-			height: 3.2
-		}
-		@pipeline = new LegoPipeline(@baseBrick)
+		@pipeline = new LegoPipeline()
+		@brickLayouter = new BrickLayouter()
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -81,6 +80,8 @@ module.exports = class NewBrickator
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
+		
+		settings = new PipelineSettings()
 
 		#ToDo (future): add rotation and scaling (the same way it's done in three)
 		#to keep visual consistency
@@ -88,15 +89,24 @@ module.exports = class NewBrickator
 		pos = selectedNode.positionData.position
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
 
-		settings = {
-			debugVoxel: @debugVoxel
-			modelTransform: modelTransform
-		}
+		settings.setModelTransform modelTransform
+		if @debugVoxel?
+			settings.setDebugVoxel @debugVoxel.x, @debugVoxel.y, @debugVoxel.z
 
 		results = @pipeline.run optimizedModel, settings, true
-		grid = results.lastResult
 
-		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
+		#@voxelVisualizer.createVisibleVoxels(
+		#	results.accumulatedResults.grid
+		#	threeNode
+		#	false
+		#	)
+
+		@brickVisualizer ?= new BrickVisualizer()
+		@brickVisualizer.createVisibleBricks(
+			threeNode,
+			results.accumulatedResults.bricks,
+			results.accumulatedResults.grid
+		)
 
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

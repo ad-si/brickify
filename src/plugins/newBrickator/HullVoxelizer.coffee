@@ -1,7 +1,7 @@
 Grid = require './Grid'
 
 module.exports = class Voxelizer
-	constructor: (@baseBrick) ->
+	constructor: () ->
 		@voxelGrid = null
 
 	setDebugVoxel: (@debugVoxel) =>
@@ -18,7 +18,7 @@ module.exports = class Voxelizer
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
 			@voxelizePolygon p0, p1, p2, n
 
-		return @voxelGrid
+		return {grid: @voxelGrid}
 
 	voxelizePolygon: (p0, p1, p2, n) =>
 		# transform model coordinates to grid coordinates
@@ -188,7 +188,7 @@ module.exports = class Voxelizer
 				errz += derrz
 
 	setupGrid: (optimizedModel, options) ->
-		@voxelGrid = new Grid(@baseBrick)
+		@voxelGrid = new Grid(options.gridSpacing)
 		@voxelGrid.setUpForModel optimizedModel, options
 		return @voxelGrid
 

@@ -41,14 +41,13 @@ module.exports = class BrickVisualizer
 		)
 
 		mat = @_getRandomMaterial()
-		cube = new THREE.Mesh(brickGeometry, mat)
 
 		#add noppen
 		noppe = new THREE.CylinderGeometry(
 			#these numbers are made up to look good. don't use for csg operations
 			gridSpacing.x * 0.3, gridSpacing.y * 0.3, gridSpacing.z * 0.7, 7
 		)
-
+		
 		for xi in [0..brick.size.x - 1] by 1
 			for yi in [0..brick.size.y - 1] by 1
 				# only show knobs if there is no connected brick to it
@@ -60,7 +59,10 @@ module.exports = class BrickVisualizer
 					noppeMesh.translateZ (gridSpacing.z * 0.7)
 					noppeMesh.rotation.x += 1.571
 
-					cube.add noppeMesh
+					noppeMesh.updateMatrix()
+					brickGeometry.merge noppeMesh.geometry, noppeMesh.matrix
+
+		cube = new THREE.Mesh(brickGeometry, mat)
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
 		#(center of model is physical center of box)

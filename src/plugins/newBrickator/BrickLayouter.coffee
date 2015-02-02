@@ -243,7 +243,8 @@ module.exports = class BrickLayouter
 			@_updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0], old
 
 		# set new brick connections
-		# tbd
+		for mbrick in mergeNeighbours.concat [brick]
+			newBrick.getConnectionsFromMergingBrick mbrick
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z

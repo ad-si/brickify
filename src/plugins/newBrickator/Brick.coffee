@@ -62,3 +62,46 @@ module.exports = class Brick
 			++i
 		return a
 
+	getConnectionsFromMergingBrick: (mBrick) =>
+		self = @
+		offsetXY = {
+			x: mBrick.position.x - @position.x
+			y: mBrick.position.y - @position.y
+		}
+
+		for slots, x in mBrick.upperSlots
+			for slot, y in slots
+				if slot != false
+					self.upperSlots[offsetXY.x + x][offsetXY.y + y] = slot
+					offsetInConBrick = {
+						x: (self.position.x + offsetXY.x + x) - slot.position.x
+						y: (self.position.y + offsetXY.y + y) - slot.position.y
+					}
+					slot.lowerSlots[offsetInConBrick.x][offsetInConBrick.y] = self
+
+		for slots, x in mBrick.lowerSlots
+			for slot, y in slots
+				if slot != false
+					self.lowerSlots[offsetXY.x + x][offsetXY.y + y] = slot
+					offsetInConBrick = {
+						x: (self.position.x + offsetXY.x + x) - slot.position.x
+						y: (self.position.y + offsetXY.y + y) - slot.position.y
+					}
+					slot.upperSlots[offsetInConBrick.x][offsetInConBrick.y] = self
+
+		return
+
+	getNeighboursFromMergingBrick: (mBrick) =>
+		#check all four directions
+		if @position.x == mBrick.position.x
+			#take neighbour in direction 0 xm
+			return
+		if @position.y == mBrick.position.y
+			#take neighbour in direction 2 ym
+			return
+		if (@position.x + @size.x) == (mBrick.position.x + mBrick.size.x)
+			#take neighbour in direction 1 xp
+			return
+		if (@position.y + @size.y) == (mBrick.position.y + mBrick.size.y)
+			#take neighbour in direction 3 yp
+			return

@@ -21,10 +21,11 @@ module.exports = class Voxelizer
 		return {grid: @voxelGrid}
 
 	voxelizePolygon: (p0, p1, p2, n) =>
-		# Align coordinates to grid origin so that we don't have ugly numbers
-		p0 = @voxelGrid.mapWorldToGridRelative p0
-		p1 = @voxelGrid.mapWorldToGridRelative p1
-		p2 = @voxelGrid.mapWorldToGridRelative p2
+		# transform model coordinates to grid coordinates
+		# (object may be moved/rotated)
+		p0 = @voxelGrid.mapModelToGrid p0
+		p1 = @voxelGrid.mapModelToGrid p1
+		p2 = @voxelGrid.mapModelToGrid p2
 
 		#store information for filling solids
 		if n.z >= 0
@@ -62,14 +63,14 @@ module.exports = class Voxelizer
 		longSideDelta =
 			(longSide.length - 1) / (shortSide1.length + shortSide2.length)
 		for i in [0..shortSide1.length - 1] by 1
-			p0 = @voxelGrid.mapVoxelToGridRelative shortSide1[i]
-			p1 = @voxelGrid.mapVoxelToGridRelative longSide[Math.round(longSideIndex)]
+			p0 = @voxelGrid.mapVoxelToGrid shortSide1[i]
+			p1 = @voxelGrid.mapVoxelToGrid longSide[Math.round(longSideIndex)]
 			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
 		for i in [0..shortSide2.length - 1] by 1
-			p0 = @voxelGrid.mapVoxelToGridRelative shortSide2[i]
-			p1 = @voxelGrid.mapVoxelToGridRelative longSide[Math.round(longSideIndex)]
+			p0 = @voxelGrid.mapVoxelToGrid shortSide2[i]
+			p1 = @voxelGrid.mapVoxelToGrid longSide[Math.round(longSideIndex)]
 			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
@@ -106,7 +107,7 @@ module.exports = class Voxelizer
 			z: Math.floor b.z
 		}
 
-		bvox = @voxelGrid.mapGridRelativeToVoxel bfl
+		bvox = @voxelGrid.mapGridToVoxel bfl
 
 		#stepping
 		sx = if bfl.x > afl.x then 1 else (if bfl.x < afl.x then -1 else 0)
@@ -148,7 +149,7 @@ module.exports = class Voxelizer
 
 		while (true)
 			gvox_old = gvox
-			gvox = @voxelGrid.mapGridRelativeToVoxel g
+			gvox = @voxelGrid.mapGridToVoxel g
 
 			if @debugVoxel
 				if @debugVoxel.x == gvox.x and
@@ -188,6 +189,6 @@ module.exports = class Voxelizer
 
 	setupGrid: (optimizedModel, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)
-		@voxelGrid.setUpForModel optimizedModel
+		@voxelGrid.setUpForModel optimizedModel, options
 		return @voxelGrid
 

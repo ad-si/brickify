@@ -1,3 +1,5 @@
+THREE = require 'three'
+
 module.exports = class Grid
 	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
 		@origin = {x: 0, y: 0, z: 0}
@@ -6,39 +8,90 @@ module.exports = class Grid
 		@numVoxelsZ = 0
 		@zLayers = []
 
-	setUpForModel: (optimizedModel) =>
+	setUpForModel: (optimizedModel, options) =>
+		@modelTransform = options.modelTransform
+
 		bb = optimizedModel.boundingBox()
 
-		# align the grid to the nearest visible lego brick on the viewed board
-		xDelta = (Math.floor(bb.min.x) % @spacing.x) + (@spacing.x * 1.5)
-		yDelta = (Math.floor(bb.min.y) % @spacing.y) + (@spacing.y * 1.5)
-		zDelta = (Math.floor(bb.min.z) % @spacing.z) - (@spacing.z * 0.5)
+		# if the object is moved in the scene (not in the origin),
+		# think about that while building the grid
+		if @modelTransform
+			bbMinWorld = new THREE.Vector3()
+			bbMinWorld.set bb.min.x, bb.min.y, bb.min.z
+			bbMinWorld.applyProjection(@modelTransform)
 
+			bbMaxWorld = new THREE.Vector3()
+			bbMaxWorld.set bb.max.x, bb.max.y, bb.max.z
+			bbMaxWorld.applyProjection(@modelTransform)
+		else
+			bbMinWorld = bb.min
+			bbMaxWorld = bb.max
+
+		# align the grid to the nearest visible lego brick on the viewed board
+		# positive values: set minimum to lower grid match
+		# (x: 85, lower grid match 80 --> subtract 5)
+		# negative values: go to next grid match (-85, delta 5 --> -80)
+		# and subtract spacing to get to next grid (-> e.g. -88)
+		xDelta = (Math.floor(Math.abs(bbMinWorld.x)) % @spacing.x)
+		if (bbMinWorld.x >= 0)
+			ox = Math.floor(bbMinWorld.x) - xDelta
+		else
+			ox = ((-Math.floor(Math.abs(bbMinWorld.x))) + xDelta) - @spacing.x
+
+		yDelta = (Math.floor(Math.abs(bbMinWorld.y)) % @spacing.y)
+		if (bbMinWorld.y >= 0)
+			oy = Math.floor(bbMinWorld.y) - yDelta
+		else
+			oy = ((-Math.floor(Math.abs(bbMinWorld.y))) + yDelta) - @spacing.y
+
+		zDelta = (Math.floor(Math.abs(bbMinWorld.z)) % @spacing.z)
+		if (bbMinWorld.z >= 0)
+			oz = Math.floor(bbMinWorld.z) - zDelta
+		else
+			oz = ((-Math.floor(Math.abs(bbMinWorld.z))) + zDelta) - @spacing.z
+
+		#subtract spacing/2 to match the lego knobs of the visible grid
 		@origin = {
-			x: Math.floor(bb.min.x) - xDelta
-			y: Math.floor(bb.min.y) - yDelta
-			z: Math.floor(bb.min.z) - zDelta
+			x: ox - (@spacing.x / 2)
+			y: oy - (@spacing.y / 2)
+			z: oz - (@spacing.z / 2)
 		}
 
+		@numVoxelsX = Math.ceil (bbMaxWorld.x - bbMinWorld.x) / @spacing.x
+		@numVoxelsX += 2
 
-		@numVoxelsX = Math.ceil (bb.max.x - bb.min.x) / @spacing.x
-		@numVoxelsX++
+		@numVoxelsY = Math.ceil (bbMaxWorld.y - bbMinWorld.y) / @spacing.y
+		@numVoxelsY += 2
 
-		@numVoxelsY = Math.ceil (bb.max.y - bb.min.y) / @spacing.y
-		@numVoxelsY++
+		@numVoxelsZ = Math.ceil (bbMaxWorld.z - bbMinWorld.z) / @spacing.z
+		@numVoxelsZ += 2
 
-		@numVoxelsZ = Math.ceil (bb.max.z - bb.min.z) / @spacing.z
-		@numVoxelsZ++
-
-	mapWorldToGridRelative: (point) =>
+	mapWorldToGrid: (point) =>
 		# maps world coordinates to aligned grid coordinates
+		# aligned grid coordinates are world units, but relative to the
+		# grid origin
+
 		return {
 			x: point.x - @origin.x
 			y: point.y - @origin.y
 			z: point.z - @origin.z
 		}
 
-	mapGridRelativeToVoxel: (point) =>
+	mapModelToGrid: (point) =>
+		# maps the model local coordinates to the grid coordinates by first
+		# transforming it with the modelTransform to world coordinates
+		# and then converting it to aligned grid coordinates
+
+		if @modelTransform?
+			v = new THREE.Vector3(point.x, point.y, point.z)
+			v.applyProjection(@modelTransform)
+			return @mapWorldToGrid v
+		else
+			# if model is placed at 0|0|0,
+			# model and world coordinates are in the same system
+			return @mapWorldToGrid point
+
+	mapGridToVoxel: (point) =>
 		# maps aligned grid coordinates to voxel indices
 		return {
 			x: Math.round(point.x / @spacing.x)
@@ -46,7 +99,7 @@ module.exports = class Grid
 			z: Math.round(point.z / @spacing.z)
 		}
 
-	mapVoxelToGridRelative: (point) =>
+	mapVoxelToGrid: (point) =>
 		# maps voxel indices to aligned grid coordinates
 		return {
 			x: point.x * @spacing.x
@@ -56,7 +109,7 @@ module.exports = class Grid
 
 	mapVoxelToWorld: (point) =>
 		# maps voxel indices to world coordinates
-		relative = @mapVoxelToGridRelative point
+		relative = @mapVoxelToGrid point
 		return {
 			x: relative.x + @origin.x
 			y: relative.y + @origin.y

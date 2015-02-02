@@ -93,3 +93,11 @@
 # function that is called when the hotkey is pressed.
 
 - getHotkeys
+
+# ## Brushes
+#
+# Plugins may return an array with an entry for each brush they provide
+# each brush should have the json structure
+# TODO
+
+- getBrushes

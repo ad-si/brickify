@@ -6,6 +6,7 @@ VoxelVisualizer = require './VoxelVisualizer'
 BrickVisualizer = require './BrickVisualizer'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
+three = require 'three'
 Brick = require './Brick'
 BrickLayouter = require './BrickLayouter'
 
@@ -82,6 +83,13 @@ module.exports = class NewBrickator
 		
 		settings = new PipelineSettings()
 
+		#ToDo (future): add rotation and scaling (the same way it's done in three)
+		#to keep visual consistency
+		modelTransform = new THREE.Matrix4()
+		pos = selectedNode.positionData.position
+		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
+
+		settings.setModelTransform modelTransform
 		if @debugVoxel?
 			settings.setDebugVoxel @debugVoxel.x, @debugVoxel.y, @debugVoxel.z
 
@@ -109,3 +117,16 @@ module.exports = class NewBrickator
 		@threejsRootNode.add object
 		node.pluginData.newBrickator = {'threeObjectUuid': object.uuid}
 		object
+
+	getBrushes: =>
+		return [{
+			text: 'Legofy'
+			icon: 'move'
+			mouseDownCallback: @_legofyBrushCallback
+			#mouseMoveCallback: @_handleMouseMove
+			#mouseUpCallback: @_handleMouseUp
+		}]
+
+	_legofyBrushCallback: (event, selectedNode) =>
+		if selectedNode?
+			@runLegoPipelineOnNode selectedNode

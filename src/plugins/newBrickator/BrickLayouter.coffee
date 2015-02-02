@@ -73,7 +73,7 @@ module.exports = class BrickLayouter
 		numTotalInitialBricks = 0
 		for layer in bricks
 			numTotalInitialBricks += layer.length
-		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks / 2
+		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 
 		while(true) #only for debugging, should be while true
 			brick = @_chooseRandomBrick bricks

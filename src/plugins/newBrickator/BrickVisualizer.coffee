@@ -10,30 +10,29 @@ module.exports = class BrickVisualizer
 		for gridZ in [0..brickData.length - 1] by 1
 			for brick in brickData[gridZ]
 				window.setTimeout @_brickCallback(
-					grid, brick.position, brick.size, threeNode),
+					grid, brick, threeNode),
 					20 * gridZ
 				#@_createBrickCallback(grid, brick.position, brick.size, threeNode)()
 				
-	_brickCallback: (grid, position, size, threeNode) =>
+	_brickCallback: (grid, brick, threeNode) =>
 		return () =>
-			@_createBrick(grid, position, size, threeNode)
+			@_createBrick(grid, brick, threeNode)
 
-	_createBrick: (grid, position, size, threeNode) =>
-		cube = @_createBrickGeometry grid.spacing, size
+	_createBrick: (grid, brick, threeNode) =>
+		cube = @_createBrickGeometry grid.spacing, brick
 
 		#move the bricks to their position in the grid
-		world = grid.mapVoxelToWorld position
+		world = grid.mapVoxelToWorld brick.position
 		cube.translateX( world.x )
 		cube.translateY( world.y )
 		cube.translateZ( world.z )
 
 		threeNode.add(cube)
 
-	_createBrickGeometry: (gridSpacing, brickSize) =>
-		brickSizeX = gridSpacing.x * brickSize.x
-		brickSizeY = gridSpacing.y * brickSize.y
-		# currently, the layouter only supports plates with h=1
-		brickSizeZ = gridSpacing.z * 1.0
+	_createBrickGeometry: (gridSpacing, brick) =>
+		brickSizeX = gridSpacing.x * brick.size.x
+		brickSizeY = gridSpacing.y * brick.size.y
+		brickSizeZ = gridSpacing.z * brick.size.z
 
 		brickGeometry = new THREE.BoxGeometry(
 			brickSizeX,
@@ -50,16 +49,18 @@ module.exports = class BrickVisualizer
 			gridSpacing.x * 0.3, gridSpacing.y * 0.3, gridSpacing.z * 0.7, 7
 		)
 
-		for xi in [0..brickSize.x - 1] by 1
-			for yi in [0..brickSize.y - 1] by 1
-				noppeMesh = new THREE.Mesh(noppe, mat)
+		for xi in [0..brick.size.x - 1] by 1
+			for yi in [0..brick.size.y - 1] by 1
+				# only show knobs if there is no connected brick to it
+				if brick.upperSlots[xi][yi] == false
+					noppeMesh = new THREE.Mesh(noppe, mat)
 
-				noppeMesh.translateX (gridSpacing.x * (xi + 0.5)) - (brickSizeX / 2)
-				noppeMesh.translateY (gridSpacing.y * (yi + 0.5)) - (brickSizeY / 2)
-				noppeMesh.translateZ (gridSpacing.z * 0.7)
-				noppeMesh.rotation.x += 1.571
+					noppeMesh.translateX (gridSpacing.x * (xi + 0.5)) - (brickSizeX / 2)
+					noppeMesh.translateY (gridSpacing.y * (yi + 0.5)) - (brickSizeY / 2)
+					noppeMesh.translateZ (gridSpacing.z * 0.7)
+					noppeMesh.rotation.x += 1.571
 
-				cube.add noppeMesh
+					cube.add noppeMesh
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
 		#(center of model is physical center of box)

@@ -34,7 +34,7 @@ class UiSelection
 			events: [
 				{
 					hotkey: 'del'
-					description: 'delete selected model'
+					description: 'Delete selected model'
 					callback: @_deleteCurrentNode
 				}
 			]

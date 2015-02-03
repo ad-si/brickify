@@ -110,7 +110,7 @@ module.exports = class SolidRenderer
 	getBrushes: =>
 		return [{
 			text: 'move'
-			icon: 'move'
+			icon: 'moveBrush.png'
 			mouseDownCallback: @_handleMouseDown
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp

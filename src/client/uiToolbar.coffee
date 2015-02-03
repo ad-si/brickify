@@ -38,8 +38,9 @@ module.exports = class UiToolbar
 			brush.jqueryElement = jqueryElement
 
 	_createBrushUi: (brush) =>
-		html = '<div class="brushcontainer"><span class="glyphicon glyphicon-' +
-			brush.icon + '"></span><br><span>' + brush.text + '</span></div>'
+		html = '<div class="brushcontainer"><img src="img/' +
+			brush.icon + '" width="64px" height="64px"><br><span>' +
+			brush.text + '</span></div>'
 		brushelement = $(html)
 		brushelement.on 'click', () =>
 			@_handleBrushClicked brush, brushelement

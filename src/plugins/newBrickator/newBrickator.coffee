@@ -96,7 +96,7 @@ module.exports = class NewBrickator
 	getBrushes: () =>
 		return [{
 			text: 'Make Lego'
-			icon: 'move'
+			icon: 'legoBrush.png'
 			selectCallback: @_brushSelectCallback
 			#deselectCallback: -> console.log 'dummy-brush was deselected'
 			mouseDownCallback: @_brushMouseDownCallback
@@ -104,7 +104,7 @@ module.exports = class NewBrickator
 			mouseUpCallback: @_brushMouseUpCallback
 		},{
 			text: 'Make 3D printed'
-			icon: 'move'
+			icon: '3dPrintBrush.png'
 			# select / deselect are the same for both voxels,
 			# but move has a different function
 			selectCallback: @_brushSelectCallback

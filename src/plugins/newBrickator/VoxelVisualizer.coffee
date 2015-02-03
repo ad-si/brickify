@@ -2,13 +2,18 @@ THREE = require 'three'
 
 module.exports = class VoxelVisualizer
 	constructor: () ->
-		@selctedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xffa500 # orange
+		@selectedMaterial = new THREE.MeshLambertMaterial({
+			color: 0xffa500 #orange
 			opacity: 0.2
 			transparent: true
 		})
 		@deselectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xc8c8c8 #green
+			color: 0xc8c8c8 #gray
+			opacity: 0.5
+			transparent: true
+		})
+		@debugMaterial = new THREE.MeshLambertMaterial({
+			color: 0xAAAAAA #debug
 			opacity: 0.5
 			transparent: true
 		})
@@ -19,7 +24,7 @@ module.exports = class VoxelVisualizer
 		
 	createVisibleVoxels: (grid, threeNode, drawInnerVoxels = true) =>
 		@clear(threeNode)
-		
+
 		@voxelGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z )
 
@@ -46,7 +51,8 @@ module.exports = class VoxelVisualizer
 		voxel = grid.zLayers[z][x][y]
 
 		if voxel.enabled
-			m = @selctedMaterial
+			#m = @selectedMaterial
+			m = @debugMaterial
 		else
 			m = @deselectedMaterial
 

@@ -77,15 +77,25 @@ module.exports = class NewBrickator
 			results.accumulatedResults.grid
 		)
 
-	getThreeObjectByNode: (node) =>
+	getThreeObjectsByNode: (node) =>
+		# search for subnode for this object
 		if node.pluginData.newBrickator?
 			uuid = node.pluginData.newBrickator.threeObjectUuid
-			for node in @threejsRootNode.children
-				return node if node.uuid == uuid
+			for threenode in @threejsRootNode.children
+				if threenode.uuid == uuid
+					return { voxels: threenode.children[0], bricks: threenode.children[1] }
+
+		#create two sub-sub nodes, one for the voxels and one for the bricks
 		object = new THREE.Object3D()
 		@threejsRootNode.add object
-		node.pluginData.newBrickator = {'threeObjectUuid': object.uuid}
-		return object
+
+		voxelObject = new THREE.Object3D()
+		object.add voxelObject
+		brickObject = new THREE.Object3D()
+		object.add brickObject
+		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
+
+		return { voxels: object.children[0], bricks: object.children[1] }
 
 	getBrushes: () =>
 		return [{
@@ -126,7 +136,6 @@ module.exports = class NewBrickator
 		if not optimizedModel?
 			return null
 			
-		threeNode = @getThreeObjectByNode selectedNode
 		settings = new PipelineSettings()
 
 		#ToDo (future): add rotation and scaling (the same way it's done in three)
@@ -170,8 +179,7 @@ module.exports = class NewBrickator
 		grid = @_getGrid selectedNode
 
 		if not grid.threeNode
-			grid.threeNode = new THREE.Object3D()
-			@threejsRootNode.add grid.threeNode
+			grid.threeNode = @getThreeObjectsByNode(selectedNode).voxels
 			@voxelVisualizer ?= new VoxelVisualizer()
 			@voxelVisualizer.createVisibleVoxels(
 				grid.grid
@@ -182,24 +190,26 @@ module.exports = class NewBrickator
 			grid.threeNode.visible = true
 
 	_selectLegoMouseMoveCallback: (event, selectedNode) =>
-		###
+		# enable all voxels we touch with the mouse
+		if not selectedNode?
+			return
+
+		threeNodes = @getThreeObjectsByNode selectedNode
+		grid = @_getGrid selectedNode
+
 		intersects =
 			interactionHelper.getPolygonClickedOn(event
-				@threejsRootNode.children
+				threeNodes.voxels.children
 				@bundle.renderer)
+
 		if (intersects.length > 0)
 			obj = intersects[0].object
-			obj.material = new THREE.MeshLambertMaterial({
-				color: 0xdf004c
-				opacity: 0.5
-				transparent: true
-			})
-			console.log "Setting debug voxel to:
-			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
+			
+			if obj.voxelCoords
+				obj.material = @voxelVisualizer.selectedMaterial
+				c = obj.voxelCoords
+				grid.grid.zLayers[c.z][c.x][c.y].enabled = true
 
-			@debugVoxel = obj.voxelCoords
-		###
-		return
 
 	_selectLegoMouseUpCallback: (event, selectedNode) =>
 		if not selectedNode

@@ -6,6 +6,9 @@ module.exports = class UiToolbar
 		@_createBrushList()
 		@_selectedBrush = false
 
+		@selection.selectionChange (selectedNode) =>
+			@_handleNodeSelected selectedNode
+
 	handleMouseDown: (event) =>
 		if @_selectedBrush and @selection.selectedNode?
 			if @_selectedBrush.mouseDownCallback?
@@ -47,6 +50,12 @@ module.exports = class UiToolbar
 		$('#toolbar').append(brushelement)
 
 		return brushelement
+
+	_handleNodeSelected: (selectedNode) =>
+		if selectedNode?
+			if @_selectedBrush
+				if @_selectedBrush.selectCallback?
+					@_selectedBrush.selectCallback selectedNode
 
 	_handleBrushClicked: (brush, jqueryElement) =>
 		if @_selectedBrush

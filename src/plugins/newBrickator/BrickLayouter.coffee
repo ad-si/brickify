@@ -23,8 +23,7 @@ module.exports = class BrickLayouter
 				for y in [0..grid.numVoxelsY - 1] by 1
 
 					if grid.zLayers[z]?[x]?[y]?
-						if (grid.zLayers[z][x][y] != false) and
-						(grid.zLayers[z][x][y].enabled == true)
+						if @_testVoxelExistsAndEnabled grid, z, x, y
 
 							# create brick
 							position = {x: x, y: y, z: z}
@@ -44,7 +43,7 @@ module.exports = class BrickLayouter
 
 	_connectToBrickBelow: (brick, x, y, z, grid) =>
 		if z > 0 and grid.zLayers[z - 1]?[x]?[y]? and
-		grid.zLayers[z - 1][x][y] != false
+		@_testVoxelExistsAndEnabled grid, z - 1, x, y
 			brickBelow = grid.zLayers[z - 1][x][y].brick
 			brick.lowerSlots[0][0] = brickBelow
 			brickBelow.upperSlots[0][0] = brick
@@ -52,17 +51,22 @@ module.exports = class BrickLayouter
 
 	_connectToBrickXm: (brick, x, y, z, grid) =>
 		if x > 0 and grid.zLayers[z]?[x - 1]?[y]? and
-		grid.zLayers[z][x - 1][y] != false
+		@_testVoxelExistsAndEnabled grid, z, x - 1, y
 			brick.neighbours[0] = [grid.zLayers[z][x - 1][y].brick]
 			grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
 		return
 
 	_connectToBrickYm: (brick, x, y, z, grid) =>
 		if y > 0 and grid.zLayers[z]?[x]?[y - 1]? and
-		grid.zLayers[z][x][y - 1] != false
+		@_testVoxelExistsAndEnabled grid, z, x, y - 1
 			brick.neighbours[2] = [grid.zLayers[z][x][y - 1].brick]
 			grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
 		return
+
+	_testVoxelExistsAndEnabled: (grid, z, x, y) =>
+		if (grid.zLayers[z][x][y] == false)
+			return false
+		return grid.zLayers[z][x][y].enabled == true
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -75,6 +79,7 @@ module.exports = class BrickLayouter
 		for layer in bricks
 			numTotalInitialBricks += layer.length
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
+		console.log numTotalInitialBricks
 
 		while(true) #only for debugging, should be while true
 			brick = @_chooseRandomBrick bricks

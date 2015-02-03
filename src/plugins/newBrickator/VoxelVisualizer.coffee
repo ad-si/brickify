@@ -12,11 +12,6 @@ module.exports = class VoxelVisualizer
 			opacity: 0.5
 			transparent: true
 		})
-		@debugMaterial = new THREE.MeshLambertMaterial({
-			color: 0xAAAAAA #debug
-			opacity: 0.5
-			transparent: true
-		})
 		
 	clear: (threeNode) ->
 		if threeNode?
@@ -51,8 +46,7 @@ module.exports = class VoxelVisualizer
 		voxel = grid.zLayers[z][x][y]
 
 		if voxel.enabled
-			#m = @selectedMaterial
-			m = @debugMaterial
+			m = @selectedMaterial
 		else
 			m = @deselectedMaterial
 

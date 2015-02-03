@@ -101,19 +101,21 @@ module.exports = class NewBrickator
 		return [{
 			text: 'Make Lego'
 			icon: 'move'
-			selectCallback: @_selectLegoBrushSelectCallback
+			selectCallback: @_brushSelectCallback
 			#deselectCallback: -> console.log 'dummy-brush was deselected'
-			mouseDownCallback: @_selectLegoMouseDownCallback
+			mouseDownCallback: @_brushMouseDownCallback
 			mouseMoveCallback: @_selectLegoMouseMoveCallback
-			mouseUpCallback: @_selectLegoMouseUpCallback
+			mouseUpCallback: @_brushMouseUpCallback
 		},{
 			text: 'Make 3D printed'
 			icon: 'move'
-			#selectCallback: -> console.log 'dummy-brush was selected'
+			# select / deselect are the same for both voxels,
+			# but move has a different function
+			selectCallback: @_brushSelectCallback
 			#deselectCallback: -> console.log 'dummy-brush was deselected'
-			mouseDownCallback: @_legofyBrushCallback
-			#mouseMoveCallback: @_handleMouseMove
-			#mouseUpCallback: @_handleMouseUp
+			mouseDownCallback: @_brushMouseDownCallback
+			mouseMoveCallback: @_select3DMouseMoveCallback
+			mouseUpCallback: @_brushMouseUpCallback
 		}]
 
 	_getGrid: (selectedNode) =>
@@ -157,7 +159,7 @@ module.exports = class NewBrickator
 		}
 		return @gridCache[identifier]
 
-	_selectLegoBrushSelectCallback: (selectedNode) =>
+	_brushSelectCallback: (selectedNode) =>
 		# get optimized model that is selected and store in local cache
 		if not selectedNode
 			return
@@ -172,7 +174,7 @@ module.exports = class NewBrickator
 					@optimizedModelCache[id] = optimizedModel
 			)
 
-	_selectLegoMouseDownCallback: (event, selectedNode) =>
+	_brushMouseDownCallback: (event, selectedNode) =>
 		if not selectedNode
 			return
 
@@ -189,10 +191,30 @@ module.exports = class NewBrickator
 		else
 			grid.threeNode.visible = true
 
+	_select3DMouseMoveCallback: (event, selectedNode) =>
+		# disable all voxels we touch with the mouse
+		obj = @_getSelectedVoxel event, selectedNode
+
+		if obj
+			obj.material = @voxelVisualizer.deselectedMaterial
+			c = obj.voxelCoords
+			grid.grid.zLayers[c.z][c.x][c.y].enabled = false
+
 	_selectLegoMouseMoveCallback: (event, selectedNode) =>
 		# enable all voxels we touch with the mouse
+		obj = @_getSelectedVoxel event, selectedNode
+
+		if obj
+			obj.material = @voxelVisualizer.selectedMaterial
+			c = obj.voxelCoords
+			grid.grid.zLayers[c.z][c.x][c.y].enabled = true
+
+	_getSelectedVoxel: (event, selectedNode) =>
+		# returns the first visible voxel (three.Object3D) that is below
+		# the cursor position, if it has a voxelCoords property
+
 		if not selectedNode?
-			return
+			return null
 
 		threeNodes = @getThreeObjectsByNode selectedNode
 		grid = @_getGrid selectedNode
@@ -206,12 +228,11 @@ module.exports = class NewBrickator
 			obj = intersects[0].object
 			
 			if obj.voxelCoords
-				obj.material = @voxelVisualizer.selectedMaterial
-				c = obj.voxelCoords
-				grid.grid.zLayers[c.z][c.x][c.y].enabled = true
+				return obj
+		return null
 
 
-	_selectLegoMouseUpCallback: (event, selectedNode) =>
+	_brushMouseUpCallback: (event, selectedNode) =>
 		if not selectedNode
 			return
 

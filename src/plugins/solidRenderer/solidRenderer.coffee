@@ -110,7 +110,7 @@ module.exports = class SolidRenderer
 	getBrushes: =>
 		return [{
 			text: 'move'
-			icon: 'move'
+			icon: 'moveBrush.png'
 			mouseDownCallback: @_handleMouseDown
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp
@@ -123,9 +123,6 @@ module.exports = class SolidRenderer
 		return null
 
 	_handleMouseDown: (event, selectedNode) =>
-		if not selectedNode?
-			return
-
 		@mouseStartPosition = @_getGridXY event.clientX, event.clientY
 
 		@originalObjectPosition = selectedNode.positionData.position
@@ -135,8 +132,6 @@ module.exports = class SolidRenderer
 		return
 
 	_handleMouseMove: (event, selectedNode) =>
-		if not selectedNode?
-			return
 		pld = selectedNode.pluginData.solidRenderer
 
 		mouseCurrent = @_getGridXY event.clientX, event.clientY

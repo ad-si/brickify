@@ -144,6 +144,7 @@ module.exports = class DummyPlugin
 		}
 
 	getBrushes: ->
+		###
 		return [{
 			text: 'dummy-brush'
 			icon: 'move'
@@ -153,3 +154,5 @@ module.exports = class DummyPlugin
 			selectCallback: -> console.log 'dummy-brush was selected'
 			deselectCallback: -> console.log 'dummy-brush was deselected'
 		}]
+		###
+		return []

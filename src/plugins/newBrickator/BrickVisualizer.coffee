@@ -7,12 +7,13 @@ module.exports = class BrickVisualizer
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
 	createVisibleBricks: (threeNode, brickData, grid) =>
+		threeNode.children = []
+
 		for gridZ in [0..brickData.length - 1] by 1
 			for brick in brickData[gridZ]
 				window.setTimeout @_brickCallback(
 					grid, brick, threeNode),
 					20 * gridZ
-				#@_createBrickCallback(grid, brick.position, brick.size, threeNode)()
 				
 	_brickCallback: (grid, brick, threeNode) =>
 		return () =>

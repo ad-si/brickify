@@ -23,7 +23,8 @@ module.exports = class BrickLayouter
 				for y in [0..grid.numVoxelsY - 1] by 1
 
 					if grid.zLayers[z]?[x]?[y]?
-						if grid.zLayers[z][x][y] != false
+						if (grid.zLayers[z][x][y] != false) and
+						(grid.zLayers[z][x][y].enabled == true)
 
 							# create brick
 							position = {x: x, y: y, z: z}

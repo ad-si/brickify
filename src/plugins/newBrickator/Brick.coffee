@@ -95,13 +95,66 @@ module.exports = class Brick
 		#check all four directions
 		if @position.x == mBrick.position.x
 			#take neighbour in direction 0 xm
-			return
+			@_replaceOldNeighbours mBrick, 0, 1
 		if @position.y == mBrick.position.y
 			#take neighbour in direction 2 ym
-			return
+			@_replaceOldNeighbours mBrick, 2, 3
 		if (@position.x + @size.x) == (mBrick.position.x + mBrick.size.x)
 			#take neighbour in direction 1 xp
-			return
+			@_replaceOldNeighbours mBrick, 1, 0
 		if (@position.y + @size.y) == (mBrick.position.y + mBrick.size.y)
 			#take neighbour in direction 3 yp
-			return
+			@_replaceOldNeighbours mBrick, 3, 2
+
+	_replaceOldNeighbours: (mBrick, dir, opp) =>
+		for neighbour in mBrick.neighbours[dir]
+			@neighbours[dir].push neighbour
+			@_removeFirstOccurenceFromArray mBrick, neighbour.neighbours[opp]
+			neighbour.neighbours[opp].push @
+		return
+
+	getPositionAndSizeForNewBrick: (mergeIndex, mergeNeighbours) =>
+		if mergeIndex == 1
+			position = @position
+			size = {
+				x: @size.x + mergeNeighbours[0].size.x
+				y: @size.y
+				z: @size.z
+			}
+		else if mergeIndex == 0
+			position = {
+				x: mergeNeighbours[0].position.x
+				y: @position.y
+				z: @position.z
+			}
+			size = {
+				x: @size.x + mergeNeighbours[0].size.x
+				y: @size.y
+				z: @size.z
+			}
+		else if mergeIndex == 3
+			position = @position
+			size = {
+				x: @size.x
+				y: @size.y + mergeNeighbours[0].size.y
+				z: @size.z
+			}
+		else if mergeIndex == 2
+			position = {
+				x: @position.x
+				y: mergeNeighbours[0].position.y
+				z: @position.z
+			}
+			size = {
+				x: @size.x
+				y: @size.y + mergeNeighbours[0].size.y
+				z: @size.z
+			}
+
+		return {position: position, size: size}
+
+	_removeFirstOccurenceFromArray: (object, array) =>
+		i = array.indexOf object
+		if i != -1
+			array.splice i, 1
+		return

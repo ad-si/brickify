@@ -161,9 +161,6 @@ module.exports = class NewBrickator
 
 	_brushSelectCallback: (selectedNode) =>
 		# get optimized model that is selected and store in local cache
-		if not selectedNode
-			return
-
 		id = selectedNode.meshHash
 
 		if @optimizedModelCache[id]?
@@ -175,9 +172,6 @@ module.exports = class NewBrickator
 			)
 
 	_brushMouseDownCallback: (event, selectedNode) =>
-		if not selectedNode
-			return
-
 		# create voxel grid, if it does not exist yet
 		# show it
 		grid = @_getGrid selectedNode
@@ -220,10 +214,6 @@ module.exports = class NewBrickator
 	_getSelectedVoxel: (event, selectedNode) =>
 		# returns the first visible voxel (three.Object3D) that is below
 		# the cursor position, if it has a voxelCoords property
-
-		if not selectedNode?
-			return null
-
 		threeNodes = @getThreeObjectsByNode selectedNode
 
 		intersects =
@@ -241,9 +231,6 @@ module.exports = class NewBrickator
 
 	_brushMouseUpCallback: (event, selectedNode) =>
 		# hide grid, then legofy
-		if not selectedNode
-			return
-
 		grid = @_getGrid selectedNode
 		grid.threeNode.visible = false
 

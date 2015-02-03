@@ -23,8 +23,7 @@ module.exports = class BrickLayouter
 				for y in [0..grid.numVoxelsY - 1] by 1
 
 					if grid.zLayers[z]?[x]?[y]?
-						if (grid.zLayers[z][x][y] != false) and
-						(grid.zLayers[z][x][y].enabled == true)
+						if @_testVoxelExistsAndEnabled grid, z, x, y
 
 							# create brick
 							position = {x: x, y: y, z: z}
@@ -44,7 +43,7 @@ module.exports = class BrickLayouter
 
 	_connectToBrickBelow: (brick, x, y, z, grid) =>
 		if z > 0 and grid.zLayers[z - 1]?[x]?[y]? and
-		grid.zLayers[z - 1][x][y] != false
+		@_testVoxelExistsAndEnabled grid, z - 1, x, y
 			brickBelow = grid.zLayers[z - 1][x][y].brick
 			brick.lowerSlots[0][0] = brickBelow
 			brickBelow.upperSlots[0][0] = brick
@@ -52,17 +51,22 @@ module.exports = class BrickLayouter
 
 	_connectToBrickXm: (brick, x, y, z, grid) =>
 		if x > 0 and grid.zLayers[z]?[x - 1]?[y]? and
-		grid.zLayers[z][x - 1][y] != false
+		@_testVoxelExistsAndEnabled grid, z, x - 1, y
 			brick.neighbours[0] = [grid.zLayers[z][x - 1][y].brick]
 			grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
 		return
 
 	_connectToBrickYm: (brick, x, y, z, grid) =>
 		if y > 0 and grid.zLayers[z]?[x]?[y - 1]? and
-		grid.zLayers[z][x][y - 1] != false
+		@_testVoxelExistsAndEnabled grid, z, x, y - 1
 			brick.neighbours[2] = [grid.zLayers[z][x][y - 1].brick]
 			grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
 		return
+
+	_testVoxelExistsAndEnabled: (grid, z, x, y) =>
+		if (grid.zLayers[z][x][y] == false)
+			return false
+		return grid.zLayers[z][x][y].enabled == true
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -74,7 +78,8 @@ module.exports = class BrickLayouter
 		numTotalInitialBricks = 0
 		for layer in bricks
 			numTotalInitialBricks += layer.length
-		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks / 2
+		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
+		console.log numTotalInitialBricks
 
 		while(true) #only for debugging, should be while true
 			brick = @_chooseRandomBrick bricks
@@ -191,61 +196,14 @@ module.exports = class BrickLayouter
 		brick, mergeableNeighbours, mergeIndex, bricks ) =>
 		mergeNeighbours = mergeableNeighbours[mergeIndex]
 
-		if mergeIndex == 1
-			position = brick.position
-			size = {
-				x: brick.size.x + mergeNeighbours[0].size.x
-				y: brick.size.y
-				z: brick.size.z
-			}
-		else if mergeIndex == 0
-			position = {
-				x: mergeNeighbours[0].position.x
-				y: brick.position.y
-				z: brick.position.z
-			}
-			size = {
-				x: brick.size.x + mergeNeighbours[0].size.x
-				y: brick.size.y
-				z: brick.size.z
-			}
-		else if mergeIndex == 3
-			position = brick.position
-			size = {
-				x: brick.size.x
-				y: brick.size.y + mergeNeighbours[0].size.y
-				z: brick.size.z
-			}
-		else if mergeIndex == 2
-			position = {
-				x: brick.position.x
-				y: mergeNeighbours[0].position.y
-				z: brick.position.z
-			}
-			size = {
-				x: brick.size.x
-				y: brick.size.y + mergeNeighbours[0].size.y
-				z: brick.size.z
-			}
-
-		newBrick = new Brick(position, size)
+		ps = brick.getPositionAndSizeForNewBrick mergeIndex, mergeNeighbours
+		newBrick = new Brick(ps.position, ps.size)
 		newBrick.id = @nextBrickIdx()
 
-		# setting new neighbours
-		ids = @_neighbourMergeIndices(mergeIndex)
-		old = mergeNeighbours.concat [brick, newBrick]
-
-		@_updateNeighbours newBrick, brick, ids.opposite, mergeIndex, old
-		@_updateNeighbours newBrick, brick, ids.sides[0], ids.sides[1], old
-		@_updateNeighbours newBrick, brick, ids.sides[1], ids.sides[0], old
-		for mergeBrick in mergeNeighbours
-			@_updateNeighbours newBrick, mergeBrick, mergeIndex, ids.opposite, old
-			@_updateNeighbours newBrick, mergeBrick, ids.sides[0], ids.sides[1], old
-			@_updateNeighbours newBrick, mergeBrick, ids.sides[1], ids.sides[0], old
-
-		# set new brick connections
+		# set new brick connections & neighbours
 		for mbrick in mergeNeighbours.concat [brick]
 			newBrick.getConnectionsFromMergingBrick mbrick
+			newBrick.getNeighboursFromMergingBrick mbrick
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z
@@ -255,28 +213,12 @@ module.exports = class BrickLayouter
 
 		# add newBrick to bricks array
 		bricks[z].push newBrick
-
-		###
-		console.log 'MERGE'
-		console.log mergeIndex
-		console.log brick
-		console.log mergeNeighbours
-		console.log newBrick
-		###
 		return newBrick
 
 	_findWeakArticulationPointsInGraph: (bricks) =>
 		return
 
-	_updateNeighbours: (newBrick, oldBrick, dir, opp, oldBricks) =>
-		for neighbour in oldBrick.neighbours[dir]
-			if neighbour not in oldBricks
-				if neighbour.id < newBrick.id
-					newBrick.neighbours[dir].push neighbour
-					neighbour.neighbours[opp].push newBrick
-			@_removeFirstOccurenceFromArray oldBrick, neighbour.neighbours[opp]
-		return
-
+	###
 	_neighbourMergeIndices: (mergeIndex) =>
 		if mergeIndex == 0
 			opposite = 1
@@ -291,6 +233,7 @@ module.exports = class BrickLayouter
 			opposite = 2
 			sides = [0, 1]
 		return {opposite: opposite, sides: sides}
+		###
 
 	_removeFirstOccurenceFromArray: (object, array) =>
 		i = array.indexOf object
@@ -310,3 +253,4 @@ module.exports = class BrickLayouter
 				++j
 			++i
 		return a
+

@@ -15,6 +15,9 @@ colors:
 
   object: 0xccaa33
 
+  basePlate: 0x555555
+  basePlateStud: 0x5a5a5a
+
 
 # camera adjustments
 fov: 40

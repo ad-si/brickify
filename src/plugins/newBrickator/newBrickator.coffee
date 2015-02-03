@@ -47,8 +47,7 @@ module.exports = class NewBrickator
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
 
-		threeNode = @getThreeObjectByNode selectedNode
-		@voxelVisualizer.clear(threeNode)
+		threeNodes = @getThreeObjectsByNode(selectedNode)
 		
 		settings = new PipelineSettings()
 		@_applyModelTransforms selectedNode, settings
@@ -58,15 +57,9 @@ module.exports = class NewBrickator
 		}
 		results = @pipeline.run data, settings, true
 
-		@voxelVisualizer.createVisibleVoxels(
-			results.accumulatedResults.grid
-			threeNode
-			false
-		)
-
 		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(
-			threeNode,
+			threeNodes.bricks,
 			results.accumulatedResults.bricks,
 			results.accumulatedResults.grid
 		)

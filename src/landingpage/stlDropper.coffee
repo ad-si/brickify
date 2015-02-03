@@ -2,7 +2,6 @@ stlLoader = require '../plugins/stlImport/stlLoader'
 modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 
-droptext = null
 uploadFinishedCallback = null
 
 readingString = 'Reading file
@@ -11,9 +10,8 @@ uploadString = 'Uploading file
 <img src="img/spinner.gif" style="height: 1.2em;">'
 loadedString = 'File loaded!'
 
-module.exports.init = (targetDomObject, text, finishedCallback) ->
-	bindDropHandler targetDomObject
-	droptext = text
+module.exports.init = (objects, finishedCallback) ->
+	objects.each (i,el) -> bindDropHandler(el)
 	uploadFinishedCallback = finishedCallback
 
 bindDropHandler = (target) ->
@@ -35,18 +33,19 @@ onModelDrop = (event) ->
 
 		fn = file.name.toLowerCase()
 		if (fn.search('.stl') == fn.length - 4)
-			droptext.html readingString
-			loadFile file
+			$target = $(event.target)
+			$target.html readingString
+			loadFile $target, file
 		else
 			alert 'Only .stl files are supported at the moment'
 
-loadFile = (file) ->
+loadFile = (target, file) ->
 	reader = new FileReader()
-	reader.onload = handleLoadedFile(file.name)
+	reader.onload = handleLoadedFile(target, file.name)
 	reader.readAsBinaryString(file)
 
 
-handleLoadedFile = (filename) ->
+handleLoadedFile = ($target, filename) ->
 	loadCallback = 	(event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
@@ -61,10 +60,10 @@ handleLoadedFile = (filename) ->
 
 		optimizedModel.originalFileName = filename
 
-		droptext.html uploadString
+		$target.html uploadString
 
 		ufc = (md5hash) ->
-			droptext.html loadedString
+			$target.html loadedString
 			if uploadFinishedCallback?
 				uploadFinishedCallback(md5hash, importErrors)
 

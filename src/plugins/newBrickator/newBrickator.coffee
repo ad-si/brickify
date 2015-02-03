@@ -20,39 +20,6 @@ module.exports = class NewBrickator
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
-	getConvertUiSchema: () =>
-		legoCallback = (selectedNode) =>
-			@runLegoPipelineOnNode selectedNode
-
-		return {
-		title: 'NewBrickator'
-		type: 'object'
-		actions:
-			a1:
-				title: 'Legofy'
-				callback: legoCallback
-		}
-
-	onClick: (event) =>
-		intersects =
-			interactionHelper.getPolygonClickedOn(event
-				@threejsRootNode.children
-				@bundle.renderer)
-		if (intersects.length > 0)
-			obj = intersects[0].object
-			###
-			@threejsRootNode.remove obj
-			###
-			obj.material = new THREE.MeshLambertMaterial({
-				color: 0xdf004c
-				opacity: 0.5
-				transparent: true
-			})
-			console.log "Setting debug voxel to:
-			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
-
-			@debugVoxel = obj.voxelCoords
-
 	onStateUpdate: (state) =>
 		#delete voxel visualizations for deleted objects
 		availableObjects = []
@@ -127,7 +94,7 @@ module.exports = class NewBrickator
 			selectCallback: @_selectLegoBrushSelectCallback
 			#deselectCallback: -> console.log 'dummy-brush was deselected'
 			mouseDownCallback: @_selectLegoMouseDownCallback
-			#mouseMoveCallback: @_handleMouseMove
+			mouseMoveCallback: @_selectLegoMouseMoveCallback
 			mouseUpCallback: @_selectLegoMouseUpCallback
 		},{
 			text: 'Make 3D printed'
@@ -213,6 +180,26 @@ module.exports = class NewBrickator
 			)
 		else
 			grid.threeNode.visible = true
+
+	_selectLegoMouseMoveCallback: (event, selectedNode) =>
+		###
+		intersects =
+			interactionHelper.getPolygonClickedOn(event
+				@threejsRootNode.children
+				@bundle.renderer)
+		if (intersects.length > 0)
+			obj = intersects[0].object
+			obj.material = new THREE.MeshLambertMaterial({
+				color: 0xdf004c
+				opacity: 0.5
+				transparent: true
+			})
+			console.log "Setting debug voxel to:
+			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
+
+			@debugVoxel = obj.voxelCoords
+		###
+		return
 
 	_selectLegoMouseUpCallback: (event, selectedNode) =>
 		if not selectedNode

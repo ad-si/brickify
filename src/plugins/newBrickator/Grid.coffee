@@ -125,7 +125,8 @@ module.exports = class Grid
 			@zLayers[voxel.z][voxel.x] = []
 
 		if not @zLayers[voxel.z][voxel.x][voxel.y]?
-			@zLayers[voxel.z][voxel.x][voxel.y] = {dataEntrys: [data], brick: false}
+			voxData = {dataEntrys: [data], enabled: true, brick: false}
+			@zLayers[voxel.z][voxel.x][voxel.y] = voxData
 		else
 			#if the voxel already exists, push new data to existing array
 			@zLayers[voxel.z][voxel.x][voxel.y].dataEntrys.push data

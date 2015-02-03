@@ -7,6 +7,14 @@ module.exports  = class PipelineSettings
 		}
 		@debugVoxel = null
 		@modelTransform = null
+		@voxelizing = true
+		@layouting = true
+
+	deactivateLayouting: =>
+		@layouting = false
+
+	deactivateVoxelizing: =>
+		@voxelizing = false
 
 	setGridSpacing: (x, y, z) =>
 		@gridSpacing.x = x

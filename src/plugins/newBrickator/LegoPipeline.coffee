@@ -10,14 +10,26 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps = []
 		@pipelineSteps.push (lastResult, options) =>
-			@voxelizer.voxelize lastResult, options
+			if options.voxelizing
+				return @voxelizer.voxelize lastResult.optimizedModel, options
+			else
+				return lastResult
 		@pipelineSteps.push (lastResult, options) =>
-			@volumeFiller.fillGrid lastResult.grid, options
+			if options.voxelizing
+				return @volumeFiller.fillGrid lastResult.grid, options
+			else
+				return lastResult
 
 		@pipelineSteps.push (lastResult, options) =>
-			@brickLayouter.initializeBrickGraph lastResult.grid
+			if options.layouting
+				return @brickLayouter.initializeBrickGraph lastResult.grid
+			else
+				return lastResult
 		@pipelineSteps.push (lastResult, options) =>
-			@brickLayouter.layoutByGreedyMerge lastResult.bricks
+			if options.layouting
+				return @brickLayouter.layoutByGreedyMerge lastResult.bricks
+			else
+				return lastResult
 
 		@humanReadableStepNames = []
 		@humanReadableStepNames.push 'Hull voxelizing'
@@ -31,17 +43,17 @@ module.exports = class LegoPipeline
 			console.log 'Starting Lego Pipeline'
 			profilingResults = []
 
-		accumulatedResults = {}
-
-		lastResult = optimizedModel
+		accumulatedResults = {
+			optimizedModel: optimizedModel
+		}
 
 		for i in [0..@pipelineSteps.length - 1] by 1
 			if profiling
-				r = @runStepProfiled i, lastResult, options
+				r = @runStepProfiled i, accumulatedResults, options
 				profilingResults.push r.time
 				lastResult = r.result
 			else
-				lastResult = @runStep i, lastResult, options
+				lastResult = @runStep i, accumulatedResults, options
 
 			for own key of lastResult
 				accumulatedResults[key] = lastResult[key]

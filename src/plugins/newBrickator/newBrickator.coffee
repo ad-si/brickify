@@ -14,6 +14,8 @@ module.exports = class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
 		@brickLayouter = new BrickLayouter()
+		@gridCache = {}
+		@optimizedModelCache = {}
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -95,11 +97,11 @@ module.exports = class NewBrickator
 
 		results = @pipeline.run optimizedModel, settings, true
 
-		#@voxelVisualizer.createVisibleVoxels(
-		#	results.accumulatedResults.grid
-		#	threeNode
-		#	false
-		#	)
+		@voxelVisualizer.createVisibleVoxels(
+			results.accumulatedResults.grid
+			threeNode
+			false
+		)
 
 		@brickVisualizer ?= new BrickVisualizer()
 		@brickVisualizer.createVisibleBricks(
@@ -116,17 +118,105 @@ module.exports = class NewBrickator
 		object = new THREE.Object3D()
 		@threejsRootNode.add object
 		node.pluginData.newBrickator = {'threeObjectUuid': object.uuid}
-		object
+		return object
 
-	getBrushes: =>
+	getBrushes: () =>
 		return [{
-			text: 'Legofy'
+			text: 'Make Lego'
 			icon: 'move'
+			selectCallback: @_selectLegoBrushSelectCallback
+			#deselectCallback: -> console.log 'dummy-brush was deselected'
+			mouseDownCallback: @_selectLegoMouseDownCallback
+			#mouseMoveCallback: @_handleMouseMove
+			mouseUpCallback: @_selectLegoMouseUpCallback
+		},{
+			text: 'Make 3D printed'
+			icon: 'move'
+			#selectCallback: -> console.log 'dummy-brush was selected'
+			#deselectCallback: -> console.log 'dummy-brush was deselected'
 			mouseDownCallback: @_legofyBrushCallback
 			#mouseMoveCallback: @_handleMouseMove
 			#mouseUpCallback: @_handleMouseUp
 		}]
 
-	_legofyBrushCallback: (event, selectedNode) =>
-		if selectedNode?
-			@runLegoPipelineOnNode selectedNode
+	_getGrid: (selectedNode) =>
+		# returns the voxel grid for the selected node
+		# if the node has not changed position and the grid exists,
+		# the cached instance is returned
+
+		identifier = selectedNode.pluginData.solidRenderer.threeObjectUuid
+		nodePosition = selectedNode.positionData.position
+
+		if @gridCache[identifier]?
+			griddata = @gridCache[identifier]
+
+			if griddata.x == nodePosition.x and
+			griddata.y == nodePosition.y and
+			griddata.z == nodePosition.z
+				return griddata
+
+		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
+		if not optimizedModel?
+			return null
+			
+		threeNode = @getThreeObjectByNode selectedNode
+		settings = new PipelineSettings()
+
+		#ToDo (future): add rotation and scaling (the same way it's done in three)
+		#to keep visual consistency
+		modelTransform = new THREE.Matrix4()
+		pos = selectedNode.positionData.position
+		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
+		settings.setModelTransform modelTransform
+		settings.deactivateLayouting()
+
+		results = @pipeline.run optimizedModel, settings, true
+
+		@gridCache[identifier] = {
+			grid: results.accumulatedResults.grid
+			threeNode: null
+			x: nodePosition.x
+			y: nodePosition.y
+			z: nodePosition.z
+		}
+		return @gridCache[identifier]
+
+	_selectLegoBrushSelectCallback: (selectedNode) =>
+		# get optimized model that is selected and store in local cache
+		if not selectedNode
+			return
+
+		id = selectedNode.meshHash
+
+		if @optimizedModelCache[id]?
+			return
+		else
+			modelCache.request(id).then(
+				(optimizedModel) =>
+					@optimizedModelCache[id] = optimizedModel
+			)
+
+	_selectLegoMouseDownCallback: (event, selectedNode) =>
+		if not selectedNode
+			return
+
+		grid = @_getGrid selectedNode
+
+		if not grid.threeNode
+			grid.threeNode = new THREE.Object3D()
+			@threejsRootNode.add grid.threeNode
+			@voxelVisualizer ?= new VoxelVisualizer()
+			@voxelVisualizer.createVisibleVoxels(
+				grid.grid
+				grid.threeNode
+				false
+			)
+		else
+			grid.threeNode.visible = true
+
+	_selectLegoMouseUpCallback: (event, selectedNode) =>
+		if not selectedNode
+			return
+
+		grid = @_getGrid selectedNode
+		grid.threeNode.visible = false

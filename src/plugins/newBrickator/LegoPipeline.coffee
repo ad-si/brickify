@@ -38,14 +38,12 @@ module.exports = class LegoPipeline
 		@humanReadableStepNames.push 'Layout greedy merge'
 
 
-	run: (optimizedModel, options = null, profiling = false) =>
+	run: (data, options = null, profiling = false) =>
 		if profiling
 			console.log 'Starting Lego Pipeline'
 			profilingResults = []
 
-		accumulatedResults = {
-			optimizedModel: optimizedModel
-		}
+		accumulatedResults = data
 
 		for i in [0..@pipelineSteps.length - 1] by 1
 			if profiling

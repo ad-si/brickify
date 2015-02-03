@@ -51,18 +51,12 @@ module.exports = class NewBrickator
 		@voxelVisualizer.clear(threeNode)
 		
 		settings = new PipelineSettings()
+		@_applyModelTransforms selectedNode, settings
 
-		#ToDo (future): add rotation and scaling (the same way it's done in three)
-		#to keep visual consistency
-		modelTransform = new THREE.Matrix4()
-		pos = selectedNode.positionData.position
-		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
-
-		settings.setModelTransform modelTransform
-		if @debugVoxel?
-			settings.setDebugVoxel @debugVoxel.x, @debugVoxel.y, @debugVoxel.z
-
-		results = @pipeline.run optimizedModel, settings, true
+		data = {
+			optimizedModel: optimizedModel
+		}
+		results = @pipeline.run data, settings, true
 
 		@voxelVisualizer.createVisibleVoxels(
 			results.accumulatedResults.grid
@@ -76,6 +70,15 @@ module.exports = class NewBrickator
 			results.accumulatedResults.bricks,
 			results.accumulatedResults.grid
 		)
+
+	_applyModelTransforms: (selectedNode, pipelineSettings) =>
+		#ToDo (future): add rotation and scaling (the same way it's done in three)
+		#to keep visual consistency
+
+		modelTransform = new THREE.Matrix4()
+		pos = selectedNode.positionData.position
+		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
+		pipelineSettings.setModelTransform modelTransform
 
 	getThreeObjectsByNode: (node) =>
 		# search for subnode for this object
@@ -139,16 +142,13 @@ module.exports = class NewBrickator
 			return null
 			
 		settings = new PipelineSettings()
-
-		#ToDo (future): add rotation and scaling (the same way it's done in three)
-		#to keep visual consistency
-		modelTransform = new THREE.Matrix4()
-		pos = selectedNode.positionData.position
-		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
-		settings.setModelTransform modelTransform
+		@_applyModelTransforms selectedNode, settings
 		settings.deactivateLayouting()
 
-		results = @pipeline.run optimizedModel, settings, true
+		data = {
+			optimizedModel: optimizedModel
+		}
+		results = @pipeline.run data, settings, true
 
 		@gridCache[identifier] = {
 			grid: results.accumulatedResults.grid
@@ -178,10 +178,13 @@ module.exports = class NewBrickator
 		if not selectedNode
 			return
 
+		# create voxel grid, if it does not exist yet
+		# show it
 		grid = @_getGrid selectedNode
+		threeObjects = @getThreeObjectsByNode(selectedNode)
 
 		if not grid.threeNode
-			grid.threeNode = @getThreeObjectsByNode(selectedNode).voxels
+			grid.threeNode = threeObjects.voxels
 			@voxelVisualizer ?= new VoxelVisualizer()
 			@voxelVisualizer.createVisibleVoxels(
 				grid.grid
@@ -191,9 +194,13 @@ module.exports = class NewBrickator
 		else
 			grid.threeNode.visible = true
 
+		# hide bricks
+		threeObjects.bricks.visible = false
+
 	_select3DMouseMoveCallback: (event, selectedNode) =>
 		# disable all voxels we touch with the mouse
 		obj = @_getSelectedVoxel event, selectedNode
+		grid = @_getGrid selectedNode
 
 		if obj
 			obj.material = @voxelVisualizer.deselectedMaterial
@@ -203,6 +210,7 @@ module.exports = class NewBrickator
 	_selectLegoMouseMoveCallback: (event, selectedNode) =>
 		# enable all voxels we touch with the mouse
 		obj = @_getSelectedVoxel event, selectedNode
+		grid = @_getGrid selectedNode
 
 		if obj
 			obj.material = @voxelVisualizer.selectedMaterial
@@ -217,7 +225,6 @@ module.exports = class NewBrickator
 			return null
 
 		threeNodes = @getThreeObjectsByNode selectedNode
-		grid = @_getGrid selectedNode
 
 		intersects =
 			interactionHelper.getPolygonClickedOn(event
@@ -233,8 +240,38 @@ module.exports = class NewBrickator
 
 
 	_brushMouseUpCallback: (event, selectedNode) =>
+		# hide grid, then legofy
 		if not selectedNode
 			return
 
 		grid = @_getGrid selectedNode
 		grid.threeNode.visible = false
+
+		# legofy
+		settings = new PipelineSettings()
+		@_applyModelTransforms selectedNode, settings
+		settings.deactivateVoxelizing()
+
+		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
+		if not optimizedModel
+			return
+
+		data = {
+			optimizedModel: optimizedModel
+			grid: grid.grid
+		}
+		results = @pipeline.run data, settings, true
+
+		threeNodes = @getThreeObjectsByNode selectedNode
+
+		@brickVisualizer ?= new BrickVisualizer()
+		@brickVisualizer.createVisibleBricks(
+			threeNodes.bricks,
+			results.accumulatedResults.bricks,
+			results.accumulatedResults.grid
+		)
+		threeNodes.bricks.visible = true
+
+
+
+

@@ -1,45 +1,33 @@
 $ = require 'jquery'
 
 module.exports = class UiToolbar
-	constructor: (@bundle, @selection) ->
+	constructor: (@bundle) ->
 		@_toolbarContainer = $('#toolbar')
 		@_createBrushList()
 		@_selectedBrush = false
 		@_downloadEventListener = []
 
-		@selection.selectionChange (selectedNode) =>
-			@_handleNodeSelected selectedNode
-
 	handleMouseDown: (event) =>
-		if @_selectedBrush and @selection.selectedNode?
-			if @_selectedBrush.mouseDownCallback?
-				@_selectedBrush.mouseDownCallback event, @selection.selectedNode
+		if @_selectedBrush and @_selectedNode()?
+			@_selectedBrush.mouseDownCallback event, @_selectedNode()
 
 	handleMouseMove: (event) =>
-		if @_selectedBrush and @selection.selectedNode?
-			if @_selectedBrush.mouseMoveCallback?
-				@_selectedBrush.mouseMoveCallback event, @selection.selectedNode
+		if @_selectedBrush and @_selectedNode()?
+			@_selectedBrush.mouseMoveCallback? event, @_selectedNode()
 
 	handleMouseUp: (event) =>
-		if @_selectedBrush and @selection.selectedNode?
-			if @_selectedBrush.mouseUpCallback?
-				@_selectedBrush.mouseUpCallback event, @selection.selectedNode
-
-	hasBrushSelected: () =>
-		return true if  @_selectedBrush
-		return false
+		if @_selectedBrush and @_selectedNode()?
+			@_selectedBrush.mouseUpCallback? event, @_selectedNode()
 
 	_createBrushList: =>
-		returnArrays = @bundle.pluginHooks.getBrushes()
-		@_brushes = []
+		@_brushes = @bundle.pluginHooks.getBrushes().reduce(
+			(brushes, b) -> brushes.concat b
+		)
 
-		for array in returnArrays
-			for b in array
-				@_brushes.push b
-
+		$toolbar = $('#toolbar')
 		for brush in @_brushes
-			jqueryElement = @_createBrushUi brush
-			brush.jqueryElement = jqueryElement
+			brush.jqueryElement = @_createBrushUi brush
+			$toolbar.append brush.jqueryElement
 
 		@_addDownloadButtonUi()
 
@@ -48,9 +36,7 @@ module.exports = class UiToolbar
 			brush.icon + '"><br><span>' +
 			brush.text + '</span></div>'
 		brushelement = $(html)
-		brushelement.on 'click', () =>
-			@_handleBrushClicked brush, brushelement
-		@_toolbarContainer.append(brushelement)
+		brushelement.on 'click', () => @_handleBrushClicked brush, brushelement
 
 		return brushelement
 
@@ -64,35 +50,35 @@ module.exports = class UiToolbar
 		brushelement = $(html)
 
 		brushelement.on 'click', () =>
-			for c in @_downloadEventListener
-				c()
+			for dl in @_downloadEventListener
+				dl()
 
-		@_toolbarContainer.append(brushelement)
+		@_toolbarContainer.append brushelement
 
+	onNodeSelect: (selectedNode) =>
+		if @_selectedBrush and selectedNode?
+				@_selectedBrush.selectCallback? selectedNode
 
-	_handleNodeSelected: (selectedNode) =>
-		if selectedNode?
-			if @_selectedBrush
-				if @_selectedBrush.selectCallback?
-					@_selectedBrush.selectCallback selectedNode
+	_selectedNode: () =>
+		return @bundle.ui.sceneManager.selectedNode
+
+	hasBrushSelected: () =>
+		return !!@_selectedBrush # convert to strict boolean type
 
 	_handleBrushClicked: (brush, jqueryElement) =>
 		if @_selectedBrush
-			if @_selectedBrush.deselectCallback? and @selection.selectedNode?
-				@_selectedBrush.deselectCallback @selection.selectedNode
+			if @_selectedNode()?
+				@_selectedBrush.deselectCallback? @_selectedNode()
 
 			@_selectedBrush.jqueryElement.removeClass 'brushselect'
 			@_selectedBrush.jqueryElement.addClass 'brushdeselect'
 
 			#edgecase: user clicked on selected brush: deselect this brush
 			if @_selectedBrush == brush
-				@_selectedBrush = false
+				@_selectedBrush = null
 				return
 
 		@_selectedBrush = brush
-		
-		if @_selectedBrush.selectCallback? and @selection.selectedNode?
-			@_selectedBrush.selectCallback @selection.selectedNode
-
+		@_selectedBrush.selectCallback? @_selectedNode() if @_selectedNode()?
 		@_selectedBrush.jqueryElement.removeClass 'brushdeselect'
 		@_selectedBrush.jqueryElement.addClass 'brushselect'

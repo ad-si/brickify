@@ -8,7 +8,7 @@
 $ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
-objectTree = require '../../common/objectTree'
+objectTree = require '../../common/state/objectTree'
 pluginKey = 'SceneGraph'
 
 module.exports = class SceneGraph
@@ -22,7 +22,7 @@ module.exports = class SceneGraph
 
 	initUi: (sceneGraphContainer) ->
 		@tree = $(sceneGraphContainer)
-		@tree.bind 'tree.select', @onNodeSelect
+		@tree.bind 'tree.select', @_onNodeSelect
 
 	renderUi: (state) =>
 		return if not @tree?
@@ -71,12 +71,12 @@ module.exports = class SceneGraph
 	onStateUpdate: (state) =>
 		@renderUi state
 
-	onNodeSelect: (event) =>
+	_onNodeSelect: (event) =>
 		event.stopPropagation()
 
 		if event.node
 			if event.node.name == 'Scene'
-				@callNodeDeselect('Scene')
+				@_onNodeDeselect('Scene')
 				return
 
 			# console.log "Selecting " + event.node.title
@@ -85,13 +85,12 @@ module.exports = class SceneGraph
 			@bundle.statesync.performStateAction (state) =>
 				@getStateNodeForTreeNode event.node, state.rootNode, (stateNode) =>
 					@selectedStateNode = stateNode
-					@bundle.ui.selection.select stateNode
+					@bundle.ui.sceneManager.select stateNode
 		else
-			# console.log "Deselecting " + @selectedNode.name
-			@callNodeDeselect(@selectedNode.name)
+			@_onNodeDeselect(@selectedNode.name)
 
-	callNodeDeselect: (title) =>
-		@bundle.ui.selection.deselect()
+	_onNodeDeselect: (title) =>
+		@bundle.ui.sceneManager.deselect()
 
 		#definitively deselect any node
 		if @tree.tree 'getSelectedNode'

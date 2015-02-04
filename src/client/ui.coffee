@@ -61,6 +61,7 @@ module.exports = class Ui
 		@_initListeners()
 		@_initScenegraph()
 		@_initHotkeys()
+		@_initDownload()
 
 	_initListeners: =>
 		# event listener
@@ -119,6 +120,13 @@ module.exports = class Ui
 			]
 		}
 		@hotkeys.addEvents gridHotkeys
+
+	_initDownload: () =>
+		@toolbar.addDownloadListener () =>
+			selNode = @selection.selectedNode
+			if selNode?
+				dl = @bundle.downloadProvider.createDownload selNode
+				#ToDo: offer dl as a download (zip file)
 
 	_toggleGridVisibility: () =>
 		@bundle.getPlugin('lego-board').toggleVisibility()

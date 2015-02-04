@@ -252,3 +252,10 @@ module.exports = class NewBrickator
 			results.accumulatedResults.grid
 		)
 		threeNodes.bricks.visible = true
+
+	getSubtractiveCsg: (selectedNode) =>
+		# return lego brick csg for this node, so that only
+		# parts that are not created with lego get 3d printed
+		# ToDo
+
+		return null

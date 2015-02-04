@@ -3,14 +3,23 @@ THREE = require 'three'
 module.exports = class BrickVisualizer
 	constructor: () ->
 		@_createBrickMaterials()
+		@currentlyWorking = false
 
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
 	createVisibleBricks: (threeNode, brickData, grid) =>
+		# do not create multiple layers of bricks at the same time
+		# (happens when the user rapidly clicks with the mouse)
+		if @currentlyWorking
+			return
+		@currentlyWorking = true
+
 		threeNode.children = []
 
 		for gridZ in [0..brickData.length - 1] by 1
-			window.setTimeout @_layerCallback(grid, brickData[gridZ], threeNode),
+			lastCallback = true if gridZ == (brickData.length - 1)
+			window.setTimeout @_layerCallback(
+				grid, brickData[gridZ], threeNode, lastCallback),
 					10 * gridZ
 
 	_createLayer: (grid, brickLayer, threeNode) =>
@@ -22,9 +31,11 @@ module.exports = class BrickVisualizer
 		layerMesh = new THREE.Mesh(layerGeometry, @_getFaceMats())
 		threeNode.add layerMesh
 
-	_layerCallback: (grid, brickLayer, threeNode) =>
+	_layerCallback: (grid, brickLayer, threeNode, lastCallback = false) =>
 		return () =>
 			@_createLayer grid, brickLayer, threeNode
+			if lastCallback
+				@currentlyWorking = false
 
 	_brickCallback: (grid, brick, threeNode) =>
 		return () =>

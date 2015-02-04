@@ -39,10 +39,11 @@ module.exports = class PluginLoader
 	loadPlugins: () ->
 		pluginInstances = []
 
-		###pluginInstances.push @initPlugin(
+		pluginInstances.push @initPlugin(
 			require('../plugins/dummy'),
 			require('../plugins/dummy/package.json')
 		)
+		###
 		pluginInstances.push @initPlugin(
 			require('../plugins/example'),
 			require('../plugins/example/package.json')

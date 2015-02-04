@@ -1,36 +1,60 @@
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class LegoPipeline
-	constructor: (baseBrick) ->
-		@voxelizer = new HullVoxelizer(baseBrick)
+	constructor: () ->
+		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
+		@brickLayouter = new BrickLayouter()
 
 		@pipelineSteps = []
 		@pipelineSteps.push (lastResult, options) =>
-			@voxelizer.voxelize lastResult, options
+			if options.voxelizing
+				return @voxelizer.voxelize lastResult.optimizedModel, options
+			else
+				return lastResult
 		@pipelineSteps.push (lastResult, options) =>
-			@volumeFiller.fillGrid lastResult, options
+			if options.voxelizing
+				return @volumeFiller.fillGrid lastResult.grid, options
+			else
+				return lastResult
+
+		@pipelineSteps.push (lastResult, options) =>
+			if options.layouting
+				return @brickLayouter.initializeBrickGraph lastResult.grid
+			else
+				return lastResult
+		@pipelineSteps.push (lastResult, options) =>
+			if options.layouting
+				return @brickLayouter.layoutByGreedyMerge lastResult.bricks
+			else
+				return lastResult
 
 		@humanReadableStepNames = []
 		@humanReadableStepNames.push 'Hull voxelizing'
 		@humanReadableStepNames.push 'Volume filling'
+		@humanReadableStepNames.push 'Layout graph initialization'
+		@humanReadableStepNames.push 'Layout greedy merge'
 
 
-	run: (optimizedModel, options = null, profiling = false) =>
+	run: (data, options = null, profiling = false) =>
 		if profiling
 			console.log 'Starting Lego Pipeline'
 			profilingResults = []
 
-		lastResult = optimizedModel
+		accumulatedResults = data
 
 		for i in [0..@pipelineSteps.length - 1] by 1
 			if profiling
-				r = @runStepProfiled i, lastResult, options
+				r = @runStepProfiled i, accumulatedResults, options
 				profilingResults.push r.time
 				lastResult = r.result
 			else
-				 lastResult = @runStep i, lastResult, options
+				lastResult = @runStep i, accumulatedResults, options
+
+			for own key of lastResult
+				accumulatedResults[key] = lastResult[key]
 
 		if profiling
 			sum = 0
@@ -40,7 +64,7 @@ module.exports = class LegoPipeline
 
 		return {
 			profilingResults: profilingResults
-			lastResult: lastResult
+			accumulatedResults: accumulatedResults
 		}
 
 	runStep: (i, lastResult, options) ->

@@ -142,3 +142,17 @@ module.exports = class DummyPlugin
 			}
 		]
 		}
+
+	getBrushes: ->
+		###
+		return [{
+			text: 'dummy-brush'
+			icon: 'move'
+			mouseDownCallback: -> console.log 'dummy-brush modifies scene (mosue down)'
+			mouseMoveCallback: -> console.log 'dumy-brush modifies scene (move)'
+			mouseUpCallback: -> console.log 'dummy-brush modifies scene (mosue up)'
+			selectCallback: -> console.log 'dummy-brush was selected'
+			deselectCallback: -> console.log 'dummy-brush was deselected'
+		}]
+		###
+		return []

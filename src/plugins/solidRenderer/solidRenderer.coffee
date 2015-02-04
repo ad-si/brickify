@@ -75,8 +75,8 @@ module.exports = class SolidRenderer
 		geometry = optimizedModel.convertToThreeGeometry()
 		objectMaterial = new THREE.MeshLambertMaterial(
 			{
-				color: @globalConfig.defaultObjectColor
-				ambient: @globalConfig.defaultObjectColor
+				color: @globalConfig.colors.object
+				ambient: @globalConfig.colors.object
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)

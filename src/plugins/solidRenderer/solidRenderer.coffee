@@ -168,31 +168,24 @@ module.exports = class SolidRenderer
 	_getGridXY: (screenX, screenY) =>
 		# calculates the position on the z=0 plane in 3d space
 		# from given screen (mouse) coordinates
-		# see http://stackoverflow.com/questions/13055214/
 		canvas = @bundle.renderer.threeRenderer.context.canvas
-
 		camera = @bundle.renderer.getCamera()
-		vector = new THREE.Vector3()
-		relativeX = (screenX / canvas.width) * 2 - 1
-		relativeY = (-screenY / canvas.height) * 2 + 1
-		vector.set relativeX, relativeY, 0.9
-		vector.unproject camera
-		
-		console.log ''
-		console.log "-> Screen:      #{relativeX.toFixed(2)},
-			#{relativeY.toFixed(2)}, 0.500"
 
-		console.log "-> Unprojected: #{vector.x.toFixed(2)},
-			#{vector.y.toFixed(2)}, #{vector.z.toFixed(2)}"
+		posInCanvas = new THREE.Vector3(
+			(screenX / canvas.width) * 2 - 1
+			(-screenY / canvas.height) * 2 + 1
+			0.5
+		)
 
-		dir = vector.sub( camera.position ).normalize()
-		distance = -camera.position.z / dir.z
-		pos = camera.position.clone().add( dir.multiplyScalar( distance ) )
+		posInCamera = posInCanvas.clone().unproject camera
 
-		console.log "-> Position:    #{pos.x.toFixed(2)},
-			#{pos.y.toFixed(2)}, #{pos.z.toFixed(2)}"
+		ray = posInCamera.sub(camera.position).normalize()
+		# we are calculating in camera coordinate system -> y and z are rotated
+		ray.multiplyScalar -camera.position.y / ray.y
+		posInWorld = camera.position.clone().add ray
 
-		return pos
+		posInScene = new THREE.Vector3 posInWorld.x, -posInWorld.z, posInWorld.y
+		return posInScene
 
 	_rasterizeVector: (vector, raster = 2) =>
 		vector.x = @_rasterize vector.x, raster

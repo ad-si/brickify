@@ -75,8 +75,8 @@ module.exports = class SolidRenderer
 		geometry = optimizedModel.convertToThreeGeometry()
 		objectMaterial = new THREE.MeshLambertMaterial(
 			{
-				color: @globalConfig.defaultObjectColor
-				ambient: @globalConfig.defaultObjectColor
+				color: @globalConfig.colors.object
+				ambient: @globalConfig.colors.object
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
@@ -123,7 +123,8 @@ module.exports = class SolidRenderer
 		return null
 
 	_handleMouseDown: (event, selectedNode) =>
-		@mouseStartPosition = @_getGridXY event.clientX, event.clientY
+		@mouseStartPosition =
+			@bundle.renderer.getGridPosition event.clientX, event.clientY
 
 		@originalObjectPosition = selectedNode.positionData.position
 
@@ -132,77 +133,17 @@ module.exports = class SolidRenderer
 		return
 
 	_handleMouseMove: (event, selectedNode) =>
-		pld = selectedNode.pluginData.solidRenderer
-
-		mouseCurrent = @_getGridXY event.clientX, event.clientY
-		delta = {
-			x: mouseCurrent.x - @mouseStartPosition.x
-			y: mouseCurrent.y - @mouseStartPosition.y
-		}
-		#console.log delta
+		mouseCurrent = @bundle.renderer.getGridPosition event.clientX, event.clientY
 
 		newPosition = {
-			x: @originalObjectPosition.x + delta.x
-			y: @originalObjectPosition.y + delta.y
+			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
+			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
+			z: 0
 		}
 
-		rasterPos = @_rasterizeVector newPosition
+		selectedNode.positionData.position = newPosition
 
-		selectedNode.positionData.position.x = mouseCurrent.x
-		selectedNode.positionData.position.y = mouseCurrent.y
-		
-		###
-		updateCallback = (state) =>
-			selectedNode.positionData.position.x = rasterPos.x
-			selectedNode.positionData.position.y = rasterPos.y
-			return
-		@bundle.statesync.performStateAction updateCallback
-		###
+		pld = selectedNode.pluginData.solidRenderer
 
 		threeObject = @_getThreeObjectByName pld.threeObjectUuid
 		@_copyTransformDataToThree selectedNode, threeObject
-
-		#console.log "Mouse moved in 3d: x:#{delta.x}, y:#{delta.y}"
-		#console.log "Set raster position to #{rasterPos.x}, #{rasterPos.y}"
-
-	_getGridXY: (screenX, screenY) =>
-		# calculates the position on the z=0 plane in 3d space
-		# from given screen (mouse) coordinates
-		# see http://stackoverflow.com/questions/13055214/
-		canvas = @bundle.renderer.threeRenderer.context.canvas
-
-		camera = @bundle.renderer.getCamera()
-		vector = new THREE.Vector3()
-		relativeX = (screenX / canvas.width) * 2 - 1
-		relativeY = (-screenY / canvas.height) * 2 + 1
-		vector.set relativeX, relativeY, 0.9
-		vector.unproject camera
-		
-		console.log ''
-		console.log "-> Screen:      #{relativeX.toFixed(2)},
-			#{relativeY.toFixed(2)}, 0.500"
-
-		console.log "-> Unprojected: #{vector.x.toFixed(2)},
-			#{vector.y.toFixed(2)}, #{vector.z.toFixed(2)}"
-
-		dir = vector.sub( camera.position ).normalize()
-		distance = -camera.position.z / dir.z
-		pos = camera.position.clone().add( dir.multiplyScalar( distance ) )
-
-		console.log "-> Position:    #{pos.x.toFixed(2)},
-			#{pos.y.toFixed(2)}, #{pos.z.toFixed(2)}"
-
-		return pos
-
-	_rasterizeVector: (vector, raster = 2) =>
-		vector.x = @_rasterize vector.x, raster
-		vector.y = @_rasterize vector.y, raster
-		return vector
-
-	_rasterize: (value, raster) ->
-		mod = value % raster
-		if mod > (raster / 2)
-			value += (raster - mod)
-		else
-			value -= mod
-		return value

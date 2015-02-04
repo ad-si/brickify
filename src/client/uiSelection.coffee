@@ -3,14 +3,22 @@ objectTree = require '../common/objectTree'
 class UiSelection
 	constructor: (@bundle) ->
 		@selectedNode = null
+		@selectionCallbacks = []
 
 	select: (@selectedNode) =>
-		return
+		for s in @selectionCallbacks
+			s(@selectedNode)
 
 	deselect: (node) =>
 		if not node? or node is @selectedNode
 			@selectedNode = null
+
+			for s in @selectionCallbacks
+				s(null)
 		return
+
+	selectionChange: (callback) =>
+		@selectionCallbacks.push callback
 
 	_deleteCurrentNode: () =>
 		return if @bootboxOpen
@@ -33,7 +41,7 @@ class UiSelection
 			events: [
 				{
 					hotkey: 'del'
-					description: 'delete selected model'
+					description: 'Delete selected model'
 					callback: @_deleteCurrentNode
 				}
 			]

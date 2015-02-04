@@ -19,6 +19,8 @@ stylus = require 'stylus'
 nib = require 'nib'
 exec = require 'exec'
 http = require 'http'
+
+yaml = require 'js-yaml'
 # Support mixing .coffee and .js files in lowfab-project
 coffeeify = require 'coffeeify'
 # Load yaml configuration into javascript file
@@ -44,7 +46,9 @@ modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
 sharelinkGen = require '../../routes/share'
-
+globalConfig = yaml.safeLoad(
+	fs.readFileSync path.resolve(__dirname, '../common/globals.yaml')
+)
 webapp = express()
 
 # Express assumes that no env means develop.
@@ -88,9 +92,16 @@ module.exports.setupRouting = () ->
 			stylus string
 			.set 'filename', path
 			.set 'compress', !developmentMode
+			.set 'sourcemap', {
+				comment: developmentMode
+				inline: true # Generating an extra map file doesn't seem to work
+			}
 			.set 'include css', true
 			.use nib()
 			.use bootstrap()
+			# Fugly because of github.com/LearnBoost/stylus/issues/1828
+			.define 'backgroundColor', '#' + ('000000' +
+				globalConfig.colors.background.toString 16).slice -6
 	)
 
 	webapp.use (req, res, next) ->
@@ -165,19 +176,19 @@ module.exports.setupRouting = () ->
 	webapp.post '/datapacket/packet/undefined',
 		jsonParser, dataPackets.createPacket
 	webapp.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
-	webapp.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
+	webapp.get '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
 
 	webapp.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?
 			ref = request.body.ref
 			if not (ref.indexOf('develop') >= 0 or ref.indexOf('master') >= 0)
 				log.debug 'Got a server restart command, but "ref" ' +
-									'did not contain develop or master'
+					'did not contain develop or master'
 				response.send ''
 				return
 		else
 			log.warn 'Got a server restart command without a "ref" ' +
-								'json member from ' + request.connection.remoteAddress
+				'json member from ' + request.connection.remoteAddress
 			response.send ''
 			return
 

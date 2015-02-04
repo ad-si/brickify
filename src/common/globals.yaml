@@ -1,8 +1,23 @@
 # unit - all units are in mm (do not change...)
 mm: 1
 
-# scene
-clearColor: 0x202020
+
+colors:
+  background: 0x222222
+
+  axisX: 0xff0000
+  axisY: 0x00ff00
+  axisZ: 0x0000ff
+
+  gridNormal: 0x555555
+  grid5: 0x999999
+  grid10: 0xdddddd
+
+  object: 0xccaa33
+
+  basePlate: 0x555555
+  basePlateStud: 0x5a5a5a
+
 
 # camera adjustments
 fov: 40
@@ -15,19 +30,12 @@ animations: []
 
 # coordinate system
 axisLength: 100
-axisXColor: 0xff0000
-axisYColor: 0x00ff00
-axisZColor: 0x0000ff
 axisLineWidth: 2
 
 # objects
-defaultObjectColor: 0xccaa33
 meshes: []
 
 # grid
-gridColorNormal: 0xcccccc
-gridColor5: 0xffffff
-gridColor10: 0xffffff
 gridLineWidthNormal: 1
 gridLineWidth5: 1
 gridLineWidth10: 1

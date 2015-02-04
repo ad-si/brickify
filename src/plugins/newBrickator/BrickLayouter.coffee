@@ -258,9 +258,10 @@ module.exports = class BrickLayouter
 		@index = 0
 		biConnectedComponents = []
 		stack = []
-		for brick in bricks
-			if brick.biConnectedComponentId == undefined
-				@tarjanAlgorithm brick, biConnectedComponents, stack
+		for zLayer in bricks
+			for brick in zLayer
+				if brick.biConnectedComponentId == undefined
+					@tarjanAlgorithm brick, biConnectedComponents, stack
 		biConnectedComponents
 
 	tarjanAlgorithm: (brick, biConnectedComponents, stack) =>

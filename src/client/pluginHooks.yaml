@@ -119,3 +119,17 @@
 # 3d printed
 
 - getStlDownload
+
+# ## Visibility
+# Each plugin can specify an array of layers that can be turned 
+# visible/invisible by the user. 
+# Layers are visible by default.
+# Example:
+#
+# [{
+#	text: 'Imported 3D-Model'
+#	callback: @_toggleModelLayer
+# }]
+#
+
+- getVisibilityLayers

@@ -115,6 +115,16 @@ module.exports = class NewBrickator
 			csg: object.children[2]
 		}
 
+	_forAllThreeObjects: (callback) =>
+		for threenode in @threejsRootNode.children
+			obj = {
+				voxels: threenode.children[0]
+				bricks: threenode.children[1]
+			}
+
+			callback obj
+
+
 	getBrushes: () =>
 		return [{
 			text: 'Make Lego'
@@ -381,4 +391,15 @@ module.exports = class NewBrickator
 
 		return printBsp
 
+	getVisibilityLayers: () =>
+		return [
+			{
+				text: 'Bricks'
+				callback: @_toggleBrickLayer
+			}
+		]
 
+	_toggleBrickLayer: (isEnabled) =>
+		@_forAllThreeObjects (obj) ->
+			if obj.bricks?
+				obj.bricks.visible = isEnabled

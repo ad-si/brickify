@@ -123,7 +123,8 @@ module.exports = class SolidRenderer
 		return null
 
 	_handleMouseDown: (event, selectedNode) =>
-		@mouseStartPosition = @_getGridXY event.clientX, event.clientY
+		@mouseStartPosition =
+			@bundle.renderer.getGridPosition event.clientX, event.clientY
 
 		@originalObjectPosition = selectedNode.positionData.position
 
@@ -134,12 +135,12 @@ module.exports = class SolidRenderer
 	_handleMouseMove: (event, selectedNode) =>
 		pld = selectedNode.pluginData.solidRenderer
 
-		mouseCurrent = @_getGridXY event.clientX, event.clientY
 		delta = {
 			x: mouseCurrent.x - @mouseStartPosition.x
 			y: mouseCurrent.y - @mouseStartPosition.y
 		}
 		#console.log delta
+		mouseCurrent = @bundle.renderer.getGridPosition event.clientX, event.clientY
 
 		newPosition = {
 			x: @originalObjectPosition.x + delta.x
@@ -164,28 +165,6 @@ module.exports = class SolidRenderer
 
 		#console.log "Mouse moved in 3d: x:#{delta.x}, y:#{delta.y}"
 		#console.log "Set raster position to #{rasterPos.x}, #{rasterPos.y}"
-
-	_getGridXY: (screenX, screenY) =>
-		# calculates the position on the z=0 plane in 3d space
-		# from given screen (mouse) coordinates
-		canvas = @bundle.renderer.threeRenderer.context.canvas
-		camera = @bundle.renderer.getCamera()
-
-		posInCanvas = new THREE.Vector3(
-			(screenX / canvas.width) * 2 - 1
-			(-screenY / canvas.height) * 2 + 1
-			0.5
-		)
-
-		posInCamera = posInCanvas.clone().unproject camera
-
-		ray = posInCamera.sub(camera.position).normalize()
-		# we are calculating in camera coordinate system -> y and z are rotated
-		ray.multiplyScalar -camera.position.y / ray.y
-		posInWorld = camera.position.clone().add ray
-
-		posInScene = new THREE.Vector3 posInWorld.x, -posInWorld.z, posInWorld.y
-		return posInScene
 
 	_rasterizeVector: (vector, raster = 2) =>
 		vector.x = @_rasterize vector.x, raster

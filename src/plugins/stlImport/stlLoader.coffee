@@ -1,4 +1,4 @@
-OptimizedModel = require '../../common/OptimizedModel'
+OptimizedModel = require('meshlib').OptimizedModel
 Vec3 = require '../../common/Vec3'
 
 # Parses the content of a stl file.

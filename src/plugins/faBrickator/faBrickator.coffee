@@ -10,7 +10,6 @@
 
 objectTree = require '../../common/objectTree'
 modelCache = require '../../client/modelCache'
-OptimizedModel = require '../../common/OptimizedModel'
 BrickSystem = require './bricks/BrickSystem'
 BrickLayout = require './bricks/BrickLayout'
 BrickLayouter = require './bricks/BrickLayouter'

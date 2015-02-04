@@ -102,7 +102,7 @@ module.exports = class Renderer
 		)
 
 		@threeRenderer.setSize @size().width, @size().height
-		@threeRenderer.setClearColor globalConfig.clearColor, 1
+
 
 	setupScene: (globalConfig) ->
 		@scene = new THREE.Scene()
@@ -115,7 +115,7 @@ module.exports = class Renderer
 		)
 		@scene.applyMatrix(sceneRotation)
 		@scene.fog = new THREE.Fog(
-			globalConfig.clearColor
+			globalConfig.colors.background
 			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)

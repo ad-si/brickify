@@ -3,7 +3,7 @@ require('es6-promise').polyfill()
 path = require 'path'
 r = require 'react'
 $ = require 'jquery'
-globalConfig = require './globals.yaml'
+globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
 
 window.jQuery = window.$ = require 'jquery'

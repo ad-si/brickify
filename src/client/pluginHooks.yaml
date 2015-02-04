@@ -97,7 +97,17 @@
 # ## Brushes
 #
 # Plugins may return an array with an entry for each brush they provide
-# each brush should have the json structure
-# TODO
+# each brush should have the json structure like in this example:
+#
+# {
+#	text: 'Make Lego'
+#	icon: 'legoBrush.png' #from img/legoBrush.png
+#	selectCallback: # when the brush is selected, selectedNode as argument
+#	deselectCallback: # when the brush is deselected
+#	mouseDownCallback: # when a node is selected and mouse is pressed
+#	mouseMoveCallback: # after being pressed, when mouse is moved
+#	mouseUpCallback: # when mouse is released
+# }
+# 
 
 - getBrushes

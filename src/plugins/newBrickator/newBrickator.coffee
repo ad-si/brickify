@@ -257,6 +257,15 @@ module.exports = class NewBrickator
 		)
 		threeNodes.bricks.visible = true
 
+	snapToGrid: (vec3) =>
+		@gridSpacing ?= (new PipelineSettings()).gridSpacing
+		snapCoord = (coord) =>
+			vec3[coord] =
+				Math.round(vec3[coord] / @gridSpacing[coord]) * @gridSpacing[coord]
+		snapCoord 'x'
+		snapCoord 'y'
+		snapCoord 'z'
+		return vec3
 	getStlDownload: (selectedNode) =>
 		# create the intersection of selected voxels and the model mesh
 		# ToDo use high fidelity lego knobs to create geometry

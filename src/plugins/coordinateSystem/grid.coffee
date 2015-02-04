@@ -19,15 +19,15 @@ module.exports = (threejsNode, globalConfig) ->
 ###
 setupMaterials = (globalConfig) ->
 	@materialGridNormal = new THREE.LineBasicMaterial(
-		color: globalConfig.gridColorNormal
+		color: globalConfig.colors.gridNormal
 		linewidth: globalConfig.gridLineWidthNormal
 	)
 	@materialGrid5 = new THREE.LineBasicMaterial(
-		color: globalConfig.gridColor5
+		color: globalConfig.colors.grid5
 		linewidth: globalConfig.gridLineWidth5
 	)
 	@materialGrid10 = new THREE.LineBasicMaterial(
-		color: globalConfig.gridColor10
+		color: globalConfig.colors.grid10
 		linewidth: globalConfig.gridLineWidth10
 	)
 

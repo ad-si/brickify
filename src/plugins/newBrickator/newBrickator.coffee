@@ -18,6 +18,10 @@ module.exports = class NewBrickator
 		@gridCache = {}
 		@optimizedModelCache = {}
 
+		@printMaterial = new THREE.MeshLambertMaterial({
+			color: 0xfd482f #redish
+		})
+
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
@@ -348,7 +352,7 @@ module.exports = class NewBrickator
 		printBsp = modelBsp.intersect(unionBsp)
 
 		#debug: show intersected mesh
-		printMesh = printBsp.toMesh( @voxelVisualizer.selectedMaterial )
+		printMesh = printBsp.toMesh( @printMaterial )
 		@threejsRootNode.add printMesh
 
 		return null

@@ -58,7 +58,7 @@ module.exports = class UiToolbar
 		@_downloadEventListener.push callback
 
 	_addDownloadButtonUi: =>
-		html = '<div class="btn-primary brushcontainer">
+		html = '<div class="btn-success brushcontainer">
 			<img src="img/downloadBrush.png">
 			</span><br><span>Download</span></div>'
 		brushelement = $(html)

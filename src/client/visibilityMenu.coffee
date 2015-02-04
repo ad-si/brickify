@@ -1,25 +1,21 @@
 module.exports = class VisibilityMenu
 	constructor: (@bundle) ->
-		@_layers = []
-		@_visibilityContainer = $('#visibilityContainer')
-		@_initUi()
+		@_layers = @bundle.pluginHooks.getVisibilityLayers().reduce(
+			(layers, l) -> layers.concat l
+		)
 
-	_initUi: =>
-		layers = @bundle.pluginHooks.getVisibilityLayers()
+		$container = $('#visibilityContainer')
 
-		for layerArray in layers
-			for layer in layerArray
-				layer.enabled = true
-				@_layers.push layer
-				@_createLayerUi layer, (@_layers.length - 1)
+		for layer in @_layers
+			layer.enabled = true
+			$container.append @_createLayerUi layer
 
-	_createLayerUi: (layer, id) =>
-		html = "<div class=\"checkbox\"><label>
-			<input id=\"visibleLayer#{id}\"type=\"checkbox\" checked>
-			#{layer.text}</label></div>"
-		htmlElement = $(html)
-		@_visibilityContainer.append htmlElement
+	_createLayerUi: (layer) =>
+		html = "<div class=\"checkbox\">
+			<label><input type=\"checkbox\" checked>#{layer.text}</label></div>"
+		$htmlElement = $(html)
 
-		$("#visibleLayer#{id}").change () =>
+		$htmlElement.find('input').change () =>
 			layer.enabled = !layer.enabled
 			layer.callback layer.enabled
+		return $htmlElement

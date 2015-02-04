@@ -1,4 +1,5 @@
-'use strict';
+THREE = require('three')
+
 window.ThreeBSP = (function() {
 	
 	var ThreeBSP,

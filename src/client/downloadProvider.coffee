@@ -6,5 +6,5 @@ module.exports = class DownloadProvider
 
 	createDownload: (selectedNode) =>
 		console.log 'Creating Download...'
-		# first, subtract every custom geometry from original model (CSG)
-		returnArrays = @bundle.pluginHooks.getSubtractiveCsg @selectedNode
+		
+		returnArrays = @bundle.pluginHooks.getStlDownload selectedNode

@@ -118,4 +118,4 @@
 # that replaces the original 3d model (partly). everything that is not replaced gets
 # 3d printed
 
-- getSubtractiveCsg
+- getStlDownload

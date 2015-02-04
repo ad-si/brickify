@@ -66,13 +66,17 @@ module.exports = class NewBrickator
 		)
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
+		modelTransform = @_getModelTransforms selectedNode
+		pipelineSettings.setModelTransform modelTransform
+
+	_getModelTransforms: (selectedNode) =>
 		#ToDo (future): add rotation and scaling (the same way it's done in three)
 		#to keep visual consistency
 
 		modelTransform = new THREE.Matrix4()
 		pos = selectedNode.positionData.position
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
-		pipelineSettings.setModelTransform modelTransform
+		return modelTransform
 
 	getThreeObjectsByNode: (node) =>
 		# search for subnode for this object
@@ -253,9 +257,57 @@ module.exports = class NewBrickator
 		)
 		threeNodes.bricks.visible = true
 
-	getSubtractiveCsg: (selectedNode) =>
-		# return lego brick csg for this node, so that only
-		# parts that are not created with lego get 3d printed
-		# ToDo
+	getStlDownload: (selectedNode) =>
+		# create the intersection of selected voxels and the model mesh
+		# ToDo use high fidelity lego knobs to create geometry
+
+		printVoxels = []
+		grid = @_getGrid(selectedNode).grid
+
+		grid.forEachVoxel (voxel, x, y, z) =>
+			if not voxel.enabled
+				printVoxels.push {x: x, y: y, z: z}
+
+		# ToDo: merge voxels into one geometry, see issue #202
+
+		# create voxel csg
+		voxGeometry = new THREE.BoxGeometry(
+			grid.spacing.x, grid.spacing.y, grid.spacing.z
+		)
+
+		for voxel in printVoxels
+			mesh = new THREE.Mesh(voxGeometry, null)
+			mesh.translateX( grid.origin.x + grid.spacing.x * voxel.x)
+			mesh.translateY( grid.origin.y + grid.spacing.y * voxel.y)
+			mesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z)
+			meshBsp = new ThreeBSP(mesh)
+
+			if unionBsp?
+				unionBsp = unionBsp.union(meshBsp)
+			else
+				unionBsp = meshBsp
+
+		#debug: convert back to visible mesh
+		#unionMesh = unionBsp.toMesh( @brickVisualizer.selectedMaterial )
+		#@threejsRootNode.add unionMesh
+
+		#intersect with original mesh to get 3d printed stuff
+		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
+		if not optimizedModel
+			return
+
+		modelModel = optimizedModel.convertToThreeGeometry()
+		modelTransform = @_getModelTransforms selectedNode
+		modelModel.applyMatrix(modelTransform)
+
+		modelBsp = new ThreeBSP(modelModel)
+
+		printBsp = modelBsp.intersect(unionBsp)
+
+		#debug: show intersected mesh
+		printMesh = printBsp.toMesh( @brickVisualizer.selectedMaterial )
+		@threejsRootNode.add printMesh
 
 		return null
+
+

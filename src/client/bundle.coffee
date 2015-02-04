@@ -4,7 +4,7 @@ Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
 
-ObjectTree = require '../common/objectTree'
+ObjectTree = require '../common/state/objectTree'
 
 ###
 # @class Bundle

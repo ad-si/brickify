@@ -7,6 +7,8 @@
 
 THREE = require 'three'
 modelCache = require '../../client/modelCache'
+globalConfig = require '../../common/globals.yaml'
+
 
 module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
@@ -17,16 +19,10 @@ module.exports = class LegoBoard
 	# Load the board
 	init3d: (@threejsNode) =>
 		material = new THREE.MeshLambertMaterial(
-			{
-				color: 0xababab
-				ambient: 0xbebebe
-			}
+				color: globalConfig.colors.basePlate
 		)
 		knobsMaterial = new THREE.MeshLambertMaterial(
-			{
-				color: 0xa5a5a5
-				ambient: 0xbebebe
-			}
+				color: globalConfig.colors.basePlateStud
 		)
 
 		#create baseplate
@@ -36,7 +32,9 @@ module.exports = class LegoBoard
 		@threejsNode.add boxobj
 
 		#create noppen
-		modelCache.request('0de1cbfdc2710eeb3604aedb6c8853b7').then (model) =>
+		modelCache
+		.request('0de1cbfdc2710eeb3604aedb6c8853b7')
+		.then (model) =>
 			geo = model.convertToThreeGeometry()
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80

@@ -16,7 +16,7 @@ module.exports = (threejsNode, globalConfig) ->
 		new THREE.Vector3( globalConfig.axisLength, 0, 0)
 	)
 	materialXAxis = new THREE.LineBasicMaterial(
-		color: globalConfig.axisXColor
+		color: globalConfig.colors.axisX
 		linewidth: globalConfig.axisLineWidth
 	)
 	xAxis = new THREE.Line(geometryXAxis, materialXAxis)
@@ -31,7 +31,7 @@ module.exports = (threejsNode, globalConfig) ->
 		new THREE.Vector3( 0, globalConfig.axisLength, 0)
 	)
 	materialYAxis = new THREE.LineBasicMaterial(
-		color: globalConfig.axisYColor
+		color: globalConfig.colors.axisY
 		linewidth: globalConfig.axisLineWidth
 	)
 	yAxis = new THREE.Line(geometryYAxis, materialYAxis)
@@ -46,7 +46,7 @@ module.exports = (threejsNode, globalConfig) ->
 		new THREE.Vector3( 0, 0, globalConfig.axisLength)
 	)
 	materialZAxis = new THREE.LineBasicMaterial(
-		color: globalConfig.axisZColor
+		color: globalConfig.colors.axisZ
 		linewidth: globalConfig.axisLineWidth
 	)
 	zAxis = new THREE.Line(geometryZAxis, materialZAxis)

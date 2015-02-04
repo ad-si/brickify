@@ -4,67 +4,34 @@ interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
 objectTree = require '../../common/state/objectTree'
+BrickVisualizer = require './BrickVisualizer'
+PipelineSettings = require './PipelineSettings'
+objectTree = require '../../common/state/objectTree'
+three = require 'three'
+Brick = require './Brick'
+BrickLayouter = require './BrickLayouter'
 
 module.exports = class NewBrickator
 	constructor: () ->
-		# smallest lego brick
-		@baseBrick = {
-			length: 8
-			width: 8
-			height: 3.2
-		}
-		@pipeline = new LegoPipeline(@baseBrick)
+		@pipeline = new LegoPipeline()
+		@brickLayouter = new BrickLayouter()
+		@gridCache = {}
+		@optimizedModelCache = {}
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
-	getConvertUiSchema: () =>
-		legoCallback = (selectedNode) =>
-			@runLegoPipelineOnNode selectedNode
-
-		return {
-		title: 'NewBrickator'
-		type: 'object'
-		actions:
-			a1:
-				title: 'Legofy'
-				callback: legoCallback
-		}
-
-	onClick: (event) =>
-		intersects =
-			interactionHelper.getPolygonClickedOn(event
-				@threejsRootNode.children
-				@bundle.renderer)
-		if (intersects.length > 0)
-			obj = intersects[0].object
-			###
-			@threejsRootNode.remove obj
-			###
-			obj.material = new THREE.MeshLambertMaterial({
-				color: 0xdf004c
-				opacity: 0.5
-				transparent: true
-			})
-			console.log "Setting debug voxel to:
-			x: #{obj.voxelCoords.x} y: #{obj.voxelCoords.y} z: #{obj.voxelCoords.z}"
-
-			@debugVoxel = obj.voxelCoords
-
 	onStateUpdate: (state) =>
-		return unless @voxelizedNodes?
 		#delete voxel visualizations for deleted objects
-		availableNodes = []
-		objectTree.forAllSubnodesWithProperty state.rootNode,
+		availableObjects = []
+		objectTree.forAllSubnodeProperties state.rootNode,
 			'newBrickator',
-			(node) -> availableNodes.push node
+			(property) ->
+				availableObjects.push property.threeObjectUuid
 
-		deletedNodes = @voxelizedNodes.filter(
-			(node) -> availableNodes.indexOf node < 0
-		)
-		for node in deletedNodes
-			threeNode = @getThreeObjectByNode node
-			@voxelVisualizer.clear(threeNode)
+		for child in @threejsRootNode.children
+				if availableObjects.indexOf(child.uuid) < 0
+					@threejsRootNode.remove @threeObjects[key]
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
@@ -80,27 +47,218 @@ module.exports = class NewBrickator
 
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
-		@voxelizedNodes ?= []
 
-		threeNode = @getThreeObjectByNode selectedNode
-		@voxelVisualizer.clear(threeNode)
+		threeNodes = @getThreeObjectsByNode(selectedNode)
+		
+		settings = new PipelineSettings()
+		@_applyModelTransforms selectedNode, settings
 
-		settings = {
-			debugVoxel: @debugVoxel
+		data = {
+			optimizedModel: optimizedModel
 		}
+		results = @pipeline.run data, settings, true
 
-		results = @pipeline.run optimizedModel, settings, true
-		grid = results.lastResult
+		@brickVisualizer ?= new BrickVisualizer()
+		@brickVisualizer.createVisibleBricks(
+			threeNodes.bricks,
+			results.accumulatedResults.bricks,
+			results.accumulatedResults.grid
+		)
 
-		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
-		@voxelizedNodes.push selectedNode
+	_applyModelTransforms: (selectedNode, pipelineSettings) =>
+		#ToDo (future): add rotation and scaling (the same way it's done in three)
+		#to keep visual consistency
 
-	getThreeObjectByNode: (node) =>
+		modelTransform = new THREE.Matrix4()
+		pos = selectedNode.positionData.position
+		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
+		pipelineSettings.setModelTransform modelTransform
+
+	getThreeObjectsByNode: (node) =>
+		# search for subnode for this object
 		if node.pluginData.newBrickator?
 			uuid = node.pluginData.newBrickator.threeObjectUuid
-			for node in @threejsRootNode.children
-				return node if node.uuid == uuid
+			for threenode in @threejsRootNode.children
+				if threenode.uuid == uuid
+					return { voxels: threenode.children[0], bricks: threenode.children[1] }
+
+		#create two sub-sub nodes, one for the voxels and one for the bricks
 		object = new THREE.Object3D()
 		@threejsRootNode.add object
-		node.pluginData.newBrickator = {'threeObjectUuid': object.uuid}
-		object
+
+		voxelObject = new THREE.Object3D()
+		object.add voxelObject
+		brickObject = new THREE.Object3D()
+		object.add brickObject
+		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
+
+		return { voxels: object.children[0], bricks: object.children[1] }
+
+	getBrushes: () =>
+		return [{
+			text: 'Make Lego'
+			icon: 'legoBrush.png'
+			selectCallback: @_brushSelectCallback
+			mouseDownCallback: @_brushMouseDownCallback
+			mouseMoveCallback: @_selectLegoMouseMoveCallback
+			mouseUpCallback: @_brushMouseUpCallback
+		},{
+			text: 'Make 3D printed'
+			icon: '3dPrintBrush.png'
+			# select / deselect are the same for both voxels,
+			# but move has a different function
+			selectCallback: @_brushSelectCallback
+			mouseDownCallback: @_brushMouseDownCallback
+			mouseMoveCallback: @_select3DMouseMoveCallback
+			mouseUpCallback: @_brushMouseUpCallback
+		}]
+
+	_getGrid: (selectedNode) =>
+		# returns the voxel grid for the selected node
+		# if the node has not changed position and the grid exists,
+		# the cached instance is returned
+
+		identifier = selectedNode.pluginData.solidRenderer.threeObjectUuid
+		nodePosition = selectedNode.positionData.position
+
+		if @gridCache[identifier]?
+			griddata = @gridCache[identifier]
+
+			if griddata.x == nodePosition.x and
+			griddata.y == nodePosition.y and
+			griddata.z == nodePosition.z
+				return griddata
+
+		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
+		if not optimizedModel?
+			return null
+			
+		settings = new PipelineSettings()
+		@_applyModelTransforms selectedNode, settings
+		settings.deactivateLayouting()
+
+		data = {
+			optimizedModel: optimizedModel
+		}
+		results = @pipeline.run data, settings, true
+
+		@gridCache[identifier] = {
+			grid: results.accumulatedResults.grid
+			threeNode: null
+			x: nodePosition.x
+			y: nodePosition.y
+			z: nodePosition.z
+		}
+		return @gridCache[identifier]
+
+	_brushSelectCallback: (selectedNode) =>
+		# get optimized model that is selected and store in local cache
+		id = selectedNode.meshHash
+
+		if @optimizedModelCache[id]?
+			return
+		else
+			modelCache.request(id).then(
+				(optimizedModel) =>
+					@optimizedModelCache[id] = optimizedModel
+			)
+
+	_brushMouseDownCallback: (event, selectedNode) =>
+		# create voxel grid, if it does not exist yet
+		# show it
+		grid = @_getGrid selectedNode
+		threeObjects = @getThreeObjectsByNode(selectedNode)
+
+		if not grid.threeNode
+			grid.threeNode = threeObjects.voxels
+			@voxelVisualizer ?= new VoxelVisualizer()
+			@voxelVisualizer.createVisibleVoxels(
+				grid.grid
+				grid.threeNode
+				false
+			)
+		else
+			grid.threeNode.visible = true
+
+		# hide bricks
+		threeObjects.bricks.visible = false
+
+	_select3DMouseMoveCallback: (event, selectedNode) =>
+		# disable all voxels we touch with the mouse
+		obj = @_getSelectedVoxel event, selectedNode
+		grid = @_getGrid selectedNode
+
+		if obj
+			obj.material = @voxelVisualizer.deselectedMaterial
+			c = obj.voxelCoords
+			grid.grid.zLayers[c.z][c.x][c.y].enabled = false
+
+	_selectLegoMouseMoveCallback: (event, selectedNode) =>
+		# enable all voxels we touch with the mouse
+		obj = @_getSelectedVoxel event, selectedNode
+		grid = @_getGrid selectedNode
+
+		if obj
+			obj.material = @voxelVisualizer.selectedMaterial
+			c = obj.voxelCoords
+			grid.grid.zLayers[c.z][c.x][c.y].enabled = true
+
+	_getSelectedVoxel: (event, selectedNode) =>
+		# returns the first visible voxel (three.Object3D) that is below
+		# the cursor position, if it has a voxelCoords property
+		threeNodes = @getThreeObjectsByNode selectedNode
+
+		intersects =
+			interactionHelper.getPolygonClickedOn(event
+				threeNodes.voxels.children
+				@bundle.renderer)
+
+		if (intersects.length > 0)
+			obj = intersects[0].object
+			
+			if obj.voxelCoords
+				return obj
+		return null
+
+
+	_brushMouseUpCallback: (event, selectedNode) =>
+		# hide grid, then legofy
+		grid = @_getGrid selectedNode
+		grid.threeNode.visible = false
+
+		# legofy
+		settings = new PipelineSettings()
+		@_applyModelTransforms selectedNode, settings
+		settings.deactivateVoxelizing()
+
+		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
+		if not optimizedModel
+			return
+
+		data = {
+			optimizedModel: optimizedModel
+			grid: grid.grid
+		}
+		results = @pipeline.run data, settings, true
+
+		threeNodes = @getThreeObjectsByNode selectedNode
+
+		@brickVisualizer ?= new BrickVisualizer()
+		@brickVisualizer.createVisibleBricks(
+			threeNodes.bricks,
+			results.accumulatedResults.bricks,
+			results.accumulatedResults.grid
+		)
+		threeNodes.bricks.visible = true
+
+	snapToGrid: (vec3) =>
+		@gridSpacing ?= (new PipelineSettings()).gridSpacing
+		snapCoord = (coord) =>
+			vec3[coord] =
+				Math.round(vec3[coord] / @gridSpacing[coord]) * @gridSpacing[coord]
+		snapCoord 'x'
+		snapCoord 'y'
+		snapCoord 'z'
+		return vec3
+
+

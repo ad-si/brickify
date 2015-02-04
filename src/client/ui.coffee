@@ -1,6 +1,6 @@
 Hotkeys = require './hotkeys'
-UiWorkflow = require './uiWorkflow'
 UiSceneManager = require './uiSceneManager'
+UiToolbar = require './UiToolbar'
 
 ###
 # @module ui
@@ -11,6 +11,7 @@ module.exports = class Ui
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
 		@sceneManager = new UiSceneManager(@bundle)
+		@toolbar = new UiToolbar(@bundle)
 		@_init()
 
 	dropHandler: (event) ->
@@ -24,11 +25,32 @@ module.exports = class Ui
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
-	clickHandler: (event) ->
+	mouseDownHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
+
+		@_mouseIsDown = true
+
 		for onClickHandler in @pluginHooks.get 'onClick'
 			onClickHandler(event)
+
+		@toolbar.handleMouseDown event
+
+	mouseUpHandler: (event) =>
+		event.preventDefault()
+
+		@_mouseIsDown = false
+
+		if @toolbar.hasBrushSelected()
+			@toolbar.handleMouseUp event
+
+	mouseMoveHandler: (event) =>
+		event.preventDefault()
+
+		if @_mouseIsDown
+			if @toolbar.hasBrushSelected()
+				event.stopPropagation()
+				@toolbar.handleMouseMove event
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
@@ -38,7 +60,6 @@ module.exports = class Ui
 	_init: =>
 		@_initListeners()
 		@_initScenegraph()
-		@_initWorkflow()
 		@_initHotkeys()
 
 	_initListeners: =>
@@ -62,16 +83,25 @@ module.exports = class Ui
 
 		@renderer.getDomElement().addEventListener(
 			'mousedown'
-			@clickHandler.bind @
+			@mouseDownHandler.bind @
+			false
+		)
+
+		@renderer.getDomElement().addEventListener(
+			'mouseup'
+			@mouseUpHandler.bind @
+			false
+		)
+
+		@renderer.getDomElement().addEventListener(
+			'mousemove'
+			@mouseMoveHandler.bind @
 			false
 		)
 
 	_initScenegraph: =>
 		@bundle.getPlugin('scene-graph').initUi $('#sceneGraphContainer')
 		return
-
-	_initWorkflow: =>
-		@workflow = new UiWorkflow(@bundle)
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)

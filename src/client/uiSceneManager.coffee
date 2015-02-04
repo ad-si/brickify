@@ -30,8 +30,8 @@ class UiSceneManager
 #
 
 	select: (@selectedNode) =>
-		@bundle.ui.workflow.showCurrent @selectedNode
 		@pluginHooks.onNodeSelect @selectedNode
+		@bundle.ui.toolbar.onNodeSelect @selectedNode
 		return
 
 	deselect: =>

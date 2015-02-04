@@ -93,6 +93,16 @@ module.exports = class NewBrickator
 
 		return { voxels: object.children[0], bricks: object.children[1] }
 
+	_forAllThreeObjects: (callback) =>
+		for threenode in @threejsRootNode.children
+			obj = {
+				voxels: threenode.children[0]
+				bricks: threenode.children[1]
+			}
+
+			callback obj
+
+
 	getBrushes: () =>
 		return [{
 			text: 'Make Lego'
@@ -262,4 +272,15 @@ module.exports = class NewBrickator
 		snapCoord 'z'
 		return vec3
 
+	getVisibilityLayers: () =>
+		return [
+			{
+				text: 'Bricks'
+				callback: @_toggleBrickLayer
+			}
+		]
 
+	_toggleBrickLayer: (isEnabled) =>
+		@_forAllThreeObjects (obj) ->
+			if obj.bricks?
+				obj.bricks.visible = isEnabled

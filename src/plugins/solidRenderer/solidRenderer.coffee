@@ -141,8 +141,6 @@ module.exports = class SolidRenderer
 			z: 0
 		}
 
-		@bundle.getPlugin('newBrickator').snapToGrid newPosition
-
 		selectedNode.positionData.position = newPosition
 
 		pld = selectedNode.pluginData.solidRenderer

@@ -1,6 +1,7 @@
 Hotkeys = require './hotkeys'
 UiSceneManager = require './uiSceneManager'
 UiToolbar = require './UiToolbar'
+VisibilityMenu = require './VisibilityMenu'
 
 ###
 # @module ui
@@ -12,6 +13,7 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@sceneManager = new UiSceneManager(@bundle)
 		@toolbar = new UiToolbar(@bundle)
+		@visibilityMenu = new VisibilityMenu(@bundle)
 		@_init()
 
 	dropHandler: (event) ->

@@ -35,11 +35,6 @@
 
 - newBoundingSphere
 
-# if provided, a UI to configure the plugins convertion will be created. changed
-# values are always stored in the state, relative to the currently selected node
-# Must (only) be provided by converter plugins
-
-- getConvertUiSchema
 
 #  ## State synchronization
 #

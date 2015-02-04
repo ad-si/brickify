@@ -39,23 +39,11 @@ module.exports = class PluginLoader
 	loadPlugins: () ->
 		pluginInstances = []
 
-		pluginInstances.push @initPlugin(
+		###pluginInstances.push @initPlugin(
 			require('../plugins/dummy'),
 			require('../plugins/dummy/package.json')
 		)
 		###
-		pluginInstances.push @initPlugin(
-			require('../plugins/example'),
-			require('../plugins/example/package.json')
-		)###
-		pluginInstances.push @initPlugin(
-			require('../plugins/coordinateSystem'),
-			require('../plugins/coordinateSystem/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/solidRenderer'),
-			require('../plugins/solidRenderer/package.json')
-		)
 		pluginInstances.push @initPlugin(
 			require('../plugins/stlImport'),
 			require('../plugins/stlImport/package.json')
@@ -69,19 +57,19 @@ module.exports = class PluginLoader
 			require('../plugins/sceneGraph/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('../plugins/faBrickator'),
-			require('../plugins/faBrickator/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/newBrickator'),
-			require('../plugins/newBrickator/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/3dPrint'),
-			require('../plugins/3dPrint/package.json')
+			require('../plugins/coordinateSystem'),
+			require('../plugins/coordinateSystem/package.json')
 		)
 		pluginInstances.push @initPlugin(
 			require('../plugins/legoBoard'),
 			require('../plugins/legoBoard/package.json')
+		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/solidRenderer'),
+			require('../plugins/solidRenderer/package.json')
+		)
+		pluginInstances.push @initPlugin(
+			require('../plugins/newBrickator'),
+			require('../plugins/newBrickator/package.json')
 		)
 		return pluginInstances

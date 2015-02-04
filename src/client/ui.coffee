@@ -1,5 +1,5 @@
 Hotkeys = require './hotkeys'
-UiSelection = require './uiSelection'
+UiSceneManager = require './uiSceneManager'
 UiToolbar = require './UiToolbar'
 VisibilityMenu = require './VisibilityMenu'
 
@@ -11,8 +11,8 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
-		@selection = new UiSelection(@bundle)
-		@toolbar = new UiToolbar(@bundle, @selection)
+		@sceneManager = new UiSceneManager(@bundle)
+		@toolbar = new UiToolbar(@bundle)
 		@visibilityMenu = new VisibilityMenu(@bundle)
 		@_init()
 
@@ -107,7 +107,7 @@ module.exports = class Ui
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)
-		@hotkeys.addEvents @selection.getHotkeys()
+		@hotkeys.addEvents @sceneManager.getHotkeys()
 
 		gridHotkeys = {
 			title: 'UI'

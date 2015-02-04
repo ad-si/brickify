@@ -4,7 +4,7 @@ Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
 
-ObjectTree = require '../common/objectTree'
+ObjectTree = require '../common/state/objectTree'
 
 ###
 # @class Bundle
@@ -15,7 +15,7 @@ module.exports = class Bundle
 		@pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(@)
-		@modelLoader = new ModelLoader(@statesync, @pluginHooks, @globalConfig)
+		@modelLoader = new ModelLoader(@)
 
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 

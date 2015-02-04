@@ -104,6 +104,51 @@ module.exports = class DummyPlugin
 		return undefined
 
 	###
+	# Each time a new node is added to the scene, the scene will inform plugins
+	# by calling onNodeAdd
+	#
+	# @memberOf dummyClientPlugin
+	# @param {NodeStructure} node the added node
+	###
+	onNodeAdd: (node) =>
+		console.log node, ' added'
+		return
+
+	###
+	# Each time a scene's node is selected, the scene will inform plugins by
+	# calling onNodeSelect
+	#
+	# @memberOf dummyClientPlugin
+	# @param {NodeStructure} node the selected node
+	###
+	onNodeSelect: (node) =>
+		console.log node, ' selected'
+		return
+
+	###
+	# Each time a scene's node is deselected, the scene will inform plugins by
+	# calling onNodeDeselect
+	#
+	# @memberOf dummyClientPlugin
+	# @param {NodeStructure} node the deselected node
+	###
+	onNodeDeselect: (node) =>
+		console.log node, ' deselected'
+		return
+
+	###
+	# When a node is removed from the scene, the scene will inform plugins by
+	# calling onNodeRemove
+	#
+	# @memberOf dummyClientPlugin
+	# @param {NodeStructure} node the removed node
+	###
+	onNodeRemove: (node) =>
+		console.log node, ' removed'
+		return
+
+
+	###
 	# When a file is loaded into lowfab, the `fileLoader` will try to import
 	# it with every plugin that implements importFile until one succeeds.
 	# The file's name and its content are provided as arguments.

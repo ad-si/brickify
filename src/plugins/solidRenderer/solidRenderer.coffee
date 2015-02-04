@@ -133,48 +133,19 @@ module.exports = class SolidRenderer
 		return
 
 	_handleMouseMove: (event, selectedNode) =>
-		pld = selectedNode.pluginData.solidRenderer
-
-		delta = {
-			x: mouseCurrent.x - @mouseStartPosition.x
-			y: mouseCurrent.y - @mouseStartPosition.y
-		}
-		#console.log delta
 		mouseCurrent = @bundle.renderer.getGridPosition event.clientX, event.clientY
 
 		newPosition = {
-			x: @originalObjectPosition.x + delta.x
-			y: @originalObjectPosition.y + delta.y
+			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
+			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
+			z: 0
 		}
 
-		rasterPos = @_rasterizeVector newPosition
+		@bundle.getPlugin('newBrickator').snapToGrid newPosition
 
-		selectedNode.positionData.position.x = mouseCurrent.x
-		selectedNode.positionData.position.y = mouseCurrent.y
-		
-		###
-		updateCallback = (state) =>
-			selectedNode.positionData.position.x = rasterPos.x
-			selectedNode.positionData.position.y = rasterPos.y
-			return
-		@bundle.statesync.performStateAction updateCallback
-		###
+		selectedNode.positionData.position = newPosition
+
+		pld = selectedNode.pluginData.solidRenderer
 
 		threeObject = @_getThreeObjectByName pld.threeObjectUuid
 		@_copyTransformDataToThree selectedNode, threeObject
-
-		#console.log "Mouse moved in 3d: x:#{delta.x}, y:#{delta.y}"
-		#console.log "Set raster position to #{rasterPos.x}, #{rasterPos.y}"
-
-	_rasterizeVector: (vector, raster = 2) =>
-		vector.x = @_rasterize vector.x, raster
-		vector.y = @_rasterize vector.y, raster
-		return vector
-
-	_rasterize: (value, raster) ->
-		mod = value % raster
-		if mod > (raster / 2)
-			value += (raster - mod)
-		else
-			value -= mod
-		return value

@@ -1,24 +1,17 @@
-.quickConvertBackground
-	.container#quickConvert
-		h2 Quickconvert
-		p
-		| We think that you might like this conversion.
-		| You can download it directly or refine it using our online editor
-
+section.quickConvert
+	.container
 		.row
-			.col-lg-4
+			.col-lg-5.text-center
 				h3
 					center Original Model
 				canvas#renderArea1.quickConvertCanvas
-			.col-lg-4
-				div(style='width:250px; margin-left:auto; margin-right:auto; display: block; margin-top: 200px')
-					img(src='/img/convertArrow.png' width='250px')
-			.col-lg-4
+			.col-lg-2.text-center.convert-arrow
+				img.img-responsive(src='/img/convertArrow.png')
+			.col-lg-5.text-center
 				h3
-					center To LEGO bricks
+					center With LEGO#[sup &reg;] bricks
 				canvas#renderArea2.quickConvertCanvas
-				p
-					center
-						a.btn.btn-primary Download
-						|&nbsp;
-						a.btn.btn-success.applink(href='app#legofy+') Customize
+				#applinks
+					a.btn.btn-success Download
+					|&nbsp;
+					a.btn.btn-primary.applink(href='app#legofy+initialModel=1c2395a3145ad77aee7479020b461ddf') Customize

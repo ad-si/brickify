@@ -17,8 +17,8 @@ module.exports = class Hotkeys
 		for own group, events of @events
 			message += '<section><h4>' + group + '</h4>'
 			for event in events
-				message += '<p><span class="keys"><kbd class="key ">' +
-					event.hotkey + '</kbd></span><span>' + event.description + '</span></p>'
+				message += '<p><span class="keys"><kbd>' + event.hotkey +
+					'</kbd></span> <span>' + event.description + '</span></p>'
 			message += '</section>'
 		bootbox.dialog({
 			title: 'Keyboard shortcuts'

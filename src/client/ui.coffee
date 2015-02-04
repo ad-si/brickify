@@ -1,6 +1,6 @@
 Hotkeys = require './hotkeys'
 UiWorkflow = require './uiWorkflow'
-Scene = require './uiSceneManager'
+UiSceneManager = require './uiSceneManager'
 
 ###
 # @module ui
@@ -8,8 +8,8 @@ Scene = require './uiSceneManager'
 
 module.exports = class Ui
 	constructor: (@bundle) ->
-		@renderer = bundle.renderer
-		@pluginHooks = bundle.pluginHooks
+		@renderer = @bundle.renderer
+		@pluginHooks = @bundle.pluginHooks
 		@sceneManager = new UiSceneManager(@bundle)
 		@_init()
 
@@ -76,3 +76,20 @@ module.exports = class Ui
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)
 		@hotkeys.addEvents @sceneManager.getHotkeys()
+
+		gridHotkeys = {
+			title: 'UI'
+			events: [
+				{
+					description: 'Toggle coordinate system / lego plate'
+					hotkey: 'g'
+					callback: =>
+						@_toggleGridVisibility()
+				}
+			]
+		}
+		@hotkeys.addEvents gridHotkeys
+
+	_toggleGridVisibility: () =>
+		@bundle.getPlugin('lego-board').toggleVisibility()
+		@bundle.getPlugin('coordinate-system').toggleVisibility()

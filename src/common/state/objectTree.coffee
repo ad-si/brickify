@@ -83,6 +83,9 @@ module.exports = {
 	init: (state) ->
 		return state.rootNode ?= new NodeStructure()
 
+	clear: (state) ->
+		return state.rootNode = new NodeStructure()
+
 	addChild: (node) ->
 		newNode = new NodeStructure()
 

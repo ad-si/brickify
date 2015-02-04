@@ -29,16 +29,6 @@ module.exports = class NewBrickator
 			a1:
 				title: 'Legofy'
 				callback: legoCallback
-		properties:
-			gridDeltaX:
-				description: 'Voxelgrid dx (0..7)'
-				type: 'number'
-			gridDeltaY:
-				description: 'Voxelgrid dy (0..7)'
-				type: 'number'
-			gridDeltaZ:
-				description: 'Voxelgrid dz (0..3)'
-				type: 'number'
 		}
 
 	onClick: (event) =>
@@ -62,16 +52,19 @@ module.exports = class NewBrickator
 			@debugVoxel = obj.voxelCoords
 
 	onStateUpdate: (state) =>
+		return unless @voxelizedNodes?
 		#delete voxel visualizations for deleted objects
-		availableObjects = []
-		objectTree.forAllSubnodeProperties state.rootNode,
+		availableNodes = []
+		objectTree.forAllSubnodesWithProperty state.rootNode,
 			'newBrickator',
-			(property) ->
-				availableObjects.push property.threeObjectUuid
+			(node) -> availableNodes.push node
 
-		for child in @threejsRootNode.children
-				if availableObjects.indexOf(child.uuid) < 0
-					@threejsRootNode.remove @threeObjects[key]
+		deletedNodes = @voxelizedNodes.filter(
+			(node) -> availableNodes.indexOf node < 0
+		)
+		for node in deletedNodes
+			threeNode = @getThreeObjectByNode node
+			@voxelVisualizer.clear(threeNode)
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
@@ -85,41 +78,22 @@ module.exports = class NewBrickator
 				@runLegoPipeline optimizedModel, selectedNode
 		)
 
-	getUiSettings: (selectedNode) =>
-		if selectedNode.toolsValues?.newbrickator?
-			return selectedNode.toolsValues.newbrickator
-		else
-			if !(selectedNode.toolsValues?)
-				selectedNode.toolsValues = {}
-
-			selectedNode.toolsValues.newbrickator = {
-				gridDeltaX: 0
-				gridDeltaY: 0
-				gridDeltaZ: 0
-			}
-			return selectedNode.toolsValues.newbrickator
-
 	runLegoPipeline: (optimizedModel, selectedNode) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
-
-		uiSettings = @getUiSettings selectedNode
+		@voxelizedNodes ?= []
 
 		threeNode = @getThreeObjectByNode selectedNode
 		@voxelVisualizer.clear(threeNode)
 
 		settings = {
 			debugVoxel: @debugVoxel
-			gridDelta: {
-				x: uiSettings.gridDeltaX
-				y: uiSettings.gridDeltaY
-				z: uiSettings.gridDeltaZ
-			}
 		}
 
 		results = @pipeline.run optimizedModel, settings, true
 		grid = results.lastResult
 
 		@voxelVisualizer.createVisibleVoxels grid, threeNode, false
+		@voxelizedNodes.push selectedNode
 
 	getThreeObjectByNode: (node) =>
 		if node.pluginData.newBrickator?

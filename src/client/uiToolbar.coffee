@@ -8,70 +8,57 @@ module.exports = class UiToolbar
 
 	handleMouseDown: (event) =>
 		if @_selectedBrush and @_selectedNode()?
-			if @_selectedBrush.mouseDownCallback?
-				@_selectedBrush.mouseDownCallback event, @_selectedNode()
+			@_selectedBrush.mouseDownCallback event, @_selectedNode()
 
 	handleMouseMove: (event) =>
 		if @_selectedBrush and @_selectedNode()?
-			if @_selectedBrush.mouseMoveCallback?
-				@_selectedBrush.mouseMoveCallback event, @_selectedNode()
+			@_selectedBrush.mouseMoveCallback? event, @_selectedNode()
 
 	handleMouseUp: (event) =>
 		if @_selectedBrush and @_selectedNode()?
-			if @_selectedBrush.mouseUpCallback?
-				@_selectedBrush.mouseUpCallback event, @_selectedNode()
-
-	hasBrushSelected: () =>
-		return true if  @_selectedBrush
-		return false
+			@_selectedBrush.mouseUpCallback? event, @_selectedNode()
 
 	_createBrushList: =>
-		returnArrays = @bundle.pluginHooks.getBrushes()
-		@_brushes = []
+		@_brushes = @bundle.pluginHooks.getBrushes().reduce(
+			(brushes, b) -> brushes.concat b
+		)
 
-		for array in returnArrays
-			for b in array
-				@_brushes.push b
-
+		$toolbar = $('#toolbar')
 		for brush in @_brushes
-			jqueryElement = @_createBrushUi brush
-			brush.jqueryElement = jqueryElement
+			brush.jqueryElement = @_createBrushUi brush
+			$toolbar.append brush.jqueryElement
 
 	_createBrushUi: (brush) =>
 		html = '<div class="brushcontainer"><img src="img/' +
 			brush.icon + '" width="64px" height="64px"><br><span>' +
 			brush.text + '</span></div>'
 		brushelement = $(html)
-		brushelement.on 'click', () =>
-			@_handleBrushClicked brush, brushelement
-		$('#toolbar').append(brushelement)
+		brushelement.on 'click', () => @_handleBrushClicked brush, brushelement
 
 		return brushelement
 
 	onNodeSelect: (selectedNode) =>
-		if selectedNode?
-			if @_selectedBrush
-				if @_selectedBrush.selectCallback?
-					@_selectedBrush.selectCallback selectedNode
+		if @_selectedBrush and selectedNode?
+				@_selectedBrush.selectCallback? selectedNode
 
 	_selectedNode: () =>
 		return @bundle.ui.sceneManager.selectedNode
 
+	hasBrushSelected: () =>
+		return !!@_selectedBrush # convert to strict boolean type
+
 	_handleBrushClicked: (brush, jqueryElement) =>
 		if @_selectedBrush
-			if @_selectedBrush.deselectCallback? and @_selectedNode()?
-				@_selectedBrush.deselectCallback @_selectedNode()
+			if @_selectedNode()?
+				@_selectedBrush.deselectCallback? @_selectedNode()
 
 			@_selectedBrush.jqueryElement.removeClass 'brushselect'
 
 			#edgecase: user clicked on selected brush: deselect this brush
 			if @_selectedBrush == brush
-				@_selectedBrush = false
+				@_selectedBrush = null
 				return
 
 		@_selectedBrush = brush
-		
-		if @_selectedBrush.selectCallback? and @_selectedNode()?
-			@_selectedBrush.selectCallback @_selectedNode()
-
+		@_selectedBrush.selectCallback? @_selectedNode() if @_selectedNode()?
 		@_selectedBrush.jqueryElement.addClass 'brushselect'

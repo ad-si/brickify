@@ -271,11 +271,18 @@ module.exports = class NewBrickator
 		# ToDo use high fidelity lego knobs to create geometry
 
 		printVoxels = []
+		lowestZValue = {}
+		genKey = (x, y) ->
+			return "#{x}-#{y}"
+
 		grid = @_getGrid(selectedNode).grid
 
 		grid.forEachVoxel (voxel, x, y, z) =>
 			if not voxel.enabled
 				printVoxels.push {x: x, y: y, z: z}
+				lz = lowestZValue[genKey(x,y)]
+				if (not lz?) or (z < lz)
+					lowestZValue[genKey(x,y)] = z
 
 		# ToDo: merge voxels into one geometry, see issue #202
 
@@ -283,6 +290,19 @@ module.exports = class NewBrickator
 		voxGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z
 		)
+
+		knobSize = PipelineSettings.legoKnobSize
+
+		knobRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
+		
+		dz = -(grid.spacing.z / 2) + (knobSize.height / 2)
+		knobTranslation = new THREE.Matrix4().makeTranslation(0,0,dz)
+		
+		knobGeometry = new THREE.CylinderGeometry(
+			knobSize.radius, knobSize.radius, knobSize.height, 20
+		)
+		knobGeometry.applyMatrix(knobRotation)
+		knobGeometry.applyMatrix(knobTranslation)
 
 		for voxel in printVoxels
 			mesh = new THREE.Mesh(voxGeometry, null)
@@ -295,6 +315,20 @@ module.exports = class NewBrickator
 				unionBsp = unionBsp.union(meshBsp)
 			else
 				unionBsp = meshBsp
+
+			# if this is the lowes voxel, subtract a knob
+			# to make it fit to lego bricks
+
+			lz = lowestZValue[genKey(voxel.x,voxel.y)]
+			if voxel.z == lz
+				knobMesh = new THREE.Mesh(knobGeometry, null)
+				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
+				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
+				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
+
+				knobBsp = new ThreeBSP(knobMesh)
+				unionBsp = unionBsp.subtract knobBsp
+				
 
 		#debug: convert back to visible mesh
 		#unionMesh = unionBsp.toMesh( @brickVisualizer.selectedMaterial )
@@ -314,7 +348,7 @@ module.exports = class NewBrickator
 		printBsp = modelBsp.intersect(unionBsp)
 
 		#debug: show intersected mesh
-		printMesh = printBsp.toMesh( @brickVisualizer.selectedMaterial )
+		printMesh = printBsp.toMesh( @voxelVisualizer.selectedMaterial )
 		@threejsRootNode.add printMesh
 
 		return null

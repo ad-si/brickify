@@ -120,6 +120,7 @@ module.exports = class NewBrickator
 			obj = {
 				voxels: threenode.children[0]
 				bricks: threenode.children[1]
+				csg: threenode.children[2]
 			}
 
 			callback obj
@@ -396,6 +397,10 @@ module.exports = class NewBrickator
 			{
 				text: 'Bricks'
 				callback: @_toggleBrickLayer
+			},
+			{
+				text: '3D-printed Geometry'
+				callback: @_togglePrintedLayer
 			}
 		]
 
@@ -403,3 +408,8 @@ module.exports = class NewBrickator
 		@_forAllThreeObjects (obj) ->
 			if obj.bricks?
 				obj.bricks.visible = isEnabled
+
+	_togglePrintedLayer: (isEnabled) =>
+		@_forAllThreeObjects (obj) ->
+			if obj.csg?
+				obj.csg.visible = isEnabled

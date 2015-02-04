@@ -254,35 +254,35 @@ module.exports = class BrickLayouter
 			++i
 		return a
 
-	getBiConnectedComponents: (bricks) =>
+	getBiconnectedComponents: (bricks) =>
 		@index = 0
-		biConnectedComponents = []
+		biconnectedComponents = []
 		stack = []
 		for zLayer in bricks
 			for brick in zLayer
-				if brick.biConnectedComponentId == undefined
-					@tarjanAlgorithm brick, biConnectedComponents, stack
-		biConnectedComponents
+				if brick.biconnectedComponentId == undefined
+					@tarjanAlgorithm brick, biconnectedComponents, stack
+		biconnectedComponents
 
-	tarjanAlgorithm: (brick, biConnectedComponents, stack) =>
-		brick.biConnectedComponentId = @index
+	tarjanAlgorithm: (brick, biconnectedComponents, stack) =>
+		brick.biconnectedComponentId = @index
 		brick.lowlink = @index
 		@index++
 		stack.push(brick)
 		for connectedBrick in brick.uniqueConnectedBricks()
-			if connectedBrick.biConnectedComponentId == undefined
-				@tarjanAlgorithm(connectedBrick, biConnectedComponents, stack, @index)
+			if connectedBrick.biconnectedComponentId == undefined
+				@tarjanAlgorithm(connectedBrick, biconnectedComponents, stack, @index)
 				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
 				then brick.lowlink else connectedBrick.lowlink
 			else if stack.indexOf(connectedBrick) > -1
 				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
 				then brick.lowlink else connectedBrick.lowlink
 
-		if brick.lowlink == brick.biConnectedComponentId
+		if brick.lowlink == brick.biconnectedComponentId
 			otherBrick = null
 			component = []
 			while true
 				otherBrick = stack.pop()
 				component.push otherBrick
 				break unless otherBrick != brick
-			biConnectedComponents.push component
+			biconnectedComponents.push component

@@ -28,13 +28,13 @@ describe 'brickLayouter optimize', ->
 		brick3.upperSlots = [[brick4]]
 		brick4.lowerSlots = [[brick2], [brick3]]
 		bricks = [[brick1, brick2, brick3, brick4]]
-		connectedComponents = brickLayouter.getBiconnectedComponents(bricks)
+		connectedComponents = brickLayouter._getBiconnectedComponents(bricks)
 		expect(connectedComponents).to.have.length(1)
 		done()
 
 	it 'should find two biconnected components', (done) ->
 		# 4488
-		# 2357
+		# 2367
 		# 1155
 
 		brickLayouter = new BrickLayouter()
@@ -59,7 +59,7 @@ describe 'brickLayouter optimize', ->
 		brick7.upperSlots = [[brick8]]
 		brick8.lowerSlots = [[brick6], [brick7]]
 		bricks = [[brick1, brick2, brick3, brick4, brick5, brick6, brick7, brick8]]
-		connectedComponents = brickLayouter.getBiconnectedComponents(bricks)
+		connectedComponents = brickLayouter._getBiconnectedComponents(bricks)
 		expect(connectedComponents).to.have.length(2)
 		done()
 
@@ -81,6 +81,6 @@ describe 'brickLayouter optimize', ->
 		brick4.lowerSlots = [[brick2]]
 		brick5.lowerSlots = [[brick2]]
 		bricks = [[brick1, brick2, brick3, brick4, brick5]]
-		connectedComponents = brickLayouter.getBiconnectedComponents(bricks)
+		connectedComponents = brickLayouter._getBiconnectedComponents(bricks)
 		expect(connectedComponents).to.have.length(1)
 		done()

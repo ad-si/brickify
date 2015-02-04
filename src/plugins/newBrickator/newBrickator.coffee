@@ -17,6 +17,7 @@ module.exports = class NewBrickator
 		@brickLayouter = new BrickLayouter()
 		@gridCache = {}
 		@optimizedModelCache = {}
+		@csgCache = {}
 
 		@printMaterial = new THREE.MeshLambertMaterial({
 			color: 0xfd482f #redish
@@ -88,9 +89,14 @@ module.exports = class NewBrickator
 			uuid = node.pluginData.newBrickator.threeObjectUuid
 			for threenode in @threejsRootNode.children
 				if threenode.uuid == uuid
-					return { voxels: threenode.children[0], bricks: threenode.children[1] }
+					return {
+						voxels: threenode.children[0]
+						bricks: threenode.children[1]
+						csg: threenode.children[2]
+					}
 
-		#create two sub-sub nodes, one for the voxels and one for the bricks
+		# create three sub-sub nodes, one for the voxels and one for the bricks,
+		# the last one for showing the csg
 		object = new THREE.Object3D()
 		@threejsRootNode.add object
 
@@ -98,9 +104,16 @@ module.exports = class NewBrickator
 		object.add voxelObject
 		brickObject = new THREE.Object3D()
 		object.add brickObject
+		csgObject = new THREE.Object3D()
+		object.add csgObject
+
 		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
 
-		return { voxels: object.children[0], bricks: object.children[1] }
+		return {
+			voxels: object.children[0]
+			bricks: object.children[1]
+			csg: object.children[2]
+		}
 
 	getBrushes: () =>
 		return [{
@@ -261,6 +274,10 @@ module.exports = class NewBrickator
 		)
 		threeNodes.bricks.visible = true
 
+		#create CSG (todo: move to webWorker)
+		geo = @_createCSG(selectedNode, threeNodes.csg)
+		@csgCache[selectedNode] = geo
+
 	snapToGrid: (vec3) =>
 		@gridSpacing ?= (new PipelineSettings()).gridSpacing
 		snapCoord = (coord) =>
@@ -270,9 +287,16 @@ module.exports = class NewBrickator
 		snapCoord 'y'
 		snapCoord 'z'
 		return vec3
+	
 	getStlDownload: (selectedNode) =>
+		printGeometry = @csgCache[selectedNode]
+
+		#ToDo: convert ThreeBSP geometry to stl
+
+		return null
+
+	_createCSG: (selectedNode, csgThreeNode = null) =>
 		# create the intersection of selected voxels and the model mesh
-		# ToDo use high fidelity lego knobs to create geometry
 
 		printVoxels = []
 		lowestZValue = {}
@@ -287,6 +311,9 @@ module.exports = class NewBrickator
 				lz = lowestZValue[genKey(x,y)]
 				if (not lz?) or (z < lz)
 					lowestZValue[genKey(x,y)] = z
+
+		if printVoxels.length == 0
+			return null
 
 		# ToDo: merge voxels into one geometry, see issue #202
 
@@ -333,11 +360,6 @@ module.exports = class NewBrickator
 				knobBsp = new ThreeBSP(knobMesh)
 				unionBsp = unionBsp.subtract knobBsp
 				
-
-		#debug: convert back to visible mesh
-		#unionMesh = unionBsp.toMesh( @brickVisualizer.selectedMaterial )
-		#@threejsRootNode.add unionMesh
-
 		#intersect with original mesh to get 3d printed stuff
 		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
 		if not optimizedModel
@@ -352,9 +374,11 @@ module.exports = class NewBrickator
 		printBsp = modelBsp.intersect(unionBsp)
 
 		#debug: show intersected mesh
-		printMesh = printBsp.toMesh( @printMaterial )
-		@threejsRootNode.add printMesh
+		if csgThreeNode?
+			printMesh = printBsp.toMesh( @printMaterial )
+			csgThreeNode.children = []
+			csgThreeNode.add printMesh
 
-		return null
+		return printBsp
 
 

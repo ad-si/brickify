@@ -5,6 +5,7 @@ module.exports = class UiToolbar
 		@_toolbarContainer = $('#toolbar')
 		@_createBrushList()
 		@_selectedBrush = false
+		@_downloadEventListener = []
 
 		@selection.selectionChange (selectedNode) =>
 			@_handleNodeSelected selectedNode
@@ -40,16 +41,34 @@ module.exports = class UiToolbar
 			jqueryElement = @_createBrushUi brush
 			brush.jqueryElement = jqueryElement
 
+		@_addDownloadButtonUi()
+
 	_createBrushUi: (brush) =>
-		html = '<div class="brushcontainer"><img src="img/' +
-			brush.icon + '" width="64px" height="64px"><br><span>' +
+		html = '<div class="brushcontainer brushdeselect"><img src="img/' +
+			brush.icon + '"><br><span>' +
 			brush.text + '</span></div>'
 		brushelement = $(html)
 		brushelement.on 'click', () =>
 			@_handleBrushClicked brush, brushelement
-		$('#toolbar').append(brushelement)
+		@_toolbarContainer.append(brushelement)
 
 		return brushelement
+
+	addDownloadListener: (callback) =>
+		@_downloadEventListener.push callback
+
+	_addDownloadButtonUi: =>
+		html = '<div class="btn-primary brushcontainer">
+			<img src="img/downloadBrush.png">
+			</span><br><span>Download</span></div>'
+		brushelement = $(html)
+
+		brushelement.on 'click', () =>
+			for c in @_downloadEventListener
+				c()
+
+		@_toolbarContainer.append(brushelement)
+
 
 	_handleNodeSelected: (selectedNode) =>
 		if selectedNode?
@@ -63,6 +82,7 @@ module.exports = class UiToolbar
 				@_selectedBrush.deselectCallback @selection.selectedNode
 
 			@_selectedBrush.jqueryElement.removeClass 'brushselect'
+			@_selectedBrush.jqueryElement.addClass 'brushdeselect'
 
 			#edgecase: user clicked on selected brush: deselect this brush
 			if @_selectedBrush == brush
@@ -74,4 +94,5 @@ module.exports = class UiToolbar
 		if @_selectedBrush.selectCallback? and @selection.selectedNode?
 			@_selectedBrush.selectCallback @selection.selectedNode
 
+		@_selectedBrush.jqueryElement.removeClass 'brushdeselect'
 		@_selectedBrush.jqueryElement.addClass 'brushselect'

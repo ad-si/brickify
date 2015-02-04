@@ -6,9 +6,10 @@ VoxelVisualizer = require './VoxelVisualizer'
 BrickVisualizer = require './BrickVisualizer'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/objectTree'
-three = require 'three'
+THREE = require 'three'
 Brick = require './Brick'
 BrickLayouter = require './BrickLayouter'
+ThreeCSG = require './threeCSG/ThreeCSG'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -251,7 +252,3 @@ module.exports = class NewBrickator
 			results.accumulatedResults.grid
 		)
 		threeNodes.bricks.visible = true
-
-
-
-

@@ -10,11 +10,22 @@ module.exports = class BrickVisualizer
 		threeNode.children = []
 
 		for gridZ in [0..brickData.length - 1] by 1
-			for brick in brickData[gridZ]
-				window.setTimeout @_brickCallback(
-					grid, brick, threeNode),
-					20 * gridZ
-				
+			window.setTimeout @_layerCallback(grid, brickData[gridZ], threeNode),
+					10 * gridZ
+
+	_createLayer: (grid, brickLayer, threeNode) =>
+		bricks = (@_createBrick grid, brick for brick in brickLayer)
+		layerGeometry = new THREE.Geometry()
+		for brick in bricks
+			brick.updateMatrix()
+			layerGeometry.merge brick.geometry, brick.matrix
+		layerMesh = new THREE.Mesh(layerGeometry, @_getFaceMats())
+		threeNode.add layerMesh
+
+	_layerCallback: (grid, brickLayer, threeNode) =>
+		return () =>
+			@_createLayer grid, brickLayer, threeNode
+
 	_brickCallback: (grid, brick, threeNode) =>
 		return () =>
 			@_createBrick(grid, brick, threeNode)
@@ -27,10 +38,10 @@ module.exports = class BrickVisualizer
 		cube.translateX( world.x )
 		cube.translateY( world.y )
 		cube.translateZ( world.z )
-
-		threeNode.add(cube)
+		cube
 
 	_createBrickGeometry: (gridSpacing, brick) =>
+		index = @_getRandomMaterialIndex()
 		brickSizeX = gridSpacing.x * brick.size.x
 		brickSizeY = gridSpacing.y * brick.size.y
 		brickSizeZ = gridSpacing.z * brick.size.z
@@ -40,20 +51,25 @@ module.exports = class BrickVisualizer
 			brickSizeY,
 			brickSizeZ
 		)
+		for face in brickGeometry.faces
+			face.materialIndex = index
 
-		mat = @_getRandomMaterial()
+		cube = new THREE.Mesh(brickGeometry, @_getFaceMats())
 
 		#add noppen
 		noppe = new THREE.CylinderGeometry(
 			#these numbers are made up to look good. don't use for csg operations
 			gridSpacing.x * 0.3, gridSpacing.y * 0.3, gridSpacing.z * 0.7, 7
 		)
-		
+		for face in noppe.faces
+			face.materialIndex = index
+
+
 		for xi in [0..brick.size.x - 1] by 1
 			for yi in [0..brick.size.y - 1] by 1
 				# only show knobs if there is no connected brick to it
 				if brick.upperSlots[xi][yi] == false
-					noppeMesh = new THREE.Mesh(noppe, mat)
+					noppeMesh = new THREE.Mesh(noppe, @_getFaceMats())
 
 					noppeMesh.translateX (gridSpacing.x * (xi + 0.5)) - (brickSizeX / 2)
 					noppeMesh.translateY (gridSpacing.y * (yi + 0.5)) - (brickSizeY / 2)
@@ -63,7 +79,7 @@ module.exports = class BrickVisualizer
 					noppeMesh.updateMatrix()
 					brickGeometry.merge noppeMesh.geometry, noppeMesh.matrix
 
-		cube = new THREE.Mesh(brickGeometry, mat)
+		cube = new THREE.Mesh(brickGeometry, @_getFaceMats())
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
 		#(center of model is physical center of box)
@@ -79,6 +95,9 @@ module.exports = class BrickVisualizer
 
 		return cube
 
+	_getRandomMaterialIndex: () =>
+		return Math.floor(Math.random() * @_brickMaterials.length)
+
 	_getRandomMaterial: () =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
 		return @_brickMaterials[i]
@@ -89,6 +108,13 @@ module.exports = class BrickVisualizer
 		@_brickMaterials.push @_createMaterial 0xcc7a00
 		@_brickMaterials.push @_createMaterial 0xffad32
 		@_brickMaterials.push @_createMaterial 0xe58900
+		@_brickMaterials.push @_createMaterial 0xf77000
+		@_brickMaterials.push @_createMaterial 0xff7d11
+		@_brickMaterials.push @_createMaterial 0xff8b2b
+		@_brickMaterials.push @_createMaterial 0xff9944
+		@_brickMaterials.push @_createMaterial 0xffa75e
+		@_brickMaterials.push @_createMaterial 0xffb577
+		@_brickMaterials.push @_createMaterial 0xff9944
 
 	_createMaterial: (color) =>
 		return new THREE.MeshLambertMaterial({
@@ -97,3 +123,5 @@ module.exports = class BrickVisualizer
 			#transparent: true
 			})
 
+	_getFaceMats: =>
+		return new THREE.MeshFaceMaterial(@_brickMaterials)

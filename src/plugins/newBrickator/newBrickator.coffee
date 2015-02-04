@@ -3,9 +3,10 @@ LegoPipeline = require './LegoPipeline'
 interactionHelper = require '../../client/interactionHelper'
 THREE = require 'three'
 VoxelVisualizer = require './VoxelVisualizer'
+objectTree = require '../../common/state/objectTree'
 BrickVisualizer = require './BrickVisualizer'
 PipelineSettings = require './PipelineSettings'
-objectTree = require '../../common/objectTree'
+objectTree = require '../../common/state/objectTree'
 three = require 'three'
 Brick = require './Brick'
 BrickLayouter = require './BrickLayouter'
@@ -98,7 +99,6 @@ module.exports = class NewBrickator
 			text: 'Make Lego'
 			icon: 'legoBrush.png'
 			selectCallback: @_brushSelectCallback
-			#deselectCallback: -> console.log 'dummy-brush was deselected'
 			mouseDownCallback: @_brushMouseDownCallback
 			mouseMoveCallback: @_selectLegoMouseMoveCallback
 			mouseUpCallback: @_brushMouseUpCallback
@@ -108,7 +108,6 @@ module.exports = class NewBrickator
 			# select / deselect are the same for both voxels,
 			# but move has a different function
 			selectCallback: @_brushSelectCallback
-			#deselectCallback: -> console.log 'dummy-brush was deselected'
 			mouseDownCallback: @_brushMouseDownCallback
 			mouseMoveCallback: @_select3DMouseMoveCallback
 			mouseUpCallback: @_brushMouseUpCallback

@@ -254,3 +254,34 @@ module.exports = class BrickLayouter
 			++i
 		return a
 
+	getBiConnectedComponents: (bricks) =>
+		@index = 0
+		biConnectedComponents = []
+		stack = []
+		for brick in bricks
+			if brick.biConnectedComponentId == undefined
+				@tarjanAlgorithm brick, biConnectedComponents, stack
+		biConnectedComponents
+
+	tarjanAlgorithm: (brick, biConnectedComponents, stack) =>
+		brick.biConnectedComponentId = @index
+		brick.lowlink = @index
+		@index++
+		stack.push(brick)
+		for connectedBrick in brick.uniqueConnectedBricks()
+			if connectedBrick.biConnectedComponentId == undefined
+				@tarjanAlgorithm(connectedBrick, biConnectedComponents, stack, @index)
+				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
+				then brick.lowlink else connectedBrick.lowlink
+			else if stack.indexOf(connectedBrick) > -1
+				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
+				then brick.lowlink else connectedBrick.lowlink
+
+		if brick.lowlink == brick.biConnectedComponentId
+			otherBrick = null
+			component = []
+			while true
+				otherBrick = stack.pop()
+				component.push otherBrick
+				break unless otherBrick != brick
+			biConnectedComponents.push component

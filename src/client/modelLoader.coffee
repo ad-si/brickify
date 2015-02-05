@@ -64,30 +64,50 @@ module.exports = class ModelLoader
 		@bundle.statesync.performStateAction loadModelCallback, true
 
 	_alignModelToGrid: (node, optimizedModel) =>
-		# cheap alignment: move minimum point to origin
-		min = {}
+		# get biggest polygon, align it to xy-center
+		# align whole model to be on z=0
 
-		minp = (p) =>
-			if min.x?
-				min.x = p.x if min.x > p.x
+		res = {}
+		maxA = 0
+		minAx = null
+		minAy = null
+
+		minz = (p) ->
+			if res.z?
+				res.z = p.z if res.z > p.z
 			else
-				min.x = p.x
-			if min.y?
-				min.y = p.y if min.y > p.y
-			else
-				min.y = p.y
-			if min.z?
-				min.z = p.z if min.z > p.z
-			else
-				min.z = p.z
+				res.z = p.z
+
+		maxa = (xArray, yArray) ->
+			A = 0
+			j = xArray.length - 1
+
+			for i in [0..yArray.length - 1] by 1
+				A += (xArray[j] + xArray[i]) * (yArray[j] - yArray[i])
+				j = i
+			A = Math.abs(A / 2)
+
+			minX = Math.min.apply null, xArray
+			minY = Math.min.apply null, yArray
+			maxX = Math.max.apply null, xArray
+			maxY = Math.max.apply null, yArray
+
+			if A > maxA
+				maxA = A
+				res.x = minX + (maxX - minX) / 2
+				res.y = minY + (maxY - minY) / 2
 
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
-			minp p0
-			minp p1
-			minp p2
+			minz(p0)
+			minz(p1)
+			minz(p2)
+			maxa([p0.x, p1.x, p2.x], [p0.y, p1.y, p2.y])
+
+		console.log "maxA = #{maxA}"
+		console.log res
 
 		node.positionData.position = {
-			x: -min.x
-			y: -min.y
-			z: -min.z
+			x: -res.x
+			y: -res.y
+			z: -res.z
 		}

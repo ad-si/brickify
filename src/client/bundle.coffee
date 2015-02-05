@@ -4,6 +4,8 @@ Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
 
+ObjectTree = require '../common/state/objectTree'
+
 ###
 # @class Bundle
 ###
@@ -13,7 +15,7 @@ module.exports = class Bundle
 		@pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(@)
-		@modelLoader = new ModelLoader(@statesync, @pluginHooks, @globalConfig)
+		@modelLoader = new ModelLoader(@)
 
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 
@@ -48,3 +50,6 @@ module.exports = class Bundle
 
 	getPlugins: (type) =>
 		@pluginInstances.filter (instance) -> instance.lowfab.type == type
+
+	clearScene: () =>
+		@statesync.performStateAction ObjectTree.clear

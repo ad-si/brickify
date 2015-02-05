@@ -35,11 +35,6 @@
 
 - newBoundingSphere
 
-# if provided, a UI to configure the plugins convertion will be created. changed
-# values are always stored in the state, relative to the currently selected node
-# Must (only) be provided by converter plugins
-
-- getConvertUiSchema
 
 #  ## State synchronization
 #
@@ -65,6 +60,36 @@
 #  https://developer.mozilla.org/en/docs/Web/API/window.requestAnimationFrame)
 
 - on3dUpdate
+
+#  ## scene interaction and administration
+
+#  ### New nodes
+#
+#  Each time a new node is added to the scene, the sceneManager will inform
+#  plugins by calling onNodeAdd
+
+- onNodeAdd
+
+#  ### Node selection
+#
+#  Each time a scene's node is selected, the sceneManager will inform plugins by
+#  calling onNodeSelect
+
+- onNodeSelect
+
+#  ### Node deselection
+#
+#  Each time a scene's node is deselected, the sceneManager will inform plugins
+#  by calling onNodeDeselect
+
+- onNodeDeselect
+
+#  ### Node deletion
+#
+#  When a node is removed from the scene, the sceneManager will inform plugins
+#  by calling onNodeRemove
+
+- onNodeRemove
 
 
 #  ## File import
@@ -93,3 +118,35 @@
 # function that is called when the hotkey is pressed.
 
 - getHotkeys
+
+# ## Brushes
+#
+# Plugins may return an array with an entry for each brush they provide
+# each brush should have the json structure like in this example:
+#
+# {
+#	text: 'Make Lego'
+#	icon: 'legoBrush.png' #from img/legoBrush.png
+#	selectCallback: # when the brush is selected, selectedNode as argument
+#	deselectCallback: # when the brush is deselected
+#	mouseDownCallback: # when a node is selected and mouse is pressed
+#	mouseMoveCallback: # after being pressed, when mouse is moved
+#	mouseUpCallback: # when mouse is released
+# }
+# 
+
+- getBrushes
+
+# ## Visibility
+# Each plugin can specify an array of layers that can be turned 
+# visible/invisible by the user. 
+# Layers are visible by default.
+# Example:
+#
+# [{
+#	text: 'Imported 3D-Model'
+#	callback: @_toggleModelLayer
+# }]
+#
+
+- getVisibilityLayers

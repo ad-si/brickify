@@ -32,36 +32,14 @@ block body
 						.panel-body
 							#sceneGraphContainer
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
-				div#workflowMenu.panel-group(role='tablist')
-					div.panel.panel-default
-						div.panel-heading(role='tab')
-							h4.panel-title.collapse-title.collapsed(
-								data-toggle='collapse'
-								data-parent='#workflowMenu'
-								data-target='#splitCollapse') Split
-						div#splitCollapse.panel-collapse.collapse(role='tabpanel')
-							div#splitMenu.panel-body
-								p Coming soon.
-					div.panel.panel-default
-						div.panel-heading(role='tab')
-							h4.panel-title.collapse-title(
-								data-toggle='collapse'
-								data-parent='#workflowMenu'
-								data-target='#convertCollapse') Convert
-						div#convertCollapse.panel-collapse.collapse.in(role='tabpanel')
-							div#convertMenu.panel-body
-					div.panel.panel-default
-						div.panel-heading(role='tab')
-							h4.panel-title.collapse-title.collapsed(
-								data-toggle='collapse'
-								data-parent='#workflowMenu'
-								data-target='#exportCollapse') Export
-						div#exportCollapse.panel-collapse.collapse(role='tabpanel')
-							div#exportMenu.panel-body
-								button.btn.btn-default
-									span.glyphicon.glyphicon-download
-									|  Download .stl file
-
+				.panel.panel-default
+					.panel-heading
+						h4.panel-title.collapse-title(data-toggle='collapse'
+							data-target='#collapseVisibility') Visibility
+					#collapseVisibility.panel-collapse.collapse.in
+						.panel-body
+							#visibilityContainer
+		#toolbar
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?
 				= ' '

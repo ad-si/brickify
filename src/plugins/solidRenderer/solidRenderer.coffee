@@ -5,13 +5,13 @@
 ###
 
 THREE = require 'three'
-objectTree = require '../../common/objectTree'
+objectTree = require '../../common/state/objectTree'
 modelCache = require '../../client/modelCache'
 
 module.exports = class SolidRenderer
 
-	init: (bundle) ->
-		@globalConfig = bundle.globalConfig
+	init: (@bundle) ->
+		@globalConfig = @bundle.globalConfig
 
 	init3d: (@threejsNode) ->
 		return
@@ -44,20 +44,24 @@ module.exports = class SolidRenderer
 			if not threeObject?
 				return @loadModelFromCache node, properties, true
 			else
+				@_copyTransformDataToThree node, threeObject
 				return Promise.resolve()
 		else
 			node.pluginData.solidRenderer = {}
 			return @loadModelFromCache node, node.pluginData.solidRenderer, false
 
+
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name
 		success = (optimizedModel) =>
 			console.log "Got model #{node.meshHash}"
-			threeObj = @addModelToThree optimizedModel
+			threeObject = @addModelToThree optimizedModel
 			if reload
-				threeObj.name = properties.threeObjectUuid
+				threeObject.name = properties.threeObjectUuid
 			else
-				properties.threeObjectUuid = threeObj.name
+				properties.threeObjectUuid = threeObject.name
+
+			@_copyTransformDataToThree node, threeObject
 			return optimizedModel
 		failure = () ->
 			console.error "Unable to get model #{node.meshHash}"
@@ -71,8 +75,8 @@ module.exports = class SolidRenderer
 		geometry = optimizedModel.convertToThreeGeometry()
 		objectMaterial = new THREE.MeshLambertMaterial(
 			{
-				color: @globalConfig.defaultObjectColor
-				ambient: @globalConfig.defaultObjectColor
+				color: @globalConfig.colors.object
+				ambient: @globalConfig.colors.object
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
@@ -93,14 +97,65 @@ module.exports = class SolidRenderer
 		else
 			return null
 
-	# copys stored transforms to the tree object.
-	# TODO: use
-	copyTransformDataToThree: (node, threeObject) ->
+	_copyTransformDataToThree: (node, threeObject) ->
 		posd = node.positionData
-		threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
+		threeObject.position.set posd.position.x, posd.position.y, posd.position.z
 		threeObject.rotation.set(
 			posd.rotation._x,
 			posd.rotation._y,
 			posd.rotation._z
 		)
-		threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)
+		threeObject.scale.set posd.scale.x, posd.scale.y, posd.scale.z
+
+	getBrushes: =>
+		return [{
+			text: 'move'
+			icon: 'moveBrush.png'
+			mouseDownCallback: @_handleMouseDown
+			mouseMoveCallback: @_handleMouseMove
+			mouseUpCallback: @_handleMouseUp
+		}]
+
+	_getThreeObjectByName: (name) =>
+		for obj in @threejsNode.children
+			if obj.name == name
+				return obj
+		return null
+
+	_handleMouseDown: (event, selectedNode) =>
+		@mouseStartPosition =
+			@bundle.renderer.getGridPosition event.clientX, event.clientY
+
+		@originalObjectPosition = selectedNode.positionData.position
+
+	_handleMouseUp: (event, selectedNode) =>
+		@mouseStartPosition = null
+		return
+
+	_handleMouseMove: (event, selectedNode) =>
+		mouseCurrent = @bundle.renderer.getGridPosition event.clientX, event.clientY
+
+		newPosition = {
+			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
+			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
+			z: 0
+		}
+
+		selectedNode.positionData.position = newPosition
+
+		pld = selectedNode.pluginData.solidRenderer
+
+		threeObject = @_getThreeObjectByName pld.threeObjectUuid
+		@_copyTransformDataToThree selectedNode, threeObject
+
+	getVisibilityLayers: () =>
+		return [
+			{
+				text: 'Imported 3D-Model'
+				callback: @_toggleModelLayer
+			}
+		]
+
+	_toggleModelLayer: (isEnabled) =>
+		for child in @threejsNode.children
+			child.visible = isEnabled

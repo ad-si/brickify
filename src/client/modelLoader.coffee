@@ -4,10 +4,10 @@
 
 md5 = require('blueimp-md5').md5
 modelCache = require './modelCache'
-objectTree = require '../common/objectTree'
+objectTree = require '../common/state/objectTree'
 
 module.exports = class ModelLoader
-	constructor: (@stateInstance, @pluginHooks, @globalConfig) ->
+	constructor: (@bundle) ->
 		return
 
 	readFiles: (files) ->
@@ -25,15 +25,13 @@ module.exports = class ModelLoader
 					@load model
 
 	importFile: (filename, fileBuffer, callback) ->
-
-		# Load with first plugin capable of loading
-		loader = @pluginHooks.get('importFile')[0]
-
-		loader filename, fileBuffer, (error, model) ->
-			if error or not model
-				callback error
-			else
-				callback null, model
+		# Load with first plugin capable of loading the file
+		for loader in @bundle.pluginHooks.get 'importFile'
+			loader filename, fileBuffer, (error, model) ->
+				if error or not model
+					callback error
+				else
+					callback null, model
 
 	load: (model) =>
 		modelData = model.toBase64()
@@ -57,7 +55,8 @@ module.exports = class ModelLoader
 			node.fileName = fileName
 			node.meshHash = hash
 			node.pluginData = {
-				uiGen: {selectedPluginKey: @globalConfig.defaultPlugin}
+				uiGen: {selectedPluginKey: @bundle.globalConfig.defaultPlugin}
 			}
+			@bundle.ui?.sceneManager.add node
 		# call updateState on all client plugins and sync
-		@stateInstance.performStateAction loadModelCallback, true
+		@bundle.statesync.performStateAction loadModelCallback, true

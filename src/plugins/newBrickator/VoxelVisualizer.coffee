@@ -2,23 +2,13 @@ THREE = require 'three'
 
 module.exports = class VoxelVisualizer
 	constructor: () ->
-		@upMaterial = new THREE.MeshLambertMaterial({
-			color: 0x46aeff #blue
-			opacity: 0.5
+		@selectedMaterial = new THREE.MeshLambertMaterial({
+			color: 0xffa500 #orange
+			opacity: 0.2
 			transparent: true
 		})
-		@downMaterial = new THREE.MeshLambertMaterial({
-			color: 0xff40a7 #pink
-			opacity: 0.5
-			transparent: true
-		})
-		@neiterMaterial = new THREE.MeshLambertMaterial({
-			color: 0xc8c8c8 #grey
-			opacity: 0.5
-			transparent: true
-		})
-		@fillMaterial = new THREE.MeshLambertMaterial({
-			color: 0x48b427 #green
+		@deselectedMaterial = new THREE.MeshLambertMaterial({
+			color: 0xc8c8c8 #gray
 			opacity: 0.5
 			transparent: true
 		})
@@ -28,6 +18,8 @@ module.exports = class VoxelVisualizer
 			threeNode.children = []
 		
 	createVisibleVoxels: (grid, threeNode, drawInnerVoxels = true) =>
+		@clear(threeNode)
+
 		@voxelGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z )
 
@@ -53,15 +45,10 @@ module.exports = class VoxelVisualizer
 	createVoxel: (grid, threeNode, x, y, z) =>
 		voxel = grid.zLayers[z][x][y]
 
-		if voxel.definitelyUp? and voxel.definitelyUp
-			m = @upMaterial
-		else if voxel.definitelyDown? and voxel.definitelyDown
-			m = @downMaterial
-		else if voxel.dataEntrys[0].inside? and
-		voxel.dataEntrys[0].inside == true
-			m = @fillMaterial
+		if voxel.enabled
+			m = @selectedMaterial
 		else
-			m = @neiterMaterial
+			m = @deselectedMaterial
 
 		cube = new THREE.Mesh( @voxelGeometry, m )
 		cube.translateX( grid.origin.x + grid.spacing.x * x)

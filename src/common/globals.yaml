@@ -1,0 +1,58 @@
+# unit - all units are in mm (do not change...)
+mm: 1
+
+
+colors:
+  background: 0x222222
+
+  axisX: 0xff0000
+  axisY: 0x00ff00
+  axisZ: 0x0000ff
+
+  gridNormal: 0x555555
+  grid5: 0x999999
+  grid10: 0xdddddd
+
+  object: 0xccaa33
+
+  basePlate: 0x555555
+  basePlateStud: 0x5a5a5a
+
+
+# camera adjustments
+fov: 40
+cameraNearPlane: 0.1
+cameraFarPlane: 2500
+
+# animations
+animationStepSize: 0.02
+animations: []
+
+# coordinate system
+axisLength: 100
+axisLineWidth: 2
+
+# objects
+meshes: []
+
+# grid
+gridLineWidthNormal: 1
+gridLineWidth5: 1
+gridLineWidth10: 1
+gridSize: 200
+gridStepSize: 10
+
+# render DOM
+renderAreaId: 'canvas'
+staticRendererSize: false
+staticRendererWidth: 100
+staticRendererHeight: 100
+
+# sync
+syncWithServer: true
+
+#ui
+buildUi: true
+
+#editor
+defaultPlugin: 'fabrickator'

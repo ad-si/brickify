@@ -2,9 +2,7 @@ meshlib = require 'meshlib'
 
 module.exports = class StlImport
 
-	# Imports the stl, optimizes it,
-	# sends it to the server (if not cached there)
-	# and adds it to the scene as a THREE.Geometry
+	# Imports the stl, optimizes it
 	importFile: (fileName, fileBuffer, callback) ->
 
 		meshlib.parse fileBuffer, null, (error, model) ->

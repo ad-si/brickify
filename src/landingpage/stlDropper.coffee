@@ -10,26 +10,37 @@ uploadString = 'Uploading file
 <img src="img/spinner.gif" style="height: 1.2em;">'
 loadedString = 'File loaded!'
 
-module.exports.init = (objects, feedbackTarget, finishedCallback) ->
-	objects.each (i, el) -> bindDropHandler(el, feedbackTarget)
+module.exports.init = (objects, feedbackTarget, overlay, finishedCallback) ->
+	objects.each (i, el) -> bindDropHandler(el, feedbackTarget, overlay)
 	uploadFinishedCallback = finishedCallback
 
-bindDropHandler = (target, feedbackTargets) ->
+bindDropHandler = (target, feedbackTargets, overlay) ->
 	target.addEventListener 'drop',
-		(event) -> onModelDrop(event, feedbackTargets),
+		(event) -> onModelDrop(event, feedbackTargets, overlay),
 		false
-	target.addEventListener 'dragover', ignoreEvent, false
-	target.addEventListener 'dragleave', ignoreEvent, false
+	target.addEventListener 'dragover',
+		(event) -> showOverlay(event, overlay),
+		false
+	target.addEventListener 'dragleave',
+			(event) -> hideOverlay(event, overlay),
+			false
+
+showOverlay = (event, overlay) ->
+	ignoreEvent event
+	overlay.show()
+
+hideOverlay = (event, overlay) ->
+	ignoreEvent event
+	overlay.hide()
 
 ignoreEvent = (event) ->
 	event.preventDefault()
 	event.stopPropagation()
 
-onModelDrop = (event, feedbackTargets) ->
-	event.preventDefault()
-	event.stopPropagation()
+onModelDrop = (event, feedbackTargets, overlay) ->
+	ignoreEvent event
 
-	console.log feedbackTargets
+	overlay.fadeOut()
 
 	files = event.target.files ? event.dataTransfer.files
 	if files?

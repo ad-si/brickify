@@ -21,6 +21,9 @@ module.exports = class NewBrickator
 		@optimizedModelCache = {}
 		@csgCache = {}
 
+		@_brickVisibility = true
+		@_printVisibility = true
+		
 		@printMaterial = new THREE.MeshLambertMaterial({
 			color: 0xfd482f #redish
 		})

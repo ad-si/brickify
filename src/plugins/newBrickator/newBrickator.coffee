@@ -320,7 +320,8 @@ module.exports = class NewBrickator
 		# create the intersection of selected voxels and the model mesh
 
 		printVoxels = []
-		lowestZValue = {}
+		zRange = {}
+
 		genKey = (x, y) ->
 			return "#{x}-#{y}"
 
@@ -329,9 +330,20 @@ module.exports = class NewBrickator
 		grid.forEachVoxel (voxel, x, y, z) =>
 			if not voxel.enabled
 				printVoxels.push {x: x, y: y, z: z}
-				lz = lowestZValue[genKey(x,y)]
-				if (not lz?) or (z < lz)
-					lowestZValue[genKey(x,y)] = z
+
+				range = zRange[genKey(x,y)]
+
+				if not range?
+					range = {
+						lowest: z
+						highest: z
+					}
+				if range.lowest > z
+					range.lowest = z
+				if range.highest < z
+					range.highest = z
+
+				zRange[genKey(x,y)] = range
 
 		if printVoxels.length == 0
 			return null
@@ -346,15 +358,24 @@ module.exports = class NewBrickator
 		knobSize = PipelineSettings.legoKnobSize
 
 		knobRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
+				
+
+		dzBottom = -(grid.spacing.z / 2) + (knobSize.height / 2)
+		knobTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
+		dzTop = (grid.spacing.z / 2) + (knobSize.height / 2)
+		knobTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
 		
-		dz = -(grid.spacing.z / 2) + (knobSize.height / 2)
-		knobTranslation = new THREE.Matrix4().makeTranslation(0,0,dz)
-		
-		knobGeometry = new THREE.CylinderGeometry(
+		knobGeometryBottom = new THREE.CylinderGeometry(
 			knobSize.radius, knobSize.radius, knobSize.height, 20
 		)
-		knobGeometry.applyMatrix(knobRotation)
-		knobGeometry.applyMatrix(knobTranslation)
+		knobGeometryTop = new THREE.CylinderGeometry(
+			knobSize.radius, knobSize.radius, knobSize.height, 20
+		)
+
+		knobGeometryBottom.applyMatrix(knobRotation)
+		knobGeometryTop.applyMatrix(knobRotation)
+		knobGeometryBottom.applyMatrix(knobTranslationBottom)
+		knobGeometryTop.applyMatrix(knobTranslationTop)
 
 		for voxel in printVoxels
 			mesh = new THREE.Mesh(voxGeometry, null)
@@ -368,19 +389,29 @@ module.exports = class NewBrickator
 			else
 				unionBsp = meshBsp
 
-			# if this is the lowes voxel, subtract a knob
+			# if this is the lowes voxel to be printed, subtract a knob
 			# to make it fit to lego bricks
-
-			lz = lowestZValue[genKey(voxel.x,voxel.y)]
-			if voxel.z == lz
-				knobMesh = new THREE.Mesh(knobGeometry, null)
+			range = zRange[genKey(voxel.x,voxel.y)]
+			if voxel.z == range.lowest
+				knobMesh = new THREE.Mesh(knobGeometryBottom, null)
 				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
 				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
 				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
 
 				knobBsp = new ThreeBSP(knobMesh)
 				unionBsp = unionBsp.subtract knobBsp
-				
+
+			# if this is the highest voxel to be printed,
+			# add knobs (for connecting with lego above this geometry)
+			if voxel.z == range.highest
+				knobMesh = new THREE.Mesh(knobGeometryTop, null)
+				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
+				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
+				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
+
+				knobBsp = new ThreeBSP(knobMesh)
+				unionBsp = unionBsp.union knobBsp
+
 		#intersect with original mesh to get 3d printed stuff
 		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
 		if not optimizedModel

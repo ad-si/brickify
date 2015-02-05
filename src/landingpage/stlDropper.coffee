@@ -40,7 +40,11 @@ onModelDrop = (event, feedbackTargets) ->
 			feedbackTargets.each (i, el) -> el.innerHTML = readingString
 			loadFile feedbackTargets, file
 		else
-			alert 'Only .stl files are supported at the moment'
+			bootbox.alert({
+				title: 'Your file does not have the right format!'
+				message: 'Only .stl files are supported at the moment. We are working on
+adding more file formats'
+			})
 
 loadFile = (feedbackTargets, file) ->
 	reader = new FileReader()
@@ -59,7 +63,10 @@ handleLoadedFile = (feedbackTargets, filename) ->
 		optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
 		# happens with empty files
 		if !optimizedModel
-			alert 'Error loading .stl file'
+			bootbox.alert({
+				title: 'Import failed'
+				message: 'Your file contains errors that we could not fix automatically.'
+			})
 
 		optimizedModel.originalFileName = filename
 

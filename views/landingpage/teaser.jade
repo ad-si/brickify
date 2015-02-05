@@ -1,4 +1,14 @@
 header#teaser-carousel.carousel.slide(data-wrap='false', data-interval='false')
+	.container
+		.col-lg-2
+			.btn.carousel-button.builders(href='#teaser-carousel', role='button',
+			data-slide-to='0')
+				span For Builders
+
+		.col-lg-2.col-lg-offset-8
+			.btn.carousel-button.educators(href='#teaser-carousel', role='button',
+			data-slide-to='1')
+				span For Educators
 	.carousel-inner(role='listbox')
 		.item.active
 			.container
@@ -26,8 +36,3 @@ header#teaser-carousel.carousel.slide(data-wrap='false', data-interval='false')
 				#googles.col-lg-6
 					img(src='/img/lowfabFeatureImage.png' width='580px')
 
-	a.left.carousel-control.builders(href='#teaser-carousel', role='button', data-slide-to='0')
-		span For Builders
-
-	a.right.carousel-control.educators(href='#teaser-carousel', role='button', data-slide-to='1')
-		span For Educators

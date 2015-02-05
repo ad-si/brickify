@@ -31,7 +31,7 @@ module.exports = class NewBrickator
 
 		for child in @threejsRootNode.children
 				if availableObjects.indexOf(child.uuid) < 0
-					@threejsRootNode.remove @threeObjects[key]
+					@threejsRootNode.remove child
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>

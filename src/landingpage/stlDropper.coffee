@@ -1,4 +1,4 @@
-stlLoader = require '../plugins/stlImport/stlLoader'
+meshlib = require 'meshlib'
 modelCache = require '../client/modelCache'
 require 'string.prototype.endswith'
 
@@ -53,7 +53,7 @@ handleLoadedFile = ($target, filename) ->
 		errorCallback = () ->
 			importErrors = true
 
-		optimizedModel = stlLoader.parse fileContent, errorCallback, true, true
+		optimizedModel = meshlib.parse fileContent, errorCallback, true, true
 		# happens with empty files
 		if !optimizedModel
 			alert 'Error loading .stl file'

@@ -20,17 +20,16 @@ module.exports = class Bundle
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 
 	init: =>
-		@statesync.init().then(() =>
-			@pluginInstances = @pluginLoader.loadPlugins()
-			
-			if @globalConfig.buildUi
-				@downloadProvider = new DownloadProvider(@)
-				@ui = new Ui(@)
-
-			@statesync.handleUpdatedState()
-		).then(@load).then(() =>
-			window.addEventListener 'beforeunload', @unload
-		)
+		@statesync
+			.init()
+			.then () =>
+				@pluginInstances = @pluginLoader.loadPlugins()
+				if @globalConfig.buildUi
+					@downloadProvider = new DownloadProvider(@)
+					@ui = new Ui(@)
+			.then(@load)
+			.then () =>
+				window.addEventListener 'beforeunload', @unload
 
 	load: =>
 		@statesync.performStateAction @renderer.loadCamera

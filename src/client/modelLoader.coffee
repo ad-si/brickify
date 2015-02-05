@@ -71,47 +71,47 @@ module.exports = class ModelLoader
 		# get biggest polygon, align it to xy-center
 		# align whole model to be on z=0
 
-		res = {}
-		maxA = 0
-		minAx = null
-		minAy = null
+		#resulting model coordinates
+		result = {}
 
-		minz = (p) ->
-			if res.z?
-				res.z = p.z if res.z > p.z
-			else
-				res.z = p.z
+		#area of the biggest polygon
+		maxArea = 0
 
-		maxa = (xArray, yArray) ->
-			A = 0
+		polygonArea = (xArray, yArray) ->
+			# http://stackoverflow.com/questions/16285134/
+			Area = 0
 			j = xArray.length - 1
 
 			for i in [0..yArray.length - 1] by 1
-				A += (xArray[j] + xArray[i]) * (yArray[j] - yArray[i])
+				Area += (xArray[j] + xArray[i]) * (yArray[j] - yArray[i])
 				j = i
-			A = Math.abs(A / 2)
-
-			minX = Math.min.apply null, xArray
-			minY = Math.min.apply null, yArray
-			maxX = Math.max.apply null, xArray
-			maxY = Math.max.apply null, yArray
-
-			if A > maxA
-				maxA = A
-				res.x = minX + (maxX - minX) / 2
-				res.y = minY + (maxY - minY) / 2
+			Area = Math.abs(Area / 2)
+			return Area
 
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
-			minz(p0)
-			minz(p1)
-			minz(p2)
-			maxa([p0.x, p1.x, p2.x], [p0.y, p1.y, p2.y])
+			#find lowest z value (for whole model)
+			minZ  = Math.min(p0.z, p1.z, p2.z)
 
-		console.log "maxA = #{maxA}"
-		console.log res
+			result.z ?= minZ
+			result.z = Math.min(result.z, minZ)
+
+			xValues = [p0.x, p1.x, p2.x]
+			yValues = [p0.y, p1.y, p2.y]
+
+			area = polygonArea(xValues, yValues)
+
+			if area > maxArea
+				maxArea = area
+				minX = Math.min.apply null, xValues
+				minY = Math.min.apply null, yValues
+				maxX = Math.max.apply null, xValues
+				maxY = Math.max.apply null, yValues
+
+				result.x = minX + (maxX - minX) / 2
+				result.y = minY + (maxY - minY) / 2
 
 		node.positionData.position = {
-			x: -res.x
-			y: -res.y
-			z: -res.z
+			x: -result.x
+			y: -result.y
+			z: -result.z
 		}

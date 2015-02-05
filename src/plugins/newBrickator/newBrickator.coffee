@@ -403,7 +403,11 @@ module.exports = class NewBrickator
 
 			# if this is the highest voxel to be printed,
 			# add knobs (for connecting with lego above this geometry)
-			if voxel.z == range.highest
+			# but only if this voxel would have lego above it
+			if grid.zLayers[voxel.z]?[voxel.x]?[voxel.y]?
+				legoAbove = true
+				
+			if voxel.z == range.highest and legoAbove
 				knobMesh = new THREE.Mesh(knobGeometryTop, null)
 				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
 				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )

@@ -280,7 +280,7 @@ module.exports = class NewBrickator
 			results.accumulatedResults.bricks,
 			results.accumulatedResults.grid
 		)
-		threeNodes.bricks.visible = true
+		threeNodes.bricks.visible = @_brickVisibility
 
 		#create CSG (todo: move to webWorker)
 		geo = @_createCSG(selectedNode, threeNodes.csg)
@@ -413,7 +413,7 @@ module.exports = class NewBrickator
 				knobBsp = new ThreeBSP(knobMesh)
 				unionBsp = unionBsp.union knobBsp
 
-		#intersect with original mesh to get 3d printed stuff
+		#intersect with original mesh to get 3d printed geometry
 		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
 		if not optimizedModel
 			return
@@ -426,9 +426,10 @@ module.exports = class NewBrickator
 
 		printBsp = modelBsp.intersect(unionBsp)
 
-		#debug: show intersected mesh
+		#show intersected mesh
 		if csgThreeNode?
 			printMesh = printBsp.toMesh( @printMaterial )
+			printMesh.visible = @_printVisibility
 			csgThreeNode.children = []
 			csgThreeNode.add printMesh
 
@@ -447,11 +448,13 @@ module.exports = class NewBrickator
 		]
 
 	_toggleBrickLayer: (isEnabled) =>
+		@_brickVisibility = isEnabled
 		@_forAllThreeObjects (obj) ->
 			if obj.bricks?
 				obj.bricks.visible = isEnabled
 
 	_togglePrintedLayer: (isEnabled) =>
+		@_printVisibility = isEnabled
 		@_forAllThreeObjects (obj) ->
 			if obj.csg?
 				obj.csg.visible = isEnabled

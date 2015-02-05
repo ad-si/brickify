@@ -50,7 +50,6 @@ module.exports = class SolidRenderer
 			node.pluginData.solidRenderer = {}
 			return @loadModelFromCache node, node.pluginData.solidRenderer, false
 
-
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name
 		success = (optimizedModel) =>
@@ -92,6 +91,7 @@ module.exports = class SolidRenderer
 			result =
 				radius: @latestAddedObject.geometry.boundingSphere.radius
 				center: @latestAddedObject.geometry.boundingSphere.center
+			
 			@latestAddedObject = null
 			return result
 		else

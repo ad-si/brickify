@@ -36,7 +36,7 @@ module.exports = class ModelLoader
 		hash = md5(modelData)
 		fileName = optimizedModel.originalFileName
 		modelCache.store optimizedModel
-		@addModelToState fileName, hash
+		@addModelToState fileName, hash, optimizedModel
 
 	loadByHash: (hash) =>
 		modelCache.request(hash).then(
@@ -45,13 +45,49 @@ module.exports = class ModelLoader
 		)
 
 	# adds a new model to the state
-	addModelToState: (fileName, hash) ->
+	addModelToState: (fileName, hash, optimizedModel) ->
 		loadModelCallback = (state) =>
+			# create node structure
 			node = objectTree.addChild state.rootNode
 			node.fileName = fileName
 			node.meshHash = hash
 			node.pluginData = {
 				uiGen: {selectedPluginKey: @bundle.globalConfig.defaultPlugin}}
+
+			# align model to grid
+			@_alignModelToGrid node, optimizedModel
+
+			# add to state
 			@bundle.ui?.sceneManager.add node
+
 		# call updateState on all client plugins and sync
 		@bundle.statesync.performStateAction loadModelCallback, true
+
+	_alignModelToGrid: (node, optimizedModel) =>
+		# cheap alignment: move minimum point to origin
+		min = {}
+
+		minp = (p) =>
+			if min.x?
+				min.x = p.x if min.x > p.x
+			else
+				min.x = p.x
+			if min.y?
+				min.y = p.y if min.y > p.y
+			else
+				min.y = p.y
+			if min.z?
+				min.z = p.z if min.z > p.z
+			else
+				min.z = p.z
+
+		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
+			minp p0
+			minp p1
+			minp p2
+
+		node.positionData.position = {
+			x: -min.x
+			y: -min.y
+			z: -min.z
+		}

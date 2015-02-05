@@ -254,24 +254,24 @@ module.exports = class BrickLayouter
 			++i
 		return a
 
-	getBiconnectedComponents: (bricks) =>
+	_getBiconnectedComponents: (bricks) =>
 		@index = 0
 		biconnectedComponents = []
 		stack = []
 		for zLayer in bricks
 			for brick in zLayer
 				if brick.biconnectedComponentId == undefined
-					@tarjanAlgorithm brick, biconnectedComponents, stack
+					@_tarjanAlgorithm brick, biconnectedComponents, stack
 		biconnectedComponents
 
-	tarjanAlgorithm: (brick, biconnectedComponents, stack) =>
+	_tarjanAlgorithm: (brick, biconnectedComponents, stack) =>
 		brick.biconnectedComponentId = @index
 		brick.lowlink = @index
 		@index++
 		stack.push(brick)
 		for connectedBrick in brick.uniqueConnectedBricks()
 			if connectedBrick.biconnectedComponentId == undefined
-				@tarjanAlgorithm(connectedBrick, biconnectedComponents, stack, @index)
+				@_tarjanAlgorithm(connectedBrick, biconnectedComponents, stack, @index)
 				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
 				then brick.lowlink else connectedBrick.lowlink
 			else if stack.indexOf(connectedBrick) > -1

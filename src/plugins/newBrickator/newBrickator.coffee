@@ -16,6 +16,7 @@ module.exports = class NewBrickator
 		@brickLayouter = new BrickLayouter()
 		@gridCache = {}
 		@optimizedModelCache = {}
+		@brickifiedModels = []
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -63,6 +64,7 @@ module.exports = class NewBrickator
 			results.accumulatedResults.bricks,
 			results.accumulatedResults.grid
 		)
+		@brickifiedModels.push(@getUuidByNode selectedNode)
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		#ToDo (future): add rotation and scaling (the same way it's done in three)
@@ -75,8 +77,8 @@ module.exports = class NewBrickator
 
 	getThreeObjectsByNode: (node) =>
 		# search for subnode for this object
-		if node.pluginData.newBrickator?
-			uuid = node.pluginData.newBrickator.threeObjectUuid
+		uuid = @getUuidByNode node
+		if uuid?
 			for threenode in @threejsRootNode.children
 				if threenode.uuid == uuid
 					return { voxels: threenode.children[0], bricks: threenode.children[1] }
@@ -92,6 +94,11 @@ module.exports = class NewBrickator
 		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
 
 		return { voxels: object.children[0], bricks: object.children[1] }
+
+	getUuidByNode: (node) =>
+		if node.pluginData.newBrickator?
+			return node.pluginData.newBrickator.threeObjectUuid
+		return null
 
 	getBrushes: () =>
 		return [{
@@ -169,6 +176,7 @@ module.exports = class NewBrickator
 		# show it
 		grid = @_getGrid selectedNode
 		threeObjects = @getThreeObjectsByNode(selectedNode)
+		@configurationChanged = false
 
 		if not grid.threeNode
 			grid.threeNode = threeObjects.voxels
@@ -192,6 +200,8 @@ module.exports = class NewBrickator
 		if obj
 			obj.material = @voxelVisualizer.deselectedMaterial
 			c = obj.voxelCoords
+			if grid.grid.zLayers[c.z][c.x][c.y].enabled == true
+				@configurationChanged = true
 			grid.grid.zLayers[c.z][c.x][c.y].enabled = false
 
 	_selectLegoMouseMoveCallback: (event, selectedNode) =>
@@ -202,6 +212,8 @@ module.exports = class NewBrickator
 		if obj
 			obj.material = @voxelVisualizer.selectedMaterial
 			c = obj.voxelCoords
+			if grid.grid.zLayers[c.z][c.x][c.y].enabled == false
+				@configurationChanged = true
 			grid.grid.zLayers[c.z][c.x][c.y].enabled = true
 
 	_getSelectedVoxel: (event, selectedNode) =>
@@ -226,6 +238,16 @@ module.exports = class NewBrickator
 		# hide grid, then legofy
 		grid = @_getGrid selectedNode
 		grid.threeNode.visible = false
+
+		uuid = @getUuidByNode selectedNode
+		console.log @configurationChanged
+		console.log @brickifiedModels
+		if @configurationChanged == false and @brickifiedModels.indexOf(uuid) >= 0
+			threeNodes = @getThreeObjectsByNode selectedNode
+			threeNodes.bricks.visible = true
+			return
+
+		@brickifiedModels.push uuid if @brickifiedModels.indexOf uuid < 0
 
 		# legofy
 		settings = new PipelineSettings()

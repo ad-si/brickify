@@ -33,7 +33,7 @@ module.exports = class LegoBoard
 
 		#create noppen
 		modelCache
-		.request('0de1cbfdc2710eeb3604aedb6c8853b7')
+		.request('1336affaf837a831f6b580ec75c3b73a')
 		.then (model) =>
 			geo = model.convertToThreeGeometry()
 			for x in [-160..160] by 80

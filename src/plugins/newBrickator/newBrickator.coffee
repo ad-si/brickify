@@ -28,17 +28,14 @@ module.exports = class NewBrickator
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
 
-	onStateUpdate: (state) =>
-		#delete voxel visualizations for deleted objects
-		availableObjects = []
-		objectTree.forAllSubnodeProperties state.rootNode,
-			'newBrickator',
-			(property) ->
-				availableObjects.push property.threeObjectUuid
-
-		for child in @threejsRootNode.children
-				if availableObjects.indexOf(child.uuid) < 0
-					@threejsRootNode.remove @threeObjects[key]
+	onNodeRemove: (node) =>
+		# remove node visuals (bricks, csg, ...)
+		if node.pluginData.newBrickator?
+			uuid = node.pluginData.newBrickator.threeObjectUuid
+			for threenode in @threejsRootNode.children
+				if threenode.uuid == uuid
+					@threejsRootNode.remove threenode
+					return
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
@@ -406,7 +403,7 @@ module.exports = class NewBrickator
 			# but only if this voxel would have lego above it
 			if grid.zLayers[voxel.z]?[voxel.x]?[voxel.y]?
 				legoAbove = true
-				
+
 			if voxel.z == range.highest and legoAbove
 				knobMesh = new THREE.Mesh(knobGeometryTop, null)
 				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )

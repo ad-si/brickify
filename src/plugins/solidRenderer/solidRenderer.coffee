@@ -92,6 +92,10 @@ module.exports = class SolidRenderer
 				radius: @latestAddedObject.geometry.boundingSphere.radius
 				center: @latestAddedObject.geometry.boundingSphere.center
 			
+			# update center to match moved object
+			@latestAddedObject.updateMatrix()
+			result.center.applyProjection @latestAddedObject.matrix
+
 			@latestAddedObject = null
 			return result
 		else

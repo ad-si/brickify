@@ -10,12 +10,14 @@ uploadString = 'Uploading file
 <img src="img/spinner.gif" style="height: 1.2em;">'
 loadedString = 'File loaded!'
 
-module.exports.init = (objects, finishedCallback) ->
-	objects.each (i,el) -> bindDropHandler(el)
+module.exports.init = (objects, feedbackTarget, finishedCallback) ->
+	objects.each (i, el) -> bindDropHandler(el, feedbackTarget)
 	uploadFinishedCallback = finishedCallback
 
-bindDropHandler = (target) ->
-	target.addEventListener 'drop', onModelDrop, false
+bindDropHandler = (target, feedbackTargets) ->
+	target.addEventListener 'drop',
+		(event) -> onModelDrop(event, feedbackTargets),
+		false
 	target.addEventListener 'dragover', ignoreEvent, false
 	target.addEventListener 'dragleave', ignoreEvent, false
 
@@ -23,9 +25,11 @@ ignoreEvent = (event) ->
 	event.preventDefault()
 	event.stopPropagation()
 
-onModelDrop = (event) ->
+onModelDrop = (event, feedbackTargets) ->
 	event.preventDefault()
 	event.stopPropagation()
+
+	console.log feedbackTargets
 
 	files = event.target.files ? event.dataTransfer.files
 	if files?
@@ -33,19 +37,18 @@ onModelDrop = (event) ->
 
 		fn = file.name.toLowerCase()
 		if (fn.search('.stl') == fn.length - 4)
-			$target = $(event.target)
-			$target.html readingString
-			loadFile $target, file
+			feedbackTargets.each (i, el) -> el.innerHTML = readingString
+			loadFile feedbackTargets, file
 		else
 			alert 'Only .stl files are supported at the moment'
 
-loadFile = (target, file) ->
+loadFile = (feedbackTargets, file) ->
 	reader = new FileReader()
-	reader.onload = handleLoadedFile(target, file.name)
+	reader.onload = handleLoadedFile(feedbackTargets, file.name)
 	reader.readAsBinaryString(file)
 
 
-handleLoadedFile = ($target, filename) ->
+handleLoadedFile = (feedbackTargets, filename) ->
 	loadCallback = 	(event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
@@ -60,10 +63,10 @@ handleLoadedFile = ($target, filename) ->
 
 		optimizedModel.originalFileName = filename
 
-		$target.html uploadString
+		feedbackTargets.each (i, el) -> el.innerHTML = uploadString
 
 		ufc = (md5hash) ->
-			$target.html loadedString
+			feedbackTargets.each (i, el) -> el.innerHTML = loadedString
 			if uploadFinishedCallback?
 				uploadFinishedCallback(md5hash, importErrors)
 

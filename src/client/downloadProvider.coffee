@@ -1,4 +1,5 @@
 modelCache = require './modelCache'
+saveAs = require 'filesaver.js'
 
 module.exports = class DownloadProvider
 	constructor: (@bundle) ->
@@ -7,4 +8,9 @@ module.exports = class DownloadProvider
 	createDownload: (selectedNode) =>
 		console.log 'Creating Download...'
 		
-		returnArrays = @bundle.pluginHooks.getStlDownload selectedNode
+		promisesArray = @bundle.pluginHooks.getDownload selectedNode
+
+		Promise.all(promisesArray).then (resultsArray) =>
+			for r in resultsArray
+				saveAs r.data, r.fileName
+

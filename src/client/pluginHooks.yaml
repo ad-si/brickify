@@ -143,7 +143,7 @@
 # that replaces the original 3d model (partly). everything that is not replaced gets
 # 3d printed
 
-- getStlDownload
+- getDownload
 
 # ## Visibility
 # Each plugin can specify an array of layers that can be turned 

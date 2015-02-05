@@ -11,6 +11,7 @@ THREE = require 'three'
 Brick = require './Brick'
 BrickLayouter = require './BrickLayouter'
 ThreeCSG = require './threeCSG/ThreeCSG'
+meshlib = require('meshlib')
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -298,12 +299,22 @@ module.exports = class NewBrickator
 		snapCoord 'z'
 		return vec3
 	
-	getStlDownload: (selectedNode) =>
+	getDownload: (selectedNode) =>
 		printGeometry = @csgCache[selectedNode]
 
-		#ToDo: convert ThreeBSP geometry to stl
+		threeGeometry = printGeometry.toMesh(null).geometry
 
-		return null
+		optimizedModel = new meshlib.OptimizedModel()
+		optimizedModel.fromThreeGeometry(threeGeometry)
+
+		dlPromise = new Promise (resolve) =>
+			meshlib
+			.model(optimizedModel)
+			.export null, (error, binaryStl) ->
+				resolve { data: binaryStl, fileName: '3dprinted.stl' }
+
+		return dlPromise
+
 
 	_createCSG: (selectedNode, csgThreeNode = null) =>
 		# create the intersection of selected voxels and the model mesh

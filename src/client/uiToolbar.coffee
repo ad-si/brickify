@@ -29,11 +29,23 @@ module.exports = class UiToolbar
 			$toolbar.append brush.jqueryElement
 
 	_createBrushUi: (brush) =>
-		html = '<div class="brushcontainer"><img src="img/' +
-			brush.icon + '" width="64px" height="64px"><br><span>' +
-			brush.text + '</span></div>'
+		html = '<div class="brushlayout">
+			<span class="glyphicon glyphicon-eye-open visibilityIcon"></span>
+			<br><div class="brushcontainer"><img src="img/' +
+			brush.icon + '"><br><span>' +
+			brush.text + '</span></div></div>'
 		brushelement = $(html)
-		brushelement.on 'click', () => @_handleBrushClicked brush, brushelement
+
+		button = brushelement.find('.brushcontainer')
+		visibility = brushelement.find('.visibilityIcon')
+
+		if brush.canToggleVisibility and brush.visibilityCallback?
+			visibility.on 'click', () => @_handleVisibilityClicked brush, visibility
+			brush.visible = true
+		else
+			visibility.hide()
+
+		button.on 'click', () => @_handleBrushClicked brush, button
 
 		return brushelement
 
@@ -52,7 +64,7 @@ module.exports = class UiToolbar
 			if @_selectedNode()?
 				@_selectedBrush.deselectCallback? @_selectedNode()
 
-			@_selectedBrush.jqueryElement.removeClass 'brushselect'
+			jqueryElement.removeClass 'brushselect'
 
 			#edgecase: user clicked on selected brush: deselect this brush
 			if @_selectedBrush == brush
@@ -61,4 +73,18 @@ module.exports = class UiToolbar
 
 		@_selectedBrush = brush
 		@_selectedBrush.selectCallback? @_selectedNode() if @_selectedNode()?
-		@_selectedBrush.jqueryElement.addClass 'brushselect'
+		jqueryElement.addClass 'brushselect'
+
+	_handleVisibilityClicked: (brush, jqueryElement) =>
+		brush.visible = !brush.visible
+
+		jqueryElement.removeClass('glyphicon-eye-open')
+		jqueryElement.removeClass('glyphicon-eye-close')
+
+		if brush.visible
+			jqueryElement.addClass('glyphicon-eye-open')
+		else
+			jqueryElement.addClass('glyphicon-eye-close')
+
+		brush.visibilityCallback brush.visible
+

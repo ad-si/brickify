@@ -112,6 +112,8 @@ module.exports = class NewBrickator
 			mouseDownCallback: @_brushMouseDownCallback
 			mouseMoveCallback: @_selectLegoMouseMoveCallback
 			mouseUpCallback: @_brushMouseUpCallback
+			canToggleVisibility: true
+			visibilityCallback: @_toggleBrickLayer
 		},{
 			text: 'Make 3D printed'
 			icon: '3dPrintBrush.png'
@@ -270,14 +272,6 @@ module.exports = class NewBrickator
 		snapCoord 'y'
 		snapCoord 'z'
 		return vec3
-
-	getVisibilityLayers: () =>
-		return [
-			{
-				text: 'Bricks'
-				callback: @_toggleBrickLayer
-			}
-		]
 
 	_toggleBrickLayer: (isEnabled) =>
 		@_forAllThreeObjects (obj) ->

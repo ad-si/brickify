@@ -132,21 +132,9 @@
 #	mouseDownCallback: # when a node is selected and mouse is pressed
 #	mouseMoveCallback: # after being pressed, when mouse is moved
 #	mouseUpCallback: # when mouse is released
+#   canToggleVisibility: true # if true, the user can toggle visibility
+#   visibilityCallback: # called when the user changes visibility
 # }
 # 
 
 - getBrushes
-
-# ## Visibility
-# Each plugin can specify an array of layers that can be turned 
-# visible/invisible by the user. 
-# Layers are visible by default.
-# Example:
-#
-# [{
-#	text: 'Imported 3D-Model'
-#	callback: @_toggleModelLayer
-# }]
-#
-
-- getVisibilityLayers

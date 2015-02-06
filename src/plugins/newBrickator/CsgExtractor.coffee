@@ -2,6 +2,11 @@ ThreeCSG = require './threeCSG/ThreeCSG'
 
 module.exports = class CsgExtractor
 	extractGeometry: (grid, options) ->
+		# extracts voxel that are not selected for
+		# legofication (where enabled = false)
+		# intersected with the original mesh
+		# as a 3d geometry
+
 		analyzeResult = @_analyzeGrid(grid)
 
 		if analyzeResult.printVoxels.length == 0
@@ -15,7 +20,7 @@ module.exports = class CsgExtractor
 
 	_analyzeGrid: (grid) ->
 		# creates a list of voxels to be printed
-		# and analyze their z-Range
+		# and analyzes their z-Range
 
 		printVoxels = []
 		zRange = {}
@@ -39,11 +44,14 @@ module.exports = class CsgExtractor
 				zRange[@_genKey(x,y)] = range
 
 		return {
+			# List of voxels to be printed
 			printVoxels: printVoxels
+			# for each xy-Coordinate: minimum and maximum zValue of voxels
 			zRange: zRange
 		}
 
 	_genKey: (x, y) ->
+		# a function to generate a key for a hashmap
 		return "#{x}-#{y}"
 
 	_createPrimitiveGeometry: (gridSpacing, knobSize) ->
@@ -72,14 +80,16 @@ module.exports = class CsgExtractor
 		knobGeometryTop.applyMatrix(knobTranslationTop)
 
 		return {
+			# The shape of a voxel
 			voxelGeometry: voxelGeometry
+			# The shape of a knob that is subtracted from the bottom of the voxel
 			knobGeometryBottom: knobGeometryBottom
+			# The shape of a knob that is added on top of a voxel
 			knobGeometryTop: knobGeometryTop
 		}
 
 	_createVoxelHull: (grid, printVoxels, zRange, primitiveGeometry) ->
 		# creates a hull out of the selected voxels with knobs on top and bottom
-
 		# ToDo: merge voxels into one geometry, see issue #202
 
 		for voxel in printVoxels

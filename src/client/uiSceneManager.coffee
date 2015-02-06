@@ -6,6 +6,7 @@ class UiSceneManager
 		@pluginHooks = @bundle.pluginHooks
 
 	init: () =>
+
 		# call add for existing nodes in state
 		for node in @bundle.statesync.state.rootNode.children
 			@add(node)
@@ -65,6 +66,7 @@ class UiSceneManager
 				@deselect()
 
 	_delete: (node) => (state) =>
+		objectTree.removeNode state.rootNode, node
 		@remove node
 
 	_getDeleteHotkey: ->

@@ -119,9 +119,30 @@ ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover
 	font-size 1.5em
 	cursor pointer
 	
-.objectListItem
-	color black
-	cursor pointer
+#objectsContainer
+	list-style none
+	padding-left 0
+	margin-left 0
 	
+.objectListItem
+	position relative
+	color black
+	overflow hidden
+	height 1.5em
+	cursor pointer
+	padding-left 2px
+	border-radius 5px
+	
+.objectIconContainer
+	background-color #BBBBBB
+	border-radius 5px
+	position absolute
+	padding-right 2px
+	top 0
+	right 0
+	.glyphicon
+		margin-left 2px
+		margin-right 2px
+		
 .selectedObject
-	background-color #AAAAAACC
+	background-color #BBBBBB

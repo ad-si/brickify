@@ -4,7 +4,6 @@ module.exports = class UiObjects
 	constructor: (@ui) ->
 		@objectList = []
 		@selectedStructure = null
-		return
 
 	init: (jqueryString) =>
 		@jqueryObject = $(jqueryString)
@@ -22,22 +21,43 @@ module.exports = class UiObjects
 		@objectList.push structure
 		@jqueryObject.append structure.ui
 
+		@_select structure
+
+
 	onNodeRemove: (node) =>
 		# Called by sceneManager when a node is removed
-		for structure in @objectList
+		for i in [0..@objectList.length - 1] by 1
+			structure = @objectList[i]
 			if structure.node == node
 				structure.ui.remove()
+				@objectList.splice(i, 1)
+
+				if @objectList.length > 0
+					@_select @objectList[@objectList.length - 1]
+				return
 
 	_createUi: (structure) =>
 		name = structure.node.fileName
 
-		html = "<div class='objectListItem'><p>#{name}</p></div>"
-
+		html = "<li class='objectListItem'><p>#{name}</p>
+			<div class='objectIconContainer'></div><ul class='layerlist'></ul></li>"
 		structure.ui = $(html)
+		structure.iconContainer = structure.ui.find('.objectIconContainer')
+		structure.iconContainer.hide()
+		structure.iconContainer.append(
+			$('<span class="glyphicon glyphicon-eye-open"></span>')
+			)
+		structure.iconContainer.append(
+			$('<span class="glyphicon glyphicon-move"></span>')
+			)
+		structure.iconContainer.append(
+			$('<span class="glyphicon glyphicon-refresh"></span>')
+			)
+		
 		structure.ui.on 'click', () =>
-			@_handleObjectClick(structure)
+			@_select(structure)
 
-	_handleObjectClick: (structure) =>
+	_select: (structure) =>
 		# Don't do anything when clicking on selected object
 		if structure == @selectedStructure
 			return
@@ -46,10 +66,12 @@ module.exports = class UiObjects
 		if @selectedStructure?
 			@deselectCallback @selectedStructure.node
 			@selectedStructure.ui.removeClass('selectedObject')
+			@selectedStructure.iconContainer.hide()
 
 		# select current object
 		@selectedStructure = structure
 		@selectCallback @selectedStructure.node
 		@selectedStructure.ui.addClass('selectedObject')
+		@selectedStructure.iconContainer.show()
 
 

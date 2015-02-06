@@ -10,8 +10,8 @@ objectTree = require '../../common/state/objectTree'
 THREE = require 'three'
 Brick = require './Brick'
 BrickLayouter = require './BrickLayouter'
-ThreeCSG = require './threeCSG/ThreeCSG'
 meshlib = require('meshlib')
+CsgExtractor = require './CsgExtractor'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -286,8 +286,8 @@ module.exports = class NewBrickator
 		threeNodes.bricks.visible = @_brickVisibility
 
 		#create CSG (todo: move to webWorker)
-		geo = @_createCSG(selectedNode, threeNodes.csg)
-		@csgCache[selectedNode] = geo
+		printThreeMesh = @_createCSG(selectedNode, threeNodes.csg)
+		@csgCache[selectedNode] = printThreeMesh
 
 	snapToGrid: (vec3) =>
 		@gridSpacing ?= (new PipelineSettings()).gridSpacing
@@ -300,12 +300,10 @@ module.exports = class NewBrickator
 		return vec3
 	
 	getDownload: (selectedNode) =>
-		printGeometry = @csgCache[selectedNode]
-
-		threeGeometry = printGeometry.toMesh(null).geometry
+		printMesh = @csgCache[selectedNode]
 
 		optimizedModel = new meshlib.OptimizedModel()
-		optimizedModel.fromThreeGeometry(threeGeometry)
+		optimizedModel.fromThreeGeometry(printMesh.geometry)
 
 		dlPromise = new Promise (resolve) =>
 			meshlib
@@ -317,126 +315,35 @@ module.exports = class NewBrickator
 
 
 	_createCSG: (selectedNode, csgThreeNode = null) =>
-		# create the intersection of selected voxels and the model mesh
-
-		printVoxels = []
-		zRange = {}
-
-		genKey = (x, y) ->
-			return "#{x}-#{y}"
-
-		grid = @_getGrid(selectedNode).grid
-
-		grid.forEachVoxel (voxel, x, y, z) =>
-			if not voxel.enabled
-				printVoxels.push {x: x, y: y, z: z}
-
-				range = zRange[genKey(x,y)]
-
-				if not range?
-					range = {
-						lowest: z
-						highest: z
-					}
-				if range.lowest > z
-					range.lowest = z
-				if range.highest < z
-					range.highest = z
-
-				zRange[genKey(x,y)] = range
-
-		if printVoxels.length == 0
-			return null
-
-		# ToDo: merge voxels into one geometry, see issue #202
-
-		# create voxel csg
-		voxGeometry = new THREE.BoxGeometry(
-			grid.spacing.x, grid.spacing.y, grid.spacing.z
-		)
-
-		knobSize = PipelineSettings.legoKnobSize
-
-		knobRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
-				
-
-		dzBottom = -(grid.spacing.z / 2) + (knobSize.height / 2)
-		knobTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
-		dzTop = (grid.spacing.z / 2) + (knobSize.height / 2)
-		knobTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
-		
-		knobGeometryBottom = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 20
-		)
-		knobGeometryTop = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 20
-		)
-
-		knobGeometryBottom.applyMatrix(knobRotation)
-		knobGeometryTop.applyMatrix(knobRotation)
-		knobGeometryBottom.applyMatrix(knobTranslationBottom)
-		knobGeometryTop.applyMatrix(knobTranslationTop)
-
-		for voxel in printVoxels
-			mesh = new THREE.Mesh(voxGeometry, null)
-			mesh.translateX( grid.origin.x + grid.spacing.x * voxel.x)
-			mesh.translateY( grid.origin.y + grid.spacing.y * voxel.y)
-			mesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z)
-			meshBsp = new ThreeBSP(mesh)
-
-			if unionBsp?
-				unionBsp = unionBsp.union(meshBsp)
-			else
-				unionBsp = meshBsp
-
-			# if this is the lowes voxel to be printed, subtract a knob
-			# to make it fit to lego bricks
-			range = zRange[genKey(voxel.x,voxel.y)]
-			if voxel.z == range.lowest
-				knobMesh = new THREE.Mesh(knobGeometryBottom, null)
-				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
-				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
-				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
-
-				knobBsp = new ThreeBSP(knobMesh)
-				unionBsp = unionBsp.subtract knobBsp
-
-			# if this is the highest voxel to be printed,
-			# add knobs (for connecting with lego above this geometry)
-			# but only if this voxel would have lego above it
-			if grid.zLayers[voxel.z]?[voxel.x]?[voxel.y]?
-				legoAbove = true
-
-			if voxel.z == range.highest and legoAbove
-				knobMesh = new THREE.Mesh(knobGeometryTop, null)
-				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
-				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
-				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
-
-				knobBsp = new ThreeBSP(knobMesh)
-				unionBsp = unionBsp.union knobBsp
-
-		#intersect with original mesh to get 3d printed geometry
+		# get optimized model and transform to actual position
 		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
 		if not optimizedModel
 			return
 
-		modelModel = optimizedModel.convertToThreeGeometry()
+		threeModel = optimizedModel.convertToThreeGeometry()
 		modelTransform = @_getModelTransforms selectedNode
-		modelModel.applyMatrix(modelTransform)
+		threeModel.applyMatrix(modelTransform)
 
-		modelBsp = new ThreeBSP(modelModel)
+		# create the intersection of selected voxels and the model mesh
+		grid = @_getGrid(selectedNode).grid
+		@csgExtractor ?= new CsgExtractor()
 
-		printBsp = modelBsp.intersect(unionBsp)
+		options = {
+			grid: grid
+			knobSize: PipelineSettings.legoKnobSize
+			transformedModel: threeModel
+		}
 
-		#show intersected mesh
+		printThreeMesh = @csgExtractor.extractGeometry(grid, options)
+
+		# show intersected mesh
 		if csgThreeNode?
-			printMesh = printBsp.toMesh( @printMaterial )
-			printMesh.visible = @_printVisibility
+			printThreeMesh.material = @printMaterial
+			printThreeMesh.visible = @_printVisibility
 			csgThreeNode.children = []
-			csgThreeNode.add printMesh
+			csgThreeNode.add printThreeMesh
 
-		return printBsp
+		return printThreeMesh
 
 	getVisibilityLayers: () =>
 		return [

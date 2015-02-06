@@ -1,6 +1,7 @@
 Hotkeys = require './hotkeys'
 UiSceneManager = require './uiSceneManager'
 UiToolbar = require './UiToolbar'
+UiObjects = require './UiObjects'
 
 ###
 # @module ui
@@ -10,9 +11,9 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
+		@objects = new UiObjects(@)
 		@sceneManager = new UiSceneManager(@bundle)
 		@toolbar = new UiToolbar(@bundle)
-		@_init()
 
 	dropHandler: (event) ->
 		event.stopPropagation()
@@ -57,9 +58,9 @@ module.exports = class Ui
 	windowResizeHandler: (event) ->
 		@renderer.windowResizeHandler()
 
-	_init: =>
+	init: =>
 		@_initListeners()
-		@_initScenegraph()
+		@_initUiElements()
 		@_initHotkeys()
 
 	_initListeners: =>
@@ -99,9 +100,9 @@ module.exports = class Ui
 			false
 		)
 
-	_initScenegraph: =>
-		@bundle.getPlugin('scene-graph').initUi $('#sceneGraphContainer')
-		return
+	_initUiElements: =>
+		@objects.init('#objectsContainer')
+		@sceneManager.init()
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)

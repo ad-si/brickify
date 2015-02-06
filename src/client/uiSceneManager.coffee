@@ -5,6 +5,11 @@ class UiSceneManager
 		@selectedNode = null
 		@pluginHooks = @bundle.pluginHooks
 
+	init: () =>
+		# call add for existing nodes in state
+		for node in @bundle.statesync.state.rootNode.children
+			@add(node)
+
 	getHotkeys: =>
 		return {
 			title: 'Scenegraph'
@@ -19,10 +24,12 @@ class UiSceneManager
 
 	add: (node) =>
 		@pluginHooks.onNodeAdd node
+		@bundle.ui.objects.onNodeAdd node
 		return
 
 	remove: (node) =>
 		@pluginHooks.onNodeRemove node
+		@bundle.ui.objects.onNodeRemove node
 		return
 
 #
@@ -32,6 +39,7 @@ class UiSceneManager
 	select: (@selectedNode) =>
 		@pluginHooks.onNodeSelect @selectedNode
 		@bundle.ui.toolbar.onNodeSelect @selectedNode
+
 		return
 
 	deselect: =>
@@ -57,8 +65,7 @@ class UiSceneManager
 				@deselect()
 
 	_delete: (node) => (state) =>
-		objectTree.removeNode state.rootNode, node
-		@pluginHooks.onNodeRemove node
+		@remove node
 
 	_getDeleteHotkey: ->
 		return {

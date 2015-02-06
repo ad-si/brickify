@@ -53,10 +53,6 @@ module.exports = class PluginLoader
 			require('../plugins/stlExport/package.json')
 		)
 		pluginInstances.push @initPlugin(
-			require('../plugins/sceneGraph'),
-			require('../plugins/sceneGraph/package.json')
-		)
-		pluginInstances.push @initPlugin(
 			require('../plugins/coordinateSystem'),
 			require('../plugins/coordinateSystem/package.json')
 		)

@@ -114,10 +114,18 @@ module.exports = class SolidRenderer
 	getBrushes: =>
 		return [{
 			text: 'move'
-			icon: 'moveBrush.png'
+			iconBrush: true
+			glyphicon: 'move'
 			mouseDownCallback: @_handleMouseDown
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp
+		},{
+			text: 'rotate'
+			iconBrush: true
+			glyphicon: 'refresh'
+			#mouseDownCallback: @_handleMouseDown
+			#mouseMoveCallback: @_handleMouseMove
+			#mouseUpCallback: @_handleMouseUp
 		}]
 
 	_getThreeObjectByName: (name) =>
@@ -151,14 +159,6 @@ module.exports = class SolidRenderer
 
 		threeObject = @_getThreeObjectByName pld.threeObjectUuid
 		@_copyTransformDataToThree selectedNode, threeObject
-
-	getVisibilityLayers: () =>
-		return [
-			{
-				text: 'Imported 3D-Model'
-				callback: @_toggleModelLayer
-			}
-		]
 
 	_toggleModelLayer: (isEnabled) =>
 		for child in @threejsNode.children

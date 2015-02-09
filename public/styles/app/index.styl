@@ -120,6 +120,7 @@ ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover
 	cursor pointer
 	
 #objectsContainer
+	user-select none
 	list-style none
 	padding-left 0
 	margin-left 0
@@ -128,21 +129,41 @@ ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover
 	position relative
 	color black
 	overflow hidden
-	height 1.5em
 	cursor pointer
 	padding-left 2px
 	border-radius 5px
+	z-index 1
 	
 .objectIconContainer
 	background-color #BBBBBB
 	border-radius 5px
+
+.iconFloatRight
 	position absolute
 	padding-right 2px
 	top 0
 	right 0
+	z-index 3
+	.glyphicon
+		margin-left 2px
+		margin-right 2px
+				
+.brushlist
+	list-style none	
+	padding-left 0	
+	margin-top -0.5em
+	margin-left 2em
+	z-index 2
+	
+.brushEntry
+	position relative
+	display block
 	.glyphicon
 		margin-left 2px
 		margin-right 2px
 		
+.selectedBrush
+	background-color #EEEEEE
+	
 .selectedObject
 	background-color #BBBBBB

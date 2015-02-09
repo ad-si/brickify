@@ -10,7 +10,7 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
-		@objects = new UiObjects(@)
+		@objects = new UiObjects(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
 
 	dropHandler: (event) ->
@@ -27,7 +27,7 @@ module.exports = class Ui
 	mouseDownHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
-		
+
 		for onClickHandler in @pluginHooks.get 'onClick'
 			onClickHandler(event)
 

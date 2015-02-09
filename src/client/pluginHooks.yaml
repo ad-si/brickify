@@ -126,7 +126,8 @@
 #
 # {
 #	text: 'Make Lego'
-#	icon: 'legoBrush.png' #from img/legoBrush.png
+#	iconBrush: false # if true, only a icon next to the object is displayed
+#	glyhicon: 'move' # if brushIcon, defines the glyphicon to be shown
 #	selectCallback: # when the brush is selected, selectedNode as argument
 #	deselectCallback: # when the brush is deselected
 #	mouseDownCallback: # when a node is selected and mouse is pressed

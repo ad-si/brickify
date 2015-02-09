@@ -125,7 +125,6 @@ module.exports = class Ui
 
 	_initDownload: () =>
 		@toolbar.addDownloadListener () =>
-			# return
 			selNode = @sceneManager.selectedNode
 			if selNode?
 				dl = @bundle.downloadProvider.createDownload selNode

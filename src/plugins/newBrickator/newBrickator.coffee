@@ -150,7 +150,8 @@ module.exports = class NewBrickator
 		# returns the voxel grid for the selected node
 		# if the node has not changed position and the grid exists,
 		# the cached instance is returned
-		return new Promise (resolve) =>
+		return new Promise (resolve, reject) =>
+			# ToDo handle modelPromise rejected
 			identifier = selectedNode.pluginData.solidRenderer.threeObjectUuid
 			nodePosition = selectedNode.positionData.position
 

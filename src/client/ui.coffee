@@ -1,6 +1,7 @@
 Hotkeys = require './hotkeys'
 UiSceneManager = require './uiSceneManager'
 UiObjects = require './UiObjects'
+interactionHelper = require './interactionHelper'
 
 ###
 # @module ui
@@ -28,18 +29,20 @@ module.exports = class Ui
 		event.stopPropagation()
 		event.preventDefault()
 
-		@mouseDown = true
-		brush = @objects.getSelectedBrush()
-		if brush? and brush.mouseDownCallback?
-			brush.mouseDownCallback event, @sceneManager.selectedNode
+		if @_clickedOnPluginObject(event)
+			@mouseDown = true
+			brush = @objects.getSelectedBrush()
+			if brush? and brush.mouseDownCallback?
+				brush.mouseDownCallback event, @sceneManager.selectedNode
 
 	mouseUpHandler: (event) =>
 		event.preventDefault()
 
-		@mouseDown = false
-		brush = @objects.getSelectedBrush()
-		if brush? and brush.mouseUpCallback?
-			brush.mouseUpCallback event, @sceneManager.selectedNode
+		if @mouseDown
+			@mouseDown = false
+			brush = @objects.getSelectedBrush()
+			if brush? and brush.mouseUpCallback?
+				brush.mouseUpCallback event, @sceneManager.selectedNode
 
 	mouseMoveHandler: (event) =>
 		event.preventDefault()
@@ -122,3 +125,26 @@ module.exports = class Ui
 	_toggleGridVisibility: () =>
 		@bundle.getPlugin('lego-board').toggleVisibility()
 		@bundle.getPlugin('coordinate-system').toggleVisibility()
+
+	_clickedOnPluginObject: (event) =>
+		# returns true if the current mouse (event)
+		# is over a non-coordinatesystem plugin
+
+		selection = interactionHelper.getPolygonClickedOn event,
+			@renderer.scene.children, @renderer
+
+		if selection.length > 0
+			obj = selection[0].object
+			plugin = null
+			while obj.parent and plugin == null
+				if obj.associatedPlugin?
+					plugin = obj.associatedPlugin
+				else
+					obj = obj.parent
+
+		if plugin and
+		plugin.name != 'lego-board' and
+		plugin.name != 'coordinate-system'
+			return true
+
+		return false

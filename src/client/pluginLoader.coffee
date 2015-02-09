@@ -25,6 +25,7 @@ module.exports = class PluginLoader
 
 		if @pluginHooks.hasHook(instance, 'init3d')
 			threeNode = new THREE.Object3D()
+			threeNode.associatedPlugin = instance
 			instance.init3d threeNode
 
 		@pluginHooks.register instance

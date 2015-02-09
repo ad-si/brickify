@@ -76,7 +76,9 @@ module.exports = class UiObjects
 
 	_createBrush: (brush, structure) =>
 		# creates a default brush with list entry
-		string = "<li class='brushEntry'>#{brush.text}</li>"
+		string = "<li class='brushEntry'>
+			<span class='glyphicon glyphicon-pencil'></span>
+				#{brush.text}</li>"
 		htmlElement = $(string)
 
 		if brush.canToggleVisibility

@@ -160,6 +160,6 @@ module.exports = class SolidRenderer
 		threeObject = @_getThreeObjectByName pld.threeObjectUuid
 		@_copyTransformDataToThree selectedNode, threeObject
 
-	_toggleModelLayer: (isEnabled) =>
-		for child in @threejsNode.children
-			child.visible = isEnabled
+	toggleNodeVisibility: (node, visible) =>
+		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+		obj.visible = visible

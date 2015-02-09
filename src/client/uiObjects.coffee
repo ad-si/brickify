@@ -68,6 +68,7 @@ module.exports = class UiObjects
 		objVis.on 'click', () =>
 			structure.nodeVisible = !structure.nodeVisible
 			@_toggleVisibleIcon structure.nodeVisible, objVis
+			@_setNodeVisibility structure.nodeVisible, structure.node
 
 		structure.iconContainer.append objVis
 		structure.nodeVisible = true
@@ -151,3 +152,6 @@ module.exports = class UiObjects
 			jqueryObject.find('.glyphicon').addClass('glyphicon-eye-close')
 			jqueryObject.find('.glyphicon').removeClass('glyphicon-eye-open')
 
+	_setNodeVisibility: (isVisible, node) =>
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+		solidRenderer.toggleNodeVisibility node, isVisible

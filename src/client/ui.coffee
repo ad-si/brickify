@@ -1,7 +1,7 @@
 Hotkeys = require './hotkeys'
 UiSceneManager = require './uiSceneManager'
-UiToolbar = require './UiToolbar'
-VisibilityMenu = require './VisibilityMenu'
+UiToolbar = require './uiToolbar'
+VisibilityMenu = require './visibilityMenu'
 
 ###
 # @module ui

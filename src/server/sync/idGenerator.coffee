@@ -9,6 +9,8 @@ chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 pattern = (length) ->
 	return new RegExp("^[#{chars}]{#{length}}$")
 
+acceptAllFilter = -> true
+
 ###
 # Generates an unique alphanumeric identifier
 #
@@ -19,7 +21,7 @@ pattern = (length) ->
 #
 # @memberOf idGenerator
 ###
-module.exports.generate = (filter = null, length = 8) ->
+module.exports.generate = (filter = acceptAllFilter, length = 8) ->
 	generate = ->
 		id = ''
 		for i in [0...length] by 1
@@ -31,6 +33,8 @@ module.exports.generate = (filter = null, length = 8) ->
 
 	for i in [0..maxNumberOfTries] by 1
 		return id if filter id = generate()
+
+	return null #no id could be found that was accepted by the filter
 
 ###
 # Checks an identifier for syntactical correctness

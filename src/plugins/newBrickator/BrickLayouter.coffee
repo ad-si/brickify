@@ -284,21 +284,30 @@ module.exports = class BrickLayouter
 		articulationPoints = []
 		for zLayer in bricks
 			for brick in zLayer
+				brick.discovered = false
+				brick.parent = null
+				brick.discoveryTime = -1
+		for zLayer in bricks
+			for brick in zLayer
 				if brick.discovered == undefined or !brick.discovered
 					@_articulationPointAlgorithm brick, articulationPoints
-		console.log articulationPoints
 		articulationPoints
 
 	_articulationPointAlgorithm: (brick, articulationPoints) =>
 		brick.discoveryTime = brick.lowlink = ++@time
 		brick.discovered = true
+		children = 0
 		for otherBrick in brick.uniqueConnectedBricks()
-			if otherBrick.discovered == undefined or !otherBrick.discovered
+			if otherBrick.discovered is undefined or !otherBrick.discovered
 				otherBrick.parent = brick
+				children++
 				@_articulationPointAlgorithm otherBrick, articulationPoints
 				brick.lowlink = Math.min brick.lowlink, otherBrick.lowlink
-				if otherBrick.lowlink >= brick.discoveryTime
+				if !brick.parent? and children > 1
 					articulationPoints.push brick
+				if brick.parent?
+					if otherBrick.lowlink >= brick.discoveryTime
+						articulationPoints.push brick
 			else if otherBrick.parent != brick
 				brick.lowlink = Math.min brick.lowlink, otherBrick.discoveryTime
 

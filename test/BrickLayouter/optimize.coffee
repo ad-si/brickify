@@ -97,7 +97,7 @@ describe 'brickLayouter optimize', ->
 		bricks = [[brick1, brick2]]
 		articulationPoints = brickLayouter._getArticulationPoints bricks
 		console.log articulationPoints
-		expect(articulationPoints).to.have.length(1)
+		expect(articulationPoints).to.have.length(0)
 		done()
 
 	it 'should find one articulation point', (done) ->
@@ -113,6 +113,5 @@ describe 'brickLayouter optimize', ->
 		brick3.lowerSlots = [[brick1], [brick2]]
 		bricks = [[brick1, brick2, brick3]]
 		articulationPoints = brickLayouter._getArticulationPoints bricks
-		console.log articulationPoints
-		expect(articulationPoints).to.have.length(1)
+		expect(articulationPoints).to.eql([brick3])
 		done()

@@ -271,7 +271,7 @@ module.exports = class BrickLayouter
 		stack.push(brick)
 		for connectedBrick in brick.uniqueConnectedBricks()
 			if connectedBrick.biconnectedComponentId == undefined
-				@_tarjanAlgorithm(connectedBrick, biconnectedComponents, stack, @index)
+				@_tarjanAlgorithm(connectedBrick, biconnectedComponents, stack)
 				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
 				then brick.lowlink else connectedBrick.lowlink
 			else if stack.indexOf(connectedBrick) > -1

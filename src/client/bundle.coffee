@@ -20,13 +20,15 @@ module.exports = class Bundle
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 
 	init: =>
-		@statesync.init().then(() =>
-			@pluginInstances = @pluginLoader.loadPlugins()
-			@ui = new Ui(@) if(@globalConfig.buildUi)
-			@statesync.handleUpdatedState()
-		).then(@load).then(() =>
-			window.addEventListener 'beforeunload', @unload
-		)
+		@statesync
+			.init()
+			.then () =>
+				@pluginInstances = @pluginLoader.loadPlugins()
+				@ui = new Ui(@) if(@globalConfig.buildUi)
+				@statesync.handleUpdatedState()
+			.then(@load)
+			.then () =>
+				window.addEventListener 'beforeunload', @unload
 
 	load: =>
 		@statesync.performStateAction @renderer.loadCamera

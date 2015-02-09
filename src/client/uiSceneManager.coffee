@@ -6,10 +6,11 @@ class UiSceneManager
 		@pluginHooks = @bundle.pluginHooks
 
 	init: () =>
-
 		# call add for existing nodes in state
-		for node in @bundle.statesync.state.rootNode.children
-			@add(node)
+		nodes = @bundle.statesync.state.rootNode.children
+		if nodes?
+			for node in nodes
+				@add(node)
 
 	getHotkeys: =>
 		return {
@@ -39,8 +40,6 @@ class UiSceneManager
 
 	select: (@selectedNode) =>
 		@pluginHooks.onNodeSelect @selectedNode
-		@bundle.ui.toolbar.onNodeSelect @selectedNode
-
 		return
 
 	deselect: =>

@@ -1,6 +1,5 @@
 Hotkeys = require './hotkeys'
 UiSceneManager = require './uiSceneManager'
-UiToolbar = require './UiToolbar'
 UiObjects = require './UiObjects'
 
 ###
@@ -13,7 +12,6 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@objects = new UiObjects(@)
 		@sceneManager = new UiSceneManager(@bundle)
-		@toolbar = new UiToolbar(@bundle)
 
 	dropHandler: (event) ->
 		event.stopPropagation()
@@ -29,29 +27,15 @@ module.exports = class Ui
 	mouseDownHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
-
-		@_mouseIsDown = true
-
+		
 		for onClickHandler in @pluginHooks.get 'onClick'
 			onClickHandler(event)
-
-		@toolbar.handleMouseDown event
 
 	mouseUpHandler: (event) =>
 		event.preventDefault()
 
-		@_mouseIsDown = false
-
-		if @toolbar.hasBrushSelected()
-			@toolbar.handleMouseUp event
-
 	mouseMoveHandler: (event) =>
 		event.preventDefault()
-
-		if @_mouseIsDown
-			if @toolbar.hasBrushSelected()
-				event.stopPropagation()
-				@toolbar.handleMouseMove event
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.

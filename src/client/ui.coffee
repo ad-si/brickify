@@ -28,14 +28,28 @@ module.exports = class Ui
 		event.stopPropagation()
 		event.preventDefault()
 
-		for onClickHandler in @pluginHooks.get 'onClick'
-			onClickHandler(event)
+		@mouseDown = true
+		brush = @objects.getSelectedBrush()
+		if brush? and brush.mouseDownCallback?
+			brush.mouseDownCallback event, @sceneManager.selectedNode
 
 	mouseUpHandler: (event) =>
 		event.preventDefault()
 
+		@mouseDown = false
+		brush = @objects.getSelectedBrush()
+		if brush? and brush.mouseUpCallback?
+			brush.mouseUpCallback event, @sceneManager.selectedNode
+
 	mouseMoveHandler: (event) =>
 		event.preventDefault()
+		#console.log "mouseMove (down: #{@mouseDown})"
+
+		if @mouseDown
+			brush = @objects.getSelectedBrush()
+			if brush? and brush.mouseMoveCallback?
+				brush.mouseMoveCallback event, @sceneManager.selectedNode
+				event.stopPropagation()
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.

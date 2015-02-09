@@ -113,6 +113,7 @@ module.exports = class UiObjects
 			@selectedStructure.ui.removeClass('selectedObject')
 			@selectedStructure.iconContainer.hide()
 			@selectedStructure.brushlist.slideUp()
+			@_deselectBrush @selectedStructure
 
 		# select current object
 		@selectedStructure = structure
@@ -136,6 +137,15 @@ module.exports = class UiObjects
 		if brush.selectCallback?
 				brush.selectCallback structure.node
 
+	_deselectBrush: (structure) =>
+		if structure.selectedBrush?
+			if structure.selectedBrush.deselectCallback?
+				structure.selectedBrush.deselectCallback structure.node
+
+			structure.selectedBrushUi.removeClass 'selectedBrush'
+
+		structure.selectedBrush = null
+
 	_toggleBrushVisibility: (brush, jqueryObject) =>
 		brush.visible  = !brush.visible
 
@@ -155,3 +165,9 @@ module.exports = class UiObjects
 	_setNodeVisibility: (isVisible, node) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')
 		solidRenderer.toggleNodeVisibility node, isVisible
+
+	getSelectedBrush: () =>
+		if @selectedStructure?
+			return @selectedStructure.selectedBrush
+		else
+			return null

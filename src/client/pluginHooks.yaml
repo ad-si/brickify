@@ -102,12 +102,6 @@
 
 - importFile
 
-#  ## On click handling
-#
-#  TODO
-
-- onClick
-
 # ## Hotkeys
 #
 # Plugins should return an object with a title property (String) that is

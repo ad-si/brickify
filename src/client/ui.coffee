@@ -29,8 +29,10 @@ module.exports = class Ui
 		event.stopPropagation()
 		event.preventDefault()
 
+		@mouseDown = true
+
 		if @_clickedOnPluginObject(event)
-			@mouseDown = true
+			@brushActive = true
 			brush = @objects.getSelectedBrush()
 			if brush? and brush.mouseDownCallback?
 				brush.mouseDownCallback event, @sceneManager.selectedNode
@@ -40,6 +42,9 @@ module.exports = class Ui
 
 		if @mouseDown
 			@mouseDown = false
+
+		if @brushActive
+			@brushActive = false
 			brush = @objects.getSelectedBrush()
 			if brush? and brush.mouseUpCallback?
 				brush.mouseUpCallback event, @sceneManager.selectedNode
@@ -48,11 +53,16 @@ module.exports = class Ui
 		event.preventDefault()
 		#console.log "mouseMove (down: #{@mouseDown})"
 
-		if @mouseDown
-			brush = @objects.getSelectedBrush()
+		brush = @objects.getSelectedBrush()
+
+		if @brushActive
 			if brush? and brush.mouseMoveCallback?
 				brush.mouseMoveCallback event, @sceneManager.selectedNode
 				event.stopPropagation()
+		else if not @mouseDown
+			if brush? and brush.mouseHoverCallback?
+				brush.mouseHoverCallback event, @sceneManager.selectedNode
+
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.

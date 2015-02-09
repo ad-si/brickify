@@ -1,11 +1,20 @@
 module.exports = class Brick
+
+	@nextBrickIndex = 0
+
+	@nextBrickIdx: () =>
+		temp = @nextBrickIndex
+		@nextBrickIndex++
+		#console.log temp
+		return temp
+
 	constructor: (@position, @size) ->
-		# position always contains smalles x & smallest y
+		# position always contains smallest x & smallest y
 
 		#initialize slots
 		@upperSlots = []
 		@lowerSlots = []
-		@id = -1
+		@id = Brick.nextBrickIdx()
 
 		for xx in [0..@size.x - 1] by 1
 			@upperSlots[xx] = []
@@ -158,3 +167,45 @@ module.exports = class Brick
 		if i != -1
 			array.splice i, 1
 		return
+
+	split: () =>
+		newBricks = []
+		for x in [0..@size.x - 1] by 1
+			newBricks[x] = []
+			for y in [0..@size.y - 1] by 1
+				newBricks[x][y] = false
+
+		for x in [0..@size.x - 1]
+			for y in [0..@size.y - 1]
+				newPosition = {
+					x: @position.x + x
+					y: @position.y + y
+					z: @position.z
+				}
+				newBricks[x][y] = new Brick(newPosition,{x: 1, y: 1, z: 1})
+
+				# update connections
+				if @upperSlots[x][y] != false
+					connectedBrick = @upperSlots[x][y]
+					newBricks[x][y].upperSlots[0][0] = connectedBrick
+					offsetInConBrick = {
+						x: (newBricks[x][y].position.x) - connectedBrick.position.x
+						y: (newBricks[x][y].position.y) - connectedBrick.position.y
+					}
+					connectedBrick.lowerSlots[offsetInConBrick.x][offsetInConBrick.y] =
+						newBricks[x][y]
+
+				if @lowerSlots[x][y] != false
+					connectedBrick = @lowerSlots[x][y]
+					newBricks[x][y].lowerSlots[0][0] = connectedBrick
+					offsetInConBrick = {
+						x: (newBricks[x][y].position.x) - connectedBrick.position.x
+						y: (newBricks[x][y].position.y) - connectedBrick.position.y
+					}
+					connectedBrick.upperSlots[offsetInConBrick.x][offsetInConBrick.y] =
+						newBricks[x][y]
+
+				# update neighbours
+
+		return [].concat.apply([], newBricks)
+

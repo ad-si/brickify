@@ -315,17 +315,12 @@ describe 'brickLayouter merge', ->
 
 	it 'should have correct upperSlots/lowerSlots after merge', (done) ->
 		brickLayouter = new BrickLayouter()
-		brickLayouter.nextBrickIndex = 1
+		Brick.nextBrickIndex = 0
 		brick1 = new Brick {x: 0, y: 0, z: 1}, {x: 1, y: 1, z: 1}
-		brick1.id = brickLayouter.nextBrickIdx()
 		brick2 = new Brick {x: 0, y: 1, z: 1}, {x: 1, y: 1, z: 1}
-		brick2.id = brickLayouter.nextBrickIdx()
 		brick3 = new Brick {x: 0, y: 0, z: 2}, {x: 1, y: 2, z: 1}
-		brick3.id = brickLayouter.nextBrickIdx()
 		brick4 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick4.id = brickLayouter.nextBrickIdx()
 		brick5 = new Brick {x: 0, y: 1, z: 0}, {x: 1, y: 1, z: 1}
-		brick5.id = brickLayouter.nextBrickIdx()
 
 		brick1.neighbours[3].push brick2
 		brick2.neighbours[2].push brick1
@@ -355,7 +350,7 @@ describe 'brickLayouter merge', ->
 
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 1})
 		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
-		expect(newBrick.id).to.equal(6)
+		expect(newBrick.id).to.equal(5)
 		expect(newBrick.upperSlots[0][0].id).to.equal(brick3.id)
 		expect(newBrick.upperSlots[0][1].id).to.equal(brick3.id)
 		expect(newBrick.lowerSlots[0][0].id).to.equal(brick4.id)

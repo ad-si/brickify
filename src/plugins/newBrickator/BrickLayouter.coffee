@@ -2,18 +2,11 @@ Brick = require './Brick'
 
 module.exports = class BrickLayouter
 	constructor: () ->
-		@nextBrickIndex = 0
 		return
-
-	nextBrickIdx: () =>
-		temp = @nextBrickIndex
-		@nextBrickIndex++
-		#console.log temp
-		return temp
 
 	initializeBrickGraph: (grid) =>
 		bricks = []
-		@nextBrickIndex = 0
+		Brick.nextBrickIndex = 0
 		for z in [0..grid.numVoxelsZ - 1] by 1
 			bricks[z] = []
 
@@ -29,7 +22,7 @@ module.exports = class BrickLayouter
 							position = {x: x, y: y, z: z}
 							size = {x: 1,y: 1,z: 1}
 							brick = new Brick position, size
-							brick.id = @nextBrickIdx()
+							#brick.id = @nextBrickIdx()
 							grid.zLayers[z][x][y].brick = brick
 
 							@_connectToBrickBelow brick, x,y,z, grid
@@ -79,7 +72,6 @@ module.exports = class BrickLayouter
 		for layer in bricks
 			numTotalInitialBricks += layer.length
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-		console.log numTotalInitialBricks
 
 		while(true) #only for debugging, should be while true
 			brick = @_chooseRandomBrick bricks
@@ -198,7 +190,7 @@ module.exports = class BrickLayouter
 
 		ps = brick.getPositionAndSizeForNewBrick mergeIndex, mergeNeighbours
 		newBrick = new Brick(ps.position, ps.size)
-		newBrick.id = @nextBrickIdx()
+		#newBrick.id = @nextBrickIdx()
 
 		# set new brick connections & neighbours
 		for mbrick in mergeNeighbours.concat [brick]
@@ -309,3 +301,18 @@ module.exports = class BrickLayouter
 					articulationPoints.push brick
 			else if otherBrick.parent != brick
 				brick.lowlink = Math.min brick.lowlink, otherBrick.discoveryTime
+
+	_splitBricks: (bricksToSplit, bricks) =>
+		newBricks = []
+
+		for brick in bricksToSplit
+			newBricks.push brick.split()
+			#remove brick from bricks
+
+		newBricks = [].concat.apply([], newBricks)
+
+		for newBrick in newBricks
+			bricks[newBrick.position.z].push newBrick
+
+		return newBricks
+

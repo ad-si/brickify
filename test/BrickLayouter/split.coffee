@@ -10,12 +10,14 @@ describe 'brickLayouter split', ->
 		height: 3.2
 	}
 
-	###
+
 	it 'should split bricks & establish new neighbours and connections', (done) ->
-		# 89AB
-		# 7777
-		# 4556
-		# 0123
+		# 89AB    xxxx
+		# 7777    2345
+		# 4556    x01x
+		# 0123    xxxx
+
+		Brick.nextBrickIndex = 0
 
 		brickLayouter = new BrickLayouter()
 		brick0 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
@@ -74,13 +76,41 @@ describe 'brickLayouter split', ->
 
 		bricksToSplit = [brick5, brick7]
 
-		newBricks = brickLayouter._splitBricks bricksToSplit bricks
+		newBricks = brickLayouter._splitBricks bricksToSplit, bricks
+
+		expect(newBricks.length).to.equal(6)
 
 		for newBrick in newBricks
 			expect(newBrick.size).to.eql({x: 1, y: 1, z: 1})
 
+		expect(newBricks[0].position).to.eql({x: 1, y: 0, z: 1})
+		expect(newBricks[0].lowerSlots).to.eql([[brick1]])
+		expect(brick1.upperSlots[0][0]).to.eql(newBricks[0])
+		expect(newBricks[0].upperSlots[0][0]).to.eql(newBricks[3])
+
+		expect(newBricks[1].position).to.eql({x: 2, y: 0, z: 1})
+		expect(newBricks[1].lowerSlots).to.eql([[brick2]])
+		expect(brick2.upperSlots[0][0]).to.eql(newBricks[1])
+		expect(newBricks[1].upperSlots[0][0]).to.eql(newBricks[4])
+		expect(newBricks[4].lowerSlots[0][0]).to.eql(newBricks[1])
+
+		expect(newBricks[2].position).to.eql({x: 0, y: 0, z: 2})
+		expect(newBricks[2].lowerSlots).to.eql([[brick4]])
+		expect(brick4.upperSlots[0][0]).to.eql(newBricks[2])
+		expect(newBricks[2].upperSlots[0][0]).to.eql(brick8)
+		expect(brick8.lowerSlots[0][0]).to.eql(newBricks[2])
+
+		console.log 'done checking connections, now checking neighbours'
+
+#		expect(newBricks[0].neighbours[0]).to.eql([brick4])
+#		expect(newBricks[0].neighbours[1]).to.eql([newBricks[1]])
+
+		# 89AB    xxxx
+		# 7777    2345
+		# 4556    x01x
+		# 0123    xxxx
+
 		# check correct neighbours
-		# check correct connections
 
 		done()
 

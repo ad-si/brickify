@@ -40,3 +40,9 @@ module.exports.delete = (request, response) ->
 		.then -> response.status(204).send()
 		.catch (id) -> response.status(404).send id
 	.catch -> response.status(400).send 'Invalid data packet id provided'
+
+###
+# Use this only for testing!
+###
+module.exports.clear = () ->
+	return dpStorage.clear()

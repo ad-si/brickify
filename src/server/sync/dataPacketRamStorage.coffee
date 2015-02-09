@@ -49,3 +49,7 @@ module.exports.delete = (id) ->
 		return Promise.resolve()
 	else
 		return Promise.reject id
+
+module.exports.clear = ->
+	packets = {}
+	return Promise.resolve()

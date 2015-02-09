@@ -84,3 +84,35 @@ describe 'brickLayouter optimize', ->
 		connectedComponents = brickLayouter._getBiconnectedComponents bricks
 		expect(connectedComponents).to.have.length(1)
 		done()
+
+	it 'should find no articulation points', (done) ->
+			# 2
+			# 1
+
+		brickLayouter = new BrickLayouter()
+		brick1 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick2 = new Brick {x: 0, y: 0, z: 1}, {x: 1, y: 1, z: 1}
+		brick1.upperSlots = [[brick2]]
+		brick2.lowerSlots = [[brick1]]
+		bricks = [[brick1, brick2]]
+		articulationPoints = brickLayouter._getArticulationPoints bricks
+		console.log articulationPoints
+		expect(articulationPoints).to.have.length(1)
+		done()
+
+	it 'should find one articulation point', (done) ->
+		# 33
+		# 12
+
+		brickLayouter = new BrickLayouter()
+		brick1 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick2 = new Brick {x: 0, y: 1, z: 0}, {x: 1, y: 1, z: 1}
+		brick3 = new Brick {x: 0, y: 0, z: 1}, {x: 1, y: 2, z: 1}
+		brick1.upperSlots = [[brick3]]
+		brick2.upperSlots = [[brick3]]
+		brick3.lowerSlots = [[brick1], [brick2]]
+		bricks = [[brick1, brick2, brick3]]
+		articulationPoints = brickLayouter._getArticulationPoints bricks
+		console.log articulationPoints
+		expect(articulationPoints).to.have.length(1)
+		done()

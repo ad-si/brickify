@@ -284,5 +284,27 @@ module.exports = class BrickLayouter
 			while true
 				otherBrick = stack.pop()
 				component.push otherBrick
-				break unless otherBrick != brick
+				break if otherBrick == brick
 			biconnectedComponents.push component
+
+	_getArticulationPoints: (bricks) =>
+		@dfsCounter = 0
+		articulationPoints = []
+		for zLayer in bricks
+			for brick in zLayer
+				if brick.discovered == undefined or !brick.discovered
+					@_articulationPointAlgorithm brick, articulationPoints
+		articulationPoints
+
+	_articulationPointAlgorithm: (brick, articulationPoints) =>
+		brick.dfsCounter = brick.lowlink = ++@dfsCounter
+		brick.discovered = true
+		for otherBrick in brick.uniqueConnectedBricks()
+			if otherBrick.discovered == undefined or !otherBrick.discovered
+				otherBrick.parent = brick
+				@_articulationPointAlgorithm otherBrick, articulationPoints
+				brick.lowlink = Math.min(brick.lowlink, otherBrick.lowlink)
+				if (otherBrick.lowlink >= brick.dfsCounter)
+					articulationPoints.push brick
+			else if otherBrick.parent != brick
+				brick.lowlink = Math.min(brick.lowlink, otherBrick.dfsCounter)

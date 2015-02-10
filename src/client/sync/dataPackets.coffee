@@ -17,12 +17,16 @@ module.exports.get = (id) ->
 	return cache.get(id).catch(-> proxy.get(id).then cache.cache)
 
 module.exports.put = (packet) ->
-	return cache.put(packet).then -> proxy.put packet
+	return proxy.put(packet).then((proxyResult) ->
+		cache.cache(packet).then(->
+			return proxyResult
+	))
 
 module.exports.delete = (id) ->
-	# The packet might not be in the cache - but still needs to be deleted
-	# from the server, therefore call proxy.delete in any case and use its result
-	return cache.delete(id).then(
-		-> proxy.delete id
-		-> proxy.delete id
-	)
+	return proxy.delete(id).then((proxyResult) ->
+		cache.ensureDelete(id).then(->
+			return proxyResult
+	))
+
+module.exports.clear = ->
+	cache.clear()

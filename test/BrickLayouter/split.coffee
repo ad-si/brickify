@@ -101,10 +101,11 @@ describe 'brickLayouter split', ->
 		expect(brick8.lowerSlots[0][0]).to.eql(newBricks[2])
 
 		console.log 'done checking connections, now checking neighbours'
-		console.log newBricks[0].neighbours
 		expect(newBricks[0].neighbours[0]).to.not.equal([])
-		#expect(newBricks[0].neighbours[0][0].id).to.equal(brick4.id)
-		#expect(newBricks[0].neighbours[1]).to.equal([newBricks[1]])
+		expect(newBricks[0].neighbours).to.eql([[brick4],[newBricks[1]],[],[]])
+		expect(newBricks[1].neighbours).to.eql([[newBricks[0]],[brick6],[],[]])
+		expect(newBricks[4].neighbours).to.
+			eql([[newBricks[3]],[newBricks[5]],[],[]])
 
 		# 89AB    xxxx
 		# 7777    2345

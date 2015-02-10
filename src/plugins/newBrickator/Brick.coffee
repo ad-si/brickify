@@ -222,6 +222,12 @@ module.exports = class Brick
 						@addNeighboursToNewBrick newBricks[x][y], 3, 2
 
 				# update neighbours inside splitting brick
+					if x > 0
+						newBricks[x][y].neighbours[0].push newBricks[x - 1][y]
+						newBricks[x - 1][y].neighbours[1].push newBricks[x][y]
+					if y > 0
+						newBricks[x][y].neighbours[2].push newBricks[x][y - 1]
+						newBricks[x][y - 1].neighbours[3].push newBricks[x][y]
 
 		#remove this (old) brick from all neighbours
 		for neighbours, i in @neighbours

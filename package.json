@@ -63,13 +63,16 @@
   },
   "devDependencies": {
     "chai": "^1.9.2",
+    "chai-as-promised": "^4.1.1",
     "coffeelint": "^1.6.1",
     "crojsdoc": "^0.8.8",
     "express-debug": "^1.1.1",
     "groc": "^0.7.0",
+    "jquery-mockjax": "^1.6.1",
     "karma": "^0.12.28",
     "karma-browserify": "^1.0.1",
     "karma-chai": "^0.1.0",
+    "karma-chai-plugins": "^0.2.4",
     "karma-chrome-launcher": "^0.1.7",
     "karma-cli": "0.0.4",
     "karma-mocha": "^0.1.10",
@@ -84,7 +87,7 @@
     "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --recursive",
-    "testFrontend": "./node_modules/.bin/karma start",
+    "testClient": "./node_modules/.bin/karma start",
     "prepublish": "npm test && npm run checkStyle"
   },
   "repository": {

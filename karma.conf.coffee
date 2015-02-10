@@ -14,16 +14,13 @@ module.exports = (config) ->
 			'browserify'
 			'mocha'
 			'chai'
+			'chai-as-promised'
 		]
 
 		# list of files/patterns to load in the browser
 		files: [
 			{
-				pattern: 'testClient/models/*.stl'
-				included: false
-			}
-			{
-				pattern: 'testClient/*.coffee'
+				pattern: 'testClient/**/*.coffee'
 				included: true
 			}
 		]

@@ -205,7 +205,49 @@ module.exports = class Brick
 					connectedBrick.upperSlots[offsetInConBrick.x][offsetInConBrick.y] =
 						newBricks[x][y]
 
-				# update neighbours
+				# update neighbours from outside splitting brick
+					if newBricks[x][y].position.x == @position.x
+						#take neighbour in direction 0 xm
+						@addNeighboursToNewBrick newBricks[x][y], 0, 1
+					if newBricks[x][y].position.y == @position.y
+						#take neighbour in direction 2 ym
+						@addNeighboursToNewBrick newBricks[x][y], 2, 3
+					if (newBricks[x][y].position.x + newBricks[x][y].size.x) ==
+					(@position.x + @size.x)
+						#take neighbour in direction 1 xp
+						@addNeighboursToNewBrick newBricks[x][y], 1, 0
+					if (newBricks[x][y].position.y + newBricks[x][y].size.y) ==
+					(@position.y + @size.y)
+						#take neighbour in direction 3 yp
+						@addNeighboursToNewBrick newBricks[x][y], 3, 2
+
+				# update neighbours inside splitting brick
+
+		#remove this (old) brick from all neighbours
+		for neighbours, i in @neighbours
+			for neighbour in neighbours
+				@_removeFirstOccurenceFromArray @, neighbour.neighbours[i]
 
 		return [].concat.apply([], newBricks)
 
+
+	addNeighboursToNewBrick: (newBrick, direction, opposite) =>
+		if direction in [0,1]
+			minY = newBrick.position.y
+			maxY = newBrick.position.y + newBrick.size.y
+			for neighbour in @neighbours[direction]
+				if neighbour.position.y <= minY and
+				neighbour.position.y + neighbour.size.y >= maxY
+					newBrick.neighbours[direction].push neighbour
+					neighbour.neighbours[opposite].push newBrick
+
+		if direction in [2, 3]
+			minX = newBrick.position.x
+			maxX = newBrick.position.x + newBrick.size.x
+			for neighbour in @neighbours[direction]
+				if neighbour.position.x <= minX and
+				neighbour.position.x + neighbour.size.x >= maxX
+					newBrick.neighbours[direction].push neighbour
+					neighbour.neighbours[opposite].push newBrick
+
+		return

@@ -104,7 +104,7 @@ module.exports = class Ui
 		return
 
 	_initHotkeys: =>
-		@hotkeys = new Hotkeys(@pluginHooks)
+		@hotkeys = new Hotkeys(@pluginHooks, @selection)
 		@hotkeys.addEvents @selection.getHotkeys()
 
 		gridHotkeys = {

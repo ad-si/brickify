@@ -17,6 +17,7 @@ module.exports = class NewBrickator
 		@gridCache = {}
 		@optimizedModelCache = {}
 		@brickifiedModels = []
+		@resultCache = {}
 
 	init: (@bundle) => return
 	init3d: (@threejsRootNode) => return
@@ -99,6 +100,24 @@ module.exports = class NewBrickator
 		if node.pluginData.newBrickator?
 			return node.pluginData.newBrickator.threeObjectUuid
 		return null
+
+	getResultByNode: (node, grid, recompute) =>
+		identifier = node.pluginData.solidRenderer.threeObjectUuid
+		if recompute
+			settings = new PipelineSettings()
+			@_applyModelTransforms node, settings
+			settings.deactivateVoxelizing()
+
+			optimizedModel = @optimizedModelCache[node.meshHash]
+			if not optimizedModel
+				return
+
+			data = {
+				optimizedModel: optimizedModel
+				grid: grid.grid
+			}
+			@resultCache[identifier] = @pipeline.run data, settings, true
+		return @resultCache[identifier]
 
 	getBrushes: () =>
 		return [{
@@ -240,8 +259,6 @@ module.exports = class NewBrickator
 		grid.threeNode.visible = false
 
 		uuid = @getUuidByNode selectedNode
-		console.log @configurationChanged
-		console.log @brickifiedModels
 		if @configurationChanged == false and @brickifiedModels.indexOf(uuid) >= 0
 			threeNodes = @getThreeObjectsByNode selectedNode
 			threeNodes.bricks.visible = true
@@ -250,19 +267,7 @@ module.exports = class NewBrickator
 		@brickifiedModels.push uuid if @brickifiedModels.indexOf uuid < 0
 
 		# legofy
-		settings = new PipelineSettings()
-		@_applyModelTransforms selectedNode, settings
-		settings.deactivateVoxelizing()
-
-		optimizedModel = @optimizedModelCache[selectedNode.meshHash]
-		if not optimizedModel
-			return
-
-		data = {
-			optimizedModel: optimizedModel
-			grid: grid.grid
-		}
-		results = @pipeline.run data, settings, true
+		results = @getResultByNode selectedNode, grid, true
 
 		threeNodes = @getThreeObjectsByNode selectedNode
 
@@ -284,4 +289,30 @@ module.exports = class NewBrickator
 		snapCoord 'z'
 		return vec3
 
+	getHotkeys: =>
+		return {
+		title: 'Bricks'
+		events: [
+			{
+				hotkey: 's'
+				description: 'show stability of bricks'
+				callback: @showStabilityView
+			}
+			]
+		}
+
+	showStabilityView: (selectedNode) =>
+		return if !selectedNode?
+		result = @getResultByNode selectedNode, grid, false
+		if result?
+			grid = @_getGrid selectedNode
+			grid.threeNode.visible = false
+			threeNodes = @getThreeObjectsByNode selectedNode
+			@brickVisualizer ?= new BrickVisualizer()
+			@brickVisualizer.createVisibleBricks(
+				threeNodes.bricks,
+				result.accumulatedResults.bricks,
+				result.accumulatedResults.grid,
+				true
+			)
 

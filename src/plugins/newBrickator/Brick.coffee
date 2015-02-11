@@ -209,3 +209,14 @@ module.exports = class Brick
 
 		return [].concat.apply([], newBricks)
 
+	getStability: () =>
+		# possible links at top and bottom
+		possibleLinks = 2 * @size.x * @size.y
+		links = 0
+		for x in [0..@size.x - 1]
+			for y in [0..@size.y - 1]
+				if @upperSlots[x][y] != false
+					links++
+				if @lowerSlots[x][y] != false
+					links++
+		links / possibleLinks

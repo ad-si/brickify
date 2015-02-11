@@ -3,11 +3,13 @@ THREE = require 'three'
 module.exports = class BrickVisualizer
 	constructor: () ->
 		@_createBrickMaterials()
+		@_createStabilityMaterials()
 		@currentlyWorking = false
 
 	# expects a three node, an array of lego bricks (with positions in)
-	# grid coordinates, and optionally a grid offset
-	createVisibleBricks: (threeNode, brickData, grid) =>
+	# grid coordinates, optionally a grid offset and whether or not to show
+	# stability (default is off)
+	createVisibleBricks: (threeNode, brickData, grid, showStability) =>
 		# do not create multiple layers of bricks at the same time
 		# (happens when the user rapidly clicks with the mouse)
 		if @currentlyWorking
@@ -19,21 +21,22 @@ module.exports = class BrickVisualizer
 		for gridZ in [0..brickData.length - 1] by 1
 			lastCallback = true if gridZ == (brickData.length - 1)
 			window.setTimeout @_layerCallback(
-				grid, brickData[gridZ], threeNode, lastCallback),
+				grid, brickData[gridZ], threeNode, lastCallback, showStability),
 					10 * gridZ
 
-	_createLayer: (grid, brickLayer, threeNode) =>
-		bricks = (@_createBrick grid, brick for brick in brickLayer)
+	_createLayer: (grid, brickLayer, threeNode, showStability) =>
+		bricks = (@_createBrick grid, brick, showStability for brick in brickLayer)
 		layerGeometry = new THREE.Geometry()
 		for brick in bricks
 			brick.updateMatrix()
 			layerGeometry.merge brick.geometry, brick.matrix
-		layerMesh = new THREE.Mesh(layerGeometry, @_getFaceMats())
+		layerMesh = new THREE.Mesh(layerGeometry, @_getFaceMats(showStability))
 		threeNode.add layerMesh
 
-	_layerCallback: (grid, brickLayer, threeNode, lastCallback = false) =>
+	_layerCallback: (grid, brickLayer, threeNode, lastCallback = false,
+									 showStability) =>
 		return () =>
-			@_createLayer grid, brickLayer, threeNode
+			@_createLayer grid, brickLayer, threeNode, showStability
 			if lastCallback
 				@currentlyWorking = false
 
@@ -41,8 +44,8 @@ module.exports = class BrickVisualizer
 		return () =>
 			@_createBrick(grid, brick, threeNode)
 
-	_createBrick: (grid, brick, threeNode) =>
-		cube = @_createBrickGeometry grid.spacing, brick
+	_createBrick: (grid, brick, showStability) =>
+		cube = @_createBrickGeometry grid.spacing, brick, showStability
 
 		#move the bricks to their position in the grid
 		world = grid.mapVoxelToWorld brick.position
@@ -51,8 +54,11 @@ module.exports = class BrickVisualizer
 		cube.translateZ( world.z )
 		cube
 
-	_createBrickGeometry: (gridSpacing, brick) =>
-		index = @_getRandomMaterialIndex()
+	_createBrickGeometry: (gridSpacing, brick, showStability) =>
+		if showStability
+			index = Math.round brick.getStability() * 19
+		else
+			index = @_getRandomMaterialIndex()
 		brickSizeX = gridSpacing.x * brick.size.x
 		brickSizeY = gridSpacing.y * brick.size.y
 		brickSizeZ = gridSpacing.z * brick.size.z
@@ -65,7 +71,7 @@ module.exports = class BrickVisualizer
 		for face in brickGeometry.faces
 			face.materialIndex = index
 
-		cube = new THREE.Mesh(brickGeometry, @_getFaceMats())
+		cube = new THREE.Mesh(brickGeometry, @_getFaceMats(showStability))
 
 		#add noppen
 		noppe = new THREE.CylinderGeometry(
@@ -80,7 +86,7 @@ module.exports = class BrickVisualizer
 			for yi in [0..brick.size.y - 1] by 1
 				# only show knobs if there is no connected brick to it
 				if brick.upperSlots[xi][yi] == false
-					noppeMesh = new THREE.Mesh(noppe, @_getFaceMats())
+					noppeMesh = new THREE.Mesh(noppe, @_getFaceMats(showStability))
 
 					noppeMesh.translateX (gridSpacing.x * (xi + 0.5)) - (brickSizeX / 2)
 					noppeMesh.translateY (gridSpacing.y * (yi + 0.5)) - (brickSizeY / 2)
@@ -90,7 +96,7 @@ module.exports = class BrickVisualizer
 					noppeMesh.updateMatrix()
 					brickGeometry.merge noppeMesh.geometry, noppeMesh.matrix
 
-		cube = new THREE.Mesh(brickGeometry, @_getFaceMats())
+		cube = new THREE.Mesh(brickGeometry, @_getFaceMats(showStability))
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
 		#(center of model is physical center of box)
@@ -109,10 +115,6 @@ module.exports = class BrickVisualizer
 	_getRandomMaterialIndex: () =>
 		return Math.floor(Math.random() * @_brickMaterials.length)
 
-	_getRandomMaterial: () =>
-		i = Math.floor(Math.random() * @_brickMaterials.length)
-		return @_brickMaterials[i]
-
 	_createBrickMaterials: () =>
 		@_brickMaterials = []
 		@_brickMaterials.push @_createMaterial 0xff9900
@@ -127,12 +129,28 @@ module.exports = class BrickVisualizer
 		@_brickMaterials.push @_createMaterial 0xffb577
 		@_brickMaterials.push @_createMaterial 0xff9944
 
-	_createMaterial: (color) =>
-		return new THREE.MeshLambertMaterial({
-			color: color
-			#opacity: 0.8
-			#transparent: true
-			})
+	_createStabilityMaterials: =>
+		@_stabilityMaterials = []
+		# 2 by 10 is the largest LEGO brick we support so an array of 21 suffices
+		# to reflect all stability shades
+		for i in [0..20] by 1
+			red = Math.round(255 - i * 255 / 20) * 0x10000
+			green = Math.round(i * 255 / 20) * 0x100
+			blue = 0
+			color = red + green + blue
+			# opacity is between 0.75 (perfectly stable) and 1 (not stable at all)
+			opacity = if i == 0 then 1 else 1 - i * 0.0125
+			@_stabilityMaterials.push @_createMaterial(color, opacity)
 
-	_getFaceMats: =>
-		return new THREE.MeshFaceMaterial(@_brickMaterials)
+
+	_createMaterial: (color, opacity = 1.0) =>
+		material = new THREE.MeshLambertMaterial({
+			color: color
+			})
+		material.opacity = opacity
+		material.transparent = opacity < 1.0
+		return material
+
+	_getFaceMats: (showStability) =>
+		materials = if showStability then @_stabilityMaterials else @_brickMaterials
+		return new THREE.MeshFaceMaterial(materials)

@@ -54,7 +54,7 @@ module.exports = class Grid
 		@origin = {
 			x: ox - (@spacing.x / 2)
 			y: oy - (@spacing.y / 2)
-			z: oz - (@spacing.z / 2)
+			z: oz + (@spacing.z / 2)
 		}
 
 		@numVoxelsX = Math.ceil (bbMaxWorld.x - bbMinWorld.x) / @spacing.x

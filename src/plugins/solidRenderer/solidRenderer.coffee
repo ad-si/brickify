@@ -55,6 +55,8 @@ module.exports = class SolidRenderer
 		success = (optimizedModel) =>
 			console.log "Got model #{node.meshHash}"
 			threeObject = @addModelToThree optimizedModel
+			# enable Ui/mouseDispatcher find out on what node we clicked
+			threeObject.associatedNode = node
 			if reload
 				threeObject.name = properties.threeObjectUuid
 			else

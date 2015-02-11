@@ -14,7 +14,14 @@ module.exports = class MouseDispatcher
 
 		@mouseDown = true
 
+		# brush action if we clicked on some plugin geometry (and not void / grid)
 		if @_clickedOnPluginObject(event)
+			# override object selection if we clicked on another object
+			clickedNode = @_getClickedNode event
+			if clickedNode? and clickedNode != @sceneManager.selectedNode
+				@objects.selectNode clickedNode
+
+			# perform brush action
 			@brushActive = true
 			brush = @objects.getSelectedBrush()
 			if brush? and brush.mouseDownCallback?
@@ -54,17 +61,38 @@ module.exports = class MouseDispatcher
 			@renderer.scene.children, @renderer
 
 		if selection.length > 0
-			obj = selection[0].object
-			plugin = null
-			while obj.parent and plugin == null
-				if obj.associatedPlugin?
-					plugin = obj.associatedPlugin
-				else
+			for geometry in selection
+				obj = geometry.object
+
+				while obj.parent
+					if obj.associatedPlugin?
+						plugin = obj.associatedPlugin
+
+						if plugin and
+						plugin.name != 'lego-board' and
+						plugin.name != 'coordinate-system'
+							return true
+
 					obj = obj.parent
 
-		if plugin and
-		plugin.name != 'lego-board' and
-		plugin.name != 'coordinate-system'
-			return true
-
 		return false
+
+	_getClickedNode: (event) =>
+		# relies on the fact that solidRenderer sets an 'associatedNode' property
+		# for three nodes added
+
+		selection = interactionHelper.getPolygonClickedOn event,
+			@renderer.scene.children, @renderer
+
+		if selection.length > 0
+			for geometry in selection
+				object = geometry.object
+
+				if object.associatedNode?
+					return object.associatedNode
+
+				while object.parent?
+					object = object.parent
+					if object.associatedNode?
+						return object.associatedNode
+		return null

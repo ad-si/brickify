@@ -42,6 +42,21 @@ module.exports = class UiObjects
 					@_objectSelect @objectList[@objectList.length - 1]
 				return
 
+	selectNode: (node) =>
+		# overrides the node selection, maintains the same selected brush
+		for s in @objectList
+			if s.node == node
+				selectedBrush = @selectedStructure.selectedBrush
+
+				@_objectSelect s
+
+				if selectedBrush
+					@_brushSelect selectedBrush,
+					@selectedStructure.brushjQueryObjects[selectedBrush.text],
+					@selectedStructure
+
+				return
+
 	_createUi: (structure) =>
 		name = structure.node.fileName
 
@@ -57,6 +72,7 @@ module.exports = class UiObjects
 			@_objectSelect(structure)
 
 		structure.brushlist = structure.ui.find('.brushlist')
+		structure.brushjQueryObjects = {}
 		for brush in @_brushList
 			if brush.iconBrush
 				@_createIconBrush brush, structure
@@ -96,6 +112,7 @@ module.exports = class UiObjects
 			@_brushSelect brush, htmlElement, structure
 
 		structure.brushlist.append htmlElement
+		structure.brushjQueryObjects[brush.text] = htmlElement
 
 	_createIconBrush: (brush, structure) =>
 		# creates a brush that is only shown as a icon next to the object
@@ -107,6 +124,7 @@ module.exports = class UiObjects
 			@_brushSelect brush, obj, structure
 
 		structure.iconContainer.append obj
+		structure.brushjQueryObjects[brush.text] = obj
 
 	_createTooltip: (jqueryObject, brush, placement = 'top') =>
 		if brush.tooltip?.length > 0

@@ -1,7 +1,7 @@
-Hotkeys = require './hotkeys'
-UiSceneManager = require './uiSceneManager'
-UiObjects = require './UiObjects'
-interactionHelper = require './interactionHelper'
+Hotkeys = require '../hotkeys'
+UiSceneManager = require './sceneManager'
+UiObjects = require './objects'
+MouseDispatcher = require './mouseDispatcher'
 
 ###
 # @module ui
@@ -13,6 +13,7 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@objects = new UiObjects(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
+		@mouseDispatcher = new MouseDispatcher(@bundle)
 
 	dropHandler: (event) ->
 		event.stopPropagation()
@@ -25,45 +26,6 @@ module.exports = class Ui
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
-	mouseDownHandler: (event) =>
-		event.stopPropagation()
-		event.preventDefault()
-
-		@mouseDown = true
-
-		if @_clickedOnPluginObject(event)
-			@brushActive = true
-			brush = @objects.getSelectedBrush()
-			if brush? and brush.mouseDownCallback?
-				brush.mouseDownCallback event, @sceneManager.selectedNode
-
-	mouseUpHandler: (event) =>
-		event.preventDefault()
-
-		if @mouseDown
-			@mouseDown = false
-
-		if @brushActive
-			@brushActive = false
-			brush = @objects.getSelectedBrush()
-			if brush? and brush.mouseUpCallback?
-				brush.mouseUpCallback event, @sceneManager.selectedNode
-
-	mouseMoveHandler: (event) =>
-		event.preventDefault()
-		#console.log "mouseMove (down: #{@mouseDown})"
-
-		brush = @objects.getSelectedBrush()
-
-		if @brushActive
-			if brush? and brush.mouseMoveCallback?
-				brush.mouseMoveCallback event, @sceneManager.selectedNode
-				event.stopPropagation()
-		else if not @mouseDown
-			if brush? and brush.mouseHoverCallback?
-				brush.mouseHoverCallback event, @sceneManager.selectedNode
-
-
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
 	windowResizeHandler: (event) ->
@@ -75,6 +37,9 @@ module.exports = class Ui
 		@_initHotkeys()
 
 	_initListeners: =>
+		# mouse dispatcher for mouse events
+		@mouseDispatcher.init(@renderer, @objects, @sceneManager)
+		
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'
@@ -95,19 +60,19 @@ module.exports = class Ui
 
 		@renderer.getDomElement().addEventListener(
 			'mousedown'
-			@mouseDownHandler.bind @
+			@mouseDispatcher.handleMouseDown
 			false
 		)
 
 		@renderer.getDomElement().addEventListener(
 			'mouseup'
-			@mouseUpHandler.bind @
+			@mouseDispatcher.handleMouseUp
 			false
 		)
 
 		@renderer.getDomElement().addEventListener(
 			'mousemove'
-			@mouseMoveHandler.bind @
+			@mouseDispatcher.handleMouseMove
 			false
 		)
 
@@ -135,26 +100,3 @@ module.exports = class Ui
 	_toggleGridVisibility: () =>
 		@bundle.getPlugin('lego-board').toggleVisibility()
 		@bundle.getPlugin('coordinate-system').toggleVisibility()
-
-	_clickedOnPluginObject: (event) =>
-		# returns true if the current mouse (event)
-		# is over a non-coordinatesystem plugin
-
-		selection = interactionHelper.getPolygonClickedOn event,
-			@renderer.scene.children, @renderer
-
-		if selection.length > 0
-			obj = selection[0].object
-			plugin = null
-			while obj.parent and plugin == null
-				if obj.associatedPlugin?
-					plugin = obj.associatedPlugin
-				else
-					obj = obj.parent
-
-		if plugin and
-		plugin.name != 'lego-board' and
-		plugin.name != 'coordinate-system'
-			return true
-
-		return false

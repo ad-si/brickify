@@ -1,5 +1,5 @@
 PluginLoader = require '../client/pluginLoader'
-Ui = require './ui'
+Ui = require './ui/ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'

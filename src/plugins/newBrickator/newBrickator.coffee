@@ -146,6 +146,8 @@ module.exports = class NewBrickator
 			mouseDownCallback: @_printMouseDownCallback
 			mouseMoveCallback: @_select3DMouseMoveCallback
 			mouseUpCallback: @_brushMouseUpCallback
+			canToggleVisibility: true
+			visibilityCallback: @_togglePrintedLayer
 		}]
 
 	_getGrid: (selectedNode) =>

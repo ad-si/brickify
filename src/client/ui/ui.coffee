@@ -2,6 +2,7 @@ Hotkeys = require '../hotkeys'
 UiSceneManager = require './sceneManager'
 UiObjects = require './objects'
 MouseDispatcher = require './mouseDispatcher'
+DownloadProvider = require './downloadProvider'
 
 ###
 # @module ui
@@ -14,6 +15,7 @@ module.exports = class Ui
 		@objects = new UiObjects(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
 		@mouseDispatcher = new MouseDispatcher(@bundle)
+		@downloadProvider = new DownloadProvider(@bundle)
 
 	dropHandler: (event) ->
 		event.stopPropagation()
@@ -35,7 +37,7 @@ module.exports = class Ui
 		@_initListeners()
 		@_initUiElements()
 		@_initHotkeys()
-		@_initDownload()
+		@downloadProvider.init('#downloadButton', @sceneManager)
 
 	_initListeners: =>
 		# mouse dispatcher for mouse events
@@ -97,14 +99,6 @@ module.exports = class Ui
 			]
 		}
 		@hotkeys.addEvents gridHotkeys
-
-	_initDownload: () =>
-		### download to be integrated
-			selNode = @sceneManager.selectedNode
-			if selNode?
-				dl = @bundle.downloadProvider.createDownload selNode
-				#ToDo: offer dl as a download (zip file)
-		###
 
 	_toggleGridVisibility: () =>
 		@bundle.getPlugin('lego-board').toggleVisibility()

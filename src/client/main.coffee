@@ -13,12 +13,16 @@ ZeroClipboard = require 'zeroclipboard'
 
 commandFunctions = {
 	initialModel: (value) ->
+		# load selected model
 		console.log 'loading initial model'
 		p = /^[0-9a-z]{32}/
 		if p.test value
 			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
+	legofy: () ->
+		nb = bundle.getPlugin('newBrickator')
+		nb.processFirstObject()
 }
 
 postInitCallback = () ->

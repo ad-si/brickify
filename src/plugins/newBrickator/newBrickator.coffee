@@ -341,9 +341,15 @@ module.exports = class NewBrickator
 
 	_createCSG: (selectedNode, cachedData, csgThreeNode = null) =>
 		# get optimized model and transform to actual position
-		threeModel = cachedData.optimizedModel.convertToThreeGeometry()
-		modelTransform = @_getModelTransforms selectedNode
-		threeModel.applyMatrix(modelTransform)
+		if not cachedData.optimizedThreeModel?
+			cachedData.optimizedThreeModel=
+				cachedData.optimizedModel.convertToThreeGeometry()
+			threeModel = cachedData.optimizedThreeModel
+
+			modelTransform = @_getModelTransforms selectedNode
+			threeModel.applyMatrix(modelTransform)
+		else
+			threeModel = cachedData.optimizedThreeModel
 
 		# create the intersection of selected voxels and the model mesh
 		@csgExtractor ?= new CsgExtractor()
@@ -357,11 +363,12 @@ module.exports = class NewBrickator
 		printThreeMesh = @csgExtractor.extractGeometry(cachedData.grid, options)
 
 		# show intersected mesh if it exists
-		if printThreeMesh? and csgThreeNode?
-			printThreeMesh.material = @printMaterial
-			printThreeMesh.visible = @_printVisibility
+		if csgThreeNode?
 			csgThreeNode.children = []
-			csgThreeNode.add printThreeMesh
+			if printThreeMesh?
+				printThreeMesh.material = @printMaterial
+				printThreeMesh.visible = @_printVisibility
+				csgThreeNode.add printThreeMesh
 
 		return printThreeMesh
 

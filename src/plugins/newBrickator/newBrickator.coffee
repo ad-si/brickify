@@ -184,6 +184,8 @@ module.exports = class NewBrickator
 					z: nodePosition.z
 				}
 				resolve(@gridCache[identifier])
+			modelPromise.catch (error) =>
+				reject error
 
 	_brushMouseDownCallback: (event, selectedNode) =>
 		# create voxel grid, if it does not exist yet

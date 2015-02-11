@@ -104,7 +104,7 @@ module.exports = class CsgExtractor
 			else
 				unionBsp = meshBsp
 
-			# if this is the lowes voxel to be printed, subtract a knob
+			# if this is the lowest voxel to be printed, subtract a knob
 			# to make it fit to lego bricks
 			range = zRange[@_genKey(voxel.x,voxel.y)]
 			if voxel.z == range.lowest

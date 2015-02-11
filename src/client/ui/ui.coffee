@@ -35,6 +35,7 @@ module.exports = class Ui
 		@_initListeners()
 		@_initUiElements()
 		@_initHotkeys()
+		@_initDownload()
 
 	_initListeners: =>
 		# mouse dispatcher for mouse events
@@ -96,6 +97,14 @@ module.exports = class Ui
 			]
 		}
 		@hotkeys.addEvents gridHotkeys
+
+	_initDownload: () =>
+		### download to be integrated
+			selNode = @sceneManager.selectedNode
+			if selNode?
+				dl = @bundle.downloadProvider.createDownload selNode
+				#ToDo: offer dl as a download (zip file)
+		###
 
 	_toggleGridVisibility: () =>
 		@bundle.getPlugin('lego-board').toggleVisibility()

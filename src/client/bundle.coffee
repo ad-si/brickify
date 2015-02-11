@@ -3,7 +3,7 @@ Ui = require './ui/ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
-
+DownloadProvider = require './downloadProvider'
 ObjectTree = require '../common/state/objectTree'
 
 ###
@@ -25,6 +25,7 @@ module.exports = class Bundle
 			.then () =>
 				@pluginInstances = @pluginLoader.loadPlugins()
 				if @globalConfig.buildUi
+					@downloadProvider = new DownloadProvider(@)
 					@ui = new Ui(@)
 					@ui.init()
 				@statesync.handleUpdatedState()

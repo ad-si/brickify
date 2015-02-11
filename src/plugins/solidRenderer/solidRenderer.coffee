@@ -154,7 +154,7 @@ module.exports = class SolidRenderer
 		newPosition = {
 			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
 			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
-			z: 0
+			z: @originalObjectPosition.z
 		}
 
 		selectedNode.positionData.position = newPosition

@@ -57,6 +57,9 @@ module.exports = class MouseDispatcher
 		# returns true if the current mouse (event)
 		# is over a non-coordinatesystem plugin
 
+		# BUG: after page reload, the raycaster in interactionHelper
+		# does not recognize the last object
+
 		selection = interactionHelper.getPolygonClickedOn event,
 			@renderer.scene.children, @renderer
 

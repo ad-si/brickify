@@ -81,7 +81,7 @@ module.exports = class UiObjects
 				#{brush.text}</li>"
 
 		htmlElement = $(string)
-		@_createTooltip htmlElement, brush
+		@_createTooltip htmlElement, brush, 'right'
 
 		if brush.canToggleVisibility
 			brush.visible = true
@@ -108,11 +108,12 @@ module.exports = class UiObjects
 
 		structure.iconContainer.append obj
 
-	_createTooltip: (jqueryObject, brush) =>
+	_createTooltip: (jqueryObject, brush, placement = 'top') =>
 		if brush.tooltip?.length > 0
 			jqueryObject.tooltip {
 				title: brush.tooltip
 				delay: 500
+				placement: placement
 			}
 
 	_objectSelect: (structure) =>

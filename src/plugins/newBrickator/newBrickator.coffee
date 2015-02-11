@@ -109,7 +109,7 @@ module.exports = class NewBrickator
 			text: 'Make Lego'
 			icon: 'legoBrush.png'
 			selectCallback: @_brushSelectCallback
-			mouseDownCallback: @_brushMouseDownCallback
+			mouseDownCallback: @_legoMouseDownCallback
 			mouseMoveCallback: @_selectLegoMouseMoveCallback
 			mouseUpCallback: @_brushMouseUpCallback
 			canToggleVisibility: true
@@ -120,7 +120,7 @@ module.exports = class NewBrickator
 			# select / deselect are the same for both voxels,
 			# but move has a different function
 			selectCallback: @_brushSelectCallback
-			mouseDownCallback: @_brushMouseDownCallback
+			mouseDownCallback: @_printMouseDownCallback
 			mouseMoveCallback: @_select3DMouseMoveCallback
 			mouseUpCallback: @_brushMouseUpCallback
 		}]
@@ -175,6 +175,19 @@ module.exports = class NewBrickator
 					@optimizedModelCache[id] = optimizedModel
 			)
 
+	_legoMouseDownCallback: (event, selectedNode) =>
+		@_brushMouseDownCallback event, selectedNode
+
+	_printMouseDownCallback: (event, selectedNode) =>
+		@_brushMouseDownCallback event, selectedNode
+
+		# hide voxels that have been deselected in the last brush
+		# action to allow to go go into the model
+		if @lastSelectedVoxels?
+			for v in @lastSelectedVoxels
+				v.visible = false
+		@lastSelectedVoxels = []
+
 	_brushMouseDownCallback: (event, selectedNode) =>
 		# create voxel grid, if it does not exist yet
 		# show it
@@ -203,6 +216,7 @@ module.exports = class NewBrickator
 		if obj
 			obj.material = @voxelVisualizer.deselectedMaterial
 			c = obj.voxelCoords
+			@lastSelectedVoxels.push obj
 			grid.grid.zLayers[c.z][c.x][c.y].enabled = false
 
 	_selectLegoMouseMoveCallback: (event, selectedNode) =>
@@ -226,10 +240,12 @@ module.exports = class NewBrickator
 				@bundle.renderer)
 
 		if (intersects.length > 0)
-			obj = intersects[0].object
+			for intersection in intersects
+				obj = intersection.object
 			
-			if obj.voxelCoords
-				return obj
+				if obj.visible and obj.voxelCoords
+					return obj
+					
 		return null
 
 

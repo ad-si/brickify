@@ -42,8 +42,8 @@ postInitCallback = () ->
 bundle = new Bundle globalConfig
 bundle.init().then(postInitCallback)
 
-#init share logic
 Promise.resolve($.get '/share').then((link) ->
+	#init share logic
 	ZeroClipboard.config(
 		{swfPath: '/node_modules/zeroclipboard/dist/ZeroClipboard.swf'})
 	url = document.location.origin + '/app?share=' + link
@@ -65,7 +65,9 @@ Promise.resolve($.get '/share').then((link) ->
 			client.on 'aftercopy', (event) ->
 				copyButton.html 'Copied <span class="glyphicon glyphicon-ok"></span>'
 				copyButton.addClass 'btn-success'
+
+	#init direct help
+	$('#cmdHelp').tooltip({placement: 'bottom'}).click () ->
+		bundle.ui.hotkeys.showHelp()
 )
 
-# Enable bootstrap tooltip
-$('[data-toggle="tooltip"]').tooltip()

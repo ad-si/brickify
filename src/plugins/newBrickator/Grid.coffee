@@ -57,14 +57,12 @@ module.exports = class Grid
 			z: oz + (@spacing.z / 2)
 		}
 
-		@numVoxelsX = Math.ceil (bbMaxWorld.x - bbMinWorld.x) / @spacing.x
-		@numVoxelsX += 2
+		maxVoxel = @mapWorldToGrid bbMaxWorld
+		minVoxel = @mapWorldToGrid bbMinWorld
 
-		@numVoxelsY = Math.ceil (bbMaxWorld.y - bbMinWorld.y) / @spacing.y
-		@numVoxelsY += 2
-
-		@numVoxelsZ = Math.ceil (bbMaxWorld.z - bbMinWorld.z) / @spacing.z
-		@numVoxelsZ += 2
+		@numVoxelsX = (maxVoxel.x - minVoxel.x) + 1
+		@numVoxelsY = (maxVoxel.y - minVoxel.y) + 1
+		@numVoxelsZ = (maxVoxel.z - minVoxel.z) + 1
 
 	mapWorldToGrid: (point) =>
 		# maps world coordinates to aligned grid coordinates

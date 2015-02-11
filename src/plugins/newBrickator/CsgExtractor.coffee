@@ -7,52 +7,43 @@ module.exports = class CsgExtractor
 		# intersected with the original mesh
 		# as a 3d geometry
 
-		analyzeResult = @_analyzeGrid(grid)
+		printVoxels = @_analyzeGrid(grid)
 
-		if analyzeResult.printVoxels.length == 0
+		if printVoxels.length == 0
 			return null
 
 		geo = @_createPrimitiveGeometry grid.spacing, options.knobSize
-		voxelHull = @_createVoxelHull options.grid,
-			analyzeResult.printVoxels, analyzeResult.zRange, geo
+		voxelHull = @_createVoxelHull options.grid,	printVoxels, geo
 		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
 		return printGeometry
 
 	_analyzeGrid: (grid) ->
 		# creates a list of voxels to be printed
-		# and analyzes their z-Range
-
 		printVoxels = []
-		zRange = {}
 
 		grid.forEachVoxel (voxel, x, y, z) =>
 			if not voxel.enabled
-				printVoxels.push {x: x, y: y, z: z}
+				#check if the voxel above is legofied. if yes, add a knob to current voxel
+				knobOnTop = false
+				if grid.zLayers[z + 1]?[x]?[y]? and grid.zLayers[z + 1][x][y].enabled
+					knobOnTop = true
 
-				range = zRange[@_genKey(x,y)]
+				# check if the voxel is the lowest voxel or has a lego brick below it
+				# if yes, create space for knob below
+				knobFromBelow = false
+				if z == 0 or
+				(grid.zLayers[z - 1]?[x]?[y]? and grid.zLayers[z - 1][x][y].enabled)
+					knobFromBelow = true
 
-				if not range?
-					range = {
-						lowest: z
-						highest: z
-					}
-				if range.lowest > z
-					range.lowest = z
-				if range.highest < z
-					range.highest = z
+				printVoxels.push {
+					x: x
+					y: y
+					z: z
+					knobOnTop: knobOnTop
+					knobFromBelow: knobFromBelow
+				}
 
-				zRange[@_genKey(x,y)] = range
-
-		return {
-			# List of voxels to be printed
-			printVoxels: printVoxels
-			# for each xy-Coordinate: minimum and maximum zValue of voxels
-			zRange: zRange
-		}
-
-	_genKey: (x, y) ->
-		# a function to generate a key for a hashmap
-		return "#{x}-#{y}"
+		return printVoxels
 
 	_createPrimitiveGeometry: (gridSpacing, knobSize) ->
 		# creates Geometry needed for CSG operations
@@ -88,7 +79,7 @@ module.exports = class CsgExtractor
 			knobGeometryTop: knobGeometryTop
 		}
 
-	_createVoxelHull: (grid, printVoxels, zRange, primitiveGeometry) ->
+	_createVoxelHull: (grid, printVoxels, primitiveGeometry) ->
 		# creates a hull out of the selected voxels with knobs on top and bottom
 		# ToDo: merge voxels into one geometry, see issue #202
 
@@ -106,8 +97,7 @@ module.exports = class CsgExtractor
 
 			# if this is the lowest voxel to be printed, subtract a knob
 			# to make it fit to lego bricks
-			range = zRange[@_genKey(voxel.x,voxel.y)]
-			if voxel.z == range.lowest
+			if voxel.knobFromBelow
 				knobMesh = new THREE.Mesh(primitiveGeometry.knobGeometryBottom, null)
 				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
 				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
@@ -116,13 +106,8 @@ module.exports = class CsgExtractor
 				knobBsp = new ThreeBSP(knobMesh)
 				unionBsp = unionBsp.subtract knobBsp
 
-			# if this is the highest voxel to be printed,
-			# add knobs (for connecting with lego above this geometry)
-			# but only if this voxel would have lego above it
-			if grid.zLayers[voxel.z]?[voxel.x]?[voxel.y]?
-				legoAbove = true
-
-			if voxel.z == range.highest and legoAbove
+			# create a knob for lego above this voxel
+			if voxel.knobOnTop
 				knobMesh = new THREE.Mesh(primitiveGeometry.knobGeometryTop, null)
 				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
 				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )

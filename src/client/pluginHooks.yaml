@@ -130,6 +130,7 @@
 #	mouseUpCallback: # when mouse is released
 #   canToggleVisibility: true # if true, the user can toggle visibility
 #   visibilityCallback: # called when the user changes visibility
+#	tooltip: ''
 # }
 # 
 

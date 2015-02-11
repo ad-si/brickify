@@ -62,3 +62,6 @@ Promise.resolve($.get '/share').then((link) ->
 				copyButton.html 'Copied <span class="glyphicon glyphicon-ok"></span>'
 				copyButton.addClass 'btn-success'
 )
+
+# Enable bootstrap tooltip
+$('[data-toggle="tooltip"]').tooltip()

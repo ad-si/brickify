@@ -79,7 +79,9 @@ module.exports = class UiObjects
 		string = "<li class='brushEntry'>
 			<span class='glyphicon glyphicon-pencil'></span>
 				#{brush.text}</li>"
+
 		htmlElement = $(string)
+		@_createTooltip htmlElement, brush
 
 		if brush.canToggleVisibility
 			brush.visible = true
@@ -99,10 +101,19 @@ module.exports = class UiObjects
 		# creates a brush that is only shown as a icon next to the object
 		html = "<span class='glyphicon glyphicon-#{brush.glyphicon}'></span>"
 		obj = $(html)
+		@_createTooltip obj, brush
+
 		obj.on 'click', () =>
 			@_brushSelect brush, obj, structure
 
 		structure.iconContainer.append obj
+
+	_createTooltip: (jqueryObject, brush) =>
+		if brush.tooltip?.length > 0
+			jqueryObject.tooltip {
+				title: brush.tooltip
+				delay: 500
+			}
 
 	_objectSelect: (structure) =>
 		# Don't do anything when clicking on selected object
@@ -173,3 +184,4 @@ module.exports = class UiObjects
 			return @selectedStructure.selectedBrush
 		else
 			return null
+

@@ -119,10 +119,12 @@ module.exports = class SolidRenderer
 			mouseDownCallback: @_handleMouseDown
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp
+			tooltip: 'Move model'
 		},{
 			text: 'rotate'
 			iconBrush: true
 			glyphicon: 'refresh'
+			tooltip: 'Rotate model'
 			#mouseDownCallback: @_handleMouseDown
 			#mouseMoveCallback: @_handleMouseMove
 			#mouseUpCallback: @_handleMouseUp

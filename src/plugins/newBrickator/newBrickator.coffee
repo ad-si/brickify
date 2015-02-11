@@ -129,7 +129,7 @@ module.exports = class NewBrickator
 
 	getBrushes: () =>
 		return [{
-			text: 'Make Lego'
+			text: 'Make LEGO'
 			icon: 'legoBrush.png'
 			selectCallback: @_brushSelectCallback
 			mouseDownCallback: @_legoMouseDownCallback
@@ -137,6 +137,7 @@ module.exports = class NewBrickator
 			mouseUpCallback: @_brushMouseUpCallback
 			canToggleVisibility: true
 			visibilityCallback: @_toggleBrickLayer
+			tooltip: 'Select geometry to be made out of LEGO'
 		},{
 			text: 'Make 3D printed'
 			icon: '3dPrintBrush.png'
@@ -148,6 +149,7 @@ module.exports = class NewBrickator
 			mouseUpCallback: @_brushMouseUpCallback
 			canToggleVisibility: true
 			visibilityCallback: @_togglePrintedLayer
+			tooltip: 'Select geometry to be 3d-printed'
 		}]
 
 	_getGrid: (selectedNode) =>

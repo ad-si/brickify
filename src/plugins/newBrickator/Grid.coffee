@@ -123,4 +123,29 @@ module.exports = class Grid
 						vox = @zLayers[z][x][y]
 						callback vox, x, y, z
 
+	getNeighbours: (x, y, z, selectionCallback) =>
+		# returns a list of neighbours for this voxel position.
+		# the selectionCallback(neighbour) defines what to return
+		# and has to return true, if the voxel neighbour should be collected
+		list = []
+
+		pos = [
+			[x + 1, y, z]
+			[x - 1, y, z]
+			[x, y + 1, z]
+			[x, y - 1, z]
+			[x, y, z + 1]
+			[x, y, z - 1]
+		]
+
+		for p in pos
+			if @zLayers[p[2]]?[p[0]]?[p[1]]?
+				v = @zLayers[p[2]][p[0]][p[1]]
+
+				if selectionCallback(v)
+					list.push v
+		return list
+
+
+
 

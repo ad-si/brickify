@@ -16,8 +16,9 @@ globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 388
 globalConfig.syncWithServer = false
 globalConfig.buildUi = false
+globalConfig.autoRotate = true
 
-#clone global config 3 times
+# clone global config 2 times
 config1 = clone globalConfig
 config2 = clone globalConfig
 

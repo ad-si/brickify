@@ -16,6 +16,7 @@ module.exports = class Renderer
 			@stats?.begin()
 			@threeRenderer.render @.scene, @.camera
 			@pluginHooks.on3dUpdate timestamp
+			@controls.update()
 
 			@stats?.end()
 			requestAnimationFrame @localRenderer
@@ -136,6 +137,8 @@ module.exports = class Renderer
 
 	setupControls: (globalConfig) ->
 		@controls = new OrbitControls(@camera, @threeRenderer.domElement)
+		@controls.autoRotate = globalConfig.autoRotate
+		@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
 		@controls.target.set(0, 0, 0)
 
 	setupFPSCounter: () ->

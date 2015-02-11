@@ -27,34 +27,18 @@ module.exports = class Grid
 			bbMinWorld = bb.min
 			bbMaxWorld = bb.max
 
-		# align the grid to the nearest visible lego brick on the viewed board
-		# positive values: set minimum to lower grid match
-		# (x: 85, lower grid match 80 --> subtract 5)
-		# negative values: go to next grid match (-85, delta 5 --> -80)
-		# and subtract spacing to get to next grid (-> e.g. -88)
-		xDelta = (Math.floor(Math.abs(bbMinWorld.x)) % @spacing.x)
-		if (bbMinWorld.x >= 0)
-			ox = Math.floor(bbMinWorld.x) - xDelta
-		else
-			ox = ((-Math.floor(Math.abs(bbMinWorld.x))) + xDelta) - @spacing.x
+		# 1.) Align bb minimum to next voxel position
+		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
+		# voxel center
+		# 3.) minimum z is to assure that grid is never below z=0
+		calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
+		calculatedZ -= @spacing.z / 2
+		minimumZ = @spacing.z / 2
 
-		yDelta = (Math.floor(Math.abs(bbMinWorld.y)) % @spacing.y)
-		if (bbMinWorld.y >= 0)
-			oy = Math.floor(bbMinWorld.y) - yDelta
-		else
-			oy = ((-Math.floor(Math.abs(bbMinWorld.y))) + yDelta) - @spacing.y
-
-		zDelta = (Math.floor(Math.abs(bbMinWorld.z)) % @spacing.z)
-		if (bbMinWorld.z >= 0)
-			oz = Math.floor(bbMinWorld.z) - zDelta
-		else
-			oz = ((-Math.floor(Math.abs(bbMinWorld.z))) + zDelta) - @spacing.z
-
-		#subtract spacing/2 to match the lego knobs of the visible grid
 		@origin = {
-			x: ox - (@spacing.x / 2)
-			y: oy - (@spacing.y / 2)
-			z: oz + (@spacing.z / 2)
+			x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
+			y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
+			z: Math.max(calculatedZ, minimumZ)
 		}
 
 		maxVoxel = @mapWorldToGrid bbMaxWorld

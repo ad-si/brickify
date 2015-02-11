@@ -93,10 +93,12 @@ module.exports = class Grid
 
 	mapGridToVoxel: (point) =>
 		# maps aligned grid coordinates to voxel indices
+		# cut z<0 to z=0, since the grid cannot have
+		# voxels in negative direction
 		return {
 			x: Math.round(point.x / @spacing.x)
 			y: Math.round(point.y / @spacing.y)
-			z: Math.round(point.z / @spacing.z)
+			z: Math.max(Math.round(point.z / @spacing.z), 0)
 		}
 
 	mapVoxelToGrid: (point) =>

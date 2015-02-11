@@ -218,7 +218,7 @@ module.exports = class NewBrickator
 				@voxelVisualizer.createVisibleVoxels(
 					grid.grid
 					grid.threeNode
-					false
+					true
 				)
 			else
 				grid.threeNode.visible = true

@@ -315,8 +315,8 @@ module.exports = class NewBrickator
 
 		printThreeMesh = @csgExtractor.extractGeometry(grid.grid, options)
 
-		# show intersected mesh
-		if csgThreeNode?
+		# show intersected mesh if it exists
+		if printThreeMesh? and csgThreeNode?
 			printThreeMesh.material = @printMaterial
 			printThreeMesh.visible = @_printVisibility
 			csgThreeNode.children = []

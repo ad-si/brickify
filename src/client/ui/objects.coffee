@@ -92,12 +92,14 @@ module.exports = class UiObjects
 
 	_createBrush: (brush, structure) =>
 		# creates a default brush with list entry
-		string = "<li class='brushEntry'>
+		string = "<li class='brushEntry'><span class='brushtext'>
 			<span class='glyphicon glyphicon-pencil'></span>
-				#{brush.text}</li>"
+				#{brush.text}</span></li>"
 
 		htmlElement = $(string)
-		@_createTooltip htmlElement, brush, 'right'
+		tooltipElement = htmlElement.find('.brushtext')
+
+		@_createTooltip tooltipElement, brush, 'right'
 
 		if brush.canToggleVisibility
 			brush.visible = true
@@ -107,6 +109,12 @@ module.exports = class UiObjects
 			htmlElement.append e
 			e.on 'click', () =>
 				@_toggleBrushVisibility brush, e
+
+			e.tooltip {
+				title: 'Toggle layer visibility'
+				placement: 'right'
+				delay: 500
+			}
 
 		htmlElement.on 'click', () =>
 			@_brushSelect brush, htmlElement, structure

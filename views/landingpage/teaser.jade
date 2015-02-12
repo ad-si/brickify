@@ -1,47 +1,10 @@
-header#teaser-carousel.carousel.slide(data-wrap='false', data-interval='false')
+header
+	a(href='/educators')
+		#educators-bar  Are you an educator? Click here!
 	.container
-		.col-lg-2
-			.btn.carousel-button.builders(href='#teaser-carousel', role='button',
-			data-slide-to='0')
-				span For Builders
-
-		.col-lg-2.col-lg-offset-8
-			.btn.carousel-button.educators(href='#teaser-carousel', role='button',
-			data-slide-to='1')
-				span For Educators
-	.carousel-inner(role='listbox')
-		.item.active
-			.container
-				.col-lg-8.pitch
-					h1 Brickolage
-					h2 Build with fancy LEGO#[sup &reg;]-compatible 3D-prints
-					p.
-						Take LEGO#[sup &reg;] to the next level and add custom
-						3D-printed parts or convert whole 3D models into building
-						blocks!
-					.drop
-						span.dropper.btn.btn-primary Drop an stl file to start!
-				#makey.col-lg-4
-		.item
-			.container
-				.col-lg-6.pitch
-					h1 Brickolage
-					h2 Fast in-class 3D printing
-					p.
-						Teach your students how to use 3D-printers and produce their
-						designed objects fast by replacing parts with
-						LEGO#[sup &reg;] bricks.
-					.drop
-						span.dropper.btn.btn-primary Drop an stl file to start!
-				.col-lg-6
-					.row
-						.col-lg-6
-							img(src='/img/sample_ballista.png' width='100%')
-						.col-lg-6
-							img(src='/img/lowfabFeatureImage.png' width='100%')
-					.row
-						.col-lg-6
-							img(src='/img/lowfabFeatureImage.png' width='100%')
-						.col-lg-6
-							img(src='/img/sample_rings.png' width='100%')
-
+		.col-lg-8.pitch
+			h1 Brickolage
+			h2 Extend your LEGO#[sup &reg;] with 3D-printed parts!
+			.drop
+				span.dropper Drop an stl file to start!
+		#makey.col-lg-4

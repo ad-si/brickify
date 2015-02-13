@@ -1,4 +1,4 @@
-ThreeCSG = require './threeCSG/ThreeCSG'
+ThreeCSG = require './threeCsg/ThreeCSG'
 
 module.exports = class CsgExtractor
 	extractGeometry: (grid, options) ->

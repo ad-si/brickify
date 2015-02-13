@@ -160,7 +160,6 @@ module.exports = class NewBrickator
 	_getCachedData: (selectedNode) =>
 		# returns Grid, optimized model and other cached data for the selected node
 		return new Promise (resolve, reject) =>
-			# ToDo handle modelPromise rejected
 			identifier = selectedNode.pluginData.solidRenderer.threeObjectUuid
 			nodePosition = selectedNode.positionData.position
 

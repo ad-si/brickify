@@ -12,6 +12,11 @@ module.exports = class VoxelVisualizer
 			opacity: 0.5
 			transparent: true
 		})
+		@hiddenMaterial = new THREE.MeshLambertMaterial({
+			color: 0xffaaaa #gray
+			opacity: 0.0
+			transparent: true
+		})
 		
 	clear: (threeNode) ->
 		if threeNode?

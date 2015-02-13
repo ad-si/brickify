@@ -11,15 +11,25 @@ module.exports = class BrushHandler
 		# show one layer of not-enabled (-> to be 3d printed) voxels
 		# (one layer = voxel has at least one enabled neighbour)
 		# so that users can re-select them
+		modifiedVoxelsNew = []
+
 		for v in cachedData.modifiedVoxels
 			c = v.voxelCoords
+
+			# ignore if this voxel already is enabled
+			if cachedData.grid.zLayers[c.z][c.x][c.y].enabled
+				continue
+			modifiedVoxelsNew.push v
 			
 			enabledVoxels = cachedData.grid.getNeighbours c.x,
 				c.y, c.z, (voxel) ->
 					return voxel.enabled
 
 			if enabledVoxels.length > 0
+				v.material = @voxelVisualizer.deselectedMaterial
 				v.visible = true
+
+		cachedData.modifiedVoxels = modifiedVoxelsNew
 
 	printMouseDown: (event, selectedNode, cachedData) =>
 		@_showVoxelGrid( event, selectedNode, cachedData )
@@ -39,7 +49,7 @@ module.exports = class BrushHandler
 		obj = @_getSelectedVoxel event, selectedNode
 
 		if obj
-			obj.material = @voxelVisualizer.deselectedMaterial
+			obj.material = @voxelVisualizer.hiddenMaterial
 			c = obj.voxelCoords
 			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = false
 

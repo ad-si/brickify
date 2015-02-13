@@ -8,7 +8,7 @@ describe 'id generator tests', ->
 
 	it 'should generate and validate according to the same pattern', ->
 		id = idGenerator.generate()
-		expect(idGenerator.check(id)).to.be.ok()
+		expect(idGenerator.check(id)).to.be.ok
 
 	it 'should generate ids of the correct length', ->
 		acceptingFilter = -> true

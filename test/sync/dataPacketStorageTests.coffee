@@ -16,7 +16,7 @@ describe 'server-side dataPacket-storage tests', ->
 				expect(response).to.have.deep.property('type', 'json')
 				expect(response).to.have.deep.property('code', 201)
 				expect(response).to.have.deep.property('content.id')
-				expect(response).to.have.deep.property('content.data').to.be.empty()
+				expect(response).to.have.deep.property('content.data').to.be.empty
 			)
 
 	describe 'dataPacket existence checks', ->

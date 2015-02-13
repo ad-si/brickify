@@ -7,7 +7,35 @@ module.exports = class BrushHandler
 
 	legoMouseDown: (event, selectedNode, cachedData) =>
 		@_showVoxelGrid( event, selectedNode, cachedData )
+		@_showNotEnabledVoxelSuggestion event, selectedNode, cachedData
+		@_enableClickedVoxel event, selectedNode, cachedData
 
+	printMouseDown: (event, selectedNode, cachedData) =>
+		@_showVoxelGrid( event, selectedNode, cachedData )
+		@_disableSelectedVoxel event, selectedNode, cachedData
+
+	legoMouseMove: (event, selectedNode, cachedData) =>
+		@_enableClickedVoxel event, selectedNode, cachedData
+
+	printMouseMove: (event, selectedNode, cachedData) =>
+		@_disableSelectedVoxel event, selectedNode, cachedData
+
+	mouseUp: (event, selectedNode, cachedData) =>
+		@_hideVoxelGrid event, selectedNode, cachedData
+
+	_disableSelectedVoxel: (event, selectedNode, cachedData) =>
+		# disable all voxels we touch with the mouse
+		obj = @_getSelectedVoxel event, selectedNode
+
+		if obj
+			obj.material = @voxelVisualizer.hiddenMaterial
+			c = obj.voxelCoords
+			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = false
+
+			if cachedData.lastSelectedVoxels.indexOf(obj) < 0
+				cachedData.lastSelectedVoxels.push obj
+
+	_showNotEnabledVoxelSuggestion: (event, selectedNode, cachedData) =>
 		# show one layer of not-enabled (-> to be 3d printed) voxels
 		# (one layer = voxel has at least one enabled neighbour)
 		# so that users can re-select them
@@ -31,33 +59,13 @@ module.exports = class BrushHandler
 
 		cachedData.modifiedVoxels = modifiedVoxelsNew
 
-	printMouseDown: (event, selectedNode, cachedData) =>
-		@_showVoxelGrid( event, selectedNode, cachedData )
-		
-
-	legoMouseMove: (event, selectedNode, cachedData) =>
-		# enable all voxels we touch with the mouse
+	_enableClickedVoxel: (event, selectedNode, cachedData) =>
 		obj = @_getSelectedVoxel event, selectedNode
 
 		if obj
 			obj.material = @voxelVisualizer.selectedMaterial
 			c = obj.voxelCoords
 			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = true
-
-	printMouseMove: (event, selectedNode, cachedData) =>
-		# disable all voxels we touch with the mouse
-		obj = @_getSelectedVoxel event, selectedNode
-
-		if obj
-			obj.material = @voxelVisualizer.hiddenMaterial
-			c = obj.voxelCoords
-			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = false
-
-			if cachedData.lastSelectedVoxels.indexOf(obj) < 0
-				cachedData.lastSelectedVoxels.push obj
-
-	mouseUp: (event, selectedNode, cachedData) =>
-		@_hideVoxelGrid event, selectedNode, cachedData
 
 	_hideVoxelGrid: (event, selectedNode, cachedData) =>
 		cachedData.threeNode.visible = false

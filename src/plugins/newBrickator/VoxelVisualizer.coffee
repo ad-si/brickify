@@ -23,6 +23,20 @@ module.exports = class VoxelVisualizer
 		@voxelGeometry = new THREE.BoxGeometry(
 			grid.spacing.x, grid.spacing.y, grid.spacing.z )
 
+		noppeGeometry = new THREE.CylinderGeometry(
+			grid.spacing.x * 0.3, grid.spacing.y * 0.3, grid.spacing.z * 0.7, 7
+		)
+
+		noppenTransform = new THREE.Matrix4()
+		translation = new THREE.Matrix4()
+		translation.makeTranslation(0, 0, grid.spacing.z * 0.7)
+		rotation = new THREE.Matrix4()
+		rotation.makeRotationX(1.571)
+		noppenTransform.multiplyMatrices(translation, rotation)
+		noppeGeometry.applyMatrix(noppenTransform)
+
+		@voxelGeometry.merge noppeGeometry
+
 		for z in [0..grid.numVoxelsZ - 1] by 1
 				window.setTimeout @zLayerCallback(grid, threeNode, drawInnerVoxels, z),
 					10 * z
@@ -51,6 +65,7 @@ module.exports = class VoxelVisualizer
 			m = @deselectedMaterial
 
 		cube = new THREE.Mesh( @voxelGeometry, m )
+
 		cube.translateX( grid.origin.x + grid.spacing.x * x)
 		cube.translateY( grid.origin.y + grid.spacing.y * y)
 		cube.translateZ( grid.origin.z + grid.spacing.z * z)

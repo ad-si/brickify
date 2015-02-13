@@ -3,12 +3,12 @@ THREE = require 'three'
 module.exports = class VoxelVisualizer
 	constructor: () ->
 		@selectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xffa500 #orange
+			color: 0xff0000 #orange
 			opacity: 0.2
-			transparent: true
+			#transparent: true
 		})
 		@deselectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xc8c8c8 #gray
+			color: 0xffaaaa #gray
 			opacity: 0.5
 			transparent: true
 		})

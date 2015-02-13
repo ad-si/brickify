@@ -24,7 +24,9 @@ module.exports = class NewBrickator
 		@_printVisibility = true
 		
 		@printMaterial = new THREE.MeshLambertMaterial({
-			color: 0xfd482f #redish
+			color: 0xe7edaa
+			opacity: 0.8
+			transparent: true
 		})
 
 	init: (@bundle) => return

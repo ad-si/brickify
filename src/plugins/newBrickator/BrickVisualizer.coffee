@@ -115,17 +115,14 @@ module.exports = class BrickVisualizer
 
 	_createBrickMaterials: () =>
 		@_brickMaterials = []
-		@_brickMaterials.push @_createMaterial 0xff9900
-		@_brickMaterials.push @_createMaterial 0xcc7a00
-		@_brickMaterials.push @_createMaterial 0xffad32
-		@_brickMaterials.push @_createMaterial 0xe58900
-		@_brickMaterials.push @_createMaterial 0xf77000
-		@_brickMaterials.push @_createMaterial 0xff7d11
-		@_brickMaterials.push @_createMaterial 0xff8b2b
-		@_brickMaterials.push @_createMaterial 0xff9944
-		@_brickMaterials.push @_createMaterial 0xffa75e
-		@_brickMaterials.push @_createMaterial 0xffb577
-		@_brickMaterials.push @_createMaterial 0xff9944
+		@_brickMaterials.push @_createMaterial 0x530000
+		@_brickMaterials.push @_createMaterial 0xfe2020
+		@_brickMaterials.push @_createMaterial 0xba0000
+		@_brickMaterials.push @_createMaterial 0xfe5c5c
+		@_brickMaterials.push @_createMaterial 0xdb0000
+		@_brickMaterials.push @_createMaterial 0x6b0000
+		@_brickMaterials.push @_createMaterial 0xfe3939
+		@_brickMaterials.push @_createMaterial 0xfe4d4d
 
 	_createMaterial: (color) =>
 		return new THREE.MeshLambertMaterial({

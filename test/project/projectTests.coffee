@@ -9,7 +9,7 @@ Scene = require '../../src/common/project/scene'
 
 dataPackets = null
 
-describe.only 'Project tests', ->
+describe 'Project tests', ->
 	beforeEach ->
 		dataPackets = new DataPacketsMock()
 		SyncObject.dataPacketProvider = dataPackets

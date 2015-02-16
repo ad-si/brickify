@@ -13,12 +13,16 @@ ZeroClipboard = require 'zeroclipboard'
 
 commandFunctions = {
 	initialModel: (value) ->
+		# load selected model
 		console.log 'loading initial model'
 		p = /^[0-9a-z]{32}/
 		if p.test value
 			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
+	legofy: () ->
+		nb = bundle.getPlugin('newBrickator')
+		nb.processFirstObject()
 }
 
 postInitCallback = () ->
@@ -38,8 +42,8 @@ postInitCallback = () ->
 bundle = new Bundle globalConfig
 bundle.init().then(postInitCallback)
 
-#init share logic
 Promise.resolve($.get '/share').then((link) ->
+	#init share logic
 	ZeroClipboard.config(
 		{swfPath: '/node_modules/zeroclipboard/dist/ZeroClipboard.swf'})
 	url = document.location.origin + '/app?share=' + link
@@ -61,4 +65,9 @@ Promise.resolve($.get '/share').then((link) ->
 			client.on 'aftercopy', (event) ->
 				copyButton.html 'Copied <span class="glyphicon glyphicon-ok"></span>'
 				copyButton.addClass 'btn-success'
+
+	#init direct help
+	$('#cmdHelp').tooltip({placement: 'bottom'}).click () ->
+		bundle.ui.hotkeys.showHelp()
 )
+

@@ -19,27 +19,25 @@ block body
 			canvas#canvas.appCanvas
 
 		#commandContainer
+			a#cmdHelp(href="#", title="Open Help")
+				img(src="/img/help.png", height="40px", alt="share")
 			a#cmdShare(href="#", title="Share your work")
 				img(src="/img/share.png", height="40px", alt="share")
-
 		#controls.row
 			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
 				.panel.panel-default
 					.panel-heading
 						h4.panel-title.collapse-title(data-toggle='collapse'
-							data-target='#collapseScenegraph') Scenegraph
-					#collapseScenegraph.panel-collapse.collapse.in
+							data-target='#collapseObjects') Objects
+					#collapseObjects.panel-collapse.collapse.in
 						.panel-body
-							#sceneGraphContainer
+							ul#objectsContainer
+				button.btn.btn-success.btn-block#downloadButton
+					span.glyphicon.glyphicon-download
+					| &nbsp;
+					| Download
+								
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
-				.panel.panel-default
-					.panel-heading
-						h4.panel-title.collapse-title(data-toggle='collapse'
-							data-target='#collapseVisibility') Visibility
-					#collapseVisibility.panel-collapse.collapse.in
-						.panel-body
-							#visibilityContainer
-		#toolbar
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?
 				= ' '

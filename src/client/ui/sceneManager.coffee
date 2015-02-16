@@ -1,9 +1,16 @@
-objectTree = require '../common/state/objectTree'
+objectTree = require '../../common/state/objectTree'
 
 class UiSceneManager
 	constructor: (@bundle) ->
 		@selectedNode = null
 		@pluginHooks = @bundle.pluginHooks
+
+	init: () =>
+		# call add for existing nodes in state
+		nodes = @bundle.statesync.state.rootNode.children
+		if nodes?
+			for node in nodes
+				@add(node)
 
 	getHotkeys: =>
 		return {
@@ -19,10 +26,12 @@ class UiSceneManager
 
 	add: (node) =>
 		@pluginHooks.onNodeAdd node
+		@bundle.ui.objects.onNodeAdd node
 		return
 
 	remove: (node) =>
 		@pluginHooks.onNodeRemove node
+		@bundle.ui.objects.onNodeRemove node
 		return
 
 #
@@ -31,7 +40,6 @@ class UiSceneManager
 
 	select: (@selectedNode) =>
 		@pluginHooks.onNodeSelect @selectedNode
-		@bundle.ui.toolbar.onNodeSelect @selectedNode
 		return
 
 	deselect: =>
@@ -58,7 +66,7 @@ class UiSceneManager
 
 	_delete: (node) => (state) =>
 		objectTree.removeNode state.rootNode, node
-		@pluginHooks.onNodeRemove node
+		@remove node
 
 	_getDeleteHotkey: ->
 		return {

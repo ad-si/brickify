@@ -3,7 +3,9 @@ interactionHelper = require '../../client/interactionHelper'
 
 module.exports = class BrushHandler
 	constructor: ( @bundle, @newBrickator ) ->
-		return
+		@highlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0x00ff00
+		})
 
 	legoMouseDown: (event, selectedNode, cachedData) =>
 		@_initializeVoxelGrid( event, selectedNode, cachedData )
@@ -20,10 +22,40 @@ module.exports = class BrushHandler
 	legoMouseHover: (event, selectedNode, cachedData) =>
 		@_toggleVoxelVisibility event, selectedNode, cachedData
 		@_showNotEnabledVoxelSuggestion event, selectedNode, cachedData
+		@_hightlightSelectedVoxel event, selectedNode, cachedData
 
 	printMouseHover: (event, selectedNode, cachedData) =>
 		@_toggleVoxelVisibility event, selectedNode, cachedData
 		@_hideDisabledVoxels selectedNode, cachedData
+		@_hightlightSelectedVoxel event, selectedNode, cachedData
+
+	printMouseMove: (event, selectedNode, cachedData) =>
+		@_disableSelectedVoxel event, selectedNode, cachedData
+
+	mouseUp: (event, selectedNode, cachedData) =>
+		for v in cachedData.lastSelectedVoxels
+			cachedData.modifiedVoxels.push v
+		cachedData.lastSelectedVoxels = []
+
+		cachedData.highlightedVoxel = null
+
+	afterPipelineUpdate: (selectedNode, cachedData) =>
+		@voxelVisualizer.updateVoxels cachedData.grid, cachedData.threeNode
+
+	_hightlightSelectedVoxel: (event, selectedNode, cachedData) =>
+		obj = @_getSelectedVoxel event, selectedNode
+		if obj?
+			if cachedData.highlightedVoxel?
+				v = cachedData.highlightedVoxel
+				v.voxel.material = v.material
+
+			v = {
+				voxel: obj
+				material: obj.material
+			}
+
+			cachedData.highlightedVoxel = v
+			obj.material = @highlightMaterial
 
 	_toggleVoxelVisibility: (event, selectedNode, cachedData) =>
 		obj = @_getSelectedVoxel event, selectedNode
@@ -38,17 +70,6 @@ module.exports = class BrushHandler
 			#show voxels, hide bricks
 			threeNodes.voxels.visible = true
 			threeNodes.bricks.visible = false
-
-	printMouseMove: (event, selectedNode, cachedData) =>
-		@_disableSelectedVoxel event, selectedNode, cachedData
-
-	mouseUp: (event, selectedNode, cachedData) =>
-		for v in cachedData.lastSelectedVoxels
-			cachedData.modifiedVoxels.push v
-		cachedData.lastSelectedVoxels = []
-
-	afterPipelineUpdate: (selectedNode, cachedData) =>
-		@voxelVisualizer.updateVoxels cachedData.grid, cachedData.threeNode
 
 	_disableSelectedVoxel: (event, selectedNode, cachedData) =>
 		# disable all voxels we touch with the mouse
@@ -66,6 +87,7 @@ module.exports = class BrushHandler
 		# show one layer of not-enabled (-> to be 3d printed) voxels
 		# (one layer = voxel has at least one enabled neighbour)
 		# so that users can re-select them
+		
 		modifiedVoxelsNew = []
 
 		for v in cachedData.modifiedVoxels

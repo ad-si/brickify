@@ -12,56 +12,67 @@ block body
 				fit into class time.
 		.col-lg-3
 			img(src='/img/placeholder.png' width='255px')
-	.section#samples
-		.container
-			.col-lg-3#sample
-				a(href='app#legofy+initialModel=708d0b0b44f491523de951afa44b3e06')
-					img(src='/img/sample_ballista2.png' width='255px')
-			.col-lg-6
-				h3 penny ballista
-				p.
-					This is a fun model for children aged 7-12. Simply strap on a rubber
-					band and place your bets.
-		.container
-			.col-lg-3#sample
-				a(href='app#legofy+initialModel=cd8a7a94eac03bf07f32048269e5cc1f')
-					img(src='/img/sample_CitrusJuicer.png' width='255px')
-			.col-lg-6
-				h3 citrus juicer
-				p.
-					Make tasty orange juice with your students!
-		.container
-			.col-lg-3#sample
-				a(href='app#legofy+initialModel=1c2395a3145ad77aee7479020b461ddf')
-					img(src='/img/sample_goggles.png' width='255px')
-			.col-lg-6
-				h3 head mounted display
-				p.
-					Use this HUD to dive into virtual realities.
-		.container
-			.col-lg-3#sample
-				a(href='app#legofy+initialModel=1b2512f0804dfd68b2783108d840ab6f')
-					img(src='/img/sample_printableWrench2.jpg' width='255px')
-			.col-lg-6
-				h3 wrench
-				p.
-					A tool with a fully functional adjustable jaw.
-		.container
-			.col-lg-3#sample
-				a(href='/')
-					img(src='img/placeholder.png' width='255px')
-			.col-lg-6
-				h3 Thingiverse
-				p Search thingiverse
-				form
-					input(placeholder='dummy')
-					.btn.btn-primary Search
-		.container
-			.col-lg-3#sample
-				a(href='/')
-					img(src='img/placeholder.png' width='255px')
-			.col-lg-6
-				h3 Custom
-				p Click here if you want to use your own models
+	.container#samples
+		table.table
+			tr
+				td#sample
+					a(href='app#legofy+initialModel=708d0b0b44f491523de951afa44b3e06')
+						img(src='/img/sample_ballista2.png' width='255px')
+				td
+					h3 penny ballista
+					p.
+						This is a fun model for children aged 7-12. Simply strap on a rubber
+						band and place your bets.
+				td.download
+					a.btn.btn-success Get course material!
+			tr
+				td#sample
+					a(href='app#legofy+initialModel=cd8a7a94eac03bf07f32048269e5cc1f')
+						img(src='/img/sample_CitrusJuicer.png' width='255px')
+				td
+					h3 citrus juicer
+					p.
+						Make tasty orange juice with your students!
+				td.download
+					a.btn.btn-success Get course material!
+			tr
+				td#sample
+					a(href='app#legofy+initialModel=1c2395a3145ad77aee7479020b461ddf')
+						img(src='/img/sample_goggles.png' width='255px')
+				td
+					h3 head mounted display
+					p.
+						Use this HUD to dive into virtual realities.
+				td.download
+					a.btn.btn-success Get course material!
+			tr
+				td#sample
+					a(href='app#legofy+initialModel=1b2512f0804dfd68b2783108d840ab6f')
+						img(src='/img/sample_printableWrench2.jpg' width='255px')
+				td
+					h3 wrench
+					p.
+						A tool with a fully functional adjustable jaw.
+				td.download
+					a.btn.btn-success Get course material!
+			tr
+				td#sample
+					a(href='/')
+						img(src='img/placeholder.png' width='255px')
+				td
+					h3 Thingiverse
+					p Search thingiverse
+					.form-inline.form-group
+						input.form-control(placeholder='dummy')
+						.btn.btn-default Search
+				td
+			tr
+				td#sample
+					a(href='/')
+						img(src='img/placeholder.png' width='255px')
+				td
+					h3 Custom
+					p Click here if you want to use your own models
+				td
 
 	include footer

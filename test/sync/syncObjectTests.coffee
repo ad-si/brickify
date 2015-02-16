@@ -21,6 +21,13 @@ describe 'SyncObject tests', ->
 			dummy = new Dummy()
 			expect(dummy.done()).to.resolve
 
+		it 'should be a Dummy and a SyncObject', ->
+			dataPackets.nextId = nextId = 'abcdefgh'
+			dummy = new Dummy()
+			dummy.done ->
+				expect(dummy).to.be.an.instanceof(Dummy)
+				expect(dummy).to.be.an.instanceof(SyncObject)
+
 		it 'should get an id by dataPacketProvider', ->
 			dataPackets.nextId = nextId = 'abcdefgh'
 			dummy = new Dummy()
@@ -79,7 +86,7 @@ describe 'SyncObject tests', ->
 			dummy.delete().then ->
 				expect(dummy.done()).to.be.rejectedWith("Dummy \##{nextId} was deleted")
 
-	describe 'task chaining', ->
+	describe 'Task chaining', ->
 		it 'should return itself when calling next', ->
 			dataPackets.nextId = nextId = 'abcdefgh'
 			dummy = new Dummy()

@@ -7,14 +7,27 @@ module.exports = class CsgExtractor
 		# intersected with the original mesh
 		# as a 3d geometry
 
+		console.log 'Creating CSG...'
+
+		d = new Date()
 		printVoxels = @_analyzeGrid(grid)
+		console.log "Grid analysis took #{new Date() - d}ms"
 
 		if printVoxels.length == 0
 			return null
 
+		d = new Date()
 		geo = @_createPrimitiveGeometry grid.spacing, options.knobSize
+		console.log "Primitive geometry took #{new Date() - d}ms"
+
+		d = new Date()
 		voxelHull = @_createVoxelHull options.grid,	printVoxels, geo
+		console.log "Voxel hull took #{new Date() - d}ms"
+
+		d = new Date()
 		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
+		console.log "Print geometry took #{new Date() - d}ms"
+
 		return printGeometry
 
 	_analyzeGrid: (grid) ->
@@ -59,10 +72,10 @@ module.exports = class CsgExtractor
 		knobTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
 		
 		knobGeometryBottom = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 20
+			knobSize.radius, knobSize.radius, knobSize.height, 8
 		)
 		knobGeometryTop = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 20
+			knobSize.radius, knobSize.radius, knobSize.height, 8
 		)
 
 		knobGeometryBottom.applyMatrix(knobRotation)

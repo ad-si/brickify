@@ -81,13 +81,24 @@ module.exports = class BrushHandler
 				c.y, c.z, (voxel) ->
 					return voxel.enabled
 
+			connectedToEnabled = false
 			if enabledVoxels.length > 0
+				connectedToEnabled = true
+
+			# has this voxel a not selected voxel below
+			# (preventing unselectable voxels)
+			# could be optimized by not using the (z-)-layer as "below",
+			# but the layer the camera is currently facing towards
+			freeBelow = true
+			if cachedData.grid.zLayers[c.z - 1]?[c.x]?[c.y]?
+				if cachedData.grid.zLayers[c.z - 1][c.x][c.y].enabled == false
+					freeBelow = false
+
+			if freeBelow and connectedToEnabled
 				v.material = @voxelVisualizer.deselectedMaterial
 				v.visible = true
 
 		cachedData.modifiedVoxels = modifiedVoxelsNew
-
-		#todo unselectable check
 
 	_hideDisabledVoxels: (selectedNode, cachedData) =>
 		# hides all voxels that are disabled

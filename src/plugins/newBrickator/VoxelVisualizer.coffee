@@ -17,9 +17,6 @@ module.exports = class VoxelVisualizer
 			opacity: 0.0
 			transparent: true
 		})
-		@highlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0x00ffff
-		})
 		
 	clear: (threeNode) ->
 		if threeNode?

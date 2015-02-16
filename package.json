@@ -64,7 +64,7 @@
   "devDependencies": {
     "chai": "^1.9.2",
     "coffeelint": "^1.6.1",
-    "crojsdoc": "^0.8.8",
+    "crojsdoc": "^0.8.11",
     "express-debug": "^1.1.1",
     "groc": "^0.7.0",
     "karma": "^0.12.28",
@@ -81,7 +81,7 @@
     "start": "./node_modules/.bin/cake start",
     "linkHooks": "./node_modules/.bin/cake linkHooks",
     "checkStyle": "./node_modules/.bin/coffeelint Cakefile .",
-    "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/",
+    "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/**/*.coffee",
     "documentation": "./node_modules/.bin/groc",
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --recursive",
     "testFrontend": "./node_modules/.bin/karma start",

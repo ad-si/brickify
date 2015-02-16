@@ -7,10 +7,17 @@ module.exports = class VoxelGeometrizer
 		return
 
 	run: (voxelsToBeGeometrized, options) =>
+		d = new Date()
 		boxGeometry = @_createVoxelGeometry(voxelsToBeGeometrized)
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
+		console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
-		return @_addKnobs(boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
+		d = new Date()
+		bspWithKnobs = @_addKnobs(
+			boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
+		console.log "Geometrizer: knob geometry took #{new Date() - d}ms"
+
+		return bspWithKnobs
 
 	_createVoxelGeometry: (voxelsToBeGeometrized) ->
 		# create the rectangular geometry for the voxels
@@ -66,7 +73,7 @@ module.exports = class VoxelGeometrizer
 								geo.faces.push new THREE.Face3(
 									v.points[3], v.points[2], upperIndices[2])
 
-							# +y direction
+							# -y direction
 							if not s.zLayers[z][x][y - 1].voxel
 								geo.faces.push new THREE.Face3(
 									upperIndices[0], upperIndices[1], v.points[0])

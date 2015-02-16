@@ -139,6 +139,7 @@ module.exports = class NewBrickator
 			selectCallback: @_brushSelectCallback
 			mouseDownCallback: @_legoMouseDownCallback
 			mouseMoveCallback: @_selectLegoMouseMoveCallback
+			mouseHoverCallback: @_legoMouseHoverCallback
 			mouseUpCallback: @_brushMouseUpCallback
 			canToggleVisibility: true
 			visibilityCallback: @_toggleBrickLayer
@@ -151,6 +152,7 @@ module.exports = class NewBrickator
 			selectCallback: @_brushSelectCallback
 			mouseDownCallback: @_printMouseDownCallback
 			mouseMoveCallback: @_select3DMouseMoveCallback
+			mouseHoverCallback: @_printMouseHoverCallback
 			mouseUpCallback: @_brushMouseUpCallback
 			canToggleVisibility: true
 			visibilityCallback: @_togglePrintedLayer
@@ -163,6 +165,7 @@ module.exports = class NewBrickator
 			identifier = selectedNode.pluginData.solidRenderer.threeObjectUuid
 			nodePosition = selectedNode.positionData.position
 
+			# cache is valid if object didn't move
 			if @gridCache[identifier]?
 				griddata = @gridCache[identifier]
 
@@ -214,6 +217,13 @@ module.exports = class NewBrickator
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.legoMouseMove event, selectedNode, cachedData
 
+	_legoMouseHoverCallback: (event, selectedNode) =>
+		@_getCachedData(selectedNode).then (cachedData) =>
+			@brushHandler.legoMouseHover event, selectedNode, cachedData
+
+	_printMouseHoverCallback: (event, selectedNode) =>
+		@_getCachedData(selectedNode).then (cachedData) =>
+			@brushHandler.printMouseHover event, selectedNode, cachedData
 
 	_brushMouseUpCallback: (event, selectedNode) =>
 		# hide grid, then legofy
@@ -240,10 +250,27 @@ module.exports = class NewBrickator
 				results.accumulatedResults.grid
 			)
 			threeNodes.bricks.visible = @_brickVisibility
+			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
 
 			#create CSG (todo: move to webWorker)
 			printThreeMesh = @_createCSG(selectedNode, cachedData, threeNodes.csg)
 			@csgCache[selectedNode] = printThreeMesh
+
+			@brushHandler.afterPipelineUpdate selectedNode, cachedData
+
+	_applyBricksToGrid: (bricks, grid) =>
+		# updates references between voxel --> brick
+		for layer in bricks
+			for brick in layer
+				for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
+					for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
+						for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
+							voxel = grid.zLayers[z][x][y]
+							if voxel?
+								voxel.brick = brick
+							else
+								console.log "Brick without voxel at #{x},#{x},#{z}"
+
 
 	getDownload: (selectedNode) =>
 		printMesh = @csgCache[selectedNode]

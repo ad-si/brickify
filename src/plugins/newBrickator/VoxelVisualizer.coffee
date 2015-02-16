@@ -17,6 +17,9 @@ module.exports = class VoxelVisualizer
 			opacity: 0.0
 			transparent: true
 		})
+		@highlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0x00ffff
+		})
 		
 	clear: (threeNode) ->
 		if threeNode?
@@ -65,9 +68,12 @@ module.exports = class VoxelVisualizer
 		voxel = grid.zLayers[z][x][y]
 
 		if voxel.enabled
-			m = @selectedMaterial
+			if voxel.brick and voxel.brick.visualizationMaterial?
+				m = voxel.brick.visualizationMaterial
+			else
+				m = @selectedMaterial
 		else
-			m = @deselectedMaterial
+			m = @hiddenMaterial
 
 		cube = new THREE.Mesh( @voxelGeometry, m )
 
@@ -82,3 +88,14 @@ module.exports = class VoxelVisualizer
 		}
 
 		threeNode.add(cube)
+
+	updateVoxels: (grid, threeNode) =>
+		if threeNode.children?
+			for child in threeNode.children
+				c = child.voxelCoords
+				vox = grid.zLayers[c.z][c.x][c.y]
+
+				if vox.enabled and vox.brick and vox.brick.visualizationMaterial?
+					child.material = vox.brick.visualizationMaterial
+				else
+					child.material = @hiddenMaterial

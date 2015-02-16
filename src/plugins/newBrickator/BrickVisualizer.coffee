@@ -10,17 +10,22 @@ module.exports = class BrickVisualizer
 	createVisibleBricks: (threeNode, brickData, grid) =>
 		# do not create multiple layers of bricks at the same time
 		# (happens when the user rapidly clicks with the mouse)
+		###
 		if @currentlyWorking
 			return
 		@currentlyWorking = true
-
+		###
+		
 		threeNode.children = []
 
 		for gridZ in [0..brickData.length - 1] by 1
 			lastCallback = true if gridZ == (brickData.length - 1)
+			###
 			window.setTimeout @_layerCallback(
 				grid, brickData[gridZ], threeNode, lastCallback),
 					10 * gridZ
+			###
+			@_createLayer grid, brickData[gridZ], threeNode
 
 	_createLayer: (grid, brickLayer, threeNode) =>
 		bricks = (@_createBrick grid, brick for brick in brickLayer)
@@ -62,8 +67,11 @@ module.exports = class BrickVisualizer
 			brickSizeY,
 			brickSizeZ
 		)
+
 		for face in brickGeometry.faces
 			face.materialIndex = index
+
+		brick.visualizationMaterial = @_brickMaterials[index]
 
 		cube = new THREE.Mesh(brickGeometry, @_getFaceMats())
 

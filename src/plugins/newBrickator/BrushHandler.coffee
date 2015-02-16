@@ -6,22 +6,49 @@ module.exports = class BrushHandler
 		return
 
 	legoMouseDown: (event, selectedNode, cachedData) =>
-		@_showVoxelGrid( event, selectedNode, cachedData )
+		@_initializeVoxelGrid( event, selectedNode, cachedData )
 		@_showNotEnabledVoxelSuggestion event, selectedNode, cachedData
 		@_enableClickedVoxel event, selectedNode, cachedData
 
 	printMouseDown: (event, selectedNode, cachedData) =>
-		@_showVoxelGrid( event, selectedNode, cachedData )
+		@_initializeVoxelGrid( event, selectedNode, cachedData )
 		@_disableSelectedVoxel event, selectedNode, cachedData
 
 	legoMouseMove: (event, selectedNode, cachedData) =>
 		@_enableClickedVoxel event, selectedNode, cachedData
 
+	legoMouseHover: (event, selectedNode, cachedData) =>
+		@_toggleVoxelVisibility event, selectedNode, cachedData
+		@_showNotEnabledVoxelSuggestion event, selectedNode, cachedData
+
+	printMouseHover: (event, selectedNode, cachedData) =>
+		@_toggleVoxelVisibility event, selectedNode, cachedData
+		@_hideDisabledVoxels selectedNode, cachedData
+
+	_toggleVoxelVisibility: (event, selectedNode, cachedData) =>
+		obj = @_getSelectedVoxel event, selectedNode
+		threeNodes = @newBrickator.getThreeObjectsByNode selectedNode
+
+		if not obj
+			# hide voxels, show bricks
+			# if we are not above an object
+			threeNodes.bricks.visible = true
+			threeNodes.voxels.visible = false
+		else
+			#show voxels, hide bricks
+			threeNodes.voxels.visible = true
+			threeNodes.bricks.visible = false
+
 	printMouseMove: (event, selectedNode, cachedData) =>
 		@_disableSelectedVoxel event, selectedNode, cachedData
 
 	mouseUp: (event, selectedNode, cachedData) =>
-		@_hideVoxelGrid event, selectedNode, cachedData
+		for v in cachedData.lastSelectedVoxels
+			cachedData.modifiedVoxels.push v
+		cachedData.lastSelectedVoxels = []
+
+	afterPipelineUpdate: (selectedNode, cachedData) =>
+		@voxelVisualizer.updateVoxels cachedData.grid, cachedData.threeNode
 
 	_disableSelectedVoxel: (event, selectedNode, cachedData) =>
 		# disable all voxels we touch with the mouse
@@ -49,6 +76,7 @@ module.exports = class BrushHandler
 				continue
 			modifiedVoxelsNew.push v
 			
+			# do we have at least one connection to an enabled voxel?
 			enabledVoxels = cachedData.grid.getNeighbours c.x,
 				c.y, c.z, (voxel) ->
 					return voxel.enabled
@@ -59,26 +87,30 @@ module.exports = class BrushHandler
 
 		cachedData.modifiedVoxels = modifiedVoxelsNew
 
+		#todo unselectable check
+
+	_hideDisabledVoxels: (selectedNode, cachedData) =>
+		# hides all voxels that are disabled
+
+		for v in cachedData.modifiedVoxels
+			c = v.voxelCoords
+			if not cachedData.grid.zLayers[c.z][c.x][c.y].enabled
+				v.visible = false
+
 	_enableClickedVoxel: (event, selectedNode, cachedData) =>
 		obj = @_getSelectedVoxel event, selectedNode
 
 		if obj
-			obj.material = @voxelVisualizer.selectedMaterial
 			c = obj.voxelCoords
-			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = true
+			voxel = cachedData.grid.zLayers[c.z][c.x][c.y]
 
-	_hideVoxelGrid: (event, selectedNode, cachedData) =>
-		cachedData.threeNode.visible = false
-
-		# hide voxels that have been deselected in the last brush
-		# action to allow to go go into the model
-		for v in cachedData.lastSelectedVoxels
-			v.visible = false
-			cachedData.modifiedVoxels.push v
-		cachedData.lastSelectedVoxels = []
+			if not voxel.enabled
+				obj.material = @voxelVisualizer.selectedMaterial
+				voxel.enabled = true
+			
 
 
-	_showVoxelGrid: (event, selectedNode, cachedData) =>
+	_initializeVoxelGrid: (event, selectedNode, cachedData) =>
 		threeObjects = @newBrickator.getThreeObjectsByNode(selectedNode)
 
 		if not cachedData.threeNode
@@ -91,9 +123,6 @@ module.exports = class BrushHandler
 			)
 		else
 			cachedData.threeNode.visible = true
-
-		# hide bricks
-		threeObjects.bricks.visible = false
 
 		return cachedData
 

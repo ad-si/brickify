@@ -1,10 +1,9 @@
 PluginLoader = require '../client/pluginLoader'
-Ui = require './ui'
+Ui = require './ui/ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
-
-ObjectTree = require '../common/objectTree'
+ObjectTree = require '../common/state/objectTree'
 
 ###
 # @class Bundle
@@ -15,18 +14,22 @@ module.exports = class Bundle
 		@pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(@)
-		@modelLoader = new ModelLoader(@statesync, @pluginHooks, @globalConfig)
+		@modelLoader = new ModelLoader(@)
 
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 
 	init: =>
-		@statesync.init().then(() =>
-			@pluginInstances = @pluginLoader.loadPlugins()
-			@ui = new Ui(@) if(@globalConfig.buildUi)
-			@statesync.handleUpdatedState()
-		).then(@load).then(() =>
-			window.addEventListener 'beforeunload', @unload
-		)
+		@statesync
+			.init()
+			.then () =>
+				@pluginInstances = @pluginLoader.loadPlugins()
+				if @globalConfig.buildUi
+					@ui = new Ui(@)
+					@ui.init()
+				@statesync.handleUpdatedState()
+			.then(@load)
+			.then () =>
+				window.addEventListener 'beforeunload', @unload
 
 	load: =>
 		@statesync.performStateAction @renderer.loadCamera

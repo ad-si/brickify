@@ -35,11 +35,6 @@
 
 - newBoundingSphere
 
-# if provided, a UI to configure the plugins convertion will be created. changed
-# values are always stored in the state, relative to the currently selected node
-# Must (only) be provided by converter plugins
-
-- getConvertUiSchema
 
 #  ## State synchronization
 #
@@ -66,6 +61,36 @@
 
 - on3dUpdate
 
+#  ## scene interaction and administration
+
+#  ### New nodes
+#
+#  Each time a new node is added to the scene, the sceneManager will inform
+#  plugins by calling onNodeAdd
+
+- onNodeAdd
+
+#  ### Node selection
+#
+#  Each time a scene's node is selected, the sceneManager will inform plugins by
+#  calling onNodeSelect
+
+- onNodeSelect
+
+#  ### Node deselection
+#
+#  Each time a scene's node is deselected, the sceneManager will inform plugins
+#  by calling onNodeDeselect
+
+- onNodeDeselect
+
+#  ### Node deletion
+#
+#  When a node is removed from the scene, the sceneManager will inform plugins
+#  by calling onNodeRemove
+
+- onNodeRemove
+
 
 #  ## File import
 #
@@ -76,12 +101,6 @@
 #  Must (only) be provided by import plugins
 
 - importFile
-
-#  ## On click handling
-#
-#  TODO
-
-- onClick
 
 # ## Hotkeys
 #
@@ -101,13 +120,27 @@
 #
 # {
 #	text: 'Make Lego'
-#	icon: 'legoBrush.png' #from img/legoBrush.png
+#	iconBrush: false # if true, only a icon next to the object is displayed
+#	glyhicon: 'move' # if brushIcon, defines the glyphicon to be shown
 #	selectCallback: # when the brush is selected, selectedNode as argument
 #	deselectCallback: # when the brush is deselected
 #	mouseDownCallback: # when a node is selected and mouse is pressed
 #	mouseMoveCallback: # after being pressed, when mouse is moved
+#   mouseHoverCallback: # when the mouse is moved, but not pressed
 #	mouseUpCallback: # when mouse is released
+#   canToggleVisibility: true # if true, the user can toggle visibility
+#   visibilityCallback: # called when the user changes visibility
+#	tooltip: ''
 # }
 # 
 
 - getBrushes
+
+# ## Subtractive CSG
+# When clicking on the download button, the user expects to download eyerything
+# he needs to 3d print. therefore, getSubtractiveCSG should return a solid geometry
+# that replaces the original 3d model (partly). everything that is not replaced gets
+# 3d printed
+
+- getDownload
+

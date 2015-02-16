@@ -1,6 +1,7 @@
 fs = require 'fs'
 mkdirp = require 'mkdirp'
 path = require 'path'
+md5 = require('blueimp-md5').md5
 
 winston = require 'winston'
 log = winston.loggers.get('log')
@@ -20,20 +21,39 @@ module.exports.hasModel = (hash, callback) ->
 	fs.exists buildFileName(hash), (exists) ->
 		callback(exists)
 
-module.exports.loadModel = (hash, callback) ->
+loadModel = (hash) ->
 	if not checkHash hash
-		callback 'invalid hash', null
-		return
+		return Promise.reject 'invalid hash'
 
-	fs.readFile buildFileName(hash), (error, data) ->
-		callback(error, data)
+	return new Promise((resolve, reject) ->
+		fs.readFile buildFileName(hash), (err, data) ->
+			if err
+				reject err
+			else
+				resolve data
+	)
+module.exports.loadModel = loadModel
 
-module.exports.saveModel = (hash, data, callback) ->
+module.exports.request = (hash) ->
+	return loadModel hash
+
+saveModel = (hash, data) ->
 	if not checkHash hash
-		callback 'invalid hash', null
-		return
+		return Promise.reject 'invalid hash'
 
-	fs.writeFile buildFileName(hash), data, callback
+	return new Promise((resolve, reject) ->
+		fs.writeFile buildFileName(hash), data, (err) ->
+			if err
+				reject err
+			else
+				resolve hash
+	)
+module.exports.saveModel = saveModel
+
+module.exports.store = (optimizedModel) ->
+	modelData = optimizedModel.toBase64()
+	hash = md5 modelData
+	return saveModel hash, modelData
 
 buildFileName = (hash) ->
 	return path.normalize modelCacheDir + '/' + hash

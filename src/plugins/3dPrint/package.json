@@ -1,9 +1,0 @@
-{
-  "name": "3d-print",
-  "version": "0.1.0",
-  "description": "Prepares a 3D model for 3D printing via .stl export",
-  "lowfab": {
-    "type": "converter"
-  },
-  "browser": "./3dPrint.coffee"
-}

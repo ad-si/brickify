@@ -27,44 +27,26 @@ module.exports = class Grid
 			bbMinWorld = bb.min
 			bbMaxWorld = bb.max
 
-		# align the grid to the nearest visible lego brick on the viewed board
-		# positive values: set minimum to lower grid match
-		# (x: 85, lower grid match 80 --> subtract 5)
-		# negative values: go to next grid match (-85, delta 5 --> -80)
-		# and subtract spacing to get to next grid (-> e.g. -88)
-		xDelta = (Math.floor(Math.abs(bbMinWorld.x)) % @spacing.x)
-		if (bbMinWorld.x >= 0)
-			ox = Math.floor(bbMinWorld.x) - xDelta
-		else
-			ox = ((-Math.floor(Math.abs(bbMinWorld.x))) + xDelta) - @spacing.x
+		# 1.) Align bb minimum to next voxel position
+		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
+		# voxel center
+		# 3.) minimum z is to assure that grid is never below z=0
+		calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
+		calculatedZ -= @spacing.z / 2
+		minimumZ = @spacing.z / 2
 
-		yDelta = (Math.floor(Math.abs(bbMinWorld.y)) % @spacing.y)
-		if (bbMinWorld.y >= 0)
-			oy = Math.floor(bbMinWorld.y) - yDelta
-		else
-			oy = ((-Math.floor(Math.abs(bbMinWorld.y))) + yDelta) - @spacing.y
-
-		zDelta = (Math.floor(Math.abs(bbMinWorld.z)) % @spacing.z)
-		if (bbMinWorld.z >= 0)
-			oz = Math.floor(bbMinWorld.z) - zDelta
-		else
-			oz = ((-Math.floor(Math.abs(bbMinWorld.z))) + zDelta) - @spacing.z
-
-		#subtract spacing/2 to match the lego knobs of the visible grid
 		@origin = {
-			x: ox - (@spacing.x / 2)
-			y: oy - (@spacing.y / 2)
-			z: oz - (@spacing.z / 2)
+			x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
+			y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
+			z: Math.max(calculatedZ, minimumZ)
 		}
 
-		@numVoxelsX = Math.ceil (bbMaxWorld.x - bbMinWorld.x) / @spacing.x
-		@numVoxelsX += 2
+		maxVoxel = @mapWorldToGrid bbMaxWorld
+		minVoxel = @mapWorldToGrid bbMinWorld
 
-		@numVoxelsY = Math.ceil (bbMaxWorld.y - bbMinWorld.y) / @spacing.y
-		@numVoxelsY += 2
-
-		@numVoxelsZ = Math.ceil (bbMaxWorld.z - bbMinWorld.z) / @spacing.z
-		@numVoxelsZ += 2
+		@numVoxelsX = (maxVoxel.x - minVoxel.x) + 1
+		@numVoxelsY = (maxVoxel.y - minVoxel.y) + 1
+		@numVoxelsZ = (maxVoxel.z - minVoxel.z) + 1
 
 	mapWorldToGrid: (point) =>
 		# maps world coordinates to aligned grid coordinates
@@ -93,10 +75,12 @@ module.exports = class Grid
 
 	mapGridToVoxel: (point) =>
 		# maps aligned grid coordinates to voxel indices
+		# cut z<0 to z=0, since the grid cannot have
+		# voxels in negative direction
 		return {
 			x: Math.round(point.x / @spacing.x)
 			y: Math.round(point.y / @spacing.y)
-			z: Math.round(point.z / @spacing.z)
+			z: Math.max(Math.round(point.z / @spacing.z), 0)
 		}
 
 	mapVoxelToGrid: (point) =>
@@ -130,4 +114,38 @@ module.exports = class Grid
 		else
 			#if the voxel already exists, push new data to existing array
 			@zLayers[voxel.z][voxel.x][voxel.y].dataEntrys.push data
+
+	forEachVoxel: (callback) =>
+		for z in [0..@numVoxelsZ - 1] by 1
+			for y in [0..@numVoxelsY - 1] by 1
+				for x in [0..@numVoxelsX - 1] by 1
+					if @zLayers[z]?[x]?[y]?
+						vox = @zLayers[z][x][y]
+						callback vox, x, y, z
+
+	getNeighbours: (x, y, z, selectionCallback) =>
+		# returns a list of neighbours for this voxel position.
+		# the selectionCallback(neighbour) defines what to return
+		# and has to return true, if the voxel neighbour should be collected
+		list = []
+
+		pos = [
+			[x + 1, y, z]
+			[x - 1, y, z]
+			[x, y + 1, z]
+			[x, y - 1, z]
+			[x, y, z + 1]
+			[x, y, z - 1]
+		]
+
+		for p in pos
+			if @zLayers[p[2]]?[p[0]]?[p[1]]?
+				v = @zLayers[p[2]][p[0]][p[1]]
+
+				if selectionCallback(v)
+					list.push v
+		return list
+
+
+
 

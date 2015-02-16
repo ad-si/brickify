@@ -17,7 +17,6 @@ module.exports = class NewBrickator
 		@pipeline = new LegoPipeline()
 		@brickLayouter = new BrickLayouter()
 		@gridCache = {}
-		@csgCache = {}
 
 		@_brickVisibility = true
 		@_printVisibility = true
@@ -252,9 +251,8 @@ module.exports = class NewBrickator
 			threeNodes.bricks.visible = @_brickVisibility
 			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
 
-			#create CSG (todo: move to webWorker)
-			printThreeMesh = @_createCSG(selectedNode, cachedData, threeNodes.csg)
-			@csgCache[selectedNode] = printThreeMesh
+			#create quick CSG (without knobs) (todo: move to webWorker)
+			printThreeMesh = @_createCSG(selectedNode, cachedData, false, threeNodes.csg)
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
@@ -273,20 +271,21 @@ module.exports = class NewBrickator
 
 
 	getDownload: (selectedNode) =>
-		printMesh = @csgCache[selectedNode]
-
-		optimizedModel = new meshlib.OptimizedModel()
-		optimizedModel.fromThreeGeometry(printMesh.geometry)
-
 		dlPromise = new Promise (resolve) =>
-			meshlib
-			.model(optimizedModel)
-			.export null, (error, binaryStl) ->
-				resolve { data: binaryStl, fileName: '3dprinted.stl' }
+			@_getCachedData(selectedNode).then (cachedData) =>
+				detailedCsg = @_createCSG selectedNode, cachedData, true, null
+
+				optimizedModel = new meshlib.OptimizedModel()
+				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
+
+				meshlib
+				.model(optimizedModel)
+				.export null, (error, binaryStl) ->
+					resolve { data: binaryStl, fileName: '3dprinted.stl' }
 
 		return dlPromise
 
-	_createCSG: (selectedNode, cachedData, csgThreeNode = null) =>
+	_createCSG: (selectedNode, cachedData, addKnobs = true, csgThreeNode = null) =>
 		# get optimized model and transform to actual position
 		if not cachedData.optimizedThreeModel?
 			cachedData.optimizedThreeModel=
@@ -304,6 +303,7 @@ module.exports = class NewBrickator
 		options = {
 			grid: cachedData.grid
 			knobSize: PipelineSettings.legoKnobSize
+			addKnobs: addKnobs
 			transformedModel: threeModel
 		}
 

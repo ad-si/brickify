@@ -12,12 +12,14 @@ module.exports = class VoxelGeometrizer
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
 		console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
-		d = new Date()
-		bspWithKnobs = @_addKnobs(
-			boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
-		console.log "Geometrizer: knob geometry took #{new Date() - d}ms"
+		if options.addKnobs
+			d = new Date()
+			bspWithKnobs = @_addKnobs(
+				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
+			console.log "Geometrizer: knob geometry took #{new Date() - d}ms"
+			return bspWithKnobs
 
-		return bspWithKnobs
+		return boxGeometryBsp
 
 	_createVoxelGeometry: (voxelsToBeGeometrized) ->
 		# create the rectangular geometry for the voxels

@@ -58,3 +58,14 @@ buildUi: true
 
 #editor
 defaultPlugin: 'fabrickator'
+
+#load these plugins
+plugins:
+  dummy: false
+  stlImport: true
+  stlExport: true
+  sceneGraph: true
+  coordinateSystem: true
+  legoBoard: true
+  solidRenderer: true
+  newBrickator: true

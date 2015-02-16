@@ -17,6 +17,14 @@ globalConfig.staticRendererHeight = 388
 globalConfig.syncWithServer = false
 globalConfig.buildUi = false
 globalConfig.autoRotate = true
+globalConfig.plugins.dummy = false
+globalConfig.plugins.stlImport = false
+globalConfig.plugins.stlExport = false
+globalConfig.plugins.sceneGraph = false
+globalConfig.plugins.coordinateSystem = false
+globalConfig.plugins.legoBoard = false
+globalConfig.plugins.solidRenderer = true
+globalConfig.plugins.newBrickator = true
 
 # clone global config 2 times
 config1 = clone globalConfig
@@ -24,6 +32,7 @@ config2 = clone globalConfig
 
 # instantiate 2 lowfab bundles
 config1.renderAreaId = 'renderArea1'
+config1.plugins.newBrickator = false
 bundle1 = new Bundle config1
 b1 = bundle1.init()
 

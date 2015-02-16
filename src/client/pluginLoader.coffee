@@ -39,37 +39,44 @@ module.exports = class PluginLoader
 	loadPlugins: () ->
 		pluginInstances = []
 
-		###pluginInstances.push @initPlugin(
-			require('../plugins/dummy'),
-			require('../plugins/dummy/package.json')
-		)
-		###
-		pluginInstances.push @initPlugin(
-			require('../plugins/stlImport'),
-			require('../plugins/stlImport/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/stlExport'),
-			require('../plugins/stlExport/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/sceneGraph'),
-			require('../plugins/sceneGraph/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/coordinateSystem'),
-			require('../plugins/coordinateSystem/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/legoBoard'),
-			require('../plugins/legoBoard/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/solidRenderer'),
-			require('../plugins/solidRenderer/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/newBrickator'),
-			require('../plugins/newBrickator/package.json')
-		)
+		if @globalConfig.plugins.dummy
+			pluginInstances.push @initPlugin(
+				require '../plugins/dummy'
+				require '../plugins/dummy/package.json'
+			)
+		if @globalConfig.plugins.stlImport
+			pluginInstances.push @initPlugin(
+				require '../plugins/stlImport'
+				require '../plugins/stlImport/package.json'
+			)
+		if @globalConfig.plugins.stlExport
+			pluginInstances.push @initPlugin(
+				require '../plugins/stlExport'
+				require '../plugins/stlExport/package.json'
+			)
+		if @globalConfig.plugins.sceneGraph
+			pluginInstances.push @initPlugin(
+				require '../plugins/sceneGraph'
+				require '../plugins/sceneGraph/package.json'
+			)
+		if @globalConfig.plugins.coordinateSystem
+			pluginInstances.push @initPlugin(
+				require '../plugins/coordinateSystem'
+				require '../plugins/coordinateSystem/package.json'
+			)
+		if @globalConfig.plugins.legoBoard
+			pluginInstances.push @initPlugin(
+				require '../plugins/legoBoard'
+				require '../plugins/legoBoard/package.json'
+			)
+		if @globalConfig.plugins.solidRenderer
+			pluginInstances.push @initPlugin(
+				require '../plugins/solidRenderer'
+				require '../plugins/solidRenderer/package.json'
+			)
+		if @globalConfig.plugins.newBrickator
+			pluginInstances.push @initPlugin(
+				require '../plugins/newBrickator'
+				require '../plugins/newBrickator/package.json'
+			)
 		return pluginInstances

@@ -4,7 +4,7 @@ chaiAsPromised = require 'chai-as-promised'
 chai.use chaiAsPromised
 expect = chai.expect
 
-DataPacketsMock = require './dataPacketsMock'
+DataPacketsMock = require '../mocks/dataPacketsMock'
 SyncObject = require '../../src/common/sync/syncObject'
 Dummy = require './dummySyncObject'
 

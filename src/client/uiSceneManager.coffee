@@ -1,4 +1,4 @@
-objectTree = require '../common/state/objectTree'
+objectTree = require '../common/project/objectTree'
 
 class UiSceneManager
 	constructor: (@bundle) ->

@@ -8,7 +8,7 @@
 $ = require 'jquery'
 jqtree = require 'jqtree'
 clone = require 'clone'
-objectTree = require '../../common/state/objectTree'
+objectTree = require '../../common/project/objectTree'
 pluginKey = 'SceneGraph'
 
 module.exports = class SceneGraph

@@ -6,7 +6,7 @@ $('#buttonContainer').fadeTo(500, 1)
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
-objectTree = require '../common/state/objectTree'
+objectTree = require '../common/project/objectTree'
 Bundle = require '../client/bundle'
 clone = require 'clone'
 

@@ -1,4 +1,4 @@
-diffHelper = require '../src/common/state/diffHelper'
+diffHelper = require '../src/common/project/diffHelper'
 diffpatch = diffHelper.createJsonDiffPatch()
 clone = require 'clone'
 

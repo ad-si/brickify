@@ -3,8 +3,8 @@
 ###
 
 $ = require 'jquery'
-objectTree = require '../common/state/objectTree'
-diffHelper = require '../common/state/diffHelper'
+objectTree = require '../common/project/objectTree'
+diffHelper = require '../common/project/diffHelper'
 diffpatch = diffHelper.createJsonDiffPatch()
 clone = require 'clone'
 

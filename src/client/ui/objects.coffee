@@ -171,12 +171,19 @@ module.exports = class UiObjects
 			if @_selectedBrush.deselectCallback?
 				@_selectedBrush.deselectCallback @selectedStructure.node
 
-			@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
+			if @_selectedBrush.iconBrush
+				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
+			else
+				@_selectedBrush.jqueryObject.removeClass 'btn-primary'
 
 		#select new brush
 		@_selectedBrush = brush
 
-		brush.jqueryObject.addClass 'selectedBrush'
+		if brush.iconBrush
+			brush.jqueryObject.addClass 'selectedBrush'
+		else
+			brush.jqueryObject.addClass 'btn-primary'
+			
 		if brush.selectCallback?
 				brush.selectCallback @selectedStructure.node
 
@@ -185,7 +192,10 @@ module.exports = class UiObjects
 			if @_selectedBrush.deselectCallback?
 				@_selectedBrush.deselectCallback node
 
-			@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
+			if brush.iconBrush
+				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
+			else
+				@_selectedBrush.jqueryObject.removeClass 'btn-primary'
 
 		@_selectedBrush = null
 

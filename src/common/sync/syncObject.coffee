@@ -9,6 +9,10 @@ class SyncObject
 	# ##Instance creation and synchronization
 	###
 
+	###
+	# Static packetProvider injection. Usually this is client/sync/dataPackets
+	# or server/sync/dataPacketRamStorage
+	###
 	@dataPacketProvider: null
 
 	###
@@ -18,6 +22,9 @@ class SyncObject
 	# of subclasses: All parameters must be passed as 'named parameters', meaning
 	# as an object. The key _generateId must not be used. The constructor must
 	# call SyncObject's constructor by calling super(arguments[0]).
+	#
+	# @param {Object} params the named parameters
+	# @memberOf SyncObject
 	###
 	constructor: ({_generateId} = {}) ->
 		if _generateId || not _generateId?
@@ -49,7 +56,7 @@ class SyncObject
 	# This function can be overwritten by subclasses to ignore additional
 	# properties, but the subclass has to call super(key)!
 	#
-	# @param {String} the name of the property to be checked.
+	# @param {String} key the name of the property to be checked.
 	# @return {Boolean} true if the key should be ignored
 	# @memberOf SyncObject
 	###

@@ -52,8 +52,7 @@ module.exports = class VoxelGeometrizer
 
 			# create bottom plate if there is no voxel below us
 			if not s.zLayers[z - 1][x][y].voxel
-				if not v.points
-					@_createGeoPoints x, y, z, s, geo
+				@_createGeoPoints x, y, z, s, geo
 
 				# add faces clockwise, because the baseplate "looks down"
 				# (we look at it from inside the model)
@@ -66,6 +65,8 @@ module.exports = class VoxelGeometrizer
 				skipSidewalls = true
 
 			if not skipSidewalls
+				# create points for this baseplate
+				@_createGeoPoints x, y, z, s, geo
 				#create points for the voxel baseplate above this voxel
 				upperIndices = @_createGeoPoints x, y, z + 1, s, geo
 				
@@ -163,6 +164,10 @@ module.exports = class VoxelGeometrizer
 		# and adds them to geometry (if they don't exist yet)
 		# returns indices
 
+		# return points if they already exist
+		if structure.zLayers[z][x][y].points?
+			return structure.zLayers[z][x][y].points
+
 		voxelCenter = @grid.mapVoxelToWorld {x: x, y: y, z: z}
 
 		# delta values to move from center to edge of voxel
@@ -184,10 +189,6 @@ module.exports = class VoxelGeometrizer
 		# |0  1|0  1|0  1|
 		# |3  2|3  2|3  2|
 		# x----x----x----x
-
-		# return points if they already exist
-		if structure.zLayers[z][x][y].points?
-			return structure.zLayers[z][x][y].points
 
 		#p0
 		if structure.zLayers[z][x + 1][y].points?

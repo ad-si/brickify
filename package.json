@@ -29,7 +29,6 @@
     "es6-promise": "^2.0.0",
     "exec": "^0.1.2",
     "express": "^4.9.8",
-    "express-session": "^1.9.1",
     "filesaver.js": "^0.1.1",
     "font-awesome": "^4.2.0",
     "fs-promise": "^0.3.1",

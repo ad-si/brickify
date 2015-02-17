@@ -100,13 +100,12 @@ module.exports = class UiObjects
 
 	_createBrush: (brush) =>
 		# creates a default brush with list entry
-		string = "<div class='btn btn-default brushtext'>#{brush.text}</div>"
+		string = "<div class='btn btn-primary'>#{brush.text}</div>"
 
 		htmlElement = $(string)
-		tooltipElement = htmlElement.find('.brushtext')
+		#@_createTooltip htmlElement, brush, 'bottom'
 
-		@_createTooltip tooltipElement, brush, 'right'
-
+		###
 		if brush.canToggleVisibility
 			brush.visible = true
 			visibilityString = '<div class="iconFloatRight">
@@ -121,6 +120,7 @@ module.exports = class UiObjects
 				placement: 'right'
 				delay: 500
 			}
+		###
 
 		htmlElement.on 'click', () =>
 			@_brushSelect brush
@@ -174,7 +174,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
-				@_selectedBrush.jqueryObject.removeClass 'btn-primary'
+				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
 
 		#select new brush
 		@_selectedBrush = brush
@@ -182,7 +182,7 @@ module.exports = class UiObjects
 		if brush.iconBrush
 			brush.jqueryObject.addClass 'selectedBrush'
 		else
-			brush.jqueryObject.addClass 'btn-primary'
+			brush.jqueryObject.addClass 'innerShadow'
 			
 		if brush.selectCallback?
 				brush.selectCallback @selectedStructure.node
@@ -195,7 +195,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
-				@_selectedBrush.jqueryObject.removeClass 'btn-primary'
+				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
 
 		@_selectedBrush = null
 

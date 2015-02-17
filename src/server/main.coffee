@@ -115,7 +115,6 @@ module.exports.setupRouting = () ->
 			'jquery'
 			'jsondiffpatch'
 			'path'
-			'react'
 			'stats-js'
 			'three'
 			'three-orbit-controls'

@@ -42,7 +42,6 @@
     "mousetrap": "^1.4.6",
     "nib": "^1.0.4",
     "operative": "^0.4.0-rc1",
-    "react": "^0.12.0",
     "readdirp": "^1.1.0",
     "serve-favicon": "^2.1.6",
     "stats-js": "^1.0.0-alpha1",

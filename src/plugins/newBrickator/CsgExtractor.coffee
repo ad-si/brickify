@@ -60,8 +60,6 @@ module.exports = class CsgExtractor
 		return printVoxels
 
 	_extractPrintGeometry: (originalModel, voxelHull) ->
-		return voxelHull.toMesh(null)
-
 		# returns the volumetric intersection of the selected voxels and
 		# the original model as a THREE.Mesh
 		modelBsp = new ThreeBSP(originalModel)

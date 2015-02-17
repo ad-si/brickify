@@ -38,67 +38,71 @@ module.exports = class VoxelGeometrizer
 		for z in [s.minZ..s.maxZ] by 1
 			for x in [s.minX..s.maxX] by 1
 				for y in [s.minY..s.maxY] by 1
-					# if this is a voxel...
-					if s.zLayers[z][x][y].voxel
-						v = s.zLayers[z][x][y]
+					@_workOnVoxel x, y, z, s, geo
 
-						# create bottom plate if there is no voxel below us
-						if not s.zLayers[z - 1][x][y].voxel
-							if not v.points
-								@_createGeoPoints x, y, z, s, geo
-
-							# add faces clockwise, because the baseplate "looks down"
-							# (we look at it from inside the model)
-							geo.faces.push new THREE.Face3(v.points[0], v.points[1], v.points[3])
-							geo.faces.push new THREE.Face3(v.points[3], v.points[1], v.points[2])
-
-						# check if we are fully inside the model (voxel neighbours to all 4 sides)
-						if s.zLayers[z][x + 1][y].voxel and s.zLayers[z][x - 1][y].voxel and
-						s.zLayers[z][x][y + 1].voxel and s.zLayers[z][x][y - 1].voxel
-							skipSidewalls = true
-
-						if not skipSidewalls
-							#create points for the voxel baseplate above this voxel
-							upperIndices = @_createGeoPoints x, y, z + 1, s, geo
-							
-							# create a sideplate if there is no voxel at this side
-							# +x direction
-							if not s.zLayers[z][x + 1][y].voxel
-								geo.faces.push new THREE.Face3(
-									upperIndices[3], upperIndices[0], v.points[0])
-								geo.faces.push new THREE.Face3(
-									v.points[0], v.points[3], upperIndices[3])
-
-							# -x direction
-							if not s.zLayers[z][x - 1][y].voxel
-								geo.faces.push new THREE.Face3(
-									upperIndices[1], upperIndices[2], v.points[2])
-								geo.faces.push new THREE.Face3(
-									v.points[2], v.points[1], upperIndices[1])
-
-							# +y direction
-							if not s.zLayers[z][x][y + 1].voxel
-								geo.faces.push new THREE.Face3(
-									upperIndices[2], upperIndices[3], v.points[3])
-								geo.faces.push new THREE.Face3(
-									v.points[3], v.points[2], upperIndices[2])
-
-							# -y direction
-							if not s.zLayers[z][x][y - 1].voxel
-								geo.faces.push new THREE.Face3(
-									upperIndices[0], upperIndices[1], v.points[0])
-								geo.faces.push new THREE.Face3(
-									v.points[1], v.points[0], upperIndices[1])
-
-						# is there a voxel above? if not, create a plate on top
-						# facing upwards to close geometry
-						if not s.zLayers[z + 1][x][y].voxel
-							upperIndices = @_createGeoPoints x, y, z + 1, s, geo
-							geo.faces.push new THREE.Face3(
-								upperIndices[1], upperIndices[3], upperIndices[2])
-							geo.faces.push new THREE.Face3(
-								upperIndices[0], upperIndices[3], upperIndices[1])
 		return geo
+
+	_workOnVoxel: (x, y, z, s, geo) =>
+		# if this is a voxel...
+		if s.zLayers[z][x][y].voxel
+			v = s.zLayers[z][x][y]
+
+			# create bottom plate if there is no voxel below us
+			if not s.zLayers[z - 1][x][y].voxel
+				if not v.points
+					@_createGeoPoints x, y, z, s, geo
+
+				# add faces clockwise, because the baseplate "looks down"
+				# (we look at it from inside the model)
+				geo.faces.push new THREE.Face3(v.points[0], v.points[1], v.points[3])
+				geo.faces.push new THREE.Face3(v.points[3], v.points[1], v.points[2])
+
+			# check if we are fully inside the model (voxel neighbours to all 4 sides)
+			if s.zLayers[z][x + 1][y].voxel and s.zLayers[z][x - 1][y].voxel and
+			s.zLayers[z][x][y + 1].voxel and s.zLayers[z][x][y - 1].voxel
+				skipSidewalls = true
+
+			if not skipSidewalls
+				#create points for the voxel baseplate above this voxel
+				upperIndices = @_createGeoPoints x, y, z + 1, s, geo
+				
+				# create a sideplate if there is no voxel at this side
+				# +x direction
+				if not s.zLayers[z][x + 1][y].voxel
+					geo.faces.push new THREE.Face3(
+						upperIndices[3], upperIndices[0], v.points[0])
+					geo.faces.push new THREE.Face3(
+						v.points[0], v.points[3], upperIndices[3])
+
+				# -x direction
+				if not s.zLayers[z][x - 1][y].voxel
+					geo.faces.push new THREE.Face3(
+						upperIndices[1], upperIndices[2], v.points[2])
+					geo.faces.push new THREE.Face3(
+						v.points[2], v.points[1], upperIndices[1])
+
+				# +y direction
+				if not s.zLayers[z][x][y + 1].voxel
+					geo.faces.push new THREE.Face3(
+						upperIndices[2], upperIndices[3], v.points[3])
+					geo.faces.push new THREE.Face3(
+						v.points[3], v.points[2], upperIndices[2])
+
+				# -y direction
+				if not s.zLayers[z][x][y - 1].voxel
+					geo.faces.push new THREE.Face3(
+						upperIndices[0], upperIndices[1], v.points[0])
+					geo.faces.push new THREE.Face3(
+						v.points[1], v.points[0], upperIndices[1])
+
+			# is there a voxel above? if not, create a plate on top
+			# facing upwards to close geometry
+			if not s.zLayers[z + 1][x][y].voxel
+				upperIndices = @_createGeoPoints x, y, z + 1, s, geo
+				geo.faces.push new THREE.Face3(
+					upperIndices[1], upperIndices[3], upperIndices[2])
+				geo.faces.push new THREE.Face3(
+					upperIndices[0], upperIndices[3], upperIndices[1])
 
 	_prepareData: (voxels) ->
 		s = {

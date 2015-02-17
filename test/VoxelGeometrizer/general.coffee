@@ -91,6 +91,44 @@ describe 'VoxelGeometrizer', ->
 
 		done()
 
+	it 'should create a 3x3 plate THREE.Geometry', (done) ->
+		vg = new VoxelGeometrizer(grid)
+		geometry = vg._createVoxelGeometry [
+			{x: 0, y: 0, z: 0}
+			{x: 1, y: 0, z: 0}
+			{x: 2, y: 0, z: 0}
+			{x: 0, y: 1, z: 0}
+			{x: 1, y: 1, z: 0}
+			{x: 2, y: 1, z: 0}
+			{x: 0, y: 2, z: 0}
+			{x: 1, y: 2, z: 0}
+			{x: 2, y: 2, z: 0}
+		]
+		
+		expect(geometry.vertices.length).to.equal(32)
+		expect(geometry.faces.length).to.equal(18 + 24 + 18)
+
+		done()
+
+	it 'should create a filled "+" plate THREE.Geometry', (done) ->
+		#  #
+		# ###
+		#  #
+
+		vg = new VoxelGeometrizer(grid)
+		geometry = vg._createVoxelGeometry [
+			{x: 1, y: 0, z: 0}
+			{x: 0, y: 1, z: 0}
+			{x: 1, y: 1, z: 0}
+			{x: 2, y: 1, z: 0}
+			{x: 1, y: 2, z: 0}
+		]
+		
+		expect(geometry.vertices.length).to.equal(24)
+		expect(geometry.faces.length).to.equal(10 + 24 + 10)
+
+		done()
+
 	it 'should create a filled "+" plate datastructure', (done) ->
 		#  #
 		# ###

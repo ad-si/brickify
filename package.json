@@ -52,7 +52,7 @@
     "zeroclipboard": "^2.2.0"
   },
   "devDependencies": {
-    "chai": "^1.9.2",
+    "chai": "^2.0.0",
     "coffeelint": "^1.6.1",
     "crojsdoc": "^0.8.11",
     "express-debug": "^1.1.1",

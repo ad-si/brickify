@@ -192,7 +192,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.deselectCallback?
 				@_selectedBrush.deselectCallback node
 
-			if brush.iconBrush
+			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
 				@_selectedBrush.jqueryObject.removeClass 'btn-primary'

@@ -12,6 +12,10 @@ module.exports = class MouseDispatcher
 		event.stopPropagation()
 		event.preventDefault()
 
+		# don't call mouse events if there is no selected node
+		if not @sceneManager.selectedNode?
+			return
+
 		@mouseDown = true
 
 		# brush action if we clicked on some plugin geometry (and not void / grid)
@@ -30,6 +34,10 @@ module.exports = class MouseDispatcher
 	handleMouseUp: (event) =>
 		event.preventDefault()
 
+		# don't call mouse events if there is no selected node
+		if not @sceneManager.selectedNode?
+			return
+
 		if @mouseDown
 			@mouseDown = false
 
@@ -41,7 +49,10 @@ module.exports = class MouseDispatcher
 
 	handleMouseMove: (event) =>
 		event.preventDefault()
-		#console.log "mouseMove (down: #{@mouseDown})"
+		
+		# don't call mouse events if there is no selected node
+		if not @sceneManager.selectedNode?
+			return
 
 		brush = @objects.getSelectedBrush()
 

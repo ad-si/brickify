@@ -6,7 +6,13 @@ module.exports = class CsgExtractor
 		# extracts voxel that are not selected for
 		# legofication (where enabled = false)
 		# intersected with the original mesh
-		# as a 3d geometry
+		# as a THREE.Mesh
+
+		# options may be
+		# {
+		#	profiling: true/false # print performance values
+		#	addKnobs: true/fals # add lego knobs to csg (slow!)
+		# }
 
 		console.log 'Creating CSG...'
 

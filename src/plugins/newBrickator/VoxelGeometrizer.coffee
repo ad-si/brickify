@@ -1,7 +1,7 @@
 THREE = require 'three'
 ThreeCSG = require './threeCSG/ThreeCSG'
 
-# creates a CSG geometry for all voxels to be 3d printed
+# creates one CSG geometry for all voxels to be 3d printed
 module.exports = class VoxelGeometrizer
 	constructor: (@grid) ->
 		return
@@ -30,19 +30,22 @@ module.exports = class VoxelGeometrizer
 		return boxGeometryBsp
 
 	_createVoxelGeometry: (voxelsToBeGeometrized) ->
-		# create the rectangular geometry for the voxels
-		s = @_prepareData(voxelsToBeGeometrized)
+		# create the rectangular THREE.Geometry for the voxels
 
+		dataStructure = @_prepareData(voxelsToBeGeometrized)
 		geo = new THREE.Geometry()
 
-		for z in [s.minZ..s.maxZ] by 1
-			for x in [s.minX..s.maxX] by 1
-				for y in [s.minY..s.maxY] by 1
-					@_workOnVoxel x, y, z, s, geo
+		for z in [dataStructure.minZ..dataStructure.maxZ] by 1
+			for x in [dataStructure.minX..dataStructure.maxX] by 1
+				for y in [dataStructure.minY..dataStructure.maxY] by 1
+					@_workOnVoxel x, y, z, dataStructure, geo
 
 		return geo
 
-	_workOnVoxel: (x, y, z, s, geo) =>
+	_workOnVoxel: (x, y, z, dataStructure, geo) =>
+		# creates points and faces needed for this voxel
+		s = dataStructure
+
 		# if this is a voxel...
 		if s.zLayers[z][x][y].voxel
 			v = s.zLayers[z][x][y]
@@ -105,6 +108,9 @@ module.exports = class VoxelGeometrizer
 					upperIndices[0], upperIndices[3], upperIndices[1])
 
 	_prepareData: (voxels) ->
+		# creates a datastructure consisting of a
+		# [z][x][y] nested array out of the voxel list
+
 		s = {
 			zLayers: []
 		}
@@ -130,7 +136,7 @@ module.exports = class VoxelGeometrizer
 			s.zLayers[v.z][v.x] ?= []
 			s.zLayers[v.z][v.x][v.y] = {
 				# these are points for the baseplate of this voxel
-				# 0---1 (as seen from above (z-Layer), x goes right, y goes downwards)
+				# 0---1 (as seen from above (z-Layer), x goes left, y goes downwards)
 				# |   |
 				# 3---2
 				points: null
@@ -154,11 +160,12 @@ module.exports = class VoxelGeometrizer
 
 	_createGeoPoints: (x, y, z, structure, geometry) ->
 		# creates baseplate points in transformed world coordinates
-		# and adds them to geometry (if they dont exist yet)
+		# and adds them to geometry (if they don't exist yet)
 		# returns indices
 
 		voxelCenter = @grid.mapVoxelToWorld {x: x, y: y, z: z}
 
+		# delta values to move from center to edge of voxel
 		pz = voxelCenter.z - (@grid.spacing.z / 2)
 		dx = (@grid.spacing.x / 2)
 		dy = (@grid.spacing.y / 2)
@@ -252,12 +259,14 @@ module.exports = class VoxelGeometrizer
 		return structure.zLayers[z][x][y].points
 
 	_addKnobs: (boxGeometry, options, voxelsToBeGeometrized, grid) ->
-		knobGeometry = @_createKnobGeometry @grid.spacing, options.knobSize
+		# adds knobs on top, subtracts knobs from below
 
+		knobGeometry = @_createKnobGeometry @grid.spacing, options.knobSize
 		unionBsp = boxGeometry
 
 		for voxel in voxelsToBeGeometrized
-			# if this is the lowest voxel to be printed, subtract a knob
+			# if this is the lowest voxel to be printed, or
+			# there is lego below this voxel, subtract a knob
 			# to make it fit to lego bricks
 			if voxel.knobFromBelow
 				knobMesh = new THREE.Mesh(knobGeometry.knobGeometryBottom, null)

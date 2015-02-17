@@ -1,5 +1,4 @@
 expect = require('chai').expect
-
 Grid = require '../../src/plugins/newBrickator/Grid'
 VoxelGeometrizer = require '../../src/plugins/newBrickator/VoxelGeometrizer'
 THREE = require 'three'
@@ -154,17 +153,9 @@ describe 'VoxelGeometrizer', ->
 		expect(data.zLayers[0]).to.not.equal(undefined)
 		expect(data.zLayers[1]).to.not.equal(undefined)
 
-		expect(data.zLayers[-1][-1]).to.not.equal(undefined)
-		expect(data.zLayers[-1][0]).to.not.equal(undefined)
-		expect(data.zLayers[-1][1]).to.not.equal(undefined)
-		expect(data.zLayers[-1][2]).to.not.equal(undefined)
-		expect(data.zLayers[-1][3]).to.not.equal(undefined)
-
-		expect(data.zLayers[0][-1]).to.not.equal(undefined)
-		expect(data.zLayers[0][0]).to.not.equal(undefined)
-		expect(data.zLayers[0][1]).to.not.equal(undefined)
-		expect(data.zLayers[0][2]).to.not.equal(undefined)
-		expect(data.zLayers[0][3]).to.not.equal(undefined)
+		for z in [-1..1] by 1
+			for x in [-1..3] by 1
+				expect(data.zLayers[z][x]).to.not.equal(undefined)
 
 		expect(data.zLayers[0][0][0].voxel).to.equal(false)
 		expect(data.zLayers[0][1][0].voxel).to.equal(true)

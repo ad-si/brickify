@@ -86,6 +86,6 @@
   "license": "All rights reserved",
   "private": true,
   "engines": {
-    "node": "~0.10.32"
+    "node": "~0.12.0"
   }
 }

@@ -33,7 +33,6 @@
     "font-awesome": "^4.2.0",
     "fs-promise": "^0.3.1",
     "jade": "^1.7.0",
-    "jqtree": "^0.22.0",
     "jquery": "^2.1.1",
     "js-yaml": "^3.2.3",
     "json-editor": "^0.7.13",

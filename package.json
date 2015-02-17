@@ -56,7 +56,7 @@
     "coffeelint": "^1.6.1",
     "crojsdoc": "^0.8.11",
     "express-debug": "^1.1.1",
-    "groc": "^0.7.0",
+    "groc": "^0.8.0",
     "karma": "^0.12.28",
     "karma-browserify": "^1.0.1",
     "karma-chai": "^0.1.0",

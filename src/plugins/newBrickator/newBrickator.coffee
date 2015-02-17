@@ -301,6 +301,7 @@ module.exports = class NewBrickator
 		@csgExtractor ?= new CsgExtractor()
 
 		options = {
+			profile: true
 			grid: cachedData.grid
 			knobSize: PipelineSettings.legoKnobSize
 			addKnobs: addKnobs

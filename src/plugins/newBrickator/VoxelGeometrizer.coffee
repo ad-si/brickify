@@ -6,17 +6,25 @@ module.exports = class VoxelGeometrizer
 	constructor: (@grid) ->
 		return
 
-	run: (voxelsToBeGeometrized, options) =>
+	run: (voxelsToBeGeometrized, options = {}) =>
+		# creates csg out of voxels. Expects an array of voxels, where
+		# each voxel has to have x,y,z coordinates (in grid voxel coords) and may have
+		# knobOnTop / knobFromBelow flags.
+		# options may consist of
+		# { addKnobs: true/false, profile: true/false }
+
 		d = new Date()
 		boxGeometry = @_createVoxelGeometry(voxelsToBeGeometrized)
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
-		console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
+		if options.profile
+			console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
 		if options.addKnobs
 			d = new Date()
 			bspWithKnobs = @_addKnobs(
 				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
-			console.log "Geometrizer: knob geometry took #{new Date() - d}ms"
+			if options.profile
+				console.log "Geometrizer: knob geometry took #{new Date() - d}ms"
 			return bspWithKnobs
 
 		return boxGeometryBsp

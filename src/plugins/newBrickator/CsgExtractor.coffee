@@ -2,7 +2,7 @@ ThreeCSG = require './threeCSG/ThreeCSG'
 VoxelGeometrizer = require './VoxelGeometrizer'
 
 module.exports = class CsgExtractor
-	extractGeometry: (grid, options) ->
+	extractGeometry: (grid, options = {}) ->
 		# extracts voxel that are not selected for
 		# legofication (where enabled = false)
 		# intersected with the original mesh
@@ -12,7 +12,8 @@ module.exports = class CsgExtractor
 
 		d = new Date()
 		printVoxels = @_analyzeGrid(grid)
-		console.log "Grid analysis took #{new Date() - d}ms"
+		if options.profile
+			console.log "Grid analysis took #{new Date() - d}ms"
 
 		if printVoxels.length == 0
 			return null
@@ -20,11 +21,13 @@ module.exports = class CsgExtractor
 		d = new Date()
 		geometrizer = new VoxelGeometrizer(grid)
 		voxelHull = geometrizer.run printVoxels, options
-		console.log "Voxel Geometrizer took #{new Date() - d}ms"
+		if options.profile
+			console.log "Voxel Geometrizer took #{new Date() - d}ms"
 
 		d = new Date()
 		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
-		console.log "Print geometry took #{new Date() - d}ms"
+		if options.profile
+			console.log "Print geometry took #{new Date() - d}ms"
 
 		return printGeometry
 
@@ -57,6 +60,8 @@ module.exports = class CsgExtractor
 		return printVoxels
 
 	_extractPrintGeometry: (originalModel, voxelHull) ->
+		return voxelHull.toMesh(null)
+
 		# returns the volumetric intersection of the selected voxels and
 		# the original model as a THREE.Mesh
 		modelBsp = new ThreeBSP(originalModel)

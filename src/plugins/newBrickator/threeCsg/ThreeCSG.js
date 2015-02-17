@@ -1,6 +1,6 @@
 THREE = require('three')
 
-window.ThreeBSP = (function() {
+ThreeBSP = (function() {
 	
 	var ThreeBSP,
 		EPSILON = 1e-5,
@@ -551,3 +551,5 @@ window.ThreeBSP = (function() {
 	
 	return ThreeBSP;
 })();
+
+module.exports = ThreeBSP

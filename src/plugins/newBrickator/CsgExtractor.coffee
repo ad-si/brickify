@@ -1,4 +1,4 @@
-ThreeCSG = require './threeCSG/ThreeCSG'
+ThreeCSG = require './threeCsg/ThreeCSG'
 VoxelGeometrizer = require './VoxelGeometrizer'
 
 module.exports = class CsgExtractor

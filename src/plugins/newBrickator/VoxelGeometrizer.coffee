@@ -277,10 +277,10 @@ module.exports = class VoxelGeometrizer
 		knobTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
 		
 		knobGeometryBottom = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 8
+			knobSize.radius, knobSize.radius, knobSize.height, 20
 		)
 		knobGeometryTop = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 8
+			knobSize.radius, knobSize.radius, knobSize.height, 20
 		)
 
 		knobGeometryBottom.applyMatrix(knobRotation)

@@ -8,8 +8,8 @@ module.exports = class VoxelVisualizer
 			#transparent: true
 		})
 		@deselectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xffaaaa #gray
-			opacity: 0.5
+			color: 0xb5ffb8 #greenish gray
+			opacity: 0.8
 			transparent: true
 		})
 		@hiddenMaterial = new THREE.MeshLambertMaterial({

@@ -30,11 +30,13 @@ postInitCallback = () ->
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
 	commands = hash.split '+'
+	prom = Promise.resolve()
+	runCmd = (key, value) -> -> Promise.resolve commandFunctions[key](value)
 	for cmd in commands
 		key = cmd.split('=')[0]
 		value = cmd.split('=')[1]
 		if commandFunctions[key]?
-			commandFunctions[key](value)
+			prom = prom.then runCmd key, value
 
 	#clear url hash after executing commands
 	window.location.hash = ''

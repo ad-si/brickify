@@ -64,10 +64,15 @@ class SyncObject
 		return -1 isnt ['id', 'ready', '_packet'].indexOf key
 
 	###
-	# Builds an object that only consists of non-transient plain objects.
-	# Is used for JSON.stringify() and the synchronization.
+	# For JSON serialization of parent objects only write a reference.
 	###
 	toJSON: =>
+		return dataPacketRef: @getId()
+
+	###
+	# Builds an object that only consists of non-transient plain objects.
+	###
+	toPOJSO: =>
 		pojso = {} # plain old javascript object
 		keys = Object.keys @
 		.filter (key) => typeof @[key] isnt 'function' && not @_isTransient(key)
@@ -75,7 +80,7 @@ class SyncObject
 		return pojso
 
 	_getPacket: =>
-		return @_packet ?= {id: @getId(), data: @.toJSON()}
+		return @_packet ?= {id: @getId(), data: @toPOJSO()}
 
 	###
 	# Saves any non-transient data of this object to the server.

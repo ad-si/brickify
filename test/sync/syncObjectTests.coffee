@@ -56,6 +56,13 @@ describe 'SyncObject tests', ->
 				expect(dummy).to.have.property('c').deep.equal({d: 'e'})
 
 	describe 'SyncObject synchronization', ->
+		it 'should be stringified to a reference', ->
+			dataPackets.nextId = nextId = 'abcdefgh'
+			dummy = new Dummy()
+			dummy.done ->
+				string = JSON.stringify(dummy)
+				expect(string).to.equal("{\"dataPacketRef\":\"#{nextId}\"}")
+
 		it 'should save a correct dataPacket', ->
 			dataPackets.nextPut = true
 			pojso = {a: 'b', c: {d: 'e'}}

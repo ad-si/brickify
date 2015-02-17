@@ -1,7 +1,6 @@
 modelCache = require '../../client/modelCache'
 LegoPipeline = require './LegoPipeline'
 THREE = require 'three'
-objectTree = require '../../common/state/objectTree'
 BrickVisualizer = require './BrickVisualizer'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/state/objectTree'
@@ -11,6 +10,7 @@ BrickLayouter = require './BrickLayouter'
 meshlib = require('meshlib')
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
+VoxelVisualizer = require './VoxelVisualizer'
 
 module.exports = class NewBrickator
 	constructor: () ->

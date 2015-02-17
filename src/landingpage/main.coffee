@@ -37,7 +37,7 @@ loadAndConvert = (hash) =>
 			nb = bundle2.getPlugin 'newBrickator'
 			nb.processFirstObject()
 		)
-	$('.applink').prop 'href', 'app#legofy+initialModel=' + hash
+	$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
 
 #load and process model
 loadAndConvert('1c2395a3145ad77aee7479020b461ddf')

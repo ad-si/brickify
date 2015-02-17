@@ -10,11 +10,12 @@ module.exports = class UiObjects
 			for brush in array
 				@_brushList.push brush
 
-	init: (jqueryString) =>
+	init: (jqueryString, brushjQueryString) =>
 		@ui = @bundle.ui
 		@jqueryObject = $(jqueryString)
 		@selectCallback = @ui.sceneManager.select
 		@deselectCallback = @ui.sceneManager.deselect
+		@_createBrushUi brushjQueryString
 
 	onNodeAdd: (node) =>
 		# Called by sceneManager when a node is added
@@ -57,12 +58,22 @@ module.exports = class UiObjects
 
 				return
 
+	_createBrushUi: (brushjQueryString) =>
+		@_selectedBrush = null
+
+		container = $(brushjQueryString)
+
+		for brush in @_brushList
+			if not brush.iconBrush
+				obj = @_createBrush brush
+				container.append obj
+				brush.jqueryObject = obj
+
 	_createUi: (structure) =>
 		name = structure.node.fileName
 
 		html = "<li class='objectListItem'><p>#{name}</p>
-			<div class='objectIconContainer iconFloatRight'></div>
-				<ul class='brushlist'></ul></li>"
+			<div class='objectIconContainer iconFloatRight'></div></li>"
 		structure.ui = $(html)
 
 		structure.iconContainer = structure.ui.find('.objectIconContainer')
@@ -71,13 +82,10 @@ module.exports = class UiObjects
 		structure.ui.on 'click', () =>
 			@_objectSelect(structure)
 
-		structure.brushlist = structure.ui.find('.brushlist')
 		structure.brushjQueryObjects = {}
 		for brush in @_brushList
 			if brush.iconBrush
 				@_createIconBrush brush, structure
-			else
-				@_createBrush brush, structure
 
 		objVisHtml = '<span><span class="glyphicon glyphicon-eye-open"></span></span>'
 		objVis = $(objVisHtml)
@@ -90,17 +98,14 @@ module.exports = class UiObjects
 		structure.nodeVisible = true
 
 
-	_createBrush: (brush, structure) =>
+	_createBrush: (brush) =>
 		# creates a default brush with list entry
-		string = "<li class='brushEntry'><span class='brushtext'>
-			<span class='glyphicon glyphicon-pencil'></span>
-				#{brush.text}</span></li>"
+		string = "<div class='btn btn-primary'>#{brush.text}</div>"
 
 		htmlElement = $(string)
-		tooltipElement = htmlElement.find('.brushtext')
+		#@_createTooltip htmlElement, brush, 'bottom'
 
-		@_createTooltip tooltipElement, brush, 'right'
-
+		###
 		if brush.canToggleVisibility
 			brush.visible = true
 			visibilityString = '<div class="iconFloatRight">
@@ -115,12 +120,12 @@ module.exports = class UiObjects
 				placement: 'right'
 				delay: 500
 			}
+		###
 
 		htmlElement.on 'click', () =>
-			@_brushSelect brush, htmlElement, structure
+			@_brushSelect brush
 
-		structure.brushlist.append htmlElement
-		structure.brushjQueryObjects[brush.text] = htmlElement
+		return htmlElement
 
 	_createIconBrush: (brush, structure) =>
 		# creates a brush that is only shown as a icon next to the object
@@ -129,10 +134,10 @@ module.exports = class UiObjects
 		@_createTooltip obj, brush
 
 		obj.on 'click', () =>
-			@_brushSelect brush, obj, structure
+			@_brushSelect brush
 
 		structure.iconContainer.append obj
-		structure.brushjQueryObjects[brush.text] = obj
+		brush.jqueryObject = obj
 
 	_createTooltip: (jqueryObject, brush, placement = 'top') =>
 		if brush.tooltip?.length > 0
@@ -152,39 +157,47 @@ module.exports = class UiObjects
 			@deselectCallback @selectedStructure.node
 			@selectedStructure.ui.removeClass('selectedObject')
 			@selectedStructure.iconContainer.hide()
-			@selectedStructure.brushlist.slideUp()
-			@_deselectBrush @selectedStructure
+			@_deselectBrush @selectedStructure.node
 
 		# select current object
 		@selectedStructure = structure
 		@selectCallback @selectedStructure.node
 		@selectedStructure.ui.addClass('selectedObject')
 		@selectedStructure.iconContainer.show()
-		@selectedStructure.brushlist.slideDown()
 
-	_brushSelect: (brush, jqueryObject, structure) =>
+	_brushSelect: (brush) =>
 		# deselect currently selected brush
-		if structure.selectedBrush?
-			if structure.selectedBrush.deselectCallback?
-				structure.selectedBrush.deselectCallback structure.node
+		if @_selectedBrush?
+			if @_selectedBrush.deselectCallback?
+				@_selectedBrush.deselectCallback @selectedStructure.node
 
-			structure.selectedBrushUi.removeClass 'selectedBrush'
+			if @_selectedBrush.iconBrush
+				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
+			else
+				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
 
 		#select new brush
-		structure.selectedBrush = brush
-		structure.selectedBrushUi = jqueryObject
-		jqueryObject.addClass 'selectedBrush'
+		@_selectedBrush = brush
+
+		if brush.iconBrush
+			brush.jqueryObject.addClass 'selectedBrush'
+		else
+			brush.jqueryObject.addClass 'innerShadow'
+			
 		if brush.selectCallback?
-				brush.selectCallback structure.node
+				brush.selectCallback @selectedStructure.node
 
-	_deselectBrush: (structure) =>
-		if structure.selectedBrush?
-			if structure.selectedBrush.deselectCallback?
-				structure.selectedBrush.deselectCallback structure.node
+	_deselectBrush: (node) =>
+		if @_selectedBrush?
+			if @_selectedBrush.deselectCallback?
+				@_selectedBrush.deselectCallback node
 
-			structure.selectedBrushUi.removeClass 'selectedBrush'
+			if @_selectedBrush.iconBrush
+				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
+			else
+				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
 
-		structure.selectedBrush = null
+		@_selectedBrush = null
 
 	_toggleBrushVisibility: (brush, jqueryObject) =>
 		brush.visible  = !brush.visible
@@ -207,8 +220,4 @@ module.exports = class UiObjects
 		solidRenderer.toggleNodeVisibility node, isVisible
 
 	getSelectedBrush: () =>
-		if @selectedStructure?
-			return @selectedStructure.selectedBrush
-		else
-			return null
-
+		return @_selectedBrush

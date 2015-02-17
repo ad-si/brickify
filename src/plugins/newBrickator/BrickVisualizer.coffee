@@ -12,17 +12,22 @@ module.exports = class BrickVisualizer
 	createVisibleBricks: (threeNode, brickData, grid, showStability) =>
 		# do not create multiple layers of bricks at the same time
 		# (happens when the user rapidly clicks with the mouse)
+		###
 		if @currentlyWorking
 			return
 		@currentlyWorking = true
-
+		###
+		
 		threeNode.children = []
 
 		for gridZ in [0..brickData.length - 1] by 1
 			lastCallback = true if gridZ == (brickData.length - 1)
+			###
 			window.setTimeout @_layerCallback(
 				grid, brickData[gridZ], threeNode, lastCallback, showStability),
 					10 * gridZ
+			###
+			@_createLayer grid, brickData[gridZ], threeNode
 
 	_createLayer: (grid, brickLayer, threeNode, showStability) =>
 		bricks = (@_createBrick grid, brick, showStability for brick in brickLayer)
@@ -68,8 +73,11 @@ module.exports = class BrickVisualizer
 			brickSizeY,
 			brickSizeZ
 		)
+
 		for face in brickGeometry.faces
 			face.materialIndex = index
+
+		brick.visualizationMaterial = @_brickMaterials[index]
 
 		cube = new THREE.Mesh(brickGeometry, @_getFaceMats(showStability))
 
@@ -117,17 +125,14 @@ module.exports = class BrickVisualizer
 
 	_createBrickMaterials: () =>
 		@_brickMaterials = []
-		@_brickMaterials.push @_createMaterial 0xff9900
-		@_brickMaterials.push @_createMaterial 0xcc7a00
-		@_brickMaterials.push @_createMaterial 0xffad32
-		@_brickMaterials.push @_createMaterial 0xe58900
-		@_brickMaterials.push @_createMaterial 0xf77000
-		@_brickMaterials.push @_createMaterial 0xff7d11
-		@_brickMaterials.push @_createMaterial 0xff8b2b
-		@_brickMaterials.push @_createMaterial 0xff9944
-		@_brickMaterials.push @_createMaterial 0xffa75e
-		@_brickMaterials.push @_createMaterial 0xffb577
-		@_brickMaterials.push @_createMaterial 0xff9944
+		@_brickMaterials.push @_createMaterial 0x530000
+		@_brickMaterials.push @_createMaterial 0xfe2020
+		@_brickMaterials.push @_createMaterial 0xba0000
+		@_brickMaterials.push @_createMaterial 0xfe5c5c
+		@_brickMaterials.push @_createMaterial 0xdb0000
+		@_brickMaterials.push @_createMaterial 0x6b0000
+		@_brickMaterials.push @_createMaterial 0xfe3939
+		@_brickMaterials.push @_createMaterial 0xfe4d4d
 
 	_createStabilityMaterials: =>
 		@_stabilityMaterials = []

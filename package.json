@@ -5,11 +5,10 @@
   "keywords": [
     "fabrication",
     "3d printing",
-    "laser cutting"
+    "lego"
   ],
   "homepage": "http://lowfab.net",
-  "bugs": "https://bitbucket.org/hpihci/fab3d-lowfab/issues",
-  "main": "build/server/main.js",
+  "bugs": "http://github.com/stuikomma/lowfab/issues",
   "dependencies": {
     "blueimp-md5": "^1.1.0",
     "body-parser": "^1.9.1",
@@ -36,7 +35,7 @@
     "jquery": "^2.1.1",
     "js-yaml": "^3.2.3",
     "jsondiffpatch": "^0.1.17",
-    "meshlib": "Lowfab/meshlib#0.2.2",
+    "meshlib": "Lowfab/meshlib#0.2.3",
     "mkdirp": "^0.5.0",
     "morgan": "^1.4.1",
     "mousetrap": "^1.4.6",
@@ -79,10 +78,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "bitbucket.org/hpihci/fab3d-lowfab.git"
+    "url": "http://github.com/stuikomma/lowfab.git"
   },
   "author": "HPI HCI-Bachelorprojekt 2014",
-  "contributors": "Adrian Sieber, Arthur Silber, Johannes Deselaers, Stefan Neubert, Yannis Kommana",
+  "contributors": [
+    {
+      "name": "Adrian Sieber"
+    },
+    {
+      "name": "Arthur Silber"
+    },
+    {
+      "name": "Johannes Deselaers"
+    },
+    {
+      "name": "Stefan Neubert"
+    },
+    {
+      "name": "Yannis Kommana"
+    }
+  ],
   "license": "All rights reserved",
   "private": true,
   "engines": {

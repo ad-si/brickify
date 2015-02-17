@@ -148,6 +148,9 @@ module.exports = class NewBrickator
 				optimizedModel: optimizedModel
 				grid: grid.grid
 			}
+			###
+  		@resultCache not used anymore, REBUILD !!!
+			###
 			@resultCache[identifier] = @pipeline.run data, settings, true
 		return @resultCache[identifier]
 
@@ -196,7 +199,6 @@ module.exports = class NewBrickator
 			modelPromise.then (optimizedModel) =>
 				settings = new PipelineSettings()
 				@_applyModelTransforms selectedNode, settings
-				settings.deactivateLayouting()
 
 				data = {
 					optimizedModel: optimizedModel
@@ -205,6 +207,7 @@ module.exports = class NewBrickator
 
 				@gridCache[identifier] = {
 					grid: results.accumulatedResults.grid
+					bricks: results.accumulatedResults.bricks
 					optimizedModel: optimizedModel
 					threeNode: null
 					x: nodePosition.x
@@ -376,16 +379,14 @@ module.exports = class NewBrickator
 
 	showStabilityView: (selectedNode) =>
 		return if !selectedNode?
-		result = @getResultByNode selectedNode, grid, false
-		if result?
-			grid = @_getGrid selectedNode
-			grid.threeNode.visible = false
-			threeNodes = @getThreeObjectsByNode selectedNode
+		@_getCachedData(selectedNode).then (cachedData) =>
+			threeObjects = @getThreeObjectsByNode(selectedNode)
+			console.log 'stability view'
 			@brickVisualizer ?= new BrickVisualizer()
 			@brickVisualizer.createVisibleBricks(
-				threeNodes.bricks,
-				result.accumulatedResults.bricks,
-				result.accumulatedResults.grid,
+				threeObjects.bricks,
+				cachedData.bricks,
+				cachedData.grid,
 				true
 			)
 

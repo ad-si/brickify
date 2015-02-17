@@ -31,69 +31,6 @@ module.exports = class BrickLayouter
 
 							bricks[z].push brick
 
-		###
-		Brick.nextBrickIndex = 0
-
-		brick0 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick1 = new Brick {x: 1, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick2 = new Brick {x: 2, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick3 = new Brick {x: 3, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-
-		brick4 = new Brick {x: 0, y: 0, z: 1}, {x: 1, y: 1, z: 1}
-		brick5 = new Brick {x: 1, y: 0, z: 1}, {x: 2, y: 1, z: 1}
-		brick6 = new Brick {x: 3, y: 0, z: 1}, {x: 1, y: 1, z: 1}
-
-		brick7 = new Brick {x: 0, y: 0, z: 2}, {x: 4, y: 1, z: 1}
-
-		brick8 = new Brick {x: 0, y: 0, z: 3}, {x: 1, y: 1, z: 1}
-		brick9 = new Brick {x: 1, y: 0, z: 3}, {x: 1, y: 1, z: 1}
-		brickA = new Brick {x: 2, y: 0, z: 3}, {x: 1, y: 1, z: 1}
-		brickB = new Brick {x: 3, y: 0, z: 3}, {x: 1, y: 1, z: 1}
-
-		brick0.neighbours = [[],[brick1],[],[]]
-		brick0.upperSlots = [[brick4]]
-		brick1.neighbours = [[brick0],[brick2],[],[]]
-		brick1.upperSlots = [[brick5]]
-		brick2.neighbours = [[brick1],[brick3],[],[]]
-		brick2.upperSlots = [[brick5]]
-		brick3.neighbours = [[brick2],[],[],[]]
-		brick3.upperSlots = [[brick5]]
-
-		brick4.neighbours = [[],[brick5],[],[]]
-		brick4.upperSlots = [[brick7]]
-		brick4.lowerSlots = [[brick0]]
-		brick5.neighbours = [[brick4],[brick6],[],[]]
-		brick5.upperSlots = [[brick7],[brick7]]
-		brick5.lowerSlots = [[brick1],[brick2]]
-		brick6.neighbours = [[brick5],[],[],[]]
-		brick6.upperSlots = [[brick7]]
-		brick6.lowerSlots = [[brick3]]
-
-		brick7.neighbours = [[],[],[],[]]
-		brick7.upperSlots = [[brick8],[brick9],[brickA],[brickB]]
-		brick7.lowerSlots = [[brick4],[brick5],[brick5],[brick6]]
-
-		brick8.neighbours = [[],[brick9],[],[]]
-		brick8.lowerSlots = [[brick7]]
-		brick9.neighbours = [[brick8],[brickA],[],[]]
-		brick9.lowerSlots = [[brick7]]
-		brickA.neighbours = [[brick9],[brickB],[],[]]
-		brickA.lowerSlots = [[brick7]]
-		brickB.neighbours = [[brickA],[],[],[]]
-		brickB.lowerSlots = [[brick7]]
-
-		layer0 = [brick0, brick1, brick2, brick3]
-		layer1 = [brick4, brick5, brick6]
-		layer2 = [brick7]
-		layer3 = [brick8, brick9, brickA, brickB]
-		bricks = [layer0, layer1, layer2, layer3]
-
-		bricksToSplit = [brick5, brick7]
-
-		newBricks = @_splitBricks bricksToSplit, bricks
-		console.log newBricks
-    ###
-
 		# console.log bricks
 		return {bricks: bricks}
 
@@ -160,6 +97,56 @@ module.exports = class BrickLayouter
 				mergeableNeighbours = @_findMergeableNeighbours brick
 
 		return {bricks: bricks}
+
+
+	optimizeForStability: (bricks) =>
+
+		for layer in bricks # access removed element?
+			for brick in layer
+				if brick? and brick.uniqueConnectedBricks().length is 0
+					console.log brick
+					if brick.uniqueNeighbours().length is 0
+						0
+						#@_removeFirstOccurenceFromArray brick, bricks[brick.position.z]
+					else
+						console.log 'splitting brick and relayouting'
+						console.log brick
+						neighbours = brick.uniqueNeighbours()
+						oldBricks = [].concat.apply([brick], neighbours)
+						@_splitBricksAndRelayout oldBricks, bricks
+
+		#console.log @_findWeakArticulationPoints bricks
+
+	_splitBricksAndRelayout: (oldBricks, bricks) =>
+		newBricks = @_splitBricks oldBricks, bricks
+		@layoutByGreedyMerge bricks
+		return
+
+
+		###
+		maxIterations = 50
+		weakPointThreshold = 2
+		weakPoints = findWeakArticulationPointsInGraph bricks
+		for i in [0..maxIterations-1] by 1
+			for wp in weakPoints
+				newBricks = []
+				neighbours = []
+				for weakBrick in wp
+					neighbours.push findAllNeighbours weakBrick
+					newBricks.push @_splitBricks [].concat(weakBrick, neighbours), bricks
+
+					#split all neighbours
+					neighbours = removeDuplicates neighbours
+					for neighbour in neighbours
+						newBricks.push @_splitBricks [neighbour]
+
+			layoutByGreedyMerge newBricks
+
+			weakPoints = findWeakArticulationPointsInGraph bricks
+			if weakPoints.size is 0 # or not changing
+				break
+  ###
+		return bricks
 
 	_anyDefined: (mergeableNeighbours) =>
 		boolean = false
@@ -272,26 +259,6 @@ module.exports = class BrickLayouter
 		bricks[z].push newBrick
 		return newBrick
 
-	_findWeakArticulationPointsInGraph: (bricks) =>
-		return
-
-	###
-	_neighbourMergeIndices: (mergeIndex) =>
-		if mergeIndex == 0
-			opposite = 1
-			sides = [2, 3]
-		else if mergeIndex == 1
-			opposite = 0
-			sides = [2, 3]
-		else if mergeIndex == 2
-			opposite = 3
-			sides = [0, 1]
-		else if mergeIndex == 3
-			opposite = 2
-			sides = [0, 1]
-		return {opposite: opposite, sides: sides}
-		###
-
 	_removeFirstOccurenceFromArray: (object, array) =>
 		i = array.indexOf object
 		if i != -1
@@ -343,6 +310,10 @@ module.exports = class BrickLayouter
 				component.push otherBrick
 				break if otherBrick == brick
 			biconnectedComponents.push component
+
+	_findWeakArticulationPoints: (bricks) =>
+		# filter out trivial articulation points
+		return @_getArticulationPoints bricks
 
 	_getArticulationPoints: (bricks) =>
 		@time = 0

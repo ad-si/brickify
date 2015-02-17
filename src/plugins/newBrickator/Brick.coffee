@@ -48,6 +48,10 @@ module.exports = class Brick
 					bricks.push slotXY
 		return Brick.removeDuplicates bricks
 
+	uniqueNeighbours: () =>
+		neighboursList = [].concat.apply([],@neighbours)
+		return neighboursList
+
 	@isValidSize: (width, length, height) =>
 		for validSize in Brick.availableBrickSizes()
 			if validSize[0] == width and validSize[1] == length and
@@ -205,7 +209,7 @@ module.exports = class Brick
 					connectedBrick.upperSlots[offsetInConBrick.x][offsetInConBrick.y] =
 						newBricks[x][y]
 
-				# update neighbours from outside splitting brick
+				# update neighbours outside of splitting brick
 					if newBricks[x][y].position.x == @position.x
 						#take neighbour in direction 0 xm
 						@addNeighboursToNewBrick newBricks[x][y], 0, 1
@@ -221,7 +225,7 @@ module.exports = class Brick
 						#take neighbour in direction 3 yp
 						@addNeighboursToNewBrick newBricks[x][y], 3, 2
 
-				# update neighbours inside splitting brick
+				# update neighbours inside the splitting brick
 					if x > 0
 						newBricks[x][y].neighbours[0].push newBricks[x - 1][y]
 						newBricks[x - 1][y].neighbours[1].push newBricks[x][y]
@@ -269,5 +273,5 @@ module.exports = class Brick
 					links++
 				if @lowerSlots[x][y] != false
 					links++
-		links / possibleLinks
+		return links / possibleLinks
 

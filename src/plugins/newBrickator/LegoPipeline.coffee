@@ -27,7 +27,13 @@ module.exports = class LegoPipeline
 				return lastResult
 		@pipelineSteps.push (lastResult, options) =>
 			if options.layouting
-				return @brickLayouter.layoutByGreedyMerge lastResult.bricks
+				return @brickLayouter.layoutByGreedyMerge lastResult.bricks,
+				lastResult.bricks
+			else
+				return lastResult
+		@pipelineSteps.push (lastResult, options) =>
+			if options.layouting
+				return @brickLayouter.optimizeForStability lastResult.bricks
 			else
 				return lastResult
 
@@ -36,6 +42,7 @@ module.exports = class LegoPipeline
 		@humanReadableStepNames.push 'Volume filling'
 		@humanReadableStepNames.push 'Layout graph initialization'
 		@humanReadableStepNames.push 'Layout greedy merge'
+		@humanReadableStepNames.push 'Layout optimize for stability'
 
 
 	run: (data, options = null, profiling = false) =>

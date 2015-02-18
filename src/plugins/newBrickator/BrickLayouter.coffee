@@ -244,12 +244,15 @@ module.exports = class BrickLayouter
 		newBrick = new Brick(ps.position, ps.size)
 
 		#save oldBricks in newBrick for debugging
-		newBrick.oldBricks = mergeNeighbours.concat [brick]
+		newBrick.mergedNeighbours = mergeNeighbours
+		newBrick.mergedBrick = brick
 
 		# set new brick connections & neighbours
-		for mbrick in mergeNeighbours.concat [brick]
-			newBrick.getConnectionsFromMergingBrick mbrick
-			newBrick.getNeighboursFromMergingBrick mbrick
+		for neighbour in mergeNeighbours
+			newBrick.getConnectionsFromMergingBrick neighbour
+			newBrick.getNeighboursFromMergingBrick neighbour
+		newBrick.getConnectionsFromMergingBrick brick
+		newBrick.getNeighboursFromMergingBrick brick
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z

@@ -10,6 +10,7 @@ BrickLayouter = require './BrickLayouter'
 meshlib = require('meshlib')
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
+jquery = require '.'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -28,6 +29,7 @@ module.exports = class NewBrickator
 
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)
+		@_initBuildButton()
 
 	init3d: (@threejsRootNode) => return
 
@@ -220,30 +222,59 @@ module.exports = class NewBrickator
 				reject error
 
 	_legoMouseDownCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.legoMouseDown event, selectedNode, cachedData
 
 	_printMouseDownCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.printMouseDown event, selectedNode, cachedData
 
 	_select3DMouseMoveCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.printMouseMove event, selectedNode, cachedData
 
 	_selectLegoMouseMoveCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.legoMouseMove event, selectedNode, cachedData
 
 	_legoMouseHoverCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.legoMouseHover event, selectedNode, cachedData
 
 	_printMouseHoverCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.printMouseHover event, selectedNode, cachedData
 
 	_brushMouseUpCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.mouseUp event, selectedNode, cachedData
 
@@ -337,3 +368,68 @@ module.exports = class NewBrickator
 		selectedNode.pluginData.newBrickator.identifier = identifier
 
 		return identifier
+
+	_initBuildButton: () =>
+		# TODO: refactor after demo on 2015-02-26
+		@buildButton = $('#buildButton')
+		@buildModeEnabled = false
+
+		@buildSlider = $('#buildSlider')
+		@buildSlider.hide()
+		@buildSlider.on 'input', () =>
+			selectedNode = @bundle.ui.sceneManager.selectedNode
+			@_updateBuildLayer(selectedNode)
+
+		@buildButton.click () =>
+			selectedNode = @bundle.ui.sceneManager.selectedNode
+
+			if @buildModeEnabled
+				@buildSlider.slideUp()
+				@buildButton.removeClass('innerShadow')
+				@_disableBuildMode selectedNode
+			else
+				@buildSlider.slideDown()
+				@buildButton.addClass('innerShadow')
+				@_enableBuildMode selectedNode
+
+			@buildModeEnabled = !@buildModeEnabled
+
+	_enableBuildMode: (selectedNode) =>
+		@_getCachedData(selectedNode).then (cachedData) =>
+			#legofy
+			settings = new PipelineSettings()
+			settings.deactivateVoxelizing()
+
+			@_applyModelTransforms selectedNode, settings
+
+			data = {
+				optimizedModel: cachedData.optimizedModel
+				grid: cachedData.grid
+			}
+			results = @pipeline.run data, settings, true
+
+			threeNodes = @getThreeObjectsByNode selectedNode
+
+			@brickVisualizer ?= new BrickVisualizer()
+			@brickVisualizer.createVisibleBricks(
+				threeNodes.bricks,
+				results.accumulatedResults.bricks,
+				results.accumulatedResults.grid
+			)
+
+			threeNodes.bricks.visible = true
+			threeNodes.voxels.visible = false
+
+			# apply grid size to layer view
+			@buildSlider.attr('min', 0)
+			@buildSlider.attr('max', cachedData.grid.zLayers.length - 1)
+			@buildSlider.attr('value', 0)
+
+	_updateBuildLayer: (selectedNode) =>
+		threeNodes = @getThreeObjectsByNode selectedNode
+		@brickVisualizer.makeLayerVisible threeNodes.bricks, @buildSlider.val()
+
+	_disableBuildMode: (selectedNode) =>
+		return
+
+

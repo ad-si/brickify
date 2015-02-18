@@ -27,6 +27,14 @@ module.exports = class BrickVisualizer
 			###
 			@_createLayer grid, brickData[gridZ], threeNode
 
+	makeLayerVisible: (threeNode, layer) =>
+		# makes all layers up to this layer visible
+		for i in [0..threeNode.children.length - 1] by 1
+			if i <= layer
+				threeNode.children[i].visible = true
+			else
+				threeNode.children[i].visible = false
+
 	_createLayer: (grid, brickLayer, threeNode) =>
 		bricks = (@_createBrick grid, brick for brick in brickLayer)
 		layerGeometry = new THREE.Geometry()

@@ -63,3 +63,20 @@ describe 'Scene tests', ->
 					that.is.an('array').with.length(0)
 				expect(scene).to.be.modified(Date.now(), Date.now() - before).with.
 					cause("Node \"#{name}\" removed")
+
+	describe 'Scene synchronization', ->
+		it 'should store nodes as references', ->
+			dataPackets.nextId = 'abcdefgh'
+			scene = new Scene()
+			dataPackets.nextId = nodeId = 'nodeid'
+			node = new Node()
+			node.setName 'Beautiful Model'
+			scene.addNode node
+			dataPackets.nextPut = true
+			scene.save()
+			scene.done ->
+				packet = dataPackets.putCalls[0].packet
+				expect(packet).to.have.deep.property('data.nodes').that.is.an('array')
+				nodes = packet.data.nodes
+				expect(nodes).to.have.length(1)
+				expect(nodes[0]).to.deep.equal({dataPacketRef: nodeId})

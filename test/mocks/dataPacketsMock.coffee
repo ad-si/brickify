@@ -38,11 +38,12 @@ class DataPacketsMock
 
 	put: (packet) =>
 		@calls++
-		@putCalls.push packet: packet, put: @nextPut
+		p = JSON.parse JSON.stringify packet
+		@putCalls.push packet: p, put: @nextPut
 		if @nextPut
-			return Promise.resolve packet.id
+			return Promise.resolve p.id
 		else
-			return Promise.reject packet.id
+			return Promise.reject p.id
 
 	delete: (id) =>
 		@calls++

@@ -2,53 +2,58 @@ class DataPacketsMock
 	constructor: ->
 		@calls = 0
 		@createCalls = []
-		@nextId = false
+		@nextIds = []
 		@existsCalls = []
-		@nextExists = false
+		@nextExists = []
 		@getCalls = []
-		@nextGet = false
+		@nextGets = []
 		@putCalls = []
-		@nextPut = false
+		@nextPuts = []
 		@deleteCalls = []
-		@nextDelete = false
+		@nextDeletes = []
 
 	create: =>
 		@calls++
-		@createCalls.push @nextId
-		if @nextId
-			return Promise.resolve {id: @nextId, data: {}}
+		nextId = @nextIds.shift()
+		@createCalls.push nextId
+		if nextId
+			return Promise.resolve {id: nextId, data: {}}
 		else
 			return Promise.reject()
 
 	exists: (id) =>
 		@calls++
-		@existsCalls.push id: id, exists: @nextExists
-		if @nextExists
+		nextExist = @nextExists.shift()
+		@existsCalls.push id: id, exists: nextExist
+		if nextExist
 			return Promise.resolve id
 		else
 			return Promise.reject id
 
 	get: (id) =>
 		@calls++
-		@getCalls.push id: id, get: @nextGet
-		if @nextGet
-			return Promise.resolve @nextGet
+		nextGet = @nextGets.shift()
+		@getCalls.push id: id, get: nextGet
+		if nextGet
+			return Promise.resolve nextGet
 		else
 			return Promise.reject id
 
 	put: (packet) =>
 		@calls++
 		p = JSON.parse JSON.stringify packet
-		@putCalls.push packet: p, put: @nextPut
-		if @nextPut
+		nextPut = @nextPuts.shift()
+		@putCalls.push packet: p, put: nextPut
+		if nextPut
 			return Promise.resolve p.id
 		else
 			return Promise.reject p.id
 
 	delete: (id) =>
 		@calls++
-		@deleteCalls.push id: id, delete: @nextDelete
-		if @nextDelete
+		nextDelete = @nextDeletes.shift();
+		@deleteCalls.push id: id, delete: nextDelete
+		if nextDelete
 			return Promise.resolve()
 		else
 			return Promise.reject id

@@ -17,19 +17,19 @@ describe 'SyncObject tests', ->
 
 	describe 'SyncObject creation', ->
 		it 'should resolve after creation', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			expect(dummy.done()).to.resolve
 
 		it 'should be a Dummy and a SyncObject', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			dummy.done ->
 				expect(dummy).to.be.an.instanceof(Dummy)
 				expect(dummy).to.be.an.instanceof(SyncObject)
 
 		it 'should get an id by dataPacketProvider', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			dummy.done ->
 				expect(dummy).to.have.property('id', nextId)
@@ -57,14 +57,14 @@ describe 'SyncObject tests', ->
 
 	describe 'SyncObject synchronization', ->
 		it 'should be stringified to a reference', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			dummy.done ->
 				string = JSON.stringify(dummy)
 				expect(string).to.equal("{\"dataPacketRef\":\"#{nextId}\"}")
 
 		it 'should save a correct dataPacket', ->
-			dataPackets.nextPut = true
+			dataPackets.nextPuts.push true
 			pojso = {a: 'b', c: {d: 'e'}}
 			packet = {id: 'abcdefgh', data: pojso}
 			expected = clone packet
@@ -77,8 +77,8 @@ describe 'SyncObject tests', ->
 				expect(dataPackets.putCalls).to.deep.have.property('[0].put', true)
 
 		it 'should delete the right datapacket', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
-			dataPackets.nextDelete = true
+			dataPackets.nextIds.push nextId = 'abcdefgh'
+			dataPackets.nextDeletes.push true
 			dummy = new Dummy()
 			dummy.delete().then ->
 				expect(dataPackets.calls).to.equal(2)
@@ -87,37 +87,37 @@ describe 'SyncObject tests', ->
 					.to.deep.equal([{delete: true, id: nextId}])
 
 		it 'should reject after deletion', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
-			dataPackets.nextDelete = true
+			dataPackets.nextIds.push nextId = 'abcdefgh'
+			dataPackets.nextDeletes.push true
 			dummy = new Dummy()
 			dummy.delete().then ->
 				expect(dummy.done()).to.be.rejectedWith("Dummy \##{nextId} was deleted")
 
 	describe 'Task chaining', ->
 		it 'should return itself when calling next', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			expect(dummy.next()).to.equal(dummy)
 
 		it 'should return a promise when calling done', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			expect(dummy.done()).to.be.an.instanceof(Promise)
 
 		it 'should resolve the done promise to the result of the callback', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			result = {a: 'b'}
 			expect(dummy.done( -> return result)).to.eventually.equal(result)
 
 		it 'should reject the done promise to thrown errors of the callback', ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			error = 'Something bad happened'
 			expect(dummy.done( -> throw new Error error)).to.be.rejectedWith(error)
 
 		it 'should catch previous errors',  ->
-			dataPackets.nextId = nextId = 'abcdefgh'
+			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dummy = new Dummy()
 			error = 'Something bad happened'
 			result = {a: 'b'}

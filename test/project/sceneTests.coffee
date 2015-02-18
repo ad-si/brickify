@@ -17,12 +17,12 @@ describe 'Scene tests', ->
 
 	describe 'Scene creation', ->
 		it 'should resolve after creation', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			scene = new Scene()
 			expect(scene.done()).to.resolve
 
 		it 'should be a Scene and a SyncObject', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			before = Date.now()
 			scene = new Scene()
 			scene.done ->
@@ -35,8 +35,9 @@ describe 'Scene tests', ->
 
 	describe 'Scene manipulation', ->
 		it 'should accept new nodes', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			scene = new Scene()
+			dataPackets.nextIds.push 'ijklmnop'
 			node = new Node()
 			name = 'Beautiful Model'
 			node.setName name
@@ -49,8 +50,9 @@ describe 'Scene tests', ->
 					cause("Node \"#{name}\" added")
 
 		it 'should remove present nodes', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			scene = new Scene()
+			dataPackets.nextIds.push 'ijklmnop'
 			node = new Node()
 			name = 'Beautiful Model'
 			node.setName name
@@ -66,13 +68,13 @@ describe 'Scene tests', ->
 
 	describe 'Scene synchronization', ->
 		it 'should store nodes as references', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			scene = new Scene()
-			dataPackets.nextId = nodeId = 'nodeid'
+			dataPackets.nextIds.push nodeId = 'nodeid'
 			node = new Node()
 			node.setName 'Beautiful Model'
 			scene.addNode node
-			dataPackets.nextPut = true
+			dataPackets.nextPuts.push true
 			scene.save()
 			scene.done ->
 				packet = dataPackets.putCalls[0].packet

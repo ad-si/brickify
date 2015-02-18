@@ -25,7 +25,7 @@ describe 'Node tests', ->
 			expect(node.done()).to.resolve
 
 		it 'should be a Node and a SyncObject', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
 			node.done ->
 				expect(node).to.be.an.instanceof(Node)
@@ -33,7 +33,7 @@ describe 'Node tests', ->
 
 	describe 'Node manipulation', ->
 		it 'should set the model\'s hash chainable', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
 			hash = 'randomModelHash'
 			result = node.setModelHash(hash)
@@ -42,15 +42,15 @@ describe 'Node tests', ->
 				expect(node).to.have.property('modelHash', hash)
 
 		it 'should get the model\'s hash', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
 			hash = 'randomModelHash'
 			node.setModelHash(hash)
 			expect(node.getModelHash()).to.eventually.equal(hash)
 
 		it 'should store the model\'s hash', ->
-			dataPackets.nextId = 'abcdefgh'
-			dataPackets.nextPut = true
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
 			node = new Node()
 			hash = 'randomModelHash'
 			node.setModelHash(hash)
@@ -61,8 +61,8 @@ describe 'Node tests', ->
 					to.deep.have.deep.property('[0].packet.data.modelHash', hash)
 
 		it 'should request the correct model', ->
-			dataPackets.nextId = 'abcdefgh'
-			dataPackets.nextPut = true
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
 			modelProvider.nextRequest = 'dummy'
 			node = new Node()
 			hash = 'randomModelHash'
@@ -75,7 +75,7 @@ describe 'Node tests', ->
 					to.have.deep.property('[0].hash', hash)
 
 		it 'should set the node\'s name chainable', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
 			name = 'Beautiful Model'
 			result = node.setName(name)
@@ -84,15 +84,15 @@ describe 'Node tests', ->
 				expect(node).to.have.property('name', name)
 
 		it 'should get the node\'s name', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
 			name = 'Beautiful Model'
 			node.setName(name)
 			expect(node.getName()).to.eventually.equal(name)
 
 		it 'should store the node\'s name', ->
-			dataPackets.nextId = 'abcdefgh'
-			dataPackets.nextPut = true
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
 			node = new Node()
 			name = 'Beautiful Model'
 			node.setName(name)

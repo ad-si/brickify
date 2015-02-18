@@ -16,12 +16,12 @@ describe 'Project tests', ->
 
 	describe 'Project creation', ->
 		it 'should resolve after creation', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			project = new Project()
 			expect(project.done()).to.resolve
 
 		it 'should be a Project and a SyncObject', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			before = Date.now()
 			project = new Project()
 			project.done ->
@@ -29,7 +29,7 @@ describe 'Project tests', ->
 				expect(project).to.be.an.instanceof(SyncObject)
 
 		it 'should have one scene that is active', ->
-			dataPackets.nextId = 'abcdefgh'
+			dataPackets.nextIds.push 'abcdefgh'
 			before = Date.now()
 			project = new Project()
 			project.done ->

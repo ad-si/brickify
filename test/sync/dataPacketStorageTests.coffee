@@ -13,8 +13,8 @@ describe 'server-side dataPacket-storage tests', ->
 			response = new Response()
 			dataPackets.create new Request(), response
 			response.whenSent.then(->
-				expect(response).to.have.deep.property('type', 'json')
-				expect(response).to.have.deep.property('code', 201)
+				expect(response).to.have.property('type', 'json')
+				expect(response).to.have.property('code', 201)
 				expect(response).to.have.deep.property('content.id')
 				expect(response).to.have.deep.property('content.data').to.be.empty
 			)
@@ -189,7 +189,7 @@ describe 'server-side dataPacket-storage tests', ->
 				deleteResponse.whenSent.then(->
 					expect(deleteResponse).to.have.property('type', 'text')
 					expect(deleteResponse).to.have.property('code', 204)
-					expect(deleteResponse).not.to.have.property('content')
+					expect(deleteResponse).to.have.property('content').which.is.empty
 				)
 			)
 

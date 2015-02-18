@@ -60,16 +60,7 @@ module.exports.buildServer = (onlyDelete = false) ->
 module.exports.linkHooks = () ->
 
 	[
-		'applypatch-msg'
-		'commit-msg'
-		'post-commit'
-		'post-receive'
-		'post-update'
-		'pre-applypatch'
 		'pre-commit'
-		'prepare-commit-msg'
-		'pre-rebase'
-		'update'
 	]
 	.forEach (hook) ->
 		hookPath = path.join('hooks', hook)

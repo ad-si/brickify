@@ -1,2 +1,66 @@
-#!/bin/sh
+#! /bin/sh
+# script to run tests on what is to be committed
+# Based on http://stackoverflow.com/a/20480591/1606867
+
+# Remember old stash
+old_stash=$(git rev-parse -q --verify refs/stash)
+
+# First, stash index and work dir, keeping only the
+# to-be-committed changes in the working directory.
+git stash save -q --keep-index
+changes_stash=$(git rev-parse -q --verify refs/stash)
+if [ "$old_stash" = "$changes_stash" ]
+then
+    echo "pre-commit script: no changes to test"
+    sleep 1 # XXX hack, editor may erase message
+    exit 0
+fi
+
+#now let's stash the staged changes
+git stash save -q
+staged_stash=$(git rev-parse -q --verify refs/stash)
+if [ "$changes_stash" = "$staged_stash" ]
+then
+    echo "pre-commit script: no staged changes to test"
+    # re-apply changes_stash
+    git reset --hard -q && git stash pop --index -q
+    sleep 1 # XXX hack, editor may erase message
+    exit 0
+fi
+
+# Add all untracked files and stash those as well
+# We don't want to use -u due to
+# http://blog.icefusion.co.uk/git-stash-can-delete-ignored-files-git-stash-u/
+git add .
+git stash save -q
+untracked_stash=$(git rev-parse -q --verify refs/stash)
+
+#Re-apply the staged changes
+if [ "$staged_stash" = "$untracked_stash" ]
+then
+    git reset --hard -q && git stash apply --index -q stash@{0}
+else
+    git reset --hard -q && git stash apply --index -q stash@{1}
+fi
+
+# Run tests
 npm run prepublish
+status=$?
+
+# Restore changes
+
+# Restore untracked if any
+if [ "$staged_stash" != "$untracked_stash" ]
+then
+    git reset --hard -q && git stash pop --index -q
+    git reset HEAD -- . -q
+fi
+
+# Restore staged changes
+git reset --hard -q && git stash pop --index -q
+
+# Restore unstaged changes
+git reset --hard -q && git stash pop --index -q
+
+# Exit with status from test-run: nonzero prevents commit
+exit $status

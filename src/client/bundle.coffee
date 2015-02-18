@@ -53,7 +53,7 @@ module.exports = class Bundle
 		@pluginInstances.filter (instance) -> instance.lowfab.type == type
 
 	clearScene: () =>
-		@statesync.performStateAction ObjectTree.clear
+		@statesync.performStateAction	ObjectTree.clear
 
 	getControls: () =>
 		@renderer.getControls()

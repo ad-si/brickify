@@ -83,7 +83,9 @@ module.exports = {
 	init: (state) ->
 		return state.rootNode ?= new NodeStructure()
 
-	clear: (state) ->
+	clear: (state, pluginHooks) ->
+		for node in state.rootNode.children
+			pluginHooks.onNodeRemove node
 		return state.rootNode = new NodeStructure()
 
 	addChild: (node) ->

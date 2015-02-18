@@ -56,7 +56,7 @@
     "stylus": "^0.49.2",
     "text-encoding": "^0.5.2",
     "three": "^0.69.0",
-    "three-orbit-controls": "^69.0.0",
+    "three-orbit-controls": "Lowfab/three-orbit-controls#v69.1.0-beta",
     "win-spawn": "^2.0.0",
     "winston": "^0.8.1",
     "zeroclipboard": "^2.2.0"

@@ -34,13 +34,15 @@ config2 = clone globalConfig
 config1.renderAreaId = 'renderArea1'
 config1.plugins.newBrickator = false
 bundle1 = new Bundle config1
+controls = bundle1.getControls()
 b1 = bundle1.init()
 
 config2.renderAreaId = 'renderArea2'
-bundle2 = new Bundle config2
+config2.plugins.solidRenderer = false
+bundle2 = new Bundle config2, controls
 b2 = bundle2.init()
 
-loadAndConvert = (hash) =>
+loadAndConvert = (hash) ->
 	b1.then(() -> bundle1.modelLoader.loadByHash hash)
 	b2.then(() -> bundle2.modelLoader.loadByHash hash)
 		.then(() ->
@@ -52,7 +54,7 @@ loadAndConvert = (hash) =>
 #load and process model
 loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
 
-loadModel = (hash, errors) =>
+loadModel = (hash, errors) ->
 	b1.then(() -> bundle1.clearScene())
 	b2.then(() -> bundle2.clearScene())
 	loadAndConvert(hash)

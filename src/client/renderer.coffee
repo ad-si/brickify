@@ -6,11 +6,11 @@ Stats = require 'stats-js'
 # @class Renderer
 ###
 module.exports = class Renderer
-	constructor: (@pluginHooks, globalConfig) ->
+	constructor: (@pluginHooks, globalConfig, controls) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
-		@init globalConfig
+		@init globalConfig, controls
 
 	localRenderer: (timestamp) =>
 			@stats?.begin()
@@ -69,13 +69,13 @@ module.exports = class Renderer
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
 
-	init: (globalConfig) ->
+	init: (globalConfig, controls) ->
 		@setupSize globalConfig
 		@setupRenderer globalConfig
 		@setupScene globalConfig
 		@setupLighting globalConfig
 		@setupCamera globalConfig
-		@setupControls globalConfig
+		@setupControls globalConfig, controls
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
 		requestAnimationFrame @localRenderer
 
@@ -135,11 +135,17 @@ module.exports = class Renderer
 		@camera.up.set(0, 1, 0)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-	setupControls: (globalConfig) ->
-		@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-		@controls.autoRotate = globalConfig.autoRotate
-		@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
-		@controls.target.set(0, 0, 0)
+	setupControls: (globalConfig, controls) ->
+		if controls?
+			controls.addObject @camera
+			controls.addDomElement @threeRenderer.domElement
+			controls.update()
+			@controls = controls
+		else
+			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
+			@controls.autoRotate = globalConfig.autoRotate
+			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
+			@controls.target.set(0, 0, 0)
 
 	setupFPSCounter: () ->
 		@stats = new Stats()
@@ -206,3 +212,6 @@ module.exports = class Renderer
 			position: { x: p.x, y: p.y, z: p.z }
 			target: { x: t.x, y: t.y, z: t.z }
 		}
+
+	getControls: () =>
+		@controls

@@ -44,7 +44,6 @@ module.exports = class NewBrickator
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
-			console.log state
 			node = state.rootNode.children[0]
 			@runLegoPipelineOnNode node
 

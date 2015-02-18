@@ -29,8 +29,11 @@ then
     git reset HEAD -- . -q
 fi
 
-# Restore changes
-git reset --hard -q && git stash pop --index -q
+# Restore changes if any
+if [ "$old_stash" != "$changes_stash" ]
+then
+    git reset --hard -q && git stash pop --index -q
+fi
 
 # Exit with status from test-run: nonzero prevents commit
 exit $status

@@ -27,7 +27,7 @@ winston.loggers.add 'buildLog',
 		colorize: true
 
 # *CakeUtilities* provides the build and start functions called below.<br>
-# See [cakeUtilities](src/server/cakeUtilities.html)
+# See [cakeUtilities](cakeUtilities.html)
 cakeUtilities = require './cakeUtilities'
 
 # Makes it possible to directly require coffee modules
@@ -43,7 +43,7 @@ task 'linkHooks', 'Links git hooks into .git/hooks', ->
 
 # Build the server javascript files from all coffee-script files inside
 # `src/server`<br>
-# See [cakeUtilities](src/server/cakeUtilities.html)
+# See [cakeUtilities](cakeUtilities.html)
 task 'buildServer', 'Builds the server js files', ->
 	cakeUtilities.buildServer()
 

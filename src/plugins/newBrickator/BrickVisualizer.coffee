@@ -7,12 +7,14 @@ module.exports = class BrickVisualizer
 
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
-	createVisibleBricks: (threeNode, brickData, grid, animate) =>
+	createVisibleBricks: (threeNode, brickData, grid, animate = true) =>
 		# do not create multiple layers of bricks at the same time
 		# (happens when the user rapidly clicks with the mouse)
 		if @currentlyWorking
 			return
 		@currentlyWorking = true
+
+		console.log animate
 
 		threeNode.children = []
 

@@ -45,7 +45,7 @@ module.exports = class NewBrickator
 				@runLegoPipeline optimizedModel, selectedNode, animate
 		)
 
-	runLegoPipeline: (optimizedModel, selectedNode, animate = true) =>
+	runLegoPipeline: (optimizedModel, selectedNode, animate) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
 
 		threeNodes = @getThreeObjectsByNode(selectedNode)

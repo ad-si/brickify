@@ -42,7 +42,7 @@ config2.plugins.solidRenderer = false
 bundle2 = new Bundle config2, controls
 b2 = bundle2.init()
 
-loadAndConvert = (hash) ->
+loadAndConvert = (hash, animate) ->
 	b1.then(() ->
 		bundle1.modelLoader.loadByHash hash)
 		.then(() ->
@@ -50,18 +50,18 @@ loadAndConvert = (hash) ->
 	b2.then(() -> bundle2.modelLoader.loadByHash hash)
 		.then(() ->
 			nb = bundle2.getPlugin 'newBrickator'
-			nb.processFirstObject false
+			nb.processFirstObject animate
 		).then(() ->
 			document.getElementById('renderArea2').style.backgroundImage = 'none')
 	$('.applink').prop 'href', 'app#legofy+initialModel=' + hash
 
 #load and process model
-loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
+loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
 loadModel = (hash, errors) ->
 	b1.then(() -> bundle1.clearScene())
 	b2.then(() -> bundle2.clearScene())
-	loadAndConvert(hash)
+	loadAndConvert(hash, true)
 
 stlDropper = require './stlDropper'
 stlDropper.init $('body'), $('#teaser-carousel .dropper'), $('#dropoverlay'),

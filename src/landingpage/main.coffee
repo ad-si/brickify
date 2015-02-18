@@ -50,7 +50,7 @@ loadAndConvert = (hash) ->
 	b2.then(() -> bundle2.modelLoader.loadByHash hash)
 		.then(() ->
 			nb = bundle2.getPlugin 'newBrickator'
-			nb.processFirstObject()
+			nb.processFirstObject false
 		).then(() ->
 			document.getElementById('renderArea2').style.backgroundImage = 'none')
 	$('.applink').prop 'href', 'app#legofy+initialModel=' + hash

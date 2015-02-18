@@ -10,7 +10,6 @@ BrickLayouter = require './BrickLayouter'
 meshlib = require('meshlib')
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
-VoxelVisualizer = require './VoxelVisualizer'
 
 module.exports = class NewBrickator
 	constructor: () ->
@@ -60,28 +59,36 @@ module.exports = class NewBrickator
 		)
 
 	runLegoPipeline: (optimizedModel, selectedNode) =>
-		@voxelVisualizer ?= new VoxelVisualizer()
+		@_getCachedData(selectedNode).then (cachedData) =>
+			#since cached data already contains voxel grid, only run lego
+			settings = new PipelineSettings()
+			settings.deactivateVoxelizing()
 
-		threeNodes = @getThreeObjectsByNode(selectedNode)
-		
-		settings = new PipelineSettings()
-		@_applyModelTransforms selectedNode, settings
+			@_applyModelTransforms selectedNode, settings
 
-		data = {
-			optimizedModel: optimizedModel
-		}
-		results = @pipeline.run data, settings, true
+			data = {
+				optimizedModel: cachedData.optimizedModel
+				grid: cachedData.grid
+			}
+			results = @pipeline.run data, settings, true
 
-		@brickVisualizer ?= new BrickVisualizer()
-		@brickVisualizer.createVisibleBricks(
-			threeNodes.bricks,
-			results.accumulatedResults.bricks,
-			results.accumulatedResults.grid
-		)
+			threeNodes = @getThreeObjectsByNode selectedNode
 
-		# instead of creating csg live, show original model semitransparent
-		@bundle.getPlugin('solid-renderer').setNodeMaterial selectedNode,
-			@printMaterial
+			@brickVisualizer ?= new BrickVisualizer()
+			@brickVisualizer.createVisibleBricks(
+				threeNodes.bricks,
+				results.accumulatedResults.bricks,
+				results.accumulatedResults.grid
+			)
+
+			threeNodes.bricks.visible = @_brickVisibility
+			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
+
+			@brushHandler.afterPipelineUpdate selectedNode, cachedData
+
+			# instead of creating csg live, show original model semitransparent
+			@bundle.getPlugin('solid-renderer').setNodeMaterial selectedNode,
+				@printMaterial
 
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
@@ -121,7 +128,10 @@ module.exports = class NewBrickator
 		csgObject = new THREE.Object3D()
 		object.add csgObject
 
-		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
+		if not node.pluginData.newBrickator?
+			node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
+		else
+			node.pluginData.newBrickator.threeObjectUuid = object.uuid
 
 		return {
 			voxels: object.children[0]
@@ -170,7 +180,7 @@ module.exports = class NewBrickator
 	_getCachedData: (selectedNode) =>
 		# returns Grid, optimized model and other cached data for the selected node
 		return new Promise (resolve, reject) =>
-			identifier = selectedNode.pluginData.solidRenderer.threeObjectUuid
+			identifier = @_getNodeIdentifier selectedNode
 			nodePosition = selectedNode.positionData.position
 
 			# cache is valid if object didn't move
@@ -234,33 +244,8 @@ module.exports = class NewBrickator
 			@brushHandler.printMouseHover event, selectedNode, cachedData
 
 	_brushMouseUpCallback: (event, selectedNode) =>
-		# hide grid, then legofy
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.mouseUp event, selectedNode, cachedData
-
-			# legofy
-			settings = new PipelineSettings()
-			@_applyModelTransforms selectedNode, settings
-			settings.deactivateVoxelizing()
-
-			data = {
-				optimizedModel: cachedData.optimizedModel
-				grid: cachedData.grid
-			}
-			results = @pipeline.run data, settings, true
-
-			threeNodes = @getThreeObjectsByNode selectedNode
-
-			@brickVisualizer ?= new BrickVisualizer()
-			@brickVisualizer.createVisibleBricks(
-				threeNodes.bricks,
-				results.accumulatedResults.bricks,
-				results.accumulatedResults.grid
-			)
-			threeNodes.bricks.visible = @_brickVisibility
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
-
-			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
 	_applyBricksToGrid: (bricks, grid) =>
 		# updates references between voxel --> brick
@@ -340,3 +325,15 @@ module.exports = class NewBrickator
 		@_forAllThreeObjects (obj) ->
 			if obj.csg?
 				obj.csg.visible = isEnabled
+
+	_getNodeIdentifier: (selectedNode) =>
+		if selectedNode.pluginData.newBrickator?.identifier?
+			return selectedNode.pluginData.newBrickator.identifier
+
+		if not selectedNode.pluginData.newBrickator?
+			selectedNode.pluginData.newBrickator = {}
+
+		identifier = selectedNode.fileName + Math.floor(Math.random() * 10000)
+		selectedNode.pluginData.newBrickator.identifier = identifier
+
+		return identifier

@@ -6,6 +6,7 @@ module.exports = class BrushHandler
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
 		})
+		@voxelVisualizer = new VoxelVisualizer()
 
 	legoMouseDown: (event, selectedNode, cachedData) =>
 		@_initializeVoxelGrid( event, selectedNode, cachedData )
@@ -13,7 +14,7 @@ module.exports = class BrushHandler
 		@_enableClickedVoxel event, selectedNode, cachedData
 
 	printMouseDown: (event, selectedNode, cachedData) =>
-		@_initializeVoxelGrid( event, selectedNode, cachedData )
+		@_initializeVoxelGrid( selectedNode, cachedData )
 		@_disableSelectedVoxel event, selectedNode, cachedData
 
 	legoMouseMove: (event, selectedNode, cachedData) =>
@@ -40,6 +41,8 @@ module.exports = class BrushHandler
 		cachedData.highlightedVoxel = null
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
+		@_initializeVoxelGrid( selectedNode, cachedData )
+		@_toggleVoxelVisibility null, selectedNode, cachedData
 		@voxelVisualizer.updateVoxels cachedData.grid, cachedData.threeNode
 
 	_hightlightSelectedVoxel: (event, selectedNode, cachedData) =>
@@ -58,8 +61,17 @@ module.exports = class BrushHandler
 			obj.material = @highlightMaterial
 
 	_toggleVoxelVisibility: (event, selectedNode, cachedData) =>
-		obj = @_getSelectedVoxel event, selectedNode
 		threeNodes = @newBrickator.getThreeObjectsByNode selectedNode
+
+		# always show voxel, never show lego bricks
+		# (because we don't re-layout after each brush, therefore
+		# the lego layout becomes invalid after first brush use)
+		threeNodes.bricks.visible = false
+		threeNodes.voxels.visible = true
+
+		return
+
+		obj = @_getSelectedVoxel event, selectedNode
 
 		if not obj
 			# hide voxels, show bricks
@@ -143,12 +155,11 @@ module.exports = class BrushHandler
 			
 
 
-	_initializeVoxelGrid: (event, selectedNode, cachedData) =>
+	_initializeVoxelGrid: (selectedNode, cachedData) =>
 		threeObjects = @newBrickator.getThreeObjectsByNode(selectedNode)
 
 		if not cachedData.threeNode
 			cachedData.threeNode = threeObjects.voxels
-			@voxelVisualizer ?= new VoxelVisualizer()
 			@voxelVisualizer.createVisibleVoxels(
 				cachedData.grid
 				cachedData.threeNode

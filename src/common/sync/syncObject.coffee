@@ -34,12 +34,28 @@ class SyncObject
 			@ready = Promise.resolve()
 
 	###
+	# Loads a dataPacket via id and wraps it in a new object constructed
+	# from the respective subclass of SyncObject
+	#
+	# @param {String} dataPacketId the id of the dataPacket to load
+	# @return {Promise} resolves to the created object of the respective subclass
+	# @memberOf SyncObject
+	###
+	@load: (dataPacketIds) ->
+		getPacketPromise = (id) =>
+			SyncObject.dataPacketProvider.get(id).then (packet) => @newFrom packet
+
+		if Array.isArray dataPacketIds
+			return dataPacketIds.map getPacketPromise
+		else
+			return getPacketPromise dataPacketIds
+
+	###
 	# Wraps a given plain old javascript object in a new object constructed
 	# from the respective subclass of SyncObject
 	#
 	# @param {Object} packet a data packet
-	# @return {SyncObject} a object of the respective subclass that holds all
-	# the properties data had as well.
+	# @return {SyncObject} object of the respective subclass with added properties
 	# @memberOf SyncObject
 	###
 	@newFrom: (packet) ->

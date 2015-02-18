@@ -1,7 +1,7 @@
 clone = require 'clone'
 chai = require 'chai'
-chaiAsPromised = require 'chai-as-promised'
-chai.use chaiAsPromised
+chai.use require 'chai-as-promised'
+chai.use require 'chai-shallow-deep-equal'
 expect = chai.expect
 
 DataPacketsMock = require '../mocks/dataPacketsMock'
@@ -44,16 +44,46 @@ describe 'SyncObject tests', ->
 				expect(dataPackets.calls).to.equal(0)
 				expect(dummy).to.be.an.instanceof(Dummy)
 				expect(dummy).to.be.an.instanceof(SyncObject)
-				expect(dummy).to.have.property('id', packet.id)
+				expect(dummy).to.shallowDeepEqual(pojso)
 
-		it 'should have the same properties as the source packet', ->
-			dataPackets.nextId = wrongid = 'shouldnotbeid'
+		it 'should support loading from an id', ->
 			pojso = {a: 'b', c: {d: 'e'}}
-			packet = {id: 'abcdefgh', data: pojso}
-			dummy = Dummy.newFrom packet
-			dummy.done ->
-				expect(dummy).to.have.property('a', 'b')
-				expect(dummy).to.have.property('c').deep.equal({d: 'e'})
+			id = 'abcdefgh'
+			packet = {id: id, data: pojso}
+			dataPackets.nextGets.push packet
+			request = Dummy.load id
+			expect(request).to.resolve
+			request.then (dummy) -> dummy.done ->
+				expect(dataPackets.calls).to.equal(1)
+				expect(dataPackets.getCalls).to.have.length(1)
+				expect(dummy).to.be.an.instanceof(Dummy)
+				expect(dummy).to.be.an.instanceof(SyncObject)
+				expect(dummy).to.shallowDeepEqual(pojso)
+
+		it 'should support loading from many ids', ->
+			pojsos = []
+			ids = []
+			packets = []
+
+			for i in [0..2]
+				pojsos[i] = {a: 'b'+i, c: {d: 'e'+i}}
+				ids[i] = 'abcdefgh' + i
+				packets[i] = {id: ids[i], data: pojsos[i]}
+				dataPackets.nextGets.push packets[i]
+
+			requests = Promise.all Dummy.load ids
+			expect(requests).to.resolve
+			requests.then (dummies) ->
+				expect(dummies).to.have.length(ids.length)
+				expect(dataPackets.calls).to.equal(ids.length)
+				expect(dataPackets.getCalls).to.have.length(ids.length)
+				promises = dummies.map (dummy) -> dummy.done()
+				Promise.all(promises).then ->
+					for i in [0...dummies.length] by 1
+						dummy = dummies[i]
+						expect(dummy).to.be.an.instanceof(Dummy)
+						expect(dummy).to.be.an.instanceof(SyncObject)
+						expect(dummy).to.shallowDeepEqual(pojsos[i])
 
 	describe 'SyncObject synchronization', ->
 		it 'should be stringified to a reference', ->

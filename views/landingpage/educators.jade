@@ -66,14 +66,13 @@ block body
 			tr
 				td.printTime
 				td#sample
-					a(href='/')
-						img(src='img/placeholder.png' width='255px')
 				td
 					h3 Thingiverse
 					p Search thingiverse
-					.form-inline.form-group
-						input.form-control(placeholder='dummy')
-						.btn.btn-default Search
+					form.form-inline.form-group(action='http://www.thingiverse' +
+					'.com/search')
+						input.form-control(name='q' placeholder='Enter a search term')
+						button.btn.btn-default(type='submit') Search
 				td
 			tr
 				td.printTime

@@ -37,7 +37,7 @@ module.exports = class BrushHandler
 		for v in cachedData.lastSelectedVoxels
 			# hide deselected voxels after print brush interaction
 			if v.material == @voxelVisualizer.deselectedMaterial
-				v.material = @voxelVisualizer.hiddenMaterial
+				v.setMaterial @voxelVisualizer.hiddenMaterial
 
 			cachedData.modifiedVoxels.push v
 		cachedData.lastSelectedVoxels = []
@@ -53,16 +53,10 @@ module.exports = class BrushHandler
 		obj = @_getSelectedVoxel event, selectedNode
 		if obj?
 			if cachedData.highlightedVoxel?
-				v = cachedData.highlightedVoxel
-				v.voxel.material = v.material
+				cachedData.highlightedVoxel.setHighlight false
+			cachedData.highlightedVoxel = obj
 
-			v = {
-				voxel: obj
-				material: obj.material
-			}
-
-			cachedData.highlightedVoxel = v
-			obj.material = @highlightMaterial
+			obj.setHighlight true, @highlightMaterial
 
 	_toggleVoxelVisibility: (event, selectedNode, cachedData) =>
 		threeNodes = @newBrickator.getThreeObjectsByNode selectedNode
@@ -92,7 +86,7 @@ module.exports = class BrushHandler
 		obj = @_getSelectedVoxel event, selectedNode
 
 		if obj
-			obj.material = @voxelVisualizer.deselectedMaterial
+			obj.setMaterial @voxelVisualizer.deselectedMaterial
 			c = obj.voxelCoords
 			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = false
 
@@ -133,7 +127,7 @@ module.exports = class BrushHandler
 					freeBelow = false
 
 			if freeBelow and connectedToEnabled
-				v.material = @voxelVisualizer.deselectedMaterial
+				v.setMaterial @voxelVisualizer.deselectedMaterial
 				v.visible = true
 
 		cachedData.modifiedVoxels = modifiedVoxelsNew
@@ -154,11 +148,9 @@ module.exports = class BrushHandler
 			voxel = cachedData.grid.zLayers[c.z][c.x][c.y]
 
 			if not voxel.enabled
-				obj.material = @voxelVisualizer.selectedMaterial
+				obj.setMaterial @voxelVisualizer.selectedMaterial
 				voxel.enabled = true
 			
-
-
 	_initializeVoxelGrid: (selectedNode, cachedData) =>
 		threeObjects = @newBrickator.getThreeObjectsByNode(selectedNode)
 
@@ -186,7 +178,7 @@ module.exports = class BrushHandler
 
 		if (intersects.length > 0)
 			for intersection in intersects
-				obj = intersection.object
+				obj = intersection.object.parent
 			
 				if obj.visible and obj.voxelCoords
 					return obj

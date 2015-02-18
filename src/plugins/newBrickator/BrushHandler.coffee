@@ -35,6 +35,10 @@ module.exports = class BrushHandler
 
 	mouseUp: (event, selectedNode, cachedData) =>
 		for v in cachedData.lastSelectedVoxels
+			# hide deselected voxels after print brush interaction
+			if v.material == @voxelVisualizer.deselectedMaterial
+				v.material = @voxelVisualizer.hiddenMaterial
+
 			cachedData.modifiedVoxels.push v
 		cachedData.lastSelectedVoxels = []
 
@@ -88,7 +92,7 @@ module.exports = class BrushHandler
 		obj = @_getSelectedVoxel event, selectedNode
 
 		if obj
-			obj.material = @voxelVisualizer.hiddenMaterial
+			obj.material = @voxelVisualizer.deselectedMaterial
 			c = obj.voxelCoords
 			cachedData.grid.zLayers[c.z][c.x][c.y].enabled = false
 

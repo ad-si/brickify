@@ -281,7 +281,10 @@ module.exports = class NewBrickator
 				meshlib
 				.model(optimizedModel)
 				.export null, (error, binaryStl) ->
-					resolve { data: binaryStl, fileName: '3dprinted.stl' }
+					fn = "brickolage-#{selectedNode.fileName}"
+					if fn.indexOf('.stl') < 0
+						fn += '.stl'
+					resolve { data: binaryStl, fileName: fn }
 
 		return dlPromise
 

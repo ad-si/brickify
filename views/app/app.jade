@@ -40,9 +40,18 @@ block body
 					| Download for 3d printer					
 
 				button.btn.btn-success.btn-block#buildButton
-					| Build now
-				input(type='range')#buildSlider
-								
+					| Build now					
+				#buildContainer
+					br
+					button.btn.btn-default#buildDecrement <	
+					| &nbsp;Showing Layer &nbsp;
+					span#currentBuildLayer 1
+					| &nbsp;of&nbsp; 				
+					span#maxBuildLayer 0
+					| &nbsp;
+					button.btn.btn-default#buildIncrement >
+					input(type='range')#buildSlider
+												
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?

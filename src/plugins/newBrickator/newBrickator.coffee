@@ -374,21 +374,45 @@ module.exports = class NewBrickator
 		@buildButton = $('#buildButton')
 		@buildModeEnabled = false
 
-		@buildSlider = $('#buildSlider')
-		@buildSlider.hide()
-		@buildSlider.on 'input', () =>
+		@buildContainer = $('#buildContainer')
+		@buildContainer.hide()
+
+		@buildLayerUi = {
+			slider: $('#buildSlider')
+			decrement: $('#buildDecrement')
+			increment: $('#buildIncrement')
+			curLayer: $('#currentBuildLayer')
+			maxLayer: $('#maxBuildLayer')
+			}
+		
+		@buildLayerUi.slider.on 'input', () =>
 			selectedNode = @bundle.ui.sceneManager.selectedNode
+			v = @buildLayerUi.slider.val()
+			@_updateBuildLayer(selectedNode)
+
+		@buildLayerUi.increment.on 'click', () =>
+			selectedNode = @bundle.ui.sceneManager.selectedNode
+			v = @buildLayerUi.slider.val()
+			v++
+			@buildLayerUi.slider.val(v)
+			@_updateBuildLayer(selectedNode)
+
+		@buildLayerUi.decrement.on 'click', () =>
+			selectedNode = @bundle.ui.sceneManager.selectedNode
+			v = @buildLayerUi.slider.val()
+			v--
+			@buildLayerUi.slider.val(v)
 			@_updateBuildLayer(selectedNode)
 
 		@buildButton.click () =>
 			selectedNode = @bundle.ui.sceneManager.selectedNode
 
 			if @buildModeEnabled
-				@buildSlider.slideUp()
+				@buildContainer.slideUp()
 				@buildButton.removeClass('innerShadow')
 				@_disableBuildMode selectedNode
 			else
-				@buildSlider.slideDown()
+				@buildContainer.slideDown()
 				@buildButton.addClass('innerShadow')
 				@_enableBuildMode selectedNode
 
@@ -421,15 +445,23 @@ module.exports = class NewBrickator
 			threeNodes.voxels.visible = false
 
 			# apply grid size to layer view
-			@buildSlider.attr('min', 0)
-			@buildSlider.attr('max', cachedData.grid.zLayers.length - 1)
-			@buildSlider.attr('value', 0)
+			@buildLayerUi.slider.attr('min', 0)
+			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length - 1)
+			@buildLayerUi.maxLayer.html(cachedData.grid.zLayers.length)
+			
+			@buildLayerUi.slider.val(0)
+			@_updateBuildLayer selectedNode
 
 	_updateBuildLayer: (selectedNode) =>
+		layer = @buildLayerUi.slider.val()
+		@buildLayerUi.curLayer.html(Number(layer) + 1)
 		threeNodes = @getThreeObjectsByNode selectedNode
-		@brickVisualizer.makeLayerVisible threeNodes.bricks, @buildSlider.val()
+		@brickVisualizer.makeLayerVisible threeNodes.bricks, layer
 
 	_disableBuildMode: (selectedNode) =>
+		threeNodes = @getThreeObjectsByNode selectedNode
+		threeNodes.bricks.visible = false
+		threeNodes.voxels.visible = true
 		return
 
 

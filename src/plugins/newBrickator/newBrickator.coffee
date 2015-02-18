@@ -205,6 +205,7 @@ module.exports = class NewBrickator
 			modelPromise.then (optimizedModel) =>
 				settings = new PipelineSettings()
 				@_applyModelTransforms selectedNode, settings
+				settings.deactivateLayouting()
 
 				data = {
 					optimizedModel: optimizedModel
@@ -304,7 +305,8 @@ module.exports = class NewBrickator
 							if voxel?
 								voxel.brick = brick
 							else
-								console.log "Brick without voxel at #{x},#{x},#{z}"
+								console.log "Brick without voxel at #{x},#{y},#{z}"
+								console.log brick
 
 	getDownload: (selectedNode) =>
 		dlPromise = new Promise (resolve) =>

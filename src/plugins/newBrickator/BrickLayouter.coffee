@@ -242,7 +242,9 @@ module.exports = class BrickLayouter
 
 		ps = brick.getPositionAndSizeForNewBrick mergeIndex, mergeNeighbours
 		newBrick = new Brick(ps.position, ps.size)
-		#newBrick.id = @nextBrickIdx()
+
+		#save oldBricks in newBrick for debugging
+		newBrick.oldBricks = mergeNeighbours.concat [brick]
 
 		# set new brick connections & neighbours
 		for mbrick in mergeNeighbours.concat [brick]

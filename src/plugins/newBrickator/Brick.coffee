@@ -16,6 +16,9 @@ module.exports = class Brick
 		@lowerSlots = []
 		@id = Brick.nextBrickIdx()
 
+		#save old bricks for debugging, false = none, otherwise [] with bricks
+		@oldBricks = false
+
 		for xx in [0..@size.x - 1] by 1
 			@upperSlots[xx] = []
 			@lowerSlots[xx] = []

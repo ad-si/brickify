@@ -56,3 +56,6 @@ buildUi: true
 
 #editor
 defaultPlugin: 'fabrickator'
+
+#newBrickator
+autoLegofy: false

@@ -40,6 +40,7 @@ postInitCallback = () ->
 	#clear url hash after executing commands
 	window.location.hash = ''
 
+globalConfig.autoLegofy = true
 bundle = new Bundle globalConfig
 bundle.init().then(postInitCallback)
 

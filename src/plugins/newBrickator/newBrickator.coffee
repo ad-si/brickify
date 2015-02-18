@@ -22,7 +22,7 @@ module.exports = class NewBrickator
 		@_printVisibility = true
 		
 		@printMaterial = new THREE.MeshLambertMaterial({
-			color: 0xe7edaa
+			color: 0xeeeeee
 			opacity: 0.8
 			transparent: true
 		})
@@ -40,6 +40,10 @@ module.exports = class NewBrickator
 				if threenode.uuid == uuid
 					@threejsRootNode.remove threenode
 					return
+
+	onNodeAdd: (node) =>
+		if @bundle.globalConfig.autoLegofy
+			@runLegoPipelineOnNode(node)
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
@@ -74,6 +78,11 @@ module.exports = class NewBrickator
 			results.accumulatedResults.bricks,
 			results.accumulatedResults.grid
 		)
+
+		# instead of creating csg live, show original model semitransparent
+		@bundle.getPlugin('solid-renderer').setNodeMaterial selectedNode,
+			@printMaterial
+
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode
@@ -250,9 +259,6 @@ module.exports = class NewBrickator
 			)
 			threeNodes.bricks.visible = @_brickVisibility
 			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
-
-			#create quick CSG (without knobs) (todo: move to webWorker)
-			printThreeMesh = @_createCSG(selectedNode, cachedData, false, threeNodes.csg)
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 

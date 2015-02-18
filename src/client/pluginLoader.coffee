@@ -25,6 +25,7 @@ module.exports = class PluginLoader
 
 		if @pluginHooks.hasHook(instance, 'init3d')
 			threeNode = new THREE.Object3D()
+			threeNode.associatedPlugin = instance
 			instance.init3d threeNode
 
 		@pluginHooks.register instance
@@ -53,11 +54,6 @@ module.exports = class PluginLoader
 			pluginInstances.push @initPlugin(
 				require '../plugins/stlExport'
 				require '../plugins/stlExport/package.json'
-			)
-		if @globalConfig.plugins.sceneGraph
-			pluginInstances.push @initPlugin(
-				require '../plugins/sceneGraph'
-				require '../plugins/sceneGraph/package.json'
 			)
 		if @globalConfig.plugins.coordinateSystem
 			pluginInstances.push @initPlugin(

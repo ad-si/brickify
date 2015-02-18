@@ -55,6 +55,8 @@ module.exports = class SolidRenderer
 		success = (optimizedModel) =>
 			console.log "Got model #{node.meshHash}"
 			threeObject = @addModelToThree optimizedModel
+			# enable Ui/mouseDispatcher find out on what node we clicked
+			threeObject.associatedNode = node
 			if reload
 				threeObject.name = properties.threeObjectUuid
 			else
@@ -114,10 +116,20 @@ module.exports = class SolidRenderer
 	getBrushes: =>
 		return [{
 			text: 'move'
-			icon: 'moveBrush.png'
+			iconBrush: true
+			glyphicon: 'move'
 			mouseDownCallback: @_handleMouseDown
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp
+			tooltip: 'Move model'
+		},{
+			text: 'rotate'
+			iconBrush: true
+			glyphicon: 'refresh'
+			tooltip: 'Rotate model'
+			#mouseDownCallback: @_handleMouseDown
+			#mouseMoveCallback: @_handleMouseMove
+			#mouseUpCallback: @_handleMouseUp
 		}]
 
 	_getThreeObjectByName: (name) =>
@@ -142,7 +154,7 @@ module.exports = class SolidRenderer
 		newPosition = {
 			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
 			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
-			z: 0
+			z: @originalObjectPosition.z
 		}
 
 		selectedNode.positionData.position = newPosition
@@ -152,14 +164,6 @@ module.exports = class SolidRenderer
 		threeObject = @_getThreeObjectByName pld.threeObjectUuid
 		@_copyTransformDataToThree selectedNode, threeObject
 
-	getVisibilityLayers: () =>
-		return [
-			{
-				text: 'Imported 3D-Model'
-				callback: @_toggleModelLayer
-			}
-		]
-
-	_toggleModelLayer: (isEnabled) =>
-		for child in @threejsNode.children
-			child.visible = isEnabled
+	toggleNodeVisibility: (node, visible) =>
+		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+		obj.visible = visible

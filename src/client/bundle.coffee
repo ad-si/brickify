@@ -1,9 +1,8 @@
 PluginLoader = require '../client/pluginLoader'
-Ui = require './ui'
+Ui = require './ui/ui'
 Renderer = require './renderer'
 Statesync = require './statesync'
 ModelLoader = require './modelLoader'
-
 ObjectTree = require '../common/state/objectTree'
 
 ###
@@ -24,7 +23,9 @@ module.exports = class Bundle
 			.init()
 			.then () =>
 				@pluginInstances = @pluginLoader.loadPlugins()
-				@ui = new Ui(@) if(@globalConfig.buildUi)
+				if @globalConfig.buildUi
+					@ui = new Ui(@)
+					@ui.init()
 				@statesync.handleUpdatedState()
 			.then(@load)
 			.then () =>

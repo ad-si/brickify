@@ -64,7 +64,6 @@ plugins:
   dummy: false
   stlImport: true
   stlExport: true
-  sceneGraph: true
   coordinateSystem: true
   legoBoard: true
   solidRenderer: true

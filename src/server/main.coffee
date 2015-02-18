@@ -12,7 +12,6 @@ bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
 errorHandler = require 'errorhandler'
-session = require 'express-session'
 favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
@@ -116,7 +115,6 @@ module.exports.setupRouting = () ->
 			'jquery'
 			'jsondiffpatch'
 			'path'
-			'react'
 			'stats-js'
 			'three'
 			'three-orbit-controls'
@@ -133,6 +131,7 @@ module.exports.setupRouting = () ->
 		external: shared
 		insertGlobals: developmentMode
 	})
+
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})

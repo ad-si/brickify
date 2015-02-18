@@ -1,7 +1,8 @@
-Hotkeys = require './hotkeys'
-UiSceneManager = require './uiSceneManager'
-UiToolbar = require './UiToolbar'
-VisibilityMenu = require './VisibilityMenu'
+Hotkeys = require '../hotkeys'
+UiSceneManager = require './sceneManager'
+UiObjects = require './objects'
+MouseDispatcher = require './mouseDispatcher'
+DownloadProvider = require './downloadProvider'
 
 ###
 # @module ui
@@ -11,10 +12,10 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
+		@objects = new UiObjects(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
-		@toolbar = new UiToolbar(@bundle)
-		@visibilityMenu = new VisibilityMenu(@bundle)
-		@_init()
+		@mouseDispatcher = new MouseDispatcher(@bundle)
+		@downloadProvider = new DownloadProvider(@bundle)
 
 	dropHandler: (event) ->
 		event.stopPropagation()
@@ -27,44 +28,21 @@ module.exports = class Ui
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
-	mouseDownHandler: (event) =>
-		event.stopPropagation()
-		event.preventDefault()
-
-		@_mouseIsDown = true
-
-		for onClickHandler in @pluginHooks.get 'onClick'
-			onClickHandler(event)
-
-		@toolbar.handleMouseDown event
-
-	mouseUpHandler: (event) =>
-		event.preventDefault()
-
-		@_mouseIsDown = false
-
-		if @toolbar.hasBrushSelected()
-			@toolbar.handleMouseUp event
-
-	mouseMoveHandler: (event) =>
-		event.preventDefault()
-
-		if @_mouseIsDown
-			if @toolbar.hasBrushSelected()
-				event.stopPropagation()
-				@toolbar.handleMouseMove event
-
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
 	windowResizeHandler: (event) ->
 		@renderer.windowResizeHandler()
 
-	_init: =>
+	init: =>
 		@_initListeners()
-		@_initScenegraph()
+		@_initUiElements()
 		@_initHotkeys()
+		@downloadProvider.init('#downloadButton', @sceneManager)
 
 	_initListeners: =>
+		# mouse dispatcher for mouse events
+		@mouseDispatcher.init(@renderer, @objects, @sceneManager)
+		
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'
@@ -85,25 +63,25 @@ module.exports = class Ui
 
 		@renderer.getDomElement().addEventListener(
 			'mousedown'
-			@mouseDownHandler.bind @
+			@mouseDispatcher.handleMouseDown
 			false
 		)
 
 		@renderer.getDomElement().addEventListener(
 			'mouseup'
-			@mouseUpHandler.bind @
+			@mouseDispatcher.handleMouseUp
 			false
 		)
 
 		@renderer.getDomElement().addEventListener(
 			'mousemove'
-			@mouseMoveHandler.bind @
+			@mouseDispatcher.handleMouseMove
 			false
 		)
 
-	_initScenegraph: =>
-		@bundle.getPlugin('scene-graph').initUi $('#sceneGraphContainer')
-		return
+	_initUiElements: =>
+		@objects.init('#objectsContainer')
+		@sceneManager.init()
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)

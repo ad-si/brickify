@@ -47,30 +47,6 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
-	# Returns a json-schema which describes the json
-	# the ui-elements of the plugin are supposed to create.
-	# [json-editor](https://github.com/jdorn/json-editor) then creates the
-	# html elements accordingly.
-	###
-	getConvertUiSchema: () =>
-		console.log('Dummy Client Plugin returns the UI schema.')
-
-		actioncallback = () ->
-			console.log 'Dummy Plugin performs an action!'
-
-		return {
-			type: 'object'
-			properties:
-				size:
-					description: 'Size of the elements'
-					type: 'number'
-			actions:
-				a1:
-					title: 'Derp'
-					callback: actioncallback
-		}
-
-	###
 	# The state synchronization module will call each plugin's
 	# `onStateUpdate` method (if provided) whenever the current state changes
 	# due to user input or calculation results on either server or client side.

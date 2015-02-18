@@ -1,4 +1,9 @@
 module.exports  = class PipelineSettings
+	@legoKnobSize = {
+		radius: 2.4
+		height: 1.8
+	}
+	
 	constructor: ->
 		@gridSpacing = {
 			x: 8

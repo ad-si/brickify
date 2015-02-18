@@ -20,7 +20,6 @@ globalConfig.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.stlExport = false
-globalConfig.plugins.sceneGraph = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.solidRenderer = true
@@ -53,7 +52,7 @@ loadAndConvert = (hash, animate) ->
 			nb.processFirstObject animate
 		).then(() ->
 			document.getElementById('renderArea2').style.backgroundImage = 'none')
-	$('.applink').prop 'href', 'app#legofy+initialModel=' + hash
+	$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
 
 #load and process model
 loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)

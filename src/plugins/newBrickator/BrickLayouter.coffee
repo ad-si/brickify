@@ -128,7 +128,6 @@ module.exports = class BrickLayouter
 		@layoutByGreedyMerge bricks
 		return
 
-
 		###
 		maxIterations = 50
 		weakPointThreshold = 2
@@ -152,7 +151,20 @@ module.exports = class BrickLayouter
 			if weakPoints.size is 0 # or not changing
 				break
   ###
+
 		return bricks
+
+	_splitBrickAndRelayoutLocally: (oldBrick, bricks) =>
+		bricksToSplit = oldBrick.uniqueNeighbours()
+		bricksToSplit.push oldBrick
+		newBricks = @_splitBricks bricksToSplit, bricks
+		for brick in newBricks
+			console.log brick.neighbours
+		@layoutByGreedyMerge [newBricks]
+		return {
+			removedBricks: bricksToSplit
+			newBricks: newBricks
+		}
 
 	_anyDefined: (mergeableNeighbours) =>
 		boolean = false

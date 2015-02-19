@@ -143,3 +143,33 @@ describe 'brickLayouter split', ->
 		expect(newBricks[4].neighbours).to.
 			eql([[newBricks[3]],[newBricks[5]],[],[]])
 
+	it 'should split one brick and its neighbours', ->
+		# 011122
+		brickLayouter = new BrickLayouter()
+		brick0 = new Brick  {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick1 = new Brick  {x: 1, y: 0, z: 0}, {x: 3, y: 1, z: 1}
+		brick2 = new Brick  {x: 2, y: 0, z: 0}, {x: 2, y: 1, z: 1}
+		brick0.neighbours = [[], [brick1], [], []]
+		brick1.neighbours = [[brick0], [brick2], [], []]
+		brick2.neighbours = [[brick1], [], [], []]
+		bricks = [[brick0, brick1, brick2]]
+		bricksToSplit = brick1.uniqueNeighbours()
+		bricksToSplit.push brick1
+		newBricks = brickLayouter._splitBricks bricksToSplit, bricks
+		expect(bricks[0]).to.eql(newBricks)
+		console.log bricks[0]
+
+	it 'should split one brick and relayout locally', () ->
+		# 01222
+		brickLayouter = new BrickLayouter()
+		brick0 = new Brick  {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick1 = new Brick  {x: 1, y: 0, z: 0}, {x: 1, y: 1, z: 1}
+		brick2 = new Brick  {x: 2, y: 0, z: 0}, {x: 3, y: 1, z: 1}
+		bricks = [[brick0, brick1, brick2]]
+
+		brick0.neighbours = [[], [brick1], [], []]
+		brick1.neighbours = [[brick0], [brick2], [], []]
+		brick2.neighbours = [[brick1], [], [], []]
+		brickLayouter._splitBrickAndRelayoutLocally brick0, bricks
+		console.log '----------------------------------------------------'
+		console.log bricks[0]

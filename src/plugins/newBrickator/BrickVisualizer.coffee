@@ -14,8 +14,6 @@ module.exports = class BrickVisualizer
 			return
 		@currentlyWorking = true
 
-		console.log animate
-
 		threeNode.children = []
 
 		if animate

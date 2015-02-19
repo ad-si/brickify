@@ -463,6 +463,10 @@ module.exports = class NewBrickator
 
 			threeNodes = @getThreeObjectsByNode selectedNode
 
+			# ToDo: this is a workaround which needs to be fixed in layouter
+			# (apply changed bricks directly to grid)
+			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
+
 			# show bricks
 			bricks = results.accumulatedResults.bricks
 			cachedData.visualization.updateBricks bricks
@@ -484,6 +488,7 @@ module.exports = class NewBrickator
 
 	_disableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
+			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.showVoxels()
 
 

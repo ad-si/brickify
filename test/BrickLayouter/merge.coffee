@@ -361,3 +361,30 @@ describe 'brickLayouter merge', ->
 		expect(brick3.lowerSlots[0][0].id).to.equal(newBrick.id)
 		expect(brick3.lowerSlots[0][1].id).to.equal(newBrick.id)
 		done()
+
+	###
+	it 'should not merge 1x4 & 1x2, even with duplicate neighbours', (done) ->
+
+			#22
+			#1111
+
+		brickLayouter = new BrickLayouter()
+		Brick.nextBrickIndex = 0
+		brick1 = new Brick {x: 0, y: 0, z: 0}, {x: 4, y: 1, z: 1}
+		brick2 = new Brick {x: 0, y: 1, z: 0}, {x: 2, y: 1, z: 1}
+		brick1.neighbours[3] = [brick2, brick2] # duplicate neighbour here
+		brick2.neighbours[2] = [brick1]
+		bricks = [[brick1, brick2]]
+		console.log bricks
+		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
+		console.log bricks
+		expect(bricksObject.bricks[0]).to.have.length(2)
+		expect(bricksObject.bricks[0][0].id).to.eql(0)
+		expect(bricksObject.bricks[0][0].size).to.eql({x: 4, y: 1, z: 1})
+		expect(bricksObject.bricks[0][1].id).to.eql(1)
+		expect(bricksObject.bricks[0][1].size).to.eql({x: 2, y: 1, z: 1})
+
+
+		done()
+
+	###

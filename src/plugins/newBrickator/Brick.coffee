@@ -17,7 +17,8 @@ module.exports = class Brick
 		@id = Brick.nextBrickIdx()
 
 		#save old bricks for debugging, false = none, otherwise [] with bricks
-		@oldBricks = false
+		@mergedNeighbours = false
+		@mergedBrick = false
 
 		for xx in [0..@size.x - 1] by 1
 			@upperSlots[xx] = []
@@ -49,7 +50,7 @@ module.exports = class Brick
 			for slotXY in slotsX
 				if slotXY != false
 					bricks.push slotXY
-		return Brick.removeDuplicates bricks
+		return removeDuplicates bricks
 
 	uniqueNeighbours: () =>
 		neighboursList = [].concat.apply([],@neighbours)
@@ -66,7 +67,7 @@ module.exports = class Brick
 		return false
 
 	# helper method, to be moved somewhere more appropriate
-	@removeDuplicates = (array) ->
+	removeDuplicates = (array) ->
 		a = array.concat()
 		i = 0
 

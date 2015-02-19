@@ -16,7 +16,7 @@
     "bootstrap": "^3.3.2",
     "bootstrap-styl": "^4.0.2",
     "browserify-data": "^0.2.0",
-    "browserify-middleware": "^5.0.1",
+    "browserify-middleware": "^4.1.0",
     "clone": "^1.0.0",
     "coffee-script": "^1.9.0",
     "coffeeify": "^1.0.0",

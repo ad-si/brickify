@@ -129,7 +129,10 @@ module.exports = class SolidRenderer
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp
 			tooltip: 'Move model'
-		},{
+		}]
+
+		###
+		{
 			text: 'rotate'
 			iconBrush: true
 			glyphicon: 'refresh'
@@ -137,7 +140,8 @@ module.exports = class SolidRenderer
 			#mouseDownCallback: @_handleMouseDown
 			#mouseMoveCallback: @_handleMouseMove
 			#mouseUpCallback: @_handleMouseUp
-		}]
+		}
+		###
 
 	_getThreeObjectByName: (name) =>
 		for obj in @threejsNode.children

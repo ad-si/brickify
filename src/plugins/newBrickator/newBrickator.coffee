@@ -76,8 +76,10 @@ module.exports = class NewBrickator
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
 			# instead of creating csg live, show original model semitransparent
-			@bundle.getPlugin('solid-renderer').setNodeMaterial selectedNode,
-				@printMaterial
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			if solidRenderer?
+				solidRenderer.setNodeMaterial selectedNode,
+					@printMaterial
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode

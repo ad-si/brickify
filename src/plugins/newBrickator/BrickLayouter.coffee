@@ -31,6 +31,12 @@ module.exports = class BrickLayouter
 
 							bricks[z].push brick
 
+		# remove references to bricks that will later become invalid
+		for z in [0..grid.numVoxelsZ - 1] by 1
+			for x in [0..grid.numVoxelsX - 1] by 1
+				for y in [0..grid.numVoxelsY - 1] by 1
+					if grid.zLayers[z]?[x]?[y]?
+						delete grid.zLayers[z][x][y].brick
 		# console.log bricks
 		return {bricks: bricks}
 

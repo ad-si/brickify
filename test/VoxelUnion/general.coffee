@@ -7,7 +7,7 @@ describe 'VoxelUnion', ->
 	grid = new Grid()
 	grid.origin = {x: 0, y: 0, z: 0}
 
-	it 'should create a single cube csg', (done) ->
+	it 'should create a single cube csg', () ->
 		vg = new VoxelUnion(grid)
 		bsp = vg.run [ {x: 0, y: 0, z: 0} ]
 		geometry = bsp.toMesh(null).geometry
@@ -15,9 +15,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.faces.length).to.equal(12)
 		expect(geometry.vertices.length).to.equal(8)
 
-		done()
-
-	it 'should create a 2x2 plate csg', (done) ->
+	it 'should create a 2x2 plate csg', () ->
 		vg = new VoxelUnion(grid)
 		bsp = vg.run [
 			{x: 0, y: 0, z: 0}
@@ -30,9 +28,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.faces.length).to.equal(32)
 		expect(geometry.vertices.length).to.equal(18)
 
-		done()
-
-	it 'should create a 2x2x2 cube csg with 26 vertices', (done) ->
+	it 'should create a 2x2x2 cube csg with 26 vertices', () ->
 		vg = new VoxelUnion(grid)
 		bsp = vg.run [
 			{x: 0, y: 0, z: 0}
@@ -49,9 +45,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.faces.length).to.equal(48)
 		expect(geometry.vertices.length).to.equal(26)
 
-		done()
-
-	it 'should create a 2x2x2 cube THREE.Geometry with 27 vertices', (done) ->
+	it 'should create a 2x2x2 cube THREE.Geometry with 27 vertices', () ->
 		# the algorithm creates a point in the middle of the cube,
 		# which is then not used in the geometry
 
@@ -70,9 +64,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.faces.length).to.equal(48)
 		expect(geometry.vertices.length).to.equal(27)
 
-		done()
-
-	it 'should create a "+" with hole plate THREE.Geometry', (done) ->
+	it 'should create a "+" with hole plate THREE.Geometry', () ->
 		#  #
 		# # #
 		#  #
@@ -88,9 +80,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.vertices.length).to.equal(24)
 		expect(geometry.faces.length).to.equal(8 + 32 + 8)
 
-		done()
-
-	it 'should create a 3x3 plate THREE.Geometry', (done) ->
+	it 'should create a 3x3 plate THREE.Geometry', () ->
 		vg = new VoxelUnion(grid)
 		geometry = vg._createVoxelGeometry [
 			{x: 0, y: 0, z: 0}
@@ -107,9 +97,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.vertices.length).to.equal(32)
 		expect(geometry.faces.length).to.equal(18 + 24 + 18)
 
-		done()
-
-	it 'should create a filled "+" plate THREE.Geometry', (done) ->
+	it 'should create a filled "+" plate THREE.Geometry', () ->
 		#  #
 		# ###
 		#  #
@@ -126,9 +114,7 @@ describe 'VoxelUnion', ->
 		expect(geometry.vertices.length).to.equal(24)
 		expect(geometry.faces.length).to.equal(10 + 24 + 10)
 
-		done()
-
-	it 'should create a filled "+" plate datastructure', (done) ->
+	it 'should create a filled "+" plate datastructure', () ->
 		#  #
 		# ###
 		#  #
@@ -170,9 +156,7 @@ describe 'VoxelUnion', ->
 		expect(data.zLayers[1][1][1].voxel).to.equal(false)
 		expect(data.zLayers[-1][1][1].voxel).to.equal(false)
 
-		done()
-
-	it 'should create a filled "+" plate point list', (done) ->
+	it 'should create a filled "+" plate point list', () ->
 		#  #
 		# ###
 		#  #
@@ -195,5 +179,5 @@ describe 'VoxelUnion', ->
 		vg._createGeoPoints 1, 2, 0, data, geo
 
 		expect(geo.vertices.length).to.equal(12)
-		done()
+
 

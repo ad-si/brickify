@@ -1,7 +1,7 @@
 modelCache = require '../../client/modelCache'
 LegoPipeline = require './LegoPipeline'
 THREE = require 'three'
-BrickVisualizer = require './BrickVisualizer'
+NodeVisualization = require './visualization/NodeVisualization'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/state/objectTree'
 THREE = require 'three'
@@ -74,16 +74,13 @@ module.exports = class NewBrickator
 			}
 			results = @pipeline.run data, settings, true
 
-			threeNodes = @getThreeObjectsByNode selectedNode
+			# show bricks
+			bricks = results.accumulatedResults.bricks
+			cachedData.visualization.updateBricks bricks
+			cachedData.visualization.showBricks()
 
-			@brickVisualizer ?= new BrickVisualizer()
-			@brickVisualizer.createVisibleBricks(
-				threeNodes.bricks,
-				results.accumulatedResults.bricks,
-				results.accumulatedResults.grid
-			)
-
-			threeNodes.bricks.visible = @_brickVisibility
+			# ToDo: this is a workaround which needs to be fixed in layouter
+			# (apply changed bricks directly to grid)
 			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
@@ -197,6 +194,7 @@ module.exports = class NewBrickator
 
 			modelPromise = modelCache.request(selectedNode.meshHash)
 			modelPromise.then (optimizedModel) =>
+				# create grid
 				settings = new PipelineSettings()
 				@_applyModelTransforms selectedNode, settings
 				settings.deactivateLayouting()
@@ -206,15 +204,22 @@ module.exports = class NewBrickator
 				}
 				results = @pipeline.run data, settings, true
 
+				# create visuals
+				grid = results.accumulatedResults.grid
+				node = new THREE.Object3D()
+				@threejsRootNode.add node
+
+				nodeVisualization = new NodeVisualization(@bundle, node, grid)
+
+				# create datastructure
 				@gridCache[identifier] = {
-					grid: results.accumulatedResults.grid
+					grid: grid
 					optimizedModel: optimizedModel
-					threeNode: null
+					threeNode: node
+					visualization: nodeVisualization
 					x: nodePosition.x
 					y: nodePosition.y
 					z: nodePosition.z
-					modifiedVoxels: []
-					lastSelectedVoxels: []
 				}
 
 				resolve(@gridCache[identifier])
@@ -434,15 +439,10 @@ module.exports = class NewBrickator
 
 			threeNodes = @getThreeObjectsByNode selectedNode
 
-			@brickVisualizer ?= new BrickVisualizer()
-			@brickVisualizer.createVisibleBricks(
-				threeNodes.bricks,
-				results.accumulatedResults.bricks,
-				results.accumulatedResults.grid
-			)
-
-			threeNodes.bricks.visible = true
-			threeNodes.voxels.visible = false
+			# show bricks
+			bricks = results.accumulatedResults.bricks
+			cachedData.visualization.updateBricks bricks
+			cachedData.visualization.showBricks()
 
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
@@ -455,13 +455,11 @@ module.exports = class NewBrickator
 	_updateBuildLayer: (selectedNode) =>
 		layer = @buildLayerUi.slider.val()
 		@buildLayerUi.curLayer.html(Number(layer) + 1)
-		threeNodes = @getThreeObjectsByNode selectedNode
-		@brickVisualizer.makeLayerVisible threeNodes.bricks, layer
+		@_getCachedData(selectedNode).then (cachedData) =>
+			cachedData.visualization.showBrickLayer layer
 
 	_disableBuildMode: (selectedNode) =>
-		threeNodes = @getThreeObjectsByNode selectedNode
-		threeNodes.bricks.visible = false
-		threeNodes.voxels.visible = true
-		return
+		@_getCachedData(selectedNode).then (cachedData) =>
+			cachedData.visualization.showVoxels()
 
 

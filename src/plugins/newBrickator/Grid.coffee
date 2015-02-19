@@ -115,6 +115,16 @@ module.exports = class Grid
 			#if the voxel already exists, push new data to existing array
 			@zLayers[voxel.z][voxel.x][voxel.y].dataEntrys.push data
 
+	getVoxel: (positionOrX, y, z) =>
+		if y? and z?
+			return @_getVoxel positionOrX, y, z
+		else
+			return @_getVoxel positionOrX.x, positionOrX.y, positionOrX.z
+
+	_getVoxel: (x, y, z) =>
+		if @zLayers[z]?[x]?[y]?
+			return @zLayers[z]?[x]?[y]
+
 	forEachVoxel: (callback) =>
 		for z in [0..@numVoxelsZ - 1] by 1
 			for y in [0..@numVoxelsY - 1] by 1

@@ -6,7 +6,6 @@ PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/state/objectTree'
 THREE = require 'three'
 Brick = require './Brick'
-BrickLayouter = require './BrickLayouter'
 meshlib = require('meshlib')
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
@@ -15,7 +14,6 @@ jquery = require '.'
 module.exports = class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
-		@brickLayouter = new BrickLayouter()
 		@gridCache = {}
 
 		@_brickVisibility = true
@@ -36,11 +34,8 @@ module.exports = class NewBrickator
 	onNodeRemove: (node) =>
 		# remove node visuals (bricks, csg, ...)
 		if node.pluginData.newBrickator?
-			uuid = node.pluginData.newBrickator.threeObjectUuid
-			for threenode in @threejsRootNode.children
-				if threenode.uuid == uuid
-					@threejsRootNode.remove threenode
-					return
+			@_getCachedData(node).then (cachedData) =>
+				@threejsRootNode.remove cachedData.threeNode
 
 	onNodeAdd: (node) =>
 		if @bundle.globalConfig.autoLegofy
@@ -102,41 +97,6 @@ module.exports = class NewBrickator
 		pos = selectedNode.positionData.position
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
 		return modelTransform
-
-	getThreeObjectsByNode: (node) =>
-		# search for subnode for this object
-		if node.pluginData.newBrickator?
-			uuid = node.pluginData.newBrickator.threeObjectUuid
-			for threenode in @threejsRootNode.children
-				if threenode.uuid == uuid
-					return {
-						voxels: threenode.children[0]
-						bricks: threenode.children[1]
-						csg: threenode.children[2]
-					}
-
-		# create three sub-sub nodes, one for the voxels and one for the bricks,
-		# the last one for showing the csg
-		object = new THREE.Object3D()
-		@threejsRootNode.add object
-
-		voxelObject = new THREE.Object3D()
-		object.add voxelObject
-		brickObject = new THREE.Object3D()
-		object.add brickObject
-		csgObject = new THREE.Object3D()
-		object.add csgObject
-
-		if not node.pluginData.newBrickator?
-			node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
-		else
-			node.pluginData.newBrickator.threeObjectUuid = object.uuid
-
-		return {
-			voxels: object.children[0]
-			bricks: object.children[1]
-			csg: object.children[2]
-		}
 
 	_forAllThreeObjects: (callback) =>
 		for threenode in @threejsRootNode.children
@@ -364,27 +324,15 @@ module.exports = class NewBrickator
 
 		printThreeMesh = @csgExtractor.extractGeometry(cachedData.grid, options)
 
-		# show intersected mesh if it exists
-		if csgThreeNode?
-			csgThreeNode.children = []
-			if printThreeMesh?
-				printThreeMesh.material = @printMaterial
-				printThreeMesh.visible = @_printVisibility
-				csgThreeNode.add printThreeMesh
-
 		return printThreeMesh
 
 	_toggleBrickLayer: (isEnabled) =>
 		@_brickVisibility = isEnabled
-		@_forAllThreeObjects (obj) ->
-			if obj.bricks?
-				obj.bricks.visible = isEnabled
+		# TODO implement for NodeVisualization
 
 	_togglePrintedLayer: (isEnabled) =>
 		@_printVisibility = isEnabled
-		@_forAllThreeObjects (obj) ->
-			if obj.csg?
-				obj.csg.visible = isEnabled
+		# TODO implement for NodeVisualization
 
 	_getNodeIdentifier: (selectedNode) =>
 		if selectedNode.pluginData.newBrickator?.identifier?
@@ -460,8 +408,6 @@ module.exports = class NewBrickator
 				grid: cachedData.grid
 			}
 			results = @pipeline.run data, settings, true
-
-			threeNodes = @getThreeObjectsByNode selectedNode
 
 			# ToDo: this is a workaround which needs to be fixed in layouter
 			# (apply changed bricks directly to grid)

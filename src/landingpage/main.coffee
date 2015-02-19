@@ -67,4 +67,4 @@ stlDropper.init $('body'), $('.dropper'), $('#dropoverlay'), loadModel
 
 stlFileSelector = require './stlFileSelector'
 stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel
-$('.dropper').html('Select an stl file')
+$('.dropper').html('Drop an stl file')

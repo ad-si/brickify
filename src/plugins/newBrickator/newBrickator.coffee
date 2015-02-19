@@ -153,11 +153,11 @@ module.exports = class NewBrickator
 		return [{
 			text: 'LEGO Brush'
 			icon: 'legoBrush.png'
-			selectCallback: @_brushSelectCallback
+			selectCallback: @_legoSelectCallback
 			mouseDownCallback: @_legoMouseDownCallback
 			mouseMoveCallback: @_selectLegoMouseMoveCallback
 			mouseHoverCallback: @_legoMouseHoverCallback
-			mouseUpCallback: @_brushMouseUpCallback
+			mouseUpCallback: @_legoMouseUpCallback
 			canToggleVisibility: true
 			visibilityCallback: @_toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
@@ -166,11 +166,11 @@ module.exports = class NewBrickator
 			icon: '3dPrintBrush.png'
 			# select / deselect are the same for both voxels,
 			# but move has a different function
-			selectCallback: @_brushSelectCallback
+			selectCallback: @_printSelectCallback
 			mouseDownCallback: @_printMouseDownCallback
 			mouseMoveCallback: @_select3DMouseMoveCallback
 			mouseHoverCallback: @_printMouseHoverCallback
-			mouseUpCallback: @_brushMouseUpCallback
+			mouseUpCallback: @_printMouseUpCallback
 			canToggleVisibility: true
 			visibilityCallback: @_togglePrintedLayer
 			tooltip: 'Select geometry to be 3d-printed'
@@ -226,6 +226,22 @@ module.exports = class NewBrickator
 			modelPromise.catch (error) =>
 				reject error
 
+	_legoSelectCallback: (selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+			
+		@_getCachedData(selectedNode).then (cachedData) =>
+			@brushHandler.legoSelect selectedNode, cachedData
+
+	_printSelectCallback: (selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+			
+		@_getCachedData(selectedNode).then (cachedData) =>
+			@brushHandler.printSelect selectedNode, cachedData
+
 	_legoMouseDownCallback: (event, selectedNode) =>
 		# ignore if we are currently in build mode
 		if @buildModeEnabled
@@ -275,13 +291,21 @@ module.exports = class NewBrickator
 		@_getCachedData(selectedNode).then (cachedData) =>
 			@brushHandler.printMouseHover event, selectedNode, cachedData
 
-	_brushMouseUpCallback: (event, selectedNode) =>
+	_legoMouseUpCallback: (event, selectedNode) =>
 		# ignore if we are currently in build mode
 		if @buildModeEnabled
 			return
 
 		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.mouseUp event, selectedNode, cachedData
+			@brushHandler.legoMouseUp event, selectedNode, cachedData
+
+	_printMouseUpCallback: (event, selectedNode) =>
+		# ignore if we are currently in build mode
+		if @buildModeEnabled
+			return
+
+		@_getCachedData(selectedNode).then (cachedData) =>
+			@brushHandler.printMouseUp event, selectedNode, cachedData
 
 	_applyBricksToGrid: (bricks, grid) =>
 		# updates references between voxel --> brick

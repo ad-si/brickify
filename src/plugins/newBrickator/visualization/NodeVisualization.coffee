@@ -26,8 +26,25 @@ module.exports = class NodeVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	updateVoxelVisualization: (coloring = @defaultColoring) =>
-		# (re)creates voxel visualization
+	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
+		# (re)creates voxel visualization.
+		# hides disabled voxels, updates material and knob visibility
+
+		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
+		recreate
+			@_createVoxelVisualization coloring
+			return
+
+		# update materials and show/hide knobs
+		for v in @voxelsSubnode.children
+			# get material
+			material = coloring.getMaterialForVoxel v.gridEntry
+			v.setMaterial material
+			@_updateVoxel v
+
+	_createVoxelVisualization: (coloring) =>
+		# clear and create voxel visualization
+
 		@voxelsSubnode.children = []
 
 		for z in [0..@grid.numVoxelsZ - 1] by 1
@@ -37,14 +54,18 @@ module.exports = class NodeVisualization
 						voxel = @grid.zLayers[z][x][y]
 						material = coloring.getMaterialForVoxel voxel
 						threeBrick = @geometryCreator.getVoxel {x: x, y: y, z: z}, material
-
-						if not voxel.enabled
-							threeBrick.visible = false
-
-						if @grid.zLayers[z + 1]?[x]?[y]?.enabled
-							threeBrick.setKnobVisibility false
-
+						@_updateVoxel threeBrick
 						@voxelsSubnode.add threeBrick
+
+	_updateVoxel: (threeBrick) =>
+		if not threeBrick.isEnabled()
+			threeBrick.visible = false
+
+		coords = threeBrick.voxelCoords
+		if @grid.getVoxel(coords.x, coords.y, coords.z + 1)?.enabled
+			threeBrick.setKnobVisibility false
+		else
+			threeBrick.setKnobVisibility true
 
 	updateBricks: (@bricks) =>
 		@updateBrickVisualization()
@@ -104,14 +125,11 @@ module.exports = class NodeVisualization
 			voxel.enable()
 			voxel.setMaterial @defaultColoring.selectedMaterial
 
-	hideDeselectedVoxels: () =>
-		# hides all currently deselected voxels
-		for v in @modifiedVoxels
-			if not v.isEnabled
-				v.visible = false
+	updateModifiedVoxels: () =>
+		# moves all currenly deselected voxels
+		# to modified voxels
 
 		for v in @currentlyDeselectedVoxels
-			v.visible = false
 			@modifiedVoxels.push v
 
 		@currentlyDeselectedVoxels = []

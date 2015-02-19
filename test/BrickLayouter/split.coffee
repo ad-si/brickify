@@ -4,14 +4,50 @@ Brick = require '../../src/plugins/newBrickator/Brick'
 Grid = require '../../src/plugins/newBrickator/Grid'
 
 describe 'brickLayouter split', ->
-	baseBrick = {
-		length: 8
-		width: 8
-		height: 3.2
-	}
+	it 'should split 1x1 brick & establish new neighbours and connections', ->
+		# y = 1
+		# x4x
+		# 123
+		# x0x
 
+		# y = 0
+		# xxx
+		# x5x
+		# xxx
 
-	it 'should split bricks & establish new neighbours and connections', (done) ->
+		# y = 2
+		# xxx
+		# x6x
+		# xxx
+
+		brickLayouter = new BrickLayouter()
+		brick0 = new Brick {x: 1, y: 1, z: 0}, {x: 1, y: 1, z: 1}
+		brick1 = new Brick {x: 0, y: 1, z: 1}, {x: 1, y: 1, z: 1}
+		brick2 = new Brick {x: 1, y: 1, z: 1}, {x: 1, y: 1, z: 1}
+		brick3 = new Brick {x: 2, y: 1, z: 1}, {x: 1, y: 1, z: 1}
+		brick4 = new Brick {x: 1, y: 1, z: 2}, {x: 1, y: 1, z: 1}
+		brick5 = new Brick {x: 1, y: 0, z: 1}, {x: 1, y: 1, z: 1}
+		brick6 = new Brick {x: 1, y: 2, z: 1}, {x: 1, y: 1, z: 1}
+
+		brick0.upperSlots = [[brick2]]
+		brick2.upperSlots = [[brick4]]
+		brick2.lowerSlots = [[brick0]]
+		brick4.lowerSlots = [[brick2]]
+
+		brick1.neighbours = [[], [brick2], [], []]
+		brick2.neighbours = [[brick1], [brick3], [brick5], [brick6]]
+		brick3.neighbours = [[brick2], [], [], []]
+		brick5.neighbours = [[], [], [], [brick2]]
+		brick6.neighbours = [[], [], [brick2], []]
+
+		newBricks = brick2.split()
+		newBrick = newBricks[0]
+		expect(newBrick).to.not.equal(brick2)
+		expect(newBrick.neighbours).to.eql([[brick1], [brick3], [brick5], [brick6]])
+		expect(newBrick.upperSlots).to.eql([[brick4]])
+		expect(newBrick.lowerSlots).to.eql([[brick0]])
+
+	it 'should split bricks & establish new neighbours and connections', ->
 		# 89AB    xxxx
 		# 7777    2345
 		# 4556    x01x
@@ -107,13 +143,3 @@ describe 'brickLayouter split', ->
 		expect(newBricks[4].neighbours).to.
 			eql([[newBricks[3]],[newBricks[5]],[],[]])
 
-		# 89AB    xxxx
-		# 7777    2345
-		# 4556    x01x
-		# 0123    xxxx
-
-		# check correct neighbours
-
-		done()
-
-	###

@@ -117,13 +117,9 @@ module.exports = class Grid
 
 	getVoxel: (positionOrX, y, z) =>
 		if y? and z?
-			return @_getVoxel positionOrX, y, z
+			return @zLayers[z]?[positionOrX]?[y]
 		else
-			return @_getVoxel positionOrX.x, positionOrX.y, positionOrX.z
-
-	_getVoxel: (x, y, z) =>
-		if @zLayers[z]?[x]?[y]?
-			return @zLayers[z]?[x]?[y]
+			return @zLayers[positionOrX.z]?[positionOrX.x]?[positionOrX.y]
 
 	forEachVoxel: (callback) =>
 		for z in [0..@numVoxelsZ - 1] by 1

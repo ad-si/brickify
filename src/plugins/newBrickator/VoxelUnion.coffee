@@ -2,7 +2,7 @@ THREE = require 'three'
 ThreeCSG = require './threeCSG/ThreeCSG'
 
 # creates one CSG geometry for all voxels to be 3d printed
-module.exports = class VoxelGeometrizer
+module.exports = class VoxelUnion
 	constructor: (@grid) ->
 		return
 
@@ -59,7 +59,8 @@ module.exports = class VoxelGeometrizer
 				geo.faces.push new THREE.Face3(v.points[0], v.points[1], v.points[3])
 				geo.faces.push new THREE.Face3(v.points[3], v.points[1], v.points[2])
 
-			# check if we are fully inside the model (voxel neighbours to all 4 sides)
+			# check if there are 4 neighbours in the same z-layer
+			# (no need to create sidwalls)
 			if s.zLayers[z][x + 1][y].voxel and s.zLayers[z][x - 1][y].voxel and
 			s.zLayers[z][x][y + 1].voxel and s.zLayers[z][x][y - 1].voxel
 				skipSidewalls = true

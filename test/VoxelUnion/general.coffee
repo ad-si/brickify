@@ -1,14 +1,14 @@
 expect = require('chai').expect
 Grid = require '../../src/plugins/newBrickator/Grid'
-VoxelGeometrizer = require '../../src/plugins/newBrickator/VoxelGeometrizer'
+VoxelUnion = require '../../src/plugins/newBrickator/VoxelUnion'
 THREE = require 'three'
 
-describe 'VoxelGeometrizer', ->
+describe 'VoxelUnion', ->
 	grid = new Grid()
 	grid.origin = {x: 0, y: 0, z: 0}
 
 	it 'should create a single cube csg', (done) ->
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		bsp = vg.run [ {x: 0, y: 0, z: 0} ]
 		geometry = bsp.toMesh(null).geometry
 
@@ -18,7 +18,7 @@ describe 'VoxelGeometrizer', ->
 		done()
 
 	it 'should create a 2x2 plate csg', (done) ->
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		bsp = vg.run [
 			{x: 0, y: 0, z: 0}
 			{x: 1, y: 0, z: 0}
@@ -33,7 +33,7 @@ describe 'VoxelGeometrizer', ->
 		done()
 
 	it 'should create a 2x2x2 cube csg with 26 vertices', (done) ->
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		bsp = vg.run [
 			{x: 0, y: 0, z: 0}
 			{x: 1, y: 0, z: 0}
@@ -55,7 +55,7 @@ describe 'VoxelGeometrizer', ->
 		# the algorithm creates a point in the middle of the cube,
 		# which is then not used in the geometry
 
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		geometry = vg._createVoxelGeometry [
 			{x: 0, y: 0, z: 0}
 			{x: 1, y: 0, z: 0}
@@ -77,7 +77,7 @@ describe 'VoxelGeometrizer', ->
 		# # #
 		#  #
 
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		geometry = vg._createVoxelGeometry [
 			{x: 1, y: 0, z: 0}
 			{x: 0, y: 1, z: 0}
@@ -91,7 +91,7 @@ describe 'VoxelGeometrizer', ->
 		done()
 
 	it 'should create a 3x3 plate THREE.Geometry', (done) ->
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		geometry = vg._createVoxelGeometry [
 			{x: 0, y: 0, z: 0}
 			{x: 1, y: 0, z: 0}
@@ -114,7 +114,7 @@ describe 'VoxelGeometrizer', ->
 		# ###
 		#  #
 
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		geometry = vg._createVoxelGeometry [
 			{x: 1, y: 0, z: 0}
 			{x: 0, y: 1, z: 0}
@@ -133,7 +133,7 @@ describe 'VoxelGeometrizer', ->
 		# ###
 		#  #
 
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		data = vg._prepareData [
 			{x: 1, y: 0, z: 0}
 			{x: 0, y: 1, z: 0}
@@ -177,7 +177,7 @@ describe 'VoxelGeometrizer', ->
 		# ###
 		#  #
 
-		vg = new VoxelGeometrizer(grid)
+		vg = new VoxelUnion(grid)
 		data = vg._prepareData [
 			{x: 1, y: 0, z: 0}
 			{x: 0, y: 1, z: 0}

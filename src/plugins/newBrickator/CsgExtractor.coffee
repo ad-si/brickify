@@ -1,5 +1,5 @@
 ThreeCSG = require './threeCsg/ThreeCSG'
-VoxelGeometrizer = require './VoxelGeometrizer'
+VoxelUnion = require './VoxelUnion'
 
 module.exports = class CsgExtractor
 	extractGeometry: (grid, options = {}) ->
@@ -25,8 +25,8 @@ module.exports = class CsgExtractor
 			return null
 
 		d = new Date()
-		geometrizer = new VoxelGeometrizer(grid)
-		voxelHull = geometrizer.run printVoxels, options
+		voxunion = new VoxelUnion(grid)
+		voxelHull = voxunion.run printVoxels, options
 		if options.profile
 			console.log "Voxel Geometrizer took #{new Date() - d}ms"
 

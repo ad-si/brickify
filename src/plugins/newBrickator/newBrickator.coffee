@@ -39,23 +39,17 @@ module.exports = class NewBrickator
 
 	onNodeAdd: (node) =>
 		if @bundle.globalConfig.autoLegofy
-			@runLegoPipelineOnNode(node)
+			@runLegoPipeline node
 
 	processFirstObject: () =>
 		@bundle.statesync.performStateAction (state) =>
 			if state.rootNode.children?
 				node = state.rootNode.children[0]
-				@runLegoPipelineOnNode node
+				@runLegoPipeline node
 			else
 				console.error 'Unable to Legofy first object: state is empty'
 
-	runLegoPipelineOnNode: (selectedNode) =>
-		modelCache.request(selectedNode.meshHash).then(
-			(optimizedModel) =>
-				@runLegoPipeline optimizedModel, selectedNode
-		)
-
-	runLegoPipeline: (optimizedModel, selectedNode) =>
+	runLegoPipeline: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
 			settings = new PipelineSettings()
@@ -84,7 +78,6 @@ module.exports = class NewBrickator
 			@bundle.getPlugin('solid-renderer').setNodeMaterial selectedNode,
 				@printMaterial
 
-
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode
 		pipelineSettings.setModelTransform modelTransform
@@ -98,20 +91,9 @@ module.exports = class NewBrickator
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
 		return modelTransform
 
-	_forAllThreeObjects: (callback) =>
-		for threenode in @threejsRootNode.children
-			obj = {
-				voxels: threenode.children[0]
-				bricks: threenode.children[1]
-				csg: threenode.children[2]
-			}
-
-			callback obj
-
-
 	getBrushes: () =>
 		return [{
-			text: 'LEGO Brush'
+			text: 'Make LEGO brush'
 			icon: 'legoBrush.png'
 			selectCallback: @_legoSelectCallback
 			mouseDownCallback: @_legoMouseDownCallback
@@ -122,10 +104,8 @@ module.exports = class NewBrickator
 			visibilityCallback: @_toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
 		},{
-			text: '3D print brush'
+			text: 'Make 3D print brush'
 			icon: '3dPrintBrush.png'
-			# select / deselect are the same for both voxels,
-			# but move has a different function
 			selectCallback: @_printSelectCallback
 			mouseDownCallback: @_printMouseDownCallback
 			mouseMoveCallback: @_select3DMouseMoveCallback

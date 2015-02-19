@@ -4,51 +4,85 @@ module.exports = class BrushHandler
 			color: 0x00ff00
 		})
 
-	legoSelect: (selectedNode, cachedData) =>
-		@_toggleVoxelVisibility event, selectedNode, cachedData
-		cachedData.visualization.updateVoxelVisualization()
-		cachedData.visualization.showDeselectedVoxelSuggestions()
+	getBrushes: () =>
+		return [{
+			text: 'Make LEGO brush'
+			icon: 'legoBrush.png'
+			selectCallback: @_legoSelect
+			mouseDownCallback: @_legoMouseDown
+			mouseMoveCallback: @_legoMouseMove
+			mouseHoverCallback: @_legoMouseHover
+			mouseUpCallback: @_legoMouseUp
+			canToggleVisibility: true
+			visibilityCallback: @newBrickator._toggleBrickLayer
+			tooltip: 'Select geometry to be made out of LEGO'
+		},{
+			text: 'Make 3D print brush'
+			icon: '3dPrintBrush.png'
+			selectCallback: @_printSelect
+			mouseDownCallback: @_printMouseDown
+			mouseMoveCallback: @_printMouseMove
+			mouseHoverCallback: @_printMouseHover
+			mouseUpCallback: @_printMouseUp
+			canToggleVisibility: true
+			visibilityCallback: @newBrickator._togglePrintedLayer
+			tooltip: 'Select geometry to be 3d-printed'
+		}]
+
+	_checkAndPrepare: (selectedNode, callback) =>
+		# ignore if we are currently in build mode
+		if @newBrickator.buildModeEnabled
+			return
+
+		@newBrickator._getCachedData(selectedNode).then (cachedData) =>
+			callback(cachedData)
+
+	_legoSelect: (selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.showVoxels()
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.showDeselectedVoxelSuggestions()
 		
-	printSelect: (selectedNode, cachedData) =>
-		@_toggleVoxelVisibility event, selectedNode, cachedData
-		cachedData.visualization.updateVoxelVisualization()
+	_printSelect: (selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.showVoxels()
+			cachedData.visualization.updateVoxelVisualization()
 		
-	legoMouseDown: (event, selectedNode, cachedData) =>
-		cachedData.visualization.selectVoxel event
+	_legoMouseDown: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.selectVoxel event
 
-	legoMouseMove: (event, selectedNode, cachedData) =>
-		cachedData.visualization.selectVoxel event
+	_legoMouseMove: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.selectVoxel event
 
-	legoMouseHover: (event, selectedNode, cachedData) =>
-		cachedData.visualization.highlightVoxel event, (voxel) ->
-			return not voxel.isEnabled()
+	_legoMouseHover: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.highlightVoxel event, (voxel) ->
+				return not voxel.isEnabled()
 
-	printMouseDown: (event, selectedNode, cachedData) =>
-		cachedData.visualization.deselectVoxel event
+	_printMouseDown: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.deselectVoxel event
 
-	printMouseHover: (event, selectedNode, cachedData) =>
-		@_hightlightSelectedVoxel event, selectedNode, cachedData
+	_printMouseHover: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.highlightVoxel event
 
-	printMouseMove: (event, selectedNode, cachedData) =>
-		cachedData.visualization.deselectVoxel event
+	_printMouseMove: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.deselectVoxel event
 
-	printMouseUp: (event, selectedNode, cachedData) =>
-		cachedData.visualization.updateModifiedVoxels()
-		cachedData.visualization.updateVoxelVisualization()
+	_printMouseUp: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.updateModifiedVoxels()
+			cachedData.visualization.updateVoxelVisualization()
 
-	legoMouseUp: (event, selectedNode, cachedData) =>
-		cachedData.visualization.updateVoxelVisualization()
-		cachedData.visualization.showDeselectedVoxelSuggestions()
+	_legoMouseUp: (event, selectedNode, cachedData) =>
+		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.showDeselectedVoxelSuggestions()
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()
-		@_toggleVoxelVisibility null, selectedNode, cachedData
-
-	_hightlightSelectedVoxel: (event, selectedNode, cachedData) =>
-		cachedData.visualization.highlightVoxel event
-
-	_toggleVoxelVisibility: (event, selectedNode, cachedData) =>
-		# always show voxel, never show lego bricks
-		# (because we don't re-layout after each brush, therefore
-		# the lego layout becomes invalid after first brush use)
 		cachedData.visualization.showVoxels()

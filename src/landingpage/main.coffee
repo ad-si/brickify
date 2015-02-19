@@ -16,36 +16,55 @@ globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 388
 globalConfig.syncWithServer = false
 globalConfig.buildUi = false
+globalConfig.autoRotate = true
+globalConfig.plugins.dummy = false
+globalConfig.plugins.stlImport = false
+globalConfig.plugins.stlExport = false
+globalConfig.plugins.coordinateSystem = false
+globalConfig.plugins.legoBoard = false
+globalConfig.plugins.solidRenderer = true
+globalConfig.plugins.newBrickator = true
 
-#clone global config 3 times
+# clone global config 2 times
 config1 = clone globalConfig
 config2 = clone globalConfig
 
 # instantiate 2 lowfab bundles
 config1.renderAreaId = 'renderArea1'
+config1.plugins.newBrickator = false
 bundle1 = new Bundle config1
+controls = bundle1.getControls()
 b1 = bundle1.init()
 
 config2.renderAreaId = 'renderArea2'
-bundle2 = new Bundle config2
+config2.plugins.solidRenderer = false
+bundle2 = new Bundle config2, controls
 b2 = bundle2.init()
 
-loadAndConvert = (hash) =>
-	b1.then(() -> bundle1.modelLoader.loadByHash hash)
+loadAndConvert = (hash, animate) ->
+	b1.then(() ->
+		bundle1.modelLoader.loadByHash hash)
+		.then(() ->
+			document.getElementById('renderArea1').style.backgroundImage = 'none')
 	b2.then(() -> bundle2.modelLoader.loadByHash hash)
 		.then(() ->
 			nb = bundle2.getPlugin 'newBrickator'
-			nb.processFirstObject()
-		)
+			nb.processFirstObject animate
+		).then(() ->
+			document.getElementById('renderArea2').style.backgroundImage = 'none')
 	$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
 
 #load and process model
-loadAndConvert('1c2395a3145ad77aee7479020b461ddf')
+loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
-loadModel = (hash, errors) =>
+loadModel = (hash, errors) ->
 	b1.then(() -> bundle1.clearScene())
 	b2.then(() -> bundle2.clearScene())
-	loadAndConvert(hash)
+	loadAndConvert(hash, true)
 
 stlDropper = require './stlDropper'
-stlDropper.init $('#teaser-carousel .dropper'), loadModel
+stlDropper.init $('body'), $('.dropper'), $('#dropoverlay'), loadModel
+
+stlFileSelector = require './stlFileSelector'
+stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel
+$('.dropper').html('Drop an stl file')

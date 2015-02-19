@@ -27,6 +27,8 @@ cameraFarPlane: 2500
 # animations
 animationStepSize: 0.02
 animations: []
+autoRotate: false
+autoRotateSpeed: 1.0
 
 # coordinate system
 axisLength: 100
@@ -59,3 +61,13 @@ defaultPlugin: 'fabrickator'
 
 #newBrickator
 autoLegofy: false
+
+#load these plugins
+plugins:
+  dummy: false
+  stlImport: true
+  stlExport: true
+  coordinateSystem: true
+  legoBoard: true
+  solidRenderer: true
+  newBrickator: true

@@ -16,6 +16,7 @@ commandFunctions = {
 		console.log 'loading initial model'
 		p = /^[0-9a-z]{32}/
 		if p.test value
+			bundle.clearScene()
 			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'

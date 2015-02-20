@@ -251,6 +251,7 @@ module.exports = class NewBrickator
 
 		@buildContainer = $('#buildContainer')
 		@buildContainer.hide()
+		@buildContainer.removeClass 'hidden'
 
 		@buildLayerUi = {
 			slider: $('#buildSlider')

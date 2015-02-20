@@ -6,7 +6,7 @@ module.exports = class BrushHandler
 
 	getBrushes: () =>
 		return [{
-			text: 'Make LEGO brush'
+			text: 'Make LEGO<br>brush'
 			icon: 'legoBrush.png'
 			selectCallback: @_legoSelect
 			mouseDownCallback: @_legoMouseDown
@@ -17,7 +17,7 @@ module.exports = class BrushHandler
 			visibilityCallback: @newBrickator._toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
 		},{
-			text: 'Make 3D print brush'
+			text: 'Make 3D print<br>brush'
 			icon: '3dPrintBrush.png'
 			selectCallback: @_printSelect
 			mouseDownCallback: @_printMouseDown

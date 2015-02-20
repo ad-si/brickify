@@ -12,14 +12,19 @@ globalConfig = require '../../common/globals.yaml'
 
 module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
-	init: (bundle) ->
-		@globalConfig = bundle.globalConfig
+	init: (@bundle) ->
+		@globalConfig = @bundle.globalConfig
 		return
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		material = new THREE.MeshLambertMaterial(
+		@baseplateMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlate
+		)
+		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
+				color: globalConfig.colors.basePlate
+				opacity: 0.4
+				transparent: true
 		)
 		knobsMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlateStud
@@ -27,11 +32,14 @@ module.exports = class LegoBoard
 
 		#create baseplate
 		box = new THREE.BoxGeometry(400, 400, 8)
-		boxobj = new THREE.Mesh(box, material)
+		boxobj = new THREE.Mesh(box, @baseplateMaterial)
 		boxobj.translateZ -4
 		@threejsNode.add boxobj
 
-		#create noppen
+		#create knobs
+		knobsContainer = new THREE.Object3D()
+		@threejsNode.add knobsContainer
+
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
 		.then (model) =>
@@ -41,7 +49,23 @@ module.exports = class LegoBoard
 					object = new THREE.Mesh(geo, knobsMaterial)
 					object.translateX x
 					object.translateY y
-					@threejsNode.add object
+					knobsContainer.add object
+
+	on3dUpdate: () =>
+		# check if the camera is below z=0. if yes, make the plate transparent
+		# and hide knobs
+		if not @bundle?
+			return
+
+		cam = @bundle.renderer.camera
+
+		# it should be z, but due to orbitcontrols the scene is rotated
+		if cam.position.y < 0
+			@threejsNode.children[0].material = @baseplateTransparentMaterial
+			@threejsNode.children[1].visible = false
+		else
+			@threejsNode.children[0].material = @baseplateMaterial
+			@threejsNode.children[1].visible = true
 
 	toggleVisibility: () =>
 		@threejsNode.visible = !@threejsNode.visible

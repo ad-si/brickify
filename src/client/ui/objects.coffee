@@ -103,24 +103,6 @@ module.exports = class UiObjects
 		string = "<div class='btn btn-primary'>#{brush.text}</div>"
 
 		htmlElement = $(string)
-		#@_createTooltip htmlElement, brush, 'bottom'
-
-		###
-		if brush.canToggleVisibility
-			brush.visible = true
-			visibilityString = '<div class="iconFloatRight">
-				<span class="glyphicon glyphicon-eye-open"></span></div>'
-			e = $(visibilityString)
-			htmlElement.append e
-			e.on 'click', () =>
-				@_toggleBrushVisibility brush, e
-
-			e.tooltip {
-				title: 'Toggle layer visibility'
-				placement: 'right'
-				delay: 500
-			}
-		###
 
 		htmlElement.on 'click', () =>
 			@_brushSelect brush

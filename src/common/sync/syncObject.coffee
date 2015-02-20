@@ -34,34 +34,41 @@ class SyncObject
 			@ready = Promise.resolve()
 
 	###
-	# Loads a dataPacket via id and wraps it in a new object constructed
-	# from the respective subclass of SyncObject
+	# Builds the respective subclass of SyncObject from a descriptor or a
+	# descriptor array which can either be a packet with an id and a data plain
+	# old javascript object or an array of packets or an id of a packet to load or
+	# an array of packet ids to be loaded or a DataPacket reference or an array
+	# of DataPacket references.
 	#
-	# @param {String} dataPacketId the id of the dataPacket to load
-	# @return {Promise} resolves to the created object of the respective subclass
+	# @param {String|Array<String>|Object|Array<Object>} syncObjectDescriptor
+	# @return {SyncObject|Array<SyncObject>} as Promise or Array of Promises
+	# @promise
 	# @memberOf SyncObject
 	###
-	@load: (dataPacketIds) ->
-		getPacketPromise = (id) =>
-			SyncObject.dataPacketProvider.get(id).then (packet) => @newFrom packet
+	@from: (syncObjectDescriptor) ->
+		_syncObjectFromPacket = (packet) =>
+			new @(_generateId: false).next (syncObject) ->
+				syncObject[p] = packet.data[p] for own p of packet.data
+				syncObject.id = packet.id
 
-		if Array.isArray dataPacketIds
-			return dataPacketIds.map getPacketPromise
+		_packetFromId = (id) => SyncObject.dataPacketProvider.get id
+
+		_fromOne = (descriptor) =>
+			if typeof descriptor is 'string'
+				packet = _packetFromId descriptor
+			else if @isSyncObjectReference descriptor
+				packet = _packetFromId descriptor.id
+			else if @isDataPacket descriptor
+				packet = Promise.resolve descriptor
+			else
+				throw new Error descriptor + ' is not an id, a packet or a reference.'
+
+			return packet.then _syncObjectFromPacket
+
+		if Array.isArray syncObjectDescriptor
+			return syncObjectDescriptor.map _fromOne
 		else
-			return getPacketPromise dataPacketIds
-
-	###
-	# Wraps a given plain old javascript object in a new object constructed
-	# from the respective subclass of SyncObject
-	#
-	# @param {Object} packet a data packet
-	# @return {SyncObject} object of the respective subclass with added properties
-	# @memberOf SyncObject
-	###
-	@newFrom: (packet) ->
-		return new @(_generateId: false).next (syncObject) ->
-			syncObject[p] = packet.data[p] for own p of packet.data
-			syncObject.id = packet.id
+			return _fromOne syncObjectDescriptor
 
 	getId: =>
 		return @id
@@ -84,6 +91,12 @@ class SyncObject
 	###
 	toJSON: =>
 		return dataPacketRef: @getId()
+
+	@isSyncObjectReference: (pojso) ->
+		return typeof pojso.dataPacketRef is 'string'
+
+	@isDataPacket: (pojso) ->
+		return typeof pojso.id is 'string' and pojso.data?
 
 	###
 	# Builds an object that only consists of non-transient plain objects.

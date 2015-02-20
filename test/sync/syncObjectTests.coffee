@@ -39,19 +39,42 @@ describe 'SyncObject tests', ->
 		it 'should support creation from a packet', ->
 			pojso = {a: 'b', c: {d: 'e'}}
 			packet = {id: 'abcdefgh', data: pojso}
-			dummy = Dummy.newFrom packet
-			dummy.done ->
+			request = Dummy.from packet
+			expect(request).to.resolve
+			request.then (dummy) ->
 				expect(dataPackets.calls).to.equal(0)
-				expect(dummy).to.be.an.instanceof(Dummy)
-				expect(dummy).to.be.an.instanceof(SyncObject)
-				expect(dummy).to.shallowDeepEqual(pojso)
+				dummy.done ->
+					expect(dummy).to.be.an.instanceof(Dummy)
+					expect(dummy).to.be.an.instanceof(SyncObject)
+					expect(dummy).to.shallowDeepEqual(pojso)
+
+		it 'should support loading from many packets', ->
+			pojsos = []
+			packets = []
+
+			for i in [0..2]
+				pojsos[i] = {a: 'b' + i, c: {d: 'e' + i}}
+				packets[i] = {id: 'abcdefgh' + i, data: pojsos[i]}
+
+			requests = Promise.all Dummy.from packets
+			expect(requests).to.resolve
+			requests.then (dummies) ->
+				expect(dummies).to.have.length(packets.length)
+				promises = dummies.map (dummy) -> dummy.done()
+				Promise.all(promises).then ->
+					expect(dataPackets.calls).to.equal(0)
+					for i in [0...dummies.length] by 1
+						dummy = dummies[i]
+						expect(dummy).to.be.an.instanceof(Dummy)
+						expect(dummy).to.be.an.instanceof(SyncObject)
+						expect(dummy).to.shallowDeepEqual(pojsos[i])
 
 		it 'should support loading from an id', ->
 			pojso = {a: 'b', c: {d: 'e'}}
 			id = 'abcdefgh'
 			packet = {id: id, data: pojso}
 			dataPackets.nextGets.push packet
-			request = Dummy.load id
+			request = Dummy.from id
 			expect(request).to.resolve
 			request.then (dummy) -> dummy.done ->
 				expect(dataPackets.calls).to.equal(1)
@@ -71,12 +94,53 @@ describe 'SyncObject tests', ->
 				packets[i] = {id: ids[i], data: pojsos[i]}
 				dataPackets.nextGets.push packets[i]
 
-			requests = Promise.all Dummy.load ids
+			requests = Promise.all Dummy.from ids
 			expect(requests).to.resolve
 			requests.then (dummies) ->
 				expect(dummies).to.have.length(ids.length)
 				expect(dataPackets.calls).to.equal(ids.length)
 				expect(dataPackets.getCalls).to.have.length(ids.length)
+				promises = dummies.map (dummy) -> dummy.done()
+				Promise.all(promises).then ->
+					for i in [0...dummies.length] by 1
+						dummy = dummies[i]
+						expect(dummy).to.be.an.instanceof(Dummy)
+						expect(dummy).to.be.an.instanceof(SyncObject)
+						expect(dummy).to.shallowDeepEqual(pojsos[i])
+
+		it 'should support loading from a reference', ->
+			pojso = {a: 'b', c: {d: 'e'}}
+			id = 'abcdefgh'
+			packet = {id: id, data: pojso}
+			dataPackets.nextGets.push packet
+			request = Dummy.from {dataPacketRef: id}
+			expect(request).to.resolve
+			request.then (dummy) -> dummy.done ->
+				expect(dataPackets.calls).to.equal(1)
+				expect(dataPackets.getCalls).to.have.length(1)
+				expect(dummy).to.be.an.instanceof(Dummy)
+				expect(dummy).to.be.an.instanceof(SyncObject)
+				expect(dummy).to.shallowDeepEqual(pojso)
+
+		it 'should support loading from many references', ->
+			pojsos = []
+			ids = []
+			references = []
+			packets = []
+
+			for i in [0..2]
+				pojsos[i] = {a: 'b' + i, c: {d: 'e' + i}}
+				ids[i] = 'abcdefgh' + i
+				references[i] = {dataPacketRef: ids[i]}
+				packets[i] = {id: ids[i], data: pojsos[i]}
+				dataPackets.nextGets.push packets[i]
+
+			requests = Promise.all Dummy.from references
+			expect(requests).to.resolve
+			requests.then (dummies) ->
+				expect(dummies).to.have.length(references.length)
+				expect(dataPackets.calls).to.equal(references.length)
+				expect(dataPackets.getCalls).to.have.length(references.length)
 				promises = dummies.map (dummy) -> dummy.done()
 				Promise.all(promises).then ->
 					for i in [0...dummies.length] by 1
@@ -99,8 +163,8 @@ describe 'SyncObject tests', ->
 			packet = {id: 'abcdefgh', data: pojso}
 			expected = clone packet
 			expected.data.dummyProperty = 'a'
-			dummy = Dummy.newFrom packet
-			dummy.save().then ->
+			request = Dummy.from packet
+			request.then (dummy) -> dummy.save().then ->
 				expect(dataPackets.calls).to.equal(1)
 				expect(dataPackets.putCalls).
 					to.deep.have.property('[0].packet').deep.equal(expected)

@@ -1,5 +1,5 @@
 THREE = require 'three'
-ThreeCSG = require './threeCSG/ThreeCSG'
+ThreeCSG = require './threeCsg/ThreeCSG'
 
 # creates one CSG geometry for all voxels to be 3d printed
 module.exports = class VoxelUnion

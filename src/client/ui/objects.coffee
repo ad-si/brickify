@@ -174,7 +174,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
-				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
+				@_selectedBrush.jqueryObject.removeClass 'active'
 
 		#select new brush
 		@_selectedBrush = brush
@@ -182,7 +182,7 @@ module.exports = class UiObjects
 		if brush.iconBrush
 			brush.jqueryObject.addClass 'selectedBrush'
 		else
-			brush.jqueryObject.addClass 'innerShadow'
+			brush.jqueryObject.addClass 'active'
 			
 		if brush.selectCallback?
 				brush.selectCallback @selectedStructure.node
@@ -195,7 +195,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
-				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
+				@_selectedBrush.jqueryObject.removeClass 'active'
 
 		@_selectedBrush = null
 

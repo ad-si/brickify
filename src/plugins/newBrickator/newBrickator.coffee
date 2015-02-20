@@ -206,9 +206,14 @@ module.exports = class NewBrickator
 
 		return printThreeMesh
 
-	_toggleBrickLayer: (isEnabled) =>
-		@_brickVisibility = isEnabled
-		# TODO implement for NodeVisualization
+	_toggleBrickLayer: () =>
+		@_brickVisibility = !@_brickVisibility
+		for k,v of @gridCache
+			if @_brickVisibility
+				v.visualization.showAll()
+			else
+				v.visualization.hideAll()
+
 
 	_togglePrintedLayer: (isEnabled) =>
 		@_printVisibility = isEnabled
@@ -225,6 +230,19 @@ module.exports = class NewBrickator
 		selectedNode.pluginData.newBrickator.identifier = identifier
 
 		return identifier
+
+	getHotkeys: =>
+		return {
+			title: 'newBrickator'
+			events: [
+				{
+					hotkey: 'L'
+					description: 'toggle Lego visibility'
+					callback: =>
+						@_toggleBrickLayer()
+				}
+			]
+		}
 
 	_initBuildButton: () =>
 		# TODO: refactor after demo on 2015-02-26

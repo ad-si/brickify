@@ -26,6 +26,12 @@ module.exports = class NodeVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
+	hideAll: () =>
+		@threeNode.visible = false
+
+	showAll: () =>
+		@threeNode.visible  = true
+
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
 		# (re)creates voxel visualization.
 		# hides disabled voxels, updates material and knob visibility

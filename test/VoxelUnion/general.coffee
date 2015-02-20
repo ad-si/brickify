@@ -110,7 +110,7 @@ describe 'VoxelUnion', ->
 			{x: 0, y: 1, z: 0}
 			{x: 2, y: 1, z: 0}
 			{x: 1, y: 2, z: 0}
-		]	
+		]
 
 		expect(geometry.vertices.length).to.equal(24)
 		expect(geometry.faces.length).to.equal(8 + 32 + 8)

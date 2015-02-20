@@ -1,6 +1,7 @@
 chai = require 'chai'
 chai.use require './sceneChaiHelper'
 chai.use require 'chai-as-promised'
+chai.use require 'chai-shallow-deep-equal'
 expect = chai.expect
 
 DataPacketsMock = require '../mocks/dataPacketsMock'
@@ -68,7 +69,7 @@ describe 'Scene tests', ->
 
 	describe 'Scene synchronization', ->
 		it 'should store nodes as references', ->
-			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextIds.push 'sceneid'
 			scene = new Scene()
 			dataPackets.nextIds.push nodeId = 'nodeid'
 			node = new Node()
@@ -82,3 +83,25 @@ describe 'Scene tests', ->
 				nodes = packet.data.nodes
 				expect(nodes).to.have.length(1)
 				expect(nodes[0]).to.deep.equal({dataPacketRef: nodeId})
+
+		it 'should restore node objects from references', ->
+			scene = {
+				id: 'sceneid'
+				data: {
+					nodes: [{dataPacketRef: 'nodeid'}]
+				}
+			}
+			dataPackets.nextGets.push scene
+			node = {
+				id: 'nodeid'
+				data: { modelHash: 'abcdefghijklmnop', name: 'Beautiful Model' }
+			}
+			dataPackets.nextGets.push node
+
+			request = Scene.from('nodeid')
+			expect(request).to.resolve
+			request.then (scene) -> scene.done ->
+				expect(scene).to.have.property('nodes').that.is.an('array')
+				nodes = scene.nodes
+				expect(nodes).to.have.length(1)
+				expect(nodes[0]).to.shallowDeepEqual(node.data)

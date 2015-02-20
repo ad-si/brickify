@@ -1,4 +1,5 @@
 SyncObject = require '../sync/syncObject'
+Node = require './node'
 
 ###
 # A scene is a collection of nodes and settings and represents a state of a
@@ -16,6 +17,10 @@ class Scene extends SyncObject
 		@lastModified =
 			date: Date.now()
 			cause: cause
+
+	_loadSubObjects: =>
+		_loadNode = (reference) -> Node.from reference
+		return Promise.all(@nodes.map _loadNode).then (nodes) => @nodes = nodes
 
 	addNode: (node) =>
 		_addNode = =>

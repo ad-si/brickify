@@ -50,6 +50,7 @@ class SyncObject
 			new @(_generateId: false).next (syncObject) ->
 				syncObject[p] = packet.data[p] for own p of packet.data
 				syncObject.id = packet.id
+				syncObject._loadSubObjects()
 
 		_packetFromId = (id) => SyncObject.dataPacketProvider.get id
 
@@ -69,6 +70,16 @@ class SyncObject
 			return syncObjectDescriptor.map _fromOne
 		else
 			return _fromOne syncObjectDescriptor
+
+	###
+	# This method is called by @from after all properties of a restored SyncObject
+	# are loaded, but without resolving children that are references to
+	# DataPackets. A subclass that has such children should implement
+	# loadSubObjects to resolve those references and load the respective
+	# SyncObjects if they should be accessible after initialization.
+	###
+	_loadSubObjects: ->
+		return
 
 	getId: =>
 		return @id

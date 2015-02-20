@@ -38,22 +38,18 @@ module.exports = class NewBrickator
 					@threejsRootNode.remove threenode
 					return
 
-		for child in @threejsRootNode.children
-				if availableObjects.indexOf(child.uuid) < 0
-					@threejsRootNode.remove child
-
-	processFirstObject: () =>
+	processFirstObject: (animate) =>
 		@bundle.statesync.performStateAction (state) =>
 			node = state.rootNode.children[0]
-			@runLegoPipelineOnNode node
+			@runLegoPipelineOnNode node, animate
 
-	runLegoPipelineOnNode: (selectedNode) =>
+	runLegoPipelineOnNode: (selectedNode, animate) =>
 		modelCache.request(selectedNode.meshHash).then(
 			(optimizedModel) =>
-				@runLegoPipeline optimizedModel, selectedNode
+				@runLegoPipeline optimizedModel, selectedNode, animate
 		)
 
-	runLegoPipeline: (optimizedModel, selectedNode) =>
+	runLegoPipeline: (optimizedModel, selectedNode, animate) =>
 		@voxelVisualizer ?= new VoxelVisualizer()
 
 		threeNodes = @getThreeObjectsByNode(selectedNode)
@@ -70,7 +66,8 @@ module.exports = class NewBrickator
 		@brickVisualizer.createVisibleBricks(
 			threeNodes.bricks,
 			results.accumulatedResults.bricks,
-			results.accumulatedResults.grid
+			results.accumulatedResults.grid,
+			animate
 		)
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>

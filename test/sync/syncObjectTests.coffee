@@ -66,7 +66,7 @@ describe 'SyncObject tests', ->
 			packets = []
 
 			for i in [0..2]
-				pojsos[i] = {a: 'b'+i, c: {d: 'e'+i}}
+				pojsos[i] = {a: 'b' + i, c: {d: 'e' + i}}
 				ids[i] = 'abcdefgh' + i
 				packets[i] = {id: ids[i], data: pojsos[i]}
 				dataPackets.nextGets.push packets[i]

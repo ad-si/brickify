@@ -9,14 +9,14 @@ ObjectTree = require '../common/project/objectTree'
 # @class Bundle
 ###
 module.exports = class Bundle
-	constructor: (@globalConfig) ->
+	constructor: (@globalConfig, controls) ->
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(@)
 		@modelLoader = new ModelLoader(@)
 
-		@renderer = new Renderer(@pluginHooks, @globalConfig)
+		@renderer = new Renderer(@pluginHooks, @globalConfig, controls)
 
 	init: =>
 		@statesync
@@ -53,4 +53,7 @@ module.exports = class Bundle
 		@pluginInstances.filter (instance) -> instance.lowfab.type == type
 
 	clearScene: () =>
-		@statesync.performStateAction ObjectTree.clear
+		@statesync.performStateAction	ObjectTree.clear
+
+	getControls: () =>
+		@renderer.getControls()

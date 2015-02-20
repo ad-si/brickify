@@ -51,7 +51,7 @@ class DataPacketsMock
 
 	delete: (id) =>
 		@calls++
-		nextDelete = @nextDeletes.shift();
+		nextDelete = @nextDeletes.shift()
 		@deleteCalls.push id: id, delete: nextDelete
 		if nextDelete
 			return Promise.resolve()

@@ -7,7 +7,7 @@ module.exports = class BrickVisualizer
 
 	# expects a three node, an array of lego bricks (with positions in)
 	# grid coordinates, and optionally a grid offset
-	createVisibleBricks: (threeNode, brickData, grid) =>
+	createVisibleBricks: (threeNode, brickData, grid, animate = true) =>
 		# do not create multiple layers of bricks at the same time
 		# (happens when the user rapidly clicks with the mouse)
 		if @currentlyWorking
@@ -16,11 +16,16 @@ module.exports = class BrickVisualizer
 
 		threeNode.children = []
 
-		for gridZ in [0..brickData.length - 1] by 1
-			lastCallback = true if gridZ == (brickData.length - 1)
-			window.setTimeout @_layerCallback(
-				grid, brickData[gridZ], threeNode, lastCallback),
-					10 * gridZ
+		if animate
+			for gridZ in [0..brickData.length - 1] by 1
+				lastCallback = true if gridZ == (brickData.length - 1)
+				window.setTimeout @_layerCallback(
+					grid, brickData[gridZ], threeNode, lastCallback),
+						10 * gridZ
+		else
+			for gridZ in [0..brickData.length - 1] by 1
+				@_createLayer grid, brickData[gridZ], threeNode
+			@currentlyWorking = false
 
 	_createLayer: (grid, brickLayer, threeNode) =>
 		bricks = (@_createBrick grid, brick for brick in brickLayer)

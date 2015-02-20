@@ -1,5 +1,4 @@
 ###
-# #SyncObject
 # This is a helper super class for objects that are synchronized using
 # dataPackets.
 # @class SyncObject
@@ -20,10 +19,11 @@ class SyncObject
 	#
 	# Due to the synchronization process there are restrictions to the constructors
 	# of subclasses: All parameters must be passed as 'named parameters', meaning
-	# as an object. The key _generateId must not be used. The constructor must
-	# call SyncObject's constructor by calling super(arguments[0]).
+	# as an object. The constructor must call SyncObject's constructor by calling
+	# super(arguments[0]).
 	#
 	# @param {Object} params the named parameters
+	# @param {Boolean} [params._generateId=true] true for a new SyncObject
 	# @memberOf SyncObject
 	###
 	constructor: ({_generateId} = {}) ->
@@ -74,19 +74,20 @@ class SyncObject
 	#
 	# @param {String} key the name of the property to be checked.
 	# @return {Boolean} true if the key should be ignored
-	# @memberOf SyncObject
 	###
 	_isTransient: (key) ->
 		return -1 isnt ['id', 'ready', '_packet'].indexOf key
 
 	###
 	# For JSON serialization of parent objects only write a reference.
+	# @return {String} a DataPacket reference to this SyncObject.
 	###
 	toJSON: =>
 		return dataPacketRef: @getId()
 
 	###
 	# Builds an object that only consists of non-transient plain objects.
+	# @return {Object} key/value mapping of this object's non-transient properties
 	###
 	toPOJSO: =>
 		pojso = {} # plain old javascript object
@@ -100,6 +101,7 @@ class SyncObject
 
 	###
 	# Saves any non-transient data of this object to the server.
+	# @promise
 	###
 	save: =>
 		@ready = @ready.then => SyncObject.dataPacketProvider.put @_getPacket()
@@ -109,6 +111,7 @@ class SyncObject
 	# Deletes the object from the server.
 	# Caution: after calling delete() on a SyncObject, it will be more or less
 	# unusable, because next, done, save and delete will reject all further calls.
+	# @promise
 	###
 	delete: =>
 		@ready = @ready.then => SyncObject.dataPacketProvider.delete @getId()
@@ -130,7 +133,6 @@ class SyncObject
 	# @param {Function} onFulfilled run when previous task fulfilled with @
 	# @param {Function} onRejected run when previous task rejected with its reason
 	# @return {SyncObject} this
-	# @memberOf SyncObject
 	###
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
@@ -142,8 +144,8 @@ class SyncObject
 	#
 	# @param {Function} onFulfilled run when previous task fulfilled with @
 	# @param {Function} onRejected run when previous task rejected with its reason
-	# @return {Promise} resolves or rejects according to the run callback's result
-	# @memberOf SyncObject
+	# @return {Object} resolves or rejects according to the run callback's result
+	# @promise
 	###
 	done: (onFulfilled, onRejected) =>
 		# we don't want to pass return values from a previous then but pass @
@@ -153,9 +155,8 @@ class SyncObject
 	###
 	# Chains up a new error handler.
 	# This is only syntactic sugar for done(undefined, onRejected)
-	# @param {Function} onFulfilled run when previous task fulfilled with @
 	# @param {Function} onRejected run when previous task rejected with its reason
-	# @memberOf SyncObject
+	# @promise
 	###
 	catch: (onRejected) =>
 		return @ready = @ready.catch onRejected

@@ -122,7 +122,7 @@ module.exports = class SolidRenderer
 
 	getBrushes: =>
 		return []
-		###		
+		###
 		# deactivated until #250 is solved
 		return [{
 			text: 'move'

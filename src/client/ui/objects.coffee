@@ -30,6 +30,10 @@ module.exports = class UiObjects
 
 		@_objectSelect structure
 
+		# make sure a brush is always selected
+		if not @_selectedBrush
+			@_brushSelect @_brushList[@_brushList.length - 1]
+
 
 	onNodeRemove: (node) =>
 		# Called by sceneManager when a node is removed
@@ -44,19 +48,10 @@ module.exports = class UiObjects
 				return
 
 	selectNode: (node) =>
-		# overrides the node selection, maintains the same selected brush
+		# overrides the node selection
 		for s in @objectList
 			if s.node == node
-				selectedBrush = @selectedStructure.selectedBrush
-
 				@_objectSelect s
-
-				if selectedBrush
-					@_brushSelect selectedBrush,
-					@selectedStructure.brushjQueryObjects[selectedBrush.text],
-					@selectedStructure
-
-				return
 
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null

@@ -14,7 +14,6 @@ module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
 	init: (@bundle) ->
 		@globalConfig = @bundle.globalConfig
-		@_belowPlate = false
 		return
 
 	# Load the board
@@ -62,15 +61,11 @@ module.exports = class LegoBoard
 
 		# it should be z, but due to orbitcontrols the scene is rotated
 		if cam.position.y < 0
-			if not @_belowPlate
-				@_belowPlate = true
-				@threejsNode.children[0].material = @baseplateTransparentMaterial
-				@threejsNode.children[1].visible = false
+			@threejsNode.children[0].material = @baseplateTransparentMaterial
+			@threejsNode.children[1].visible = false
 		else
-			if @_belowPlate
-				@_belowPlate = false
-				@threejsNode.children[0].material = @baseplateMaterial
-				@threejsNode.children[1].visible = true
+			@threejsNode.children[0].material = @baseplateMaterial
+			@threejsNode.children[1].visible = true
 
 	toggleVisibility: () =>
 		@threejsNode.visible = !@threejsNode.visible

@@ -121,6 +121,9 @@ module.exports = class SolidRenderer
 		threeObject.scale.set posd.scale.x, posd.scale.y, posd.scale.z
 
 	getBrushes: =>
+		return []
+		###		
+		# deactivated until #250 is solved
 		return [{
 			text: 'move'
 			iconBrush: true
@@ -130,6 +133,7 @@ module.exports = class SolidRenderer
 			mouseUpCallback: @_handleMouseUp
 			tooltip: 'Move model'
 		}]
+		###
 
 		###
 		{

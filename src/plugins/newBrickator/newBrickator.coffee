@@ -284,11 +284,11 @@ module.exports = class NewBrickator
 
 			if @buildModeEnabled
 				@buildContainer.slideUp()
-				@buildButton.removeClass('innerShadow')
+				@buildButton.removeClass('active')
 				@_disableBuildMode selectedNode
 			else
 				@buildContainer.slideDown()
-				@buildButton.addClass('innerShadow')
+				@buildButton.addClass('active')
 				@_enableBuildMode selectedNode
 
 			@buildModeEnabled = !@buildModeEnabled

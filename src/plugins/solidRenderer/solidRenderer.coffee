@@ -88,29 +88,33 @@ module.exports = class SolidRenderer
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
-
 		object.name = object.uuid
 		@latestAddedObject = object
 
+
+		lineContainer = new THREE.Object3D()
 		lineObject = new THREE.Mesh(geometry, objectMaterial)
 
 		#todo: make this only write to depth buffer
 		#invisible lines that make the black lines look better
-		invisibleLines = new THREE.EdgesHelper(lineObject, 0x000000)
+		invisibleLines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
 		invisibleLineMat = new FancyLineMaterial()
 		invisibleLines.material = invisibleLineMat.generate(0xffffff, 0.5)
 		invisibleLines.material.linewidth = 9
+		invisibleLines.material.colorWrite = false
 		#lines.material.depthTest = false
-		object.add invisibleLines
+		lineContainer.add invisibleLines
 
 		# visible black lines
-		lines = new THREE.EdgesHelper(lineObject, 0x000000)
+		lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
 		linemat = new FancyLineMaterial()
 		lines.material = linemat.generate(0x000000, 0.55)
 		#lines.material.depthTest = false
-		object.add lines
-
+		lineContainer.add lines
+		
 		@threejsNode.add object
+		@threejsNode.add lineContainer
+
 		return object
 
 	newBoundingSphere: () =>

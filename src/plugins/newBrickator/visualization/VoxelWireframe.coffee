@@ -9,6 +9,9 @@ module.exports = class VoxelOutline
 
 		@voxelUnion = new VoxelUnion(@grid)
 
+	setVisibility: (isVisible) =>
+		@threeNode.visible = isVisible
+
 	createWireframe: (voxels) =>
 		# expects an array of {x, y, z} objects, each representing a
 		# voxel with its voxel coordinates

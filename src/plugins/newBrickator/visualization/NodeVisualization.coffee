@@ -62,6 +62,9 @@ module.exports = class NodeVisualization
 				}
 		@voxelWireframe.createWireframe outlineVoxels
 
+	setPossibleLegoBoxVisibility: (isVisible) =>
+		@voxelWireframe.setVisibility isVisible
+
 	_createVoxelVisualization: (coloring) =>
 		# clear and create voxel visualization
 

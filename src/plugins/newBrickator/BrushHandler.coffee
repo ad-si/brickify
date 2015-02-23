@@ -41,7 +41,7 @@ module.exports = class BrushHandler
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.showDeselectedVoxelSuggestions()
+			cachedData.visualization.createInvisibleSuggestionBricks()
 		
 	_printSelect: (selectedNode) =>
 		# causes duplicate rendering when selecting print brush
@@ -87,7 +87,7 @@ module.exports = class BrushHandler
 	_legoMouseUp: (event, selectedNode, cachedData) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.showDeselectedVoxelSuggestions()
+			cachedData.visualization.createInvisibleSuggestionBricks()
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()

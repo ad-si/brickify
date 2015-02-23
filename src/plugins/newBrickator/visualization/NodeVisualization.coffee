@@ -156,10 +156,10 @@ module.exports = class NodeVisualization
 
 		@currentlyDeselectedVoxels = []
 
-	showDeselectedVoxelSuggestions: () =>
-		# show one layer of not-enabled (-> to be 3d printed) voxels
-		# (one layer = voxel has at least one enabled neighbour)
-		# so that users can re-select them
+	createInvisibleSuggestionBricks: () =>
+		# out of all voxels that can be enabled, create an
+		# invisible layer so that the user can select (raycaster)
+		# them and the selected voxel can be highlighted
 
 		newModifiedVoxel = []
 
@@ -190,7 +190,7 @@ module.exports = class NodeVisualization
 					freeBelow = false
 
 			if freeBelow and connectedToEnabled
-				v.setMaterial @defaultColoring.deselectedMaterial
+				v.setMaterial @defaultColoring.hiddenMaterial
 				v.visible = true
 
 		@modifiedVoxels = newModifiedVoxel

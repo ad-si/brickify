@@ -64,6 +64,7 @@ module.exports = class BrushHandler
 
 	_legoMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
+			cachedData.visualization.showDeselectedVoxelSuggestions()
 			cachedData.visualization.highlightVoxel event, (voxel) ->
 				return not voxel.isEnabled()
 

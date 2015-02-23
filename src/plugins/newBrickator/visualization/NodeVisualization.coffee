@@ -146,7 +146,6 @@ module.exports = class NodeVisualization
 		# so that users can re-select them
 
 		dir = @_getPrincipalCameraDirection @bundle.renderer.camera
-		console.log "Camera looks at #{dir}"
 
 		newModifiedVoxel = []
 
@@ -167,18 +166,26 @@ module.exports = class NodeVisualization
 			if enabledVoxels.length > 0
 				connectedToEnabled = true
 
-			# has this voxel a not selected voxel below
-			# (preventing unselectable voxels)
-			# could be optimized by not using the (z-)-layer as "below",
-			# but the layer the camera is currently facing towards
-			freeBelow = true
-			if @grid.zLayers[c.z - 1]?[c.x]?[c.y]?
-				if  @grid.zLayers[c.z - 1][c.x][c.y].enabled == false
-					freeBelow = false
+			# check if there is an unselected voxel behind this voxel
+			# (behind is always relative to the camera's direction)
+			# if yes, don't show this voxel
+			behindCoords = {
+				x: ((c.x - 1) if dir == '-x') || ((c.x + 1) if dir == '+x') || c.x
+				y: ((c.y - 1) if dir == '-y') || ((c.y + 1) if dir == '+y') || c.y
+				z: ((c.z - 1) if dir == '-z') || ((c.z + 1) if dir == '+z') || c.z
+			}
+			bc = behindCoords
 
-			if freeBelow and connectedToEnabled
+			freeBehind = true
+			if @grid.zLayers[bc.z]?[bc.x]?[bc.y]?
+				if  @grid.zLayers[bc.z][bc.x][bc.y].enabled == false
+					freeBehind = false
+
+			if freeBehind and connectedToEnabled
 				v.setMaterial @defaultColoring.deselectedMaterial
 				v.visible = true
+			else
+				v.visible = false
 
 		@modifiedVoxels = newModifiedVoxel
 

@@ -145,6 +145,9 @@ module.exports = class NodeVisualization
 		# (one layer = voxel has at least one enabled neighbour)
 		# so that users can re-select them
 
+		dir = @_getPrincipalCameraDirection @bundle.renderer.camera
+		console.log "Camera looks at #{dir}"
+
 		newModifiedVoxel = []
 
 		for v in @modifiedVoxels
@@ -195,6 +198,36 @@ module.exports = class NodeVisualization
 					return obj
 
 		return null
+
+	_getPrincipalCameraDirection: (camera) =>
+		# returns the main direction the camera is facing
+
+		# rotate the camera's view vector according to cam rotation
+		vecz = new THREE.Vector3(0,0,-1)
+		vecz.applyQuaternion camera.quaternion
+
+		# apply inverse scene matrix (to account for that the scene is rotated)
+		matrix = new THREE.Matrix4()
+		matrix.getInverse(@bundle.renderer.scene.matrix)
+		vecz.applyMatrix4(matrix)
+		vecz.normalize()
+
+		if vecz.z > 0.5
+			return '+z'
+		else if vecz.z < -0.5
+			return '-z'
+		else if vecz.x > 0.5
+			return '+x'
+		else if vecz.x < -0.5
+			return '-x'
+		else if vecz.y > 0.5
+			return '+y'
+		else if vecz.y < -0.5
+			return '-y'
+
+
+
+
 
 
 

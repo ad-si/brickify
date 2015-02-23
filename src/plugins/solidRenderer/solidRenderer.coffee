@@ -94,29 +94,33 @@ module.exports = class SolidRenderer
 
 		lineMaterialGen = new LineMatGenerator()
 
+		###
 		#invisible lines that make the black lines look better
 		invisibleLines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
 		invisibleLines.material = lineMaterialGen.generate(0xffffff)
 		invisibleLines.material.linewidth = 9
-		#lines.material.depthFunc = 'GREATER'
+		invisibleLines.material.depthFunc = 'GREATER'
 		invisibleLines.material.colorWrite = false
-		#lineContainer.add invisibleLines
+		lineContainer.add invisibleLines
+		###
 
 		# visible black lines
 		lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
 		lines.material = lineMaterialGen.generate(0x000000)
 		lines.material.linewidth = 2
 		lines.material.depthFunc = 'GREATER'
+		lines.material.depthWrite = false
 		lineContainer.add lines
 
 		metaObject = new THREE.Object3D()
 		metaObject.name = metaObject.uuid
 		@latestAddedObject = metaObject
 		
-		metaObject.add lineContainer
-		metaObject.lineContainer = lineContainer
 		metaObject.add object
 		metaObject.originalMesh = object
+
+		metaObject.add lineContainer
+		metaObject.lineContainer = lineContainer
 
 		@threejsNode.add metaObject
 		return metaObject

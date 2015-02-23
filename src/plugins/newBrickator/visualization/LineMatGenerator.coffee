@@ -20,9 +20,8 @@ module.exports = class LineMatGenerator
 			'varying float zVal;'
 			'void main() {'
 			'vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);'
-			'pos.z = pos.z - zDelta;'
-			'gl_Position = pos;'
-			'zVal = (pos.z + zDelta) / pos.w;'
+			'gl_Position = vec4(pos.x, pos.y, pos.z + zDelta, pos.w);'
+			'zVal = pos.z / pos.w;'
 			'}'
 		].join('\n')
 

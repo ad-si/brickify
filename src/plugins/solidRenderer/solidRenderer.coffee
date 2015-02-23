@@ -12,6 +12,7 @@ module.exports = class SolidRenderer
 
 	init: (@bundle) ->
 		@globalConfig = @bundle.globalConfig
+		@loadedModelsNodes = []
 
 	init3d: (@threejsNode) ->
 		return
@@ -53,6 +54,11 @@ module.exports = class SolidRenderer
 	loadModelFromCache: (node, properties, reload = false) ->
 		#Create object and override name
 		success = (optimizedModel) =>
+			#prevent loading the same model twice
+			if @loadedModelsNodes.indexOf(node) >= 0
+				return Promise.resolve(optimizedModel)
+			@loadedModelsNodes.push node
+
 			console.log "Got model #{node.meshHash}"
 			threeObject = @addModelToThree optimizedModel
 			# enable Ui/mouseDispatcher find out on what node we clicked
@@ -81,6 +87,7 @@ module.exports = class SolidRenderer
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
+
 		object.name = object.uuid
 		@latestAddedObject = object
 
@@ -114,6 +121,9 @@ module.exports = class SolidRenderer
 		threeObject.scale.set posd.scale.x, posd.scale.y, posd.scale.z
 
 	getBrushes: =>
+		return []
+		###
+		# deactivated until #250 is solved
 		return [{
 			text: 'move'
 			iconBrush: true
@@ -122,7 +132,11 @@ module.exports = class SolidRenderer
 			mouseMoveCallback: @_handleMouseMove
 			mouseUpCallback: @_handleMouseUp
 			tooltip: 'Move model'
-		},{
+		}]
+		###
+
+		###
+		{
 			text: 'rotate'
 			iconBrush: true
 			glyphicon: 'refresh'
@@ -130,7 +144,8 @@ module.exports = class SolidRenderer
 			#mouseDownCallback: @_handleMouseDown
 			#mouseMoveCallback: @_handleMouseMove
 			#mouseUpCallback: @_handleMouseUp
-		}]
+		}
+		###
 
 	_getThreeObjectByName: (name) =>
 		for obj in @threejsNode.children
@@ -167,3 +182,14 @@ module.exports = class SolidRenderer
 	toggleNodeVisibility: (node, visible) =>
 		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
 		obj.visible = visible
+
+	setNodeMaterial: (node, threeMaterial) =>
+		changeMaterial = () =>
+			name = node.pluginData.solidRenderer.threeObjectUuid
+			threeNode = @_getThreeObjectByName name
+			
+			if threeNode
+				threeNode.material = threeMaterial
+
+		@loadModelIfNeeded(node).then () =>
+			changeMaterial()

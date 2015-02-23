@@ -45,15 +45,10 @@ module.exports = class BrushHandler
 			cachedData.visualization.setPossibleLegoBoxVisibility true
 		
 	_printSelect: (selectedNode) =>
-		# causes duplicate rendering when selecting print brush
-		# on start. rely on the fact that all models get
-		# legofied anyways on drop
-
-		###
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-		###
+			cachedData.visualization.setPossibleLegoBoxVisibility false
 
 	_legoMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -75,9 +70,6 @@ module.exports = class BrushHandler
 	_printMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.highlightVoxel event
-
-			#this should be in print select
-			cachedData.visualization.setPossibleLegoBoxVisibility false
 
 	_printMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>

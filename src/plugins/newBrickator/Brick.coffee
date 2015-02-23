@@ -238,9 +238,10 @@ module.exports = class Brick
 					newBricks[x][y - 1].neighbours[3].push newBricks[x][y]
 
 		#remove this (old) brick from all neighbours
-		for neighbours, i in @neighbours
+		for neighbours in @neighbours
 			for neighbour in neighbours
-				@_removeFirstOccurenceFromArray @, neighbour.neighbours[i]
+				for i in [0..3] by 1
+					@_removeFirstOccurenceFromArray @, neighbour.neighbours[i]
 
 		return [].concat.apply([], newBricks)
 

@@ -214,28 +214,28 @@ module.exports = class Brick
 						newBricks[x][y]
 
 				# update neighbours outside of splitting brick
-					if newBricks[x][y].position.x == @position.x
-						#take neighbour in direction 0 xm
-						@addNeighboursToNewBrick newBricks[x][y], 0, 1
-					if newBricks[x][y].position.y == @position.y
-						#take neighbour in direction 2 ym
-						@addNeighboursToNewBrick newBricks[x][y], 2, 3
-					if (newBricks[x][y].position.x + newBricks[x][y].size.x) ==
-					(@position.x + @size.x)
-						#take neighbour in direction 1 xp
-						@addNeighboursToNewBrick newBricks[x][y], 1, 0
-					if (newBricks[x][y].position.y + newBricks[x][y].size.y) ==
-					(@position.y + @size.y)
-						#take neighbour in direction 3 yp
-						@addNeighboursToNewBrick newBricks[x][y], 3, 2
+				if newBricks[x][y].position.x == @position.x
+					#take neighbour in direction 0 xm
+					@addNeighboursToNewBrick newBricks[x][y], 0, 1
+				if newBricks[x][y].position.y == @position.y
+					#take neighbour in direction 2 ym
+					@addNeighboursToNewBrick newBricks[x][y], 2, 3
+				if (newBricks[x][y].position.x + newBricks[x][y].size.x) ==
+				(@position.x + @size.x)
+					#take neighbour in direction 1 xp
+					@addNeighboursToNewBrick newBricks[x][y], 1, 0
+				if (newBricks[x][y].position.y + newBricks[x][y].size.y) ==
+				(@position.y + @size.y)
+					#take neighbour in direction 3 yp
+					@addNeighboursToNewBrick newBricks[x][y], 3, 2
 
 				# update neighbours inside the splitting brick
-					if x > 0
-						newBricks[x][y].neighbours[0].push newBricks[x - 1][y]
-						newBricks[x - 1][y].neighbours[1].push newBricks[x][y]
-					if y > 0
-						newBricks[x][y].neighbours[2].push newBricks[x][y - 1]
-						newBricks[x][y - 1].neighbours[3].push newBricks[x][y]
+				if x > 0
+					newBricks[x][y].neighbours[0].push newBricks[x - 1][y]
+					newBricks[x - 1][y].neighbours[1].push newBricks[x][y]
+				if y > 0
+					newBricks[x][y].neighbours[2].push newBricks[x][y - 1]
+					newBricks[x][y - 1].neighbours[3].push newBricks[x][y]
 
 		#remove this (old) brick from all neighbours
 		for neighbours, i in @neighbours

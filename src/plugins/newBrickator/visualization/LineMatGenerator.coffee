@@ -12,7 +12,6 @@ module.exports = class LineMatGenerator
 			attributes: {}
 		}
 		mat = new THREE.ShaderMaterial(options)
-		mat.linewidth = 3
 		return mat
 
 	_getVertexShader: () ->

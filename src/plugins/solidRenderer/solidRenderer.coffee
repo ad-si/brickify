@@ -63,7 +63,7 @@ module.exports = class SolidRenderer
 			console.log "Got model #{node.meshHash}"
 			threeObject = @addModelToThree optimizedModel
 			# enable Ui/mouseDispatcher find out on what node we clicked
-			threeObject.associatedNode = node
+			threeObject.originalMesh.associatedNode = node
 			if reload
 				threeObject.name = properties.threeObjectUuid
 			else
@@ -88,9 +88,6 @@ module.exports = class SolidRenderer
 			}
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
-		object.name = object.uuid
-		@latestAddedObject = object
-
 
 		lineContainer = new THREE.Object3D()
 		lineObject = new THREE.Mesh(geometry, objectMaterial)
@@ -99,27 +96,38 @@ module.exports = class SolidRenderer
 
 		#invisible lines that make the black lines look better
 		invisibleLines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
-		invisibleLines.material = lineMaterialGen.generate(0xffffff, 0.5)
+		invisibleLines.material = lineMaterialGen.generate(0xffffff)
 		invisibleLines.material.linewidth = 9
+		#lines.material.depthFunc = 'GREATER'
 		invisibleLines.material.colorWrite = false
-		lineContainer.add invisibleLines
+		#lineContainer.add invisibleLines
 
 		# visible black lines
 		lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
-		lines.material = lineMaterialGen.generate(0x000000, 0.55)
+		lines.material = lineMaterialGen.generate(0x000000)
+		lines.material.linewidth = 2
+		lines.material.depthFunc = 'GREATER'
 		lineContainer.add lines
-		
-		object.add lineContainer
 
-		@threejsNode.add object
-		return object
+		metaObject = new THREE.Object3D()
+		metaObject.name = metaObject.uuid
+		@latestAddedObject = metaObject
+		
+		metaObject.add lineContainer
+		metaObject.lineContainer = lineContainer
+		metaObject.add object
+		metaObject.originalMesh = object
+
+		@threejsNode.add metaObject
+		return metaObject
 
 	newBoundingSphere: () =>
 		if @latestAddedObject
-			@latestAddedObject.geometry.computeBoundingSphere()
+			geometry = @latestAddedObject.originalMesh.geometry
+			geometry.computeBoundingSphere()
 			result =
-				radius: @latestAddedObject.geometry.boundingSphere.radius
-				center: @latestAddedObject.geometry.boundingSphere.center
+				radius: geometry.boundingSphere.radius
+				center: geometry.boundingSphere.center
 			
 			# update center to match moved object
 			@latestAddedObject.updateMatrix()
@@ -209,7 +217,7 @@ module.exports = class SolidRenderer
 			threeNode = @_getThreeObjectByName name
 			
 			if threeNode
-				threeNode.material = threeMaterial
+				threeNode.originalMesh.material = threeMaterial
 
 		@loadModelIfNeeded(node).then () =>
 			changeMaterial()

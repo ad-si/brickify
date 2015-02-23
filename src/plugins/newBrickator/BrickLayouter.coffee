@@ -192,7 +192,7 @@ module.exports = class BrickLayouter
 		Math.floor(Math.random() * max)
 
 	_pseudoRandom: (max) =>
-		@seed = (1103515245 * @seed + 12345) % 2^31
+		@seed = (1103515245 * @seed + 12345) % 2 ^ 31
 		@seed % max
 
 	_findMergeableNeighbours: (brick) =>

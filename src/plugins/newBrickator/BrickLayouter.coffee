@@ -1,7 +1,10 @@
 Brick = require './Brick'
 
 module.exports = class BrickLayouter
-	constructor: () ->
+	constructor: (pseudoRandom = false) ->
+		if pseudoRandom
+			@seed = 42
+			@_random = @_pseudoRandom
 		return
 
 	initializeBrickGraph: (grid) =>
@@ -173,11 +176,18 @@ module.exports = class BrickLayouter
 		return boolean
 
 	_chooseRandomBrick: (bricks) =>
-		brickLayer = bricks[Math.floor(Math.random() * bricks.length)]
+		brickLayer = bricks[@_random(bricks.length)]
 		while brickLayer.length is 0 # if a layer has no bricks, retry
-			brickLayer = bricks[Math.floor(Math.random() * bricks.length)]
-		brick = brickLayer[Math.floor(Math.random() * brickLayer.length)]
+			brickLayer = bricks[@_random(bricks.length)]
+		brick = brickLayer[@_random(brickLayer.length)]
 		return brick
+
+	_random: (max) =>
+		Math.floor(Math.random() * max)
+
+	_pseudoRandom: (max) =>
+		@seed = (1103515245 * @seed + 12345) % 2^31
+		@seed % max
 
 	_findMergeableNeighbours: (brick) =>
 		mergeableNeighbours = []

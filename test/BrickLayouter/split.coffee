@@ -168,7 +168,8 @@ describe 'brickLayouter split', ->
 
 	it 'should split one brick and relayout locally', () ->
 		# 01222
-		brickLayouter = new BrickLayouter()
+		Brick.nextBrickIndex = 0
+		brickLayouter = new BrickLayouter(true)
 		brick0 = new Brick  {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
 		brick1 = new Brick  {x: 1, y: 0, z: 0}, {x: 1, y: 1, z: 1}
 		brick2 = new Brick  {x: 2, y: 0, z: 0}, {x: 3, y: 1, z: 1}
@@ -177,6 +178,10 @@ describe 'brickLayouter split', ->
 		brick0.neighbours = [[], [brick1], [], []]
 		brick1.neighbours = [[brick0], [brick2], [], []]
 		brick2.neighbours = [[brick1], [], [], []]
-		brickLayouter._splitBrickAndRelayoutLocally brick0, bricks
-		console.log '----------------------------------------------------'
-		console.log bricks[0]
+		brickLayouter.splitBricksAndRelayoutLocally [brick0], bricks
+		expect(bricks[0]).to.have.length(2)
+		expect(bricks[0][0]).to.equal(brick2)
+		expect(bricks[0][1].position).to.eql({x: 0, y: 0, z: 0})
+		expect(bricks[0][1].size).to.eql({x: 2, y: 1, z: 1})
+		expect(bricks[0][1].neighbours).to.eql([[], [brick2], [], []])
+		expect(bricks[0][0].neighbours).to.eql([[bricks[0][1]], [], [], []])

@@ -74,20 +74,23 @@ module.exports = class BrickLayouter
 	# any brick can still merge --> use heuristic:
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
-	layoutByGreedyMerge: (bricks) =>
+	layoutByGreedyMerge: (bricks, bricksToLayout) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
-		for layer in bricks
+		if !bricksToLayout?
+			bricksToLayout = bricks
+		for layer in bricksToLayout
 			numTotalInitialBricks += layer.length
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 
 		return unless numTotalInitialBricks > 0
 
 		while(true) #only for debugging, should be while true
-			brick = @_chooseRandomBrick bricks
+			brick = @_chooseRandomBrick bricksToLayout
+			if !brick?
+				return {bricks: bricks}
 			numRandomChoices++
-			#console.log numRandomChoices
 			mergeableNeighbours = @_findMergeableNeighbours brick
 
 			if !@_anyDefined(mergeableNeighbours)
@@ -102,7 +105,7 @@ module.exports = class BrickLayouter
 			while(@_anyDefined(mergeableNeighbours))
 				mergeIndex = @_chooseNeighboursToMergeWith mergeableNeighbours
 				brick = @_mergeBricksAndUpdateGraphConnections brick,
-					mergeableNeighbours, mergeIndex, bricks
+					mergeableNeighbours, mergeIndex, bricks, bricksToLayout
 				mergeableNeighbours = @_findMergeableNeighbours brick
 
 		return {bricks: bricks}
@@ -157,13 +160,13 @@ module.exports = class BrickLayouter
 
 		return bricks
 
-	_splitBrickAndRelayoutLocally: (oldBrick, bricks) =>
-		bricksToSplit = oldBrick.uniqueNeighbours()
-		bricksToSplit.push oldBrick
+	splitBricksAndRelayoutLocally: (oldBricks, bricks) =>
+		bricksToSplit = []
+		for brick in oldBricks
+			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
+			bricksToSplit.push brick
 		newBricks = @_splitBricks bricksToSplit, bricks
-		for brick in newBricks
-			console.log brick.neighbours
-		@layoutByGreedyMerge [newBricks]
+		@layoutByGreedyMerge bricks, [newBricks]
 		return {
 			removedBricks: bricksToSplit
 			newBricks: newBricks
@@ -176,8 +179,11 @@ module.exports = class BrickLayouter
 		return boolean
 
 	_chooseRandomBrick: (bricks) =>
+		i = 0
 		brickLayer = bricks[@_random(bricks.length)]
 		while brickLayer.length is 0 # if a layer has no bricks, retry
+			if ++i >= bricks.length
+				return null
 			brickLayer = bricks[@_random(bricks.length)]
 		brick = brickLayer[@_random(brickLayer.length)]
 		return brick
@@ -260,12 +266,11 @@ module.exports = class BrickLayouter
 			if num == maxConnections
 				largestIndices.push i
 
-		randomOfLargestIndices = largestIndices[Math.floor(Math.random() *
-			largestIndices.length)]
+		randomOfLargestIndices = largestIndices[@_random(largestIndices.length)]
 		return randomOfLargestIndices
 
 	_mergeBricksAndUpdateGraphConnections: (
-		brick, mergeableNeighbours, mergeIndex, bricks ) =>
+		brick, mergeableNeighbours, mergeIndex, bricks, bricksToLayout ) =>
 		mergeNeighbours = mergeableNeighbours[mergeIndex]
 
 		ps = brick.getPositionAndSizeForNewBrick mergeIndex, mergeNeighbours
@@ -285,8 +290,12 @@ module.exports = class BrickLayouter
 		# delete outdated bricks from bricks array
 		z = brick.position.z
 		@_removeFirstOccurenceFromArray brick, bricks[z]
+		if bricksToLayout
+			@_removeFirstOccurenceFromArray brick, bricksToLayout[0]
 		for neighbour in mergeNeighbours
 			@_removeFirstOccurenceFromArray neighbour, bricks[z]
+			if bricksToLayout
+				@_removeFirstOccurenceFromArray neighbour, bricksToLayout[0]
 
 		# add newBrick to bricks array
 		bricks[z].push newBrick

@@ -2,6 +2,7 @@ GeometryCreator = require './GeometryCreator'
 THREE = require 'three'
 Coloring = require './Coloring'
 interactionHelper = require '../../../client/interactionHelper'
+VoxelWireframe = require './VoxelWireframe'
 
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
@@ -10,6 +11,8 @@ module.exports = class NodeVisualization
 		@bricksSubnode = new THREE.Object3D()
 
 		@threeNode.add @voxelsSubnode
+		@voxelWireframe = new VoxelWireframe(@grid, @threeNode)
+
 		@threeNode.add @bricksSubnode
 
 		@defaultColoring = new Coloring()
@@ -48,6 +51,17 @@ module.exports = class NodeVisualization
 			v.setMaterial material
 			@_updateVoxel v
 
+		# show not filled lego shape as outline
+		outlineVoxels = []
+		for v in @modifiedVoxels
+			if not v.isEnabled()
+				outlineVoxels.push {
+					x: v.voxelCoords.x
+					y: v.voxelCoords.y
+					z: v.voxelCoords.z
+				}
+		@voxelWireframe.createWireframe outlineVoxels
+
 	_createVoxelVisualization: (coloring) =>
 		# clear and create voxel visualization
 
@@ -64,6 +78,8 @@ module.exports = class NodeVisualization
 						@voxelsSubnode.add threeBrick
 
 	_updateVoxel: (threeBrick) =>
+		# makes disabled voxels invisible, toggles knob visibility
+
 		if not threeBrick.isEnabled()
 			threeBrick.visible = false
 

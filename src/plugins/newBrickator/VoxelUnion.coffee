@@ -11,10 +11,17 @@ module.exports = class VoxelUnion
 		# each voxel has to have x,y,z coordinates (in grid voxel coords) and may have
 		# knobOnTop / knobFromBelow flags.
 		# options may consist of
-		# { addKnobs: true/false, profile: true/false }
+		# {
+		# addKnobs: true/false
+		# profile: true/false, threeBoxGeometryOnly: true/false
+        # }
 
 		d = new Date()
+		
 		boxGeometry = @_createVoxelGeometry(voxelsToBeGeometrized)
+		if options.threeBoxGeometryOnly
+			return boxGeometry
+
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
 		if options.profile
 			console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"

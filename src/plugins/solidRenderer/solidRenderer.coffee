@@ -104,10 +104,22 @@ module.exports = class SolidRenderer
 		lineContainer.add invisibleLines
 		###
 
+		#shadow
+		shadowMat = new THREE.MeshBasicMaterial({
+			color: 0x000000
+			transparent: true
+			opacity: 0.4
+			})
+		shadowMat.depthFunc = 'GREATER'
+		shadowObject = new THREE.Mesh(geometry, shadowMat)
+		lineContainer.add shadowObject
+
 		# visible black lines
 		lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
 		lines.material = lineMaterialGen.generate(0x000000)
 		lines.material.linewidth = 2
+		lines.material.transparent = true
+		lines.material.opacity = 0.1
 		lines.material.depthFunc = 'GREATER'
 		lines.material.depthWrite = false
 		lineContainer.add lines

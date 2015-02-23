@@ -91,6 +91,12 @@ module.exports = class SolidRenderer
 		object.name = object.uuid
 		@latestAddedObject = object
 
+		lineObject = new THREE.Mesh(geometry, objectMaterial)
+		lines = new THREE.EdgesHelper(lineObject, 0x000000)
+		lines.material.linewidth = 3
+		lines.material.depthTest = false
+		object.add lines
+
 		@threejsNode.add object
 		return object
 

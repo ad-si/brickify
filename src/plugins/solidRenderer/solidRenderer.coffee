@@ -7,6 +7,7 @@
 THREE = require 'three'
 objectTree = require '../../common/state/objectTree'
 modelCache = require '../../client/modelCache'
+FancyLineMaterial = require '../newBrickator/visualization/FancyLineMaterial'
 
 module.exports = class SolidRenderer
 
@@ -93,7 +94,8 @@ module.exports = class SolidRenderer
 
 		lineObject = new THREE.Mesh(geometry, objectMaterial)
 		lines = new THREE.EdgesHelper(lineObject, 0x000000)
-		lines.material.linewidth = 3
+		linemat = new FancyLineMaterial()
+		lines.material = linemat.generate()
 		lines.material.depthTest = false
 		object.add lines
 

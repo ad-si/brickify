@@ -30,6 +30,10 @@ module.exports = class UiObjects
 
 		@_objectSelect structure
 
+		# make sure a brush is always selected
+		if not @_selectedBrush
+			@_brushSelect @_brushList[@_brushList.length - 1]
+
 
 	onNodeRemove: (node) =>
 		# Called by sceneManager when a node is removed
@@ -44,19 +48,10 @@ module.exports = class UiObjects
 				return
 
 	selectNode: (node) =>
-		# overrides the node selection, maintains the same selected brush
+		# overrides the node selection
 		for s in @objectList
 			if s.node == node
-				selectedBrush = @selectedStructure.selectedBrush
-
 				@_objectSelect s
-
-				if selectedBrush
-					@_brushSelect selectedBrush,
-					@selectedStructure.brushjQueryObjects[selectedBrush.text],
-					@selectedStructure
-
-				return
 
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null
@@ -103,24 +98,6 @@ module.exports = class UiObjects
 		string = "<div class='btn btn-primary'>#{brush.text}</div>"
 
 		htmlElement = $(string)
-		#@_createTooltip htmlElement, brush, 'bottom'
-
-		###
-		if brush.canToggleVisibility
-			brush.visible = true
-			visibilityString = '<div class="iconFloatRight">
-				<span class="glyphicon glyphicon-eye-open"></span></div>'
-			e = $(visibilityString)
-			htmlElement.append e
-			e.on 'click', () =>
-				@_toggleBrushVisibility brush, e
-
-			e.tooltip {
-				title: 'Toggle layer visibility'
-				placement: 'right'
-				delay: 500
-			}
-		###
 
 		htmlElement.on 'click', () =>
 			@_brushSelect brush
@@ -174,7 +151,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
-				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
+				@_selectedBrush.jqueryObject.removeClass 'active'
 
 		#select new brush
 		@_selectedBrush = brush
@@ -182,7 +159,7 @@ module.exports = class UiObjects
 		if brush.iconBrush
 			brush.jqueryObject.addClass 'selectedBrush'
 		else
-			brush.jqueryObject.addClass 'innerShadow'
+			brush.jqueryObject.addClass 'active'
 			
 		if brush.selectCallback?
 				brush.selectCallback @selectedStructure.node
@@ -195,7 +172,7 @@ module.exports = class UiObjects
 			if @_selectedBrush.iconBrush
 				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
 			else
-				@_selectedBrush.jqueryObject.removeClass 'innerShadow'
+				@_selectedBrush.jqueryObject.removeClass 'active'
 
 		@_selectedBrush = null
 

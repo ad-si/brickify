@@ -19,8 +19,8 @@ block body
 			canvas#canvas.appCanvas
 
 		#commandContainer
-			a#cmdHelp(href="#", title="Open Help")
-				img(src="/img/help.png", height="40px", alt="share")
+			a#cmdHelp(href="#", title="Open keyboard shortcuts")
+				img(src="/img/keyboard.png", height="40px", alt="share")
 			a#cmdShare(href="#", title="Share your work")
 				img(src="/img/share.png", height="40px", alt="share")
 		#controls.row
@@ -37,8 +37,23 @@ block body
 				button.btn.btn-success.btn-block#downloadButton
 					span.glyphicon.glyphicon-download
 					| &nbsp;
-					| Download
-								
+					| Download for 3d printer
+
+				button.btn.btn-success.btn-block#buildButton
+					| Show me how to build with LEGO
+				#buildContainer.hidden
+					br
+					button.btn.btn-default#buildDecrement
+						span.glyphicon.glyphicon-chevron-left
+					| &nbsp;Showing Layer&nbsp;
+					span#currentBuildLayer 1
+					| &nbsp;of&nbsp;
+					span#maxBuildLayer 0
+					| &nbsp;
+					button.btn.btn-default#buildIncrement
+						span.glyphicon.glyphicon-chevron-right
+					input(type='range')#buildSlider
+
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?
@@ -51,7 +66,6 @@ block body
 
 block scripts
 	script(src='/libs/webglCheck.js')
-	script(src='/node_modules/json-editor/dist/jsoneditor.js')
 	script(src='node_modules/mousetrap/mousetrap.min.js')
 	if app.get('env') === 'development'
 		script(src='/shared.js')

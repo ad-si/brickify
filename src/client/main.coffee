@@ -1,7 +1,6 @@
 require('es6-promise').polyfill()
 
 path = require 'path'
-r = require 'react'
 $ = require 'jquery'
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
@@ -17,6 +16,7 @@ commandFunctions = {
 		console.log 'loading initial model'
 		p = /^[0-9a-z]{32}/
 		if p.test value
+			bundle.clearScene()
 			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
@@ -30,15 +30,18 @@ postInitCallback = () ->
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
 	commands = hash.split '+'
+	prom = Promise.resolve()
+	runCmd = (key, value) -> -> Promise.resolve commandFunctions[key](value)
 	for cmd in commands
 		key = cmd.split('=')[0]
 		value = cmd.split('=')[1]
 		if commandFunctions[key]?
-			commandFunctions[key](value)
+			prom = prom.then runCmd key, value
 
 	#clear url hash after executing commands
 	window.location.hash = ''
 
+globalConfig.autoLegofy = true
 bundle = new Bundle globalConfig
 bundle.init().then(postInitCallback)
 

@@ -1,3 +1,11 @@
 {
-  "glob": ["README.md", "Cakefile", "package.json", "coffeelint.json", "src/**/*.coffee", "src/**/*.yaml"]
+  "glob": [
+    "README.md",
+    "Cakefile",
+    "cakeUtilities.coffee",
+    "package.json",
+    "coffeelint.json",
+    "src/**/*.coffee",
+    "src/**/*.yaml"
+  ]
 }

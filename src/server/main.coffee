@@ -12,7 +12,6 @@ bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
 errorHandler = require 'errorhandler'
-session = require 'express-session'
 favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
@@ -116,7 +115,6 @@ module.exports.setupRouting = () ->
 			'jquery'
 			'jsondiffpatch'
 			'path'
-			'react'
 			'stats-js'
 			'three'
 			'three-orbit-controls'
@@ -165,6 +163,7 @@ module.exports.setupRouting = () ->
 	webapp.get '/contribute', landingPage.getContribute
 	webapp.get '/team', landingPage.getTeam
 	webapp.get '/imprint', landingPage.getImprint
+	webapp.get '/educators', landingPage.getEducators
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
 	webapp.get '/statesync/get', jsonParser, statesync.getState

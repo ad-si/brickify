@@ -1,0 +1,39 @@
+#! /bin/sh
+# script to run tests on what is to be committed
+# Based on http://stackoverflow.com/a/20480591/1606867
+
+# Remember old stash
+old_stash=$(git rev-parse -q --verify refs/stash)
+
+# First, stash all changes
+git stash save -q
+changes_stash=$(git rev-parse -q --verify refs/stash)
+
+# Add all untracked files and stash those as well
+# We don't want to use -u due to
+# http://blog.icefusion.co.uk/git-stash-can-delete-ignored-files-git-stash-u/
+git add .
+git stash save -q
+untracked_stash=$(git rev-parse -q --verify refs/stash)
+
+# Run tests
+npm run prepublish
+status=$?
+
+# Restore changes
+
+# Restore untracked if any
+if [ "$changes_stash" != "$untracked_stash" ]
+then
+    git reset --hard -q && git stash pop --index -q
+    git reset HEAD -- . -q
+fi
+
+# Restore changes if any
+if [ "$old_stash" != "$changes_stash" ]
+then
+    git reset --hard -q && git stash pop --index -q
+fi
+
+# Exit with status from test-run: nonzero prevents commit
+exit $status

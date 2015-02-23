@@ -11,3 +11,6 @@ module.exports.getTeam = (request, response) ->
 
 module.exports.getImprint = (request, response) ->
 	response.render path.join('landingpage','imprint')
+
+module.exports.getEducators = (request, response) ->
+	response.render path.join('landingpage','educators')

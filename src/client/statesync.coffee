@@ -23,19 +23,20 @@ module.exports = class Statesync
 		@$spinnerContainer = $('#spinnerContainer')
 
 	init: ->
-		@statePromise.then((data) =>
+		@statePromise = @statePromise.then((data) =>
 			@state = data
 			@oldState = clone(@state)
 			console.log "Got initial state from server: #{JSON.stringify(@state)}"
 			objectTree.init @state
 			@unlockState()
+			return @state
 		)
 
 	# executes callback(state) and then synchronizes the state with the server.
 	# if updatedStateEvent is set to true, the updateState hook of all client
 	# plugins will be called before synchronization with the server
 	performStateAction: (callback, updatedStateEvent = false) =>
-		prom = @statePromise.then(() => callback(@state))
+		prom = @statePromise.then(() => callback(@state, @bundle.pluginHooks))
 		if(updatedStateEvent)
 			prom = prom.then(@handleUpdatedState)
 		@statePromise = prom.then(@sync)

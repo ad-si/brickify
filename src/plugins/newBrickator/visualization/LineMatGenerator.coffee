@@ -1,6 +1,6 @@
 THREE = require 'three'
 
-module.exports = class FancyLineMaterial
+module.exports = class LineMatGenerator
 	generate: (color = 0x000000, zDelta = 0.0) =>
 		options = {
 			vertexShader: @_getVertexShader()

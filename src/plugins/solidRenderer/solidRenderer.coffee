@@ -181,7 +181,8 @@ module.exports = class SolidRenderer
 
 	toggleNodeVisibility: (node, visible) =>
 		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
-		obj.visible = visible
+		if obj?
+			obj.visible = visible
 
 	setNodeMaterial: (node, threeMaterial) =>
 		changeMaterial = () =>

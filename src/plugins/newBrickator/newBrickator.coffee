@@ -68,6 +68,7 @@ module.exports = class NewBrickator
 			bricks = results.accumulatedResults.bricks
 			cachedData.visualization.updateBricks bricks
 			cachedData.visualization.showBricks()
+			@_applyVoxelAndBrickVisibility cachedData
 
 			# ToDo: this is a workaround which needs to be fixed in layouter
 			# (apply changed bricks directly to grid)
@@ -80,6 +81,8 @@ module.exports = class NewBrickator
 			if solidRenderer?
 				solidRenderer.setNodeMaterial selectedNode,
 					@printMaterial
+				@_applyPrintVisibility cachedData
+
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode
@@ -211,47 +214,53 @@ module.exports = class NewBrickator
 	_toggleBrickLayer: (isEnabled) =>
 		@_brickVisibility = isEnabled
 
+		for k,v of @gridCache
+			@_applyVoxelAndBrickVisibility v
+
+	_applyVoxelAndBrickVisibility: (cachedData) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')
 
-		for k,v of @gridCache
-			if @_brickVisibility
-				v.visualization.showVoxelAndBricks()
-				# if bricks are shown, show whole model instead of csg (faster)
-				v.visualization.hideCsg()
-				if solidRenderer? and @_printVisibility
-					solidRenderer.toggleNodeVisibility(v.node, true)
-			else
-				# if bricks are hidden, csg has to be generated because
-				# the user would else see the whole original model
-				if @_printVisibility
-					csg = @_createCSG v.node, v, true
-					v.visualization.showCsg(csg)
-				
-				if solidRenderer?
-					solidRenderer.toggleNodeVisibility(v.node, false)
-				v.visualization.hideVoxelAndBricks()
-
+		if @_brickVisibility
+			cachedData.visualization.showVoxelAndBricks()
+			# if bricks are shown, show whole model instead of csg (faster)
+			cachedData.visualization.hideCsg()
+			if solidRenderer? and @_printVisibility
+				solidRenderer.toggleNodeVisibility(cachedData.node, true)
+		else
+			# if bricks are hidden, csg has to be generated because
+			# the user would else see the whole original model
+			if @_printVisibility
+				csg = @_createCSG cachedData.node, cachedData, true
+				cachedData.visualization.showCsg(csg)
+			
+			if solidRenderer?
+				solidRenderer.toggleNodeVisibility(cachedData.node, false)
+			cachedData.visualization.hideVoxelAndBricks()
 
 	_togglePrintedLayer: (isEnabled) =>
 		@_printVisibility = isEnabled
-		
-		solidRenderer = @bundle.getPlugin('solid-renderer')
 
 		for k,v of @gridCache
-			if @_printVisibility
-				if @_brickVisibility
-					# show face csg (original model) when bricks are visible
-					v.visualization.hideCsg()
-					if solidRenderer?
-						solidRenderer.toggleNodeVisibility(v.node, true)
-				else
-					# show real csg
-					csg = @_createCSG v.node, v, true
-					v.visualization.showCsg(csg)
-			else
-				v.visualization.hideCsg()
+			@_applyPrintVisibility v
+			
+	_applyPrintVisibility: (cachedData) =>
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+
+		if @_printVisibility
+			if @_brickVisibility
+				# show face csg (original model) when bricks are visible
+				cachedData.visualization.hideCsg()
 				if solidRenderer?
-						solidRenderer.toggleNodeVisibility(v.node, false)
+					solidRenderer.toggleNodeVisibility(cachedData.node, true)
+			else
+				# show real csg
+				csg = @_createCSG cachedData.node, cachedData, true
+				cachedData.visualization.showCsg(csg)
+		else
+			cachedData.visualization.hideCsg()
+			if solidRenderer?
+				solidRenderer.toggleNodeVisibility(cachedData.node, false)
+
 
 	_getNodeIdentifier: (selectedNode) =>
 		if selectedNode.pluginData.newBrickator?.identifier?

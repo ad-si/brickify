@@ -48,6 +48,7 @@ module.exports = class BrushHandler
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.clearInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
 
 	_legoMouseDown: (event, selectedNode) =>

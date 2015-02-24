@@ -196,6 +196,10 @@ module.exports = class NodeVisualization
 
 		@modifiedVoxels = newModifiedVoxel
 
+	clearInvisibleSuggestionBricks: () =>
+		for v in @modifiedVoxels
+			v.setSelectable false
+
 	# returns the first visible or selectable voxel below the mouse cursor
 	getVoxel: (event) =>
 		intersects =

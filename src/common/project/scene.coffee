@@ -29,6 +29,9 @@ class Scene extends SyncObject
 				@_modify "Node \"#{name}\" added"
 		return @next _addNode
 
+	getNodes: =>
+		return @done => @nodes
+
 	removeNode: (node) =>
 		_removeNode = =>
 			node.getName().then (name) =>

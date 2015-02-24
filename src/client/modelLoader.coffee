@@ -4,7 +4,7 @@
 
 md5 = require('blueimp-md5').md5
 modelCache = require './modelCache'
-objectTree = require '../common/project/objectTree'
+Node = require '../common/project/node'
 
 module.exports = class ModelLoader
 	constructor: (@bundle) ->
@@ -38,7 +38,7 @@ module.exports = class ModelLoader
 		hash = md5(modelData)
 		fileName = model.originalFileName
 		modelCache.store model
-		@addModelToState fileName, hash, model
+		@addModelToScene fileName, hash, model
 	loadByHash: (hash) =>
 		modelCache
 		.request(hash)
@@ -48,26 +48,12 @@ module.exports = class ModelLoader
 			console.error error
 
 	# adds a new model to the state
-	addModelToState: (fileName, hash, optimizedModel) ->
-		loadModelCallback = (state) =>
-			# create node structure
-			node = objectTree.addChild state.rootNode
-			node.fileName = fileName
-			node.meshHash = hash
-			node.pluginData = {
-				uiGen: {selectedPluginKey: @bundle.globalConfig.defaultPlugin}
-			}
+	addModelToScene: (fileName, hash, model) ->
+		transform = position: @_calculateModelPosition model
+		node = new Node name: fileName, modelHash: hash, transform: transform
+		@bundle.sceneManager.add node
 
-			# align model to grid
-			@_alignModelToGrid node, optimizedModel
-
-			# add to state
-			@bundle.ui?.sceneManager.add node
-
-		# call updateState on all client plugins and sync
-		@bundle.statesync.performStateAction loadModelCallback, true
-
-	_alignModelToGrid: (node, optimizedModel) =>
+	_calculateModelPosition: (model) =>
 		# get biggest polygon, align it to xy-center
 		# align whole model to be on z=0
 
@@ -88,7 +74,7 @@ module.exports = class ModelLoader
 			Area = Math.abs(Area / 2)
 			return Area
 
-		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
+		model.forEachPolygon (p0, p1, p2, n) =>
 			#find lowest z value (for whole model)
 			minZ  = Math.min(p0.z, p1.z, p2.z)
 
@@ -110,7 +96,7 @@ module.exports = class ModelLoader
 				result.x = minX + (maxX - minX) / 2
 				result.y = minY + (maxY - minY) / 2
 
-		node.positionData.position = {
+		return {
 			x: -result.x
 			y: -result.y
 			z: -result.z

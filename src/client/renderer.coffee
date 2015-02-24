@@ -14,16 +14,12 @@ module.exports = class Renderer
 
 	localRenderer: (timestamp) =>
 			@stats?.begin()
-			@threeRenderer.render @.scene, @.camera
+			@threeRenderer.render @scene, @camera
 			@pluginHooks.on3dUpdate timestamp
 			@controls.update()
 
 			@stats?.end()
 			requestAnimationFrame @localRenderer
-
-	onStateUpdate: (state) =>
-		for r in @pluginHooks.newBoundingSphere()
-			@adjustCameraToObject r if r?
 
 	addToScene: (node) ->
 		@scene.add node

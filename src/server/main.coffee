@@ -40,7 +40,6 @@ log = winston.loggers.get('log')
 pluginLoader = require './pluginLoader'
 app = require '../../routes/app'
 landingPage = require '../../routes/landingpage'
-statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
@@ -166,9 +165,6 @@ module.exports.setupRouting = () ->
 	webapp.get '/educators', landingPage.getEducators
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
-	webapp.get '/statesync/get', jsonParser, statesync.getState
-	webapp.post '/statesync/set', jsonParser, statesync.setState
-	webapp.get '/statesync/reset', jsonParser, statesync.resetState
 	webapp.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists
 	webapp.get '/model/get/:hash', urlParser, modelStorageApi.getModel
 	webapp.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
@@ -200,7 +196,7 @@ module.exports.setupRouting = () ->
 			if error
 				log.warn "Error while updating server: #{error}"
 
-	pluginLoader.loadPlugins statesync, path.resolve(__dirname, '../plugins')
+	pluginLoader.loadPlugins path.resolve(__dirname, '../plugins')
 
 	if developmentMode
 		webapp.use errorHandler()

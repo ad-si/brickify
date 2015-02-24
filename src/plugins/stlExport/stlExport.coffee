@@ -13,20 +13,15 @@ modelCache = require '../../client/modelCache'
 
 module.exports = class StlExport
 
-	constructor: () ->
-		@$spinnerContainer = $('#spinnerContainer')
-
 	exportStl: (encoding) =>
-		@$spinnerContainer.fadeIn 'fast', () =>
-			modelCache
-			.request @node.meshHash
-			.then (optimizedModel) =>
-				meshlib
-				.model optimizedModel
-				.export {format: 'stl', encoding: encoding}, (error, buffer) =>
-					if error then throw error
-					saveAs buffer, optimizedModel.originalFileName
-					@$spinnerContainer.fadeOut()
+		modelCache
+		.request @node.meshHash
+		.then (optimizedModel) =>
+			meshlib
+			.model optimizedModel
+			.export {format: 'stl', encoding: encoding}, (error, buffer) =>
+				if error then throw error
+				saveAs buffer, optimizedModel.originalFileName
 
 	uiEnabled: (@node) ->
 		return

@@ -8,6 +8,10 @@ Scene = require './scene'
 # @class Project
 ###
 class Project extends SyncObject
+	@load: =>
+		#TODO: Load from share or session
+		return Promise.resolve new @()
+
 	constructor: ->
 		super arguments[0]
 		@scenes = []

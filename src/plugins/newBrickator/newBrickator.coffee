@@ -3,7 +3,6 @@ LegoPipeline = require './LegoPipeline'
 THREE = require 'three'
 NodeVisualization = require './visualization/NodeVisualization'
 PipelineSettings = require './PipelineSettings'
-objectTree = require '../../common/project/objectTree'
 THREE = require 'three'
 Brick = require './Brick'
 meshlib = require('meshlib')
@@ -43,12 +42,8 @@ module.exports = class NewBrickator
 
 	processFirstObject: (animate) =>
 		#ToDo: Add animation to brick/voxel visualization (see #255)
-		@bundle.statesync.performStateAction (state) =>
-			if state.rootNode.children?
-				node = state.rootNode.children[0]
-				@runLegoPipeline node
-			else
-				console.error 'Unable to Legofy first object: state is empty'
+		#TODO: @runLegoPipeline node
+		return
 
 	runLegoPipeline: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>

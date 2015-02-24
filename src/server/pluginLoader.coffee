@@ -2,8 +2,6 @@
 fs = require 'fs'
 # Manipulate platform-independent path strings
 path = require 'path'
-# Server-side plugins
-stateSyncModule = null
 # Colorful logger for console
 winston = require 'winston'
 log = winston.loggers.get('log')
@@ -37,9 +35,7 @@ loadPlugin = (directory) ->
 	log.info "Plugin #{instance.name} loaded"
 
 
-module.exports.loadPlugins = (stateSync, directory) ->
-	stateSyncModule = stateSync
-
+module.exports.loadPlugins = (directory) ->
 	fs.readdir directory, (error, dirs) ->
 		if error
 			throw error

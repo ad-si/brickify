@@ -1,5 +1,3 @@
-objectTree = require '../../common/project/objectTree'
-
 module.exports = class UiObjects
 	constructor: (@bundle) ->
 		@objectList = []
@@ -13,8 +11,8 @@ module.exports = class UiObjects
 	init: (jqueryString, brushjQueryString) =>
 		@ui = @bundle.ui
 		@jqueryObject = $(jqueryString)
-		@selectCallback = @ui.sceneManager.select
-		@deselectCallback = @ui.sceneManager.deselect
+		@selectCallback = @bundle.sceneManager.select
+		@deselectCallback = @bundle.sceneManager.deselect
 		@_createBrushUi brushjQueryString
 
 	onNodeAdd: (node) =>
@@ -23,16 +21,16 @@ module.exports = class UiObjects
 			node: node
 		}
 
-		@_createUi(structure)
+		@_createUi(structure).then =>
 
-		@objectList.push structure
-		@jqueryObject.append structure.ui
+			@objectList.push structure
+			@jqueryObject.append structure.ui
 
-		@_objectSelect structure
+			@_objectSelect structure
 
-		# make sure a brush is always selected
-		if not @_selectedBrush
-			@_brushSelect @_brushList[@_brushList.length - 1]
+			# make sure a brush is always selected
+			if not @_selectedBrush and @_brushList.length > 0
+				@_brushSelect @_brushList[@_brushList.length - 1]
 
 
 	onNodeRemove: (node) =>
@@ -65,32 +63,32 @@ module.exports = class UiObjects
 				brush.jqueryObject = obj
 
 	_createUi: (structure) =>
-		name = structure.node.fileName
+		structure.node.getName().then (name) =>
+			html = "<li class='objectListItem'><p>#{name}</p>
+				<div class='objectIconContainer iconFloatRight'></div></li>"
+			structure.ui = $(html)
 
-		html = "<li class='objectListItem'><p>#{name}</p>
-			<div class='objectIconContainer iconFloatRight'></div></li>"
-		structure.ui = $(html)
+			structure.iconContainer = structure.ui.find('.objectIconContainer')
+			structure.iconContainer.hide()
 
-		structure.iconContainer = structure.ui.find('.objectIconContainer')
-		structure.iconContainer.hide()
-		
-		structure.ui.on 'click', () =>
-			@_objectSelect(structure)
+			structure.ui.on 'click', () =>
+				@_objectSelect(structure)
 
-		structure.brushjQueryObjects = {}
-		for brush in @_brushList
-			if brush.iconBrush
-				@_createIconBrush brush, structure
+			structure.brushjQueryObjects = {}
+			for brush in @_brushList
+				if brush.iconBrush
+					@_createIconBrush brush, structure
 
-		objVisHtml = '<span><span class="glyphicon glyphicon-eye-open"></span></span>'
-		objVis = $(objVisHtml)
-		objVis.on 'click', () =>
-			structure.nodeVisible = !structure.nodeVisible
-			@_toggleVisibleIcon structure.nodeVisible, objVis
-			@_setNodeVisibility structure.nodeVisible, structure.node
+			objVisHtml = '<span><span class="glyphicon glyphicon-eye-open">
+										</span></span>'
+			objVis = $(objVisHtml)
+			objVis.on 'click', () =>
+				structure.nodeVisible = !structure.nodeVisible
+				@_toggleVisibleIcon structure.nodeVisible, objVis
+				@_setNodeVisibility structure.nodeVisible, structure.node
 
-		structure.iconContainer.append objVis
-		structure.nodeVisible = true
+			structure.iconContainer.append objVis
+			structure.nodeVisible = true
 
 
 	_createBrush: (brush) =>
@@ -194,7 +192,7 @@ module.exports = class UiObjects
 
 	_setNodeVisibility: (isVisible, node) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')
-		solidRenderer.toggleNodeVisibility node, isVisible
+		solidRenderer.setNodeVisibility node, isVisible
 
 	getSelectedBrush: () =>
 		return @_selectedBrush

@@ -17,8 +17,8 @@ module.exports = class UiObjects
 		@deselectCallback = @ui.sceneManager.deselect
 		@_createBrushUi brushjQueryString
 
+	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		# Called by sceneManager when a node is added
 		structure = {
 			node: node
 		}
@@ -34,9 +34,8 @@ module.exports = class UiObjects
 		if not @_selectedBrush
 			@_brushSelect @_brushList[@_brushList.length - 1]
 
-
+	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
-		# Called by sceneManager when a node is removed
 		for i in [0..@objectList.length - 1] by 1
 			structure = @objectList[i]
 			if structure.node == node
@@ -46,9 +45,8 @@ module.exports = class UiObjects
 				if @objectList.length > 0
 					@_objectSelect @objectList[@objectList.length - 1]
 				return
-
+	# overrides the node selection
 	selectNode: (node) =>
-		# overrides the node selection
 		for s in @objectList
 			if s.node == node
 				@_objectSelect s
@@ -92,9 +90,8 @@ module.exports = class UiObjects
 		structure.iconContainer.append objVis
 		structure.nodeVisible = true
 
-
+	# creates a default brush with list entry
 	_createBrush: (brush) =>
-		# creates a default brush with list entry
 		string = "<div class='btn btn-primary'>#{brush.text}</div>"
 
 		htmlElement = $(string)
@@ -104,8 +101,8 @@ module.exports = class UiObjects
 
 		return htmlElement
 
+	# creates a brush that is only shown as a icon next to the object
 	_createIconBrush: (brush, structure) =>
-		# creates a brush that is only shown as a icon next to the object
 		html = "<span class='glyphicon glyphicon-#{brush.glyphicon}'></span>"
 		obj = $(html)
 		@_createTooltip obj, brush
@@ -124,8 +121,8 @@ module.exports = class UiObjects
 				placement: placement
 			}
 
+	# Don't do anything when clicking on selected object
 	_objectSelect: (structure) =>
-		# Don't do anything when clicking on selected object
 		if structure == @selectedStructure
 			return
 
@@ -142,8 +139,8 @@ module.exports = class UiObjects
 		@selectedStructure.ui.addClass('selectedObject')
 		@selectedStructure.iconContainer.show()
 
+	# deselect currently selected brush
 	_brushSelect: (brush) =>
-		# deselect currently selected brush
 		if @_selectedBrush?
 			if @_selectedBrush.deselectCallback?
 				@_selectedBrush.deselectCallback @selectedStructure.node

@@ -6,11 +6,15 @@ interactionHelper = require '../../../client/interactionHelper'
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
 	constructor: (@bundle, @threeNode, @grid) ->
+		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
 		@bricksSubnode = new THREE.Object3D()
+		@csgSubnode = new THREE.Object3D()
 
-		@threeNode.add @voxelsSubnode
-		@threeNode.add @bricksSubnode
+		@threeNode.add @voxelBrickSubnode
+		@voxelBrickSubnode.add @voxelsSubnode
+		@voxelBrickSubnode.add @bricksSubnode
+		@threeNode.add @csgSubnode
 
 		@defaultColoring = new Coloring()
 		@geometryCreator = new GeometryCreator(@grid)
@@ -26,11 +30,23 @@ module.exports = class NodeVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	hideAll: () =>
-		@threeNode.visible = false
+	showCsg: (newCsgMesh = null) =>
+		if newCsgMesh?
+			@csgSubnode.children = []
+			@csgSubnode.add newCsgMesh
+			newCsgMesh.material = @defaultColoring.csgMaterial
 
-	showAll: () =>
-		@threeNode.visible  = true
+		@csgSubnode.visible = true
+
+	hideCsg: () =>
+		@csgSubnode.visible = false
+
+
+	hideVoxelAndBricks: () =>
+		@voxelBrickSubnode.visible = false
+
+	showVoxelAndBricks: () =>
+		@voxelBrickSubnode.visible  = true
 
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
 		# (re)creates voxel visualization.

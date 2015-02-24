@@ -134,6 +134,7 @@ module.exports = class NewBrickator
 
 				# create datastructure
 				@gridCache[identifier] = {
+					node: selectedNode
 					grid: grid
 					optimizedModel: optimizedModel
 					threeNode: node
@@ -164,7 +165,7 @@ module.exports = class NewBrickator
 	getDownload: (selectedNode) =>
 		dlPromise = new Promise (resolve) =>
 			@_getCachedData(selectedNode).then (cachedData) =>
-				detailedCsg = @_createCSG selectedNode, cachedData, true, null
+				detailedCsg = @_createCSG selectedNode, cachedData, true
 
 				optimizedModel = new meshlib.OptimizedModel()
 				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
@@ -179,7 +180,7 @@ module.exports = class NewBrickator
 
 		return dlPromise
 
-	_createCSG: (selectedNode, cachedData, addKnobs = true, csgThreeNode = null) =>
+	_createCSG: (selectedNode, cachedData, addKnobs = true) =>
 		# get optimized model and transform to actual position
 		if not cachedData.optimizedThreeModel?
 			cachedData.optimizedThreeModel=
@@ -206,18 +207,51 @@ module.exports = class NewBrickator
 
 		return printThreeMesh
 
-	_toggleBrickLayer: () =>
-		@_brickVisibility = !@_brickVisibility
+	# makes bricks visible/invisible
+	_toggleBrickLayer: (isEnabled) =>
+		@_brickVisibility = isEnabled
+
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+
 		for k,v of @gridCache
 			if @_brickVisibility
-				v.visualization.showAll()
+				v.visualization.showVoxelAndBricks()
+				# if bricks are shown, show whole model instead of csg (faster)
+				v.visualization.hideCsg()
+				if solidRenderer? and @_printVisibility
+					solidRenderer.toggleNodeVisibility(v.node, true)
 			else
-				v.visualization.hideAll()
+				# if bricks are hidden, csg has to be generated because
+				# the user would else see the whole original model
+				if @_printVisibility
+					csg = @_createCSG v.node, v, true
+					v.visualization.showCsg(csg)
+				
+				if solidRenderer?
+					solidRenderer.toggleNodeVisibility(v.node, false)
+				v.visualization.hideVoxelAndBricks()
 
 
 	_togglePrintedLayer: (isEnabled) =>
 		@_printVisibility = isEnabled
-		# TODO implement for NodeVisualization
+		
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+
+		for k,v of @gridCache
+			if @_printVisibility
+				if @_brickVisibility
+					# show face csg (original model) when bricks are visible
+					v.visualization.hideCsg()
+					if solidRenderer?
+						solidRenderer.toggleNodeVisibility(v.node, true)
+				else
+					# show real csg
+					csg = @_createCSG v.node, v, true
+					v.visualization.showCsg(csg)
+			else
+				v.visualization.hideCsg()
+				if solidRenderer?
+						solidRenderer.toggleNodeVisibility(v.node, false)
 
 	_getNodeIdentifier: (selectedNode) =>
 		if selectedNode.pluginData.newBrickator?.identifier?

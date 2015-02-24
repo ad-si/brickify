@@ -6,16 +6,14 @@ module.exports = class VoxelUnion
 	constructor: (@grid) ->
 		return
 
+	# creates csg out of voxels. Expects an array of voxels, where
+	# each voxel has to have x,y,z coordinates (in grid voxel coords) and may have
+	# knobOnTop / knobFromBelow flags.
+	# @param {Object.<string, boolean>} options
+	# @param {boolean} options.addKnobs
+	# @param {boolean} options.profile
+	# @param {boolean} options.threeBoxGeometryOnly
 	run: (voxelsToBeGeometrized, options = {}) =>
-		# creates csg out of voxels. Expects an array of voxels, where
-		# each voxel has to have x,y,z coordinates (in grid voxel coords) and may have
-		# knobOnTop / knobFromBelow flags.
-		# options may consist of
-		# {
-		# addKnobs: true/false
-		# profile: true/false, threeBoxGeometryOnly: true/false
-        # }
-
 		d = new Date()
 		
 		boxGeometry = @_createVoxelGeometry(voxelsToBeGeometrized)
@@ -36,9 +34,9 @@ module.exports = class VoxelUnion
 
 		return boxGeometryBsp
 
+	# create the rectangular THREE.Geometry for the voxels
+	# @param {Object[]} voxelsToBeGeometrized Array of voxels
 	_createVoxelGeometry: (voxelsToBeGeometrized) ->
-		# create the rectangular THREE.Geometry for the voxels
-
 		dataStructure = @_prepareData(voxelsToBeGeometrized)
 		geo = new THREE.Geometry()
 
@@ -49,8 +47,8 @@ module.exports = class VoxelUnion
 
 		return geo
 
+	# creates points and faces needed for this voxel
 	_workOnVoxel: (x, y, z, dataStructure, geo) =>
-		# creates points and faces needed for this voxel
 		s = dataStructure
 
 		# if this is a voxel...
@@ -116,10 +114,10 @@ module.exports = class VoxelUnion
 				geo.faces.push new THREE.Face3(
 					upperIndices[0], upperIndices[3], upperIndices[1])
 
+	# creates a datastructure consisting of a
+	# [z][x][y] nested array out of the voxel list
+	# @param {Object[]} voxels Array of voxels
 	_prepareData: (voxels) ->
-		# creates a datastructure consisting of a
-		# [z][x][y] nested array out of the voxel list
-
 		s = {
 			zLayers: []
 		}
@@ -167,11 +165,10 @@ module.exports = class VoxelUnion
 							}
 		return s
 
+	# creates baseplate points in transformed world coordinates
+	# and adds them to geometry (if they don't exist yet)
+	# returns indices
 	_createGeoPoints: (x, y, z, structure, geometry) ->
-		# creates baseplate points in transformed world coordinates
-		# and adds them to geometry (if they don't exist yet)
-		# returns indices
-
 		# return points if they already exist
 		if structure.zLayers[z][x][y].points?
 			return structure.zLayers[z][x][y].points
@@ -267,9 +264,8 @@ module.exports = class VoxelUnion
 		structure.zLayers[z][x][y].points = [p0i, p1i, p2i, p3i]
 		return structure.zLayers[z][x][y].points
 
+	# adds knobs on top, subtracts knobs from below
 	_addKnobs: (boxGeometry, options, voxelsToBeGeometrized, grid) ->
-		# adds knobs on top, subtracts knobs from below
-
 		knobGeometry = @_createKnobGeometry @grid.spacing, options.knobSize
 		unionBsp = boxGeometry
 
@@ -298,8 +294,8 @@ module.exports = class VoxelUnion
 
 		return unionBsp
 
+	# creates Geometry needed for CSG operations
 	_createKnobGeometry: (gridSpacing, knobSize) ->
-		# creates Geometry needed for CSG operations
 		knobRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
 		dzBottom = -(gridSpacing.z / 2) + (knobSize.height / 2)
 		knobTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)

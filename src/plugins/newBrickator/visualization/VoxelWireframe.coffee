@@ -12,10 +12,9 @@ module.exports = class VoxelOutline
 	setVisibility: (isVisible) =>
 		@threeNode.visible = isVisible
 
+	# creates a wireframe out of voxels
+	# @param {{x,y,z}[]} voxels
 	createWireframe: (voxels) =>
-		# expects an array of {x, y, z} objects, each representing a
-		# voxel with its voxel coordinates
-
 		# clear old representations
 		@threeNode.children = []
 

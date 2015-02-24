@@ -124,7 +124,10 @@ module.exports = class UiObjects
 
 	# creates a default brush with list entry
 	_createBrush: (brush) =>
-		string = "<div class='btn btn-primary'>#{brush.text}</div>"
+		string = "<div class='btn btn-primary'>
+			#{brush.text}<br>
+			<img src='img/#{brush.icon}' width='64' height='64'></img>
+			</div>"
 
 		htmlElement = $(string)
 

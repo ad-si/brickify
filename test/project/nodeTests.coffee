@@ -60,6 +60,12 @@ describe 'Node tests', ->
 				expect(dataPackets.putCalls).
 					to.deep.have.deep.property('[0].packet.data.modelHash', hash)
 
+		it 'should set the model\'s hash in constructor', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			hash = 'randomModelHash'
+			node = new Node modelHash: hash
+			expect(node.getModelHash()).to.eventually.equal(hash)
+
 		it 'should request the correct model', ->
 			dataPackets.nextIds.push 'abcdefgh'
 			dataPackets.nextPuts.push true
@@ -101,3 +107,123 @@ describe 'Node tests', ->
 				expect(dataPackets.createCalls).to.have.length(1)
 				expect(dataPackets.putCalls).
 				to.deep.have.deep.property('[0].packet.data.name', name)
+
+		it 'should set the node\'s name in constructor', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			name = 'Beautiful Model'
+			node = new Node name: name
+			expect(node.getName()).to.eventually.equal(name)
+
+	describe 'node transform', ->
+		it 'should provide reasonable default transforms', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			position = x: 0, y: 0, z: 0
+			rotation = x: 0, y: 0, z: 0
+			scale = x: 1, y: 1, z: 1
+			Promise.all([
+				expect(node.getPosition()).to.eventually.deep.equal(position)
+				expect(node.getRotation()).to.eventually.deep.equal(rotation)
+				expect(node.getScale()).to.eventually.deep.equal(scale)
+			])
+
+		it 'should set the position chainable', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			position = x: 10, y: 20, z: 30
+			result = node.setPosition(position)
+			expect(result).to.equal(node)
+			result.done ->
+				expect(node).to.have.deep.property('transform.position', position)
+
+		it 'should get the position', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			position = x: 10, y: 20, z: 30
+			node.setPosition(position)
+			expect(node.getPosition()).to.eventually.deep.equal(position)
+
+		it 'should set the rotation chainable', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			rotation = x: 1, y: 2, z: 3
+			result = node.setRotation(rotation)
+			expect(result).to.equal(node)
+			result.done ->
+				expect(node).to.have.deep.property('transform.rotation', rotation)
+
+		it 'should get the rotation', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			rotation = x: 1, y: 2, z: 3
+			node.setRotation(rotation)
+			expect(node.getRotation()).to.eventually.deep.equal(rotation)
+
+		it 'should set the scale chainable', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			scale = x: 2, y: 2, z: 2
+			result = node.setScale(scale)
+			expect(result).to.equal(node)
+			result.done ->
+				expect(node).to.have.deep.property('transform.scale', scale)
+
+		it 'should get the scale', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			scale = x: 2, y: 2, z: 2
+			node.setScale(scale)
+			expect(node.getScale()).to.eventually.deep.equal(scale)
+
+		it 'should set the transform chainable', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			position = x: 0, y: 10, z: 20
+			rotation = x: 30, y: 40, z: 50
+			scale = x: 1, y: 2, z: 3
+			transform = position: position, rotation: rotation, scale: scale
+			result = node.setTransform(transform)
+			expect(result).to.equal(node)
+			result.done ->
+				expect(node).to.have.deep.property('transform.position', position)
+				expect(node).to.have.deep.property('transform.rotation', rotation)
+				expect(node).to.have.deep.property('transform.scale', scale)
+
+		it 'should set the transform in constructor', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			position = x: 0, y: 10, z: 20
+			rotation = x: 30, y: 40, z: 50
+			scale = x: 1, y: 2, z: 3
+			transform = position: position, rotation: rotation, scale: scale
+			node = new Node transform: transform
+			Promise.all([
+				expect(node.getPosition()).to.eventually.deep.equal(position)
+				expect(node.getRotation()).to.eventually.deep.equal(rotation)
+				expect(node.getScale()).to.eventually.deep.equal(scale)
+			])
+
+		it 'should get the transform', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			position = x: 0, y: 10, z: 20
+			rotation = x: 30, y: 40, z: 50
+			scale = x: 1, y: 2, z: 3
+			transform = position: position, rotation: rotation, scale: scale
+			node.setTransform(transform)
+			expect(node.getTransform()).to.eventually.deep.equal(transform)
+
+		it 'should store the transform', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
+			node = new Node()
+			position = x: 0, y: 10, z: 20
+			rotation = x: 30, y: 40, z: 50
+			scale = x: 1, y: 2, z: 3
+			transform = position: position, rotation: rotation, scale: scale
+			node.setTransform(transform)
+			node.save().then ->
+				expect(dataPackets.calls).to.equal(2)
+				expect(dataPackets.createCalls).to.have.length(1)
+				expect(dataPackets.putCalls).
+				to.deep.have.deep.property('[0].packet.data.transform').
+				that.deep.equals(transform)

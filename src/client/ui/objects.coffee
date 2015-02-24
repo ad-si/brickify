@@ -68,7 +68,7 @@ module.exports = class UiObjects
 
 		htmlEmpty = "<div class='btn btn-primary'></div>"
 		htmlEye = "<div class='btn btn-default'>
-			<span class='visibilityIcon glyphicon glyphicon-eye-open'></span>
+			<i class='visibilityIcon fa fa-eye'></i>
 			</div>"
 		for brush in @_brushList
 			if not brush.iconBrush
@@ -84,11 +84,11 @@ module.exports = class UiObjects
 		jqueryObject.on 'click', () =>
 			glyphClass = jqueryObject.find('.visibilityIcon')
 			if brush.visible
-				glyphClass.removeClass('glyphicon-eye-open')
-				glyphClass.addClass('glyphicon-eye-close')
+				glyphClass.removeClass('fa-eye')
+				glyphClass.addClass('fa-eye-slash')
 			else
-				glyphClass.addClass('glyphicon-eye-open')
-				glyphClass.removeClass('glyphicon-eye-close')
+				glyphClass.addClass('fa-eye')
+				glyphClass.removeClass('fa-eye-slash')
 			
 			brush.visible = !brush.visible
 			if brush.visibilityCallback?
@@ -112,7 +112,7 @@ module.exports = class UiObjects
 			if brush.iconBrush
 				@_createIconBrush brush, structure
 
-		objVisHtml = '<span><span class="glyphicon glyphicon-eye-open"></span></span>'
+		objVisHtml = '<span><i class="fa-eye"></i></span></span>'
 		objVis = $(objVisHtml)
 		objVis.on 'click', () =>
 			structure.nodeVisible = !structure.nodeVisible
@@ -218,11 +218,11 @@ module.exports = class UiObjects
 
 	_toggleVisibleIcon: (isVisible, jqueryObject) =>
 		if isVisible
-			jqueryObject.find('.glyphicon').removeClass('glyphicon-eye-close')
-			jqueryObject.find('.glyphicon').addClass('glyphicon-eye-open')
+			jqueryObject.find('i').removeClass('fa-eye-slash')
+			jqueryObject.find('i').addClass('fa-eye')
 		else
-			jqueryObject.find('.glyphicon').addClass('glyphicon-eye-close')
-			jqueryObject.find('.glyphicon').removeClass('glyphicon-eye-open')
+			jqueryObject.find('i').addClass('fa-eye-slash')
+			jqueryObject.find('i').removeClass('fa-eye')
 
 	_setNodeVisibility: (isVisible, node) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')

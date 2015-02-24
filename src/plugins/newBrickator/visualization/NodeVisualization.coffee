@@ -41,7 +41,6 @@ module.exports = class NodeVisualization
 	hideCsg: () =>
 		@csgSubnode.visible = false
 
-
 	hideVoxelAndBricks: () =>
 		@voxelBrickSubnode.visible = false
 
@@ -138,6 +137,8 @@ module.exports = class NodeVisualization
 			voxel.disable()
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
+			return voxel
+		return null
 
 	selectVoxel: (event) =>
 		# enables the voxel below mouse
@@ -146,6 +147,8 @@ module.exports = class NodeVisualization
 		if voxel and not voxel.isEnabled()
 			voxel.enable()
 			voxel.setMaterial @defaultColoring.selectedMaterial
+			return voxel
+		return null
 
 	updateModifiedVoxels: () =>
 		# moves all currenly deselected voxels

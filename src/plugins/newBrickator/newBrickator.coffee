@@ -142,6 +142,7 @@ module.exports = class NewBrickator
 					optimizedModel: optimizedModel
 					threeNode: node
 					visualization: nodeVisualization
+					csgNeedsRecalculation: true
 					x: nodePosition.x
 					y: nodePosition.y
 					z: nodePosition.z
@@ -184,6 +185,11 @@ module.exports = class NewBrickator
 		return dlPromise
 
 	_createCSG: (selectedNode, cachedData, addKnobs = true) =>
+		# return cached version if grid was not modified
+		if not cachedData.csgNeedsRecalculation
+			return cachedData.cachedCsg
+		cachedData.csgNeedsRecalculation = false
+
 		# get optimized model and transform to actual position
 		if not cachedData.optimizedThreeModel?
 			cachedData.optimizedThreeModel=
@@ -208,6 +214,7 @@ module.exports = class NewBrickator
 
 		printThreeMesh = @csgExtractor.extractGeometry(cachedData.grid, options)
 
+		cachedData.cachedCsg = printThreeMesh
 		return printThreeMesh
 
 	# makes bricks visible/invisible

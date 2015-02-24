@@ -67,9 +67,7 @@ module.exports = class UiObjects
 		container = $(visibilityjQueryString)
 
 		htmlEmpty = "<div class='btn btn-primary'></div>"
-		htmlEye = "<div class='btn btn-default'>
-			<i class='visibilityIcon fa fa-eye'></i>
-			</div>"
+		htmlEye = "<div class='btn btn-default fa fa-eye'></div>"
 		for brush in @_brushList
 			if not brush.iconBrush
 				if brush.canToggleVisibility
@@ -82,17 +80,10 @@ module.exports = class UiObjects
 
 	_createVisibilityClickCallback: (jqueryObject, brush) =>
 		jqueryObject.on 'click', () =>
-			glyphClass = jqueryObject.find('.visibilityIcon')
-			if brush.visible
-				glyphClass.removeClass('fa-eye')
-				glyphClass.addClass('fa-eye-slash')
-			else
-				glyphClass.addClass('fa-eye')
-				glyphClass.removeClass('fa-eye-slash')
-			
 			brush.visible = !brush.visible
-			if brush.visibilityCallback?
-				brush.visibilityCallback brush.visible
+			jqueryObject.toggleClass('fa-eye', brush.visible)
+			jqueryObject.toggleClass('fa-eye-slash', !brush.visible)
+			brush.visibilityCallback? brush.visible
 
 	_createUi: (structure) =>
 		name = structure.node.fileName
@@ -103,7 +94,7 @@ module.exports = class UiObjects
 
 		structure.iconContainer = structure.ui.find('.objectIconContainer')
 		structure.iconContainer.hide()
-		
+
 		structure.ui.on 'click', () =>
 			@_objectSelect(structure)
 
@@ -192,7 +183,7 @@ module.exports = class UiObjects
 			brush.jqueryObject.addClass 'selectedBrush'
 		else
 			brush.jqueryObject.addClass 'active'
-			
+
 		if brush.selectCallback?
 				brush.selectCallback @selectedStructure.node
 

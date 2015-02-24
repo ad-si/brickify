@@ -10,12 +10,13 @@ module.exports = class UiObjects
 			for brush in array
 				@_brushList.push brush
 
-	init: (jqueryString, brushjQueryString) =>
+	init: (jqueryString, brushjQueryString, visibilityjQueryString) =>
 		@ui = @bundle.ui
 		@jqueryObject = $(jqueryString)
 		@selectCallback = @ui.sceneManager.select
 		@deselectCallback = @ui.sceneManager.deselect
 		@_createBrushUi brushjQueryString
+		@_createVisibilityUi visibilityjQueryString
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -61,6 +62,37 @@ module.exports = class UiObjects
 				obj = @_createBrush brush
 				container.append obj
 				brush.jqueryObject = obj
+
+	_createVisibilityUi: (visibilityjQueryString) =>
+		container = $(visibilityjQueryString)
+
+		htmlEmpty = "<div class='btn btn-primary'></div>"
+		htmlEye = "<div class='btn btn-default'>
+			<span class='visibilityIcon glyphicon glyphicon-eye-open'></span>
+			</div>"
+		for brush in @_brushList
+			if not brush.iconBrush
+				if brush.canToggleVisibility
+					obj = $(htmlEye)
+					brush.visible = true
+					@_createVisibilityClickCallback obj, brush
+				else
+					obj = $(htmlEmpty)
+				container.append obj
+
+	_createVisibilityClickCallback: (jqueryObject, brush) =>
+		jqueryObject.on 'click', () =>
+			glyphClass = jqueryObject.find('.visibilityIcon')
+			if brush.visible
+				glyphClass.removeClass('glyphicon-eye-open')
+				glyphClass.addClass('glyphicon-eye-close')
+			else
+				glyphClass.addClass('glyphicon-eye-open')
+				glyphClass.removeClass('glyphicon-eye-close')
+			
+			brush.visible = !brush.visible
+			if brush.visibilityCallback?
+				brush.visibilityCallback brush.visible
 
 	_createUi: (structure) =>
 		name = structure.node.fileName

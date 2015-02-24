@@ -7,13 +7,20 @@ module.exports = class BrickObject extends THREE.Object3D
 		knobMesh = new THREE.Mesh(knobGeometry, material)
 		@add brickMesh
 		@add knobMesh
+		@selectable = true
+		@_isHighlighted = false
 
 	setMaterial: (@material) =>
 		@children[0].material = @material
 		@children[1].material = @material
+		# material override resets highlight state
+		@_isHighlighted = false
 
 	setKnobVisibility: (boolean) =>
 		@children[1].visible = boolean
+
+	setSelectable: (boolean) =>
+		@selectable = boolean
 
 	setVoxelCoords: (@voxelCoords) =>
 		# stores a reference of this bricks voxel coordinates for
@@ -36,9 +43,14 @@ module.exports = class BrickObject extends THREE.Object3D
 
 	setHighlight: (isHighlighted, material) =>
 		# one may highlight this brick with a special material
-		if isHighlighted
+		if isHighlighted and not @_isHighlighted
+			@_isHighlighted = true
+			@_beforeHighlightVisibility = @visible
+			@visible = true
 			@children[0].material = material
 			@children[1].material = material
-		else
+		else if @_isHighlighted
+			@_isHighlighted = false
+			@visible = @_beforeHighlightVisibility if @_beforeHighlightVisibility?
 			@children[0].material = @material
 			@children[1].material = @material

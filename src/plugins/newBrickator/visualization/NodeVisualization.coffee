@@ -136,6 +136,7 @@ module.exports = class NodeVisualization
 
 		if voxel and voxel.isEnabled()
 			voxel.disable()
+			voxel.setSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
 
@@ -145,6 +146,7 @@ module.exports = class NodeVisualization
 
 		if voxel and not voxel.isEnabled()
 			voxel.enable()
+			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
 
 	# moves all currenly deselected voxels
@@ -156,8 +158,8 @@ module.exports = class NodeVisualization
 		@currentlyDeselectedVoxels = []
 
 	# out of all voxels that can be enabled, create an
-	# invisible layer so that the user can select (raycaster)
-	# them and the selected voxel can be highlighted
+	# invisible layer (selectable = true) so that the user can select
+	# them via raycaster and the selected voxel can be highlighted
 	createInvisibleSuggestionBricks: () =>
 		newModifiedVoxel = []
 
@@ -188,12 +190,13 @@ module.exports = class NodeVisualization
 					freeBelow = false
 
 			if freeBelow and connectedToEnabled
-				v.setMaterial @defaultColoring.hiddenMaterial
-				v.visible = true
+				v.setSelectable true
+			else
+				v.setSelectable false
 
 		@modifiedVoxels = newModifiedVoxel
 
-	# returns the first voxel below the mouse cursor
+	# returns the first visible or selectable voxel below the mouse cursor
 	getVoxel: (event) =>
 		intersects =
 			interactionHelper.getPolygonClickedOn(
@@ -205,7 +208,7 @@ module.exports = class NodeVisualization
 			for intersection in intersects
 				obj = intersection.object.parent
 			
-				if obj.visible and obj.voxelCoords
+				if obj.voxelCoords and (obj.visible or obj.selectable)
 					return obj
 
 		return null

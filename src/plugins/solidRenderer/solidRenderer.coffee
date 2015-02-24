@@ -100,7 +100,7 @@ module.exports = class SolidRenderer
 			result =
 				radius: @latestAddedObject.geometry.boundingSphere.radius
 				center: @latestAddedObject.geometry.boundingSphere.center
-			
+
 			# update center to match moved object
 			@latestAddedObject.updateMatrix()
 			result.center.applyProjection @latestAddedObject.matrix
@@ -119,33 +119,6 @@ module.exports = class SolidRenderer
 			posd.rotation._z
 		)
 		threeObject.scale.set posd.scale.x, posd.scale.y, posd.scale.z
-
-	getBrushes: =>
-		return []
-		###
-		# deactivated until #250 is solved
-		return [{
-			text: 'move'
-			iconBrush: true
-			glyphicon: 'move'
-			mouseDownCallback: @_handleMouseDown
-			mouseMoveCallback: @_handleMouseMove
-			mouseUpCallback: @_handleMouseUp
-			tooltip: 'Move model'
-		}]
-		###
-
-		###
-		{
-			text: 'rotate'
-			iconBrush: true
-			glyphicon: 'refresh'
-			tooltip: 'Rotate model'
-			#mouseDownCallback: @_handleMouseDown
-			#mouseMoveCallback: @_handleMouseMove
-			#mouseUpCallback: @_handleMouseUp
-		}
-		###
 
 	_getThreeObjectByName: (name) =>
 		for obj in @threejsNode.children
@@ -192,7 +165,7 @@ module.exports = class SolidRenderer
 		changeMaterial = () =>
 			name = node.pluginData.solidRenderer.threeObjectUuid
 			threeNode = @_getThreeObjectByName name
-			
+
 			if threeNode
 				threeNode.material = threeMaterial
 

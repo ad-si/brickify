@@ -322,8 +322,8 @@ module.exports = class NewBrickator
 		events: [
 			{
 				hotkey: 's'
-				description: 'show stability of bricks'
-				callback: @showStabilityView
+				description: 'toggle stability view'
+				callback: @_toggleStabilityView
 			},
 			{
 				hotkey: 'l'
@@ -334,18 +334,11 @@ module.exports = class NewBrickator
 		]
 		}
 
-	showStabilityView: (selectedNode) =>
+	_toggleStabilityView: (selectedNode) =>
 		return if !selectedNode?
 		@_getCachedData(selectedNode).then (cachedData) =>
-			threeObjects = @getThreeObjectsByNode(selectedNode)
-			console.log 'stability view'
-			@brickVisualizer ?= new BrickVisualizer()
-			@brickVisualizer.createVisibleBricks(
-				threeObjects.bricks,
-				cachedData.bricks,
-				cachedData.grid,
-				true
-			)
+			cachedData.visualization.toggleStabilityView()
+			cachedData.visualization.showBricks()
 
 	_createCSG: (selectedNode, cachedData, addKnobs = true, csgThreeNode = null) =>
 		# get optimized model and transform to actual position

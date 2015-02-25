@@ -45,6 +45,9 @@ module.exports = class Coloring
 		brick.visualizationMaterial = @_getRandomBrickMaterial()
 		return brick.visualizationMaterial
 
+	getStabilityMaterialForBrick: (brick) =>
+		 @getMaterialForBrick brick
+
 	_getRandomBrickMaterial: () =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
 		return @_brickMaterials[i]
@@ -60,9 +63,9 @@ module.exports = class Coloring
 		@_brickMaterials.push @_createMaterial 0xfe3939
 		@_brickMaterials.push @_createMaterial 0xfe4d4d
 
-	_createMaterial: (color) =>
+	_createMaterial: (color, opacity = 1) =>
 		return new THREE.MeshLambertMaterial({
 			color: color
-			#opacity: 0.8
-			#transparent: true
-			})
+			opacity: opacity
+			transparent: opacity < 1.0
+		})

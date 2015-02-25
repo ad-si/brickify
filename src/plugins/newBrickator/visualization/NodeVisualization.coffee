@@ -1,6 +1,7 @@
 GeometryCreator = require './GeometryCreator'
 THREE = require 'three'
 Coloring = require './Coloring'
+StabilityColoring = require './StabilityColoring'
 interactionHelper = require '../../../client/interactionHelper'
 
 # This class represents the visualization of a node in the scene
@@ -13,10 +14,13 @@ module.exports = class NodeVisualization
 		@threeNode.add @bricksSubnode
 
 		@defaultColoring = new Coloring()
+		@stabilityColoring = new StabilityColoring()
 		@geometryCreator = new GeometryCreator(@grid)
 
 		@currentlyDeselectedVoxels = []
 		@modifiedVoxels = []
+
+		@isStabilityView = false
 
 	showVoxels: () =>
 		@voxelsSubnode.visible = true
@@ -75,6 +79,12 @@ module.exports = class NodeVisualization
 
 	updateBricks: (@bricks) =>
 		@updateBrickVisualization()
+		return
+
+	toggleStabilityView: () =>
+		@isStabilityView = !@isStabilityView
+		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
+		@updateBrickVisualization(coloring)
 		return
 
 	updateBrickVisualization: (coloring = @defaultColoring) =>

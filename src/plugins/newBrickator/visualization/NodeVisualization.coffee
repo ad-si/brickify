@@ -7,13 +7,17 @@ VoxelWireframe = require './VoxelWireframe'
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
 	constructor: (@bundle, @threeNode, @grid) ->
+		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
 		@bricksSubnode = new THREE.Object3D()
+		@csgSubnode = new THREE.Object3D()
 
-		@threeNode.add @voxelsSubnode
-		@voxelWireframe = new VoxelWireframe(@grid, @threeNode)
+		@threeNode.add @voxelBrickSubnode
+		@voxelBrickSubnode.add @voxelsSubnode
+		@voxelBrickSubnode.add @bricksSubnode
+		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
 
-		@threeNode.add @bricksSubnode
+		@threeNode.add @csgSubnode
 
 		@defaultColoring = new Coloring()
 		@geometryCreator = new GeometryCreator(@grid)
@@ -29,11 +33,22 @@ module.exports = class NodeVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	hideAll: () =>
-		@threeNode.visible = false
+	showCsg: (newCsgMesh = null) =>
+		if newCsgMesh?
+			@csgSubnode.children = []
+			@csgSubnode.add newCsgMesh
+			newCsgMesh.material = @defaultColoring.csgMaterial
 
-	showAll: () =>
-		@threeNode.visible  = true
+		@csgSubnode.visible = true
+
+	hideCsg: () =>
+		@csgSubnode.visible = false
+
+	hideVoxelAndBricks: () =>
+		@voxelBrickSubnode.visible = false
+
+	showVoxelAndBricks: () =>
+		@voxelBrickSubnode.visible  = true
 
 	# (re)creates voxel visualization.
 	# hides disabled voxels, updates material and knob visibility
@@ -139,6 +154,8 @@ module.exports = class NodeVisualization
 			voxel.setSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
+			return voxel
+		return null
 
 	# enables the voxel below mouse
 	selectVoxel: (event) =>
@@ -148,6 +165,8 @@ module.exports = class NodeVisualization
 			voxel.enable()
 			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
+			return voxel
+		return null
 
 	# moves all currenly deselected voxels
 	# to modified voxels

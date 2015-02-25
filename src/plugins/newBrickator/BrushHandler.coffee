@@ -53,11 +53,15 @@ module.exports = class BrushHandler
 
 	_legoMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.selectVoxel event
+			voxel = cachedData.visualization.selectVoxel event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.selectVoxel event
+			voxel = cachedData.visualization.selectVoxel event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -66,7 +70,9 @@ module.exports = class BrushHandler
 
 	_printMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.deselectVoxel event
+			voxel = cachedData.visualization.deselectVoxel event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_printMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -74,7 +80,9 @@ module.exports = class BrushHandler
 
 	_printMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.deselectVoxel event
+			voxel = cachedData.visualization.deselectVoxel event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>

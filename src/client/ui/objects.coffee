@@ -1,6 +1,6 @@
 objectTree = require '../../common/state/objectTree'
 
-module.exports = class UiObjects
+class UiObjects
 	constructor: (@bundle) ->
 		@objectList = []
 		@selectedStructure = null
@@ -10,15 +10,14 @@ module.exports = class UiObjects
 			for brush in array
 				@_brushList.push brush
 
-	init: (jqueryString, brushjQueryString) =>
+	init: (jqueryString, brushjQueryString, visibilityjQueryString) =>
 		@ui = @bundle.ui
 		@jqueryObject = $(jqueryString)
-		@selectCallback = @ui.sceneManager.select
-		@deselectCallback = @ui.sceneManager.deselect
 		@_createBrushUi brushjQueryString
+		@_createVisibilityUi visibilityjQueryString
 
+	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		# Called by sceneManager when a node is added
 		structure = {
 			node: node
 		}
@@ -34,10 +33,9 @@ module.exports = class UiObjects
 		if not @_selectedBrush
 			@_brushSelect @_brushList[@_brushList.length - 1]
 
-
+	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
-		# Called by sceneManager when a node is removed
-		for i in [0..@objectList.length - 1] by 1
+		for i in [0...@objectList.length] by 1
 			structure = @objectList[i]
 			if structure.node == node
 				structure.ui.remove()
@@ -47,11 +45,14 @@ module.exports = class UiObjects
 					@_objectSelect @objectList[@objectList.length - 1]
 				return
 
-	selectNode: (node) =>
-		# overrides the node selection
-		for s in @objectList
-			if s.node == node
-				@_objectSelect s
+	# overrides the node selection
+	onNodeSelect: (node) =>
+		return if node is @selectedStructure.node
+
+		for structure in @objectList
+			if structure.node == node
+				@_objectSelect structure, true
+				return
 
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null
@@ -59,145 +60,87 @@ module.exports = class UiObjects
 		container = $(brushjQueryString)
 
 		for brush in @_brushList
-			if not brush.iconBrush
-				obj = @_createBrush brush
-				container.append obj
-				brush.jqueryObject = obj
+			brush.jqueryObject = @_createBrush brush
+			container.append brush.jqueryObject
+
+	_createVisibilityUi: (visibilityjQueryString) =>
+		container = $(visibilityjQueryString)
+
+		htmlEmpty = "<div class='btn btn-primary'></div>"
+		for brush in @_brushList
+			if brush.canToggleVisibility
+				obj = @_createEyeButton brush
+			else
+				obj = $(htmlEmpty)
+			container.append obj
+
+	_createEyeButton: (brush) =>
+		htmlEye = "<div class='btn btn-default fa fa-eye'></div>"
+		obj = $(htmlEye)
+		brush.visible = true
+		obj.on 'click', () =>
+			brush.visible = !brush.visible
+			obj
+			.toggleClass 'fa-eye', brush.visible
+			.toggleClass 'fa-eye-slash', !brush.visible
+			brush.visibilityCallback? brush.visible
+		return obj
 
 	_createUi: (structure) =>
 		name = structure.node.fileName
 
-		html = "<li class='objectListItem'><p>#{name}</p>
-			<div class='objectIconContainer iconFloatRight'></div></li>"
+		html = "<li class='objectListItem'><p>#{name}</p></li>"
 		structure.ui = $(html)
 
-		structure.iconContainer = structure.ui.find('.objectIconContainer')
-		structure.iconContainer.hide()
-		
 		structure.ui.on 'click', () =>
 			@_objectSelect(structure)
 
-		structure.brushjQueryObjects = {}
-		for brush in @_brushList
-			if brush.iconBrush
-				@_createIconBrush brush, structure
-
-		objVisHtml = '<span><span class="glyphicon glyphicon-eye-open"></span></span>'
-		objVis = $(objVisHtml)
-		objVis.on 'click', () =>
-			structure.nodeVisible = !structure.nodeVisible
-			@_toggleVisibleIcon structure.nodeVisible, objVis
-			@_setNodeVisibility structure.nodeVisible, structure.node
-
-		structure.iconContainer.append objVis
-		structure.nodeVisible = true
-
-
+	# creates a default brush with list entry
 	_createBrush: (brush) =>
-		# creates a default brush with list entry
 		string = "<div class='btn btn-primary'>
-			#{brush.text}<br>
-			<img src='img/#{brush.icon}' width='64' height='64'></img>
-			</div>"
+								#{brush.text}<br>
+								<img src='img/#{brush.icon}' width='64' height='64' />
+							</div>"
 
 		htmlElement = $(string)
-
-		htmlElement.on 'click', () =>
-			@_brushSelect brush
+		htmlElement.on 'click', () => @_brushSelect brush
 
 		return htmlElement
 
-	_createIconBrush: (brush, structure) =>
-		# creates a brush that is only shown as a icon next to the object
-		html = "<span class='glyphicon glyphicon-#{brush.glyphicon}'></span>"
-		obj = $(html)
-		@_createTooltip obj, brush
-
-		obj.on 'click', () =>
-			@_brushSelect brush
-
-		structure.iconContainer.append obj
-		brush.jqueryObject = obj
-
-	_createTooltip: (jqueryObject, brush, placement = 'top') =>
-		if brush.tooltip?.length > 0
-			jqueryObject.tooltip {
-				title: brush.tooltip
-				delay: 500
-				placement: placement
-			}
-
-	_objectSelect: (structure) =>
+	_objectSelect: (structure, sceneManagerEvent = false) =>
 		# Don't do anything when clicking on selected object
-		if structure == @selectedStructure
-			return
+		return if structure is @selectedStructure
 
 		# deselect previously selected object
 		if @selectedStructure?
-			@deselectCallback @selectedStructure.node
+			@ui.sceneManager.deselect @selectedStructure.node
 			@selectedStructure.ui.removeClass('selectedObject')
-			@selectedStructure.iconContainer.hide()
 			@_deselectBrush @selectedStructure.node
 
 		# select current object
 		@selectedStructure = structure
-		@selectCallback @selectedStructure.node
+		@ui.sceneManager.select @selectedStructure.node unless sceneManagerEvent
 		@selectedStructure.ui.addClass('selectedObject')
-		@selectedStructure.iconContainer.show()
 
+	# deselect currently selected brush
 	_brushSelect: (brush) =>
-		# deselect currently selected brush
 		if @_selectedBrush?
-			if @_selectedBrush.deselectCallback?
-				@_selectedBrush.deselectCallback @selectedStructure.node
-
-			if @_selectedBrush.iconBrush
-				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
-			else
-				@_selectedBrush.jqueryObject.removeClass 'active'
+			@_selectedBrush.deselectCallback? @selectedStructure.node
+			@_selectedBrush.jqueryObject.removeClass 'active'
 
 		#select new brush
 		@_selectedBrush = brush
-
-		if brush.iconBrush
-			brush.jqueryObject.addClass 'selectedBrush'
-		else
-			brush.jqueryObject.addClass 'active'
-			
-		if brush.selectCallback?
-				brush.selectCallback @selectedStructure.node
+		brush.jqueryObject.addClass 'active'
+		brush.selectCallback? @selectedStructure.node
 
 	_deselectBrush: (node) =>
 		if @_selectedBrush?
-			if @_selectedBrush.deselectCallback?
-				@_selectedBrush.deselectCallback node
-
-			if @_selectedBrush.iconBrush
-				@_selectedBrush.jqueryObject.removeClass 'selectedBrush'
-			else
-				@_selectedBrush.jqueryObject.removeClass 'active'
+			@_selectedBrush.deselectCallback? node
+			@_selectedBrush.jqueryObject.removeClass 'active'
 
 		@_selectedBrush = null
 
-	_toggleBrushVisibility: (brush, jqueryObject) =>
-		brush.visible  = !brush.visible
-
-		@_toggleVisibleIcon brush.visible, jqueryObject
-
-		if brush.visibilityCallback?
-			brush.visibilityCallback brush.visible
-
-	_toggleVisibleIcon: (isVisible, jqueryObject) =>
-		if isVisible
-			jqueryObject.find('.glyphicon').removeClass('glyphicon-eye-close')
-			jqueryObject.find('.glyphicon').addClass('glyphicon-eye-open')
-		else
-			jqueryObject.find('.glyphicon').addClass('glyphicon-eye-close')
-			jqueryObject.find('.glyphicon').removeClass('glyphicon-eye-open')
-
-	_setNodeVisibility: (isVisible, node) =>
-		solidRenderer = @bundle.getPlugin('solid-renderer')
-		solidRenderer.toggleNodeVisibility node, isVisible
-
 	getSelectedBrush: () =>
 		return @_selectedBrush
+
+module.exports = UiObjects

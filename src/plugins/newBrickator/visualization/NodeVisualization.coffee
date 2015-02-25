@@ -2,15 +2,22 @@ GeometryCreator = require './GeometryCreator'
 THREE = require 'three'
 Coloring = require './Coloring'
 interactionHelper = require '../../../client/interactionHelper'
+VoxelWireframe = require './VoxelWireframe'
 
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
 	constructor: (@bundle, @threeNode, @grid) ->
+		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
 		@bricksSubnode = new THREE.Object3D()
+		@csgSubnode = new THREE.Object3D()
 
-		@threeNode.add @voxelsSubnode
-		@threeNode.add @bricksSubnode
+		@threeNode.add @voxelBrickSubnode
+		@voxelBrickSubnode.add @voxelsSubnode
+		@voxelBrickSubnode.add @bricksSubnode
+		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
+
+		@threeNode.add @csgSubnode
 
 		@defaultColoring = new Coloring()
 		@geometryCreator = new GeometryCreator(@grid)
@@ -26,16 +33,26 @@ module.exports = class NodeVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	hideAll: () =>
-		@threeNode.visible = false
+	showCsg: (newCsgMesh = null) =>
+		if newCsgMesh?
+			@csgSubnode.children = []
+			@csgSubnode.add newCsgMesh
+			newCsgMesh.material = @defaultColoring.csgMaterial
 
-	showAll: () =>
-		@threeNode.visible  = true
+		@csgSubnode.visible = true
 
+	hideCsg: () =>
+		@csgSubnode.visible = false
+
+	hideVoxelAndBricks: () =>
+		@voxelBrickSubnode.visible = false
+
+	showVoxelAndBricks: () =>
+		@voxelBrickSubnode.visible  = true
+
+	# (re)creates voxel visualization.
+	# hides disabled voxels, updates material and knob visibility
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
-		# (re)creates voxel visualization.
-		# hides disabled voxels, updates material and knob visibility
-
 		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
 		recreate
 			@_createVoxelVisualization coloring
@@ -48,9 +65,22 @@ module.exports = class NodeVisualization
 			v.setMaterial material
 			@_updateVoxel v
 
-	_createVoxelVisualization: (coloring) =>
-		# clear and create voxel visualization
+		# show not filled lego shape as outline
+		outlineVoxels = []
+		for v in @modifiedVoxels
+			if not v.isLego()
+				outlineVoxels.push {
+					x: v.voxelCoords.x
+					y: v.voxelCoords.y
+					z: v.voxelCoords.z
+				}
+		@voxelWireframe.createWireframe outlineVoxels
 
+	setPossibleLegoBoxVisibility: (isVisible) =>
+		@voxelWireframe.setVisibility isVisible
+
+	# clear and create voxel visualization
+	_createVoxelVisualization: (coloring) =>
 		@voxelsSubnode.children = []
 
 		for z in [0..@grid.numVoxelsZ - 1] by 1
@@ -63,8 +93,9 @@ module.exports = class NodeVisualization
 						@_updateVoxel threeBrick
 						@voxelsSubnode.add threeBrick
 
+	# makes disabled voxels invisible, toggles knob visibility
 	_updateVoxel: (threeBrick) =>
-		if not threeBrick.isEnabled()
+		if not threeBrick.isLego()
 			threeBrick.visible = false
 
 		coords = threeBrick.voxelCoords
@@ -98,8 +129,8 @@ module.exports = class NodeVisualization
 
 		@showBricks()
 
+	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, condition) =>
-		# highlights the voxel below mouse and returns it
 		voxel = @getVoxel event
 
 		if voxel?
@@ -114,42 +145,48 @@ module.exports = class NodeVisualization
 
 		return voxel
 
-	deselectVoxel: (event) =>
-		# disables the voxel below mouse
+	# makes the voxel below mouse to be 3d printed
+	makeVoxel3dPrinted: (event) =>
 		voxel = @getVoxel event
 
-		if voxel and voxel.isEnabled()
-			voxel.disable()
+		if voxel and voxel.isLego()
+			voxel.make3dPrinted()
+			voxel.setRaycasterSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
+			return voxel
+		return null
 
-	selectVoxel: (event) =>
-		# enables the voxel below mouse
+	# makes the voxel below mouse to be made out of lego
+	makeVoxelLego: (event) =>
 		voxel = @getVoxel event
 
-		if voxel and not voxel.isEnabled()
-			voxel.enable()
+		if voxel and not voxel.isLego()
+			voxel.makeLego()
+			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
+			return voxel
+		return null
 
+	# moves all currenly deselected voxels
+	# to modified voxels
 	updateModifiedVoxels: () =>
-		# moves all currenly deselected voxels
-		# to modified voxels
-
 		for v in @currentlyDeselectedVoxels
 			@modifiedVoxels.push v
 
 		@currentlyDeselectedVoxels = []
 
-	showDeselectedVoxelSuggestions: () =>
-		# show one layer of not-enabled (-> to be 3d printed) voxels
-		# (one layer = voxel has at least one enabled neighbour)
-		# so that users can re-select them
+	# out of all voxels that can be enabled, create an
+	# invisible layer (raycasterSelectable = true) so that the user can select
+	# them via raycaster and the selected voxel can be highlighted
+	createInvisibleSuggestionBricks: () =>
+		dir = @_getPrincipalCameraDirection @bundle.renderer.camera
 
 		newModifiedVoxel = []
 
 		for v in @modifiedVoxels
 			# ignore and removed enabled voxel
-			if v.isEnabled()
+			if v.isLego()
 				continue
 			newModifiedVoxel.push v
 
@@ -164,23 +201,31 @@ module.exports = class NodeVisualization
 			if enabledVoxels.length > 0
 				connectedToEnabled = true
 
-			# has this voxel a not selected voxel below
-			# (preventing unselectable voxels)
-			# could be optimized by not using the (z-)-layer as "below",
-			# but the layer the camera is currently facing towards
-			freeBelow = true
-			if @grid.zLayers[c.z - 1]?[c.x]?[c.y]?
-				if  @grid.zLayers[c.z - 1][c.x][c.y].enabled == false
-					freeBelow = false
+			# check if there is an unselected voxel behind this voxel
+			# (behind is always relative to the camera's direction)
+			# if yes, don't show this voxel
+			behindCoords = {
+				x: ((c.x - 1) if dir == '-x') || ((c.x + 1) if dir == '+x') || c.x
+				y: ((c.y - 1) if dir == '-y') || ((c.y + 1) if dir == '+y') || c.y
+				z: ((c.z - 1) if dir == '-z') || ((c.z + 1) if dir == '+z') || c.z
+			}
+			bc = behindCoords
 
-			if freeBelow and connectedToEnabled
-				v.setMaterial @defaultColoring.deselectedMaterial
-				v.visible = true
+			freeBehind = true
+			if @grid.zLayers[bc.z]?[bc.x]?[bc.y]?
+				if  @grid.zLayers[bc.z][bc.x][bc.y].enabled == false
+					freeBehind = false
+
+			v.setRaycasterSelectable (freeBehind and connectedToEnabled)
 
 		@modifiedVoxels = newModifiedVoxel
 
+	clearInvisibleSuggestionBricks: () =>
+		for v in @modifiedVoxels
+			v.setRaycasterSelectable false
+
+	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event) =>
-		# returns the first voxel below the mouse cursor
 		intersects =
 			interactionHelper.getPolygonClickedOn(
 				event
@@ -191,10 +236,40 @@ module.exports = class NodeVisualization
 			for intersection in intersects
 				obj = intersection.object.parent
 			
-				if obj.visible and obj.voxelCoords
+				if obj.voxelCoords and (obj.visible or obj.raycasterSelectable)
 					return obj
 
 		return null
+
+	_getPrincipalCameraDirection: (camera) =>
+		# returns the main direction the camera is facing
+
+		# rotate the camera's view vector according to cam rotation
+		vecz = new THREE.Vector3(0,0,-1)
+		vecz.applyQuaternion camera.quaternion
+
+		# apply inverse scene matrix (to account for that the scene is rotated)
+		matrix = new THREE.Matrix4()
+		matrix.getInverse(@bundle.renderer.scene.matrix)
+		vecz.applyMatrix4(matrix)
+		vecz.normalize()
+
+		if vecz.z > 0.5
+			return '+z'
+		else if vecz.z < -0.5
+			return '-z'
+		else if vecz.x > 0.5
+			return '+x'
+		else if vecz.x < -0.5
+			return '-x'
+		else if vecz.y > 0.5
+			return '+y'
+		else if vecz.y < -0.5
+			return '-y'
+
+
+
+
 
 
 

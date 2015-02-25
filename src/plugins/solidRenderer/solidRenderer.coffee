@@ -144,7 +144,7 @@ module.exports = class SolidRenderer
 			result =
 				radius: geometry.boundingSphere.radius
 				center: geometry.boundingSphere.center
-			
+
 			# update center to match moved object
 			@latestAddedObject.updateMatrix()
 			result.center.applyProjection @latestAddedObject.matrix
@@ -163,33 +163,6 @@ module.exports = class SolidRenderer
 			posd.rotation._z
 		)
 		threeObject.scale.set posd.scale.x, posd.scale.y, posd.scale.z
-
-	getBrushes: =>
-		return []
-		###
-		# deactivated until #250 is solved
-		return [{
-			text: 'move'
-			iconBrush: true
-			glyphicon: 'move'
-			mouseDownCallback: @_handleMouseDown
-			mouseMoveCallback: @_handleMouseMove
-			mouseUpCallback: @_handleMouseUp
-			tooltip: 'Move model'
-		}]
-		###
-
-		###
-		{
-			text: 'rotate'
-			iconBrush: true
-			glyphicon: 'refresh'
-			tooltip: 'Rotate model'
-			#mouseDownCallback: @_handleMouseDown
-			#mouseMoveCallback: @_handleMouseMove
-			#mouseUpCallback: @_handleMouseUp
-		}
-		###
 
 	_getThreeObjectByName: (name) =>
 		for obj in @threejsNode.children
@@ -224,14 +197,19 @@ module.exports = class SolidRenderer
 		@_copyTransformDataToThree selectedNode, threeObject
 
 	toggleNodeVisibility: (node, visible) =>
-		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
-		obj.visible = visible
+		setVisibility = () =>
+			obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+			if obj?
+				obj.visible = visible
+
+		@loadModelIfNeeded(node).then () =>
+			setVisibility()
 
 	setNodeMaterial: (node, threeMaterial) =>
 		changeMaterial = () =>
 			name = node.pluginData.solidRenderer.threeObjectUuid
 			threeNode = @_getThreeObjectByName name
-			
+
 			if threeNode
 				threeNode.originalMesh.material = threeMaterial
 

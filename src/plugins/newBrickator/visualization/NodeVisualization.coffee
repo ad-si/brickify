@@ -145,8 +145,8 @@ module.exports = class NodeVisualization
 
 		return voxel
 
-	# disables the voxel below mouse
-	deselectVoxel: (event) =>
+	# makes the voxel below mouse to be 3d printed
+	makeVoxel3dPrinted: (event) =>
 		voxel = @getVoxel event
 
 		if voxel and voxel.isLego()
@@ -157,8 +157,8 @@ module.exports = class NodeVisualization
 			return voxel
 		return null
 
-	# enables the voxel below mouse
-	selectVoxel: (event) =>
+	# makes the voxel below mouse to be made out of lego
+	makeVoxelLego: (event) =>
 		voxel = @getVoxel event
 
 		if voxel and not voxel.isLego()

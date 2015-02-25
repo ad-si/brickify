@@ -68,7 +68,7 @@ module.exports = class NodeVisualization
 		# show not filled lego shape as outline
 		outlineVoxels = []
 		for v in @modifiedVoxels
-			if not v.isEnabled()
+			if not v.isLego()
 				outlineVoxels.push {
 					x: v.voxelCoords.x
 					y: v.voxelCoords.y
@@ -95,7 +95,7 @@ module.exports = class NodeVisualization
 
 	# makes disabled voxels invisible, toggles knob visibility
 	_updateVoxel: (threeBrick) =>
-		if not threeBrick.isEnabled()
+		if not threeBrick.isLego()
 			threeBrick.visible = false
 
 		coords = threeBrick.voxelCoords
@@ -149,8 +149,8 @@ module.exports = class NodeVisualization
 	deselectVoxel: (event) =>
 		voxel = @getVoxel event
 
-		if voxel and voxel.isEnabled()
-			voxel.disable()
+		if voxel and voxel.isLego()
+			voxel.make3dPrinted()
 			voxel.setRaycasterSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
@@ -161,8 +161,8 @@ module.exports = class NodeVisualization
 	selectVoxel: (event) =>
 		voxel = @getVoxel event
 
-		if voxel and not voxel.isEnabled()
-			voxel.enable()
+		if voxel and not voxel.isLego()
+			voxel.makeLego()
 			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
 			return voxel
@@ -184,7 +184,7 @@ module.exports = class NodeVisualization
 
 		for v in @modifiedVoxels
 			# ignore and removed enabled voxel
-			if v.isEnabled()
+			if v.isLego()
 				continue
 			newModifiedVoxel.push v
 

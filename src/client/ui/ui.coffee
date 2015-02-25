@@ -78,7 +78,7 @@ module.exports = class Ui
 		)
 
 	_initUiElements: =>
-		@objects.init('#objectsContainer', '#brushContainer')
+		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks)

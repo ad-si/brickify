@@ -38,7 +38,7 @@ class SolidRenderer
 			result =
 				radius: @latestAddedObject.geometry.boundingSphere.radius
 				center: @latestAddedObject.geometry.boundingSphere.center
-			
+
 			# update center to match moved object
 			@latestAddedObject.updateMatrix()
 			result.center.applyProjection @latestAddedObject.matrix
@@ -50,6 +50,9 @@ class SolidRenderer
 
 	setNodeVisibility: (node, visible) =>
 		threeHelper.find(node, @threejsNode)?.visible = visible
+
+		@loadModelIfNeeded(node).then () =>
+			setVisibility()
 
 	setNodeMaterial: (node, threeMaterial) =>
 		threeHelper.find(node, @threejsNode)?.material = threeMaterial

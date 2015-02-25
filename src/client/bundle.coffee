@@ -23,7 +23,7 @@ module.exports = class Bundle
 		@ui = new Ui(@) if @globalConfig.buildUi
 
 	init: =>
-		@ui.init()
+		@ui?.init()
 		return @sceneManager.init()
 
 	getPlugin: (name) =>

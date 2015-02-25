@@ -43,6 +43,7 @@ module.exports = class BrushHandler
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.createInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
+			@_setModelShadowVisiblity selectedNode, false
 		
 	_printSelect: (selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -50,6 +51,7 @@ module.exports = class BrushHandler
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.clearInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
+			@_setModelShadowVisiblity selectedNode, true
 
 	_legoMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -98,3 +100,8 @@ module.exports = class BrushHandler
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()
 		cachedData.visualization.showVoxels()
+
+	_setModelShadowVisiblity: (selectedNode, visible) =>
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+		if solidRenderer?
+			solidRenderer.setShadowVisibility selectedNode, visible

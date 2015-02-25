@@ -7,17 +7,17 @@ VoxelWireframe = require './VoxelWireframe'
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
 	constructor: (@bundle, @threeNode, @grid) ->
+		@csgSubnode = new THREE.Object3D()
+		@threeNode.add @csgSubnode
+
 		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
-		@bricksSubnode = new THREE.Object3D()
-		@csgSubnode = new THREE.Object3D()
-
-		@threeNode.add @voxelBrickSubnode
 		@voxelBrickSubnode.add @voxelsSubnode
+		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
-		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
 
-		@threeNode.add @csgSubnode
+		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
+		@threeNode.add @voxelBrickSubnode
 
 		@defaultColoring = new Coloring()
 		@geometryCreator = new GeometryCreator(@grid)
@@ -74,6 +74,7 @@ module.exports = class NodeVisualization
 					y: v.voxelCoords.y
 					z: v.voxelCoords.z
 				}
+
 		@voxelWireframe.createWireframe outlineVoxels
 
 	setPossibleLegoBoxVisibility: (isVisible) =>

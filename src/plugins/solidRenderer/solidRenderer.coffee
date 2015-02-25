@@ -122,6 +122,8 @@ module.exports = class SolidRenderer
 		lines.material.opacity = 0.1
 		lines.material.depthFunc = 'GREATER'
 		lines.material.depthWrite = false
+
+		# ToDo: create fancy shader material
 		lineContainer.add lines
 
 		metaObject = new THREE.Object3D()
@@ -201,6 +203,15 @@ module.exports = class SolidRenderer
 			obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
 			if obj?
 				obj.visible = visible
+
+		@loadModelIfNeeded(node).then () =>
+			setVisibility()
+
+	setShadowVisibility: (node, visible) =>
+		setVisibility = () =>
+			obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+			if obj?
+				obj.children[1].visible = visible
 
 		@loadModelIfNeeded(node).then () =>
 			setVisibility()

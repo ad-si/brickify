@@ -26,10 +26,10 @@ module.exports = class VoxelOutline
 
 		#edge helper to the rescue
 		material = new THREE.MeshLambertMaterial({
-			color: 0x00ff00
+			color: 0xff0000
 		})
 		mesh = new THREE.Mesh(boxGeometry, material)
 
-		edgeHelper = new THREE.EdgesHelper(mesh, 0x000000)
+		edgeHelper = new THREE.EdgesHelper(mesh, 0x000000, 10)
 		edgeHelper.material.linewidth = 2
 		@threeNode.add edgeHelper

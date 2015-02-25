@@ -66,7 +66,7 @@ Promise.resolve($.get '/share').then((link) ->
 
 		client.on 'ready', (readyEvent) ->
 			client.on 'aftercopy', (event) ->
-				copyButton.html 'Copied <span class="glyphicon glyphicon-ok"></span>'
+				copyButton.html 'Copied <span class="fa fa-check"></span>'
 				copyButton.addClass 'btn-success'
 
 	#init direct help

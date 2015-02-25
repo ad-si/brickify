@@ -161,10 +161,10 @@ describe 'brickLayouter split', ->
 		for brick in bricks[0]
 			expect(brick.size).to.eql({x: 1, y: 1, z: 1})
 		expect(bricks[0][0].position).to.eql({x: 0, y: 0, z: 0})
-		expect(bricks[0][0].neighbours[0]).to.be.empty()
-		expect(bricks[0][0].neighbours[1]).not.to.be.empty()
-		expect(bricks[0][0].neighbours[2]).to.be.empty()
-		expect(bricks[0][0].neighbours[3]).to.be.empty()
+		expect(bricks[0][0].neighbours[0]).to.be.empty
+		expect(bricks[0][0].neighbours[1]).not.to.be.empty
+		expect(bricks[0][0].neighbours[2]).to.be.empty
+		expect(bricks[0][0].neighbours[3]).to.be.empty
 
 	it 'should split one brick and relayout locally', () ->
 		# 01222

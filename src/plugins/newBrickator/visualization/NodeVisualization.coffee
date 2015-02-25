@@ -208,10 +208,7 @@ module.exports = class NodeVisualization
 				if  @grid.zLayers[c.z - 1][c.x][c.y].enabled == false
 					freeBelow = false
 
-			if freeBelow and connectedToEnabled
-				v.setRaycasterSelectable true
-			else
-				v.setRaycasterSelectable false
+			v.setRaycasterSelectable (freeBelow and connectedToEnabled)
 
 		@modifiedVoxels = newModifiedVoxel
 

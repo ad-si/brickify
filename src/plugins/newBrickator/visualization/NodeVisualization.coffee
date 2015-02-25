@@ -151,7 +151,7 @@ module.exports = class NodeVisualization
 
 		if voxel and voxel.isEnabled()
 			voxel.disable()
-			voxel.setSelectable false
+			voxel.setRaycasterSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
 			return voxel
@@ -209,15 +209,15 @@ module.exports = class NodeVisualization
 					freeBelow = false
 
 			if freeBelow and connectedToEnabled
-				v.setSelectable true
+				v.setRaycasterSelectable true
 			else
-				v.setSelectable false
+				v.setRaycasterSelectable false
 
 		@modifiedVoxels = newModifiedVoxel
 
 	clearInvisibleSuggestionBricks: () =>
 		for v in @modifiedVoxels
-			v.setSelectable false
+			v.setRaycasterSelectable false
 
 	# returns the first visible or selectable voxel below the mouse cursor
 	getVoxel: (event) =>
@@ -231,7 +231,7 @@ module.exports = class NodeVisualization
 			for intersection in intersects
 				obj = intersection.object.parent
 			
-				if obj.voxelCoords and (obj.visible or obj.selectable)
+				if obj.voxelCoords and (obj.visible or obj.raycasterSelectable)
 					return obj
 
 		return null

@@ -7,42 +7,46 @@ module.exports = class BrickObject extends THREE.Object3D
 		knobMesh = new THREE.Mesh(knobGeometry, material)
 		@add brickMesh
 		@add knobMesh
-		@selectable = true
+		@raycasterSelectable = true
 		@_isHighlighted = false
 
 	setMaterial: (@material) =>
 		@children[0].material = @material
 		@children[1].material = @material
+		
 		# material override resets highlight state
 		@_isHighlighted = false
 
 	setKnobVisibility: (boolean) =>
 		@children[1].visible = boolean
 
-	setSelectable: (boolean) =>
-		@selectable = boolean
+	# If the object is not visible, it can still be selected by the
+	# raycaster in NodeVisualization.getVoxel if it is raycasterSelectable
+	# (visible objects can always be selected by the raycaster)
+	setRaycasterSelectable: (boolean) =>
+		@raycasterSelectable = boolean
 
+	# stores a reference of this bricks voxel coordinates for
+	# further usage
 	setVoxelCoords: (@voxelCoords) =>
-		# stores a reference of this bricks voxel coordinates for
-		# further usage
 		return
 
 	setGridReference: (@gridEntry) =>
 		return
 
+	# makes the voxel being 3d printed
 	disable: () =>
-		# makes the voxel being 3d printed
 		@gridEntry.enabled = false
 
+	# makes the voxel being legotized
 	enable: () =>
-		# makes the voxel being legotized
 		@gridEntry.enabled = true
 
 	isEnabled: () =>
 		return @gridEntry.enabled
 
+	# one may highlight this brick with a special material
 	setHighlight: (isHighlighted, material) =>
-		# one may highlight this brick with a special material
 		if isHighlighted and not @_isHighlighted
 			@_isHighlighted = true
 			@_beforeHighlightVisibility = @visible

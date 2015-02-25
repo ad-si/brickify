@@ -143,6 +143,10 @@ module.exports = class NodeVisualization
 
 			@currentlyHighlightedVoxel = voxel
 			voxel.setHighlight true, @defaultColoring.highlightMaterial
+		else
+			# clear highlight if no voxel is below mouse
+			if @currentlyHighlightedVoxel?
+				@currentlyHighlightedVoxel.setHighlight false
 
 		return voxel
 

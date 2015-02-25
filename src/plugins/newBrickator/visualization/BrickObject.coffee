@@ -13,7 +13,7 @@ module.exports = class BrickObject extends THREE.Object3D
 	setMaterial: (@material) =>
 		@children[0].material = @material
 		@children[1].material = @material
-		
+
 		# material override resets highlight state
 		@_isHighlighted = false
 
@@ -53,7 +53,7 @@ module.exports = class BrickObject extends THREE.Object3D
 			@visible = true
 			@children[0].material = material
 			@children[1].material = material
-		else if @_isHighlighted
+		else if (not isHighlighted) and @_isHighlighted
 			@_isHighlighted = false
 			@visible = @_beforeHighlightVisibility if @_beforeHighlightVisibility?
 			@children[0].material = @material

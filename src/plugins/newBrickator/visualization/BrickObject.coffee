@@ -7,7 +7,6 @@ module.exports = class BrickObject extends THREE.Object3D
 		knobMesh = new THREE.Mesh(knobGeometry, material)
 		@add brickMesh
 		@add knobMesh
-		@raycasterSelectable = true
 		@_isHighlighted = false
 
 	setMaterial: (@material) =>
@@ -19,12 +18,6 @@ module.exports = class BrickObject extends THREE.Object3D
 
 	setKnobVisibility: (boolean) =>
 		@children[1].visible = boolean
-
-	# If the object is not visible, it can still be selected by the
-	# raycaster in NodeVisualization.getVoxel if it is raycasterSelectable
-	# (visible objects can always be selected by the raycaster)
-	setRaycasterSelectable: (boolean) =>
-		@raycasterSelectable = boolean
 
 	# stores a reference of this bricks voxel coordinates for
 	# further usage

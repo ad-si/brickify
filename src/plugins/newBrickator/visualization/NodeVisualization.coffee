@@ -132,9 +132,8 @@ module.exports = class NodeVisualization
 		@showBricks()
 
 	# highlights the voxel below mouse and returns it
-	highlightVoxel: (event, selectedNode, needsToBeVisible) =>
-		voxel = @getVoxel event, selectedNode, needsToBeVisible
-
+	highlightVoxel: (event, selectedNode, needsToBeLego) =>
+		voxel = @getVoxel event, selectedNode, needsToBeLego
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
@@ -184,11 +183,6 @@ module.exports = class NodeVisualization
 				@voxelsSubnode.children
 				@bundle.renderer)
 
-		if @solidRenderer?
-			modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
-		else
-			modelIntersects = []
-
 		# Get the first lego voxel. cancel if we are above a voxel that
 		# has been handeled in this brush action
 		firstLegoVoxel = null
@@ -227,7 +221,13 @@ module.exports = class NodeVisualization
 
 			# this is not pointing towards the baseplate. return voxel in middle of model
 			# Model material needs to be side = THREE.DoubleSide
+			if @solidRenderer?
+				modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
+			else
+				modelIntersects = []
+
 			console.log "Model intersects: #{modelIntersects.length}"
+
 			if modelIntersects.length >= 2
 				modelStart = modelIntersects[0]
 				modelEnd = modelIntersects[1]
@@ -244,33 +244,6 @@ module.exports = class NodeVisualization
 			else
 				# we didn't point at anything useful
 				return null
-
-	_getPrincipalCameraDirection: (camera) =>
-		# returns the main direction the camera is facing
-
-		# rotate the camera's view vector according to cam rotation
-		vecz = new THREE.Vector3(0,0,-1)
-		vecz.applyQuaternion camera.quaternion
-
-		# apply inverse scene matrix (to account for that the scene is rotated)
-		matrix = new THREE.Matrix4()
-		matrix.getInverse(@bundle.renderer.scene.matrix)
-		vecz.applyMatrix4(matrix)
-		vecz.normalize()
-
-		if vecz.z > 0.5
-			return '+z'
-		else if vecz.z < -0.5
-			return '-z'
-		else if vecz.x > 0.5
-			return '+x'
-		else if vecz.x < -0.5
-			return '-x'
-		else if vecz.y > 0.5
-			return '+y'
-		else if vecz.y < -0.5
-			return '-y'
-
 
 
 

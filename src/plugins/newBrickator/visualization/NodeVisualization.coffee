@@ -7,17 +7,17 @@ VoxelWireframe = require './VoxelWireframe'
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
 	constructor: (@bundle, @threeNode, @grid) ->
+		@csgSubnode = new THREE.Object3D()
+		@threeNode.add @csgSubnode
+
 		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
-		@bricksSubnode = new THREE.Object3D()
-		@csgSubnode = new THREE.Object3D()
-
-		@threeNode.add @voxelBrickSubnode
 		@voxelBrickSubnode.add @voxelsSubnode
+		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
-		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
 
-		@threeNode.add @csgSubnode
+		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
+		@threeNode.add @voxelBrickSubnode
 
 		@defaultColoring = new Coloring()
 		@geometryCreator = new GeometryCreator(@grid)
@@ -74,6 +74,7 @@ module.exports = class NodeVisualization
 					y: v.voxelCoords.y
 					z: v.voxelCoords.z
 				}
+
 		@voxelWireframe.createWireframe outlineVoxels
 
 	setPossibleLegoBoxVisibility: (isVisible) =>
@@ -180,6 +181,8 @@ module.exports = class NodeVisualization
 	# invisible layer (raycasterSelectable = true) so that the user can select
 	# them via raycaster and the selected voxel can be highlighted
 	createInvisibleSuggestionBricks: () =>
+		dir = @_getPrincipalCameraDirection @bundle.renderer.camera
+
 		newModifiedVoxel = []
 
 		for v in @modifiedVoxels
@@ -199,16 +202,22 @@ module.exports = class NodeVisualization
 			if enabledVoxels.length > 0
 				connectedToEnabled = true
 
-			# has this voxel a not selected voxel below
-			# (preventing unselectable voxels)
-			# could be optimized by not using the (z-)-layer as "below",
-			# but the layer the camera is currently facing towards
-			freeBelow = true
-			if @grid.zLayers[c.z - 1]?[c.x]?[c.y]?
-				if  @grid.zLayers[c.z - 1][c.x][c.y].enabled == false
-					freeBelow = false
+			# check if there is an unselected voxel behind this voxel
+			# (behind is always relative to the camera's direction)
+			# if yes, don't show this voxel
+			behindCoords = {
+				x: ((c.x - 1) if dir == '-x') || ((c.x + 1) if dir == '+x') || c.x
+				y: ((c.y - 1) if dir == '-y') || ((c.y + 1) if dir == '+y') || c.y
+				z: ((c.z - 1) if dir == '-z') || ((c.z + 1) if dir == '+z') || c.z
+			}
+			bc = behindCoords
 
-			v.setRaycasterSelectable (freeBelow and connectedToEnabled)
+			freeBehind = true
+			if @grid.zLayers[bc.z]?[bc.x]?[bc.y]?
+				if  @grid.zLayers[bc.z][bc.x][bc.y].enabled == false
+					freeBehind = false
+
+			v.setRaycasterSelectable (freeBehind and connectedToEnabled)
 
 		@modifiedVoxels = newModifiedVoxel
 
@@ -232,6 +241,36 @@ module.exports = class NodeVisualization
 					return obj
 
 		return null
+
+	_getPrincipalCameraDirection: (camera) =>
+		# returns the main direction the camera is facing
+
+		# rotate the camera's view vector according to cam rotation
+		vecz = new THREE.Vector3(0,0,-1)
+		vecz.applyQuaternion camera.quaternion
+
+		# apply inverse scene matrix (to account for that the scene is rotated)
+		matrix = new THREE.Matrix4()
+		matrix.getInverse(@bundle.renderer.scene.matrix)
+		vecz.applyMatrix4(matrix)
+		vecz.normalize()
+
+		if vecz.z > 0.5
+			return '+z'
+		else if vecz.z < -0.5
+			return '-z'
+		else if vecz.x > 0.5
+			return '+x'
+		else if vecz.x < -0.5
+			return '-x'
+		else if vecz.y > 0.5
+			return '+y'
+		else if vecz.y < -0.5
+			return '-y'
+
+
+
+
 
 
 

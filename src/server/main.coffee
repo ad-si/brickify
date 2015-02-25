@@ -135,6 +135,9 @@ module.exports.setupRouting = () ->
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
+	
+	fontAwesomeRegex = /\/fonts\/fontawesome-.*/
+	webapp.get fontAwesomeRegex, express.static('node_modules/font-awesome/')
 
 	webapp.use express.static('public')
 	webapp.use('/node_modules', express.static('node_modules'))

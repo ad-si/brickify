@@ -23,7 +23,7 @@ module.exports = class MouseDispatcher
 			# override object selection if we clicked on another object
 			clickedNode = @_getClickedNode event
 			if clickedNode? and clickedNode != @sceneManager.selectedNode
-				@objects.selectNode clickedNode
+				@sceneManager.select clickedNode
 
 			# perform brush action
 			@brushActive = true
@@ -56,13 +56,13 @@ module.exports = class MouseDispatcher
 			if brush? and brush.mouseMoveCallback?
 				event.stopPropagation()
 				event.preventDefault()
-				
+
 				brush.mouseMoveCallback event, @sceneManager.selectedNode
 		else if not @mouseDown
 			if brush? and brush.mouseHoverCallback?
 				event.stopPropagation()
 				event.preventDefault()
-				
+
 				brush.mouseHoverCallback event, @sceneManager.selectedNode
 
 	_clickedOnPluginObject: (event) =>

@@ -80,7 +80,7 @@ module.exports = class Ui
 		)
 
 	_initUiElements: =>
-		@objects.init('#objectsContainer', '#brushContainer')
+		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 		@sceneManager.init()
 
 	_initHotkeys: =>

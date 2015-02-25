@@ -40,7 +40,9 @@ module.exports = class LegoPipeline
 
 	run: (data, options = null, profiling = false) =>
 		if profiling
-			console.log 'Starting Lego Pipeline'
+			console.log "Starting Lego Pipeline
+			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting})"
+
 			profilingResults = []
 
 		accumulatedResults = data

@@ -6,7 +6,7 @@ module.exports = class BrushHandler
 
 	getBrushes: () =>
 		return [{
-			text: 'Make LEGO<br>brush'
+			text: 'Make LEGO'
 			icon: 'legoBrush.png'
 			selectCallback: @_legoSelect
 			mouseDownCallback: @_legoMouseDown
@@ -17,8 +17,8 @@ module.exports = class BrushHandler
 			visibilityCallback: @newBrickator._toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
 		},{
-			text: 'Make 3D print<br>brush'
-			icon: '3dPrintBrush.png'
+			text: 'Make 3D print'
+			icon: 'printBrush.png'
 			selectCallback: @_printSelect
 			mouseDownCallback: @_printMouseDown
 			mouseMoveCallback: @_printMouseMove
@@ -41,36 +41,39 @@ module.exports = class BrushHandler
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.showDeselectedVoxelSuggestions()
+			cachedData.visualization.createInvisibleSuggestionBricks()
+			cachedData.visualization.setPossibleLegoBoxVisibility true
 		
 	_printSelect: (selectedNode) =>
-		# causes duplicate rendering when selecting print brush
-		# on start. rely on the fact that all models get
-		# legofied anyways on drop
-
-		###
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-		###
+			cachedData.visualization.clearInvisibleSuggestionBricks()
+			cachedData.visualization.setPossibleLegoBoxVisibility false
 
 	_legoMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.selectVoxel event
+			voxel = cachedData.visualization.makeVoxelLego event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.selectVoxel event
+			voxel = cachedData.visualization.makeVoxelLego event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.showDeselectedVoxelSuggestions()
+			cachedData.visualization.createInvisibleSuggestionBricks()
 			cachedData.visualization.highlightVoxel event, (voxel) ->
-				return not voxel.isEnabled()
+				return not voxel.isLego()
 
 	_printMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.deselectVoxel event
+			voxel = cachedData.visualization.makeVoxel3dPrinted event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_printMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -78,7 +81,9 @@ module.exports = class BrushHandler
 
 	_printMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.deselectVoxel event
+			voxel = cachedData.visualization.makeVoxel3dPrinted event
+			if voxel?
+				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -88,7 +93,7 @@ module.exports = class BrushHandler
 	_legoMouseUp: (event, selectedNode, cachedData) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.showDeselectedVoxelSuggestions()
+			cachedData.visualization.createInvisibleSuggestionBricks()
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()

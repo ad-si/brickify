@@ -120,7 +120,6 @@
 #
 # {
 #	text: 'Make Lego'
-#	iconBrush: false # if true, only a icon next to the object is displayed
 #	glyhicon: 'move' # if brushIcon, defines the glyphicon to be shown
 #	selectCallback: # when the brush is selected, selectedNode as argument
 #	deselectCallback: # when the brush is deselected
@@ -132,7 +131,7 @@
 #   visibilityCallback: # called when the user changes visibility
 #	tooltip: ''
 # }
-# 
+#
 
 - getBrushes
 

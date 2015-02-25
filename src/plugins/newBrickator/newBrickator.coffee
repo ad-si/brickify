@@ -24,6 +24,8 @@ module.exports = class NewBrickator
 			opacity: 0.8
 			transparent: true
 		})
+		# important for finding the middle of model via raycaster
+		@printMaterial.side = THREE.DoubleSide
 
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)

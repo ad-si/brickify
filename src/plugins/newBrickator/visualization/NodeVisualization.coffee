@@ -22,9 +22,10 @@ module.exports = class NodeVisualization
 		@defaultColoring = new Coloring()
 		@geometryCreator = new GeometryCreator(@grid)
 
-		@currentlyDeselectedVoxels = []
+		@currentlyTouchedVoxels = []
 		@modifiedVoxels = []
 
+		@solidRenderer = @bundle.getPlugin('solid-renderer')
 	showVoxels: () =>
 		@voxelsSubnode.visible = true
 		@bricksSubnode.visible = false
@@ -131,8 +132,8 @@ module.exports = class NodeVisualization
 		@showBricks()
 
 	# highlights the voxel below mouse and returns it
-	highlightVoxel: (event, condition) =>
-		voxel = @getVoxel event
+	highlightVoxel: (event, selectedNode, needsToBeVisible) =>
+		voxel = @getVoxel event, selectedNode, needsToBeVisible
 
 		if voxel?
 			if @currentlyHighlightedVoxel?
@@ -147,100 +148,102 @@ module.exports = class NodeVisualization
 		return voxel
 
 	# makes the voxel below mouse to be 3d printed
-	makeVoxel3dPrinted: (event) =>
-		voxel = @getVoxel event
+	makeVoxel3dPrinted: (event, selectedNode) =>
+		voxel = @getVoxel event, selectedNode, true
 
 		if voxel and voxel.isLego()
 			voxel.make3dPrinted()
-			voxel.setRaycasterSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
-			@currentlyDeselectedVoxels.push voxel
+			@currentlyTouchedVoxels.push voxel
 			return voxel
 		return null
 
 	# makes the voxel below mouse to be made out of lego
-	makeVoxelLego: (event) =>
-		voxel = @getVoxel event
-
+	makeVoxelLego: (event, selectedNode) =>
+		voxel = @getVoxel event, selectedNode, false
 		if voxel and not voxel.isLego()
 			voxel.makeLego()
 			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
+			@currentlyTouchedVoxels.push voxel
 			return voxel
 		return null
 
-	# moves all currenly deselected voxels
-	# to modified voxels
+	# moves all currenly touched voxels to modified voxels
 	updateModifiedVoxels: () =>
-		for v in @currentlyDeselectedVoxels
+		for v in @currentlyTouchedVoxels
 			@modifiedVoxels.push v
 
-		@currentlyDeselectedVoxels = []
-
-	# out of all voxels that can be enabled, create an
-	# invisible layer (raycasterSelectable = true) so that the user can select
-	# them via raycaster and the selected voxel can be highlighted
-	createInvisibleSuggestionBricks: () =>
-		dir = @_getPrincipalCameraDirection @bundle.renderer.camera
-
-		newModifiedVoxel = []
-
-		for v in @modifiedVoxels
-			# ignore and removed enabled voxel
-			if v.isLego()
-				continue
-			newModifiedVoxel.push v
-
-			c = v.voxelCoords
-
-			#check if there is at least one connection to an enabled voxel
-			enabledVoxels = @grid.getNeighbours c.x,
-				c.y, c.z, (voxel) ->
-					return voxel.enabled
-
-			connectedToEnabled = false
-			if enabledVoxels.length > 0
-				connectedToEnabled = true
-
-			# check if there is an unselected voxel behind this voxel
-			# (behind is always relative to the camera's direction)
-			# if yes, don't show this voxel
-			behindCoords = {
-				x: ((c.x - 1) if dir == '-x') || ((c.x + 1) if dir == '+x') || c.x
-				y: ((c.y - 1) if dir == '-y') || ((c.y + 1) if dir == '+y') || c.y
-				z: ((c.z - 1) if dir == '-z') || ((c.z + 1) if dir == '+z') || c.z
-			}
-			bc = behindCoords
-
-			freeBehind = true
-			if @grid.zLayers[bc.z]?[bc.x]?[bc.y]?
-				if  @grid.zLayers[bc.z][bc.x][bc.y].enabled == false
-					freeBehind = false
-
-			v.setRaycasterSelectable (freeBehind and connectedToEnabled)
-
-		@modifiedVoxels = newModifiedVoxel
-
-	clearInvisibleSuggestionBricks: () =>
-		for v in @modifiedVoxels
-			v.setRaycasterSelectable false
+		@currentlyTouchedVoxels = []
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
-	getVoxel: (event) =>
-		intersects =
+	getVoxel: (event, selectedNode, needsToBeLego = false) =>
+		voxelIntersects =
 			interactionHelper.getPolygonClickedOn(
 				event
 				@voxelsSubnode.children
 				@bundle.renderer)
 
-		if (intersects.length > 0)
-			for intersection in intersects
-				obj = intersection.object.parent
-			
-				if obj.voxelCoords and (obj.visible or obj.raycasterSelectable)
-					return obj
+		if @solidRenderer?
+			modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
+		else
+			modelIntersects = []
 
-		return null
+		# Get the first lego voxel. cancel if we are above a voxel that
+		# has been handeled in this brush action
+		firstLegoVoxel = null
+		lastNonLegoVoxel = null
+		for intersection in voxelIntersects
+			voxel = intersection.object.parent
+			continue if not voxel.voxelCoords?
+			# cancel if we are above a voxel we just modified
+			return null if @currentlyTouchedVoxels.indexOf(voxel) >= 0
+
+			if voxel.isLego()
+				firstLegoVoxel = voxel
+				break
+			else
+				lastNonLegoVoxel = voxel
+
+		# if we may only select visible voxels, we are done
+		if needsToBeLego
+			return firstLegoVoxel
+
+		if firstLegoVoxel?
+			# return the last non-visible voxel (to prevent occlusion)
+			return lastNonLegoVoxel
+		else
+			# either, we are pointing at the baseplate, then return
+			# the voxel on the baseplate. or, if we are pointing into the model
+			# return the voxel in the middle of the model
+			baseplatePosition =
+				@bundle.renderer.getGridPosition(event.pageX, event.pageY)
+			baseplateVoxelPosition =
+				@grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePosition
+
+			bpvp = baseplateVoxelPosition
+			if @grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?
+				return lastNonLegoVoxel
+
+			# this is not pointing towards the baseplate. return voxel in middle of model
+			# Model material needs to be side = THREE.DoubleSide
+			console.log "Model intersects: #{modelIntersects.length}"
+			if modelIntersects.length >= 2
+				modelStart = modelIntersects[0]
+				modelEnd = modelIntersects[1]
+
+				middle = {
+					x: (modelStart.point.x + modelEnd.point.x) / 2
+					y: (modelStart.point.y + modelEnd.point.y) / 2
+					z: (modelStart.point.z + modelEnd.point.z) / 2
+				}
+
+				console.log middle
+				#TODO TODO TODO
+				return null
+			else
+				# we didn't point at anything useful
+				return null
 
 	_getPrincipalCameraDirection: (camera) =>
 		# returns the main direction the camera is facing

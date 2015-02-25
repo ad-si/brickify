@@ -8,6 +8,7 @@ THREE = require 'three'
 objectTree = require '../../common/state/objectTree'
 modelCache = require '../../client/modelCache'
 LineMatGenerator = require '../newBrickator/visualization/LineMatGenerator'
+interactionHelper = require '../../client/interactionHelper'
 
 module.exports = class SolidRenderer
 
@@ -226,3 +227,15 @@ module.exports = class SolidRenderer
 
 		@loadModelIfNeeded(node).then () =>
 			changeMaterial()
+
+	intersectRayWithModel: (event, node) =>
+		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+		return [] if not obj?
+
+		intersects =
+			interactionHelper.getPolygonClickedOn(
+				event
+				[obj.children[1]]
+				@bundle.renderer)
+
+		return intersects

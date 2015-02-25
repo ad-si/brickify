@@ -25,6 +25,7 @@ module.exports = class BrickObject extends THREE.Object3D
 		return
 
 	setGridReference: (@gridEntry) =>
+		@gridEntry.visibleVoxel = @
 		return
 
 	# makes the voxel being 3d printed

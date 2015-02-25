@@ -221,6 +221,7 @@ module.exports = class NodeVisualization
 
 			# this is not pointing towards the baseplate. return voxel in middle of model
 			# Model material needs to be side = THREE.DoubleSide
+			# TODO: intersectionCoordinates are somehow broken, does not work yet
 			if @solidRenderer?
 				modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
 			else
@@ -238,9 +239,16 @@ module.exports = class NodeVisualization
 					z: (modelStart.point.z + modelEnd.point.z) / 2
 				}
 
-				console.log middle
-				#TODO TODO TODO
-				return null
+				middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
+
+				#return if valid grid coordinates (should always be the case)
+				if @grid.zLayers[middleVoxel.z]?[middleVoxel.x]?[middleVoxel.y]?
+					gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
+					return gridEntry.visibleVoxel
+				else
+					console.warn 'Middle of model seemed not to be filled with voxel'
+					console.warn middle
+					console.warn middleVoxel
 			else
 				# we didn't point at anything useful
 				return null

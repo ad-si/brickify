@@ -177,7 +177,7 @@ module.exports = class NodeVisualization
 		@currentlyDeselectedVoxels = []
 
 	# out of all voxels that can be enabled, create an
-	# invisible layer (selectable = true) so that the user can select
+	# invisible layer (raycasterSelectable = true) so that the user can select
 	# them via raycaster and the selected voxel can be highlighted
 	createInvisibleSuggestionBricks: () =>
 		newModifiedVoxel = []
@@ -219,7 +219,7 @@ module.exports = class NodeVisualization
 		for v in @modifiedVoxels
 			v.setRaycasterSelectable false
 
-	# returns the first visible or selectable voxel below the mouse cursor
+	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event) =>
 		intersects =
 			interactionHelper.getPolygonClickedOn(

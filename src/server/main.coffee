@@ -16,7 +16,7 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-exec = require 'exec'
+exec = require('child_process').exec
 http = require 'http'
 
 yaml = require 'js-yaml'

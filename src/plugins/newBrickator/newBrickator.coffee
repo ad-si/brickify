@@ -106,6 +106,13 @@ module.exports = class NewBrickator
 			identifier = @_getNodeIdentifier selectedNode
 			nodePosition = selectedNode.positionData.position
 
+			#check if the requested data is currently being created
+			if @gridCache[identifier]?.modelPromise?
+				# resolve after cached data has been created
+				@gridCache[identifier].modelPromise.then () =>
+					resolve @gridCache[identifier]
+				return
+
 			# cache is valid if object didn't move
 			if @gridCache[identifier]?
 				griddata = @gridCache[identifier]
@@ -147,10 +154,14 @@ module.exports = class NewBrickator
 					y: nodePosition.y
 					z: nodePosition.z
 				}
-
-				resolve(@gridCache[identifier])
+				resolve @gridCache[identifier]
 			modelPromise.catch (error) =>
 				reject error
+
+			# while creating the cached data, store a reference to the promise
+			@gridCache[identifier] = {
+				modelPromise: modelPromise
+			}
 
 	_applyBricksToGrid: (bricks, grid) =>
 		# updates references between voxel --> brick

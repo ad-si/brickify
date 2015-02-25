@@ -2,6 +2,7 @@ GeometryCreator = require './GeometryCreator'
 THREE = require 'three'
 Coloring = require './Coloring'
 interactionHelper = require '../../../client/interactionHelper'
+VoxelWireframe = require './VoxelWireframe'
 
 # This class represents the visualization of a node in the scene
 module.exports = class NodeVisualization
@@ -14,6 +15,8 @@ module.exports = class NodeVisualization
 		@threeNode.add @voxelBrickSubnode
 		@voxelBrickSubnode.add @voxelsSubnode
 		@voxelBrickSubnode.add @bricksSubnode
+		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
+
 		@threeNode.add @csgSubnode
 
 		@defaultColoring = new Coloring()
@@ -47,10 +50,9 @@ module.exports = class NodeVisualization
 	showVoxelAndBricks: () =>
 		@voxelBrickSubnode.visible  = true
 
+	# (re)creates voxel visualization.
+	# hides disabled voxels, updates material and knob visibility
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
-		# (re)creates voxel visualization.
-		# hides disabled voxels, updates material and knob visibility
-
 		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
 		recreate
 			@_createVoxelVisualization coloring
@@ -63,9 +65,22 @@ module.exports = class NodeVisualization
 			v.setMaterial material
 			@_updateVoxel v
 
-	_createVoxelVisualization: (coloring) =>
-		# clear and create voxel visualization
+		# show not filled lego shape as outline
+		outlineVoxels = []
+		for v in @modifiedVoxels
+			if not v.isLego()
+				outlineVoxels.push {
+					x: v.voxelCoords.x
+					y: v.voxelCoords.y
+					z: v.voxelCoords.z
+				}
+		@voxelWireframe.createWireframe outlineVoxels
 
+	setPossibleLegoBoxVisibility: (isVisible) =>
+		@voxelWireframe.setVisibility isVisible
+
+	# clear and create voxel visualization
+	_createVoxelVisualization: (coloring) =>
 		@voxelsSubnode.children = []
 
 		for z in [0..@grid.numVoxelsZ - 1] by 1
@@ -78,8 +93,9 @@ module.exports = class NodeVisualization
 						@_updateVoxel threeBrick
 						@voxelsSubnode.add threeBrick
 
+	# makes disabled voxels invisible, toggles knob visibility
 	_updateVoxel: (threeBrick) =>
-		if not threeBrick.isEnabled()
+		if not threeBrick.isLego()
 			threeBrick.visible = false
 
 		coords = threeBrick.voxelCoords
@@ -113,8 +129,8 @@ module.exports = class NodeVisualization
 
 		@showBricks()
 
+	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, condition) =>
-		# highlights the voxel below mouse and returns it
 		voxel = @getVoxel event
 
 		if voxel?
@@ -129,46 +145,46 @@ module.exports = class NodeVisualization
 
 		return voxel
 
-	deselectVoxel: (event) =>
-		# disables the voxel below mouse
+	# makes the voxel below mouse to be 3d printed
+	makeVoxel3dPrinted: (event) =>
 		voxel = @getVoxel event
 
-		if voxel and voxel.isEnabled()
-			voxel.disable()
+		if voxel and voxel.isLego()
+			voxel.make3dPrinted()
+			voxel.setRaycasterSelectable false
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 			@currentlyDeselectedVoxels.push voxel
 			return voxel
 		return null
 
-	selectVoxel: (event) =>
-		# enables the voxel below mouse
+	# makes the voxel below mouse to be made out of lego
+	makeVoxelLego: (event) =>
 		voxel = @getVoxel event
 
-		if voxel and not voxel.isEnabled()
-			voxel.enable()
+		if voxel and not voxel.isLego()
+			voxel.makeLego()
+			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
 			return voxel
 		return null
 
+	# moves all currenly deselected voxels
+	# to modified voxels
 	updateModifiedVoxels: () =>
-		# moves all currenly deselected voxels
-		# to modified voxels
-
 		for v in @currentlyDeselectedVoxels
 			@modifiedVoxels.push v
 
 		@currentlyDeselectedVoxels = []
 
-	showDeselectedVoxelSuggestions: () =>
-		# show one layer of not-enabled (-> to be 3d printed) voxels
-		# (one layer = voxel has at least one enabled neighbour)
-		# so that users can re-select them
-
+	# out of all voxels that can be enabled, create an
+	# invisible layer (raycasterSelectable = true) so that the user can select
+	# them via raycaster and the selected voxel can be highlighted
+	createInvisibleSuggestionBricks: () =>
 		newModifiedVoxel = []
 
 		for v in @modifiedVoxels
 			# ignore and removed enabled voxel
-			if v.isEnabled()
+			if v.isLego()
 				continue
 			newModifiedVoxel.push v
 
@@ -192,14 +208,16 @@ module.exports = class NodeVisualization
 				if  @grid.zLayers[c.z - 1][c.x][c.y].enabled == false
 					freeBelow = false
 
-			if freeBelow and connectedToEnabled
-				v.setMaterial @defaultColoring.deselectedMaterial
-				v.visible = true
+			v.setRaycasterSelectable (freeBelow and connectedToEnabled)
 
 		@modifiedVoxels = newModifiedVoxel
 
+	clearInvisibleSuggestionBricks: () =>
+		for v in @modifiedVoxels
+			v.setRaycasterSelectable false
+
+	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event) =>
-		# returns the first voxel below the mouse cursor
 		intersects =
 			interactionHelper.getPolygonClickedOn(
 				event
@@ -210,7 +228,7 @@ module.exports = class NodeVisualization
 			for intersection in intersects
 				obj = intersection.object.parent
 			
-				if obj.visible and obj.voxelCoords
+				if obj.voxelCoords and (obj.visible or obj.raycasterSelectable)
 					return obj
 
 		return null

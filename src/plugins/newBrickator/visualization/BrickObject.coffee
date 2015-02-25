@@ -2,9 +2,9 @@ THREE = require 'three'
 module.exports = class BrickObject extends THREE.Object3D
 	constructor: (brickGeometry, knobGeometry, material) ->
 		super()
-		@material = material
-		brickMesh = new THREE.Mesh(brickGeometry, material)
-		knobMesh = new THREE.Mesh(knobGeometry, material)
+		@material = material.clone()
+		brickMesh = new THREE.Mesh(brickGeometry, @material)
+		knobMesh = new THREE.Mesh(knobGeometry, @material)
 		@add brickMesh
 		@add knobMesh
 
@@ -33,6 +33,14 @@ module.exports = class BrickObject extends THREE.Object3D
 
 	isEnabled: () =>
 		return @gridEntry.enabled
+
+	setOpacity: (value) ->
+		if value > 0.99
+			@material.transparent = false
+			@material.opacity = value
+		else
+			@material.transparent = true
+			@material.opacity = value
 
 	setHighlight: (isHighlighted, material) =>
 		# one may highlight this brick with a special material

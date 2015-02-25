@@ -105,9 +105,17 @@ module.exports = class NodeVisualization
 				layerObject.add threeBrick
 
 	showBrickLayer: (layer) =>
+		layer = Number(layer)
 		for i in [0..@bricksSubnode.children.length - 1] by 1
 			if i <= layer
 				@bricksSubnode.children[i].visible = true
+
+				if i == layer and i > 0
+					for brick in @bricksSubnode.children[i].children
+						brick.setOpacity 0.5
+				else
+					for brick in @bricksSubnode.children[i].children
+						brick.setOpacity 1
 			else
 				@bricksSubnode.children[i].visible = false
 

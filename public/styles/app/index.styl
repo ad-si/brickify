@@ -46,8 +46,11 @@
 	margin-right 10px
 	z-index 2
 	a
-		margin-left 5px
-		margin-right 5px
+		margin-left 10px
+		margin-right 10px
+		font-size 2.5em
+		color white
+
 input[readonly].not-readonly
 	background white
 	cursor default
@@ -83,40 +86,9 @@ input[readonly].not-readonly
 	padding-left 2px
 	z-index 1
 
-.objectIconContainer
-	background-color #BBBBBB
-
-.iconFloatRight
-	position absolute
-	padding-right 2px
-	top 0
-	right 0
-	z-index 3
-	.glyphicon
-		margin-left 2px
-		margin-right 2px
-
 #brushContainer
 	div
 		font-size 0.90em
-
-.brushlist
-	list-style none
-	padding-left 0
-	margin-top -0.5em
-	margin-left 2em
-	z-index 2
-
-.brushEntry
-	position relative
-	display block
-	.glyphicon
-		margin-left 2px
-		margin-right 2px
-
-.selectedBrush
-	border-radius 5px
-	background-color #EEEEEE
 
 .selectedObject
 	border-radius 5px
@@ -127,3 +99,32 @@ input[readonly].not-readonly
 #buildContainer
 	display block
 	text-align center
+
+/* Visibility */
+#visibilityContainer .fa
+	font-size 1.5em
+
+/* darker bootstrap buttons */
+@import "darkerButton.styl"
+
+.btn-default
+	button-variant($btn-default-color, $btn-default-bg, $btn-default-border)
+.btn-primary
+	button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border)
+.btn-success
+	button-variant($btn-success-color, $btn-success-bg, $btn-success-border)
+.btn-info
+	button-variant($btn-info-color, $btn-info-bg, $btn-info-border)
+.btn-warning
+	button-variant($btn-warning-color, $btn-warning-bg, $btn-warning-border)
+.btn-danger
+	button-variant($btn-danger-color, $btn-danger-bg, $btn-danger-border)
+
+//Taken from bootstrap-styl/button.styl
+.btn
+	&:active,
+	&.active
+		outline 0
+		background-image none
+		//making shadow bigger
+		box-shadow inset 0 0 20px 3px rgba(0,0,0,0.40);

@@ -19,10 +19,8 @@ block body
 			canvas#canvas.appCanvas
 
 		#commandContainer
-			a#cmdHelp(href="#", title="Open keyboard shortcuts")
-				img(src="/img/keyboard.png", height="40px", alt="share")
-			a#cmdShare(href="#", title="Share your work")
-				img(src="/img/share.png", height="40px", alt="share")
+			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
+			a#cmdShare.fa.fa-share-alt(href="#", title="Share your work")
 		#controls.row
 			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
 				.panel.panel-default
@@ -33,9 +31,10 @@ block body
 						.panel-body
 							ul#objectsContainer
 				.btn-group.btn-group-justified(role='group')#brushContainer
+				.btn-group.btn-group-justified(role='group')#visibilityContainer
 				br
 				button.btn.btn-success.btn-block#downloadButton
-					span.glyphicon.glyphicon-download
+					i.fa.fa-download
 					| &nbsp;
 					| Download for 3d printer
 
@@ -43,15 +42,13 @@ block body
 					| Show me how to build with LEGO
 				#buildContainer.hidden
 					br
-					button.btn.btn-default#buildDecrement
-						span.glyphicon.glyphicon-chevron-left
+					button.btn.btn-default.fa.fa-chevron-left#buildDecrement
 					| &nbsp;Showing Layer&nbsp;
 					span#currentBuildLayer 1
 					| &nbsp;of&nbsp;
 					span#maxBuildLayer 0
 					| &nbsp;
-					button.btn.btn-default#buildIncrement
-						span.glyphicon.glyphicon-chevron-right
+					button.btn.btn-default.fa.fa-chevron-right#buildIncrement
 					input(type='range')#buildSlider
 
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4

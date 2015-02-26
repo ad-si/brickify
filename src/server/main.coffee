@@ -16,7 +16,7 @@ favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-exec = require 'exec'
+exec = require('child_process').exec
 http = require 'http'
 
 yaml = require 'js-yaml'
@@ -135,6 +135,9 @@ module.exports.setupRouting = () ->
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
+	
+	fontAwesomeRegex = /\/fonts\/fontawesome-.*/
+	webapp.get fontAwesomeRegex, express.static('node_modules/font-awesome/')
 
 	webapp.use express.static('public')
 	webapp.use('/node_modules', express.static('node_modules'))

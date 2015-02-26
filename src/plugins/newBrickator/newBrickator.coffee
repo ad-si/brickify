@@ -1,7 +1,6 @@
 modelCache = require '../../client/modelCache'
 LegoPipeline = require './LegoPipeline'
 THREE = require 'three'
-BrickVisualizer = require './BrickVisualizer'
 NodeVisualization = require './visualization/NodeVisualization'
 PipelineSettings = require './PipelineSettings'
 objectTree = require '../../common/state/objectTree'

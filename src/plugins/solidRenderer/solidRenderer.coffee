@@ -95,16 +95,6 @@ module.exports = class SolidRenderer
 
 		lineMaterialGen = new LineMatGenerator()
 
-		###
-		#invisible lines that make the black lines look better
-		invisibleLines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
-		invisibleLines.material = lineMaterialGen.generate(0xffffff)
-		invisibleLines.material.linewidth = 9
-		invisibleLines.material.depthFunc = 'GREATER'
-		invisibleLines.material.colorWrite = false
-		lineContainer.add invisibleLines
-		###
-
 		#shadow
 		shadowMat = new THREE.MeshBasicMaterial({
 			color: 0x000000

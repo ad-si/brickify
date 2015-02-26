@@ -91,7 +91,7 @@ module.exports = class NewBrickator
 			modifiedBricks: modifiedBricks
 		}
 
-		results = @pipeline.run data, settings, true
+		results = @pipeline.run data, settings, false
 		@_updateBricks cachedData, results.accumulatedResults.bricks
 
 	# stores bricks in cached data, updates references in grid and updates

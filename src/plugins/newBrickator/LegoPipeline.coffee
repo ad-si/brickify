@@ -9,58 +9,49 @@ module.exports = class LegoPipeline
 		@brickLayouter = new BrickLayouter()
 
 		@pipelineSteps = []
-		@pipelineSteps.push (lastResult, options) =>
-			if options.voxelizing
+		@pipelineSteps.push {
+			name: 'Hull voxelizing'
+			decision: (options) => return (options.voxelizing)
+			worker: (lastResult, options) =>
 				return @voxelizer.voxelize lastResult.optimizedModel, options
-			else
-				return lastResult
-		@pipelineSteps.push (lastResult, options) =>
-			if options.voxelizing
-				return @volumeFiller.fillGrid lastResult.grid, options
-			else
-				return lastResult
+		}
 
-		@pipelineSteps.push (lastResult, options) =>
-			if options.layouting
+		@pipelineSteps.push {
+			name: 'Volume filling'
+			decision: (options) => return options.voxelizing
+			worker: (lastResult, options) =>
+				return @volumeFiller.fillGrid lastResult.grid, options
+		}
+
+		@pipelineSteps.push {
+			name: 'Layout graph initialization'
+			decision: (options) => return options.layouting
+			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
-			else
-				return lastResult
-		@pipelineSteps.push (lastResult, options) =>
-			if options.layouting
+		}
+		 
+		@pipelineSteps.push {
+			name: 'Layout greedy merge'
+			decision: (options) => return options.layouting
+			worker: (lastResult, options) =>
 				return @brickLayouter.layoutByGreedyMerge lastResult.bricks,
 				lastResult.bricks
-			else
-				return lastResult
+		}
 
-		@pipelineSteps.push (lastResult, options) =>
-			if options.reLayout
+		@pipelineSteps.push {
+			name: 'Local reLayout'
+			decision: (options) => return options.reLayout
+			worker: (lastResult, options) =>
 				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
 				lastResult.bricks
 				return lastResult.bricks
-			else
-				return lastResult
-
-		###
-		@pipelineSteps.push (lastResult, options) =>
-			if options.layouting
-				return @brickLayouter.optimizeForStability lastResult.bricks
-			else
-				return lastResult
-  		###
-
-		@humanReadableStepNames = []
-		@humanReadableStepNames.push 'Hull voxelizing'
-		@humanReadableStepNames.push 'Volume filling'
-		@humanReadableStepNames.push 'Layout graph initialization'
-		@humanReadableStepNames.push 'Layout greedy merge'
-		@humanReadableStepNames.push 'Local reLayout'
-		#@humanReadableStepNames.push 'Layout optimize for stability'
-
+		}
 
 	run: (data, options = null, profiling = false) =>
 		if profiling
 			console.log "Starting Lego Pipeline
-			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting})"
+			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
+			 onlyReLayout: #{options.reLayout}"
 
 			profilingResults = []
 
@@ -89,14 +80,24 @@ module.exports = class LegoPipeline
 		}
 
 	runStep: (i, lastResult, options) ->
-		return @pipelineSteps[i](lastResult, options)
+		step = @pipelineSteps[i]
+
+		if step.decision options
+			return step.worker lastResult, options
+		return lastResult
 
 	runStepProfiled: (i, lastResult, options) ->
-		console.log "Running step #{@humanReadableStepNames[i]}"
-		start = new Date()
-		result = @runStep i, lastResult, options
-		stop = new Date() - start
-		console.log "Step #{@humanReadableStepNames[i]} finished in #{stop}ms"
+		step = @pipelineSteps[i]
+
+		if step.decision options
+			console.log "Running step #{step.name}"
+			start = new Date()
+			result = @runStep i, lastResult, options
+			stop = new Date() - start
+			console.log "Step #{step.name} finished in #{stop}ms"
+		else
+			console.log "(Skipping step #{step.name})"
+			result = lastResult
 
 		return {
 			time: stop

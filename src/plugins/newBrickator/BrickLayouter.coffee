@@ -110,9 +110,7 @@ module.exports = class BrickLayouter
 
 		return {bricks: bricks}
 
-
 	optimizeForStability: (bricks) =>
-
 		for layer in bricks # access removed element?
 			for brick in layer
 				if brick? and brick.uniqueConnectedBricks().length is 0
@@ -133,32 +131,6 @@ module.exports = class BrickLayouter
 		newBricks = @_splitBricks oldBricks, bricks
 		@layoutByGreedyMerge bricks
 		return
-
-		###
-		maxIterations = 50
-		weakPointThreshold = 2
-		weakPoints = findWeakArticulationPointsInGraph bricks
-		for i in [0..maxIterations-1] by 1
-			for wp in weakPoints
-				newBricks = []
-				neighbours = []
-				for weakBrick in wp
-					neighbours.push findAllNeighbours weakBrick
-					newBricks.push @_splitBricks [].concat(weakBrick, neighbours), bricks
-
-					#split all neighbours
-					neighbours = removeDuplicates neighbours
-					for neighbour in neighbours
-						newBricks.push @_splitBricks [neighbour]
-
-			layoutByGreedyMerge newBricks
-
-			weakPoints = findWeakArticulationPointsInGraph bricks
-			if weakPoints.size is 0 # or not changing
-				break
-  ###
-
-		return bricks
 
 	splitBricksAndRelayoutLocally: (oldBricks, bricks) =>
 		bricksToSplit = []
@@ -245,7 +217,6 @@ module.exports = class BrickLayouter
 				if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) +
 				length, brick.size.z)
 					return brick.neighbours[dir]
-
 
 	_chooseNeighboursToMergeWith: (mergeableNeighbours) =>
 		numConnections = []

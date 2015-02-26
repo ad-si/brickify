@@ -1,5 +1,4 @@
 module.exports = class Brick
-
 	@nextBrickIndex = 0
 
 	@nextBrickIdx: () =>
@@ -244,8 +243,6 @@ module.exports = class Brick
 					@_removeFirstOccurenceFromArray @, neighbour.neighbours[i]
 
 		return [].concat.apply([], newBricks)
-
-
 
 	addNeighboursToNewBrick: (newBrick, direction, opposite) =>
 		if direction in [0,1]

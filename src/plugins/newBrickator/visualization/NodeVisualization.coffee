@@ -203,85 +203,100 @@ module.exports = class NodeVisualization
 			else
 				lastNonLegoVoxel = voxel
 
-		# if we may only select visible voxels, we are done
+		# if we may only select lego voxels, we are done
 		if needsToBeLego
 			return firstLegoVoxel
 
+		# return the last non-visible voxel to prevent occlusion
 		if firstLegoVoxel?
-			# return the last non-visible voxel (to prevent occlusion)
-			return lastNonLegoVoxel
-		else
-			# either, we are pointing at the baseplate, then return
-			# the voxel on the baseplate. or, if we are pointing into the model
-			# return the voxel in the middle of the model
-			baseplatePosition =
-				@bundle.renderer.getGridPosition(event.pageX, event.pageY)
-			baseplateVoxelPosition =
-				@grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePosition
-
-			bpvp = baseplateVoxelPosition
-			if @grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?
-				return lastNonLegoVoxel
-
-			# this is not pointing towards the baseplate. return voxel in middle of model
-			# Model material needs to be side = THREE.DoubleSide
-			# TODO: intersectionCoordinates are somehow broken, does not work yet
-			if @solidRenderer?
-				modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
-			else
-				modelIntersects = []
-
-			# merge together intersects that are nearly at the same position
-			# (happens when the cursor is above the edge of two polygons)
-			newIntersects  = []
-			for i in [0..modelIntersects.length - 2] by 1
-				intersect1 = modelIntersects[i]
-				intersect2 = modelIntersects[i + 1]
-
-				intersectDistance = intersect2.distance - intersect1.distance
-				if intersectDistance < 3
-					# only push one intersection of two
-					newIntersects.push intersect1 if not intersect1.pushed
-				else
-					# push both if they haven't been pushed to the list
-					newIntersects.push intersect1 if not intersect1.pushed
-					newIntersects.push intersect2 if not intersect2.pushed
-
-				# mark both intersections as used/pushed
-				intersect1.pushed = true
-				intersect2.pushed = true
-			modelIntersects = newIntersects
-
-			if modelIntersects.length >= 2
-				modelStart = modelIntersects[0]
-				modelEnd = modelIntersects[1]
-
-				middle = {
-					x: (modelStart.point.x + modelEnd.point.x) / 2
-					y: (modelStart.point.y + modelEnd.point.y) / 2
-					z: (modelStart.point.z + modelEnd.point.z) / 2
-				}
-
-				# reverse scene transform
-				revTransform = new THREE.Matrix4()
-				revTransform.getInverse @bundle.renderer.scene.matrix
-				middle = new THREE.Vector3(middle.x, middle.y, middle.z)
-				middle.applyMatrix4(revTransform)
-
-				middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
-
-
-				#return if valid grid coordinates (should always be the case)
-				if @grid.zLayers[middleVoxel.z]?[middleVoxel.x]?[middleVoxel.y]?
-					gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
-					return gridEntry.visibleVoxel
-				else
-					console.warn 'Middle of model seemed not to be filled with voxel'
-					console.warn middle
-					console.warn middleVoxel
-			else
-				# we didn't point at anything useful
+			if not lastNonLegoVoxel?
 				return null
+
+			# to prevent unecpected selection behavior, it is required
+			# that both voxels are neighbours (otherwise strange
+			# results appear if selecting lego through model geometry)
+
+			c0 = firstLegoVoxel.voxelCoords
+			c1 = lastNonLegoVoxel.voxelCoords
+
+			sqDistance = Math.pow (c0.x - c1.x), 2
+			sqDistance += Math.pow (c0.y - c1.y), 2
+			sqDistance += Math.pow (c0.z - c1.z), 2
+
+			return lastNonLegoVoxel if sqDistance <= 2
+
+		# else...
+		# either, we are pointing at the baseplate, then return
+		# the voxel on the baseplate. or, if we are pointing into the model
+		# return the voxel in the middle of the model
+		baseplatePosition =
+			@bundle.renderer.getGridPosition(event.pageX, event.pageY)
+		baseplateVoxelPosition =
+			@grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePosition
+
+		bpvp = baseplateVoxelPosition
+		if @grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?
+			return lastNonLegoVoxel
+
+		# this is not pointing towards the baseplate. return voxel in middle of model
+		# Model material needs to be side = THREE.DoubleSide
+		# TODO: intersectionCoordinates are somehow broken, does not work yet
+		if @solidRenderer?
+			modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
+		else
+			modelIntersects = []
+
+		# merge together intersects that are nearly at the same position
+		# (happens when the cursor is above the edge of two polygons)
+		newIntersects  = []
+		for i in [0..modelIntersects.length - 2] by 1
+			intersect1 = modelIntersects[i]
+			intersect2 = modelIntersects[i + 1]
+
+			intersectDistance = intersect2.distance - intersect1.distance
+			if intersectDistance < 3
+				# only push one intersection of two
+				newIntersects.push intersect1 if not intersect1.pushed
+			else
+				# push both if they haven't been pushed to the list
+				newIntersects.push intersect1 if not intersect1.pushed
+				newIntersects.push intersect2 if not intersect2.pushed
+
+			# mark both intersections as used/pushed
+			intersect1.pushed = true
+			intersect2.pushed = true
+		modelIntersects = newIntersects
+
+		if modelIntersects.length >= 2
+			modelStart = modelIntersects[0]
+			modelEnd = modelIntersects[1]
+
+			middle = {
+				x: (modelStart.point.x + modelEnd.point.x) / 2
+				y: (modelStart.point.y + modelEnd.point.y) / 2
+				z: (modelStart.point.z + modelEnd.point.z) / 2
+			}
+
+			# reverse scene transform
+			revTransform = new THREE.Matrix4()
+			revTransform.getInverse @bundle.renderer.scene.matrix
+			middle = new THREE.Vector3(middle.x, middle.y, middle.z)
+			middle.applyMatrix4(revTransform)
+
+			middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
+
+
+			#return if valid grid coordinates (should always be the case)
+			if @grid.zLayers[middleVoxel.z]?[middleVoxel.x]?[middleVoxel.y]?
+				gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
+				return gridEntry.visibleVoxel
+			else
+				console.warn 'Middle of model seemed not to be filled with voxel'
+				console.warn middle
+				console.warn middleVoxel
+		else
+			# we didn't point at anything useful
+			return null
 
 
 

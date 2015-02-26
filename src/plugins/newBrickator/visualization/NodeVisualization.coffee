@@ -181,27 +181,13 @@ module.exports = class NodeVisualization
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>
-		voxelIntersects =
-			interactionHelper.getPolygonClickedOn(
-				event
-				@voxelsSubnode.children
-				@bundle.renderer)
-
 		# Get the first lego voxel. cancel if we are above a voxel that
 		# has been handeled in this brush action
-		firstLegoVoxel = null
-		lastNonLegoVoxel = null
-		for intersection in voxelIntersects
-			voxel = intersection.object.parent
-			continue if not voxel.voxelCoords?
-			# cancel if we are above a voxel we just modified
-			return null if @currentlyTouchedVoxels.indexOf(voxel) >= 0
-
-			if voxel.isLego()
-				firstLegoVoxel = voxel
-				break
-			else
-				lastNonLegoVoxel = voxel
+		voxels = @_getIntersectedVoxels event, selectedNode
+		return null if not voxels?
+		firstLegoVoxel = voxels[0]
+		lastNonLegoVoxel = voxels[1]
+		
 
 		# if we may only select lego voxels, we are done
 		if needsToBeLego
@@ -215,58 +201,79 @@ module.exports = class NodeVisualization
 			# to prevent unecpected selection behavior, it is required
 			# that both voxels are neighbours (otherwise strange
 			# results appear if selecting lego through model geometry)
+			if @_voxelsAreNeighbour lastNonLegoVoxel, firstLegoVoxel
+				return lastNonLegoVoxel
+		else
+			# if there is no lego voxel, maybe we are pointing at the baseplate?
+			if @_pointsTowardsBaseplate event
+				return lastNonLegoVoxel
 
-			c0 = firstLegoVoxel.voxelCoords
-			c1 = lastNonLegoVoxel.voxelCoords
+		# no lego voxel and not pointing towards the baseplate.
+		# return voxel in middle of model as a last chance
+		return @_getVoxelInMiddleOfModel event, selectedNode
+		
 
-			sqDistance = Math.pow (c0.x - c1.x), 2
-			sqDistance += Math.pow (c0.y - c1.y), 2
-			sqDistance += Math.pow (c0.z - c1.z), 2
+	# returnes the first intersected lego voxel and
+	# the last intersected non-lego voxel.
+	# returns null, if cursor is above a currently modified voxel
+	_getIntersectedVoxels: (event, selectedNode) ->
+		voxelIntersects =
+			interactionHelper.getPolygonClickedOn(
+				event
+				@voxelsSubnode.children
+				@bundle.renderer)
 
-			return lastNonLegoVoxel if sqDistance <= 2
+		firstLegoVoxel = null
+		lastNonLegoVoxel = null
 
-		# else...
-		# either, we are pointing at the baseplate, then return
-		# the voxel on the baseplate. or, if we are pointing into the model
-		# return the voxel in the middle of the model
+		for intersection in voxelIntersects
+			voxel = intersection.object.parent
+			continue if not voxel.voxelCoords?
+			# cancel if we are above a voxel we just modified
+			return null if @currentlyTouchedVoxels.indexOf(voxel) >= 0
+
+			if voxel.isLego()
+				firstLegoVoxel = voxel
+				break
+			else
+				lastNonLegoVoxel = voxel
+
+		return [firstLegoVoxel, lastNonLegoVoxel]
+
+	# returns true if both voxels are neigbours, meaning there is
+	# a maximum square distance of two
+	_voxelsAreNeighbour: (a, b) ->
+		c0 = a.voxelCoords
+		c1 = b.voxelCoords
+
+		sqDistance = Math.pow (c0.x - c1.x), 2
+		sqDistance += Math.pow (c0.y - c1.y), 2
+		sqDistance += Math.pow (c0.z - c1.z), 2
+
+		return (sqDistance <= 2)
+
+	# returns true if the mouse points to a baseplate position where there
+	# is a voxel in the grid
+	_pointsTowardsBaseplate: (event) ->
 		baseplatePosition =
 			@bundle.renderer.getGridPosition(event.pageX, event.pageY)
 		baseplateVoxelPosition =
 			@grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePosition
 
 		bpvp = baseplateVoxelPosition
-		if @grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?
-			return lastNonLegoVoxel
+		return (@grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?)
 
-		# this is not pointing towards the baseplate. return voxel in middle of model
-		# Model material needs to be side = THREE.DoubleSide
-		# TODO: intersectionCoordinates are somehow broken, does not work yet
+	# returns the voxel in the middle of the model
+	_getVoxelInMiddleOfModel: (event, selectedNode) ->
 		if @solidRenderer?
 			modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
 		else
-			modelIntersects = []
+			return null
+		
+		modelIntersects = @_mergeIdenticalIntersects modelIntersects
 
-		# merge together intersects that are nearly at the same position
-		# (happens when the cursor is above the edge of two polygons)
-		newIntersects  = []
-		for i in [0..modelIntersects.length - 2] by 1
-			intersect1 = modelIntersects[i]
-			intersect2 = modelIntersects[i + 1]
-
-			intersectDistance = intersect2.distance - intersect1.distance
-			if intersectDistance < 3
-				# only push one intersection of two
-				newIntersects.push intersect1 if not intersect1.pushed
-			else
-				# push both if they haven't been pushed to the list
-				newIntersects.push intersect1 if not intersect1.pushed
-				newIntersects.push intersect2 if not intersect2.pushed
-
-			# mark both intersections as used/pushed
-			intersect1.pushed = true
-			intersect2.pushed = true
-		modelIntersects = newIntersects
-
+		# calculate the middle of the first two intersections
+		# and return voxel at this position
 		if modelIntersects.length >= 2
 			modelStart = modelIntersects[0]
 			modelEnd = modelIntersects[1]
@@ -285,24 +292,30 @@ module.exports = class NodeVisualization
 
 			middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
 
-
-			#return if valid grid coordinates (should always be the case)
-			if @grid.zLayers[middleVoxel.z]?[middleVoxel.x]?[middleVoxel.y]?
-				gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
-				return gridEntry.visibleVoxel
-			else
-				console.warn 'Middle of model seemed not to be filled with voxel'
-				console.warn middle
-				console.warn middleVoxel
+			gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
+			return gridEntry.visibleVoxel
 		else
-			# we didn't point at anything useful
+			# no model selected / enough intersections to get a 'middle voxel'
 			return null
 
+	# merge together intersects that are nearly at the same position
+	# (happens when the cursor is above the edge of two polygons)
+	_mergeIdenticalIntersects: (intersects) ->
+		newIntersects  = []
+		for i in [0..intersects.length - 2] by 1
+			intersect1 = intersects[i]
+			intersect2 = intersects[i + 1]
 
+			intersectDistance = intersect2.distance - intersect1.distance
+			if intersectDistance < 3
+				# only push one intersection of two
+				newIntersects.push intersect1 if not intersect1.pushed
+			else
+				# push both if they haven't been pushed to the list
+				newIntersects.push intersect1 if not intersect1.pushed
+				newIntersects.push intersect2 if not intersect2.pushed
 
-
-
-
-
-
-
+			# mark both intersections as used/pushed
+			intersect1.pushed = true
+			intersect2.pushed = true
+		return newIntersects

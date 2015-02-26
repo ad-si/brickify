@@ -44,7 +44,7 @@
     "serve-favicon": "^2.1.6",
     "stats-js": "^1.0.0-alpha1",
     "stylus": "^0.50.0",
-    "three": "^0.69.0",
+    "three": "Lowfab/three.js#devWithLowfabFeatures",
     "three-orbit-controls": "Lowfab/three-orbit-controls#v69.1.0-beta",
     "winston": "^0.8.1",
     "zeroclipboard": "^2.2.0"

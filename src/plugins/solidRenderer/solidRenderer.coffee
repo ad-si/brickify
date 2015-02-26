@@ -7,6 +7,8 @@
 THREE = require 'three'
 objectTree = require '../../common/state/objectTree'
 modelCache = require '../../client/modelCache'
+LineMatGenerator = require '../newBrickator/visualization/LineMatGenerator'
+interactionHelper = require '../../client/interactionHelper'
 
 module.exports = class SolidRenderer
 
@@ -62,7 +64,7 @@ module.exports = class SolidRenderer
 			console.log "Got model #{node.meshHash}"
 			threeObject = @addModelToThree optimizedModel
 			# enable Ui/mouseDispatcher find out on what node we clicked
-			threeObject.associatedNode = node
+			threeObject.originalMesh.associatedNode = node
 			if reload
 				threeObject.name = properties.threeObjectUuid
 			else
@@ -88,18 +90,53 @@ module.exports = class SolidRenderer
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
 
-		object.name = object.uuid
-		@latestAddedObject = object
+		lineContainer = new THREE.Object3D()
+		lineObject = new THREE.Mesh(geometry, objectMaterial)
 
-		@threejsNode.add object
-		return object
+		lineMaterialGen = new LineMatGenerator()
+
+		#shadow
+		shadowMat = new THREE.MeshBasicMaterial({
+			color: 0x000000
+			transparent: true
+			opacity: 0.4
+			})
+		shadowMat.depthFunc = 'GREATER'
+		shadowObject = new THREE.Mesh(geometry, shadowMat)
+		lineContainer.add shadowObject
+
+		# visible black lines
+		lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
+		lines.material = lineMaterialGen.generate(0x000000)
+		lines.material.linewidth = 2
+		lines.material.transparent = true
+		lines.material.opacity = 0.1
+		lines.material.depthFunc = 'GREATER'
+		lines.material.depthWrite = false
+
+		# ToDo: create fancy shader material / correct rendering pipeline
+		lineContainer.add lines
+
+		metaObject = new THREE.Object3D()
+		metaObject.name = metaObject.uuid
+		@latestAddedObject = metaObject
+		
+		metaObject.add object
+		metaObject.originalMesh = object
+
+		metaObject.add lineContainer
+		metaObject.lineContainer = lineContainer
+
+		@threejsNode.add metaObject
+		return metaObject
 
 	newBoundingSphere: () =>
 		if @latestAddedObject
-			@latestAddedObject.geometry.computeBoundingSphere()
+			geometry = @latestAddedObject.originalMesh.geometry
+			geometry.computeBoundingSphere()
 			result =
-				radius: @latestAddedObject.geometry.boundingSphere.radius
-				center: @latestAddedObject.geometry.boundingSphere.center
+				radius: geometry.boundingSphere.radius
+				center: geometry.boundingSphere.center
 
 			# update center to match moved object
 			@latestAddedObject.updateMatrix()
@@ -161,13 +198,41 @@ module.exports = class SolidRenderer
 		@loadModelIfNeeded(node).then () =>
 			setVisibility()
 
+	setShadowVisibility: (node, visible) =>
+		setVisibility = () =>
+			obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+			if obj?
+				obj.children[1].visible = visible
+
+		@loadModelIfNeeded(node).then () =>
+			setVisibility()
+
 	setNodeMaterial: (node, threeMaterial) =>
 		changeMaterial = () =>
 			name = node.pluginData.solidRenderer.threeObjectUuid
 			threeNode = @_getThreeObjectByName name
 
 			if threeNode
-				threeNode.material = threeMaterial
+				threeNode.originalMesh.material = threeMaterial
 
 		@loadModelIfNeeded(node).then () =>
 			changeMaterial()
+
+	intersectRayWithModel: (event, node) =>
+		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
+		return [] if not obj?
+
+		# set two sided material to catch all sides
+		visibleObject = obj.children[0]
+		oldMaterialSide = visibleObject.material.side
+		visibleObject.material.side = THREE.DoubleSide
+
+		intersects =
+			interactionHelper.getPolygonClickedOn(
+				event
+				[visibleObject]
+				@bundle.renderer)
+
+		visibleObject.material.side = oldMaterialSide
+
+		return intersects

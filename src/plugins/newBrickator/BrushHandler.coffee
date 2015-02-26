@@ -41,46 +41,45 @@ module.exports = class BrushHandler
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.createInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
+			@_setModelShadowVisiblity selectedNode, false
 		
 	_printSelect: (selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.clearInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
+			@_setModelShadowVisiblity selectedNode, true
 
 	_legoMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxelLego event
+			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxelLego event
+			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.highlightVoxel event, (voxel) ->
-				return not voxel.isLego()
+			cachedData.visualization.highlightVoxel event, selectedNode, false
 
 	_printMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxel3dPrinted event
+			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.highlightVoxel event
+			cachedData.visualization.highlightVoxel event, selectedNode, true
 
 	_printMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxel3dPrinted event
+			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
@@ -92,8 +91,14 @@ module.exports = class BrushHandler
 	_legoMouseUp: (event, selectedNode, cachedData) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.createInvisibleSuggestionBricks()
+			cachedData.visualization.updateModifiedVoxels()
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()
 		cachedData.visualization.showVoxels()
+
+	_setModelShadowVisiblity: (selectedNode, visible) =>
+		if not @solidRenderer?
+			@solidRenderer = @bundle.getPlugin('solid-renderer')
+		if @solidRenderer?
+			@solidRenderer.setShadowVisibility selectedNode, visible

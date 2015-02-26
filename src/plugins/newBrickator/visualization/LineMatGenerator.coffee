@@ -1,6 +1,8 @@
 THREE = require 'three'
 
 module.exports = class LineMatGenerator
+	# creates a material that may have a custom z-Buffer offset (z-Delta) to play
+	# with depth buffer values.
 	generate: (color = 0x000000, zDelta = 0.0) =>
 		options = {
 			vertexShader: @_getVertexShader()

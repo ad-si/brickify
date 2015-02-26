@@ -124,7 +124,7 @@ module.exports = class SolidRenderer
 		lines.material.depthFunc = 'GREATER'
 		lines.material.depthWrite = false
 
-		# ToDo: create fancy shader material
+		# ToDo: create fancy shader material / correct rendering pipeline
 		lineContainer.add lines
 
 		metaObject = new THREE.Object3D()

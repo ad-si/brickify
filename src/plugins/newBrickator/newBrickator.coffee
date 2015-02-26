@@ -63,16 +63,7 @@ module.exports = class NewBrickator
 				grid: cachedData.grid
 			}
 			results = @pipeline.run data, settings, true
-
-			# show bricks
-			bricks = results.accumulatedResults.bricks
-			cachedData.visualization.updateBricks bricks
-			cachedData.visualization.showBricks()
-			@_applyVoxelAndBrickVisibility cachedData
-
-			# ToDo: this is a workaround which needs to be fixed in layouter
-			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
+			@_updateBricks cachedData, results.accumulatedResults.bricks
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
@@ -82,6 +73,42 @@ module.exports = class NewBrickator
 				solidRenderer.setNodeMaterial selectedNode,
 					@printMaterial
 					@_applyPrintVisibility cachedData
+
+	# If voxels have been selected as lego / as 3d print, the brick layout
+	# needs to be locally regenerated
+	relayoutModifiedParts: (cachedData, modifiedVoxels) =>
+		modifiedBricks = []
+		for v in modifiedVoxels
+			if v.gridEntry.brick?
+				modifiedBricks.push v.gridEntry.brick
+
+		settings = new PipelineSettings()
+		settings.onlyRelayout()
+		data = {
+			optimizedModel: cachedData.optimizedModel
+			grid: cachedData.grid
+			bricks: cachedData.bricks
+			modifiedBricks: modifiedBricks
+		}
+
+		results = @pipeline.run data, settings, true
+		@_updateBricks cachedData, results.accumulatedResults.bricks
+
+	# stores bricks in cached data, updates references in grid and updates
+	# brick visuals
+	_updateBricks: (cachedData, bricks) =>
+		cachedData.bricks = bricks
+
+		# ToDo: this is a workaround which needs to be fixed in layouter
+		# (apply changed bricks directly to grid)
+		@_applyBricksToGrid cachedData.bricks, cachedData.grid
+
+		# update bricks and make voxel same colors as bricks
+		cachedData.visualization.updateBricks cachedData.bricks
+		cachedData.visualization.updateVoxelVisualization()
+		cachedData.visualization.showVoxels()
+		@_applyVoxelAndBrickVisibility cachedData
+
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode

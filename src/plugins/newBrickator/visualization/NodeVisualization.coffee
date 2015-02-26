@@ -184,10 +184,13 @@ module.exports = class NodeVisualization
 
 	# moves all currenly touched voxels to modified voxels
 	updateModifiedVoxels: () =>
+		tmp = []
 		for v in @currentlyTouchedVoxels
 			@modifiedVoxels.push v
+			tmp.push v
 
 		@currentlyTouchedVoxels = []
+		return tmp
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>

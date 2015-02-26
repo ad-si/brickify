@@ -31,19 +31,29 @@ module.exports = class LegoPipeline
 				lastResult.bricks
 			else
 				return lastResult
+
+		@pipelineSteps.push (lastResult, options) =>
+			if options.reLayout
+				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
+				lastResult.bricks
+				return lastResult.bricks
+			else
+				return lastResult
+
 		###
 		@pipelineSteps.push (lastResult, options) =>
 			if options.layouting
 				return @brickLayouter.optimizeForStability lastResult.bricks
 			else
 				return lastResult
-  	###
+  		###
 
 		@humanReadableStepNames = []
 		@humanReadableStepNames.push 'Hull voxelizing'
 		@humanReadableStepNames.push 'Volume filling'
 		@humanReadableStepNames.push 'Layout graph initialization'
 		@humanReadableStepNames.push 'Layout greedy merge'
+		@humanReadableStepNames.push 'Local reLayout'
 		#@humanReadableStepNames.push 'Layout optimize for stability'
 
 

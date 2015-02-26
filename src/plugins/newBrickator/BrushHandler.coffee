@@ -85,13 +85,17 @@ module.exports = class BrushHandler
 
 	_printMouseUp: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.updateModifiedVoxels()
+			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
+			
 			cachedData.visualization.updateVoxelVisualization()
 
 	_legoMouseUp: (event, selectedNode, cachedData) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
+			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
+
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.updateModifiedVoxels()
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()

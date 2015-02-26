@@ -83,7 +83,6 @@ module.exports = class NewBrickator
 					@printMaterial
 					@_applyPrintVisibility cachedData
 
-
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode
 		pipelineSettings.setModelTransform modelTransform
@@ -96,54 +95,6 @@ module.exports = class NewBrickator
 		pos = selectedNode.positionData.position
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
 		return modelTransform
-
-	getThreeObjectsByNode: (node) =>
-		# search for subnode for this object
-		uuid = @getUuidByNode node
-		if uuid?
-			for threenode in @threejsRootNode.children
-				if threenode.uuid == uuid
-					return {
-						voxels: threenode.children[0]
-						bricks: threenode.children[1]
-						csg: threenode.children[2]
-					}
-
-		# create three sub-sub nodes, one for the voxels and one for the bricks,
-		# the last one for showing the csg
-		object = new THREE.Object3D()
-		@threejsRootNode.add object
-
-		voxelObject = new THREE.Object3D()
-		object.add voxelObject
-		brickObject = new THREE.Object3D()
-		object.add brickObject
-		csgObject = new THREE.Object3D()
-		object.add csgObject
-
-		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
-
-		return {
-			voxels: object.children[0]
-			bricks: object.children[1]
-			csg: object.children[2]
-		}
-
-	_forAllThreeObjects: (callback) =>
-		for threenode in @threejsRootNode.children
-			obj = {
-				voxels: threenode.children[0]
-				bricks: threenode.children[1]
-				csg: threenode.children[2]
-			}
-
-			callback obj
-
-
-	getUuidByNode: (node) =>
-		if node.pluginData.newBrickator?
-			return node.pluginData.newBrickator.threeObjectUuid
-		return null
 
 	getResultByNode: (node, grid, recompute) =>
 		identifier = node.pluginData.solidRenderer.threeObjectUuid
@@ -296,6 +247,7 @@ module.exports = class NewBrickator
 
 		cachedData.cachedCsg = printThreeMesh
 		return printThreeMesh
+
 	getHotkeys: =>
 		return {
 		title: 'Bricks'
@@ -319,7 +271,6 @@ module.exports = class NewBrickator
 		@_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.toggleStabilityView()
 			cachedData.visualization.showBricks()
-
 
 	# makes bricks visible/invisible
 	_toggleBrickLayer: (isEnabled) =>

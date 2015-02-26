@@ -17,23 +17,23 @@ module.exports = class LineMatGenerator
 		return mat
 
 	_getVertexShader: () ->
-		return[
-			'uniform float zDelta;'
-			'varying float zVal;'
-			'void main() {'
-			'vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);'
-			'gl_Position = vec4(pos.x, pos.y, pos.z + zDelta, pos.w);'
-			'zVal = pos.z / pos.w;'
-			'}'
-		].join('\n')
+		'
+		uniform float zDelta;
+		varying float zVal;
+		void main() {
+			vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			gl_Position = vec4(pos.x, pos.y, pos.z + zDelta, pos.w);
+			zVal = pos.z / pos.w;
+		}
+		'
 
 	_getFragmentShader: () ->
-		return[
-			'varying float zVal;'
-			'uniform vec3 linecolor;'
-			'void main() {'
-			'vec3 fog = vec3(1,1,1);'
-			'vec3 color = linecolor ;//+ fog * smoothstep(0.995, 1.005, zVal);'
-			'gl_FragColor = vec4(color.r, color.g, color.b, 1.0);'
-			'}'
-		].join('\n')
+		'
+		varying float zVal;
+		uniform vec3 linecolor;
+		void main() {
+			vec3 color = linecolor;
+			gl_FragColor = vec4(color.r, color.g, color.b, 1.0);
+		}
+		'
+

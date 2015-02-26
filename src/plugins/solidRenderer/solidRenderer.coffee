@@ -232,10 +232,17 @@ module.exports = class SolidRenderer
 		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
 		return [] if not obj?
 
+		# set two sided material to catch all sides
+		visibleObject = obj.children[0]
+		oldMaterialSide = visibleObject.material.side
+		visibleObject.material.side = THREE.DoubleSide
+
 		intersects =
 			interactionHelper.getPolygonClickedOn(
 				event
-				[obj.children[1]]
+				[visibleObject]
 				@bundle.renderer)
+
+		visibleObject.material.side = oldMaterialSide
 
 		return intersects

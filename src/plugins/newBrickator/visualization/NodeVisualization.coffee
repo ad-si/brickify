@@ -231,7 +231,26 @@ module.exports = class NodeVisualization
 			else
 				modelIntersects = []
 
-			console.log "Model intersects: #{modelIntersects.length}"
+			# merge together intersects that are nearly at the same position
+			# (happens when the cursor is above the edge of two polygons)
+			newIntersects  = []
+			for i in [0..modelIntersects.length - 2] by 1
+				intersect1 = modelIntersects[i]
+				intersect2 = modelIntersects[i + 1]
+
+				intersectDistance = intersect2.distance - intersect1.distance
+				if intersectDistance < 3
+					# only push one intersection of two
+					newIntersects.push intersect1 if not intersect1.pushed
+				else
+					# push both if they haven't been pushed to the list
+					newIntersects.push intersect1 if not intersect1.pushed
+					newIntersects.push intersect2 if not intersect2.pushed
+
+				# mark both intersections as used/pushed
+				intersect1.pushed = true
+				intersect2.pushed = true
+			modelIntersects = newIntersects
 
 			if modelIntersects.length >= 2
 				modelStart = modelIntersects[0]
@@ -243,7 +262,14 @@ module.exports = class NodeVisualization
 					z: (modelStart.point.z + modelEnd.point.z) / 2
 				}
 
+				# reverse scene transform
+				revTransform = new THREE.Matrix4()
+				revTransform.getInverse @bundle.renderer.scene.matrix
+				middle = new THREE.Vector3(middle.x, middle.y, middle.z)
+				middle.applyMatrix4(revTransform)
+
 				middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
+
 
 				#return if valid grid coordinates (should always be the case)
 				if @grid.zLayers[middleVoxel.z]?[middleVoxel.x]?[middleVoxel.y]?

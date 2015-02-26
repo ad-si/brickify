@@ -132,13 +132,32 @@ module.exports = class BrickLayouter
 		@layoutByGreedyMerge bricks
 		return
 
-	splitBricksAndRelayoutLocally: (oldBricks, bricks) =>
+	splitBricksAndRelayoutLocally: (oldBricks, bricks, grid) =>
+		# split up all bricks into single bricks
 		bricksToSplit = []
 		for brick in oldBricks
+			# stefanie said only to split the brick clicked on, so maybe
+			# remove the line below?
 			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
 			bricksToSplit.push brick
 		newBricks = @_splitBricks bricksToSplit, bricks
+
+		#TODO: since not all voxels are enabled to be made to lego,
+		#some bricks have to be deleted
+		### something like...
+		legoBricks = []
+		for brick in newBricks
+			p = brick.position
+			if not grid.zLayers[p.z][p.x][p.y].enabled
+				# This voxle is going to be 3d printed --> delete brick
+				#deleteBrick(brick)
+			else
+				legoBricks.push brick
+		@layoutByGreedyMerge bricks, [legoBricks]
+		###
+
 		@layoutByGreedyMerge bricks, [newBricks]
+
 		return {
 			removedBricks: bricksToSplit
 			newBricks: newBricks

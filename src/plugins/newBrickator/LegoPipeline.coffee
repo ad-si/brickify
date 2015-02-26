@@ -43,7 +43,7 @@ module.exports = class LegoPipeline
 			decision: (options) => return options.reLayout
 			worker: (lastResult, options) =>
 				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
-				lastResult.bricks
+				lastResult.bricks, lastResult.grid
 				return lastResult.bricks
 		}
 

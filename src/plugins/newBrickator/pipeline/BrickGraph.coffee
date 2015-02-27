@@ -12,6 +12,11 @@ module.exports = class BrickGraph
 		else
 			@bricks = brickList
 
+	# creates a brickList that creates a 1x1 brick for each
+	# enabled voxel in the grid
+	# the @bricks list is an array consisting of an array for each z-layer,
+	# within a z-layer, the array is an unordered list of Bricks
+	# that belong to this z-layer
 	_initialize: () =>
 		for z in [0..@grid.numVoxelsZ - 1] by 1
 			@bricks[z] = []
@@ -77,3 +82,22 @@ module.exports = class BrickGraph
 		arrayHelper.removeFirstOccurenceFromArray brick, @bricks[brick.position.z]
 		# remove references to neighbours/connections
 		brick.removeSelfFromSurrounding()
+
+	# updates the 'brick' reference in each voxel in the grid
+	updateReferencesInGrid: () =>
+		# clear all references
+		@grid.forEachVoxel (voxel) ->
+			voxel.brick = null
+
+		# set references from brick list
+		for layer in @bricks
+			for brick in layer
+				for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
+					for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
+						for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
+							voxel = @grid.zLayers[z][x][y]
+							if voxel?
+								voxel.brick = brick
+							else
+								console.warn "Brick without voxel at #{x},#{y},#{z}"
+

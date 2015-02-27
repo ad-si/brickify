@@ -100,10 +100,6 @@ module.exports = class NewBrickator
 	_updateBricks: (cachedData, brickGraph) =>
 		cachedData.brickGraph = brickGraph
 
-		# ToDo: this is a workaround which needs to be fixed in layouter
-		# (apply changed bricks directly to grid)
-		@_applyBricksToGrid cachedData.brickGraph.bricks, cachedData.grid
-
 		# update bricks and make voxel same colors as bricks
 		cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 		cachedData.visualization.updateVoxelVisualization()
@@ -210,20 +206,6 @@ module.exports = class NewBrickator
 			@gridCache[identifier] = {
 				modelPromise: modelPromise
 			}
-
-	_applyBricksToGrid: (bricks, grid) =>
-		# updates references between voxel --> brick
-		for layer in bricks
-			for brick in layer
-				for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
-					for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
-						for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
-							voxel = grid.zLayers[z][x][y]
-							if voxel?
-								voxel.brick = brick
-							else
-								console.log "Brick without voxel at #{x},#{y},#{z}"
-								console.log brick
 
 	getDownload: (selectedNode) =>
 		dlPromise = new Promise (resolve) =>
@@ -427,11 +409,6 @@ module.exports = class NewBrickator
 				grid: cachedData.grid
 			}
 			results = @pipeline.run data, settings, true
-
-			# ToDo: this is a workaround which needs to be fixed in layouter
-			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.brickGraph.bricks,
-			cachedData.grid
 
 			# show bricks
 			bricks = results.accumulatedResults.brickGraph.bricks

@@ -11,7 +11,10 @@ CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
 jquery = require '.'
 
-module.exports = class NewBrickator
+###
+# @class NewBrickator
+###
+class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
 		@gridCache = {}
@@ -74,14 +77,23 @@ module.exports = class NewBrickator
 					@printMaterial
 					@_applyPrintVisibility cachedData
 
+	###
 	# If voxels have been selected as lego / as 3d print, the brick layout
 	# needs to be locally regenerated
-	relayoutModifiedParts: (cachedData, modifiedVoxels) =>
+	# @param cachedData reference to cachedData
+	# @param modifiedVoxels {BrickObject[]} list of voxels that have been modified
+	# @param {boolean} createBricks creates Bricks if a voxel has no associated
+	# brick. this happens when using the lego brush to create new bricks
+	###
+	relayoutModifiedParts: (cachedData, modifiedVoxels, createBricks = false) =>
 		modifiedBricks = []
 		for v in modifiedVoxels
 			if v.gridEntry.brick?
 				if modifiedBricks.indexOf(v.gridEntry.brick) < 0
 					modifiedBricks.push v.gridEntry.brick
+			else if createBricks
+				pos = v.voxelCoords
+				modifiedBricks.push cachedData.brickGraph.createBrick pos.x, pos.y, pos.z
 
 		settings = new PipelineSettings()
 		settings.onlyRelayout()
@@ -420,4 +432,4 @@ module.exports = class NewBrickator
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.showVoxels()
 
-
+module.exports = NewBrickator

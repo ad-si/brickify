@@ -174,6 +174,7 @@ module.exports = class NodeVisualization
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode) =>
 		voxel = @getVoxel event, selectedNode, false
+		
 		if voxel and not voxel.isLego()
 			voxel.makeLego()
 			voxel.visible = true

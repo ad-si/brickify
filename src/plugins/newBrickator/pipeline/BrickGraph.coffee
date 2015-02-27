@@ -76,6 +76,69 @@ module.exports = class BrickGraph
 			@grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
 		return
 
+	getBrickAt: (x, y, z) ->
+		layer = @bricks[z]
+
+		if layer?
+			for brick in layer
+				if x >= brick.position.x and x < (brick.position.x + brick.size.x)
+					if y >= brick.position.y and y < (brick.position.y + brick.size.y)
+						return brick
+		return null
+
+	# creates a 1x1 brick at the given position. warning: does not check
+	# if a brick already exists there
+	createBrick: (x, y, z) =>
+		brick = new Brick {x: x, y: y, z: z}, {x: 1, y: 1}
+
+		# add neighbour references
+		neighbourXp = @getBrickAt x + 1, y, z
+		neighbourXm = @getBrickAt x - 1, y, z
+		neighbourYp = @getBrickAt x, y + 1, z
+		neighbourYm = @getBrickAt x, y - 1, z
+
+		#x-
+		if neighbourXm?
+			brick.neighbours[0].push neighbourXm
+			neighbourXm.neighbours[1].push brick
+
+		#x+
+		if neighbourXp?
+			brick.neighbours[1].push neighbourXp
+			neighbourXp.neighbours[0].push brick
+
+		#y-
+		if neighbourYm?
+			brick.neighbours[2].push neighbourYm
+			neighbourYm.neighbours[3].push brick
+
+		#y+
+		if neighbourYp?
+			brick.neighbours[3].push neighbourYp
+			neighbourYp.neighbours[2].push brick
+
+		# add upper / lower slots
+		upperBrick = @getBrickAt x, y, z + 1
+		if upperBrick?
+			slot = {
+				x: brick.position.x - upperBrick.position.x
+				y: brick.position.y - upperBrick.position.y
+			}
+			upperBrick.lowerSlots[slot.x][slot.y] = brick
+
+		lowerBrick = @getBrickAt x, y, z - 1
+		if lowerBrick?
+			slot = {
+				x: brick.position.x - lowerBrick.position.x
+				y: brick.position.y - lowerBrick.position.y
+			}
+			lowerBrick.upperSlots[slot.x][slot.y] = brick
+
+		# add to list
+		@bricks[z].push brick
+
+		return brick
+
 	# remove the selected brick out of the graph datastructure
 	deleteBrick: (brick) =>
 		# delete from structure

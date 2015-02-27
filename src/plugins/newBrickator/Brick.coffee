@@ -38,6 +38,31 @@ module.exports = class Brick
 			[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
 		]
 
+	# Removes references to this brick from this brick's neighbours/connections
+	removeSelfFromSurrounding: () =>
+		# delete from connected and neighbour bricks
+		connectedBricks = @uniqueNeighbours()
+		connectedBricks = connectedBricks.concat @uniqueConnectedBricks()
+
+		for connectedBrick in connectedBricks
+			connectedBrick.clearReferenceTo @
+
+	# Removes all references to the brickToBeRemoved from this brick
+	clearReferenceTo: (brickToBeRemoved) =>
+		for xi in [0...@size.x]
+			for yi in [0...@size.y]
+				if @upperSlots[xi][yi] == brickToBeRemoved
+					@upperSlots[xi][yi] = false
+				if @lowerSlots[xi][yi] == brickToBeRemoved
+					@lowerSlots[xi][yi] = false
+
+		for neighbourList in @neighbours
+			if neighbourList.indexOf(brickToBeRemoved) >= 0
+				l = []
+				for neighbour in neighbourList
+					l.push neighbour if neighbour != brickToBeRemoved
+				neighbourList = l
+
 	uniqueConnectedBricks: () =>
 		upperBricks = Brick.uniqueBricksInSlots @upperSlots
 		lowerBricks = Brick.uniqueBricksInSlots @lowerSlots

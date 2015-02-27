@@ -138,30 +138,50 @@ module.exports = class BrickLayouter
 		for brick in oldBricks
 			# stefanie said only to split the brick clicked on, so maybe
 			# remove the line below?
-			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
+			#bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
 			bricksToSplit.push brick
 		newBricks = @_splitBricks bricksToSplit, bricks
 
 		#TODO: since not all voxels are enabled to be made to lego,
 		#some bricks have to be deleted
-		### something like...
+
 		legoBricks = []
 		for brick in newBricks
 			p = brick.position
-			if not grid.zLayers[p.z][p.x][p.y].enabled
-				# This voxle is going to be 3d printed --> delete brick
-				#deleteBrick(brick)
+			if grid? and not grid.zLayers[p.z][p.x][p.y].enabled
+				# This voxel is going to be 3d printed --> delete brick
+				@_deleteBrick(brick, bricks)
 			else
 				legoBricks.push brick
-		@layoutByGreedyMerge bricks, [legoBricks]
-		###
 
-		@layoutByGreedyMerge bricks, [newBricks]
+		@layoutByGreedyMerge bricks, [legoBricks]
 
 		return {
 			removedBricks: bricksToSplit
-			newBricks: newBricks
+			newBricks: legoBricks
 		}
+
+	_splitBricks: (bricksToSplit, bricks) =>
+		newBricks = []
+
+		for brick in bricksToSplit
+			newBricks.push brick.split()
+			@_deleteBrick brick, bricks
+
+		newBricks = [].concat.apply([], newBricks)
+
+		for newBrick in newBricks
+			bricks[newBrick.position.z].push newBrick
+
+		return newBricks
+
+	# Please check: this method should remove this brick
+	# out of the bricks datastructure
+	_deleteBrick: (brick, bricks) ->
+		# delete from structure
+		@_removeFirstOccurenceFromArray brick, bricks[brick.position.z]
+		# remove references to neighbours/connections
+		brick.removeSelfFromSurrounding()
 
 	_anyDefined: (mergeableNeighbours) =>
 		boolean = false
@@ -378,18 +398,3 @@ module.exports = class BrickLayouter
 						articulationPoints.push brick
 			else if otherBrick.parent != brick
 				brick.lowlink = Math.min brick.lowlink, otherBrick.discoveryTime
-
-	_splitBricks: (bricksToSplit, bricks) =>
-		newBricks = []
-
-		for brick in bricksToSplit
-			newBricks.push brick.split()
-			@_removeFirstOccurenceFromArray brick, bricks[brick.position.z]
-
-		newBricks = [].concat.apply([], newBricks)
-
-		for newBrick in newBricks
-			bricks[newBrick.position.z].push newBrick
-
-		return newBricks
-

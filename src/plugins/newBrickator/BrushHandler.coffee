@@ -39,7 +39,7 @@ module.exports = class BrushHandler
 
 	_legoSelect: (selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.showVoxels()
+			cachedData.visualization.showBricks()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
 			@_setModelShadowVisiblity selectedNode, false
@@ -89,6 +89,7 @@ module.exports = class BrushHandler
 			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
 			
 			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.bricks
 
 	_legoMouseUp: (event, selectedNode, cachedData) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -96,6 +97,7 @@ module.exports = class BrushHandler
 			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
 
 			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.bricks
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()

@@ -80,7 +80,8 @@ module.exports = class NewBrickator
 		modifiedBricks = []
 		for v in modifiedVoxels
 			if v.gridEntry.brick?
-				modifiedBricks.push v.gridEntry.brick
+				if modifiedBricks.indexOf(v.gridEntry.brick) < 0
+					modifiedBricks.push v.gridEntry.brick
 
 		settings = new PipelineSettings()
 		settings.onlyRelayout()
@@ -91,7 +92,7 @@ module.exports = class NewBrickator
 			modifiedBricks: modifiedBricks
 		}
 
-		results = @pipeline.run data, settings, false
+		results = @pipeline.run data, settings, true
 		@_updateBricks cachedData, results.accumulatedResults.bricks
 
 	# stores bricks in cached data, updates references in grid and updates

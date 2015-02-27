@@ -1,5 +1,5 @@
 require('es6-promise').polyfill()
-require 'PEP-dist'
+require 'PEP'
 
 path = require 'path'
 $ = require 'jquery'

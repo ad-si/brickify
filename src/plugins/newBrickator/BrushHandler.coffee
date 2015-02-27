@@ -89,7 +89,7 @@ module.exports = class BrushHandler
 			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
 			
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.updateBricks cachedData.bricks
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_legoMouseUp: (event, selectedNode, cachedData) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
@@ -97,7 +97,7 @@ module.exports = class BrushHandler
 			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
 
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.updateBricks cachedData.bricks
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()

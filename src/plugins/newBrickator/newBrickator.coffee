@@ -63,7 +63,7 @@ module.exports = class NewBrickator
 				grid: cachedData.grid
 			}
 			results = @pipeline.run data, settings, true
-			@_updateBricks cachedData, results.accumulatedResults.bricks
+			@_updateBricks cachedData, results.accumulatedResults.brickGraph
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
@@ -88,24 +88,24 @@ module.exports = class NewBrickator
 		data = {
 			optimizedModel: cachedData.optimizedModel
 			grid: cachedData.grid
-			bricks: cachedData.bricks
+			brickGraph: cachedData.brickGraph
 			modifiedBricks: modifiedBricks
 		}
 
 		results = @pipeline.run data, settings, true
-		@_updateBricks cachedData, results.accumulatedResults.bricks
+		@_updateBricks cachedData, results.accumulatedResults.brickGraph
 
 	# stores bricks in cached data, updates references in grid and updates
 	# brick visuals
-	_updateBricks: (cachedData, bricks) =>
-		cachedData.bricks = bricks
+	_updateBricks: (cachedData, brickGraph) =>
+		cachedData.brickGraph = brickGraph
 
 		# ToDo: this is a workaround which needs to be fixed in layouter
 		# (apply changed bricks directly to grid)
-		@_applyBricksToGrid cachedData.bricks, cachedData.grid
+		@_applyBricksToGrid cachedData.brickGraph.bricks, cachedData.grid
 
 		# update bricks and make voxel same colors as bricks
-		cachedData.visualization.updateBricks cachedData.bricks
+		cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 		cachedData.visualization.updateVoxelVisualization()
 		cachedData.visualization.showVoxels()
 		@_applyVoxelAndBrickVisibility cachedData
@@ -430,10 +430,11 @@ module.exports = class NewBrickator
 
 			# ToDo: this is a workaround which needs to be fixed in layouter
 			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
+			@_applyBricksToGrid results.accumulatedResults.brickGraph.bricks,
+			cachedData.grid
 
 			# show bricks
-			bricks = results.accumulatedResults.bricks
+			bricks = results.accumulatedResults.brickGraph.bricks
 			cachedData.visualization.updateBricks bricks
 			cachedData.visualization.showBricks()
 

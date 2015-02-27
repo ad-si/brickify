@@ -34,8 +34,8 @@ module.exports = class LegoPipeline
 			name: 'Layout greedy merge'
 			decision: (options) => return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.layoutByGreedyMerge lastResult.bricks,
-				lastResult.bricks
+				return @brickLayouter.layoutByGreedyMerge lastResult.brickGraph,
+				lastResult.brickGraph.bricks
 		}
 
 		@pipelineSteps.push {
@@ -43,8 +43,8 @@ module.exports = class LegoPipeline
 			decision: (options) => return options.reLayout
 			worker: (lastResult, options) =>
 				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
-				lastResult.bricks, lastResult.grid
-				return lastResult.bricks
+				lastResult.brickGraph, lastResult.grid
+				return lastResult
 		}
 
 	run: (data, options = null, profiling = false) =>

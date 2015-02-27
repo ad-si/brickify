@@ -112,7 +112,7 @@ describe 'brickLayouter split', ->
 
 		bricksToSplit = [brick5, brick7]
 
-		newBricks = brickLayouter._splitBricks bricksToSplit, bricks
+		newBricks = brickLayouter._splitBricks bricksToSplit, {bricks: bricks}
 
 		expect(newBricks.length).to.equal(6)
 
@@ -155,7 +155,7 @@ describe 'brickLayouter split', ->
 		bricks = [[brick0, brick1, brick2]]
 		bricksToSplit = brick1.uniqueNeighbours()
 		bricksToSplit.push brick1
-		newBricks = brickLayouter._splitBricks bricksToSplit, bricks
+		newBricks = brickLayouter._splitBricks bricksToSplit, {bricks: bricks}
 		expect(bricks[0]).to.eql(newBricks)
 		expect(newBricks).to.have.length(6)
 		for brick in bricks[0]
@@ -178,7 +178,7 @@ describe 'brickLayouter split', ->
 		brick0.neighbours = [[], [brick1], [], []]
 		brick1.neighbours = [[brick0], [brick2], [], []]
 		brick2.neighbours = [[brick1], [], [], []]
-		brickLayouter.splitBricksAndRelayoutLocally [brick0], bricks
+		brickLayouter.splitBricksAndRelayoutLocally [brick0], {bricks: bricks}
 		expect(bricks[0]).to.have.length(2)
 		expect(bricks[0][0]).to.equal(brick2)
 		expect(bricks[0][1].position).to.eql({x: 0, y: 0, z: 0})

@@ -120,7 +120,7 @@ module.exports = class SolidRenderer
 		metaObject = new THREE.Object3D()
 		metaObject.name = metaObject.uuid
 		@latestAddedObject = metaObject
-		
+
 		metaObject.add object
 		metaObject.originalMesh = object
 
@@ -202,7 +202,7 @@ module.exports = class SolidRenderer
 		visibleObject.material.side = THREE.DoubleSide
 
 		intersects =
-			interactionHelper.getPolygonClickedOn(
+			interactionHelper.getIntersections(
 				event
 				[visibleObject]
 				@bundle.renderer)

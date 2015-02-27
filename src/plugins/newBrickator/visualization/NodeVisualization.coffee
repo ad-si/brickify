@@ -218,7 +218,7 @@ module.exports = class NodeVisualization
 	# returns null, if cursor is above a currently modified voxel
 	_getIntersectedVoxels: (event, selectedNode) ->
 		voxelIntersects =
-			interactionHelper.getPolygonClickedOn(
+			interactionHelper.getIntersections(
 				event
 				@voxelsSubnode.children
 				@bundle.renderer)

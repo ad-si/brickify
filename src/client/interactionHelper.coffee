@@ -1,45 +1,91 @@
+###
+# @module interactionHelper
+###
+
 THREE = require 'three'
 
-getPolygonClickedOn = (event, objects, renderer) ->
-	camera = renderer.getCamera()
+###
+# Determines the intersections a ray casted by a screen space interaction hits
+# @param {Object} event usually a mouse or tap or pointer event
+# @param {Number} event.pageX the x coordinate on the screen
+# @param {Number} event.pageY the y coordinate on the screen
+# @param {Array<Object>} objects the three nodes which take part in ray casting
+# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @return {Array<Object>} an array of intersections
+# @memberOf interactionHelper
+###
+getIntersections = (event, objects, renderer) ->
+	ray = calculateRay event, renderer
+
 	raycaster = new THREE.Raycaster()
-	x = event.pageX
-	y = event.pageY
-	relativeX = x / window.innerWidth * 2 - 1
-	relativeY = y / window.innerHeight
-	vector = new THREE.Vector3 relativeX, -relativeY * 2 + 1, 0.5
-	vector.unproject camera
-	raycaster.ray.set(camera.position, vector.sub(camera.position).normalize())
-	raycaster.intersectObjects objects, true
+	raycaster.ray.set renderer.getCamera().position, ray
 
-module.exports.getPolygonClickedOn = getPolygonClickedOn
+	return raycaster.intersectObjects objects, true
+module.exports.getIntersections = getIntersections
 
 ###
-# Calculates the position on the z=0 plane in 3d space from given screen
-# (mouse) coordinates.
-#
-# @param {Number} screenX the x coordinate of the mouse event
-# @param {Number} screenY the y coordinate of the mouse event
-# @memberOf
+# Determines the position of an event on the z=0 plane
+# @param {Object} event usually a mouse or tap or pointer event
+# @param {Number} event.pageX the x coordinate on the screen
+# @param {Number} event.pageY the y coordinate on the screen
+# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @return {Object} a vector {x, y, z}
+# @memberOf interactionHelper
 ###
-getGridPosition = (event, renderer) ->
-	canvas = renderer.getDomElement()
+calculatePositionOnGrid = (event, renderer) ->
+	ray = calculateRay event, renderer
+
+	# we are calculating in camera coordinate system -> y and z are rotated
 	camera = renderer.getCamera()
+	ray.multiplyScalar -camera.position.y / ray.y
+	posInWorld = camera.position.clone().add ray
 
-	posInCanvas = new THREE.Vector3(
+	return x: posInWorld.x, y: -posInWorld.z, z: posInWorld.y
+module.exports.getGridPosition = calculatePositionOnGrid
+
+###
+# Determines the position of an event in canvas space
+# @param {Object} event usually a mouse or tap or pointer event
+# @param {Number} event.pageX the x coordinate on the screen
+# @param {Number} event.pageY the y coordinate on the screen
+# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @return {Object} a three vector
+# @memberOf interactionHelper
+###
+calculatePositionInCanvasSpace = (event, renderer) ->
+	canvas = renderer.getDomElement()
+
+	return new THREE.Vector3(
 		(event.pageX / canvas.width) * 2 - 1
 		(-event.pageY / canvas.height) * 2 + 1
 		0.5
 	)
+module.exports.calculatePositionInCanvasSpace = calculatePositionInCanvasSpace
 
-	posInCamera = posInCanvas.clone().unproject camera
+###
+# Determines the position of the event in camera space
+# @param {Object} event usually a mouse or tap or pointer event
+# @param {Number} event.pageX the x coordinate on the screen
+# @param {Number} event.pageY the y coordinate on the screen
+# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @return {Object} a three vector
+# @memberOf interactionHelper
+###
+calculatePositionInCameraSpace = (event, renderer) ->
+	positionInCanvasCS = calculatePositionInCanvasSpace event, renderer
+	return positionInCanvasCS.unproject renderer.getCamera()
+module.exports.calculatePositionInCameraSpace = calculatePositionInCameraSpace
 
-	ray = posInCamera.sub(camera.position).normalize()
-	# we are calculating in camera coordinate system -> y and z are rotated
-	ray.multiplyScalar -camera.position.y / ray.y
-	posInWorld = camera.position.clone().add ray
-
-	posInScene = new THREE.Vector3 posInWorld.x, -posInWorld.z, posInWorld.y
-	return posInScene
-
-module.exports.getGridPosition = getGridPosition
+###
+# Determines a virtual ray that a screen space interaction casts
+# @param {Object} event usually a mouse or tap or pointer event
+# @param {Number} event.pageX the x coordinate on the screen
+# @param {Number} event.pageY the y coordinate on the screen
+# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @return {Object} a normalized three vector {x, y, z}
+# @memberOf interactionHelper
+###
+calculateRay = (event, renderer) ->
+	positionInCameraCS = calculatePositionInCameraSpace event, renderer
+	return positionInCameraCS.sub(renderer.getCamera().position).normalize()
+module.exports.calculateRay = calculateRay

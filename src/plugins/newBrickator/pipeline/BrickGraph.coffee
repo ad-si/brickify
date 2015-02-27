@@ -2,11 +2,15 @@ Brick = require './Brick'
 arrayHelper = require './arrayHelper'
 
 module.exports = class BrickGraph
-	constructor: (@grid) ->
-		@bricks = []
-		Brick.nextBrickIndex = 0
-
-		@_initialize()
+	# Brick graph can be created either with a grid,
+	# or with a pre-filled list of bricks
+	constructor: (@grid, brickList) ->
+		if not brickList?
+			@bricks = []
+			Brick.nextBrickIndex = 0
+			@_initialize()
+		else
+			@bricks = brickList
 
 	_initialize: () =>
 		for z in [0..@grid.numVoxelsZ - 1] by 1

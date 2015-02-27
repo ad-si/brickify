@@ -202,7 +202,7 @@ module.exports = class BrickLayouter
 			if neighbours
 				for neighbour in neighbours
 					connectedBricks = connectedBricks.concat neighbour.uniqueConnectedBricks()
-				connectedBricks = removeDuplicates connectedBricks
+				connectedBricks = arrayHelper.removeDuplicates connectedBricks
 				numConnections[i] = connectedBricks.length
 
 		maxConnections = 0
@@ -249,19 +249,6 @@ module.exports = class BrickLayouter
 		# add newBrick to bricks array
 		brickGraph.bricks[z].push newBrick
 		return newBrick
-
-	# helper method, to be moved somewhere more appropriate
-	removeDuplicates = (array) ->
-		a = array.concat()
-		i = 0
-
-		while i < a.length
-			j = i + 1
-			while j < a.length
-				a.splice j--, 1  if a[i] is a[j]
-				++j
-			++i
-		return a
 
 	_getBiconnectedComponents: (bricks) =>
 		@index = 0

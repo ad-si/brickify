@@ -1,4 +1,5 @@
 Brick = require './Brick'
+arrayHelper = require './arrayHelper'
 
 module.exports = class BrickGraph
 	constructor: (@grid) ->
@@ -65,3 +66,10 @@ module.exports = class BrickGraph
 			brick.neighbours[2] = [@grid.zLayers[z][x][y - 1].brick]
 			@grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
 		return
+
+	# remove the selected brick out of the graph datastructure
+	deleteBrick: (brick) =>
+		# delete from structure
+		arrayHelper.removeFirstOccurenceFromArray brick, @bricks[brick.position.z]
+		# remove references to neighbours/connections
+		brick.removeSelfFromSurrounding()

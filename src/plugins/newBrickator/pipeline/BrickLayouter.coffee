@@ -1,5 +1,6 @@
 Brick = require './Brick'
 BrickGraph = require './BrickGraph'
+arrayHelper = require './arrayHelper'
 
 module.exports = class BrickLayouter
 	constructor: (pseudoRandom = false) ->
@@ -62,7 +63,7 @@ module.exports = class BrickLayouter
 					console.log brick
 					if brick.uniqueNeighbours().length is 0
 						0
-						#@_removeFirstOccurenceFromArray brick, bricks[brick.position.z]
+						#arrayHelper.removeFirstOccurenceFromArray brick, bricks[brick.position.z]
 					else
 						console.log 'splitting brick and relayouting'
 						console.log brick
@@ -95,7 +96,7 @@ module.exports = class BrickLayouter
 			p = brick.position
 			if grid? and not grid.zLayers[p.z][p.x][p.y].enabled
 				# This voxel is going to be 3d printed --> delete brick
-				@_deleteBrick(brick, brickGraph)
+				brickGraph.deleteBrick brick
 			else
 				legoBricks.push brick
 
@@ -111,7 +112,7 @@ module.exports = class BrickLayouter
 
 		for brick in bricksToSplit
 			newBricks.push brick.split()
-			@_deleteBrick brick, brickGraph
+			brickGraph.deleteBrick brick
 
 		newBricks = [].concat.apply([], newBricks)
 
@@ -119,14 +120,6 @@ module.exports = class BrickLayouter
 			brickGraph.bricks[newBrick.position.z].push newBrick
 
 		return newBricks
-
-	# Please check: this method should remove this brick
-	# out of the bricks datastructure
-	_deleteBrick: (brick, brickGraph) ->
-		# delete from structure
-		@_removeFirstOccurenceFromArray brick, brickGraph.bricks[brick.position.z]
-		# remove references to neighbours/connections
-		brick.removeSelfFromSurrounding()
 
 	_anyDefined: (mergeableNeighbours) =>
 		boolean = false
@@ -245,23 +238,17 @@ module.exports = class BrickLayouter
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z
-		@_removeFirstOccurenceFromArray brick, brickGraph.bricks[z]
+		arrayHelper.removeFirstOccurenceFromArray brick, brickGraph.bricks[z]
 		if bricksToLayout
-			@_removeFirstOccurenceFromArray brick, bricksToLayout[0]
+			arrayHelper.removeFirstOccurenceFromArray brick, bricksToLayout[0]
 		for neighbour in mergeNeighbours
-			@_removeFirstOccurenceFromArray neighbour, brickGraph.bricks[z]
+			arrayHelper.removeFirstOccurenceFromArray neighbour, brickGraph.bricks[z]
 			if bricksToLayout
-				@_removeFirstOccurenceFromArray neighbour, bricksToLayout[0]
+				arrayHelper.removeFirstOccurenceFromArray neighbour, bricksToLayout[0]
 
 		# add newBrick to bricks array
 		brickGraph.bricks[z].push newBrick
 		return newBrick
-
-	_removeFirstOccurenceFromArray: (object, array) =>
-		i = array.indexOf object
-		if i != -1
-			array.splice i, 1
-		return
 
 	# helper method, to be moved somewhere more appropriate
 	removeDuplicates = (array) ->

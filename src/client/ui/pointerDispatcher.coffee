@@ -95,11 +95,9 @@ class PointerDispatcher
 		return
 
 	onGotPointerCapture: (event) =>
-		console.log 'capture!'
 		return
 
 	onLostPointerCapture: (event) =>
-		console.log '-.- release'
 		return
 
 	_capturePointerFor: (event) =>

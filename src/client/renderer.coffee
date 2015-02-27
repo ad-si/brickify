@@ -172,33 +172,6 @@ module.exports = class Renderer
 		directionalLight.position.set 20, -20, -30
 		@scene.add directionalLight
 
-	###
-	# Calculates the position on the z=0 plane in 3d space from given screen
-  # (mouse) coordinates.
-  #
-  # @param {Number} screenX the x coordinate of the mouse event
-  # @param {Number} screenY the y coordinate of the mouse event
-  # @memberOf Renderer
-	###
-	getGridPosition: (screenX, screenY) ->
-		canvas = @threeRenderer.context.canvas
-
-		posInCanvas = new THREE.Vector3(
-			(screenX / canvas.width) * 2 - 1
-			(-screenY / canvas.height) * 2 + 1
-			0.5
-		)
-
-		posInCamera = posInCanvas.clone().unproject @camera
-
-		ray = posInCamera.sub(@camera.position).normalize()
-		# we are calculating in camera coordinate system -> y and z are rotated
-		ray.multiplyScalar -@camera.position.y / ray.y
-		posInWorld = @camera.position.clone().add ray
-
-		posInScene = new THREE.Vector3 posInWorld.x, -posInWorld.z, posInWorld.y
-		return posInScene
-
 	loadCamera: (state) =>
 		if state.controls?
 			@setCamera state.controls.position, state.controls.target

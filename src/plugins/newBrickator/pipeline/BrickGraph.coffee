@@ -83,7 +83,7 @@ module.exports = class BrickGraph
 		# remove references to neighbours/connections
 		brick.removeSelfFromSurrounding()
 
-	# updates the 'brick' reference in each voxel in the grid
+	# updates the 'voxel.brick' reference in each voxel in the grid
 	updateReferencesInGrid: () =>
 		# clear all references
 		@grid.forEachVoxel (voxel) ->

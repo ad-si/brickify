@@ -26,6 +26,7 @@ module.exports = class Brick
 				@upperSlots[xx][yy] = false
 				@lowerSlots[xx][yy] = false
 
+		# x-, x+, y-, y+
 		@neighbours = [[], [], [], []]
 		return
 
@@ -56,12 +57,10 @@ module.exports = class Brick
 				if @lowerSlots[xi][yi] == brickToBeRemoved
 					@lowerSlots[xi][yi] = false
 
-		for neighbourList in @neighbours
-			if neighbourList.indexOf(brickToBeRemoved) >= 0
-				l = []
-				for neighbour in neighbourList
-					l.push neighbour if neighbour != brickToBeRemoved
-				neighbourList = l
+		for i in [0...@neighbours.length]
+			brickIndex = @neighbours[i].indexOf(brickToBeRemoved)
+			if brickIndex >= 0
+				@neighbours[i].splice(brickIndex,1)
 
 	uniqueConnectedBricks: () =>
 		upperBricks = Brick.uniqueBricksInSlots @upperSlots

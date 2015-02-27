@@ -398,21 +398,7 @@ module.exports = class NewBrickator
 
 	_enableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
-			#legofy
-			settings = new PipelineSettings()
-			settings.deactivateVoxelizing()
-
-			@_applyModelTransforms selectedNode, settings
-
-			data = {
-				optimizedModel: cachedData.optimizedModel
-				grid: cachedData.grid
-			}
-			results = @pipeline.run data, settings, true
-
 			# show bricks
-			bricks = results.accumulatedResults.brickGraph.bricks
-			cachedData.visualization.updateBricks bricks
 			cachedData.visualization.showBricks()
 
 			# apply grid size to layer view

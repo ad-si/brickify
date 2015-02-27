@@ -39,7 +39,7 @@ module.exports = class BrushHandler
 
 	_legoSelect: (selectedNode) =>
 		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.showBricks()
+			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
 			@_setModelShadowVisiblity selectedNode, false

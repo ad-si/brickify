@@ -410,26 +410,38 @@ class NewBrickator
 
 	_enableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
-			# show bricks
+			# show bricks and csg
 			cachedData.visualization.showBricks()
+
+			csg = @_createCSG cachedData.node, cachedData, true
+			cachedData.visualization.showCsg(csg)
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			if solidRenderer?
+					solidRenderer.toggleNodeVisibility(cachedData.node, false)
 
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
-			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length - 1)
+			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length)
 			@buildLayerUi.maxLayer.html(cachedData.grid.zLayers.length)
 			
-			@buildLayerUi.slider.val(0)
+			@buildLayerUi.slider.val(1)
 			@_updateBuildLayer selectedNode
 
 	_updateBuildLayer: (selectedNode) =>
 		layer = @buildLayerUi.slider.val()
-		@buildLayerUi.curLayer.html(Number(layer) + 1)
+		@buildLayerUi.curLayer.html(Number(layer))
 		@_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.showBrickLayer layer
+			cachedData.visualization.showBrickLayer layer - 1
 
 	_disableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
+			
+			# hide csg, show model, show voxels
+			cachedData.visualization.hideCsg()
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			if solidRenderer?
+					solidRenderer.toggleNodeVisibility(cachedData.node, true)
 			cachedData.visualization.showVoxels()
 
 module.exports = NewBrickator

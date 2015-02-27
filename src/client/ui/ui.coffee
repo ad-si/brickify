@@ -1,7 +1,7 @@
 Hotkeys = require '../hotkeys'
 UiSceneManager = require './sceneManager'
 UiObjects = require './objects'
-MouseDispatcher = require './mouseDispatcher'
+PointerDispatcher = require './pointerDispatcher'
 DownloadProvider = require './downloadProvider'
 
 ###
@@ -14,23 +14,23 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@objects = new UiObjects(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
-		@mouseDispatcher = new MouseDispatcher(@bundle)
+		@pointerDispatcher = new PointerDispatcher(@bundle)
 		@downloadProvider = new DownloadProvider(@bundle)
 
-	dropHandler: (event) ->
+	dropHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
 		@bundle.modelLoader.readFiles files if files?
 
-	dragOverHandler: (event) ->
+	dragOverHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
-	windowResizeHandler: (event) ->
+	windowResizeHandler: (event) =>
 		@renderer.windowResizeHandler()
 
 	init: =>
@@ -40,43 +40,21 @@ module.exports = class Ui
 		@downloadProvider.init('#downloadButton', @sceneManager)
 
 	_initListeners: =>
-		# mouse dispatcher for mouse events
-		@mouseDispatcher.init(@renderer, @objects, @sceneManager)
-		
+		@pointerDispatcher.init()
+
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'
-			@dragOverHandler.bind @
-			false
+			@dragOverHandler
 		)
 		@renderer.getDomElement().addEventListener(
 			'drop'
-			@dropHandler.bind @
-			false
+			@dropHandler
 		)
 
 		window.addEventListener(
-			'resize',
-			@windowResizeHandler.bind @,
-			false
-		)
-
-		@renderer.getDomElement().addEventListener(
-			'mousedown'
-			@mouseDispatcher.handleMouseDown
-			false
-		)
-
-		@renderer.getDomElement().addEventListener(
-			'mouseup'
-			@mouseDispatcher.handleMouseUp
-			false
-		)
-
-		@renderer.getDomElement().addEventListener(
-			'mousemove'
-			@mouseDispatcher.handleMouseMove
-			false
+			'resize'
+			@windowResizeHandler
 		)
 
 	_initUiElements: =>

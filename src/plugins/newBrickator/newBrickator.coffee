@@ -410,6 +410,9 @@ class NewBrickator
 
 	_enableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
+			#hide brushes
+			@bundle.ui.objects.hideBrushContainer()
+
 			# show bricks and csg
 			cachedData.visualization.showBricks()
 
@@ -436,6 +439,9 @@ class NewBrickator
 	_disableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
+
+			#show brushes
+			@bundle.ui.objects.showBrushContainer()
 			
 			# hide csg, show model, show voxels
 			cachedData.visualization.hideCsg()

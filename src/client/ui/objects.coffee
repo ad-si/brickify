@@ -57,14 +57,20 @@ class UiObjects
 				@_objectSelect structure, true
 				return
 
+	hideBrushContainer: =>
+		@brushContainer.hide()
+
+	showBrushContainer: =>
+		@brushContainer.show()
+
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null
 
-		container = $(brushjQueryString)
+		@brushContainer = $(brushjQueryString)
 
 		for brush in @_brushList
 			brush.jqueryObject = @_createBrush brush
-			container.append brush.jqueryObject
+			@brushContainer.append brush.jqueryObject
 
 	###
 	_createVisibilityUi: (visibilityjQueryString) =>

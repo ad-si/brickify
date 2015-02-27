@@ -220,8 +220,9 @@ module.exports = class NodeVisualization
 		voxelIntersects =
 			interactionHelper.getIntersections(
 				event
+				@bundle.renderer
 				@voxelsSubnode.children
-				@bundle.renderer)
+			)
 
 		firstLegoVoxel = null
 		lastNonLegoVoxel = null

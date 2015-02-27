@@ -9,12 +9,12 @@ THREE = require 'three'
 # @param {Object} event usually a mouse or tap or pointer event
 # @param {Number} event.pageX the x coordinate on the screen
 # @param {Number} event.pageY the y coordinate on the screen
-# @param {Array<Object>} objects the three nodes which take part in ray casting
 # @param {Renderer} renderer the renderer that provides the camera and canvas
+# @param {Array<Object>} objects the three nodes which take part in ray casting
 # @return {Array<Object>} an array of intersections
 # @memberOf interactionHelper
 ###
-getIntersections = (event, objects, renderer) ->
+getIntersections = (event, renderer, objects) ->
 	ray = calculateRay event, renderer
 
 	raycaster = new THREE.Raycaster()

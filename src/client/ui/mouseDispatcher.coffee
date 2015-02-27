@@ -72,8 +72,8 @@ module.exports = class MouseDispatcher
 		# BUG: after page reload, the raycaster in interactionHelper
 		# does not recognize the last object
 
-		selection = interactionHelper.getIntersections event,
-			@renderer.scene.children, @renderer
+		selection = interactionHelper.getIntersections event, @renderer,
+			@renderer.scene.children
 
 		if selection.length > 0
 			for geometry in selection
@@ -96,8 +96,8 @@ module.exports = class MouseDispatcher
 		# relies on the fact that solidRenderer sets an 'associatedNode' property
 		# for three nodes added
 
-		selection = interactionHelper.getIntersections event,
-			@renderer.scene.children, @renderer
+		selection = interactionHelper.getIntersections event, @renderer,
+			@renderer.scene.children
 
 		if selection.length > 0
 			for geometry in selection

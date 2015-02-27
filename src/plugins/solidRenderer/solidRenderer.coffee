@@ -204,8 +204,9 @@ module.exports = class SolidRenderer
 		intersects =
 			interactionHelper.getIntersections(
 				event
+				@bundle.renderer
 				[visibleObject]
-				@bundle.renderer)
+			)
 
 		visibleObject.material.side = oldMaterialSide
 

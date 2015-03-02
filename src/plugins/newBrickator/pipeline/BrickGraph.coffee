@@ -69,6 +69,11 @@ module.exports = class BrickGraph
 		brick.neighbours[2] = [@grid.zLayers[z][x][y - 1].brick]
 		@grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
 
+	forEachBrick: (callback) =>
+		for layer in @bricks
+			for brick in layer
+				callback(brick)
+
 	getBrickAt: (x, y, z) ->
 		layer = @bricks[z]
 		return null if not layer?
@@ -131,7 +136,7 @@ module.exports = class BrickGraph
 
 		return brick
 
-	# remove the selected brick out of the graph datastructure
+	# remove the selected brick from the graph datastructure
 	deleteBrick: (brick) =>
 		# delete from structure
 		arrayHelper.removeFirstOccurenceFromArray brick, @bricks[brick.position.z]
@@ -144,15 +149,19 @@ module.exports = class BrickGraph
 		@grid.forEachVoxel (voxel) ->
 			voxel.brick = null
 
+		forEachVoxelInBrick = (brick, callback) =>
+			for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
+				for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
+					for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
+						voxel = @grid.zLayers[z][x][y]
+						if voxel?
+							callback(voxel)
+						else
+							console.warn "Brick without voxel at #{x}, #{y}, #{z}"
+
 		# set references from brick list
-		for layer in @bricks
-			for brick in layer
-				for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
-					for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
-						for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
-							voxel = @grid.zLayers[z][x][y]
-							if voxel?
-								voxel.brick = brick
-							else
-								console.warn "Brick without voxel at #{x},#{y},#{z}"
+		@forEachBrick (brick) =>
+			forEachVoxelInBrick brick, (voxel) =>
+				voxel.brick = brick
+	
 

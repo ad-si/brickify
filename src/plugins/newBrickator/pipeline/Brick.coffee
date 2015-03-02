@@ -244,22 +244,18 @@ module.exports = class Brick
 				# update neighbours outside of splitting brick
 				if newBricks[x][y].position.x == @position.x
 					#take neighbour in direction 0 xm
-					@addNeighboursToNewBrick newBricks[x][y],
-					Brick.direction.Xm, Brick.direction.Xp
+					@addNeighboursToNewBrick newBricks[x][y], Brick.direction.Xm
 				if newBricks[x][y].position.y == @position.y
 					#take neighbour in direction 2 ym
-					@addNeighboursToNewBrick newBricks[x][y],
-					Brick.direction.Ym, Brick.direction.Yp
+					@addNeighboursToNewBrick newBricks[x][y], Brick.direction.Ym
 				if (newBricks[x][y].position.x + newBricks[x][y].size.x) ==
 				(@position.x + @size.x)
 					#take neighbour in direction 1 xp
-					@addNeighboursToNewBrick newBricks[x][y],
-					Brick.direction.Xp, Brick.direction.Xm
+					@addNeighboursToNewBrick newBricks[x][y], Brick.direction.Xp
 				if (newBricks[x][y].position.y + newBricks[x][y].size.y) ==
 				(@position.y + @size.y)
 					#take neighbour in direction 3 yp
-					@addNeighboursToNewBrick newBricks[x][y],
-					Brick.direction.Yp, Brick.direction.Ym
+					@addNeighboursToNewBrick newBricks[x][y], Brick.direction.Yp
 
 				# update neighbours inside the splitting brick
 				if x > 0
@@ -277,7 +273,17 @@ module.exports = class Brick
 
 		return [].concat.apply([], newBricks)
 
-	addNeighboursToNewBrick: (newBrick, direction, opposite) =>
+	addNeighboursToNewBrick: (newBrick, direction) =>
+		switch direction
+			when Brick.direction.Xm
+				opposite = Brick.direction.Xp
+			when Brick.direction.Xp
+				opposite = Brick.direction.Xm
+			when Brick.direction.Ym
+				opposite = Brick.direction.Yp
+			when Brick.direction.Yp
+				opposite = Brick.direction.Ym
+		
 		if direction in [Brick.direction.Xm,Brick.direction.Xp]
 			minY = newBrick.position.y
 			maxY = newBrick.position.y + newBrick.size.y

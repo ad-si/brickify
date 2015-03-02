@@ -81,8 +81,9 @@ class NewBrickator
 	# If voxels have been selected as lego / as 3d print, the brick layout
 	# needs to be locally regenerated
 	# @param cachedData reference to cachedData
-	# @param modifiedVoxels {BrickObject[]} list of voxels that have been modified
-	# @param {boolean} createBricks creates Bricks if a voxel has no associated
+	# @param {Array<BrickObject>} modifiedVoxels list of voxels that have
+	# been modified
+	# @param {Boolean} createBricks creates Bricks if a voxel has no associated
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (cachedData, modifiedVoxels, createBricks = false) =>
@@ -131,27 +132,6 @@ class NewBrickator
 		pos = selectedNode.positionData.position
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
 		return modelTransform
-
-	getResultByNode: (node, grid, recompute) =>
-		identifier = node.pluginData.solidRenderer.threeObjectUuid
-		if recompute
-			settings = new PipelineSettings()
-			@_applyModelTransforms node, settings
-			settings.deactivateVoxelizing()
-
-			optimizedModel = @optimizedModelCache[node.meshHash]
-			if not optimizedModel
-				return
-
-			data = {
-				optimizedModel: optimizedModel
-				grid: grid.grid
-			}
-			###
-  		@resultCache not used anymore, REBUILD !!!
-			###
-			@resultCache[identifier] = @pipeline.run data, settings, true
-		return @resultCache[identifier]
 
 	getBrushes: () =>
 		return @brushHandler.getBrushes()
@@ -282,8 +262,7 @@ class NewBrickator
 			{
 				hotkey: 'l'
 				description: 'toggle Lego visibility'
-				callback: =>
-					@_toggleBrickLayer()
+				callback: @_toggleBrickLayer
 			}
 		]
 		}

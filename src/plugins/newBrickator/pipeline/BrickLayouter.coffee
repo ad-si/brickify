@@ -101,6 +101,10 @@ module.exports = class BrickLayouter
 			else
 				legoBricks.push brick
 
+		# reset visible material
+		for brick in legoBricks
+			brick.visualizationMaterial = null
+
 		@layoutByGreedyMerge brickGraph, [legoBricks]
 
 		return {

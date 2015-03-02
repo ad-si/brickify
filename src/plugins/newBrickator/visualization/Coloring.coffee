@@ -46,7 +46,20 @@ module.exports = class Coloring
 		if brick.visualizationMaterial?
 			return brick.visualizationMaterial
 
-		brick.visualizationMaterial = @_getRandomBrickMaterial()
+		# collect materials of neighbors
+		neighbors = brick.uniqueNeighbours()
+		neighborColors = neighbors.map (brick) ->
+			brick.visualizationMaterial
+
+		# try max. (brickMaterials.length) times to
+		# find a material that has not been used
+		# by neighbors to visually distinguish bricks
+		for i in [0...@_brickMaterials.length]
+			material = @_getRandomBrickMaterial()
+			continue if neighborColors.indexOf(material) >= 0
+			break
+
+		brick.visualizationMaterial = material
 		return brick.visualizationMaterial
 
 	getStabilityMaterialForBrick: (brick) =>

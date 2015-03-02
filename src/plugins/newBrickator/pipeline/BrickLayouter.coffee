@@ -117,19 +117,18 @@ module.exports = class BrickLayouter
 		return newBricks
 
 	_anyDefined: (mergeableNeighbours) =>
-		boolean = false
-		for neighbours in mergeableNeighbours
-			boolean = boolean or neighbours?
-		return boolean
+		return mergeableNeighbours.some (entry) -> entry?
 
-	_chooseRandomBrick: (bricks) =>
+	_chooseRandomBrick: (brickLayers) =>
 		i = 0
-		brickLayer = bricks[@_random(bricks.length)]
-		while brickLayer.length is 0 # if a layer has no bricks, retry
-			if ++i >= bricks.length
+		brickList = brickLayers[@_random(brickLayers.length)]
+
+		while brickList.length is 0 # if a layer has no bricks, retry
+			if ++i >= brickLayers.length
 				return null
-			brickLayer = bricks[@_random(bricks.length)]
-		brick = brickLayer[@_random(brickLayer.length)]
+			brickList = brickLayers[@_random(brickLayers.length)]
+
+		brick = brickList[@_random(brickList.length)]
 		return brick
 
 	_random: (max) =>

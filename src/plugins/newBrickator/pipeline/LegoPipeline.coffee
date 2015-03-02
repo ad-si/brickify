@@ -29,7 +29,7 @@ module.exports = class LegoPipeline
 			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 		}
-		 
+
 		@pipelineSteps.push {
 			name: 'Layout greedy merge'
 			decision: (options) => return options.layouting
@@ -106,6 +106,7 @@ module.exports = class LegoPipeline
 		else
 			console.log "(Skipping step #{step.name})"
 			result = lastResult
+			stop = 0
 
 		return {
 			time: stop

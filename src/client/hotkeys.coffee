@@ -4,6 +4,7 @@
 
 module.exports = class Hotkeys
 	constructor: (pluginHooks) ->
+		@bootboxOpen = false
 		@events = []
 		@bind '?', 'General', 'Show this help', () =>
 			@showHelp()
@@ -13,6 +14,7 @@ module.exports = class Hotkeys
 		@addEvents events for events in pluginHooks.getHotkeys()
 
 	showHelp: =>
+		return if @bootboxOpen
 		message = ''
 		for own group, events of @events
 			message += '<section><h4>' + group + '</h4>'
@@ -20,10 +22,20 @@ module.exports = class Hotkeys
 				message += '<p><span class="keys"><kbd>' + event.hotkey +
 					'</kbd></span> <span>' + event.description + '</span></p>'
 			message += '</section>'
-		bootbox.dialog({
+		@bootboxOpen = true
+		bootbox.dialog {
 			title: 'Keyboard shortcuts'
 			message: message
-		})
+			buttons: {
+				success: {
+					label: 'Got it!'
+					className: "btn-primary"
+					callback: () =>
+						@bootboxOpen = false
+						return true
+				}
+			}
+		}
 
 	###
 	# @param {String} hotkey Event description of Mousescript

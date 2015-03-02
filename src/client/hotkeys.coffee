@@ -29,7 +29,7 @@ module.exports = class Hotkeys
 			buttons: {
 				success: {
 					label: 'Got it!'
-					className: "btn-primary"
+					className: 'btn-primary'
 					callback: () =>
 						@bootboxOpen = false
 						return true

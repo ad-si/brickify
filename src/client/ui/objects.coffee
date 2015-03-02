@@ -14,10 +14,6 @@ class UiObjects
 		@ui = @bundle.ui
 		@jqueryObject = $(jqueryString)
 		@_createBrushUi brushjQueryString
-		
-		# deactivated since build preview shows csg + variable amount of lego
-		# so there is no real need for these 'ugly eyes' (?)
-		#@_createVisibilityUi visibilityjQueryString
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -71,19 +67,6 @@ class UiObjects
 		for brush in @_brushList
 			brush.jqueryObject = @_createBrush brush
 			@brushContainer.append brush.jqueryObject
-
-	###
-	_createVisibilityUi: (visibilityjQueryString) =>
-		container = $(visibilityjQueryString)
-
-		htmlEmpty = "<div class='btn btn-primary'></div>"
-		for brush in @_brushList
-			if brush.canToggleVisibility
-				obj = @_createEyeButton brush
-			else
-				obj = $(htmlEmpty)
-			container.append obj
-	###
 
 	_createEyeButton: (brush) =>
 		htmlEye = "<div class='btn btn-default fa fa-eye'></div>"

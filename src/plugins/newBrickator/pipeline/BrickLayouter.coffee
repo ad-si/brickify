@@ -83,11 +83,13 @@ module.exports = class BrickLayouter
 	splitBricksAndRelayoutLocally: (oldBricks, brickGraph, grid) =>
 		# split up all bricks into single bricks
 		bricksToSplit = []
+
 		for brick in oldBricks
-			# stefanie said only to split the brick clicked on, so maybe
-			# remove the line below?
-			#bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
+			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
 			bricksToSplit.push brick
+
+		bricksToSplit = arrayHelper.removeDuplicates bricksToSplit
+
 		newBricks = @_splitBricks bricksToSplit, brickGraph
 
 		legoBricks = []

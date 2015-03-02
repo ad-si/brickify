@@ -149,25 +149,25 @@ module.exports = class BrickLayouter
 
 		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
-			0
+			Brick.direction.Xm
 			(obj) -> return obj.y
 			(obj) -> return obj.x
 		)
 		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
-			1
+			Brick.direction.Xp
 			(obj) -> return obj.y
 			(obj) -> return obj.x
 		)
 		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
-			2
+			Brick.direction.Ym
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
 		mergeableNeighbours.push @_findMergeableNeighboursInDirection(
 			brick
-			3
+			Brick.direction.Yp
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)

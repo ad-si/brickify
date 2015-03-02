@@ -60,14 +60,14 @@ module.exports = class BrickGraph
 	_connectToBrickXm: (brick, x, y, z) =>
 		return if not @_voxelExistsAndIsEnabled z, x - 1, y
 
-		brick.neighbours[0] = [@grid.zLayers[z][x - 1][y].brick]
-		@grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
+		brick.neighbours[Brick.direction.Xm] = [@grid.zLayers[z][x - 1][y].brick]
+		@grid.zLayers[z][x - 1][y].brick.neighbours[Brick.direction.Xp] = [brick]
 
 	_connectToBrickYm: (brick, x, y, z) =>
 		return if not @_voxelExistsAndIsEnabled z, x, y - 1
 		
-		brick.neighbours[2] = [@grid.zLayers[z][x][y - 1].brick]
-		@grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
+		brick.neighbours[Brick.direction.Ym] = [@grid.zLayers[z][x][y - 1].brick]
+		@grid.zLayers[z][x][y - 1].brick.neighbours[Brick.direction.Yp] = [brick]
 
 	forEachBrick: (callback) =>
 		for layer in @bricks
@@ -96,23 +96,23 @@ module.exports = class BrickGraph
 
 		#x-
 		if neighbourXm?
-			brick.neighbours[0].push neighbourXm
-			neighbourXm.neighbours[1].push brick
+			brick.neighbours[Brick.direction.Xm].push neighbourXm
+			neighbourXm.neighbours[Brick.direction.Xp].push brick
 
 		#x+
 		if neighbourXp?
-			brick.neighbours[1].push neighbourXp
-			neighbourXp.neighbours[0].push brick
+			brick.neighbours[Brick.direction.Xp].push neighbourXp
+			neighbourXp.neighbours[Brick.direction.Xm].push brick
 
 		#y-
 		if neighbourYm?
-			brick.neighbours[2].push neighbourYm
-			neighbourYm.neighbours[3].push brick
+			brick.neighbours[Brick.direction.Ym].push neighbourYm
+			neighbourYm.neighbours[Brick.direction.Yp].push brick
 
 		#y+
 		if neighbourYp?
-			brick.neighbours[3].push neighbourYp
-			neighbourYp.neighbours[2].push brick
+			brick.neighbours[Brick.direction.Yp].push neighbourYp
+			neighbourYp.neighbours[Brick.direction.Ym].push brick
 
 		# add upper / lower slots
 		upperBrick = @getBrickAt x, y, z + 1

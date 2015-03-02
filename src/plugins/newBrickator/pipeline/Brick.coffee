@@ -1,6 +1,14 @@
 module.exports = class Brick
 	@_nextBrickIndex = 0
 
+	# to replace magic numbers when using the @neighbours[] array
+	@direction = {
+		Xm: 0
+		Xp: 1
+		Ym: 2
+		Yp: 3
+	}
+
 	@getNextBrickIndex: () =>
 		return @_nextBrickIndex++
 
@@ -132,16 +140,16 @@ module.exports = class Brick
 		#check all four directions
 		if @position.x == mBrick.position.x
 			#take neighbour in direction 0 xm
-			@_replaceOldNeighbours mBrick, 0, 1
+			@_replaceOldNeighbours mBrick, Brick.direction.Xm, Brick.direction.Xp
 		if @position.y == mBrick.position.y
 			#take neighbour in direction 2 ym
-			@_replaceOldNeighbours mBrick, 2, 3
+			@_replaceOldNeighbours mBrick, Brick.direction.Ym, Brick.direction.Yp
 		if (@position.x + @size.x) == (mBrick.position.x + mBrick.size.x)
 			#take neighbour in direction 1 xp
-			@_replaceOldNeighbours mBrick, 1, 0
+			@_replaceOldNeighbours mBrick, Brick.direction.Xp, Brick.direction.Xm
 		if (@position.y + @size.y) == (mBrick.position.y + mBrick.size.y)
 			#take neighbour in direction 3 yp
-			@_replaceOldNeighbours mBrick, 3, 2
+			@_replaceOldNeighbours mBrick, Brick.direction.Yp, Brick.direction.Ym
 
 	_replaceOldNeighbours: (mBrick, dir, opp) =>
 		for neighbour in mBrick.neighbours[dir]
@@ -236,26 +244,30 @@ module.exports = class Brick
 				# update neighbours outside of splitting brick
 				if newBricks[x][y].position.x == @position.x
 					#take neighbour in direction 0 xm
-					@addNeighboursToNewBrick newBricks[x][y], 0, 1
+					@addNeighboursToNewBrick newBricks[x][y],
+					Brick.direction.Xm, Brick.direction.Xp
 				if newBricks[x][y].position.y == @position.y
 					#take neighbour in direction 2 ym
-					@addNeighboursToNewBrick newBricks[x][y], 2, 3
+					@addNeighboursToNewBrick newBricks[x][y],
+					Brick.direction.Ym, Brick.direction.Yp
 				if (newBricks[x][y].position.x + newBricks[x][y].size.x) ==
 				(@position.x + @size.x)
 					#take neighbour in direction 1 xp
-					@addNeighboursToNewBrick newBricks[x][y], 1, 0
+					@addNeighboursToNewBrick newBricks[x][y],
+					Brick.direction.Xp, Brick.direction.Xm
 				if (newBricks[x][y].position.y + newBricks[x][y].size.y) ==
 				(@position.y + @size.y)
 					#take neighbour in direction 3 yp
-					@addNeighboursToNewBrick newBricks[x][y], 3, 2
+					@addNeighboursToNewBrick newBricks[x][y],
+					Brick.direction.Yp, Brick.direction.Ym
 
 				# update neighbours inside the splitting brick
 				if x > 0
-					newBricks[x][y].neighbours[0].push newBricks[x - 1][y]
-					newBricks[x - 1][y].neighbours[1].push newBricks[x][y]
+					newBricks[x][y].neighbours[Brick.direction.Xm].push newBricks[x - 1][y]
+					newBricks[x - 1][y].neighbours[Brick.direction.Xp].push newBricks[x][y]
 				if y > 0
-					newBricks[x][y].neighbours[2].push newBricks[x][y - 1]
-					newBricks[x][y - 1].neighbours[3].push newBricks[x][y]
+					newBricks[x][y].neighbours[Brick.direction.Ym].push newBricks[x][y - 1]
+					newBricks[x][y - 1].neighbours[Brick.direction.Yp].push newBricks[x][y]
 
 		#remove this (old) brick from all neighbours
 		for neighbours in @neighbours
@@ -266,7 +278,7 @@ module.exports = class Brick
 		return [].concat.apply([], newBricks)
 
 	addNeighboursToNewBrick: (newBrick, direction, opposite) =>
-		if direction in [0,1]
+		if direction in [Brick.direction.Xm,Brick.direction.Xp]
 			minY = newBrick.position.y
 			maxY = newBrick.position.y + newBrick.size.y
 			for neighbour in @neighbours[direction]
@@ -275,7 +287,7 @@ module.exports = class Brick
 					newBrick.neighbours[direction].push neighbour
 					neighbour.neighbours[opposite].push newBrick
 
-		if direction in [2, 3]
+		if direction in [Brick.direction.Ym, Brick.direction.Yp]
 			minX = newBrick.position.x
 			maxX = newBrick.position.x + newBrick.size.x
 			for neighbour in @neighbours[direction]

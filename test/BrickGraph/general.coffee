@@ -59,22 +59,22 @@ describe 'BrickGraph', ->
 			for brick in zLayer
 
 				if brick.position.x > 0
-					n = brick.neighbours[0][0]
+					n = brick.neighbours[Brick.direction.Xm][0]
 					expect(n.position.x).to.equal(brick.position.x - 1)
 					expect(n.position.y).to.equal(brick.position.y)
 					expect(n.position.z).to.equal(brick.position.z)
 				if brick.position.x < grid.numVoxelsX - 1
-					n = brick.neighbours[1][0]
+					n = brick.neighbours[Brick.direction.Xp][0]
 					expect(n.position.x).to.equal(brick.position.x + 1)
 					expect(n.position.y).to.equal(brick.position.y)
 					expect(n.position.z).to.equal(brick.position.z)
 				if brick.position.y > 0
-					n = brick.neighbours[2][0]
+					n = brick.neighbours[Brick.direction.Ym][0]
 					expect(n.position.x).to.equal(brick.position.x)
 					expect(n.position.y).to.equal(brick.position.y - 1)
 					expect(n.position.z).to.equal(brick.position.z)
 				if brick.position.y < grid.numVoxelsY - 1
-					n = brick.neighbours[3][0]
+					n = brick.neighbours[Brick.direction.Yp][0]
 					expect(n.position.x).to.equal(brick.position.x)
 					expect(n.position.y).to.equal(brick.position.y + 1)
 					expect(n.position.z).to.equal(brick.position.z)

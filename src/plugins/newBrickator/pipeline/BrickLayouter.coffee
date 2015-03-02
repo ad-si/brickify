@@ -68,7 +68,7 @@ module.exports = class BrickLayouter
 						console.log 'splitting brick and relayouting'
 						console.log brick
 						neighbours = brick.uniqueNeighbours()
-						oldBricks = [].concat.apply([brick], neighbours)
+						oldBricks = neighbours.concat(brick)
 						@_splitBricksAndRelayout oldBricks, bricks
 
 		#console.log @_findWeakArticulationPoints bricks
@@ -87,9 +87,6 @@ module.exports = class BrickLayouter
 			#bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
 			bricksToSplit.push brick
 		newBricks = @_splitBricks bricksToSplit, brickGraph
-
-		#TODO: since not all voxels are enabled to be made to lego,
-		#some bricks have to be deleted
 
 		legoBricks = []
 		for brick in newBricks
@@ -111,10 +108,8 @@ module.exports = class BrickLayouter
 		newBricks = []
 
 		for brick in bricksToSplit
-			newBricks.push brick.split()
+			newBricks = newBricks.concat brick.split()
 			brickGraph.deleteBrick brick
-
-		newBricks = [].concat.apply([], newBricks)
 
 		for newBrick in newBricks
 			brickGraph.bricks[newBrick.position.z].push newBrick

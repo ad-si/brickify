@@ -25,6 +25,7 @@ module.exports = class BrickObject extends THREE.Object3D
 		return
 
 	setGridReference: (@gridEntry) =>
+		return unless @gridEntry
 		@gridEntry.visibleVoxel = @
 		return
 

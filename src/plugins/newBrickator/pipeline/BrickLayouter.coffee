@@ -31,7 +31,7 @@ module.exports = class BrickLayouter
 
 		return unless numTotalInitialBricks > 0
 
-		while(true) #only for debugging, should be while true
+		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
 				return {brickGraph: brickGraph}
@@ -44,9 +44,11 @@ module.exports = class BrickLayouter
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					console.log " - randomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
-					break # done with initial layout
+					# done with initial layout
+					break
 				else
-					continue # randomly choose a new brick
+					# randomly choose a new brick
+					continue
 
 			while(@_anyDefined(mergeableNeighbours))
 				mergeIndex = @_chooseNeighboursToMergeWith mergeableNeighbours

@@ -252,19 +252,14 @@ class NewBrickator
 
 	getHotkeys: =>
 		return {
-		title: 'Bricks'
-		events: [
-			{
-				hotkey: 's'
-				description: 'toggle stability view'
-				callback: @_toggleStabilityView
-			},
-			{
-				hotkey: 'l'
-				description: 'toggle Lego visibility'
-				callback: @_toggleBrickLayer
-			}
-		]
+			title: 'Bricks'
+			events: [
+				{
+					hotkey: 's'
+					description: 'toggle stability view'
+					callback: @_toggleStabilityView
+				}
+			]
 		}
 
 	_toggleStabilityView: (selectedNode) =>

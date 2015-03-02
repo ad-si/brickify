@@ -39,9 +39,9 @@ describe 'Brick', ->
 					console.log 'brick is in connectedBricks'
 					refs++
 
-				for nlist in brick.neighbours
-					for n in nlist
-						if n == brickToBeDeleted
+				for neighborList in brick.neighbours
+					for neighbor in neighborList
+						if neighbor == brickToBeDeleted
 							refs++
 
 		expect(refs).to.equal(0)

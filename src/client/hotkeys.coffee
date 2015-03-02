@@ -22,6 +22,9 @@ module.exports = class Hotkeys
 				message += '<p><span class="keys"><kbd>' + event.hotkey +
 					'</kbd></span> <span>' + event.description + '</span></p>'
 			message += '</section>'
+		callback = () =>
+			@bootboxOpen = false
+			return true
 		@bootboxOpen = true
 		bootbox.dialog {
 			title: 'Keyboard shortcuts'
@@ -30,11 +33,10 @@ module.exports = class Hotkeys
 				success: {
 					label: 'Got it!'
 					className: 'btn-primary'
-					callback: () =>
-						@bootboxOpen = false
-						return true
+					callback: callback
 				}
 			}
+			onEscape: callback
 		}
 
 	###

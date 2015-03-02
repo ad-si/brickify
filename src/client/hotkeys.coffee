@@ -32,7 +32,8 @@ module.exports = class Hotkeys
 	# @param {Function} callback Callback to be called when event is triggered
 	###
 	bind: (hotkey, titlegroup, description, callback) ->
-		Mousetrap.bind hotkey, => callback @sceneManager.selectedNode
+		Mousetrap.bind hotkey.toLowerCase(), => callback @sceneManager.selectedNode
+		Mousetrap.bind hotkey.toUpperCase(), => callback @sceneManager.selectedNode
 		if @events[titlegroup] is undefined
 			@events[titlegroup] = []
 		@events[titlegroup].push {hotkey: hotkey, description: description}

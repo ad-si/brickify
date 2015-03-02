@@ -1,5 +1,4 @@
 module.exports = class Brick
-
 	@nextBrickIndex = 0
 
 	@nextBrickIdx: () =>
@@ -27,6 +26,7 @@ module.exports = class Brick
 				@upperSlots[xx][yy] = false
 				@lowerSlots[xx][yy] = false
 
+		# x-, x+, y-, y+
 		@neighbours = [[], [], [], []]
 		return
 
@@ -38,6 +38,29 @@ module.exports = class Brick
 			[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
 			[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
 		]
+
+	# Removes references to this brick from this brick's neighbours/connections
+	removeSelfFromSurrounding: () =>
+		# delete from connected and neighbour bricks
+		connectedBricks = @uniqueNeighbours()
+		connectedBricks = connectedBricks.concat @uniqueConnectedBricks()
+
+		for connectedBrick in connectedBricks
+			connectedBrick.clearReferenceTo @
+
+	# Removes all references to the brickToBeRemoved from this brick
+	clearReferenceTo: (brickToBeRemoved) =>
+		for xi in [0...@size.x]
+			for yi in [0...@size.y]
+				if @upperSlots[xi][yi] == brickToBeRemoved
+					@upperSlots[xi][yi] = false
+				if @lowerSlots[xi][yi] == brickToBeRemoved
+					@lowerSlots[xi][yi] = false
+
+		for i in [0...@neighbours.length]
+			brickIndex = @neighbours[i].indexOf(brickToBeRemoved)
+			if brickIndex >= 0
+				@neighbours[i].splice(brickIndex,1)
 
 	uniqueConnectedBricks: () =>
 		upperBricks = Brick.uniqueBricksInSlots @upperSlots
@@ -244,8 +267,6 @@ module.exports = class Brick
 					@_removeFirstOccurenceFromArray @, neighbour.neighbours[i]
 
 		return [].concat.apply([], newBricks)
-
-
 
 	addNeighboursToNewBrick: (newBrick, direction, opposite) =>
 		if direction in [0,1]

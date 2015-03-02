@@ -1,7 +1,7 @@
 expect = require('chai').expect
-BrickLayouter = require '../../src/plugins/newBrickator/BrickLayouter'
-Brick = require '../../src/plugins/newBrickator/Brick'
-Grid = require '../../src/plugins/newBrickator/Grid'
+BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
+Brick = require '../../src/plugins/newBrickator/pipeline/Brick'
+Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'brickLayouter optimize', ->
 	baseBrick = {

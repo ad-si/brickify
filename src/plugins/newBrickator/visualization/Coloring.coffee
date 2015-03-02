@@ -25,6 +25,10 @@ module.exports = class Coloring
 			color: 0x00ff00
 		})
 
+		@csgMaterial = new THREE.MeshLambertMaterial({
+			color: 0xb5ffb8 #greenish gray
+		})
+
 		@_createBrickMaterials()
 
 	getMaterialForVoxel: (gridEntry) =>

@@ -1,18 +1,20 @@
 modelCache = require '../../client/modelCache'
-LegoPipeline = require './LegoPipeline'
+LegoPipeline = require './pipeline/LegoPipeline'
 THREE = require 'three'
-BrickVisualizer = require './BrickVisualizer'
 NodeVisualization = require './visualization/NodeVisualization'
-PipelineSettings = require './PipelineSettings'
+PipelineSettings = require './pipeline/PipelineSettings'
 objectTree = require '../../common/state/objectTree'
 THREE = require 'three'
-Brick = require './Brick'
+Brick = require './pipeline/Brick'
 meshlib = require('meshlib')
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
 jquery = require '.'
 
-module.exports = class NewBrickator
+###
+# @class NewBrickator
+###
+class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
 		@gridCache = {}
@@ -64,23 +66,59 @@ module.exports = class NewBrickator
 				grid: cachedData.grid
 			}
 			results = @pipeline.run data, settings, true
-
-			# show bricks
-			bricks = results.accumulatedResults.bricks
-			cachedData.visualization.updateBricks bricks
-			cachedData.visualization.showBricks()
-
-			# ToDo: this is a workaround which needs to be fixed in layouter
-			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
+			@_updateBricks cachedData, results.accumulatedResults.brickGraph
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
-		# instead of creating csg live, show original model semitransparent
-		solidRenderer = @bundle.getPlugin('solid-renderer')
-		if solidRenderer?
-			solidRenderer.setNodeMaterial selectedNode,
-				@printMaterial
+			# instead of creating csg live, show original model semitransparent
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			if solidRenderer?
+				solidRenderer.setNodeMaterial selectedNode,
+					@printMaterial
+					@_applyPrintVisibility cachedData
+
+	###
+	# If voxels have been selected as lego / as 3d print, the brick layout
+	# needs to be locally regenerated
+	# @param cachedData reference to cachedData
+	# @param {Array<BrickObject>} modifiedVoxels list of voxels that have
+	# been modified
+	# @param {Boolean} createBricks creates Bricks if a voxel has no associated
+	# brick. this happens when using the lego brush to create new bricks
+	###
+	relayoutModifiedParts: (cachedData, modifiedVoxels, createBricks = false) =>
+		modifiedBricks = []
+		for v in modifiedVoxels
+			if v.gridEntry.brick?
+				if modifiedBricks.indexOf(v.gridEntry.brick) < 0
+					modifiedBricks.push v.gridEntry.brick
+			else if createBricks
+				pos = v.voxelCoords
+				modifiedBricks.push cachedData.brickGraph.createBrick pos.x, pos.y, pos.z
+
+		settings = new PipelineSettings()
+		settings.onlyRelayout()
+		data = {
+			optimizedModel: cachedData.optimizedModel
+			grid: cachedData.grid
+			brickGraph: cachedData.brickGraph
+			modifiedBricks: modifiedBricks
+		}
+
+		results = @pipeline.run data, settings, true
+		@_updateBricks cachedData, results.accumulatedResults.brickGraph
+
+	# stores bricks in cached data, updates references in grid and updates
+	# brick visuals
+	_updateBricks: (cachedData, brickGraph) =>
+		cachedData.brickGraph = brickGraph
+
+		# update bricks and make voxel same colors as bricks
+		cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+		cachedData.visualization.updateVoxelVisualization()
+		cachedData.visualization.showVoxels()
+		@_applyVoxelAndBrickVisibility cachedData
+
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
 		modelTransform = @_getModelTransforms selectedNode
@@ -95,75 +133,6 @@ module.exports = class NewBrickator
 		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
 		return modelTransform
 
-	getThreeObjectsByNode: (node) =>
-		# search for subnode for this object
-		uuid = @getUuidByNode node
-		if uuid?
-			for threenode in @threejsRootNode.children
-				if threenode.uuid == uuid
-					return {
-						voxels: threenode.children[0]
-						bricks: threenode.children[1]
-						csg: threenode.children[2]
-					}
-
-		# create three sub-sub nodes, one for the voxels and one for the bricks,
-		# the last one for showing the csg
-		object = new THREE.Object3D()
-		@threejsRootNode.add object
-
-		voxelObject = new THREE.Object3D()
-		object.add voxelObject
-		brickObject = new THREE.Object3D()
-		object.add brickObject
-		csgObject = new THREE.Object3D()
-		object.add csgObject
-
-		node.pluginData.newBrickator = { threeObjectUuid: object.uuid }
-
-		return {
-			voxels: object.children[0]
-			bricks: object.children[1]
-			csg: object.children[2]
-		}
-
-	_forAllThreeObjects: (callback) =>
-		for threenode in @threejsRootNode.children
-			obj = {
-				voxels: threenode.children[0]
-				bricks: threenode.children[1]
-				csg: threenode.children[2]
-			}
-
-			callback obj
-
-
-	getUuidByNode: (node) =>
-		if node.pluginData.newBrickator?
-			return node.pluginData.newBrickator.threeObjectUuid
-		return null
-
-	getResultByNode: (node, grid, recompute) =>
-		identifier = node.pluginData.solidRenderer.threeObjectUuid
-		if recompute
-			settings = new PipelineSettings()
-			@_applyModelTransforms node, settings
-			settings.deactivateVoxelizing()
-
-			optimizedModel = @optimizedModelCache[node.meshHash]
-			if not optimizedModel
-				return
-
-			data = {
-				optimizedModel: optimizedModel
-				grid: grid.grid
-			}
-			###
-  		@resultCache not used anymore, REBUILD !!!
-			###
-			@resultCache[identifier] = @pipeline.run data, settings, true
-		return @resultCache[identifier]
-
 	getBrushes: () =>
 		return @brushHandler.getBrushes()
 
@@ -172,6 +141,13 @@ module.exports = class NewBrickator
 		return new Promise (resolve, reject) =>
 			identifier = @_getNodeIdentifier selectedNode
 			nodePosition = selectedNode.positionData.position
+
+			#check if the requested data is currently being created
+			if @gridCache[identifier]?.modelPromise?
+				# resolve after cached data has been created
+				@gridCache[identifier].modelPromise.then () =>
+					resolve @gridCache[identifier]
+				return
 
 			# cache is valid if object didn't move
 			if @gridCache[identifier]?
@@ -204,104 +180,29 @@ module.exports = class NewBrickator
 
 				# create datastructure
 				@gridCache[identifier] = {
-					grid: results.accumulatedResults.grid
-					bricks: results.accumulatedResults.bricks
+					node: selectedNode
+					grid: grid
 					optimizedModel: optimizedModel
 					threeNode: node
 					visualization: nodeVisualization
+					csgNeedsRecalculation: true
 					x: nodePosition.x
 					y: nodePosition.y
 					z: nodePosition.z
 				}
-
-				resolve(@gridCache[identifier])
+				resolve @gridCache[identifier]
 			modelPromise.catch (error) =>
 				reject error
 
-	_legoMouseDownCallback: (event, selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.legoMouseDown event, selectedNode, cachedData
-
-	_printMouseDownCallback: (event, selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.printMouseDown event, selectedNode, cachedData
-
-	_select3DMouseMoveCallback: (event, selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.printMouseMove event, selectedNode, cachedData
-
-	_selectLegoMouseMoveCallback: (event, selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.legoMouseMove event, selectedNode, cachedData
-
-	_legoMouseHoverCallback: (event, selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.legoMouseHover event, selectedNode, cachedData
-
-	_printMouseHoverCallback: (event, selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.printMouseHover event, selectedNode, cachedData
-
-	_brushMouseUpCallback: (event, selectedNode) =>
-		# hide grid, then legofy
-		@_getCachedData(selectedNode).then (cachedData) =>
-			@brushHandler.mouseUp event, selectedNode, cachedData
-
-			# legofy
-			settings = new PipelineSettings()
-			@_applyModelTransforms selectedNode, settings
-			settings.deactivateVoxelizing()
-
-			data = {
-				optimizedModel: cachedData.optimizedModel
-				grid: cachedData.grid
+			# while creating the cached data, store a reference to the promise
+			@gridCache[identifier] = {
+				modelPromise: modelPromise
 			}
-			results = @pipeline.run data, settings, true
-
-			threeNodes = @getThreeObjectsByNode selectedNode
-
-			@brickVisualizer ?= new BrickVisualizer()
-			@brickVisualizer.createVisibleBricks(
-				threeNodes.bricks,
-				results.accumulatedResults.bricks,
-				results.accumulatedResults.grid
-			)
-			threeNodes.bricks.visible = @_brickVisibility
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
-
-			#create quick CSG (without knobs) (todo: move to webWorker)
-			printThreeMesh = @_createCSG(selectedNode, cachedData, false, threeNodes.csg)
-
-			@brushHandler.afterPipelineUpdate selectedNode, cachedData
-
-	snapToGrid: (vec3) =>
-		@gridSpacing ?= (new PipelineSettings()).gridSpacing
-		snapCoord = (coord) =>
-			vec3[coord] =
-				Math.round(vec3[coord] / @gridSpacing[coord]) * @gridSpacing[coord]
-		snapCoord 'x'
-		snapCoord 'y'
-		snapCoord 'z'
-		return vec3
-
-	_applyBricksToGrid: (bricks, grid) =>
-		# updates references between voxel --> brick
-		for layer in bricks
-			for brick in layer
-				for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
-					for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
-						for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
-							voxel = grid.zLayers[z][x][y]
-							if voxel?
-								voxel.brick = brick
-							else
-								console.log "Brick without voxel at #{x},#{y},#{z}"
-								console.log brick
 
 	getDownload: (selectedNode) =>
 		dlPromise = new Promise (resolve) =>
 			@_getCachedData(selectedNode).then (cachedData) =>
-				detailedCsg = @_createCSG selectedNode, cachedData, true, null
+				detailedCsg = @_createCSG selectedNode, cachedData, true
 
 				optimizedModel = new meshlib.OptimizedModel()
 				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
@@ -316,31 +217,12 @@ module.exports = class NewBrickator
 
 		return dlPromise
 
-	getHotkeys: =>
-		return {
-		title: 'Bricks'
-		events: [
-			{
-				hotkey: 's'
-				description: 'toggle stability view'
-				callback: @_toggleStabilityView
-			},
-			{
-				hotkey: 'l'
-				description: 'toggle Lego visibility'
-				callback: =>
-					@_toggleBrickLayer()
-			}
-		]
-		}
+	_createCSG: (selectedNode, cachedData, addKnobs = true) =>
+		# return cached version if grid was not modified
+		if not cachedData.csgNeedsRecalculation
+			return cachedData.cachedCsg
+		cachedData.csgNeedsRecalculation = false
 
-	_toggleStabilityView: (selectedNode) =>
-		return if !selectedNode?
-		@_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.toggleStabilityView()
-			cachedData.visualization.showBricks()
-
-	_createCSG: (selectedNode, cachedData, addKnobs = true, csgThreeNode = null) =>
 		# get optimized model and transform to actual position
 		if not cachedData.optimizedThreeModel?
 			cachedData.optimizedThreeModel=
@@ -365,20 +247,83 @@ module.exports = class NewBrickator
 
 		printThreeMesh = @csgExtractor.extractGeometry(cachedData.grid, options)
 
+		cachedData.cachedCsg = printThreeMesh
 		return printThreeMesh
 
-	_toggleBrickLayer: () =>
-		@_brickVisibility = !@_brickVisibility
-		for k,v of @gridCache
-			if @_brickVisibility
-				v.visualization.showAll()
-			else
-				v.visualization.hideAll()
+	getHotkeys: =>
+		return {
+		title: 'Bricks'
+		events: [
+			{
+				hotkey: 's'
+				description: 'toggle stability view'
+				callback: @_toggleStabilityView
+			},
+			{
+				hotkey: 'l'
+				description: 'toggle Lego visibility'
+				callback: @_toggleBrickLayer
+			}
+		]
+		}
 
+	_toggleStabilityView: (selectedNode) =>
+		return if !selectedNode?
+		@_getCachedData(selectedNode).then (cachedData) =>
+			cachedData.visualization.toggleStabilityView()
+			cachedData.visualization.showBricks()
+
+	# makes bricks visible/invisible
+	_toggleBrickLayer: (isEnabled) =>
+		@_brickVisibility = isEnabled
+
+		for k,v of @gridCache
+			@_applyVoxelAndBrickVisibility v
+
+	_applyVoxelAndBrickVisibility: (cachedData) =>
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+
+		if @_brickVisibility
+			cachedData.visualization.showVoxelAndBricks()
+			# if bricks are shown, show whole model instead of csg (faster)
+			cachedData.visualization.hideCsg()
+			if solidRenderer? and @_printVisibility
+				solidRenderer.toggleNodeVisibility(cachedData.node, true)
+		else
+			# if bricks are hidden, csg has to be generated because
+			# the user would else see the whole original model
+			if @_printVisibility
+				csg = @_createCSG cachedData.node, cachedData, true
+				cachedData.visualization.showCsg(csg)
+			
+			if solidRenderer?
+				solidRenderer.toggleNodeVisibility(cachedData.node, false)
+			cachedData.visualization.hideVoxelAndBricks()
 
 	_togglePrintedLayer: (isEnabled) =>
 		@_printVisibility = isEnabled
-		# TODO implement for NodeVisualization
+
+		for k,v of @gridCache
+			@_applyPrintVisibility v
+			
+	_applyPrintVisibility: (cachedData) =>
+		solidRenderer = @bundle.getPlugin('solid-renderer')
+
+		if @_printVisibility
+			if @_brickVisibility
+				# show face csg (original model) when bricks are visible
+				cachedData.visualization.hideCsg()
+				if solidRenderer?
+					solidRenderer.toggleNodeVisibility(cachedData.node, true)
+			else
+				# show real csg
+				csg = @_createCSG cachedData.node, cachedData, true
+				cachedData.visualization.showCsg(csg)
+		else
+			cachedData.visualization.hideCsg()
+			if solidRenderer?
+				solidRenderer.toggleNodeVisibility(cachedData.node, false)
+
 
 	_getNodeIdentifier: (selectedNode) =>
 		if selectedNode.pluginData.newBrickator?.identifier?
@@ -444,44 +389,44 @@ module.exports = class NewBrickator
 
 	_enableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
-			#legofy
-			settings = new PipelineSettings()
-			settings.deactivateVoxelizing()
+			#hide brushes
+			@bundle.ui.objects.hideBrushContainer()
 
-			@_applyModelTransforms selectedNode, settings
-
-			data = {
-				optimizedModel: cachedData.optimizedModel
-				grid: cachedData.grid
-			}
-			results = @pipeline.run data, settings, true
-
-			# ToDo: this is a workaround which needs to be fixed in layouter
-			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
-
-			# show bricks
-			bricks = results.accumulatedResults.bricks
-			cachedData.visualization.updateBricks bricks
+			# show bricks and csg
 			cachedData.visualization.showBricks()
+
+			csg = @_createCSG cachedData.node, cachedData, true
+			cachedData.visualization.showCsg(csg)
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			if solidRenderer?
+					solidRenderer.toggleNodeVisibility(cachedData.node, false)
 
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
-			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length - 1)
+			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length)
 			@buildLayerUi.maxLayer.html(cachedData.grid.zLayers.length)
 			
-			@buildLayerUi.slider.val(0)
+			@buildLayerUi.slider.val(1)
 			@_updateBuildLayer selectedNode
 
 	_updateBuildLayer: (selectedNode) =>
 		layer = @buildLayerUi.slider.val()
-		@buildLayerUi.curLayer.html(Number(layer) + 1)
+		@buildLayerUi.curLayer.html(Number(layer))
 		@_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.showBrickLayer layer
+			cachedData.visualization.showBrickLayer layer - 1
 
 	_disableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
+
+			#show brushes
+			@bundle.ui.objects.showBrushContainer()
+			
+			# hide csg, show model, show voxels
+			cachedData.visualization.hideCsg()
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			if solidRenderer?
+					solidRenderer.toggleNodeVisibility(cachedData.node, true)
 			cachedData.visualization.showVoxels()
 
-
+module.exports = NewBrickator

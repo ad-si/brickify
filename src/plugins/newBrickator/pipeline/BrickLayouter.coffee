@@ -1,4 +1,6 @@
 Brick = require './Brick'
+BrickGraph = require './BrickGraph'
+arrayHelper = require './arrayHelper'
 
 module.exports = class BrickLayouter
 	constructor: (pseudoRandom = false) ->
@@ -8,78 +10,21 @@ module.exports = class BrickLayouter
 		return
 
 	initializeBrickGraph: (grid) =>
-		bricks = []
-		Brick.nextBrickIndex = 0
-		for z in [0..grid.numVoxelsZ - 1] by 1
-			bricks[z] = []
-
-		# create all bricks
-		for z in [0..grid.numVoxelsZ - 1] by 1
-			for x in [0..grid.numVoxelsX - 1] by 1
-				for y in [0..grid.numVoxelsY - 1] by 1
-
-					if grid.zLayers[z]?[x]?[y]?
-						if @_testVoxelExistsAndEnabled grid, z, x, y
-
-							# create brick
-							position = {x: x, y: y, z: z}
-							size = {x: 1,y: 1,z: 1}
-							brick = new Brick position, size
-							#brick.id = @nextBrickIdx()
-							grid.zLayers[z][x][y].brick = brick
-
-							@_connectToBrickBelow brick, x,y,z, grid
-							@_connectToBrickXm brick, x,y,z, grid
-							@_connectToBrickYm brick, x,y,z, grid
-
-							bricks[z].push brick
-
-		# remove references to bricks that will later become invalid
-		for z in [0..grid.numVoxelsZ - 1] by 1
-			for x in [0..grid.numVoxelsX - 1] by 1
-				for y in [0..grid.numVoxelsY - 1] by 1
-					if grid.zLayers[z]?[x]?[y]?
-						delete grid.zLayers[z][x][y].brick
-		# console.log bricks
-		return {bricks: bricks}
-
-	_connectToBrickBelow: (brick, x, y, z, grid) =>
-		if z > 0 and grid.zLayers[z - 1]?[x]?[y]? and
-		@_testVoxelExistsAndEnabled grid, z - 1, x, y
-			brickBelow = grid.zLayers[z - 1][x][y].brick
-			brick.lowerSlots[0][0] = brickBelow
-			brickBelow.upperSlots[0][0] = brick
-		return
-
-	_connectToBrickXm: (brick, x, y, z, grid) =>
-		if x > 0 and grid.zLayers[z]?[x - 1]?[y]? and
-		@_testVoxelExistsAndEnabled grid, z, x - 1, y
-			brick.neighbours[0] = [grid.zLayers[z][x - 1][y].brick]
-			grid.zLayers[z][x - 1][y].brick.neighbours[1] = [brick]
-		return
-
-	_connectToBrickYm: (brick, x, y, z, grid) =>
-		if y > 0 and grid.zLayers[z]?[x]?[y - 1]? and
-		@_testVoxelExistsAndEnabled grid, z, x, y - 1
-			brick.neighbours[2] = [grid.zLayers[z][x][y - 1].brick]
-			grid.zLayers[z][x][y - 1].brick.neighbours[3] = [brick]
-		return
-
-	_testVoxelExistsAndEnabled: (grid, z, x, y) =>
-		if (grid.zLayers[z][x][y] == false)
-			return false
-		return grid.zLayers[z][x][y].enabled == true
+		brickGraph = new BrickGraph(grid)
+		return {brickGraph: brickGraph}
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
-	layoutByGreedyMerge: (bricks, bricksToLayout) =>
+	layoutByGreedyMerge: (brickGraph, bricksToLayout) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
-		if !bricksToLayout?
-			bricksToLayout = bricks
+
+		if not bricksToLayout?
+			bricksToLayout = brickGraph.bricks
+
 		for layer in bricksToLayout
 			numTotalInitialBricks += layer.length
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
@@ -89,7 +34,8 @@ module.exports = class BrickLayouter
 		while(true) #only for debugging, should be while true
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
-				return {bricks: bricks}
+				return {brickGraph: brickGraph}
+
 			numRandomChoices++
 			mergeableNeighbours = @_findMergeableNeighbours brick
 
@@ -105,21 +51,19 @@ module.exports = class BrickLayouter
 			while(@_anyDefined(mergeableNeighbours))
 				mergeIndex = @_chooseNeighboursToMergeWith mergeableNeighbours
 				brick = @_mergeBricksAndUpdateGraphConnections brick,
-					mergeableNeighbours, mergeIndex, bricks, bricksToLayout
+					mergeableNeighbours, mergeIndex, brickGraph, bricksToLayout
 				mergeableNeighbours = @_findMergeableNeighbours brick
 
-		return {bricks: bricks}
-
+		return {brickGraph: brickGraph}
 
 	optimizeForStability: (bricks) =>
-
 		for layer in bricks # access removed element?
 			for brick in layer
 				if brick? and brick.uniqueConnectedBricks().length is 0
 					console.log brick
 					if brick.uniqueNeighbours().length is 0
 						0
-						#@_removeFirstOccurenceFromArray brick, bricks[brick.position.z]
+						#arrayHelper.removeFirstOccurenceFromArray brick, bricks[brick.position.z]
 					else
 						console.log 'splitting brick and relayouting'
 						console.log brick
@@ -134,43 +78,48 @@ module.exports = class BrickLayouter
 		@layoutByGreedyMerge bricks
 		return
 
-		###
-		maxIterations = 50
-		weakPointThreshold = 2
-		weakPoints = findWeakArticulationPointsInGraph bricks
-		for i in [0..maxIterations-1] by 1
-			for wp in weakPoints
-				newBricks = []
-				neighbours = []
-				for weakBrick in wp
-					neighbours.push findAllNeighbours weakBrick
-					newBricks.push @_splitBricks [].concat(weakBrick, neighbours), bricks
-
-					#split all neighbours
-					neighbours = removeDuplicates neighbours
-					for neighbour in neighbours
-						newBricks.push @_splitBricks [neighbour]
-
-			layoutByGreedyMerge newBricks
-
-			weakPoints = findWeakArticulationPointsInGraph bricks
-			if weakPoints.size is 0 # or not changing
-				break
-  ###
-
-		return bricks
-
-	splitBricksAndRelayoutLocally: (oldBricks, bricks) =>
+	splitBricksAndRelayoutLocally: (oldBricks, brickGraph, grid) =>
+		# split up all bricks into single bricks
 		bricksToSplit = []
 		for brick in oldBricks
-			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
+			# stefanie said only to split the brick clicked on, so maybe
+			# remove the line below?
+			#bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
 			bricksToSplit.push brick
-		newBricks = @_splitBricks bricksToSplit, bricks
-		@layoutByGreedyMerge bricks, [newBricks]
+		newBricks = @_splitBricks bricksToSplit, brickGraph
+
+		#TODO: since not all voxels are enabled to be made to lego,
+		#some bricks have to be deleted
+
+		legoBricks = []
+		for brick in newBricks
+			p = brick.position
+			if grid? and not grid.zLayers[p.z][p.x][p.y].enabled
+				# This voxel is going to be 3d printed --> delete brick
+				brickGraph.deleteBrick brick
+			else
+				legoBricks.push brick
+
+		@layoutByGreedyMerge brickGraph, [legoBricks]
+
 		return {
 			removedBricks: bricksToSplit
-			newBricks: newBricks
+			newBricks: legoBricks
 		}
+
+	_splitBricks: (bricksToSplit, brickGraph) =>
+		newBricks = []
+
+		for brick in bricksToSplit
+			newBricks.push brick.split()
+			brickGraph.deleteBrick brick
+
+		newBricks = [].concat.apply([], newBricks)
+
+		for newBrick in newBricks
+			brickGraph.bricks[newBrick.position.z].push newBrick
+
+		return newBricks
 
 	_anyDefined: (mergeableNeighbours) =>
 		boolean = false
@@ -246,7 +195,6 @@ module.exports = class BrickLayouter
 				length, brick.size.z)
 					return brick.neighbours[dir]
 
-
 	_chooseNeighboursToMergeWith: (mergeableNeighbours) =>
 		numConnections = []
 		for neighbours, i in mergeableNeighbours
@@ -254,7 +202,7 @@ module.exports = class BrickLayouter
 			if neighbours
 				for neighbour in neighbours
 					connectedBricks = connectedBricks.concat neighbour.uniqueConnectedBricks()
-				connectedBricks = removeDuplicates connectedBricks
+				connectedBricks = arrayHelper.removeDuplicates connectedBricks
 				numConnections[i] = connectedBricks.length
 
 		maxConnections = 0
@@ -270,7 +218,8 @@ module.exports = class BrickLayouter
 		return randomOfLargestIndices
 
 	_mergeBricksAndUpdateGraphConnections: (
-		brick, mergeableNeighbours, mergeIndex, bricks, bricksToLayout ) =>
+		brick, mergeableNeighbours, mergeIndex, brickGraph, bricksToLayout ) =>
+
 		mergeNeighbours = mergeableNeighbours[mergeIndex]
 
 		ps = brick.getPositionAndSizeForNewBrick mergeIndex, mergeNeighbours
@@ -289,36 +238,17 @@ module.exports = class BrickLayouter
 
 		# delete outdated bricks from bricks array
 		z = brick.position.z
-		@_removeFirstOccurenceFromArray brick, bricks[z]
+		arrayHelper.removeFirstOccurenceFromArray brick, brickGraph.bricks[z]
 		if bricksToLayout
-			@_removeFirstOccurenceFromArray brick, bricksToLayout[0]
+			arrayHelper.removeFirstOccurenceFromArray brick, bricksToLayout[0]
 		for neighbour in mergeNeighbours
-			@_removeFirstOccurenceFromArray neighbour, bricks[z]
+			arrayHelper.removeFirstOccurenceFromArray neighbour, brickGraph.bricks[z]
 			if bricksToLayout
-				@_removeFirstOccurenceFromArray neighbour, bricksToLayout[0]
+				arrayHelper.removeFirstOccurenceFromArray neighbour, bricksToLayout[0]
 
 		# add newBrick to bricks array
-		bricks[z].push newBrick
+		brickGraph.bricks[z].push newBrick
 		return newBrick
-
-	_removeFirstOccurenceFromArray: (object, array) =>
-		i = array.indexOf object
-		if i != -1
-			array.splice i, 1
-		return
-
-	# helper method, to be moved somewhere more appropriate
-	removeDuplicates = (array) ->
-		a = array.concat()
-		i = 0
-
-		while i < a.length
-			j = i + 1
-			while j < a.length
-				a.splice j--, 1  if a[i] is a[j]
-				++j
-			++i
-		return a
 
 	_getBiconnectedComponents: (bricks) =>
 		@index = 0
@@ -388,18 +318,3 @@ module.exports = class BrickLayouter
 						articulationPoints.push brick
 			else if otherBrick.parent != brick
 				brick.lowlink = Math.min brick.lowlink, otherBrick.discoveryTime
-
-	_splitBricks: (bricksToSplit, bricks) =>
-		newBricks = []
-
-		for brick in bricksToSplit
-			newBricks.push brick.split()
-			@_removeFirstOccurenceFromArray brick, bricks[brick.position.z]
-
-		newBricks = [].concat.apply([], newBricks)
-
-		for newBrick in newBricks
-			bricks[newBrick.position.z].push newBrick
-
-		return newBricks
-

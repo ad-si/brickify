@@ -181,8 +181,6 @@ module.exports = class Renderer
   # @memberOf Renderer
 	###
 	getGridPosition: (screenX, screenY) ->
-		# calculates the position on the z=0 plane in 3d space
-		# from given screen (mouse) coordinates
 		canvas = @threeRenderer.context.canvas
 
 		posInCanvas = new THREE.Vector3(

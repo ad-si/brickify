@@ -40,6 +40,7 @@ class UiSceneManager
 
 	select: (@selectedNode) =>
 		@pluginHooks.onNodeSelect @selectedNode
+		@bundle.ui.objects.onNodeSelect @selectedNode
 		return
 
 	deselect: =>

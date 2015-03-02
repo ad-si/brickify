@@ -14,12 +14,18 @@ module.exports  = class PipelineSettings
 		@modelTransform = null
 		@voxelizing = true
 		@layouting = true
+		@reLayout = false
 
 	deactivateLayouting: =>
 		@layouting = false
 
 	deactivateVoxelizing: =>
 		@voxelizing = false
+
+	onlyRelayout: =>
+		@deactivateVoxelizing()
+		@deactivateLayouting()
+		@reLayout = true
 
 	setGridSpacing: (x, y, z) =>
 		@gridSpacing.x = x

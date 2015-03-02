@@ -1,7 +1,8 @@
 expect = require('chai').expect
-BrickLayouter = require '../../src/plugins/newBrickator/BrickLayouter'
-Brick = require '../../src/plugins/newBrickator/Brick'
-Grid = require '../../src/plugins/newBrickator/Grid'
+BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
+Brick = require '../../src/plugins/newBrickator/pipeline/Brick'
+BrickGraph = require '../../src/plugins/newBrickator/pipeline/BrickGraph'
+Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'brickLayouter split', ->
 	it 'should split 1x1 brick & establish new neighbours and connections', ->
@@ -109,10 +110,12 @@ describe 'brickLayouter split', ->
 		layer2 = [brick7]
 		layer3 = [brick8, brick9, brickA, brickB]
 		bricks = [layer0, layer1, layer2, layer3]
+		brickGraph = new BrickGraph null, bricks
 
 		bricksToSplit = [brick5, brick7]
 
-		newBricks = brickLayouter._splitBricks bricksToSplit, bricks
+
+		newBricks = brickLayouter._splitBricks bricksToSplit, brickGraph
 
 		expect(newBricks.length).to.equal(6)
 
@@ -153,9 +156,13 @@ describe 'brickLayouter split', ->
 		brick1.neighbours = [[brick0], [brick2], [], []]
 		brick2.neighbours = [[brick1], [], [], []]
 		bricks = [[brick0, brick1, brick2]]
+		brickGraph = new BrickGraph null, bricks
+
 		bricksToSplit = brick1.uniqueNeighbours()
 		bricksToSplit.push brick1
-		newBricks = brickLayouter._splitBricks bricksToSplit, bricks
+
+		newBricks = brickLayouter._splitBricks bricksToSplit, brickGraph
+
 		expect(bricks[0]).to.eql(newBricks)
 		expect(newBricks).to.have.length(6)
 		for brick in bricks[0]
@@ -174,11 +181,14 @@ describe 'brickLayouter split', ->
 		brick1 = new Brick  {x: 1, y: 0, z: 0}, {x: 1, y: 1, z: 1}
 		brick2 = new Brick  {x: 2, y: 0, z: 0}, {x: 3, y: 1, z: 1}
 		bricks = [[brick0, brick1, brick2]]
+		brickGraph = new BrickGraph null, bricks
 
 		brick0.neighbours = [[], [brick1], [], []]
 		brick1.neighbours = [[brick0], [brick2], [], []]
 		brick2.neighbours = [[brick1], [], [], []]
-		brickLayouter.splitBricksAndRelayoutLocally [brick0], bricks
+		
+		brickLayouter.splitBricksAndRelayoutLocally [brick0], brickGraph
+	
 		expect(bricks[0]).to.have.length(2)
 		expect(bricks[0][0]).to.equal(brick2)
 		expect(bricks[0][1].position).to.eql({x: 0, y: 0, z: 0})

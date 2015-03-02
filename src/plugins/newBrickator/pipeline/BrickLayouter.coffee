@@ -189,27 +189,33 @@ module.exports = class BrickLayouter
 				length, brick.size.z)
 					return brick.neighbours[dir]
 
+	# Returns the index of the mergeableNeighbours sub-array,
+	# where the bricks have the most connected neighbours.
+	# If multiple sub-arrays have the same number of connected neigbours,
+	# one is randomly chosen
 	_chooseNeighboursToMergeWith: (mergeableNeighbours) =>
 		numConnections = []
+		maxConnections = 0
+
 		for neighbours, i in mergeableNeighbours
 			connectedBricks = []
-			if neighbours
-				for neighbour in neighbours
-					connectedBricks = connectedBricks.concat neighbour.uniqueConnectedBricks()
-				connectedBricks = arrayHelper.removeDuplicates connectedBricks
-				numConnections[i] = connectedBricks.length
+			continue if not neighbours
+			
+			for neighbour in neighbours
+				connectedBricks = connectedBricks.concat neighbour.uniqueConnectedBricks()
+			connectedBricks = arrayHelper.removeDuplicates connectedBricks
 
-		maxConnections = 0
-		largestIndices = []
-		for num, i in numConnections
-			if num > maxConnections
-				maxConnections = num
-		for num, i in numConnections
-			if num == maxConnections
-				largestIndices.push i
+			numConnections.push {
+				num: connectedBricks.length
+				index: i
+			}
+			maxConnections = Math.max maxConnections, connectedBricks.length
 
-		randomOfLargestIndices = largestIndices[@_random(largestIndices.length)]
-		return randomOfLargestIndices
+		largestConnections = numConnections.filter (element) ->
+			return element.num == maxConnections
+
+		randomOfLargest = largestConnections[@_random(largestConnections.length)]
+		return randomOfLargest.index
 
 	_mergeBricksAndUpdateGraphConnections: (
 		brick, mergeableNeighbours, mergeIndex, brickGraph, bricksToLayout ) =>

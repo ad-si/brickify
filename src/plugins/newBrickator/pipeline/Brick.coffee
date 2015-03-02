@@ -1,11 +1,8 @@
 module.exports = class Brick
-	@nextBrickIndex = 0
+	@_nextBrickIndex = 0
 
-	@nextBrickIdx: () =>
-		temp = @nextBrickIndex
-		@nextBrickIndex++
-		#console.log temp
-		return temp
+	@getNextBrickIndex: () =>
+		return @_nextBrickIndex++
 
 	constructor: (@position, @size) ->
 		# position always contains smallest x & smallest y
@@ -13,7 +10,7 @@ module.exports = class Brick
 		#initialize slots
 		@upperSlots = []
 		@lowerSlots = []
-		@id = Brick.nextBrickIdx()
+		@id = Brick.getNextBrickIndex()
 
 		#save old bricks for debugging, false = none, otherwise [] with bricks
 		@mergedNeighbours = false

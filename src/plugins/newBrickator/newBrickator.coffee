@@ -424,8 +424,7 @@ class NewBrickator
 			# hide csg, show model, show voxels
 			cachedData.visualization.hideCsg()
 			solidRenderer = @bundle.getPlugin('solid-renderer')
-			if solidRenderer?
-					solidRenderer.toggleNodeVisibility(cachedData.node, true)
+			solidRenderer?.toggleNodeVisibility cachedData.node, false
 			cachedData.visualization.showVoxels()
 
 module.exports = NewBrickator

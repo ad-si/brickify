@@ -68,18 +68,6 @@ class UiObjects
 			brush.jqueryObject = @_createBrush brush
 			@brushContainer.append brush.jqueryObject
 
-	_createEyeButton: (brush) =>
-		htmlEye = "<div class='btn btn-default fa fa-eye'></div>"
-		obj = $(htmlEye)
-		brush.visible = true
-		obj.on 'click', () =>
-			brush.visible = !brush.visible
-			obj
-			.toggleClass 'fa-eye', brush.visible
-			.toggleClass 'fa-eye-slash', !brush.visible
-			brush.visibilityCallback? brush.visible
-		return obj
-
 	_createUi: (structure) =>
 		name = structure.node.fileName
 

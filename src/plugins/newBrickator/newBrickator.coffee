@@ -398,8 +398,7 @@ class NewBrickator
 			csg = @_createCSG cachedData.node, cachedData, true
 			cachedData.visualization.showCsg(csg)
 			solidRenderer = @bundle.getPlugin('solid-renderer')
-			if solidRenderer?
-					solidRenderer.toggleNodeVisibility(cachedData.node, false)
+			solidRenderer?.toggleNodeVisibility cachedData.node, false
 
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)

@@ -69,7 +69,7 @@ class PointerDispatcher
 		if @isBrushing and brush.mouseMoveCallback?
 			brush.mouseMoveCallback event, @sceneManager.selectedNode
 			@_stop event
-		else if brush.mouseHoverCallback?
+		else if event.buttons is 0 and brush.mouseHoverCallback?
 			brush.mouseHoverCallback event, @sceneManager.selectedNode
 			@_stop event
 

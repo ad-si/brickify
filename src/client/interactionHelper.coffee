@@ -55,15 +55,18 @@ module.exports.getNode = getNode
 # @param {Number} event.pageY the y coordinate on the screen
 # @param {Renderer} renderer the renderer that provides the camera and canvas
 # @param {Array<Object>} objects the three nodes which take part in ray casting
-# @return {String|undefined} the name of the plugin
+# @param {Function} [filter] filter a filter function to ignore some plugins
+# @param {Plugin} filter.plugin a plugin to check for filtering
+# @return {Plugin|undefined} the name of the plugin
 # @memberOf interactionHelper
 ###
-getResponsiblePlugin = (event, renderer, objects) ->
+getResponsiblePlugin = (event, renderer, objects, filter = () -> true) ->
 	for intersection in getIntersections event, renderer, objects
 		object = intersection.object
 
 		while object?
-			return object.associatedPlugin if object.associatedPlugin?
+			plugin = object.associatedPlugin
+			return plugin if plugin? and filter plugin
 			object = object.parent
 
 	return undefined

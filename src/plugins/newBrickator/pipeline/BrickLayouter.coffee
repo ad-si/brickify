@@ -85,7 +85,10 @@ module.exports = class BrickLayouter
 		bricksToSplit = []
 
 		for brick in oldBricks
-			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
+			# ToDo: Refactor datastructure of everything.
+			# Relayouting with the line below takes up to 5 minutes for one voxel
+			#bricksToSplit = bricksToSplit.concat brick.uniqueNeighbours()
+			
 			bricksToSplit.push brick
 
 		bricksToSplit = arrayHelper.removeDuplicates bricksToSplit

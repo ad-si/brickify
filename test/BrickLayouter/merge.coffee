@@ -1,7 +1,7 @@
 expect = require('chai').expect
-BrickLayouter = require '../../src/plugins/newBrickator/BrickLayouter'
-Brick = require '../../src/plugins/newBrickator/Brick'
-Grid = require '../../src/plugins/newBrickator/Grid'
+BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
+Brick = require '../../src/plugins/newBrickator/pipeline/Brick'
+Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'brickLayouter merge', ->
 	baseBrick = {
@@ -18,14 +18,14 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 1, y: 0, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 
 		brick = bricks[0][0]
-		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick
 		expect(mergeableNeighbours[1][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
-		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick
 		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
 		done()
 
@@ -37,14 +37,14 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 0, y: 1, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 
 		brick = bricks[0][0]
-		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick
 		expect(mergeableNeighbours[3][0]).to.equal(bricks[0][1])
 
 		brick = bricks[0][1]
-		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick
 		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][0])
 		done()
 
@@ -59,10 +59,10 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 0, y: 1, z: 0}
 		grid.setVoxel {x: 2, y: 1, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 
 		brick = bricks[0][2]
-		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
+		mergeableNeighbours = brickLayouter._findMergeableNeighbours brick
 		expect(mergeableNeighbours[0][0]).to.equal(bricks[0][0])
 		expect(mergeableNeighbours[1][0]).to.equal(bricks[0][4])
 		expect(mergeableNeighbours[2][0]).to.equal(bricks[0][1])
@@ -76,7 +76,7 @@ describe 'brickLayouter merge', ->
 		grid.numVoxelsZ = 1
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 		connectedBricks = bricks[0][0].uniqueConnectedBricks()
 		expect(connectedBricks).to.have.length(0)
 
@@ -87,7 +87,7 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 0, y: 0, z: 1}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 		connectedBricks = bricks[0][0].uniqueConnectedBricks()
 		expect(connectedBricks).to.have.length(1)
 
@@ -99,7 +99,7 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 0, y: 0, z: 1}
 		grid.setVoxel {x: 0, y: 0, z: 2}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 		connectedBricks = bricks[1][0].uniqueConnectedBricks()
 		expect(connectedBricks).to.have.length(2)
 		done()
@@ -114,11 +114,11 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 2, y: 0, z: 0}
 		grid.setVoxel {x: 2, y: 0, z: 1}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
+		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 
 		brick = bricks[0][1]
 		for num in [1..10]
-			mergeableNeighbours = brickLayouter._findMergeableNeighbours brick, bricks
+			mergeableNeighbours = brickLayouter._findMergeableNeighbours brick
 			mergeDirection =
 				brickLayouter._chooseNeighboursToMergeWith mergeableNeighbours
 			expect(mergeableNeighbours[mergeDirection][0]).to.equal(bricks[0][2])
@@ -147,7 +147,7 @@ describe 'brickLayouter merge', ->
 			brick2
 			[[brick1], [], [], []]
 			0
-			bricks
+			{bricks: bricks}
 		)
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 2, y: 1, z: 1})
@@ -172,7 +172,7 @@ describe 'brickLayouter merge', ->
 			brick1
 			[[], [brick2], [], []]
 			1
-			bricks
+			{bricks: bricks}
 		)
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 2, y: 1, z: 1})
@@ -197,7 +197,7 @@ describe 'brickLayouter merge', ->
 			brick3
 			[[], [], [brick1], []]
 			2
-			bricks
+			{bricks: bricks}
 		)
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
@@ -222,7 +222,7 @@ describe 'brickLayouter merge', ->
 			brick1
 			[[], [], [], [brick3]]
 			3
-			bricks
+			{bricks: bricks}
 		)
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 0})
 		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
@@ -239,10 +239,12 @@ describe 'brickLayouter merge', ->
 		grid.numVoxelsZ = 1
 		grid.setVoxel {x: 5, y: 5, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
-		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
-		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
-		expect(bricksObject.bricks[0][0].size).to.eql({x: 1, y: 1, z: 1})
+
+		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
+		brickLayouter.layoutByGreedyMerge(brickGraph)
+	
+		expect(brickGraph.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
+		expect(brickGraph.bricks[0][0].size).to.eql({x: 1, y: 1, z: 1})
 		done()
 
 	it 'should merge two bricks 2x1', (done) ->
@@ -253,46 +255,13 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 5, y: 5, z: 0}
 		grid.setVoxel {x: 5, y: 6, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
-		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
-		expect(bricksObject.bricks[0]).to.have.length(1)
-		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
-		expect(bricksObject.bricks[0][0].size).to.eql({x: 1, y: 2, z: 1})
-		done()
+		
+		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
+		brickLayouter.layoutByGreedyMerge(brickGraph).brickGraph
 
-	it 'should merge two bricks 2x1 then 2x2 with neighbours', (done) ->
-		grid = new Grid(baseBrick)
-		grid.numVoxelsX = 10
-		grid.numVoxelsY = 10
-		grid.numVoxelsZ = 1
-		grid.setVoxel {x: 5, y: 5, z: 0}
-		grid.setVoxel {x: 5, y: 6, z: 0}
-		grid.setVoxel {x: 6, y: 5, z: 0}
-		grid.setVoxel {x: 6, y: 6, z: 0}
-		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
-		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
-			bricks[0][0]
-			bricks[0][0].neighbours
-			1
-			bricks
-		)
-		expect(newBrick.neighbours[0]).to.have.length(0)
-		expect(newBrick.neighbours[1]).to.have.length(0)
-		expect(newBrick.neighbours[2]).to.have.length(0)
-		expect(newBrick.neighbours[3]).to.have.length(2)
-		newBrick = brickLayouter._mergeBricksAndUpdateGraphConnections(
-			newBrick
-			newBrick.neighbours
-			3
-			bricks
-		)
-		expect(newBrick.neighbours[0]).to.have.length(0)
-		expect(newBrick.neighbours[1]).to.have.length(0)
-		expect(newBrick.neighbours[2]).to.have.length(0)
-		expect(newBrick.neighbours[3]).to.have.length(0)
-		expect(newBrick.position).to.eql({x: 5, y: 5, z: 0})
-		expect(newBrick.size).to.eql({x: 2, y: 2, z: 1})
+		expect(brickGraph.bricks[0]).to.have.length(1)
+		expect(brickGraph.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
+		expect(brickGraph.bricks[0][0].size).to.eql({x: 1, y: 2, z: 1})
 		done()
 
 	it 'should merge four bricks', (done) ->
@@ -304,28 +273,24 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 5, y: 6, z: 0}
 		grid.setVoxel {x: 6, y: 5, z: 0}
 		grid.setVoxel {x: 6, y: 6, z: 0}
-		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).bricks
-		bricksObject = brickLayouter.layoutByGreedyMerge(bricks)
-		expect(bricksObject.bricks[0]).to.have.length(1)
-		expect(bricksObject.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
-		expect(bricksObject.bricks[0][0].size).to.eql({x: 2, y: 2, z: 1})
-		done()
 
+		brickLayouter = new BrickLayouter()
+		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
+		brickLayouter.layoutByGreedyMerge(brickGraph)
+		
+		expect(brickGraph.bricks[0]).to.have.length(1)
+		expect(brickGraph.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
+		expect(brickGraph.bricks[0][0].size).to.eql({x: 2, y: 2, z: 1})
+		done()
 
 	it 'should have correct upperSlots/lowerSlots after merge', (done) ->
 		brickLayouter = new BrickLayouter()
-		brickLayouter.nextBrickIndex = 1
+		Brick._nextBrickIndex = 0
 		brick1 = new Brick {x: 0, y: 0, z: 1}, {x: 1, y: 1, z: 1}
-		brick1.id = brickLayouter.nextBrickIdx()
 		brick2 = new Brick {x: 0, y: 1, z: 1}, {x: 1, y: 1, z: 1}
-		brick2.id = brickLayouter.nextBrickIdx()
 		brick3 = new Brick {x: 0, y: 0, z: 2}, {x: 1, y: 2, z: 1}
-		brick3.id = brickLayouter.nextBrickIdx()
 		brick4 = new Brick {x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}
-		brick4.id = brickLayouter.nextBrickIdx()
 		brick5 = new Brick {x: 0, y: 1, z: 0}, {x: 1, y: 1, z: 1}
-		brick5.id = brickLayouter.nextBrickIdx()
 
 		brick1.neighbours[3].push brick2
 		brick2.neighbours[2].push brick1
@@ -350,12 +315,12 @@ describe 'brickLayouter merge', ->
 			brick1
 			brick1.neighbours
 			3
-			bricks
+			{bricks: bricks}
 		)
 
 		expect(newBrick.position).to.eql({x: 0, y: 0, z: 1})
 		expect(newBrick.size).to.eql({x: 1, y: 2, z: 1})
-		expect(newBrick.id).to.equal(6)
+		expect(newBrick.id).to.equal(5)
 		expect(newBrick.upperSlots[0][0].id).to.equal(brick3.id)
 		expect(newBrick.upperSlots[0][1].id).to.equal(brick3.id)
 		expect(newBrick.lowerSlots[0][0].id).to.equal(brick4.id)

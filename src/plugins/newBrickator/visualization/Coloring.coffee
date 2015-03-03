@@ -46,8 +46,24 @@ module.exports = class Coloring
 		if brick.visualizationMaterial?
 			return brick.visualizationMaterial
 
-		brick.visualizationMaterial = @_getRandomBrickMaterial()
+		# collect materials of neighbors
+		neighbors = brick.uniqueNeighbours()
+		neighborColors = neighbors.map (brick) ->
+			brick.visualizationMaterial
+
+		# try max. (brickMaterials.length) times to
+		# find a material that has not been used
+		# by neighbors to visually distinguish bricks
+		for i in [0...@_brickMaterials.length]
+			material = @_getRandomBrickMaterial()
+			continue if neighborColors.indexOf(material) >= 0
+			break
+
+		brick.visualizationMaterial = material
 		return brick.visualizationMaterial
+
+	getStabilityMaterialForBrick: (brick) =>
+		 @getMaterialForBrick brick
 
 	_getRandomBrickMaterial: () =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
@@ -64,9 +80,9 @@ module.exports = class Coloring
 		@_brickMaterials.push @_createMaterial 0xfe3939
 		@_brickMaterials.push @_createMaterial 0xfe4d4d
 
-	_createMaterial: (color) =>
+	_createMaterial: (color, opacity = 1) =>
 		return new THREE.MeshLambertMaterial({
 			color: color
-			#opacity: 0.8
-			#transparent: true
-			})
+			opacity: opacity
+			transparent: opacity < 1.0
+		})

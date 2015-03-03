@@ -1,6 +1,7 @@
 GeometryCreator = require './GeometryCreator'
 THREE = require 'three'
 Coloring = require './Coloring'
+StabilityColoring = require './StabilityColoring'
 interactionHelper = require '../../../client/interactionHelper'
 VoxelWireframe = require './VoxelWireframe'
 
@@ -20,12 +21,15 @@ module.exports = class NodeVisualization
 		@threeNode.add @voxelBrickSubnode
 
 		@defaultColoring = new Coloring()
+		@stabilityColoring = new StabilityColoring()
 		@geometryCreator = new GeometryCreator(@grid)
 
 		@currentlyTouchedVoxels = []
 		@modifiedVoxels = []
 
 		@solidRenderer = @bundle.getPlugin('solid-renderer')
+		@isStabilityView = false
+
 	showVoxels: () =>
 		@voxelsSubnode.visible = true
 		@bricksSubnode.visible = false
@@ -110,6 +114,12 @@ module.exports = class NodeVisualization
 		@updateBrickVisualization()
 		return
 
+	toggleStabilityView: () =>
+		@isStabilityView = !@isStabilityView
+		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
+		@updateBrickVisualization(coloring)
+		return
+
 	updateBrickVisualization: (coloring = @defaultColoring) =>
 		@bricksSubnode.children = []
 
@@ -164,6 +174,7 @@ module.exports = class NodeVisualization
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode) =>
 		voxel = @getVoxel event, selectedNode, false
+		
 		if voxel and not voxel.isLego()
 			voxel.makeLego()
 			voxel.visible = true
@@ -177,7 +188,9 @@ module.exports = class NodeVisualization
 		for v in @currentlyTouchedVoxels
 			@modifiedVoxels.push v
 
+		touchedVoxels = @currentlyTouchedVoxels.slice 0
 		@currentlyTouchedVoxels = []
+		return touchedVoxels
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>

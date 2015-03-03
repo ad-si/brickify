@@ -62,7 +62,7 @@ module.exports = class Ui
 		@sceneManager.init()
 
 	_initHotkeys: =>
-		@hotkeys = new Hotkeys(@pluginHooks)
+		@hotkeys = new Hotkeys(@pluginHooks, @sceneManager)
 		@hotkeys.addEvents @sceneManager.getHotkeys()
 
 		gridHotkeys = {

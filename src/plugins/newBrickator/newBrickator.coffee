@@ -1,17 +1,20 @@
 modelCache = require '../../client/modelCache'
-LegoPipeline = require './LegoPipeline'
+LegoPipeline = require './pipeline/LegoPipeline'
 THREE = require 'three'
 NodeVisualization = require './visualization/NodeVisualization'
-PipelineSettings = require './PipelineSettings'
+PipelineSettings = require './pipeline/PipelineSettings'
 objectTree = require '../../common/state/objectTree'
 THREE = require 'three'
-Brick = require './Brick'
-meshlib = require('meshlib')
+Brick = require './pipeline/Brick'
+meshlib = require 'meshlib'
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
 jquery = require '.'
 
-module.exports = class NewBrickator
+###
+# @class NewBrickator
+###
+class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
 		@gridCache = {}
@@ -63,16 +66,7 @@ module.exports = class NewBrickator
 				grid: cachedData.grid
 			}
 			results = @pipeline.run data, settings, true
-
-			# show bricks
-			bricks = results.accumulatedResults.bricks
-			cachedData.visualization.updateBricks bricks
-			cachedData.visualization.showBricks()
-			@_applyVoxelAndBrickVisibility cachedData
-
-			# ToDo: this is a workaround which needs to be fixed in layouter
-			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
+			@_updateBricks cachedData, results.accumulatedResults.brickGraph
 
 			@brushHandler.afterPipelineUpdate selectedNode, cachedData
 
@@ -81,7 +75,49 @@ module.exports = class NewBrickator
 			if solidRenderer?
 				solidRenderer.setNodeMaterial selectedNode,
 					@printMaterial
-				@_applyPrintVisibility cachedData
+					@_applyPrintVisibility cachedData
+
+	###
+	# If voxels have been selected as lego / as 3d print, the brick layout
+	# needs to be locally regenerated
+	# @param cachedData reference to cachedData
+	# @param {Array<BrickObject>} modifiedVoxels list of voxels that have
+	# been modified
+	# @param {Boolean} createBricks creates Bricks if a voxel has no associated
+	# brick. this happens when using the lego brush to create new bricks
+	###
+	relayoutModifiedParts: (cachedData, modifiedVoxels, createBricks = false) =>
+		modifiedBricks = []
+		for v in modifiedVoxels
+			if v.gridEntry.brick?
+				if modifiedBricks.indexOf(v.gridEntry.brick) < 0
+					modifiedBricks.push v.gridEntry.brick
+			else if createBricks
+				pos = v.voxelCoords
+				modifiedBricks.push cachedData.brickGraph.createBrick pos.x, pos.y, pos.z
+
+		settings = new PipelineSettings()
+		settings.onlyRelayout()
+		data = {
+			optimizedModel: cachedData.optimizedModel
+			grid: cachedData.grid
+			brickGraph: cachedData.brickGraph
+			modifiedBricks: modifiedBricks
+		}
+
+		results = @pipeline.run data, settings, true
+		@_updateBricks cachedData, results.accumulatedResults.brickGraph
+
+	# stores bricks in cached data, updates references in grid and updates
+	# brick visuals
+	_updateBricks: (cachedData, brickGraph) =>
+		cachedData.brickGraph = brickGraph
+
+		# update bricks and make voxel same colors as bricks
+		cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+		cachedData.visualization.updateVoxelVisualization()
+		cachedData.visualization.showVoxels()
+		@_applyVoxelAndBrickVisibility cachedData
 
 
 	_applyModelTransforms: (selectedNode, pipelineSettings) =>
@@ -163,20 +199,6 @@ module.exports = class NewBrickator
 				modelPromise: modelPromise
 			}
 
-	_applyBricksToGrid: (bricks, grid) =>
-		# updates references between voxel --> brick
-		for layer in bricks
-			for brick in layer
-				for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
-					for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
-						for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
-							voxel = grid.zLayers[z][x][y]
-							if voxel?
-								voxel.brick = brick
-							else
-								console.log "Brick without voxel at #{x},#{x},#{z}"
-
-
 	getDownload: (selectedNode) =>
 		dlPromise = new Promise (resolve) =>
 			@_getCachedData(selectedNode).then (cachedData) =>
@@ -227,6 +249,24 @@ module.exports = class NewBrickator
 
 		cachedData.cachedCsg = printThreeMesh
 		return printThreeMesh
+
+	getHotkeys: =>
+		return {
+			title: 'Bricks'
+			events: [
+				{
+					hotkey: 's'
+					description: 'toggle stability view'
+					callback: @_toggleStabilityView
+				}
+			]
+		}
+
+	_toggleStabilityView: (selectedNode) =>
+		return if !selectedNode?
+		@_getCachedData(selectedNode).then (cachedData) =>
+			cachedData.visualization.toggleStabilityView()
+			cachedData.visualization.showBricks()
 
 	# makes bricks visible/invisible
 	_toggleBrickLayer: (isEnabled) =>
@@ -292,19 +332,6 @@ module.exports = class NewBrickator
 
 		return identifier
 
-	getHotkeys: =>
-		return {
-			title: 'newBrickator'
-			events: [
-				{
-					hotkey: 'L'
-					description: 'toggle Lego visibility'
-					callback: =>
-						@_toggleBrickLayer()
-				}
-			]
-		}
-
 	_initBuildButton: () =>
 		# TODO: refactor after demo on 2015-02-26
 		@buildButton = $('#buildButton')
@@ -357,44 +384,42 @@ module.exports = class NewBrickator
 
 	_enableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
-			#legofy
-			settings = new PipelineSettings()
-			settings.deactivateVoxelizing()
+			#hide brushes
+			@bundle.ui.objects.hideBrushContainer()
 
-			@_applyModelTransforms selectedNode, settings
-
-			data = {
-				optimizedModel: cachedData.optimizedModel
-				grid: cachedData.grid
-			}
-			results = @pipeline.run data, settings, true
-
-			# ToDo: this is a workaround which needs to be fixed in layouter
-			# (apply changed bricks directly to grid)
-			@_applyBricksToGrid results.accumulatedResults.bricks, cachedData.grid
-
-			# show bricks
-			bricks = results.accumulatedResults.bricks
-			cachedData.visualization.updateBricks bricks
+			# show bricks and csg
 			cachedData.visualization.showBricks()
+
+			csg = @_createCSG cachedData.node, cachedData, true
+			cachedData.visualization.showCsg(csg)
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			solidRenderer?.toggleNodeVisibility cachedData.node, false
 
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
-			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length - 1)
+			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length)
 			@buildLayerUi.maxLayer.html(cachedData.grid.zLayers.length)
 			
-			@buildLayerUi.slider.val(0)
+			@buildLayerUi.slider.val(1)
 			@_updateBuildLayer selectedNode
 
 	_updateBuildLayer: (selectedNode) =>
 		layer = @buildLayerUi.slider.val()
-		@buildLayerUi.curLayer.html(Number(layer) + 1)
+		@buildLayerUi.curLayer.html(Number(layer))
 		@_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.showBrickLayer layer
+			cachedData.visualization.showBrickLayer layer - 1
 
 	_disableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
+
+			#show brushes
+			@bundle.ui.objects.showBrushContainer()
+			
+			# hide csg, show model, show voxels
+			cachedData.visualization.hideCsg()
+			solidRenderer = @bundle.getPlugin('solid-renderer')
+			solidRenderer?.toggleNodeVisibility cachedData.node, false
 			cachedData.visualization.showVoxels()
 
-
+module.exports = NewBrickator

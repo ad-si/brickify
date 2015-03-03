@@ -54,9 +54,7 @@ module.exports = class ModelLoader
 			node = objectTree.addChild state.rootNode
 			node.fileName = fileName
 			node.meshHash = hash
-			node.pluginData = {
-				uiGen: {selectedPluginKey: @bundle.globalConfig.defaultPlugin}
-			}
+			node.pluginData = { }
 
 			# align model to grid
 			@_alignModelToGrid node, optimizedModel

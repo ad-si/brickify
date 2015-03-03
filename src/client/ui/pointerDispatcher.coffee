@@ -41,7 +41,7 @@ class PointerDispatcher
 		return unless @sceneManager.selectedNode?
 		# ignore interaction with empty space or with the base plane
 		plugin = @_getResponsiblePluginFor event
-		return if not plugin or plugin.name in ['lego-board', 'coordinate-system']
+		return if not plugin
 
 		# we have a valid plugin -> we will handle this!
 		@_capturePointerFor event
@@ -121,6 +121,7 @@ class PointerDispatcher
 			event
 			@bundle.ui.renderer
 			@bundle.ui.renderer.scene.children
+			(plugin) -> plugin.name not in ['lego-board', 'coordinate-system']
 		)
 
 	_getNodeFor: (event) =>

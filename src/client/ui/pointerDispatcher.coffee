@@ -14,17 +14,21 @@ class PointerDispatcher
 		_registerEvent = (element, event) =>
 			element.addEventListener event.toLowerCase(), @['on' + event]
 
+		events = [
+			'PointerOver'
+			'PointerEnter'
+			'PointerDown'
+			'PointerMove'
+			'PointerUp'
+			'PointerCancel'
+			'PointerOut'
+			'PointerLeave'
+			'GotPointerCapture'
+			'LostPointerCapture'
+		]
+
 		element = @bundle.ui.renderer.getDomElement()
-		_registerEvent element, 'PointerOver'
-		_registerEvent element, 'PointerEnter'
-		_registerEvent element, 'PointerDown'
-		_registerEvent element, 'PointerMove'
-		_registerEvent element, 'PointerUp'
-		_registerEvent element, 'PointerCancel'
-		_registerEvent element, 'PointerOut'
-		_registerEvent element, 'PointerLeave'
-		_registerEvent element, 'GotPointerCapture'
-		_registerEvent element, 'LostPointerCapture'
+		_registerEvent element, event for event in events
 
 	onPointerOver: (event) =>
 		return

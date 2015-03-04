@@ -183,15 +183,15 @@ module.exports = class BrickLayouter
 		return mergeableNeighbours
 
 	_findMergeableNeighboursInDirection: (brick, dir, widthFn, lengthFn) =>
-		if brick.neighbours[dir].length > 0
+		if brick.neighbors[dir].length > 0
 			width = 0
-			for neighbour in brick.neighbours[dir]
+			for neighbour in brick.neighbors[dir]
 				width += widthFn neighbour.size
 			if width == widthFn(brick.size)
 				minWidth = widthFn brick.position
 				maxWidth = widthFn(brick.position) + widthFn(brick.size) - 1
-				length = lengthFn(brick.neighbours[dir][0].size)
-				for neighbour in brick.neighbours[dir]
+				length = lengthFn(brick.neighbors[dir][0].size)
+				for neighbour in brick.neighbors[dir]
 					if widthFn(neighbour.position) < minWidth
 						return
 					else if widthFn(neighbour.position) +
@@ -201,7 +201,7 @@ module.exports = class BrickLayouter
 						return
 				if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) +
 				length, brick.size.z)
-					return brick.neighbours[dir]
+					return brick.neighbors[dir]
 
 	# Returns the index of the mergeableNeighbours sub-array,
 	# where the bricks have the most connected neighbours.

@@ -28,7 +28,7 @@ describe 'BrickGraph', ->
 		for zLayer in bricks
 			expect(zLayer.length).to.equal(grid.numVoxelsX * grid.numVoxelsY)
 
-	it 'should initialize correct number of neighbours', () ->
+	it 'should initialize correct number of neighbors', () ->
 		brickLayouter = new BrickLayouter()
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 
@@ -49,7 +49,7 @@ describe 'BrickGraph', ->
 				actualNeighbours = brick.uniqueNeighbours().length
 				expect(actualNeighbours).to.equal(expectedNeighbours)
 
-	it 'should initialize correct references to neighbours', () ->
+	it 'should initialize correct references to neighbors', () ->
 		brickLayouter = new BrickLayouter()
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 
@@ -59,22 +59,22 @@ describe 'BrickGraph', ->
 			for brick in zLayer
 
 				if brick.position.x > 0
-					n = brick.neighbours[Brick.direction.Xm][0]
+					n = brick.neighbors[Brick.direction.Xm][0]
 					expect(n.position.x).to.equal(brick.position.x - 1)
 					expect(n.position.y).to.equal(brick.position.y)
 					expect(n.position.z).to.equal(brick.position.z)
 				if brick.position.x < grid.numVoxelsX - 1
-					n = brick.neighbours[Brick.direction.Xp][0]
+					n = brick.neighbors[Brick.direction.Xp][0]
 					expect(n.position.x).to.equal(brick.position.x + 1)
 					expect(n.position.y).to.equal(brick.position.y)
 					expect(n.position.z).to.equal(brick.position.z)
 				if brick.position.y > 0
-					n = brick.neighbours[Brick.direction.Ym][0]
+					n = brick.neighbors[Brick.direction.Ym][0]
 					expect(n.position.x).to.equal(brick.position.x)
 					expect(n.position.y).to.equal(brick.position.y - 1)
 					expect(n.position.z).to.equal(brick.position.z)
 				if brick.position.y < grid.numVoxelsY - 1
-					n = brick.neighbours[Brick.direction.Yp][0]
+					n = brick.neighbors[Brick.direction.Yp][0]
 					expect(n.position.x).to.equal(brick.position.x)
 					expect(n.position.y).to.equal(brick.position.y + 1)
 					expect(n.position.z).to.equal(brick.position.z)

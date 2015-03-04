@@ -39,7 +39,7 @@ describe 'Brick', ->
 					console.log 'brick is in connectedBricks'
 					refs++
 
-				for neighborList in brick.neighbours
+				for neighborList in brick.neighbors
 					for neighbor in neighborList
 						if neighbor == brickToBeDeleted
 							refs++

@@ -120,7 +120,7 @@ module.exports = class SolidRenderer
 		metaObject = new THREE.Object3D()
 		metaObject.name = metaObject.uuid
 		@latestAddedObject = metaObject
-		
+
 		metaObject.add object
 		metaObject.originalMesh = object
 
@@ -163,32 +163,6 @@ module.exports = class SolidRenderer
 				return obj
 		return null
 
-	_handleMouseDown: (event, selectedNode) =>
-		@mouseStartPosition =
-			@bundle.renderer.getGridPosition event.clientX, event.clientY
-
-		@originalObjectPosition = selectedNode.positionData.position
-
-	_handleMouseUp: (event, selectedNode) =>
-		@mouseStartPosition = null
-		return
-
-	_handleMouseMove: (event, selectedNode) =>
-		mouseCurrent = @bundle.renderer.getGridPosition event.clientX, event.clientY
-
-		newPosition = {
-			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
-			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
-			z: @originalObjectPosition.z
-		}
-
-		selectedNode.positionData.position = newPosition
-
-		pld = selectedNode.pluginData.solidRenderer
-
-		threeObject = @_getThreeObjectByName pld.threeObjectUuid
-		@_copyTransformDataToThree selectedNode, threeObject
-
 	toggleNodeVisibility: (node, visible) =>
 		setVisibility = () =>
 			obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
@@ -228,10 +202,11 @@ module.exports = class SolidRenderer
 		visibleObject.material.side = THREE.DoubleSide
 
 		intersects =
-			interactionHelper.getPolygonClickedOn(
+			interactionHelper.getIntersections(
 				event
+				@bundle.renderer
 				[visibleObject]
-				@bundle.renderer)
+			)
 
 		visibleObject.material.side = oldMaterialSide
 

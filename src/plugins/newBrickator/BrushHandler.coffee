@@ -6,27 +6,19 @@ module.exports = class BrushHandler
 
 	getBrushes: () =>
 		return [{
-			text: 'Make LEGO'
-			icon: 'legoBrush.png'
+			containerId: '#legoBrush'
 			selectCallback: @_legoSelect
 			mouseDownCallback: @_legoMouseDown
 			mouseMoveCallback: @_legoMouseMove
 			mouseHoverCallback: @_legoMouseHover
 			mouseUpCallback: @_legoMouseUp
-			canToggleVisibility: true
-			visibilityCallback: @newBrickator._toggleBrickLayer
-			tooltip: 'Select geometry to be made out of LEGO'
 		},{
-			text: 'Make 3D print'
-			icon: 'printBrush.png'
+			containerId: '#printBrush'
 			selectCallback: @_printSelect
 			mouseDownCallback: @_printMouseDown
 			mouseMoveCallback: @_printMouseMove
 			mouseHoverCallback: @_printMouseHover
 			mouseUpCallback: @_printMouseUp
-			canToggleVisibility: true
-			visibilityCallback: @newBrickator._togglePrintedLayer
-			tooltip: 'Select geometry to be 3d-printed'
 		}]
 
 	_checkAndPrepare: (selectedNode, callback) =>

@@ -126,9 +126,6 @@
 #	mouseMoveCallback: # after being pressed, when mouse is moved
 #	mouseHoverCallback: # when the mouse is moved, but not pressed
 #	mouseUpCallback: # when mouse is released
-#	canToggleVisibility: true # if true, the user can toggle visibility
-#	visibilityCallback: # called when the user changes visibility
-#	tooltip: ''
 # }
 #
 

@@ -65,8 +65,12 @@ class UiObjects
 		@brushContainer = $(brushjQueryString)
 
 		for brush in @_brushList
-			brush.jqueryObject = @_createBrush brush
-			@brushContainer.append brush.jqueryObject
+			htmlContainer = @brushContainer.find brush.containerId
+			brush.jqueryObject = htmlContainer
+			@_bindBrushEvent htmlContainer, brush
+			
+	_bindBrushEvent: (htmlContainer, brush) ->
+		htmlContainer.on 'click', () => @_brushSelect brush
 
 	_createUi: (structure) =>
 		name = structure.node.fileName
@@ -76,18 +80,6 @@ class UiObjects
 
 		structure.ui.on 'click', () =>
 			@_objectSelect(structure)
-
-	# creates a default brush with list entry
-	_createBrush: (brush) =>
-		string = "<div class='btn btn-primary'>
-								#{brush.text}<br>
-								<img src='img/#{brush.icon}' width='64' height='64' />
-							</div>"
-
-		htmlElement = $(string)
-		htmlElement.on 'click', () => @_brushSelect brush
-
-		return htmlElement
 
 	_objectSelect: (structure, sceneManagerEvent = false) =>
 		# Don't do anything when clicking on selected object

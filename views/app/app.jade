@@ -23,6 +23,13 @@ block body
 			a#cmdShare.fa.fa-share-alt(href="#", title="Share your work")
 		#controls.row
 			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
+				button.btn.btn-success.btn-block
+					| LOAD
+					br
+					| drop an stl file
+
+				h4 Edit
+
 				.panel.panel-default
 					.panel-heading
 						h4.panel-title.collapse-title(data-toggle='collapse'
@@ -39,12 +46,22 @@ block body
 						| Make 3D-print
 						br
 						img(src='img/printBrush.png' width=64 height=64)
-				br
-				button.btn.btn-success.btn-block#downloadButton
-					i.fa.fa-download
-					| &nbsp;
-					| Download for 3d printer
 
+				.row.twoButtonRow
+					.col-xs-6(style="padding-right: 2px")
+						.btn.btn-primary.btn-block
+							| Make everything
+							br 
+							| LEGO
+					.col-xs-6(style="padding-left: 2px")
+						.btn.btn-primary.btn-block
+							| Make everything
+							br
+							| 3D-print
+				h4 Preview
+
+				button.btn.btn-success.btn-block
+					| Check stability
 				button.btn.btn-success.btn-block#buildButton
 					| Show me how to build with LEGO
 				#buildContainer.hidden
@@ -57,6 +74,24 @@ block body
 					| &nbsp;
 					button.btn.btn-default.fa.fa-chevron-right#buildIncrement
 					input(type='range')#buildSlider
+
+				h4 Export
+
+				.row.twoButtonRow
+					.col-xs-6(style="padding-right: 2px")			
+						.btn.btn-primary.btn-block#downloadButton
+							| Download
+							br 
+							| stl
+							br
+							| for 3D printer							
+					.col-xs-6(style="padding-left: 2px")
+						.btn.btn-primary.btn-block
+							| Download
+							br
+							| pdf
+							br
+							| LEGO instructions
 
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
 		#webGlWarning

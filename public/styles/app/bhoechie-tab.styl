@@ -1,0 +1,49 @@
+.bhoechie-tab-container
+  z-index 10  
+  padding 0
+  border-radius 4px
+  border 1px solid $gray-dark
+  background-clip padding-box
+  background $gray-dark
+  
+.bhoechie-tab-menu
+  padding-right 0
+  padding-left 0
+  padding-bottom 0    
+  .list-group
+    margin-bottom 0
+    & > a
+      margin-bottom 0
+      &:first-child
+        border-top-right-radius 0
+      &:last-child
+        border-bottom-right-radius 0
+      &.active
+        &:after
+          content ''
+          position absolute
+          left 100%
+          top 50%
+          margin-top -13px
+          border-left 0
+          border-bottom 13px solid transparent
+          border-top 13px solid transparent
+          border-left 10px solid $gray-darker
+
+.bhoechie-tab-menu
+  .list-group-item
+    color #ffffff
+    background-color $gray-light
+    &.active
+      background-color $gray-darker
+      border-color $gray-darker
+  
+
+.bhoechie-tab-content
+  background-color $gray-dak
+  padding-left 20px
+  padding-top 10px
+
+
+.bhoechie-tab .bhoechie-tab-content:not(.active)
+  display none

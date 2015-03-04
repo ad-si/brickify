@@ -49,6 +49,9 @@ class PointerDispatcher
 		if clickedNode? and clickedNode != @sceneManager.selectedNode
 			@sceneManager.select clickedNode
 
+		# toggle brush if it is the right mouse button
+		@objects.toggleBrush() if(event.buttons & 2)
+
 		# perform brush action
 		@isBrushing = true
 		brush = @objects.getSelectedBrush()
@@ -83,6 +86,9 @@ class PointerDispatcher
 
 		# end brush action
 		if @isBrushing
+			# un-toggle brush if it is the right mouse button
+			@objects.toggleBrush() if(event.buttons & 2)
+
 			@isBrushing = false
 			brush = @objects.getSelectedBrush()
 			if brush? and brush.mouseUpCallback?
@@ -90,6 +96,8 @@ class PointerDispatcher
 
 	onPointerCancel: (event) =>
 		# Pointer capture will be implicitly released
+		# un-toggle brush if it is the right mouse button
+		@objects.toggleBrush() if(event.buttons & 2)
 		return
 
 	onPointerOut: (event) =>

@@ -74,3 +74,34 @@ Promise.resolve($.get '/share').then((link) ->
 		bundle.ui.hotkeys.showHelp()
 )
 
+$('#mmLoad').on 'change', () ->
+	$('.mmGroup').hide()
+
+	if this.checked
+		$('#mmLoadTarget').show()
+	else
+		$('#mmLoadTarget').hide()
+
+$('#mmEdit').on 'change', () ->
+	$('.mmGroup').hide()
+
+	if this.checked
+		$('#mmEditTarget').show()
+	else
+		$('#mmEditTarget').hide()
+
+$('#mmPreview').on 'change', () ->
+	$('.mmGroup').hide()
+	
+	if this.checked
+		$('#mmPreviewTarget').show()
+	else
+		$('#mmPreviewTarget').hide()
+
+$('#mmExport').on 'change', () ->
+	$('.mmGroup').hide()
+	
+	if this.checked
+		$('#mmExportTarget').show()
+	else
+		$('#mmExportTarget').hide()

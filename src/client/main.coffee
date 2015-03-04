@@ -74,34 +74,12 @@ Promise.resolve($.get '/share').then((link) ->
 		bundle.ui.hotkeys.showHelp()
 )
 
-$('#mmLoad').on 'change', () ->
-	$('.mmGroup').hide()
-
-	if this.checked
-		$('#mmLoadTarget').show()
-	else
-		$('#mmLoadTarget').hide()
-
-$('#mmEdit').on 'change', () ->
-	$('.mmGroup').hide()
-
-	if this.checked
-		$('#mmEditTarget').show()
-	else
-		$('#mmEditTarget').hide()
-
-$('#mmPreview').on 'change', () ->
-	$('.mmGroup').hide()
-	
-	if this.checked
-		$('#mmPreviewTarget').show()
-	else
-		$('#mmPreviewTarget').hide()
-
-$('#mmExport').on 'change', () ->
-	$('.mmGroup').hide()
-	
-	if this.checked
-		$('#mmExportTarget').show()
-	else
-		$('#mmExportTarget').hide()
+$(document).ready () ->
+	$('div.bhoechie-tab-menu>div.list-group>a').click (e) ->
+		e.preventDefault()
+		$(this).siblings('a.active').removeClass('active')
+		$(this).addClass('active')
+        
+		index = $(this).index()
+		$('div.bhoechie-tab>div.bhoechie-tab-content').removeClass('active')
+		$('div.bhoechie-tab>div.bhoechie-tab-content').eq(index).addClass('active')

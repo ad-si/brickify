@@ -22,104 +22,99 @@ block body
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
 			a#cmdShare.fa.fa-share-alt(href="#", title="Share your work")
 		#controls.row			
-			aside.col-lg-1.col-md-1.col-sm-1
-				.btn-group-vertical(role="group" data-toggle="buttons")					
-					label.btn.btn-primary.btn-block
-						input(type="radio")#mmLoad
-						| Load
-						br
-						img(src="img/mmLoad.png" width=64 height=64)
-					label.btn.btn-primary.btn-block
-						input(type="radio" checked)#mmEdit
-						| Edit
-						br
-						i.fa.fa-paint-brush(style="font-size: 4em;")
-					label.btn.btn-primary.btn-block
-						input(type="radio")#mmPreview
-						| Preview
-						br
-						i.fa.fa-eye(style="font-size: 4em;")
-					label.btn.btn-primary.btn-block
-						input(type="radio")#mmExport
-						| Export
-						br
-						i.fa.fa-download(style="font-size: 4em;")
-
-			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-				.mmGroup#mmLoadTarget
-					button.btn.btn-success.btn-block
-						| LOAD
-						br
-						| drop an stl file
-
-					br
-
-					.panel.panel-default
-						.panel-heading
-							h4.panel-title.collapse-title(data-toggle='collapse'
-								data-target='#collapseObjects') Objects
-						#collapseObjects.panel-collapse.collapse.in
-							.panel-body
-								ul#objectsContainer
-
-				.mmGroup#mmEditTarget
-					.btn-group.btn-group-justified(role='group')#brushContainer
-						.btn.btn-primary#legoBrush
-							| Make LEGO
+			.col-lg-3.col-md-3.col-sm-3.bhoechie-tab-container
+				.col-lg-3.col-md-3.col-sm-3.bhoechie-tab-menu
+					.list-group
+						a(href='#').list-group-item.active.text-center
+							h4 Load
 							br
-							img(src='img/legoBrush.png' width=64 height=64)
-						.btn.btn-primary#printBrush
-							| Make 3D-print
+							img(src="img/mmLoad.png" width=64 height=64)
+						a(href='#').list-group-item.text-center
+							h4 Edit
 							br
-							img(src='img/printBrush.png' width=64 height=64)
+							i.fa.fa-paint-brush(style="font-size: 4em;")
+						a(href='#').list-group-item.text-center
+							h4 Preview
+							br
+							i.fa.fa-eye(style="font-size: 4em;")
+						a(href='#').list-group-item.text-center
+							h4 Export
+							br
+							i.fa.fa-download(style="font-size: 4em;")
 
-					.row.twoButtonRow
-						.col-xs-6(style="padding-right: 2px")
-							.btn.btn-primary.btn-block
-								| Make everything
-								br 
-								| LEGO
-						.col-xs-6(style="padding-left: 2px")
-							.btn.btn-primary.btn-block
-								| Make everything
-								br
-								| 3D-print
+				.col-lg-9.col-md-9.col-sm-9.bhoechie-tab
+					.bhoechie-tab-content.active
+						button.btn.btn-success.btn-block
+							| LOAD
+							br
+							| drop an stl file
 
-				.mmGroup#mmPreviewTarget
-					button.btn.btn-success.btn-block
-						| Check stability
-					button.btn.btn-success.btn-block#buildButton
-						| Show me how to build with LEGO
-					#buildContainer.hidden
 						br
-						button.btn.btn-default.fa.fa-chevron-left#buildDecrement
-						| &nbsp;Showing Layer&nbsp;
-						span#currentBuildLayer 1
-						| &nbsp;of&nbsp;
-						span#maxBuildLayer 0
-						| &nbsp;
-						button.btn.btn-default.fa.fa-chevron-right#buildIncrement
-						input(type='range')#buildSlider
 
+						.panel.panel-default
+							.panel-heading
+								h4.panel-title.collapse-title(data-toggle='collapse'
+									data-target='#collapseObjects') Objects
+							#collapseObjects.panel-collapse.collapse.in
+								.panel-body
+									ul#objectsContainer
 
-				.mmGroup#mmExportTarget
-					.row.twoButtonRow
-						.col-xs-6(style="padding-right: 2px")			
-							.btn.btn-primary.btn-block#downloadButton
-								| Download
-								br 
-								| stl
+					.bhoechie-tab-content
+						.btn-group.btn-group-justified(role='group')#brushContainer
+							.btn.btn-primary#legoBrush
+								| Make LEGO
 								br
-								| for 3D printer							
-						.col-xs-6(style="padding-left: 2px")
-							.btn.btn-primary.btn-block
-								| Download
+								img(src='img/legoBrush.png' width=64 height=64)
+							.btn.btn-primary#printBrush
+								| Make 3D-print
 								br
-								| pdf
-								br
-								| LEGO instructions
+								img(src='img/printBrush.png' width=64 height=64)
 
-			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
+						.row.twoButtonRow
+							.col-xs-6(style="padding-right: 2px")
+								.btn.btn-primary.btn-block
+									| Make everything
+									br 
+									| LEGO
+							.col-xs-6(style="padding-left: 2px")
+								.btn.btn-primary.btn-block
+									| Make everything
+									br
+									| 3D-print
+
+					.bhoechie-tab-content
+						button.btn.btn-success.btn-block
+							| Check stability
+						button.btn.btn-success.btn-block#buildButton
+							| Show me how to build with LEGO
+						#buildContainer.hidden
+							br
+							button.btn.btn-default.fa.fa-chevron-left#buildDecrement
+							| &nbsp;Showing Layer&nbsp;
+							span#currentBuildLayer 1
+							| &nbsp;of&nbsp;
+							span#maxBuildLayer 0
+							| &nbsp;
+							button.btn.btn-default.fa.fa-chevron-right#buildIncrement
+							input(type='range')#buildSlider
+
+					.bhoechie-tab-content
+						.row.twoButtonRow
+							.col-xs-6(style="padding-right: 2px")			
+								.btn.btn-primary.btn-block#downloadButton
+									| Download
+									br 
+									| stl
+									br
+									| for 3D printer							
+							.col-xs-6(style="padding-left: 2px")
+								.btn.btn-primary.btn-block
+									| Download
+									br
+									| pdf
+									br
+									| LEGO instructions
+
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?
 				= ' '

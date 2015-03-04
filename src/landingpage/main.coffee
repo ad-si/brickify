@@ -25,6 +25,9 @@ globalConfig.plugins.legoBoard = false
 globalConfig.plugins.solidRenderer = true
 globalConfig.plugins.newBrickator = true
 
+# disable wireframe on landinpage
+globalConfig.createVisibleWireframe = false
+
 # clone global config 2 times
 config1 = clone globalConfig
 config2 = clone globalConfig

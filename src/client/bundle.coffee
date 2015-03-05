@@ -9,14 +9,14 @@ ObjectTree = require '../common/state/objectTree'
 # @class Bundle
 ###
 module.exports = class Bundle
-	constructor: (@globalConfig, controls) ->
+	constructor: (@globalConfig, @controls) ->
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 
 		@statesync = new Statesync(@)
 		@modelLoader = new ModelLoader(@)
 
-		@renderer = new Renderer(@pluginHooks, @globalConfig, controls)
+		@renderer = new Renderer(@pluginHooks, @globalConfig)
 
 	init: =>
 		@statesync
@@ -26,6 +26,7 @@ module.exports = class Bundle
 				if @globalConfig.buildUi
 					@ui = new Ui(@)
 					@ui.init()
+				@renderer.setupControls @globalConfig, @controls
 				@statesync.handleUpdatedState()
 			.then(@load)
 			.then () =>

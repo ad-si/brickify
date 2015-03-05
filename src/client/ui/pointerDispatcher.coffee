@@ -158,6 +158,7 @@ class PointerDispatcher
 
 	_stop: (event) =>
 		event.stopPropagation()
+		event.stopImmediatePropagation()
 		event.preventDefault()
 
 	_getResponsiblePluginFor: (event) =>

@@ -77,6 +77,11 @@ class PointerDispatcher
 		# don't call mouse events if there is no selected node
 		return unless @sceneManager.selectedNode?
 
+		if event.buttons not in
+		[BUTTON_STATES.none, BUTTON_STATES.left, BUTTON_STATES.right]
+			@_cancelBrush event
+			return
+
 		# perform brush action
 		brush = @objects.getSelectedBrush()
 		return unless brush?
@@ -104,17 +109,12 @@ class PointerDispatcher
 				brush.mouseUpCallback event, @sceneManager.selectedNode
 
 			@_untoggleBrush()
+		return
 
 	onPointerCancel: (event) =>
 		# Pointer capture will be implicitly released
 
-		if @isBrushing
-			@isBrushing = false
-			brush = @objects.getSelectedBrush()
-			if brush? and brush.cancelCallback?
-				brush.cancelCallback event, @sceneManager.selectedNode
-
-			@_untoggleBrush()
+		@_cancelBrush event
 		return
 
 	onPointerOut: (event) =>
@@ -141,10 +141,20 @@ class PointerDispatcher
 		# this event sometimes interferes with right clicks
 		@_stop event
 
-	_untoggleBrush: () =>
+	_untoggleBrush: =>
 		if @brushToggled
 			@objects.toggleBrush()
 			@brushToggled = false
+
+	_cancelBrush: (event) =>
+		if @isBrushing
+			@isBrushing = false
+			brush = @objects.getSelectedBrush()
+			if brush? and brush.cancelCallback?
+				brush.cancelCallback event, @sceneManager.selectedNode
+
+			@_untoggleBrush()
+			@_stop event
 
 	_stop: (event) =>
 		event.stopPropagation()

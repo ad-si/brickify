@@ -23,7 +23,8 @@ block body
 			a#cmdShare.fa.fa-share-alt(href="#", title="Share your work")
 		#controls.row
 			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-				button.btn.btn-success.btn-block
+				label.btn.btn-success.btn-block#loadButton
+					input(type='file' accept='.stl' style='display: none')
 					| LOAD
 					br
 					| drop an stl file
@@ -33,7 +34,7 @@ block body
 				.panel.panel-default
 					.panel-heading
 						h4.panel-title.collapse-title(data-toggle='collapse'
-							data-target='#collapseObjects') Objects
+							data-target='#collapseObjects') Objects loaded
 					#collapseObjects.panel-collapse.collapse.in
 						.panel-body
 							ul#objectsContainer

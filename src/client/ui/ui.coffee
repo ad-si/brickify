@@ -17,7 +17,7 @@ module.exports = class Ui
 		@mouseDispatcher = new MouseDispatcher(@bundle)
 		@downloadProvider = new DownloadProvider(@bundle)
 
-	dropHandler: (event) ->
+	fileLoadHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
@@ -49,11 +49,14 @@ module.exports = class Ui
 			@dragOverHandler.bind @
 			false
 		)
+
 		@renderer.getDomElement().addEventListener(
 			'drop'
-			@dropHandler.bind @
+			@fileLoadHandler.bind @
 			false
 		)
+		$('#loadButton').on 'change', (event) =>
+			@fileLoadHandler event
 
 		window.addEventListener(
 			'resize',

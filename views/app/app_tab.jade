@@ -22,26 +22,44 @@ block body
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
 			a#cmdShare.fa.fa-share-alt(href="#", title="Share your work")
 		#controls.row
-			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-				button.btn.btn-success.btn-block
-					| LOAD
-					br
-					| drop an stl file
+			.col-lg-3.col-md-5.col-sm-6.bhoechie-tab-container
+				.col-lg-3.col-md-3.col-sm-3.bhoechie-tab-menu
+					.list-group
+						a(href='#').list-group-item.text-center
+							h4 Load
+							br
+							img(src="img/mmLoad.png" width=64 height=64)
+						a(href='#').list-group-item.active.text-center
+							h4 Edit
+							br
+							i.fa.fa-paint-brush(style="font-size: 3.5em;")
+						a(href='#').list-group-item.text-center
+							h4 Preview
+							br
+							i.fa.fa-eye(style="font-size: 3.5em;")
+						a(href='#').list-group-item.text-center
+							h4 Export
+							br
+							i.fa.fa-download(style="font-size: 3.5em;")
 
-				br
+				.col-lg-9.col-md-9.col-sm-9.bhoechie-tab
+					.bhoechie-tab-content
+						button.btn.btn-success.btn-block
+							| LOAD
+							br
+							| drop an stl file
 
-				.panel.panel-default
-					.panel-heading
-						h4.panel-title.collapse-title(data-toggle='collapse'
-							data-target='#collapseObjects') Objects
-					#collapseObjects.panel-collapse.collapse.in
-						.panel-body
-							ul#objectsContainer
+						br
 
-				.panel.panel-default
-					.panel-heading
-						h4.panel-title Edit
-					.panel-body
+						.panel.panel-default
+							.panel-heading
+								h4.panel-title.collapse-title(data-toggle='collapse'
+									data-target='#collapseObjects') Objects
+							#collapseObjects.panel-collapse.collapse.in
+								.panel-body
+									ul#objectsContainer
+
+					.bhoechie-tab-content.active
 						.btn-group.btn-group-justified(role='group')#brushContainer
 							.btn.btn-primary#legoBrush
 								| Make LEGO
@@ -63,11 +81,8 @@ block body
 									| Make everything
 									br
 									| 3D-print
-				
-				.panel.panel-default
-					.panel-heading
-						h4.panel-title Preview
-					.panel-body					
+
+					.bhoechie-tab-content
 						button.btn.btn-success.btn-block
 							| Check stability
 						button.btn.btn-success.btn-block#buildButton
@@ -83,13 +98,9 @@ block body
 							button.btn.btn-default.fa.fa-chevron-right#buildIncrement
 							input(type='range')#buildSlider
 
-				
-				.panel.panel-default
-					.panel-heading
-						h4.panel-title Export
-					.panel-body
+					.bhoechie-tab-content
 						.row.twoButtonRow
-							.col-xs-6(style="padding-right: 2px")			
+							.col-xs-6(style="padding-right: 2px")
 								.btn.btn-primary.btn-block#downloadButton
 									| Download
 									br 
@@ -104,7 +115,6 @@ block body
 									br
 									| LEGO instructions
 
-			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?
 				= ' '

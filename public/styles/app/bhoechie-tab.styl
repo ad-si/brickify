@@ -28,14 +28,15 @@
           border-left 0
           border-bottom 13px solid transparent
           border-top 13px solid transparent
-          border-left 10px solid $gray-darker
+          border-left 10px solid darken($gray-light, 15%)
 
 .bhoechie-tab-menu
   .list-group-item
     color #ffffff
     background-color $gray-light
     &.active
-      background-color $gray-darker
+      background-color darken($gray-light, 15%)
+      box-shadow inset 10px 0 20px 0px $gray-darker
       border-color $gray-darker
   
 

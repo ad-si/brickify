@@ -283,7 +283,7 @@ class NewBrickator
 			# if bricks are shown, show whole model instead of csg (faster)
 			cachedData.visualization.hideCsg()
 			if solidRenderer? and @_printVisibility
-				solidRenderer.toggleNodeVisibility(cachedData.node, true)
+				solidRenderer.setNodeVisibility(cachedData.node, true)
 		else
 			# if bricks are hidden, csg has to be generated because
 			# the user would else see the whole original model
@@ -292,7 +292,7 @@ class NewBrickator
 				cachedData.visualization.showCsg(csg)
 			
 			if solidRenderer?
-				solidRenderer.toggleNodeVisibility(cachedData.node, false)
+				solidRenderer.setNodeVisibility(cachedData.node, false)
 			cachedData.visualization.hideVoxelAndBricks()
 
 	_togglePrintedLayer: (isEnabled) =>
@@ -309,7 +309,7 @@ class NewBrickator
 				# show face csg (original model) when bricks are visible
 				cachedData.visualization.hideCsg()
 				if solidRenderer?
-					solidRenderer.toggleNodeVisibility(cachedData.node, true)
+					solidRenderer.setNodeVisibility(cachedData.node, true)
 			else
 				# show real csg
 				csg = @_createCSG cachedData.node, cachedData, true
@@ -317,7 +317,7 @@ class NewBrickator
 		else
 			cachedData.visualization.hideCsg()
 			if solidRenderer?
-				solidRenderer.toggleNodeVisibility(cachedData.node, false)
+				solidRenderer.setNodeVisibility(cachedData.node, false)
 
 
 	_getNodeIdentifier: (selectedNode) =>
@@ -393,7 +393,7 @@ class NewBrickator
 			csg = @_createCSG cachedData.node, cachedData, true
 			cachedData.visualization.showCsg(csg)
 			solidRenderer = @bundle.getPlugin('solid-renderer')
-			solidRenderer?.toggleNodeVisibility cachedData.node, false
+			solidRenderer?.setNodeVisibility cachedData.node, false
 
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
@@ -419,7 +419,7 @@ class NewBrickator
 			# hide csg, show model, show voxels
 			cachedData.visualization.hideCsg()
 			solidRenderer = @bundle.getPlugin('solid-renderer')
-			solidRenderer?.toggleNodeVisibility cachedData.node, true
+			solidRenderer?.setNodeVisibility cachedData.node, true
 			cachedData.visualization.showVoxels()
 
 module.exports = NewBrickator

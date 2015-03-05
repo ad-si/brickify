@@ -11,7 +11,6 @@ LineMatGenerator = require '../newBrickator/visualization/LineMatGenerator'
 interactionHelper = require '../../client/interactionHelper'
 
 module.exports = class SolidRenderer
-
 	init: (@bundle) ->
 		@globalConfig = @bundle.globalConfig
 		@loadedModelsNodes = []
@@ -90,42 +89,43 @@ module.exports = class SolidRenderer
 		)
 		object = new THREE.Mesh(geometry, objectMaterial)
 
-		lineContainer = new THREE.Object3D()
-		lineObject = new THREE.Mesh(geometry, objectMaterial)
-
-		lineMaterialGen = new LineMatGenerator()
-
-		#shadow
-		shadowMat = new THREE.MeshBasicMaterial({
-			color: 0x000000
-			transparent: true
-			opacity: 0.4
-			})
-		shadowMat.depthFunc = 'GREATER'
-		shadowObject = new THREE.Mesh(geometry, shadowMat)
-		lineContainer.add shadowObject
-
-		# visible black lines
-		lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
-		lines.material = lineMaterialGen.generate(0x000000)
-		lines.material.linewidth = 2
-		lines.material.transparent = true
-		lines.material.opacity = 0.1
-		lines.material.depthFunc = 'GREATER'
-		lines.material.depthWrite = false
-
-		# ToDo: create fancy shader material / correct rendering pipeline
-		lineContainer.add lines
-
 		metaObject = new THREE.Object3D()
 		metaObject.name = metaObject.uuid
 		@latestAddedObject = metaObject
-		
+
 		metaObject.add object
 		metaObject.originalMesh = object
 
-		metaObject.add lineContainer
-		metaObject.lineContainer = lineContainer
+		if @globalConfig.createVisibleWireframe
+			lineContainer = new THREE.Object3D()
+			lineObject = new THREE.Mesh(geometry, objectMaterial)
+
+			lineMaterialGen = new LineMatGenerator()
+
+			#shadow
+			shadowMat = new THREE.MeshBasicMaterial({
+				color: 0x000000
+				transparent: true
+				opacity: 0.4
+				})
+			shadowMat.depthFunc = 'GREATER'
+			shadowObject = new THREE.Mesh(geometry, shadowMat)
+			lineContainer.add shadowObject
+
+			# visible black lines
+			lines = new THREE.EdgesHelper(lineObject, 0x000000, 30)
+			lines.material = lineMaterialGen.generate(0x000000)
+			lines.material.linewidth = 2
+			lines.material.transparent = true
+			lines.material.opacity = 0.1
+			lines.material.depthFunc = 'GREATER'
+			lines.material.depthWrite = false
+
+			# ToDo: create fancy shader material / correct rendering pipeline
+			lineContainer.add lines
+
+			metaObject.add lineContainer
+			metaObject.lineContainer = lineContainer
 
 		@threejsNode.add metaObject
 		return metaObject
@@ -163,33 +163,7 @@ module.exports = class SolidRenderer
 				return obj
 		return null
 
-	_handleMouseDown: (event, selectedNode) =>
-		@mouseStartPosition =
-			@bundle.renderer.getGridPosition event.clientX, event.clientY
-
-		@originalObjectPosition = selectedNode.positionData.position
-
-	_handleMouseUp: (event, selectedNode) =>
-		@mouseStartPosition = null
-		return
-
-	_handleMouseMove: (event, selectedNode) =>
-		mouseCurrent = @bundle.renderer.getGridPosition event.clientX, event.clientY
-
-		newPosition = {
-			x: @originalObjectPosition.x + mouseCurrent.x - @mouseStartPosition.x
-			y: @originalObjectPosition.y + mouseCurrent.y - @mouseStartPosition.y
-			z: @originalObjectPosition.z
-		}
-
-		selectedNode.positionData.position = newPosition
-
-		pld = selectedNode.pluginData.solidRenderer
-
-		threeObject = @_getThreeObjectByName pld.threeObjectUuid
-		@_copyTransformDataToThree selectedNode, threeObject
-
-	toggleNodeVisibility: (node, visible) =>
+	setNodeVisibility: (node, visible) =>
 		setVisibility = () =>
 			obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
 			if obj?
@@ -228,10 +202,11 @@ module.exports = class SolidRenderer
 		visibleObject.material.side = THREE.DoubleSide
 
 		intersects =
-			interactionHelper.getPolygonClickedOn(
+			interactionHelper.getIntersections(
 				event
+				@bundle.renderer
 				[visibleObject]
-				@bundle.renderer)
+			)
 
 		visibleObject.material.side = oldMaterialSide
 

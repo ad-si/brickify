@@ -1,6 +1,6 @@
 Hotkeys = require '../hotkeys'
 UiSceneManager = require './sceneManager'
-MouseDispatcher = require './mouseDispatcher'
+PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi.coffee'
 
 ###
@@ -13,7 +13,7 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@workflowUi = new WorkflowUi(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
-		@mouseDispatcher = new MouseDispatcher(@bundle)
+		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) ->
 		event.stopPropagation()
@@ -21,14 +21,14 @@ module.exports = class Ui
 		files = event.target.files ? event.dataTransfer.files
 		@bundle.modelLoader.readFiles files if files?
 
-	dragOverHandler: (event) ->
+	dragOverHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
-	windowResizeHandler: (event) ->
+	windowResizeHandler: (event) =>
 		@renderer.windowResizeHandler()
 
 	init: =>
@@ -38,14 +38,12 @@ module.exports = class Ui
 		@_initHotkeys()
 
 	_initListeners: =>
-		# mouse dispatcher for mouse events
-		@mouseDispatcher.init(@renderer, @workflowUi.objects, @sceneManager)
-		
+		@pointerDispatcher.init()
+
 		# event listener
 		@renderer.getDomElement().addEventListener(
 			'dragover'
-			@dragOverHandler.bind @
-			false
+			@dragOverHandler
 		)
 
 		@renderer.getDomElement().addEventListener(
@@ -57,27 +55,8 @@ module.exports = class Ui
 			@fileLoadHandler event
 
 		window.addEventListener(
-			'resize',
-			@windowResizeHandler.bind @,
-			false
-		)
-
-		@renderer.getDomElement().addEventListener(
-			'mousedown'
-			@mouseDispatcher.handleMouseDown
-			false
-		)
-
-		@renderer.getDomElement().addEventListener(
-			'mouseup'
-			@mouseDispatcher.handleMouseUp
-			false
-		)
-
-		@renderer.getDomElement().addEventListener(
-			'mousemove'
-			@mouseDispatcher.handleMouseMove
-			false
+			'resize'
+			@windowResizeHandler
 		)
 
 	_initUiElements: =>

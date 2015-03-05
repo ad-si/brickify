@@ -200,7 +200,7 @@ module.exports = class NodeVisualization
 		return null if not voxels?
 		firstLegoVoxel = voxels[0]
 		lastNonLegoVoxel = voxels[1]
-		
+
 
 		# if we may only select lego voxels, we are done
 		if needsToBeLego
@@ -224,17 +224,18 @@ module.exports = class NodeVisualization
 		# no lego voxel and not pointing towards the baseplate.
 		# return voxel in middle of model as a last chance
 		return @_getVoxelInMiddleOfModel event, selectedNode
-		
+
 
 	# returnes the first intersected lego voxel and
 	# the last intersected non-lego voxel.
 	# returns null, if cursor is above a currently modified voxel
 	_getIntersectedVoxels: (event, selectedNode) ->
 		voxelIntersects =
-			interactionHelper.getPolygonClickedOn(
+			interactionHelper.getIntersections(
 				event
+				@bundle.renderer
 				@voxelsSubnode.children
-				@bundle.renderer)
+			)
 
 		firstLegoVoxel = null
 		lastNonLegoVoxel = null
@@ -269,7 +270,7 @@ module.exports = class NodeVisualization
 	# is a voxel in the grid
 	_pointsTowardsBaseplate: (event) ->
 		baseplatePosition =
-			@bundle.renderer.getGridPosition(event.pageX, event.pageY)
+			interactionHelper.getGridPosition event, @bundle.renderer
 		baseplateVoxelPosition =
 			@grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePosition
 
@@ -282,7 +283,7 @@ module.exports = class NodeVisualization
 			modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
 		else
 			return null
-		
+
 		modelIntersects = @_mergeIdenticalIntersects modelIntersects
 
 		# calculate the middle of the first two intersections

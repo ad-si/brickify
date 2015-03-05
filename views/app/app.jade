@@ -25,11 +25,11 @@ block body
 			.col-lg-3.col-md-5.col-sm-6.bhoechie-tab-container
 				.col-lg-3.col-md-3.col-sm-3.bhoechie-tab-menu
 					.list-group
-						a(href='#').list-group-item.active.text-center
+						a(href='#').list-group-item.text-center
 							h4 Load
 							br
 							img(src="img/mmLoad.png" width=64 height=64)
-						a(href='#').list-group-item.text-center
+						a(href='#').list-group-item.active.text-center
 							h4 Edit
 							br
 							i.fa.fa-paint-brush(style="font-size: 3.5em;")
@@ -43,7 +43,7 @@ block body
 							i.fa.fa-download(style="font-size: 3.5em;")
 
 				.col-lg-9.col-md-9.col-sm-9.bhoechie-tab
-					.bhoechie-tab-content.active
+					.bhoechie-tab-content
 						button.btn.btn-success.btn-block
 							| LOAD
 							br
@@ -59,7 +59,7 @@ block body
 								.panel-body
 									ul#objectsContainer
 
-					.bhoechie-tab-content
+					.bhoechie-tab-content.active
 						.btn-group.btn-group-justified(role='group')#brushContainer
 							.btn.btn-primary#legoBrush
 								| Make LEGO

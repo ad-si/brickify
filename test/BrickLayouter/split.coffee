@@ -158,7 +158,7 @@ describe 'brickLayouter split', ->
 		bricks = [[brick0, brick1, brick2]]
 		brickGraph = new BrickGraph null, bricks
 
-		bricksToSplit = brick1.uniqueNeighbours()
+		bricksToSplit = brick1.uniqueNeighbors()
 		bricksToSplit.push brick1
 
 		newBricks = brickLayouter._splitBricks bricksToSplit, brickGraph

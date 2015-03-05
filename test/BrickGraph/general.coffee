@@ -36,18 +36,18 @@ describe 'BrickGraph', ->
 		
 		for zLayer in bricks
 			for brick in zLayer
-				expectedNeighbours = 0
+				expectedNeighbors = 0
 				if brick.position.x > 0
-					expectedNeighbours++
+					expectedNeighbors++
 				if brick.position.x < grid.numVoxelsX - 1
-					expectedNeighbours++
+					expectedNeighbors++
 				if brick.position.y > 0
-					expectedNeighbours++
+					expectedNeighbors++
 				if brick.position.y < grid.numVoxelsY - 1
-					expectedNeighbours++
+					expectedNeighbors++
 
-				actualNeighbours = brick.uniqueNeighbours().length
-				expect(actualNeighbours).to.equal(expectedNeighbours)
+				actualNeighbors = brick.uniqueNeighbors().length
+				expect(actualNeighbors).to.equal(expectedNeighbors)
 
 	it 'should initialize correct references to neighbors', () ->
 		brickLayouter = new BrickLayouter()

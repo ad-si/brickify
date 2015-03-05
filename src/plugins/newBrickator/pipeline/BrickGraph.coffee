@@ -88,31 +88,31 @@ module.exports = class BrickGraph
 	createBrick: (x, y, z) =>
 		brick = new Brick {x: x, y: y, z: z}, {x: 1, y: 1}
 
-		# add neighbour references
-		neighbourXp = @getBrickAt x + 1, y, z
-		neighbourXm = @getBrickAt x - 1, y, z
-		neighbourYp = @getBrickAt x, y + 1, z
-		neighbourYm = @getBrickAt x, y - 1, z
+		# add neighbor references
+		neighborXp = @getBrickAt x + 1, y, z
+		neighborXm = @getBrickAt x - 1, y, z
+		neighborYp = @getBrickAt x, y + 1, z
+		neighborYm = @getBrickAt x, y - 1, z
 
 		#x-
-		if neighbourXm?
-			brick.neighbors[Brick.direction.Xm].push neighbourXm
-			neighbourXm.neighbors[Brick.direction.Xp].push brick
+		if neighborXm?
+			brick.neighbors[Brick.direction.Xm].push neighborXm
+			neighborXm.neighbors[Brick.direction.Xp].push brick
 
 		#x+
-		if neighbourXp?
-			brick.neighbors[Brick.direction.Xp].push neighbourXp
-			neighbourXp.neighbors[Brick.direction.Xm].push brick
+		if neighborXp?
+			brick.neighbors[Brick.direction.Xp].push neighborXp
+			neighborXp.neighbors[Brick.direction.Xm].push brick
 
 		#y-
-		if neighbourYm?
-			brick.neighbors[Brick.direction.Ym].push neighbourYm
-			neighbourYm.neighbors[Brick.direction.Yp].push brick
+		if neighborYm?
+			brick.neighbors[Brick.direction.Ym].push neighborYm
+			neighborYm.neighbors[Brick.direction.Yp].push brick
 
 		#y+
-		if neighbourYp?
-			brick.neighbors[Brick.direction.Yp].push neighbourYp
-			neighbourYp.neighbors[Brick.direction.Ym].push brick
+		if neighborYp?
+			brick.neighbors[Brick.direction.Yp].push neighborYp
+			neighborYp.neighbors[Brick.direction.Ym].push brick
 
 		# add upper / lower slots
 		upperBrick = @getBrickAt x, y, z + 1
@@ -140,7 +140,7 @@ module.exports = class BrickGraph
 	deleteBrick: (brick) =>
 		# delete from structure
 		arrayHelper.removeFirstOccurenceFromArray brick, @bricks[brick.position.z]
-		# remove references to neighbours/connections
+		# remove references to neighbors/connections
 		brick.removeSelfFromSurrounding()
 
 	# updates the 'voxel.brick' reference in each voxel in the grid

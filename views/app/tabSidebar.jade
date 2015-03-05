@@ -1,0 +1,32 @@
+.col-lg-3.col-md-5.col-sm-6.bhoechie-tab-container
+	.col-lg-3.col-md-3.col-sm-3.bhoechie-tab-menu
+		.list-group
+			a(href='#').list-group-item.text-center
+				h4 Load
+				br
+				img(src="img/mmLoad.png" width=64 height=64)
+			a(href='#').list-group-item.active.text-center
+				h4 Edit
+				br
+				i.fa.fa-paint-brush(style="font-size: 3.5em;")
+			a(href='#').list-group-item.text-center
+				h4 Preview
+				br
+				i.fa.fa-eye(style="font-size: 3.5em;")
+			a(href='#').list-group-item.text-center
+				h4 Export
+				br
+				i.fa.fa-download(style="font-size: 3.5em;")
+
+	.col-lg-9.col-md-9.col-sm-9.bhoechie-tab
+		.bhoechie-tab-content
+			include ./workflowComponents/load.jade
+
+		.bhoechie-tab-content.active
+			include ./workflowComponents/edit.jade
+
+		.bhoechie-tab-content
+			include ./workflowComponents/preview.jade
+
+		.bhoechie-tab-content
+			include ./workflowComponents/export.jade

@@ -1,0 +1,14 @@
+button.btn.btn-success.btn-block
+	| Check stability
+button.btn.btn-success.btn-block#buildButton
+	| Show me how to build with LEGO
+#buildContainer.hidden
+	br
+	button.btn.btn-default.fa.fa-chevron-left#buildDecrement
+	| &nbsp;Showing Layer&nbsp;
+	span#currentBuildLayer 1
+	| &nbsp;of&nbsp;
+	span#maxBuildLayer 0
+	| &nbsp;
+	button.btn.btn-default.fa.fa-chevron-right#buildIncrement
+	input(type='range')#buildSlider

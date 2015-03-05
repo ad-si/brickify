@@ -2,6 +2,8 @@ path = require 'path'
 
 module.exports = (request, response) ->
 	if request.query.ui? and request.query.ui == 'tabs'
-		response.render path.join('app','app_tab')
+		tabSidebar = true
 	else
-		response.render path.join('app','app')
+		tabSidebar = false
+
+	response.render path.join('app','app'), {tabSidebar: tabSidebar}

@@ -158,6 +158,7 @@ module.exports = class BrickGraph
 							callback(voxel)
 						else
 							console.warn "Brick without voxel at #{x}, #{y}, #{z}"
+							#console.warn brick
 
 		# set references from brick list
 		@forEachBrick (brick) =>

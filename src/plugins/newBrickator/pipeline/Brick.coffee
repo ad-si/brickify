@@ -317,5 +317,9 @@ module.exports = class Brick
 		return links / possibleLinks
 
 	addNeighbor: (direction, brick) =>
-		if (brick.id != @id) and (@neighbors[direction].indexOf brick == -1)
-			@neighbors[direction].push brick
+		if (@neighbors[direction].indexOf brick) != -1
+			#prevent addition of duplicate neighbor
+			#console.warn 'trying to add duplicate neighbor'
+			return
+		@neighbors[direction].push brick
+

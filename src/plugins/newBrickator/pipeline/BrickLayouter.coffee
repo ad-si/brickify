@@ -185,8 +185,16 @@ module.exports = class BrickLayouter
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) =>
 		if brick.neighbors[dir].length > 0
 			width = 0
+			ids = []
 			for neighbor in brick.neighbors[dir]
 				width += widthFn neighbor.size
+				if neighbor.id in ids
+					console.warn 'detected duplicate neighbour'
+					console.warn neighbor.id
+					console.warn brick
+					return
+				else
+					ids.push neighbor.id
 			if width == widthFn(brick.size)
 				minWidth = widthFn brick.position
 				maxWidth = widthFn(brick.position) + widthFn(brick.size) - 1

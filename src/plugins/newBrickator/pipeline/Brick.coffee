@@ -153,9 +153,9 @@ module.exports = class Brick
 
 	_replaceOldNeighbors: (mBrick, dir, opp) =>
 		for neighbor in mBrick.neighbors[dir]
-			@neighbors[dir].push neighbor
+			@addNeighbor dir, neighbor
 			@_removeFirstOccurenceFromArray mBrick, neighbor.neighbors[opp]
-			neighbor.neighbors[opp].push @
+			neighbor.addNeighbor opp, @
 		return
 
 	getPositionAndSizeForNewBrick: (mergeIndex, mergeNeighbors) =>
@@ -259,11 +259,11 @@ module.exports = class Brick
 
 				# update neighbors inside the splitting brick
 				if x > 0
-					newBricks[x][y].neighbors[Brick.direction.Xm].push newBricks[x - 1][y]
-					newBricks[x - 1][y].neighbors[Brick.direction.Xp].push newBricks[x][y]
+					newBricks[x][y].addNeighbor Brick.direction.Xm, newBricks[x - 1][y]
+					newBricks[x - 1][y].addNeighbor Brick.direction.Xp, newBricks[x][y]
 				if y > 0
-					newBricks[x][y].neighbors[Brick.direction.Ym].push newBricks[x][y - 1]
-					newBricks[x][y - 1].neighbors[Brick.direction.Yp].push newBricks[x][y]
+					newBricks[x][y].addNeighbor Brick.direction.Ym, newBricks[x][y - 1]
+					newBricks[x][y - 1].addNeighbor Brick.direction.Yp, newBricks[x][y]
 
 		#remove this (old) brick from all neighbors
 		for neighbors in @neighbors
@@ -290,8 +290,8 @@ module.exports = class Brick
 			for neighbor in @neighbors[direction]
 				if neighbor.position.y <= minY and
 				neighbor.position.y + neighbor.size.y >= maxY
-					newBrick.neighbors[direction].push neighbor
-					neighbor.neighbors[opposite].push newBrick
+					newBrick.addNeighbor direction, neighbor
+					neighbor.addNeighbor opposite, newBrick
 
 		if direction in [Brick.direction.Ym, Brick.direction.Yp]
 			minX = newBrick.position.x
@@ -299,8 +299,8 @@ module.exports = class Brick
 			for neighbor in @neighbors[direction]
 				if neighbor.position.x <= minX and
 				neighbor.position.x + neighbor.size.x >= maxX
-					newBrick.neighbors[direction].push neighbor
-					neighbor.neighbors[opposite].push newBrick
+					newBrick.addNeighbor direction, neighbor
+					neighbor.addNeighbor opposite, newBrick
 
 		return
 

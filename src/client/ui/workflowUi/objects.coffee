@@ -52,10 +52,12 @@ module.exports = class UiObjects
 				return
 
 	hideBrushContainer: =>
-		@brushContainer.hide()
+		$('#editGroup').slideUp()
+		#@brushContainer.hide()
 
 	showBrushContainer: =>
-		@brushContainer.show()
+		$('#editGroup').slideDown()
+		#@brushContainer.show()
 
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null

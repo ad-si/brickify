@@ -385,7 +385,7 @@ class NewBrickator
 	_enableBuildMode: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			#hide brushes
-			@bundle.ui.objects.hideBrushContainer()
+			@bundle.ui.workflowUi.objects.hideBrushContainer()
 
 			# show bricks and csg
 			cachedData.visualization.showBricks()
@@ -414,12 +414,12 @@ class NewBrickator
 			cachedData.visualization.updateVoxelVisualization()
 
 			#show brushes
-			@bundle.ui.objects.showBrushContainer()
+			@bundle.ui.workflowUi.objects.showBrushContainer()
 			
 			# hide csg, show model, show voxels
 			cachedData.visualization.hideCsg()
 			solidRenderer = @bundle.getPlugin('solid-renderer')
-			solidRenderer?.toggleNodeVisibility cachedData.node, false
+			solidRenderer?.toggleNodeVisibility cachedData.node, true
 			cachedData.visualization.showVoxels()
 
 module.exports = NewBrickator

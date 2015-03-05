@@ -25,6 +25,7 @@ class PointerDispatcher
 			'PointerLeave'
 			'GotPointerCapture'
 			'LostPointerCapture'
+			'ContextMenu'
 		]
 
 		element = @bundle.ui.renderer.getDomElement()
@@ -119,6 +120,10 @@ class PointerDispatcher
 	_releasePointerFor: (event) =>
 		element = @bundle.ui.renderer.getDomElement()
 		element.releasePointerCapture event.pointerId
+
+	onContextMenu: (event) =>
+		# this event sometimes interferes with right clicks
+		@_stop event
 
 	_stop: (event) =>
 		event.stopPropagation()

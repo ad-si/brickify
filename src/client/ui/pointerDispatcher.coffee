@@ -6,6 +6,7 @@ class PointerDispatcher
 
 	init: =>
 		@isBrushing = false
+		@brushToggled = false
 		@sceneManager = @bundle.ui.sceneManager
 		@objects = @bundle.ui.objects
 		@initListeners()
@@ -51,7 +52,7 @@ class PointerDispatcher
 			@sceneManager.select clickedNode
 
 		# toggle brush if it is the right mouse button
-		@objects.toggleBrush() if(event.buttons & 2)
+		@brushToggled = @objects.toggleBrush() if(event.buttons & 2)
 
 		# perform brush action
 		@isBrushing = true
@@ -87,18 +88,23 @@ class PointerDispatcher
 
 		# end brush action
 		if @isBrushing
-			# un-toggle brush if it is the right mouse button
-			@objects.toggleBrush() if(event.buttons & 2)
-
 			@isBrushing = false
 			brush = @objects.getSelectedBrush()
 			if brush? and brush.mouseUpCallback?
 				brush.mouseUpCallback event, @sceneManager.selectedNode
 
+			@_untoggleBrush()
+
 	onPointerCancel: (event) =>
 		# Pointer capture will be implicitly released
-		# un-toggle brush if it is the right mouse button
-		@objects.toggleBrush() if(event.buttons & 2)
+
+		if @isBrushing
+			@isBrushing = false
+			brush = @objects.getSelectedBrush()
+			if brush? and brush.cancelCallback?
+				brush.cancelCallback event, @sceneManager.selectedNode
+
+			@_untoggleBrush()
 		return
 
 	onPointerOut: (event) =>
@@ -124,6 +130,11 @@ class PointerDispatcher
 	onContextMenu: (event) =>
 		# this event sometimes interferes with right clicks
 		@_stop event
+
+	_untoggleBrush: () =>
+		if @brushToggled
+			@objects.toggleBrush()
+			@brushToggled = false
 
 	_stop: (event) =>
 		event.stopPropagation()

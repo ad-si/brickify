@@ -29,71 +29,80 @@ module.exports = class BrushHandler
 			tooltip: 'Select geometry to be 3d-printed'
 		}]
 
-	_checkAndPrepare: (selectedNode, callback) =>
+	_checkAndPrepare: (selectedNode) =>
 		# ignore if we are currently in build mode
 		if @newBrickator.buildModeEnabled
 			return
 
-		@newBrickator._getCachedData(selectedNode).then (cachedData) =>
-			callback(cachedData)
+		return @newBrickator._getCachedData(selectedNode)
 
 	_legoSelect: (selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
 			@_setModelShadowVisiblity selectedNode, false
-		
+
 	_printSelect: (selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
 			@_setModelShadowVisiblity selectedNode, true
 
 	_legoMouseDown: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, false
 
 	_printMouseDown: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, true
 
 	_printMouseMove: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
-			
+
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
-	_legoMouseUp: (event, selectedNode, cachedData) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+	_legoMouseUp: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels, true

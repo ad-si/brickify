@@ -1,6 +1,4 @@
-objectTree = require '../../common/state/objectTree'
-
-class UiObjects
+module.exports = class UiObjects
 	constructor: (@bundle) ->
 		@objectList = []
 		@selectedStructure = null

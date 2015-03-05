@@ -1,8 +1,7 @@
 Hotkeys = require '../hotkeys'
 UiSceneManager = require './sceneManager'
-UiObjects = require './objects'
 MouseDispatcher = require './mouseDispatcher'
-DownloadProvider = require './downloadProvider'
+WorkflowUi = require './workflowUi/workflowUi.coffee'
 
 ###
 # @module ui
@@ -12,10 +11,9 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
-		@objects = new UiObjects(@bundle)
+		@workflowUi = new WorkflowUi(@bundle)
 		@sceneManager = new UiSceneManager(@bundle)
 		@mouseDispatcher = new MouseDispatcher(@bundle)
-		@downloadProvider = new DownloadProvider(@bundle)
 
 	fileLoadHandler: (event) ->
 		event.stopPropagation()
@@ -34,14 +32,14 @@ module.exports = class Ui
 		@renderer.windowResizeHandler()
 
 	init: =>
+		@workflowUi.init()
 		@_initListeners()
 		@_initUiElements()
 		@_initHotkeys()
-		@downloadProvider.init('#downloadButton', @sceneManager)
 
 	_initListeners: =>
 		# mouse dispatcher for mouse events
-		@mouseDispatcher.init(@renderer, @objects, @sceneManager)
+		@mouseDispatcher.init(@renderer, @workflowUi.objects, @sceneManager)
 		
 		# event listener
 		@renderer.getDomElement().addEventListener(
@@ -83,7 +81,6 @@ module.exports = class Ui
 		)
 
 	_initUiElements: =>
-		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 		@sceneManager.init()
 
 	_initHotkeys: =>

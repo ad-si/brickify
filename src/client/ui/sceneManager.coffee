@@ -26,12 +26,12 @@ class UiSceneManager
 
 	add: (node) =>
 		@pluginHooks.onNodeAdd node
-		@bundle.ui.objects.onNodeAdd node
+		@bundle.ui.workflowUi.objects.onNodeAdd node
 		return
 
 	remove: (node) =>
 		@pluginHooks.onNodeRemove node
-		@bundle.ui.objects.onNodeRemove node
+		@bundle.ui.workflowUi.objects.onNodeRemove node
 		return
 
 #
@@ -40,7 +40,7 @@ class UiSceneManager
 
 	select: (@selectedNode) =>
 		@pluginHooks.onNodeSelect @selectedNode
-		@bundle.ui.objects.onNodeSelect @selectedNode
+		@bundle.ui.workflowUi.objects.onNodeSelect @selectedNode
 		return
 
 	deselect: =>

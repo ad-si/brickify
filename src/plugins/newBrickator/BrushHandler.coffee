@@ -13,6 +13,7 @@ class BrushHandler
 			mouseMoveCallback: @_legoMouseMove
 			mouseHoverCallback: @_legoMouseHover
 			mouseUpCallback: @_legoMouseUp
+			cancelCallback: @_legoCancel
 			canToggleVisibility: true
 			visibilityCallback: @newBrickator._toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
@@ -24,6 +25,7 @@ class BrushHandler
 			mouseMoveCallback: @_printMouseMove
 			mouseHoverCallback: @_printMouseHover
 			mouseUpCallback: @_printMouseUp
+			cancelCallback: @_printCancel
 			canToggleVisibility: true
 			visibilityCallback: @newBrickator._togglePrintedLayer
 			tooltip: 'Select geometry to be 3d-printed'
@@ -81,6 +83,13 @@ class BrushHandler
 		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, false
 
+	_legoCancel: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			cachedData.visualization.resetTouchedVoxelsTo3dPrinted()
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+
 	_printMouseDown: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode
 		.then (cachedData) =>
@@ -109,6 +118,13 @@ class BrushHandler
 		@_checkAndPrepare selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, true
+
+	_printCancel: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			cachedData.visualization.resetTouchedVoxelsToLego()
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()

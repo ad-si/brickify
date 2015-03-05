@@ -171,10 +171,15 @@ module.exports = class NodeVisualization
 			return voxel
 		return null
 
+	resetTouchedVoxelsToLego: =>
+		for voxel in @currentlyTouchedVoxels
+			voxel.makeLego()
+		@currentlyTouchedVoxels = []
+
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode) =>
 		voxel = @getVoxel event, selectedNode, false
-		
+
 		if voxel and not voxel.isLego()
 			voxel.makeLego()
 			voxel.visible = true
@@ -182,6 +187,11 @@ module.exports = class NodeVisualization
 			@currentlyTouchedVoxels.push voxel
 			return voxel
 		return null
+
+	resetTouchedVoxelsTo3dPrinted: =>
+		for voxel in @currentlyTouchedVoxels
+			voxel.make3dPrinted()
+		@currentlyTouchedVoxels = []
 
 	# moves all currenly touched voxels to modified voxels
 	updateModifiedVoxels: () =>

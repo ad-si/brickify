@@ -1,5 +1,14 @@
 interactionHelper = require '../interactionHelper'
 
+BUTTON_STATES =
+	none: 0
+	left: 1
+	right: 2
+	middle: 4
+	x1: 8
+	x2: 16
+	eraser: 32
+
 class PointerDispatcher
 	constructor: (@bundle) ->
 		return
@@ -52,7 +61,8 @@ class PointerDispatcher
 			@sceneManager.select clickedNode
 
 		# toggle brush if it is the right mouse button
-		@brushToggled = @objects.toggleBrush() if(event.buttons & 2)
+		if(event.buttons & BUTTON_STATES.right)
+			@brushToggled = @objects.toggleBrush()
 
 		# perform brush action
 		@isBrushing = true
@@ -74,7 +84,7 @@ class PointerDispatcher
 		if @isBrushing and brush.mouseMoveCallback?
 			brush.mouseMoveCallback event, @sceneManager.selectedNode
 			@_stop event
-		else if event.buttons is 0 and brush.mouseHoverCallback?
+		else if event.buttons is BUTTON_STATES.none and brush.mouseHoverCallback?
 			brush.mouseHoverCallback event, @sceneManager.selectedNode
 			@_stop event
 

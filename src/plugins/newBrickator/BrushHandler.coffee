@@ -1,4 +1,4 @@
-module.exports = class BrushHandler
+class BrushHandler
 	constructor: ( @bundle, @newBrickator ) ->
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
@@ -66,6 +66,16 @@ module.exports = class BrushHandler
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
+	_legoMouseUp: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels, true
+
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+
 	_legoMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode
 		.then (cachedData) =>
@@ -77,11 +87,6 @@ module.exports = class BrushHandler
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
-
-	_printMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
-		.then (cachedData) =>
-			cachedData.visualization.highlightVoxel event, selectedNode, true
 
 	_printMouseMove: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode
@@ -100,15 +105,10 @@ module.exports = class BrushHandler
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
-	_legoMouseUp: (event, selectedNode) =>
+	_printMouseHover: (event, selectedNode) =>
 		@_checkAndPrepare selectedNode
 		.then (cachedData) =>
-			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
-			console.log "Will re-layout #{touchedVoxels.length} voxel"
-			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels, true
-
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+			cachedData.visualization.highlightVoxel event, selectedNode, true
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()
@@ -119,3 +119,5 @@ module.exports = class BrushHandler
 			@solidRenderer = @bundle.getPlugin('solid-renderer')
 		if @solidRenderer?
 			@solidRenderer.setShadowVisibility selectedNode, visible
+
+module.exports = BrushHandler

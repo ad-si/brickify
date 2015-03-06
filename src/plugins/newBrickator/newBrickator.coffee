@@ -8,7 +8,7 @@ Brick = require './pipeline/Brick'
 meshlib = require 'meshlib'
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
-jquery = require '.'
+$ = require 'jquery'
 
 ###
 # @class NewBrickator

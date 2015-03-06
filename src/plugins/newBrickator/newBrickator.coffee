@@ -9,6 +9,7 @@ meshlib = require 'meshlib'
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
 $ = require 'jquery'
+threeHelper = require '../../client/threeHelper'
 
 ###
 # @class NewBrickator
@@ -16,7 +17,6 @@ $ = require 'jquery'
 class NewBrickator
 	constructor: () ->
 		@pipeline = new LegoPipeline()
-		@gridCache = {}
 
 		@_brickVisibility = true
 		@_printVisibility = true
@@ -34,10 +34,7 @@ class NewBrickator
 	init3d: (@threejsRootNode) => return
 
 	onNodeRemove: (node) =>
-		# remove node visuals (bricks, csg, ...)
-		if node.pluginData.newBrickator?
-			@_getCachedData(node).then (cachedData) =>
-				@threejsRootNode.remove cachedData.threeNode
+		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
 
 	onNodeAdd: (node) =>
 		if @bundle.globalConfig.autoLegofy
@@ -49,7 +46,7 @@ class NewBrickator
 			settings = new PipelineSettings()
 			settings.deactivateVoxelizing()
 
-			@_applyModelTransforms selectedNode, settings
+			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
 
 			data = {
 				optimizedModel: cachedData.optimizedModel
@@ -108,85 +105,54 @@ class NewBrickator
 		cachedData.visualization.showVoxels()
 		@_applyVoxelAndBrickVisibility cachedData
 
-
-	_applyModelTransforms: (selectedNode, pipelineSettings) =>
-		modelTransform = @_getModelTransforms selectedNode
-		pipelineSettings.setModelTransform modelTransform
-
-	_getModelTransforms: (selectedNode) =>
-		#ToDo (future): add rotation and scaling (the same way it's done in three)
-		#to keep visual consistency
-
-		modelTransform = new THREE.Matrix4()
-		pos = selectedNode.positionData.position
-		modelTransform.makeTranslation(pos.x, pos.y, pos.z)
-		return modelTransform
-
 	getBrushes: () =>
 		return @brushHandler.getBrushes()
 
-	_getCachedData: (selectedNode) =>
-		# returns Grid, optimized model and other cached data for the selected node
-		return new Promise (resolve, reject) =>
-			identifier = @_getNodeIdentifier selectedNode
-			nodePosition = selectedNode.positionData.position
+	_createDataStructure: (selectedNode) =>
+		selectedNode.getModel().then (model) =>
+			# create grid
+			settings = new PipelineSettings()
+			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
+			settings.deactivateLayouting()
 
-			#check if the requested data is currently being created
-			if @gridCache[identifier]?.modelPromise?
-				# resolve after cached data has been created
-				@gridCache[identifier].modelPromise.then () =>
-					resolve @gridCache[identifier]
-				return
+			results = @pipeline.run(
+				optimizedModel: model
+				settings
+				true
+			)
 
-			# cache is valid if object didn't move
-			if @gridCache[identifier]?
-				griddata = @gridCache[identifier]
+			# create visuals
+			grid = results.accumulatedResults.grid
+			node = new THREE.Object3D()
+			@threejsRootNode.add node
+			threeHelper.link selectedNode, node
 
-				if griddata.x == nodePosition.x and
-				griddata.y == nodePosition.y and
-				griddata.z == nodePosition.z
-					resolve(griddata)
-					return
+			nodeVisualization = new NodeVisualization @bundle, node, grid
 
-			modelPromise = modelCache.request(selectedNode.meshHash)
-			modelPromise.then (optimizedModel) =>
-				# create grid
-				settings = new PipelineSettings()
-				@_applyModelTransforms selectedNode, settings
-				settings.deactivateLayouting()
-
-				data = {
-					optimizedModel: optimizedModel
-				}
-				results = @pipeline.run data, settings, true
-
-				# create visuals
-				grid = results.accumulatedResults.grid
-				node = new THREE.Object3D()
-				@threejsRootNode.add node
-
-				nodeVisualization = new NodeVisualization(@bundle, node, grid)
-
-				# create datastructure
-				@gridCache[identifier] = {
-					node: selectedNode
-					grid: grid
-					optimizedModel: optimizedModel
-					threeNode: node
-					visualization: nodeVisualization
-					csgNeedsRecalculation: true
-					x: nodePosition.x
-					y: nodePosition.y
-					z: nodePosition.z
-				}
-				resolve @gridCache[identifier]
-			modelPromise.catch (error) =>
-				reject error
-
-			# while creating the cached data, store a reference to the promise
-			@gridCache[identifier] = {
-				modelPromise: modelPromise
+			# create datastructure
+			data = {
+				node: selectedNode
+				grid: grid
+				optimizedModel: model
+				threeNode: node
+				visualization: nodeVisualization
+				csgNeedsRecalculation: true
 			}
+			return data
+
+	_checkDataStructure: (selectedNode, data) =>
+		return yes
+
+	_getCachedData: (selectedNode) =>
+		return selectedNode.getPluginData 'newBrickator'
+		.then (data) =>
+			if data? and @_checkDataStructure selectedNode, data
+				return data
+			else
+				@_createDataStructure selectedNode
+				.then (data) =>
+					selectedNode.storePluginData 'newBrickator', data, true
+					return data
 
 	getDownload: (selectedNode) =>
 		dlPromise = new Promise (resolve) =>
@@ -217,9 +183,7 @@ class NewBrickator
 			cachedData.optimizedThreeModel=
 				cachedData.optimizedModel.convertToThreeGeometry()
 			threeModel = cachedData.optimizedThreeModel
-
-			modelTransform = @_getModelTransforms selectedNode
-			threeModel.applyMatrix(modelTransform)
+			threeModel.applyMatrix threeHelper.getTransformMatrix selectedNode
 		else
 			threeModel = cachedData.optimizedThreeModel
 
@@ -294,19 +258,6 @@ class NewBrickator
 			cachedData.visualization.hideCsg()
 			if solidRenderer?
 				solidRenderer.setNodeVisibility(cachedData.node, false)
-
-
-	_getNodeIdentifier: (selectedNode) =>
-		if selectedNode.pluginData.newBrickator?.identifier?
-			return selectedNode.pluginData.newBrickator.identifier
-
-		if not selectedNode.pluginData.newBrickator?
-			selectedNode.pluginData.newBrickator = {}
-
-		identifier = selectedNode.fileName + Math.floor(Math.random() * 10000)
-		selectedNode.pluginData.newBrickator.identifier = identifier
-
-		return identifier
 
 	_initBuildButton: () =>
 		# TODO: refactor after demo on 2015-02-26

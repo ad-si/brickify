@@ -70,11 +70,9 @@ module.exports = class PluginLoader
 				require '../plugins/solidRenderer'
 				require '../plugins/solidRenderer/package.json'
 			)
-		###
 		if @globalConfig.plugins.newBrickator
 			pluginInstances.push @initPlugin(
 				require '../plugins/newBrickator'
 				require '../plugins/newBrickator/package.json'
 			)
-		###
 		return pluginInstances

@@ -10,7 +10,7 @@ class SceneManager
 	init: () =>
 		@scene
 		.then (scene) -> scene.getNodes()
-		.then (nodes) => @_notifyAdd node for node in nodes
+		.then (nodes) => @_notify 'onNodeAdd', node for node in nodes
 
 	getHotkeys: =>
 		return {
@@ -20,6 +20,10 @@ class SceneManager
 			]
 		}
 
+	_notify: (hook, node) =>
+		Promise.all @pluginHooks[hook] node
+		.then => @bundle.ui?.objects[hook] node
+
 #
 # Administration of nodes
 #
@@ -27,26 +31,19 @@ class SceneManager
 	add: (node) =>
 		@scene
 		.then (scene) -> scene.addNode node
-		.then => @_notifyAdd node
-
-	_notifyAdd: (node) =>
-		@pluginHooks.onNodeAdd node
-		@bundle.ui?.objects.onNodeAdd node
+		.then => @_notify 'onNodeAdd', node
 
 	remove: (node) =>
 		@scene
 		.then (scene) -> scene.removeNode node
-		.then =>
-			@pluginHooks.onNodeRemove node
-			@bundle.ui?.objects.onNodeRemove node
+		.then => @_notify 'onNodeRemove',  node
 
 #
 # Selection of nodes
 #
 
 	select: (@selectedNode) =>
-		@pluginHooks.onNodeSelect @selectedNode
-		@bundle.ui?.objects.onNodeSelect @selectedNode
+		@_notify 'onNodeSelect', @selectedNode
 		return
 
 	deselect: =>

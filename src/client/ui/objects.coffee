@@ -12,7 +12,6 @@ class UiObjects
 		@jqueryObject = $(jqueryString)
 
 		@_createBrushUi brushjQueryString
-		@_createVisibilityUi visibilityjQueryString
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -52,37 +51,20 @@ class UiObjects
 				@_objectSelect structure, true
 				return
 
+	hideBrushContainer: =>
+		@brushContainer.hide()
+
+	showBrushContainer: =>
+		@brushContainer.show()
+
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null
 
-		container = $(brushjQueryString)
+		@brushContainer = $(brushjQueryString)
 
 		for brush in @_brushList
 			brush.jqueryObject = @_createBrush brush
-			container.append brush.jqueryObject
-
-	_createVisibilityUi: (visibilityjQueryString) =>
-		container = $(visibilityjQueryString)
-
-		htmlEmpty = "<div class='btn btn-primary'></div>"
-		for brush in @_brushList
-			if brush.canToggleVisibility
-				obj = @_createEyeButton brush
-			else
-				obj = $(htmlEmpty)
-			container.append obj
-
-	_createEyeButton: (brush) =>
-		htmlEye = "<div class='btn btn-default fa fa-eye'></div>"
-		obj = $(htmlEye)
-		brush.visible = true
-		obj.on 'click', () =>
-			brush.visible = !brush.visible
-			obj
-			.toggleClass 'fa-eye', brush.visible
-			.toggleClass 'fa-eye-slash', !brush.visible
-			brush.visibilityCallback? brush.visible
-		return obj
+			@brushContainer.append brush.jqueryObject
 
 	_createUi: (structure) =>
 		structure.node.getName().then (name) =>
@@ -139,7 +121,14 @@ class UiObjects
 
 		@_selectedBrush = null
 
-	getSelectedBrush: () =>
+	getSelectedBrush: =>
 		return @_selectedBrush
+
+	toggleBrush: =>
+		for brush in @_brushList
+			if brush isnt @_selectedBrush
+				@_brushSelect brush
+				return true
+		return false
 
 module.exports = UiObjects

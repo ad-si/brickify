@@ -6,17 +6,17 @@ Stats = require 'stats-js'
 # @class Renderer
 ###
 module.exports = class Renderer
-	constructor: (@pluginHooks, globalConfig, controls) ->
+	constructor: (@pluginHooks, globalConfig) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
-		@init globalConfig, controls
+		@init globalConfig
 
 	localRenderer: (timestamp) =>
 			@stats?.begin()
 			@threeRenderer.render @scene, @camera
 			@pluginHooks.on3dUpdate timestamp
-			@controls.update()
+			@controls?.update()
 
 			@stats?.end()
 			requestAnimationFrame @localRenderer
@@ -65,13 +65,12 @@ module.exports = class Renderer
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
 
-	init: (globalConfig, controls) ->
+	init: (globalConfig) ->
 		@setupSize globalConfig
 		@setupRenderer globalConfig
 		@setupScene globalConfig
 		@setupLighting globalConfig
 		@setupCamera globalConfig
-		@setupControls globalConfig, controls
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
 		requestAnimationFrame @localRenderer
 
@@ -167,35 +166,6 @@ module.exports = class Renderer
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, -20, -30
 		@scene.add directionalLight
-
-	###
-	# Calculates the position on the z=0 plane in 3d space from given screen
-  # (mouse) coordinates.
-  #
-  # @param {Number} screenX the x coordinate of the mouse event
-  # @param {Number} screenY the y coordinate of the mouse event
-  # @memberOf Renderer
-	###
-	getGridPosition: (screenX, screenY) ->
-		# calculates the position on the z=0 plane in 3d space
-		# from given screen (mouse) coordinates
-		canvas = @threeRenderer.context.canvas
-
-		posInCanvas = new THREE.Vector3(
-			(screenX / canvas.width) * 2 - 1
-			(-screenY / canvas.height) * 2 + 1
-			0.5
-		)
-
-		posInCamera = posInCanvas.clone().unproject @camera
-
-		ray = posInCamera.sub(@camera.position).normalize()
-		# we are calculating in camera coordinate system -> y and z are rotated
-		ray.multiplyScalar -@camera.position.y / ray.y
-		posInWorld = @camera.position.clone().add ray
-
-		posInScene = new THREE.Vector3 posInWorld.x, -posInWorld.z, posInWorld.y
-		return posInScene
 
 	loadCamera: (state) =>
 		if state.controls?

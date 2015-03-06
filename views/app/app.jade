@@ -16,7 +16,7 @@ block body
 				| instructions how to enable JavaScript in your web browser
 
 		#canvasContainer
-			canvas#canvas.appCanvas
+			canvas#canvas.appCanvas(touch-action="none")
 
 		#commandContainer
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
@@ -31,7 +31,6 @@ block body
 						.panel-body
 							ul#objectsContainer
 				.btn-group.btn-group-justified(role='group')#brushContainer
-				.btn-group.btn-group-justified(role='group')#visibilityContainer
 				br
 				button.btn.btn-success.btn-block#downloadButton
 					i.fa.fa-download
@@ -42,15 +41,13 @@ block body
 					| Show me how to build with LEGO
 				#buildContainer.hidden
 					br
-					button.btn.btn-default#buildDecrement
-						span.glyphicon.glyphicon-chevron-left
+					button.btn.btn-default.fa.fa-chevron-left#buildDecrement
 					| &nbsp;Showing Layer&nbsp;
 					span#currentBuildLayer 1
 					| &nbsp;of&nbsp;
 					span#maxBuildLayer 0
 					| &nbsp;
-					button.btn.btn-default#buildIncrement
-						span.glyphicon.glyphicon-chevron-right
+					button.btn.btn-default.fa.fa-chevron-right#buildIncrement
 					input(type='range')#buildSlider
 
 			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4

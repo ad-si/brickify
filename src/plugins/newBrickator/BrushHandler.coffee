@@ -1,4 +1,4 @@
-module.exports = class BrushHandler
+class BrushHandler
 	constructor: ( @bundle, @newBrickator ) ->
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
@@ -13,6 +13,7 @@ module.exports = class BrushHandler
 			mouseMoveCallback: @_legoMouseMove
 			mouseHoverCallback: @_legoMouseHover
 			mouseUpCallback: @_legoMouseUp
+			cancelCallback: @_legoCancel
 			canToggleVisibility: true
 			visibilityCallback: @newBrickator._toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
@@ -24,76 +25,115 @@ module.exports = class BrushHandler
 			mouseMoveCallback: @_printMouseMove
 			mouseHoverCallback: @_printMouseHover
 			mouseUpCallback: @_printMouseUp
+			cancelCallback: @_printCancel
 			canToggleVisibility: true
 			visibilityCallback: @newBrickator._togglePrintedLayer
 			tooltip: 'Select geometry to be 3d-printed'
 		}]
 
-	_checkAndPrepare: (selectedNode, callback) =>
+	_checkAndPrepare: (selectedNode) =>
 		# ignore if we are currently in build mode
 		if @newBrickator.buildModeEnabled
 			return
 
-		@newBrickator._getCachedData(selectedNode).then (cachedData) =>
-			callback(cachedData)
+		return @newBrickator._getCachedData(selectedNode)
 
 	_legoSelect: (selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.createInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
-		
+			@_setModelShadowVisiblity selectedNode, false
+
 	_printSelect: (selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.clearInvisibleSuggestionBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
+			@_setModelShadowVisiblity selectedNode, true
 
 	_legoMouseDown: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxelLego event
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxelLego event
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
+
+	_legoMouseUp: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels, true
+
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_legoMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.highlightVoxel event, (voxel) ->
-				return not voxel.isLego()
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			cachedData.visualization.highlightVoxel event, selectedNode, false
+
+	_legoCancel: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			cachedData.visualization.resetTouchedVoxelsTo3dPrinted()
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseDown: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxel3dPrinted event
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
-	_printMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.highlightVoxel event
-
 	_printMouseMove: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			voxel = cachedData.visualization.makeVoxel3dPrinted event
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
-			cachedData.visualization.updateModifiedVoxels()
-			cachedData.visualization.updateVoxelVisualization()
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			@newBrickator.relayoutModifiedParts cachedData, touchedVoxels
 
-	_legoMouseUp: (event, selectedNode, cachedData) =>
-		@_checkAndPrepare selectedNode, (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.createInvisibleSuggestionBricks()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+
+	_printMouseHover: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			cachedData.visualization.highlightVoxel event, selectedNode, true
+
+	_printCancel: (event, selectedNode) =>
+		@_checkAndPrepare selectedNode
+		.then (cachedData) =>
+			cachedData.visualization.resetTouchedVoxelsToLego()
+			cachedData.visualization.updateVoxelVisualization()
+			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	afterPipelineUpdate: (selectedNode, cachedData) =>
 		cachedData.visualization.updateVoxelVisualization()
 		cachedData.visualization.showVoxels()
+
+	_setModelShadowVisiblity: (selectedNode, visible) =>
+		if not @solidRenderer?
+			@solidRenderer = @bundle.getPlugin('solid-renderer')
+		if @solidRenderer?
+			@solidRenderer.setShadowVisibility selectedNode, visible
+
+module.exports = BrushHandler

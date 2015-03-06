@@ -13,17 +13,18 @@ Node.modelProvider = require './modelCache'
 # @class Bundle
 ###
 module.exports = class Bundle
-	constructor: (@globalConfig, controls) ->
+	constructor: (@globalConfig, @controls) ->
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 		@modelLoader = new ModelLoader(@)
 		@sceneManager = new SceneManager(@)
-		@renderer = new Renderer(@pluginHooks, @globalConfig, controls)
+		@renderer = new Renderer(@pluginHooks, @globalConfig)
 		@pluginInstances = @pluginLoader.loadPlugins()
 		@ui = new Ui(@) if @globalConfig.buildUi
 
 	init: =>
 		@ui?.init()
+		@renderer.setupControls @globalConfig, @controls
 		return @sceneManager.init()
 
 	getPlugin: (name) =>

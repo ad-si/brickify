@@ -56,9 +56,6 @@ syncWithServer: true
 #ui
 buildUi: true
 
-#editor
-defaultPlugin: 'fabrickator'
-
 #newBrickator
 autoLegofy: false
 
@@ -71,3 +68,6 @@ plugins:
   legoBoard: true
   solidRenderer: true
   newBrickator: true
+
+# shall solid renderer display shadows and wireframe?
+createVisibleWireframe: true

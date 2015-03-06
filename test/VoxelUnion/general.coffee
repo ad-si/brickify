@@ -1,5 +1,5 @@
 expect = require('chai').expect
-Grid = require '../../src/plugins/newBrickator/Grid'
+Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 VoxelUnion = require '../../src/plugins/newBrickator/VoxelUnion'
 THREE = require 'three'
 

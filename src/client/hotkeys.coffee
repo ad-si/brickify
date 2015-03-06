@@ -3,7 +3,8 @@
 ###
 
 module.exports = class Hotkeys
-	constructor: (pluginHooks) ->
+	constructor: (pluginHooks, @sceneManager) ->
+		@bootboxOpen = false
 		@events = []
 		@bind '?', 'General', 'Show this help', () =>
 			@showHelp()
@@ -13,6 +14,7 @@ module.exports = class Hotkeys
 		@addEvents events for events in pluginHooks.getHotkeys()
 
 	showHelp: =>
+		return if @bootboxOpen
 		message = ''
 		for own group, events of @events
 			message += '<section><h4>' + group + '</h4>'
@@ -20,10 +22,22 @@ module.exports = class Hotkeys
 				message += '<p><span class="keys"><kbd>' + event.hotkey +
 					'</kbd></span> <span>' + event.description + '</span></p>'
 			message += '</section>'
-		bootbox.dialog({
+		callback = () =>
+			@bootboxOpen = false
+			return true
+		@bootboxOpen = true
+		bootbox.dialog {
 			title: 'Keyboard shortcuts'
 			message: message
-		})
+			buttons: {
+				success: {
+					label: 'Got it!'
+					className: 'btn-primary'
+					callback: callback
+				}
+			}
+			onEscape: callback
+		}
 
 	###
 	# @param {String} hotkey Event description of Mousescript
@@ -32,8 +46,8 @@ module.exports = class Hotkeys
 	# @param {Function} callback Callback to be called when event is triggered
 	###
 	bind: (hotkey, titlegroup, description, callback) ->
-		Mousetrap.bind hotkey.toLowerCase(), callback
-		Mousetrap.bind hotkey.toUpperCase(), callback
+		Mousetrap.bind hotkey.toLowerCase(), => callback @sceneManager.selectedNode
+		Mousetrap.bind hotkey.toUpperCase(), => callback @sceneManager.selectedNode
 		if @events[titlegroup] is undefined
 			@events[titlegroup] = []
 		@events[titlegroup].push {hotkey: hotkey, description: description}

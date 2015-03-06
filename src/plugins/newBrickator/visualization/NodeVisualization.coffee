@@ -317,7 +317,8 @@ module.exports = class NodeVisualization
 			middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
 
 			gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
-			return gridEntry.visibleVoxel
+			return gridEntry.visibleVoxel if gridEntry?
+			return null
 		else
 			# no model selected / enough intersections to get a 'middle voxel'
 			return null

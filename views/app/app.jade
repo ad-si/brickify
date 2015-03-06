@@ -5,9 +5,6 @@ block styles
 
 block body
 	#wrapper.container-fluid
-
-		h1#logo Brickolage
-
 		noscript
 			| For full functionality of this site it is necessary to enable JavaScript.
 			| Here are the
@@ -21,11 +18,14 @@ block body
 		#commandContainer
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
 
-		#controls.row
-			if tabSidebar
-				include ./tabSidebar.jade
-			else
-				include ./defaultSidebar.jade
+		.row
+			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
+				h1#logo Brickolage
+
+				if tabSidebar
+					include ./tabSidebar.jade
+				else
+					include ./defaultSidebar.jade
 
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?

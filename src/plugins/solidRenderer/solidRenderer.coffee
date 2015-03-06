@@ -56,6 +56,7 @@ class SolidRenderer
 			lines.material = @lineMat
 			wireframe.add lines
 
+			parent.add wireframe
 			parent.wireframe = wireframe
 
 		_addModel = (model) =>

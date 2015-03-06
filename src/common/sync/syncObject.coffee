@@ -111,10 +111,11 @@ class SyncObject
 
 	###
 	# Builds an object that only consists of non-transient plain objects.
+	# (Also called "Plain Old JavaScript Object")
 	# @return {Object} key/value mapping of this object's non-transient properties
 	###
 	toPOJSO: =>
-		pojso = {} # plain old javascript object
+		pojso = {}
 		keys = Object.keys @
 		.filter (key) => typeof @[key] isnt 'function' && not @_isTransient(key)
 		.map (key) => pojso[key] = @[key]

@@ -31,8 +31,6 @@ module.exports.put = (request, response) ->
 		.catch (id) -> response.status(404).send id
 	.catch -> response.status(400).send 'Invalid data packet id provided'
 
-#TODO: module.exports.patch
-
 module.exports.delete = (request, response) ->
 	dpStorage.isSaneId request.params.id
 	.then ->

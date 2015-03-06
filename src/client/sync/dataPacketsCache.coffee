@@ -33,8 +33,6 @@ module.exports.get = (id) ->
 module.exports.put = (packet) ->
 	return exists(packet.id).then(-> cache packet).then Promise.resolve packet.id
 
-#TODO: module.exports.patch
-
 module.exports.delete = (id) ->
 	if packets[id]?
 		return ensureDelete id

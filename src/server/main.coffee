@@ -134,7 +134,7 @@ module.exports.setupRouting = () ->
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
-	
+
 	fontAwesomeRegex = /\/fonts\/fontawesome-.*/
 	webapp.get fontAwesomeRegex, express.static('node_modules/font-awesome/')
 
@@ -175,8 +175,6 @@ module.exports.setupRouting = () ->
 	webapp.get '/datapacket/exists/:id', urlParser, dataPackets.exists
 	webapp.get '/datapacket/get/:id', urlParser, dataPackets.get
 	webapp.put '/datapacket/put/:id', jsonParser, dataPackets.put
-	#TODO:
-	#webapp.patch '/datapacket/patch/:id/:patcher', jsonParser, dataPackets.patch
 	webapp.get '/datapacket/create', urlParser, dataPackets.create
 	webapp.delete '/datapacket/delete', urlParser, dataPackets.delete
 

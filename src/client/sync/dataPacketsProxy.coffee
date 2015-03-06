@@ -20,7 +20,5 @@ module.exports.put = (packet) ->
 			data: JSON.stringify packet.data
 	)
 
-#TODO: module.exports.patch
-
 module.exports.delete = (id) ->
 	return Promise.resolve $.ajax '/datapacket/delete/' + id, type: 'DELETE'

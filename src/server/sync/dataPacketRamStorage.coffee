@@ -41,8 +41,6 @@ module.exports.put = (packet) ->
 	else
 		return Promise.reject packet.id
 
-#TODO: module.exports.patch
-
 module.exports.delete = (id) ->
 	if packets[id]?
 		delete packets[id]

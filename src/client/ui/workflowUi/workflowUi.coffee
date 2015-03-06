@@ -11,6 +11,7 @@ module.exports = class WorkflowUi
 		@downloadProvider.init('#downloadButton', @sceneManager)
 		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 		@_initStabilityCheck()
+		@_initNotImplementedMessages()
 
 	_initStabilityCheck: () =>
 		@newBrickator = @bundle.getPlugin 'newBrickator'
@@ -22,4 +23,17 @@ module.exports = class WorkflowUi
 				$('#stabilityCheckButton').addClass 'active'
 				
 			@newBrickator._toggleStabilityView @sceneManager.selectedNode
+
+	_initNotImplementedMessages: () =>
+		alertCallback = () ->
+			bootbox.alert({
+					title: 'Not implemented yet'
+					message: 'We are sorry, but this feature is not implemented yet.
+					 Please check back later.'
+			})
+
+		$('#everythingPrinted').click alertCallback
+		$('#everythingLego').click alertCallback
+		$('#downloadPdfButton').click alertCallback
+
 

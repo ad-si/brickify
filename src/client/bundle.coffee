@@ -32,8 +32,5 @@ module.exports = class Bundle
 			return p if p.name == name
 		return null
 
-	getPlugins: (type) =>
-		return @pluginInstances.filter (instance) -> instance.lowfab.type == type
-
 	getControls: =>
 		@renderer.getControls()

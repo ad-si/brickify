@@ -69,28 +69,19 @@ class SolidRenderer
 			threeHelper.applyNodeTransforms node, object
 
 			@threejsNode.add object
+			@zoomToNode node
 
 		node.getModel().then _addModel
 
+	zoomToNode: (node) =>
+		threeNode = threeHelper.find node, @threejsNode
+		boundingSphere = threeHelper.getBoundingSphere threeNode.solid
+		threeNode.updateMatrix()
+		boundingSphere.center.applyProjection threeNode.matrix
+		@bundle.renderer.zoomToBoundingSphere boundingSphere
+
 	onNodeRemove: (node) =>
 		@threejsNode.remove threeHelper.find node, @threejsNode
-
-	newBoundingSphere: () =>
-		if @latestAddedObject
-			geometry = @latestAddedObject.originalMesh.geometry
-			geometry.computeBoundingSphere()
-			result =
-				radius: geometry.boundingSphere.radius
-				center: geometry.boundingSphere.center
-
-			# update center to match moved object
-			@latestAddedObject.updateMatrix()
-			result.center.applyProjection @latestAddedObject.matrix
-
-			@latestAddedObject = null
-			return result
-		else
-			return null
 
 	setNodeVisibility: (node, visible) =>
 		threeHelper.find(node, @threejsNode)?.visible = visible

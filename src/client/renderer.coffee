@@ -38,7 +38,7 @@ module.exports = class Renderer
 
 		@threeRenderer.render @scene, @camera
 
-	adjustCameraToObject: (radiusAndPosition) ->
+	zoomToBoundingSphere: (radiusAndPosition) ->
 		# zooms out/in the camera so that the object is fully visible
 		radius = radiusAndPosition.radius
 		center = radiusAndPosition.center

@@ -38,6 +38,11 @@ class SceneManager
 		.then (scene) -> scene.removeNode node
 		.then => @_notify 'onNodeRemove',  node
 
+	clearScene: =>
+		@scene
+		.then (scene) -> scene.getNodes()
+		.then (nodes) => remove node for node in nodes
+
 #
 # Selection of nodes
 #

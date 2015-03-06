@@ -18,9 +18,7 @@ class Node extends SyncObject
 		return key in @transientProperties or super(key)
 
 	getPluginData: (key) =>
-		return @done =>
-			return @[key] if @[key]?
-			return Promise.reject()
+		return @done => @[key]
 
 	storePluginData: (key, data, transient = true) =>
 		return @next =>

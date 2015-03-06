@@ -23,7 +23,7 @@ class Node extends SyncObject
 	storePluginData: (key, data, transient = true) =>
 		return @next =>
 			@[key] = data
-			if transient and not key in @transientProperties
+			if transient and key not in @transientProperties
 				@transientProperties.push key
 
 	setModelHash: (hash) =>

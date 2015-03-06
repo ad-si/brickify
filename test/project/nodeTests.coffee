@@ -106,13 +106,60 @@ describe 'Node tests', ->
 				expect(dataPackets.calls).to.equal(2)
 				expect(dataPackets.createCalls).to.have.length(1)
 				expect(dataPackets.putCalls).
-				to.deep.have.deep.property('[0].packet.data.name', name)
+				to.have.deep.property('[0].packet.data.name', name)
 
 		it 'should set the node\'s name in constructor', ->
 			dataPackets.nextIds.push 'abcdefgh'
 			name = 'Beautiful Model'
 			node = new Node name: name
 			expect(node.getName()).to.eventually.equal(name)
+
+	describe 'plugin data in nodes', ->
+		it 'should store plugin data chainable', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			data = {random: ['plugin', 'data']}
+			result = node.storePluginData 'pluginName', data
+			expect(result).to.equal(node)
+			result.done ->
+				expect(node).to.have.property('pluginName').that.deep.equals(data)
+
+		it 'should get plugin data', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			data = {random: ['plugin', 'data']}
+			result = node.storePluginData 'pluginName', data
+			expect(node.getPluginData('pluginName')).to.eventually.deep.equal(data)
+
+		it 'should return undefined if plugin data is not available', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			node = new Node()
+			expect(node.getPluginData('pluginName')).to.eventually.be.undefined
+
+		it 'should not store plugin data by default', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
+			node = new Node()
+			data = {random: ['plugin', 'data']}
+			node.storePluginData 'pluginName', data
+			node.save().then ->
+				expect(dataPackets.calls).to.equal(2)
+				expect(dataPackets.createCalls).to.have.length(1)
+				expect(dataPackets.putCalls).
+				to.not.deep.have.property('[0].packet.data.pluginName')
+
+		it 'should store plugin data if transient set to false', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
+			node = new Node()
+			data = {random: ['plugin', 'data']}
+			node.storePluginData 'pluginName', data, false
+			node.save().then ->
+				expect(dataPackets.calls).to.equal(2)
+				expect(dataPackets.createCalls).to.have.length(1)
+				expect(dataPackets.putCalls).
+				to.deep.have.property('[0].packet.data.pluginName').
+				that.deep.equals(data)
 
 	describe 'node transform', ->
 		it 'should provide reasonable default transforms', ->

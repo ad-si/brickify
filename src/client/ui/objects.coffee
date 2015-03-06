@@ -15,12 +15,12 @@ class UiObjects
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		structure = {
-			node: node
-		}
+		node.done =>
+			structure = {
+				node: node
+			}
 
-		@_createUi(structure).then =>
-
+			@_createUi structure
 			@objectList.push structure
 			@jqueryObject.append structure.ui
 
@@ -29,6 +29,7 @@ class UiObjects
 			# make sure a brush is always selected
 			if not @_selectedBrush and @_brushList.length > 0
 				@_brushSelect @_brushList[@_brushList.length - 1]
+			return
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
@@ -67,14 +68,10 @@ class UiObjects
 			@brushContainer.append brush.jqueryObject
 
 	_createUi: (structure) =>
-		structure.node.getName().then (name) =>
-
-
-			html = "<li class='objectListItem'><p>#{name}</p></li>"
-			structure.ui = $(html)
-
-			structure.ui.on 'click', () =>
-				@_objectSelect(structure)
+		name = structure.node.name
+		html = "<li class='objectListItem'><p>#{name}</p></li>"
+		structure.ui = $(html)
+		structure.ui.on 'click', () => @_objectSelect(structure)
 
 	# creates a default brush with list entry
 	_createBrush: (brush) =>

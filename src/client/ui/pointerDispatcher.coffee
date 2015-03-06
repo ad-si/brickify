@@ -16,7 +16,7 @@ class PointerDispatcher
 	init: =>
 		@isBrushing = false
 		@brushToggled = false
-		@sceneManager = @bundle.ui.sceneManager
+		@sceneManager = @bundle.sceneManager
 		@objects = @bundle.ui.workflowUi.objects
 		@initListeners()
 

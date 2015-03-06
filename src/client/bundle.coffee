@@ -1,9 +1,13 @@
 PluginLoader = require '../client/pluginLoader'
 Ui = require './ui/ui'
 Renderer = require './renderer'
-Statesync = require './statesync'
 ModelLoader = require './modelLoader'
-ObjectTree = require '../common/state/objectTree'
+SceneManager = require './sceneManager'
+
+SyncObject = require '../common/sync/syncObject'
+SyncObject.dataPacketProvider = require './sync/dataPackets'
+Node = require '../common/project/node'
+Node.modelProvider = require './modelCache'
 
 ###
 # @class Bundle
@@ -12,49 +16,21 @@ module.exports = class Bundle
 	constructor: (@globalConfig, @controls) ->
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
-
-		@statesync = new Statesync(@)
 		@modelLoader = new ModelLoader(@)
-
+		@sceneManager = new SceneManager(@)
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
+		@pluginInstances = @pluginLoader.loadPlugins()
+		@ui = new Ui(@) if @globalConfig.buildUi
 
 	init: =>
-		@statesync
-			.init()
-			.then () =>
-				@pluginInstances = @pluginLoader.loadPlugins()
-				if @globalConfig.buildUi
-					@ui = new Ui(@)
-					@ui.init()
-				@renderer.setupControls @globalConfig, @controls
-				@statesync.handleUpdatedState()
-			.then(@load)
-			.then () =>
-				window.addEventListener 'beforeunload', @unload
-
-	load: =>
-		@statesync.performStateAction @renderer.loadCamera
-
-	onStateUpdate: (state) =>
-		@renderer.onStateUpdate state
-
-	unload: =>
-		@saveChanges()
-
-	saveChanges: =>
-		@statesync.performStateAction @renderer.saveCamera
+		@ui?.init()
+		@renderer.setupControls @globalConfig, @controls
+		return @sceneManager.init()
 
 	getPlugin: (name) =>
 		for p in @pluginInstances
-			if p.name == name
-				return p
+			return p if p.name == name
 		return null
 
-	getPlugins: (type) =>
-		@pluginInstances.filter (instance) -> instance.lowfab.type == type
-
-	clearScene: () =>
-		@statesync.performStateAction	ObjectTree.clear
-
-	getControls: () =>
+	getControls: =>
 		@renderer.getControls()

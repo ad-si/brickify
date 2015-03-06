@@ -6,7 +6,6 @@ $('#buttonContainer').fadeTo(500, 1)
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
-objectTree = require '../common/state/objectTree'
 Bundle = require '../client/bundle'
 clone = require 'clone'
 
@@ -19,7 +18,6 @@ globalConfig.buildUi = false
 globalConfig.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
-globalConfig.plugins.stlExport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.solidRenderer = true
@@ -50,11 +48,8 @@ b1 = bundle1.init().then ->
 				document.getElementById('renderArea1').style.backgroundImage = 'none')
 		b2.then(() -> bundle2.modelLoader.loadByHash hash)
 			.then(() ->
-				nb = bundle2.getPlugin 'newBrickator'
-				nb.processFirstObject animate
-			).then(() ->
 				document.getElementById('renderArea2').style.backgroundImage = 'none')
-		$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
+		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)

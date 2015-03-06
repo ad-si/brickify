@@ -1,5 +1,4 @@
 Hotkeys = require '../hotkeys'
-UiSceneManager = require './sceneManager'
 PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi.coffee'
 
@@ -12,7 +11,6 @@ module.exports = class Ui
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
 		@workflowUi = new WorkflowUi(@bundle)
-		@sceneManager = new UiSceneManager(@bundle)
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) ->
@@ -34,7 +32,6 @@ module.exports = class Ui
 	init: =>
 		@workflowUi.init()
 		@_initListeners()
-		@_initUiElements()
 		@_initHotkeys()
 
 	_initListeners: =>
@@ -59,12 +56,9 @@ module.exports = class Ui
 			@windowResizeHandler
 		)
 
-	_initUiElements: =>
-		@sceneManager.init()
-
 	_initHotkeys: =>
-		@hotkeys = new Hotkeys(@pluginHooks, @sceneManager)
-		@hotkeys.addEvents @sceneManager.getHotkeys()
+		@hotkeys = new Hotkeys(@pluginHooks, @bundle.sceneManager)
+		@hotkeys.addEvents @bundle.sceneManager.getHotkeys()
 
 		gridHotkeys = {
 			title: 'UI'

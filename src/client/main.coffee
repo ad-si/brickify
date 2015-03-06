@@ -17,13 +17,10 @@ commandFunctions = {
 		console.log 'loading initial model'
 		p = /^[0-9a-z]{32}/
 		if p.test value
-			bundle.clearScene()
+			bundle.sceneManager.clearScene()
 			bundle.modelLoader.loadByHash value
 		else
 			console.warn 'Invalid value for initialModel'
-	legofy: () ->
-		nb = bundle.getPlugin('newBrickator')
-		nb.processFirstObject()
 }
 
 postInitCallback = () ->
@@ -42,7 +39,6 @@ postInitCallback = () ->
 	#clear url hash after executing commands
 	window.location.hash = ''
 
-globalConfig.autoLegofy = true
 bundle = new Bundle globalConfig
 bundle.init().then(postInitCallback)
 

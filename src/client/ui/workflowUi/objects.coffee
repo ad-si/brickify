@@ -1,4 +1,4 @@
-module.exports = class UiObjects
+class UiObjects
 	constructor: (@bundle) ->
 		@objectList = []
 		@selectedStructure = null
@@ -9,26 +9,27 @@ module.exports = class UiObjects
 				@_brushList.push brush
 
 	init: (jqueryString, brushjQueryString, visibilityjQueryString) =>
-		@ui = @bundle.ui
 		@jqueryObject = $(jqueryString)
+
 		@_createBrushUi brushjQueryString
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		structure = {
-			node: node
-		}
+		node.done =>
+			structure = {
+				node: node
+			}
 
-		@_createUi(structure)
+			@_createUi structure
+			@objectList.push structure
+			@jqueryObject.append structure.ui
 
-		@objectList.push structure
-		@jqueryObject.append structure.ui
+			@_objectSelect structure
 
-		@_objectSelect structure
-
-		# make sure a brush is always selected
-		if not @_selectedBrush
-			@_brushSelect @_brushList[@_brushList.length - 1]
+			# make sure a brush is always selected
+			if not @_selectedBrush and @_brushList.length > 0
+				@_brushSelect @_brushList[@_brushList.length - 1]
+			return
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
@@ -73,13 +74,10 @@ module.exports = class UiObjects
 		htmlContainer.on 'click', () => @_brushSelect brush
 
 	_createUi: (structure) =>
-		name = structure.node.fileName
-
+		name = structure.node.name
 		html = "<li class='objectListItem'><p>#{name}</p></li>"
 		structure.ui = $(html)
-
-		structure.ui.on 'click', () =>
-			@_objectSelect(structure)
+		structure.ui.on 'click', () => @_objectSelect(structure)
 
 	_objectSelect: (structure, sceneManagerEvent = false) =>
 		# Don't do anything when clicking on selected object
@@ -87,13 +85,13 @@ module.exports = class UiObjects
 
 		# deselect previously selected object
 		if @selectedStructure?
-			@ui.sceneManager.deselect @selectedStructure.node
+			@bundle.sceneManager.deselect @selectedStructure.node
 			@selectedStructure.ui.removeClass('selectedObject')
 			@_deselectBrush @selectedStructure.node
 
 		# select current object
 		@selectedStructure = structure
-		@ui.sceneManager.select @selectedStructure.node unless sceneManagerEvent
+		@bundle.sceneManager.select @selectedStructure.node unless sceneManagerEvent
 		@selectedStructure.ui.addClass('selectedObject')
 
 	# deselect currently selected brush

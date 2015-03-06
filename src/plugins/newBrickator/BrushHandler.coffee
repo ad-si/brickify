@@ -23,15 +23,9 @@ class BrushHandler
 			cancelCallback: @_printCancel
 		}]
 
-	_checkAndPrepare: (selectedNode) =>
-		# ignore if we are currently in build mode
-		if @newBrickator.buildModeEnabled
-			return
-
-		return @newBrickator._getCachedData(selectedNode)
-
 	_legoSelect: (selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
@@ -39,7 +33,8 @@ class BrushHandler
 			@_setModelShadowVisiblity selectedNode, false
 
 	_printSelect: (selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
@@ -47,21 +42,24 @@ class BrushHandler
 			@_setModelShadowVisiblity selectedNode, true
 
 	_legoMouseDown: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseUp: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
@@ -71,33 +69,38 @@ class BrushHandler
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_legoMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, false
 
 	_legoCancel: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.resetTouchedVoxelsTo3dPrinted()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseDown: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseMove: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
@@ -107,12 +110,14 @@ class BrushHandler
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseHover: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, true
 
 	_printCancel: (event, selectedNode) =>
-		@_checkAndPrepare selectedNode
+		return if @newBrickator.buildModeEnabled
+		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.resetTouchedVoxelsToLego()
 			cachedData.visualization.updateVoxelVisualization()

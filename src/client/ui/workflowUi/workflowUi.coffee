@@ -7,7 +7,7 @@ module.exports = class WorkflowUi
 		@objects = new UiObjects(@bundle)
 
 	init: () =>
-		@sceneManager = @bundle.ui.sceneManager
+		@sceneManager = @bundle.sceneManager
 		@downloadProvider.init('#downloadButton', @sceneManager)
 		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 		@_initStabilityCheck()

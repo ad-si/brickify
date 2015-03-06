@@ -37,7 +37,7 @@ Following scripts are currently available:
 - `apiDocumentation`: Generates API documentation
 - `documentation`: Generates code documentation
 - `test`: Executes headless tests
-- `testFrontend`: Executes frontend tests in the browser
+- `testClient`: Executes frontend tests in the browser
 - `batchTest`: Batch test all models and create a HTML report
 - `prepublish`: Prepares publication of project
 

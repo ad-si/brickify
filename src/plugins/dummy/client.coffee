@@ -47,27 +47,6 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
-	# The state synchronization module will call each plugin's
-	# `onStateUpdate` method (if provided) whenever the current state changes
-	# due to user input or calculation results on either server or client side.
-	#
-	# The hook provides the new complete state as an argument.
-	#
-	# `state.toolsValues` contains the values of the associated ui-elements
-	# in the tools-container.
-	#
-	# If the plugin does asynchronous work, it has to return a thenable (promise
-	# or promise like)object that resolves on completion of the plugins work.
-	#
-	# @param {Object} state the complete current state
-	# @memberOf dummyClientPlugin
-	# @see stateSynchronization
-	###
-	onStateUpdate: (state) =>
-		console.log 'Dummy Client Plugin state change'
-		return Promise.resolve()
-
-	###
 	# On each render frame the renderer will call the `on3dUpdate`
 	# method of all plugins that provide it.
 	#
@@ -84,7 +63,7 @@ module.exports = class DummyPlugin
 	# by calling onNodeAdd
 	#
 	# @memberOf dummyClientPlugin
-	# @param {NodeStructure} node the added node
+	# @param {Node} node the added node
 	###
 	onNodeAdd: (node) =>
 		console.log node, ' added'
@@ -95,7 +74,7 @@ module.exports = class DummyPlugin
 	# calling onNodeSelect
 	#
 	# @memberOf dummyClientPlugin
-	# @param {NodeStructure} node the selected node
+	# @param {Node} node the selected node
 	###
 	onNodeSelect: (node) =>
 		console.log node, ' selected'
@@ -106,7 +85,7 @@ module.exports = class DummyPlugin
 	# calling onNodeDeselect
 	#
 	# @memberOf dummyClientPlugin
-	# @param {NodeStructure} node the deselected node
+	# @param {Node} node the deselected node
 	###
 	onNodeDeselect: (node) =>
 		console.log node, ' deselected'

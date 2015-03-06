@@ -47,7 +47,7 @@ module.exports = class Coloring
 			return brick.visualizationMaterial
 
 		# collect materials of neighbors
-		neighbors = brick.uniqueNeighbours()
+		neighbors = brick.uniqueNeighbors()
 		neighborColors = neighbors.map (brick) ->
 			brick.visualizationMaterial
 

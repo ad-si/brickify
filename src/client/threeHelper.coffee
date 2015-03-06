@@ -16,7 +16,7 @@ module.exports.applyNodeTransforms = applyNodeTransforms
 
 module.exports.getTransformMatrix = (node) ->
 	threeNode = new THREE.Object3D()
-	applyNodeTransforms selectedNode, threeNode
+	applyNodeTransforms node, threeNode
 	threeNode.updateMatrix()
 	return threeNode.matrix
 

@@ -17,7 +17,7 @@ module.exports = class NodeVisualization
 		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
 
-		@voxelWireframe = new VoxelWireframe(@grid, @voxelBrickSubnode)
+		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
 		@threeNode.add @voxelBrickSubnode
 
 		@defaultColoring = new Coloring()
@@ -232,8 +232,8 @@ module.exports = class NodeVisualization
 				return lastNonLegoVoxel
 
 		# no lego voxel and not pointing towards the baseplate.
-		# return voxel in middle of model as a last chance
-		return @_getVoxelInMiddleOfModel event, selectedNode
+		# return voxel in middle of what could be lego as a last chance
+		return @_getVoxelInMiddleOfPossibleLego event, selectedNode
 
 
 	# returnes the first intersected lego voxel and
@@ -288,13 +288,8 @@ module.exports = class NodeVisualization
 		return (@grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?)
 
 	# returns the voxel in the middle of the model
-	_getVoxelInMiddleOfModel: (event, selectedNode) ->
-		if @solidRenderer?
-			modelIntersects = @solidRenderer.intersectRayWithModel event, selectedNode
-		else
-			return null
-
-		modelIntersects = @_mergeIdenticalIntersects modelIntersects
+	_getVoxelInMiddleOfPossibleLego: (event, selectedNode) ->
+		modelIntersects = @voxelWireframe.intersectRay event
 
 		# calculate the middle of the first two intersections
 		# and return voxel at this position

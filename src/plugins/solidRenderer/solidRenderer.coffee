@@ -191,23 +191,3 @@ module.exports = class SolidRenderer
 
 		@loadModelIfNeeded(node).then () =>
 			changeMaterial()
-
-	intersectRayWithModel: (event, node) =>
-		obj = @_getThreeObjectByName node.pluginData.solidRenderer.threeObjectUuid
-		return [] if not obj?
-
-		# set two sided material to catch all sides
-		visibleObject = obj.children[0]
-		oldMaterialSide = visibleObject.material.side
-		visibleObject.material.side = THREE.DoubleSide
-
-		intersects =
-			interactionHelper.getIntersections(
-				event
-				@bundle.renderer
-				[visibleObject]
-			)
-
-		visibleObject.material.side = oldMaterialSide
-
-		return intersects

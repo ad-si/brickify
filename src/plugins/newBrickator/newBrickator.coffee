@@ -277,26 +277,26 @@ class NewBrickator
 			}
 
 		@buildLayerUi.slider.on 'input', () =>
-			selectedNode = @bundle.ui.sceneManager.selectedNode
+			selectedNode = @bundle.sceneManager.selectedNode
 			v = @buildLayerUi.slider.val()
 			@_updateBuildLayer(selectedNode)
 
 		@buildLayerUi.increment.on 'click', () =>
-			selectedNode = @bundle.ui.sceneManager.selectedNode
+			selectedNode = @bundle.sceneManager.selectedNode
 			v = @buildLayerUi.slider.val()
 			v++
 			@buildLayerUi.slider.val(v)
 			@_updateBuildLayer(selectedNode)
 
 		@buildLayerUi.decrement.on 'click', () =>
-			selectedNode = @bundle.ui.sceneManager.selectedNode
+			selectedNode = @bundle.sceneManager.selectedNode
 			v = @buildLayerUi.slider.val()
 			v--
 			@buildLayerUi.slider.val(v)
 			@_updateBuildLayer(selectedNode)
 
 		@buildButton.click () =>
-			selectedNode = @bundle.ui.sceneManager.selectedNode
+			selectedNode = @bundle.sceneManager.selectedNode
 
 			if @buildModeEnabled
 				@buildContainer.slideUp()

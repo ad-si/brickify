@@ -35,5 +35,6 @@ module.exports = class WorkflowUi
 		$('#everythingPrinted').click alertCallback
 		$('#everythingLego').click alertCallback
 		$('#downloadPdfButton').click alertCallback
+		$('#shareButton').click alertCallback
 
 

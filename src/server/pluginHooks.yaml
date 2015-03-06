@@ -12,12 +12,3 @@
 #  The [pluginLoader](pluginLoader.html) will call each plugin's `init` method
 #  (if provided) after loading the plugin. It is the first method to be called.
 - init
-
-#  ##State synchronization##
-#
-#  The [state synchronization module](statesync.html) will call each plugin's
-#  `onStateUpdate` method (if provided) whenever the current state changes
-#  due to user input or calculation results on either server or client side.
-#
-#  The hook provides the new complete state as an argument.
-- onStateUpdate

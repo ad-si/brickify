@@ -57,13 +57,12 @@ syncWithServer: true
 buildUi: true
 
 #newBrickator
-autoLegofy: false
+autoLegofy: true
 
 #load these plugins
 plugins:
   dummy: false
   stlImport: true
-  stlExport: true
   coordinateSystem: true
   legoBoard: true
   solidRenderer: true

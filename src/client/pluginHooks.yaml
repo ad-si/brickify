@@ -35,20 +35,6 @@
 
 - newBoundingSphere
 
-
-#  ## State synchronization
-#
-#  The [state synchronization module](statesync.html) will call each plugin's
-#  `onStateUpdate` method (if provided) whenever the current state changes
-#  due to user input or calculation results on either server or client side.
-#
-#  The hook provides the new complete state as an argument. If the plugin
-#  does asynchronous work, it has to return a thenable (promise or promise like)
-#  object that resolves on completion of the plugins work.
-
-- onStateUpdate
-
-
 #  ## 3D scene update and animation
 #
 #  On each render frame the [renderer](render.html) will call the `on3dUpdate`
@@ -127,8 +113,6 @@
 #	mouseHoverCallback: # when the mouse is moved, but not pressed
 #	mouseUpCallback: # when mouse is released
 #	cancelCallback: # when interaction is canceled (ESC, two buttons pressed)
-#	canToggleVisibility: true # if true, the user can toggle visibility
-#	visibilityCallback: # called when the user changes visibility
 #	tooltip: ''
 # }
 #

@@ -1,5 +1,4 @@
 Hotkeys = require '../hotkeys'
-UiSceneManager = require './sceneManager'
 UiObjects = require './objects'
 PointerDispatcher = require './pointerDispatcher'
 DownloadProvider = require './downloadProvider'
@@ -13,7 +12,6 @@ module.exports = class Ui
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
 		@objects = new UiObjects(@bundle)
-		@sceneManager = new UiSceneManager(@bundle)
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 		@downloadProvider = new DownloadProvider(@bundle)
 
@@ -37,7 +35,7 @@ module.exports = class Ui
 		@_initListeners()
 		@_initUiElements()
 		@_initHotkeys()
-		@downloadProvider.init('#downloadButton', @sceneManager)
+		@downloadProvider.init('#downloadButton', @bundle.sceneManager)
 
 	_initListeners: =>
 		@pointerDispatcher.init()
@@ -59,11 +57,10 @@ module.exports = class Ui
 
 	_initUiElements: =>
 		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
-		@sceneManager.init()
 
 	_initHotkeys: =>
-		@hotkeys = new Hotkeys(@pluginHooks, @sceneManager)
-		@hotkeys.addEvents @sceneManager.getHotkeys()
+		@hotkeys = new Hotkeys(@pluginHooks, @bundle.sceneManager)
+		@hotkeys.addEvents @bundle.sceneManager.getHotkeys()
 
 		gridHotkeys = {
 			title: 'UI'

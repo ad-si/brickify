@@ -49,11 +49,8 @@ b1 = bundle1.init().then ->
 				document.getElementById('renderArea1').style.backgroundImage = 'none')
 		b2.then(() -> bundle2.modelLoader.loadByHash hash)
 			.then(() ->
-				nb = bundle2.getPlugin 'newBrickator'
-				nb.processFirstObject animate
-			).then(() ->
 				document.getElementById('renderArea2').style.backgroundImage = 'none')
-		$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
+		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)

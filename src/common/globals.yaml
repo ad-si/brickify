@@ -57,7 +57,7 @@ syncWithServer: true
 buildUi: true
 
 #newBrickator
-autoLegofy: false
+autoLegofy: true
 
 #load these plugins
 plugins:

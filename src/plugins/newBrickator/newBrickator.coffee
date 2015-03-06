@@ -43,15 +43,6 @@ class NewBrickator
 		if @bundle.globalConfig.autoLegofy
 			@runLegoPipeline node
 
-	processFirstObject: (animate) =>
-		#ToDo: Add animation to brick/voxel visualization (see #255)
-		@bundle.statesync.performStateAction (state) =>
-			if state.rootNode.children?
-				node = state.rootNode.children[0]
-				@runLegoPipeline node
-			else
-				console.error 'Unable to Legofy first object: state is empty'
-
 	runLegoPipeline: (selectedNode) =>
 		@_getCachedData(selectedNode).then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego

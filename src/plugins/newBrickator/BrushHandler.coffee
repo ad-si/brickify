@@ -14,8 +14,6 @@ class BrushHandler
 			mouseHoverCallback: @_legoMouseHover
 			mouseUpCallback: @_legoMouseUp
 			cancelCallback: @_legoCancel
-			canToggleVisibility: true
-			visibilityCallback: @newBrickator._toggleBrickLayer
 			tooltip: 'Select geometry to be made out of LEGO'
 		},{
 			text: 'Make 3D print'
@@ -26,8 +24,6 @@ class BrushHandler
 			mouseHoverCallback: @_printMouseHover
 			mouseUpCallback: @_printMouseUp
 			cancelCallback: @_printCancel
-			canToggleVisibility: true
-			visibilityCallback: @newBrickator._togglePrintedLayer
 			tooltip: 'Select geometry to be 3d-printed'
 		}]
 

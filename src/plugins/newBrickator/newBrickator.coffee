@@ -257,13 +257,6 @@ class NewBrickator
 			cachedData.visualization.toggleStabilityView()
 			cachedData.visualization.showBricks()
 
-	# makes bricks visible/invisible
-	_toggleBrickLayer: (isEnabled) =>
-		@_brickVisibility = isEnabled
-
-		for k,v of @gridCache
-			@_applyVoxelAndBrickVisibility v
-
 	_applyVoxelAndBrickVisibility: (cachedData) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')
 
@@ -283,12 +276,6 @@ class NewBrickator
 			if solidRenderer?
 				solidRenderer.setNodeVisibility(cachedData.node, false)
 			cachedData.visualization.hideVoxelAndBricks()
-
-	_togglePrintedLayer: (isEnabled) =>
-		@_printVisibility = isEnabled
-
-		for k,v of @gridCache
-			@_applyPrintVisibility v
 
 	_applyPrintVisibility: (cachedData) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')

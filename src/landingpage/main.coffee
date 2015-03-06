@@ -36,29 +36,28 @@ config2 = clone globalConfig
 config1.renderAreaId = 'renderArea1'
 config1.plugins.newBrickator = false
 bundle1 = new Bundle config1
-controls = bundle1.getControls()
-b1 = bundle1.init()
+b1 = bundle1.init().then ->
+	controls = bundle1.getControls()
+	config2.renderAreaId = 'renderArea2'
+	config2.plugins.solidRenderer = false
+	bundle2 = new Bundle config2, controls
+	b2 = bundle2.init()
 
-config2.renderAreaId = 'renderArea2'
-config2.plugins.solidRenderer = false
-bundle2 = new Bundle config2, controls
-b2 = bundle2.init()
+	loadAndConvert = (hash, animate) ->
+		b1.then(() ->
+			bundle1.modelLoader.loadByHash hash)
+			.then(() ->
+				document.getElementById('renderArea1').style.backgroundImage = 'none')
+		b2.then(() -> bundle2.modelLoader.loadByHash hash)
+			.then(() ->
+				nb = bundle2.getPlugin 'newBrickator'
+				nb.processFirstObject animate
+			).then(() ->
+				document.getElementById('renderArea2').style.backgroundImage = 'none')
+		$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
 
-loadAndConvert = (hash, animate) ->
-	b1.then(() ->
-		bundle1.modelLoader.loadByHash hash)
-		.then(() ->
-			document.getElementById('renderArea1').style.backgroundImage = 'none')
-	b2.then(() -> bundle2.modelLoader.loadByHash hash)
-		.then(() ->
-			nb = bundle2.getPlugin 'newBrickator'
-			nb.processFirstObject animate
-		).then(() ->
-			document.getElementById('renderArea2').style.backgroundImage = 'none')
-	$('.applink').prop 'href', "app#initialModel=#{hash}+legofy"
-
-#load and process model
-loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
+	#load and process model
+	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
 loadModel = (hash, errors) ->
 	b1.then(() -> bundle1.clearScene())

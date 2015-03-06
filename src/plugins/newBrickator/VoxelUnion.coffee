@@ -73,7 +73,7 @@ class VoxelUnion
 				geo.faces.push new THREE.Face3(v.points[0], v.points[1], v.points[3])
 				geo.faces.push new THREE.Face3(v.points[3], v.points[1], v.points[2])
 
-			# check if there are 4 neighbours in the same z-layer
+			# check if there are 4 neighbors in the same z-layer
 			# (no need to create sidwalls)
 			if s.zLayers[z][x + 1][y].voxel and s.zLayers[z][x - 1][y].voxel and
 			s.zLayers[z][x][y + 1].voxel and s.zLayers[z][x][y - 1].voxel
@@ -193,7 +193,7 @@ class VoxelUnion
 		dx = (@grid.spacing.x / 2)
 		dy = (@grid.spacing.y / 2)
 
-		# check if this point already exists in a neighbour voxel
+		# check if this point already exists in a neighbor voxel
 		# (a point can be used by up to 4 voxels in a layer, so check
 		# if it already has been generated to prevent duplicates)
 
@@ -201,7 +201,7 @@ class VoxelUnion
 		# |0  1|0  1|0  1|  |
 		# |3  2|3  2|3  2|  y
 		# x----§----x----x  |  point § of selected voxel can already exist as
-		# |0  1|sel.|0  1|  v  point 1, 2 or 3 of neighbour voxels
+		# |0  1|sel.|0  1|  v  point 1, 2 or 3 of neighbor voxels
 		# |3  2|vox |3  2|
 		# x----x----x----x
 		# |0  1|0  1|0  1|

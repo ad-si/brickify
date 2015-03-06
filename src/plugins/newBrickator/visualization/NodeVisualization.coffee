@@ -171,10 +171,15 @@ module.exports = class NodeVisualization
 			return voxel
 		return null
 
+	resetTouchedVoxelsToLego: =>
+		for voxel in @currentlyTouchedVoxels
+			voxel.makeLego()
+		@currentlyTouchedVoxels = []
+
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode) =>
 		voxel = @getVoxel event, selectedNode, false
-		
+
 		if voxel and not voxel.isLego()
 			voxel.makeLego()
 			voxel.visible = true
@@ -182,6 +187,11 @@ module.exports = class NodeVisualization
 			@currentlyTouchedVoxels.push voxel
 			return voxel
 		return null
+
+	resetTouchedVoxelsTo3dPrinted: =>
+		for voxel in @currentlyTouchedVoxels
+			voxel.make3dPrinted()
+		@currentlyTouchedVoxels = []
 
 	# moves all currenly touched voxels to modified voxels
 	updateModifiedVoxels: () =>
@@ -212,9 +222,9 @@ module.exports = class NodeVisualization
 				return null
 
 			# to prevent unecpected selection behavior, it is required
-			# that both voxels are neighbours (otherwise strange
+			# that both voxels are neighbors (otherwise strange
 			# results appear if selecting lego through model geometry)
-			if @_voxelsAreNeighbour lastNonLegoVoxel, firstLegoVoxel
+			if @_voxelsAreNeighbor lastNonLegoVoxel, firstLegoVoxel
 				return lastNonLegoVoxel
 		else
 			# if there is no lego voxel, maybe we are pointing at the baseplate?
@@ -256,7 +266,7 @@ module.exports = class NodeVisualization
 
 	# returns true if both voxels are neigbours, meaning there is
 	# a maximum square distance of two
-	_voxelsAreNeighbour: (a, b) ->
+	_voxelsAreNeighbor: (a, b) ->
 		c0 = a.voxelCoords
 		c1 = b.voxelCoords
 

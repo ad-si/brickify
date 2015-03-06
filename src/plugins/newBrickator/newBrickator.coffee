@@ -73,9 +73,8 @@ class NewBrickator
 			# instead of creating csg live, show original model semitransparent
 			solidRenderer = @bundle.getPlugin('solid-renderer')
 			if solidRenderer?
-				solidRenderer.setNodeMaterial selectedNode,
-					@printMaterial
-					@_applyPrintVisibility cachedData
+				solidRenderer.setNodeMaterial selectedNode, @printMaterial
+			@_applyPrintVisibility cachedData
 
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout

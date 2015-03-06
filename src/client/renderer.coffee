@@ -6,17 +6,17 @@ Stats = require 'stats-js'
 # @class Renderer
 ###
 module.exports = class Renderer
-	constructor: (@pluginHooks, globalConfig, controls) ->
+	constructor: (@pluginHooks, globalConfig) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
-		@init globalConfig, controls
+		@init globalConfig
 
 	localRenderer: (timestamp) =>
 			@stats?.begin()
 			@threeRenderer.render @.scene, @.camera
 			@pluginHooks.on3dUpdate timestamp
-			@controls.update()
+			@controls?.update()
 
 			@stats?.end()
 			requestAnimationFrame @localRenderer
@@ -69,13 +69,12 @@ module.exports = class Renderer
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
 
-	init: (globalConfig, controls) ->
+	init: (globalConfig) ->
 		@setupSize globalConfig
 		@setupRenderer globalConfig
 		@setupScene globalConfig
 		@setupLighting globalConfig
 		@setupCamera globalConfig
-		@setupControls globalConfig, controls
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
 		requestAnimationFrame @localRenderer
 

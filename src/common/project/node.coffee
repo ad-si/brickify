@@ -8,10 +8,25 @@ SyncObject = require '../sync/syncObject'
 class Node extends SyncObject
 	constructor: ({name, modelHash, transform} = {}) ->
 		super arguments[0]
+		@transientProperties = []
 		@name = name || null
 		@modelHash = modelHash || null
 		@transform = {}
 		@_setTransform transform
+
+	_isTransient: (key) =>
+		return key in @transientProperties or super(key)
+
+	getPluginData: (key) =>
+		return @done =>
+			return @[key] if @[key]?
+			return Promise.reject()
+
+	storePluginData: (key, data, transient = true) =>
+		return @next =>
+			@[key] = data
+			if transient and not key in @transientProperties
+				@transientProperties.push key
 
 	setModelHash: (hash) =>
 		return @next => @modelHash = hash

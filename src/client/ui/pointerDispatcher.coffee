@@ -1,11 +1,21 @@
 interactionHelper = require '../interactionHelper'
 
+BUTTON_STATES =
+	none: 0
+	left: 1
+	right: 2
+	middle: 4
+	x1: 8
+	x2: 16
+	eraser: 32
+
 class PointerDispatcher
 	constructor: (@bundle) ->
 		return
 
 	init: =>
 		@isBrushing = false
+		@brushToggled = false
 		@sceneManager = @bundle.ui.sceneManager
 		@objects = @bundle.ui.objects
 		@initListeners()
@@ -25,6 +35,7 @@ class PointerDispatcher
 			'PointerLeave'
 			'GotPointerCapture'
 			'LostPointerCapture'
+			'ContextMenu'
 		]
 
 		element = @bundle.ui.renderer.getDomElement()
@@ -49,6 +60,10 @@ class PointerDispatcher
 		if clickedNode? and clickedNode != @sceneManager.selectedNode
 			@sceneManager.select clickedNode
 
+		# toggle brush if it is the right mouse button
+		if(event.buttons & BUTTON_STATES.right)
+			@brushToggled = @objects.toggleBrush()
+
 		# perform brush action
 		@isBrushing = true
 		brush = @objects.getSelectedBrush()
@@ -62,6 +77,11 @@ class PointerDispatcher
 		# don't call mouse events if there is no selected node
 		return unless @sceneManager.selectedNode?
 
+		if event.buttons not in
+		[BUTTON_STATES.none, BUTTON_STATES.left, BUTTON_STATES.right]
+			@_cancelBrush event
+			return
+
 		# perform brush action
 		brush = @objects.getSelectedBrush()
 		return unless brush?
@@ -69,7 +89,7 @@ class PointerDispatcher
 		if @isBrushing and brush.mouseMoveCallback?
 			brush.mouseMoveCallback event, @sceneManager.selectedNode
 			@_stop event
-		else if event.buttons is 0 and brush.mouseHoverCallback?
+		else if event.buttons is BUTTON_STATES.none and brush.mouseHoverCallback?
 			brush.mouseHoverCallback event, @sceneManager.selectedNode
 			@_stop event
 
@@ -88,8 +108,13 @@ class PointerDispatcher
 			if brush? and brush.mouseUpCallback?
 				brush.mouseUpCallback event, @sceneManager.selectedNode
 
+			@_untoggleBrush()
+		return
+
 	onPointerCancel: (event) =>
 		# Pointer capture will be implicitly released
+
+		@_cancelBrush event
 		return
 
 	onPointerOut: (event) =>
@@ -112,8 +137,28 @@ class PointerDispatcher
 		element = @bundle.ui.renderer.getDomElement()
 		element.releasePointerCapture event.pointerId
 
+	onContextMenu: (event) =>
+		# this event sometimes interferes with right clicks
+		@_stop event
+
+	_untoggleBrush: =>
+		if @brushToggled
+			@objects.toggleBrush()
+			@brushToggled = false
+
+	_cancelBrush: (event) =>
+		if @isBrushing
+			@isBrushing = false
+			brush = @objects.getSelectedBrush()
+			if brush? and brush.cancelCallback?
+				brush.cancelCallback event, @sceneManager.selectedNode
+
+			@_untoggleBrush()
+			@_stop event
+
 	_stop: (event) =>
 		event.stopPropagation()
+		event.stopImmediatePropagation()
 		event.preventDefault()
 
 	_getResponsiblePluginFor: (event) =>

@@ -122,7 +122,14 @@ class UiObjects
 
 		@_selectedBrush = null
 
-	getSelectedBrush: () =>
+	getSelectedBrush: =>
 		return @_selectedBrush
+
+	toggleBrush: =>
+		for brush in @_brushList
+			if brush isnt @_selectedBrush
+				@_brushSelect brush
+				return true
+		return false
 
 module.exports = UiObjects

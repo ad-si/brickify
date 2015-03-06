@@ -18,7 +18,6 @@ globalConfig.buildUi = false
 globalConfig.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
-globalConfig.plugins.stlExport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.solidRenderer = true

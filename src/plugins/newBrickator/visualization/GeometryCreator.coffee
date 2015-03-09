@@ -17,7 +17,13 @@ module.exports = class GeometryCreator
 		@knob.applyMatrix(rotation)
 
 	getVoxel: (gridPosition, material) =>
-		return @getBrick gridPosition, {x: 1, y: 1, z: 1}, material
+		brick = @getBrick gridPosition, {x: 1, y: 1, z: 1}, material
+
+		#store references (voxel) for further use
+		brick.setVoxelCoords gridPosition
+		brick.setGridReference @grid.getVoxel gridPosition
+
+		return brick
 
 	getBrick: (gridPosition, brickDimensions, material) =>
 		# returns a THREE.Geometry that uses the given material and is
@@ -50,10 +56,6 @@ module.exports = class GeometryCreator
 		brick.translateX worldBrickPosition.x
 		brick.translateY worldBrickPosition.y
 		brick.translateZ worldBrickPosition.z
-
-		#store references for further use
-		brick.setVoxelCoords gridPosition
-		brick.setGridReference @grid.getVoxel gridPosition
 
 		return brick
 

@@ -70,6 +70,10 @@ module.exports = class NodeVisualization
 			v.setMaterial material
 			@_updateVoxel v
 
+			#check link
+			if (v.gridEntry.visibleVoxel != v)
+				console.warn 'Wrong link between grid entry and visible voxel'
+
 		# show not filled lego shape as outline
 		outlineVoxels = []
 		for v in @modifiedVoxels
@@ -98,6 +102,10 @@ module.exports = class NodeVisualization
 						threeBrick = @geometryCreator.getVoxel {x: x, y: y, z: z}, material
 						@_updateVoxel threeBrick
 						@voxelsSubnode.add threeBrick
+
+						#check link
+						if (threeBrick.gridEntry.visibleVoxel != threeBrick)
+							console.warn 'Wrong link between grid entry and visible voxel'
 
 	# makes disabled voxels invisible, toggles knob visibility
 	_updateVoxel: (threeBrick) =>
@@ -147,9 +155,6 @@ module.exports = class NodeVisualization
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
-
-			if condition?
-				return if not condition(voxel)
 
 			@currentlyHighlightedVoxel = voxel
 			voxel.setHighlight true, @defaultColoring.highlightMaterial

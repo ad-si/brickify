@@ -17,11 +17,7 @@ module.exports = class WorkflowUi
 		@newBrickator = @bundle.getPlugin 'newBrickator'
 
 		$('#stabilityCheckButton').on 'click', () =>
-			if $('#stabilityCheckButton').hasClass 'active'
-				$('#stabilityCheckButton').removeClass 'active'
-			else
-				$('#stabilityCheckButton').addClass 'active'
-				
+			$('#stabilityCheckButton').toggleClass 'active'
 			@newBrickator._toggleStabilityView @sceneManager.selectedNode
 
 	_initNotImplementedMessages: () =>

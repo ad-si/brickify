@@ -21,11 +21,7 @@ block body
 		.row
 			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
 				h1#logo Brickolage
-
-				if tabSidebar
-					include ./tabSidebar.jade
-				else
-					include ./defaultSidebar.jade
+				include ./sidebar.jade
 
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?

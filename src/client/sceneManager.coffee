@@ -22,7 +22,7 @@ class SceneManager
 
 	_notify: (hook, node) =>
 		Promise.all @pluginHooks[hook] node
-		.then => @bundle.ui?.workflowUi.objects[hook] node
+		.then => @bundle.ui?.workflowUi[hook]? node
 
 #
 # Administration of nodes

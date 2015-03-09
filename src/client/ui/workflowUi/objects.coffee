@@ -13,7 +13,7 @@ class UiObjects
 
 		@_createBrushUi brushjQueryString
 
-	# Called by sceneManager when a node is added
+	# Called  when a node is added
 	onNodeAdd: (node) =>
 		node.done =>
 			structure = {
@@ -31,7 +31,7 @@ class UiObjects
 				@_brushSelect @_brushList[@_brushList.length - 1]
 			return
 
-	# Called by sceneManager when a node is removed
+	# Called by when a node is removed
 	onNodeRemove: (node) =>
 		for i in [0...@objectList.length] by 1
 			structure = @objectList[i]

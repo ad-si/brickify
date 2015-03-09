@@ -5,6 +5,24 @@ module.exports = class WorkflowUi
 	constructor: (@bundle) ->
 		@downloadProvider = new DownloadProvider(@bundle)
 		@objects = new UiObjects(@bundle)
+		@numObjects = 0
+
+	# Called by sceneManager when a node is added
+	onNodeAdd: (node) =>
+		@objects.onNodeAdd node
+		@numObjects++
+
+		# enable rest of UI
+		@_enableUiGroups ['load', 'edit', 'preview', 'export']
+
+	# Called by sceneManager when a node is removed
+	onNodeRemove: (node) =>
+		@objects.onNodeRemove node
+		@numObjects--
+
+		if @numObjects == 0
+			# disable rest of UI
+			@_enableUiGroups ['load']
 
 	init: () =>
 		@sceneManager = @bundle.sceneManager
@@ -15,6 +33,9 @@ module.exports = class WorkflowUi
 		@_initStabilityCheck()
 		@_initBuildButton()
 		@_initNotImplementedMessages()
+
+		# only enable load ui until a model is loaded
+		@_enableUiGroups ['load']
 
 	_initStabilityCheck: () =>
 		@stabilityCheckButton = $('#stabilityCheckButton')
@@ -27,10 +48,10 @@ module.exports = class WorkflowUi
 	_applyStabilityViewMode: () =>
 		#disable other UI
 		if @stabilityCheckModeEnabled
-			@_disabelNonStabilityUi()
+			@_disableNonStabilityUi()
 		else
 			@_enableNonStabilityUi()
-			
+
 		@stabilityCheckButton.toggleClass 'active', @stabilityCheckModeEnabled
 		@newBrickator._setStabilityView(
 			@sceneManager.selectedNode, @stabilityCheckModeEnabled
@@ -111,30 +132,41 @@ module.exports = class WorkflowUi
 
 
 	_disableNonBuildUi: () =>
-		@_disableNonPreviewGroups()
+		@_enableUiGroups ['preview']
 		@stabilityCheckButton.addClass 'disabled'
 
 	_enableNonBuildUi: () =>
-		@_enableNonPreviewGroups()
+		@_enableUiGroups ['load', 'edit', 'preview', 'export']
 		@stabilityCheckButton.removeClass 'disabled'
 
-	_disabelNonStabilityUi: () =>
-		@_disableNonPreviewGroups()
+	_disableNonStabilityUi: () =>
+		@_enableUiGroups ['preview']
 		@buildButton.addClass 'disabled'
 
 	_enableNonStabilityUi: () =>
-		@_enableNonPreviewGroups()
+		@_enableUiGroups ['load', 'edit', 'preview', 'export']
 		@buildButton.removeClass 'disabled'
 
-	_disableNonPreviewGroups: () =>
-		$('#loadGroup').find('.btn, .panel').addClass 'disabled'
-		$('#editGroup').find('.btn').addClass 'disabled'
-		$('#exportGroup').find('.btn').addClass 'disabled'
+	_enableUiGroups: (groupsList) =>
+		if groupsList.indexOf('load') >= 0
+			$('#loadGroup').find('.btn, .panel').removeClass 'disabled'
+		else
+			$('#loadGroup').find('.btn, .panel').addClass 'disabled'
 
-	_enableNonPreviewGroups: () =>
-		$('#loadGroup').find('.btn, .panel').removeClass 'disabled'
-		$('#editGroup').find('.btn').removeClass 'disabled'
-		$('#exportGroup').find('.btn').removeClass 'disabled'
+		if groupsList.indexOf('edit') >= 0
+			$('#editGroup').find('.btn').removeClass 'disabled'
+		else
+			$('#editGroup').find('.btn').addClass 'disabled'
+
+		if groupsList.indexOf('preview') >= 0
+			$('#previewGroup').find('.btn').removeClass 'disabled'
+		else
+			$('#previewGroup').find('.btn').addClass 'disabled'
+
+		if groupsList.indexOf('export') >= 0
+			$('#exportGroup').find('.btn').removeClass 'disabled'
+		else
+			$('#exportGroup').find('.btn').addClass 'disabled'
 
 	_initNotImplementedMessages: () =>
 		alertCallback = () ->

@@ -41,7 +41,7 @@ class SceneManager
 	clearScene: =>
 		@scene
 		.then (scene) -> scene.getNodes()
-		.then (nodes) => remove node for node in nodes
+		.then (nodes) => @remove node for node in nodes
 
 #
 # Selection of nodes

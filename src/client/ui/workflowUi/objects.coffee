@@ -54,11 +54,9 @@ class UiObjects
 
 	hideBrushContainer: =>
 		$('#editGroup').slideUp()
-		#@brushContainer.hide()
 
 	showBrushContainer: =>
 		$('#editGroup').slideDown()
-		#@brushContainer.show()
 
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null
@@ -68,10 +66,10 @@ class UiObjects
 		for brush in @_brushList
 			htmlContainer = @brushContainer.find brush.containerId
 			brush.jqueryObject = htmlContainer
-			@_bindBrushEvent htmlContainer, brush
+			@_bindBrushEvent brush
 			
-	_bindBrushEvent: (htmlContainer, brush) ->
-		htmlContainer.on 'click', () => @_brushSelect brush
+	_bindBrushEvent: (brush) ->
+		brush.jqueryObject.on 'click', () => @_brushSelect brush
 
 	_createUi: (structure) =>
 		name = structure.node.name

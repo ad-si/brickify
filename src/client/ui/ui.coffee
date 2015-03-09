@@ -13,7 +13,7 @@ module.exports = class Ui
 		@workflowUi = new WorkflowUi(@bundle)
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
-	fileLoadHandler: (event) ->
+	fileLoadHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
@@ -45,7 +45,7 @@ module.exports = class Ui
 
 		@renderer.getDomElement().addEventListener(
 			'drop'
-			@fileLoadHandler.bind @
+			@fileLoadHandler
 			false
 		)
 		$('#loadButton').on 'change', (event) =>

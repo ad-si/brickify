@@ -216,12 +216,15 @@ class NewBrickator
 
 	_setStabilityView: (selectedNode, stabilityViewEnabled) =>
 		return if !selectedNode?
+
 		@_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.setStabilityView(stabilityViewEnabled)
 			if stabilityViewEnabled
 				cachedData.visualization.showBricks()
+				@brushHandler.interactionDisabled = true
 			else
 				cachedData.visualization.showVoxels()
+				@brushHandler.interactionDisabled = false
 
 	_applyVoxelAndBrickVisibility: (cachedData) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')
@@ -265,6 +268,9 @@ class NewBrickator
 	# are shown
 	enableBuildMode: (selectedNode) =>
 		return @_getCachedData(selectedNode).then (cachedData) =>
+			# disable interaction
+			@brushHandler.interactionDisabled = true
+
 			# show bricks and csg
 			cachedData.visualization.showBricks()
 
@@ -284,9 +290,11 @@ class NewBrickator
 	# disables build mode and shows voxels, hides csg
 	disableBuildMode: (selectedNode) =>
 		return @_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.updateVoxelVisualization()
+			#enable interaction
+			@brushHandler.interactionDisabled = false
 
 			# hide csg, show model, show voxels
+			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.hideCsg()
 			solidRenderer = @bundle.getPlugin('solid-renderer')
 			solidRenderer?.setNodeVisibility cachedData.node, true

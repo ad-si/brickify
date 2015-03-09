@@ -3,6 +3,8 @@ class BrushHandler
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
 		})
+		
+		@interactionDisabled = false
 
 	getBrushes: () =>
 		return [{
@@ -24,7 +26,7 @@ class BrushHandler
 		}]
 
 	_legoSelect: (selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
@@ -33,7 +35,7 @@ class BrushHandler
 			@_setModelShadowVisiblity selectedNode, false
 
 	_printSelect: (selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.showVoxels()
@@ -42,7 +44,7 @@ class BrushHandler
 			@_setModelShadowVisiblity selectedNode, true
 
 	_legoMouseDown: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
@@ -50,7 +52,7 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
@@ -58,7 +60,7 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseUp: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
@@ -69,13 +71,13 @@ class BrushHandler
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_legoMouseHover: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, false
 
 	_legoCancel: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.resetTouchedVoxelsTo3dPrinted()
@@ -83,7 +85,7 @@ class BrushHandler
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseDown: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
@@ -91,7 +93,7 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseMove: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
@@ -99,7 +101,7 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
@@ -110,13 +112,13 @@ class BrushHandler
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseHover: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.highlightVoxel event, selectedNode, true
 
 	_printCancel: (event, selectedNode) =>
-		return if @newBrickator.buildModeEnabled
+		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.visualization.resetTouchedVoxelsToLego()

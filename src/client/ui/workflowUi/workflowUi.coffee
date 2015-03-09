@@ -25,6 +25,12 @@ module.exports = class WorkflowUi
 			@_applyStabilityViewMode()
 	
 	_applyStabilityViewMode: () =>
+		#disable other UI
+		if @stabilityCheckModeEnabled
+			@_disabelNonStabilityUi()
+		else
+			@_enableNonStabilityUi()
+			
 		@stabilityCheckButton.toggleClass 'active', @stabilityCheckModeEnabled
 		@newBrickator._setStabilityView(
 			@sceneManager.selectedNode, @stabilityCheckModeEnabled
@@ -81,8 +87,8 @@ module.exports = class WorkflowUi
 
 	_enableBuildMode: (selectedNode) =>
 		@newBrickator.enableBuildMode(selectedNode).then (numZLayers) =>
-			#hide brushes
-			@bundle.ui.workflowUi.objects.hideBrushContainer()
+			# disable other UI
+			@_disableNonBuildUi()
 	
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
@@ -100,9 +106,35 @@ module.exports = class WorkflowUi
 
 	_disableBuildMode: (selectedNode) =>
 		@newBrickator.disableBuildMode(selectedNode).then () =>
-			#show brushes
-			@bundle.ui.workflowUi.objects.showBrushContainer()
+			# enable other ui
+			@_enableNonBuildUi()
 
+
+	_disableNonBuildUi: () =>
+		@_disableNonPreviewGroups()
+		@stabilityCheckButton.addClass 'disabled'
+
+	_enableNonBuildUi: () =>
+		@_enableNonPreviewGroups()
+		@stabilityCheckButton.removeClass 'disabled'
+
+	_disabelNonStabilityUi: () =>
+		@_disableNonPreviewGroups()
+		@buildButton.addClass 'disabled'
+
+	_enableNonStabilityUi: () =>
+		@_enableNonPreviewGroups()
+		@buildButton.removeClass 'disabled'
+
+	_disableNonPreviewGroups: () =>
+		$('#loadGroup').find('.btn, .panel').addClass 'disabled'
+		$('#editGroup').find('.btn').addClass 'disabled'
+		$('#exportGroup').find('.btn').addClass 'disabled'
+
+	_enableNonPreviewGroups: () =>
+		$('#loadGroup').find('.btn, .panel').removeClass 'disabled'
+		$('#editGroup').find('.btn').removeClass 'disabled'
+		$('#exportGroup').find('.btn').removeClass 'disabled'
 
 	_initNotImplementedMessages: () =>
 		alertCallback = () ->

@@ -29,7 +29,6 @@ class NewBrickator
 
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)
-		@_initBuildButton()
 
 	init3d: (@threejsRootNode) => return
 
@@ -259,61 +258,10 @@ class NewBrickator
 			if solidRenderer?
 				solidRenderer.setNodeVisibility(cachedData.node, false)
 
-	_initBuildButton: () =>
-		# TODO: refactor after demo on 2015-02-26
-		@buildButton = $('#buildButton')
-		@buildModeEnabled = false
-
-		@buildContainer = $('#buildContainer')
-		@buildContainer.hide()
-		@buildContainer.removeClass 'hidden'
-
-		@buildLayerUi = {
-			slider: $('#buildSlider')
-			decrement: $('#buildDecrement')
-			increment: $('#buildIncrement')
-			curLayer: $('#currentBuildLayer')
-			maxLayer: $('#maxBuildLayer')
-			}
-
-		@buildLayerUi.slider.on 'input', () =>
-			selectedNode = @bundle.sceneManager.selectedNode
-			v = @buildLayerUi.slider.val()
-			@_updateBuildLayer(selectedNode)
-
-		@buildLayerUi.increment.on 'click', () =>
-			selectedNode = @bundle.sceneManager.selectedNode
-			v = @buildLayerUi.slider.val()
-			v++
-			@buildLayerUi.slider.val(v)
-			@_updateBuildLayer(selectedNode)
-
-		@buildLayerUi.decrement.on 'click', () =>
-			selectedNode = @bundle.sceneManager.selectedNode
-			v = @buildLayerUi.slider.val()
-			v--
-			@buildLayerUi.slider.val(v)
-			@_updateBuildLayer(selectedNode)
-
-		@buildButton.click () =>
-			selectedNode = @bundle.sceneManager.selectedNode
-
-			if @buildModeEnabled
-				@buildContainer.slideUp()
-				@buildButton.removeClass('active')
-				@_disableBuildMode selectedNode
-			else
-				@buildContainer.slideDown()
-				@buildButton.addClass('active')
-				@_enableBuildMode selectedNode
-
-			@buildModeEnabled = !@buildModeEnabled
-
-	_enableBuildMode: (selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
-			#hide brushes
-			@bundle.ui.workflowUi.objects.hideBrushContainer()
-
+	# enables the build mode, which means that only bricks and CSG
+	# are shown
+	enableBuildMode: (selectedNode) =>
+		return @_getCachedData(selectedNode).then (cachedData) =>
 			# show bricks and csg
 			cachedData.visualization.showBricks()
 
@@ -322,31 +270,24 @@ class NewBrickator
 			solidRenderer = @bundle.getPlugin('solid-renderer')
 			solidRenderer?.setNodeVisibility cachedData.node, false
 
-			# apply grid size to layer view
-			@buildLayerUi.slider.attr('min', 0)
-			@buildLayerUi.slider.attr('max', cachedData.grid.zLayers.length)
-			@buildLayerUi.maxLayer.html(cachedData.grid.zLayers.length)
+			return cachedData.grid.zLayers.length
 
-			@buildLayerUi.slider.val(1)
-			@_updateBuildLayer selectedNode
-
-	_updateBuildLayer: (selectedNode) =>
-		layer = @buildLayerUi.slider.val()
-		@buildLayerUi.curLayer.html(Number(layer))
-		@_getCachedData(selectedNode).then (cachedData) =>
+	# when build mode is enabled, this tells the visualization to show
+	# bricks up to the specified layer
+	showBuildLayer: (selectedNode, layer) =>
+		return @_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.showBrickLayer layer - 1
 
-	_disableBuildMode: (selectedNode) =>
-		@_getCachedData(selectedNode).then (cachedData) =>
+	# disables build mode and shows voxels, hides csg
+	disableBuildMode: (selectedNode) =>
+		return @_getCachedData(selectedNode).then (cachedData) =>
 			cachedData.visualization.updateVoxelVisualization()
-
-			#show brushes
-			@bundle.ui.workflowUi.objects.showBrushContainer()
 
 			# hide csg, show model, show voxels
 			cachedData.visualization.hideCsg()
 			solidRenderer = @bundle.getPlugin('solid-renderer')
 			solidRenderer?.setNodeVisibility cachedData.node, true
 			cachedData.visualization.showVoxels()
+
 
 module.exports = NewBrickator

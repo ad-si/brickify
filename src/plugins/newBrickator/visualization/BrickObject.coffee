@@ -1,17 +1,15 @@
 THREE = require 'three'
 module.exports = class BrickObject extends THREE.Object3D
-	constructor: (brickGeometry, knobGeometry, material) ->
+	constructor: (brickGeometry, knobGeometry, @material) ->
 		super()
-		@actualMaterial = material
-		brickMesh = new THREE.Mesh(brickGeometry, @actualMaterial)
-		knobMesh = new THREE.Mesh(knobGeometry, @actualMaterial)
+		brickMesh = new THREE.Mesh(brickGeometry, @material)
+		knobMesh = new THREE.Mesh(knobGeometry, @material)
 		@add brickMesh
 		@add knobMesh
-		@_isHighlighted = false
 
-	setMaterial: (@actualMaterial) =>
-		@children[0].material = @actualMaterial
-		@children[1].material = @actualMaterial
+	setMaterial: (@material) =>
+		@children[0].material = @material
+		@children[1].material = @material
 
 		# material override resets highlight state
 		@_isHighlighted = false
@@ -32,12 +30,12 @@ module.exports = class BrickObject extends THREE.Object3D
 	# makes the voxel being 3d printed
 	make3dPrinted: () =>
 		@gridEntry.enabled = false
-		@correctVisibility = false
+		@nonHighlightVisibility = false
 
 	# makes the voxel being legotized
 	makeLego: () =>
 		@gridEntry.enabled = true
-		@correctVisibility = true
+		@nonHighlightVisibility = true
 
 	isLego: () =>
 		return @gridEntry.enabled
@@ -45,12 +43,10 @@ module.exports = class BrickObject extends THREE.Object3D
 	# one may highlight this brick with a special material
 	setHighlight: (isHighlighted, material) =>
 		if isHighlighted
-			@_isHighlighted = true
 			@visible = true
 			@children[0].material = material
 			@children[1].material = material
 		else
-			@_isHighlighted = false
-			@visible = @correctVisibility
-			@children[0].material = @actualMaterial
-			@children[1].material = @actualMaterial
+			@visible = @nonHighlightVisibility
+			@children[0].material = @material
+			@children[1].material = @material

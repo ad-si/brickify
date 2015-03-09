@@ -70,13 +70,3 @@ Promise.resolve($.get '/share').then((link) ->
 	$('#cmdHelp').tooltip({placement: 'bottom'}).click () ->
 		bundle.ui.hotkeys.showHelp()
 )
-
-$(document).ready () ->
-	$('div.bhoechie-tab-menu>div.list-group>a').click (e) ->
-		e.preventDefault()
-		$(this).siblings('a.active').removeClass('active')
-		$(this).addClass('active')
-        
-		index = $(this).index()
-		$('div.bhoechie-tab>div.bhoechie-tab-content').removeClass('active')
-		$('div.bhoechie-tab>div.bhoechie-tab-content').eq(index).addClass('active')

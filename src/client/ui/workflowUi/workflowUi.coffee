@@ -17,9 +17,18 @@ module.exports = class WorkflowUi
 		@_initNotImplementedMessages()
 
 	_initStabilityCheck: () =>
-		$('#stabilityCheckButton').on 'click', () =>
-			$('#stabilityCheckButton').toggleClass 'active'
-			@newBrickator._toggleStabilityView @sceneManager.selectedNode
+		@stabilityCheckButton = $('#stabilityCheckButton')
+		@stabilityCheckModeEnabled = false
+
+		@stabilityCheckButton.on 'click', () =>
+			@stabilityCheckModeEnabled = !@stabilityCheckModeEnabled
+			@_applyStabilityViewMode()
+	
+	_applyStabilityViewMode: () =>
+		@stabilityCheckButton.toggleClass 'active', @stabilityCheckModeEnabled
+		@newBrickator._setStabilityView(
+			@sceneManager.selectedNode, @stabilityCheckModeEnabled
+		)
 
 	_initBuildButton: () =>
 		@buildButton = $('#buildButton')

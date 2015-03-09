@@ -114,8 +114,8 @@ module.exports = class NodeVisualization
 		@updateBrickVisualization()
 		return
 
-	toggleStabilityView: () =>
-		@isStabilityView = !@isStabilityView
+	setStabilityView: (enabled) =>
+		@isStabilityView = enabled
 		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
 		@updateBrickVisualization(coloring)
 		return

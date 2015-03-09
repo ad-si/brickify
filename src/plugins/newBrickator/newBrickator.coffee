@@ -214,11 +214,14 @@ class NewBrickator
 			]
 		}
 
-	_toggleStabilityView: (selectedNode) =>
+	_setStabilityView: (selectedNode, stabilityViewEnabled) =>
 		return if !selectedNode?
 		@_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.toggleStabilityView()
-			cachedData.visualization.showBricks()
+			cachedData.visualization.setStabilityView(stabilityViewEnabled)
+			if stabilityViewEnabled
+				cachedData.visualization.showBricks()
+			else
+				cachedData.visualization.showVoxels()
 
 	_applyVoxelAndBrickVisibility: (cachedData) =>
 		solidRenderer = @bundle.getPlugin('solid-renderer')

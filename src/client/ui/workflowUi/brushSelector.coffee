@@ -8,10 +8,15 @@ class BrushSelector
 			for brush in array
 				@_brushList.push brush
 
-	init: (jqueryString, brushjQueryString, visibilityjQueryString) =>
-		@jqueryObject = $(jqueryString)
+	init: (jQueryBrushContainerSelector) =>
+		@_selectedBrush = null
 
-		@_createBrushUi brushjQueryString
+		@brushContainer = $(jQueryBrushContainerSelector)
+
+		for brush in @_brushList
+			htmlContainer = @brushContainer.find brush.containerId
+			brush.jqueryObject = htmlContainer
+			@_bindBrushEvent brush
 
 	onNodeSelect: (node) =>
 		@selectedNode = node
@@ -22,16 +27,6 @@ class BrushSelector
 	onNodeDeselect: (node) =>
 		@_deselectBrush node
 		@selectedNode = null
-
-	_createBrushUi: (brushjQueryString) =>
-		@_selectedBrush = null
-
-		@brushContainer = $(brushjQueryString)
-
-		for brush in @_brushList
-			htmlContainer = @brushContainer.find brush.containerId
-			brush.jqueryObject = htmlContainer
-			@_bindBrushEvent brush
 			
 	_bindBrushEvent: (brush) ->
 		brush.jqueryObject.on 'click', () => @_brushSelect brush

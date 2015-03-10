@@ -31,7 +31,7 @@ module.exports = class WorkflowUi
 	init: () =>
 		@sceneManager = @bundle.sceneManager
 		@downloadProvider.init('#downloadButton', @sceneManager)
-		@brushSelector.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
+		@brushSelector.init '#brushContainer'
 		@newBrickator = @bundle.getPlugin 'newBrickator'
 
 		@_initStabilityCheck()

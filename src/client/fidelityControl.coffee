@@ -31,6 +31,6 @@ class FidelityControl
 
 	_anyTrue: (arrayOfBoolean) ->
 		return false if arrayOfBoolean.length == 0
-		return arrayOfBoolean.any (value) -> reutrn value
+		return arrayOfBoolean.some (value) -> return value
 
 module.exports = FidelityControl

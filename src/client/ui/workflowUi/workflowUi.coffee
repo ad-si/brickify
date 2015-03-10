@@ -9,7 +9,6 @@ module.exports = class WorkflowUi
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		@objects.onNodeAdd node
 		@numObjects++
 
 		# enable rest of UI
@@ -17,12 +16,17 @@ module.exports = class WorkflowUi
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
-		@objects.onNodeRemove node
 		@numObjects--
 
 		if @numObjects == 0
 			# disable rest of UI
 			@_enableUiGroups ['load']
+
+	onNodeSelect: (node) =>
+		@objects.onNodeSelect node
+
+	onNodeDeselect: (node) =>
+		@objects.onNodeDeselect node
 
 	init: () =>
 		@sceneManager = @bundle.sceneManager

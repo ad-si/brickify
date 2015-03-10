@@ -32,11 +32,18 @@ class SceneManager
 		@scene
 		.then (scene) -> scene.addNode node
 		.then => @_notify 'onNodeAdd', node
+		.then =>
+			@select node
 
 	remove: (node) =>
 		@scene
 		.then (scene) -> scene.removeNode node
 		.then => @_notify 'onNodeRemove',  node
+		.then =>
+			if node == @selectedNode
+				@deselect node
+				if (@scene.nodes.length > 0)
+					@select @scene.nodes[0]
 
 	clearScene: =>
 		@scene
@@ -53,7 +60,7 @@ class SceneManager
 
 	deselect: =>
 		if @selectedNode?
-			@pluginHooks.onNodeDeselect @selectedNode
+			@_notify 'onNodeDeselect', @selectedNode
 			@selectedNode = null
 		return
 

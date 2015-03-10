@@ -1,9 +1,9 @@
 class UiObjects
 	constructor: (@bundle) ->
-		@objectList = []
-		@selectedStructure = null
+		@selectedNode = null
 
 		@_brushList = []
+
 		for array in @bundle.pluginHooks.getBrushes()
 			for brush in array
 				@_brushList.push brush
@@ -13,50 +13,15 @@ class UiObjects
 
 		@_createBrushUi brushjQueryString
 
-	# Called  when a node is added
-	onNodeAdd: (node) =>
-		node.done =>
-			structure = {
-				node: node
-			}
-
-			@_createUi structure
-			@objectList.push structure
-			@jqueryObject.append structure.ui
-
-			@_objectSelect structure
-
-			# make sure a brush is always selected
-			if not @_selectedBrush and @_brushList.length > 0
-				@_brushSelect @_brushList[@_brushList.length - 1]
-			return
-
-	# Called by when a node is removed
-	onNodeRemove: (node) =>
-		for i in [0...@objectList.length] by 1
-			structure = @objectList[i]
-			if structure.node == node
-				structure.ui.remove()
-				@objectList.splice(i, 1)
-
-				if @objectList.length > 0
-					@_objectSelect @objectList[@objectList.length - 1]
-				return
-
-	# overrides the node selection
 	onNodeSelect: (node) =>
-		return if node is @selectedStructure.node
+		@selectedNode = node
 
-		for structure in @objectList
-			if structure.node == node
-				@_objectSelect structure, true
-				return
+		if not @_selectedBrush and @_brushList.length > 0
+			@_brushSelect @_brushList[@_brushList.length - 1]
 
-	hideBrushContainer: =>
-		$('#editGroup').slideUp()
-
-	showBrushContainer: =>
-		$('#editGroup').slideDown()
+	onNodeDeselect: (node) =>
+		@_deselectBrush node
+		@selectedNode = null
 
 	_createBrushUi: (brushjQueryString) =>
 		@_selectedBrush = null
@@ -71,44 +36,21 @@ class UiObjects
 	_bindBrushEvent: (brush) ->
 		brush.jqueryObject.on 'click', () => @_brushSelect brush
 
-	_createUi: (structure) =>
-		name = structure.node.name
-		html = "<li class='objectListItem'><p>#{name}</p></li>"
-		structure.ui = $(html)
-		structure.ui.on 'click', () => @_objectSelect(structure)
-
-	_objectSelect: (structure, sceneManagerEvent = false) =>
-		# Don't do anything when clicking on selected object
-		return if structure is @selectedStructure
-
-		# deselect previously selected object
-		if @selectedStructure?
-			@bundle.sceneManager.deselect @selectedStructure.node
-			@selectedStructure.ui.removeClass('selectedObject')
-			@_deselectBrush @selectedStructure.node
-
-		# select current object
-		@selectedStructure = structure
-		@bundle.sceneManager.select @selectedStructure.node unless sceneManagerEvent
-		@selectedStructure.ui.addClass('selectedObject')
-
-	# deselect currently selected brush
+	
 	_brushSelect: (brush) =>
-		if @_selectedBrush?
-			@_selectedBrush.deselectCallback? @selectedStructure.node
-			@_selectedBrush.jqueryObject.removeClass 'active'
+		# deselect currently selected brush
+		@_deselectBrush @selectedNode
 
 		#select new brush
 		@_selectedBrush = brush
 		brush.jqueryObject.addClass 'active'
-		brush.selectCallback? @selectedStructure.node
+		brush.selectCallback? @selectedNode
 
 	_deselectBrush: (node) =>
 		if @_selectedBrush?
 			@_selectedBrush.deselectCallback? node
 			@_selectedBrush.jqueryObject.removeClass 'active'
-
-		@_selectedBrush = null
+			@_selectedBrush = null
 
 	getSelectedBrush: =>
 		return @_selectedBrush

@@ -48,6 +48,7 @@ module.exports = class BrickGraph
 						delete @grid.zLayers[z][x][y].brick
 
 	_voxelExistsAndIsEnabled: (z, x, y) =>
+		# !! makes sure a boolean is returned
 		return !!@grid.zLayers[z]?[x]?[y]?.enabled
 
 	_connectToBrickBelow: (brick, x, y, z) =>
@@ -142,27 +143,24 @@ module.exports = class BrickGraph
 		arrayHelper.removeFirstOccurenceFromArray brick, @bricks[brick.position.z]
 		# remove references to neighbors/connections
 		brick.removeSelfFromSurrounding()
+		# remove references in voxels
+		@forEachVoxelInBrick brick, (voxel) =>
+			voxel.brick = null
 
 	# updates the 'voxel.brick' reference in each voxel in the grid
 	updateReferencesInGrid: () =>
-		# clear all references
-		@grid.forEachVoxel (voxel) ->
-			voxel.brick = null
-
-		forEachVoxelInBrick = (brick, callback) =>
-			for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
-				for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
-					for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
-						voxel = @grid.zLayers[z][x][y]
-						if voxel?
-							callback(voxel)
-						else
-							console.warn "Brick without voxel at #{x}, #{y}, #{z}"
-							#console.warn brick
-
 		# set references from brick list
 		@forEachBrick (brick) =>
-			forEachVoxelInBrick brick, (voxel) =>
+			@forEachVoxelInBrick brick, (voxel) =>
 				voxel.brick = brick
-	
 
+	forEachVoxelInBrick: (brick, callback) =>
+		for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
+			for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
+				for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
+					voxel = @grid?.zLayers[z][x][y]
+					if voxel?
+						callback(voxel)
+					else
+						console.warn "Brick without voxel at #{x}, #{y}, #{z}"
+						#console.warn brick

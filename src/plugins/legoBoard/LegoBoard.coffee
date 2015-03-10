@@ -77,7 +77,7 @@ module.exports = class LegoBoard
 			@threejsNode.children[1].visible = false
 		else
 			@threejsNode.children[0].material = @currentBaseplateMaterial
-			@threejsNode.children[1].visible = true
+			@threejsNode.children[1].visible = true if @highQualMode
 
 	toggleVisibility: () =>
 		@threejsNode.visible = !@threejsNode.visible

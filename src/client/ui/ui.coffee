@@ -61,7 +61,8 @@ module.exports = class Ui
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks, @bundle.sceneManager)
 		@hotkeys.addEvents @bundle.sceneManager.getHotkeys()
-
+		@hotkeys.addEvents @renderer.fidelityControl.getHotkeys()
+		
 		gridHotkeys = {
 			title: 'UI'
 			events: [

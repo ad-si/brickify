@@ -18,7 +18,7 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		@highQualMode = true		
+		@highQualMode = true
 
 		knobTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		knobTexture.wrapS = THREE.RepeatWrapping

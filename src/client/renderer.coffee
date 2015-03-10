@@ -1,6 +1,7 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
+FidelityConrol = require './fidelityControl'
 
 ###
 # @class Renderer
@@ -12,14 +13,40 @@ module.exports = class Renderer
 		@threeRenderer = null
 		@init globalConfig
 
+		@fpsAverage = 1
+		@accumulatedFrames = 0
+		@accumulatedTime = 0
+		@accumulationTime = 500
+
+		@fidelityControl = new FidelityConrol(@pluginHooks)
+
 	localRenderer: (timestamp) =>
 			@stats?.begin()
 			@threeRenderer.render @scene, @camera
 			@pluginHooks.on3dUpdate timestamp
 			@controls?.update()
-
 			@stats?.end()
 			requestAnimationFrame @localRenderer
+
+			@_updateFpsAverage timestamp
+
+	_updateFpsAverage: (timestamp) =>
+		if not @_lastTimestamp?
+			@_lastTimestamp = timestamp
+			return
+
+		delta = timestamp - @_lastTimestamp
+
+		@_lastTimestamp = timestamp
+		@accumulatedTime += delta
+		@accumulatedFrames++
+
+		if @accumulatedTime > @accumulationTime
+			@fpsAverage = (@accumulatedFrames / @accumulatedTime) * 1000
+			@accumulatedFrames = 0
+			@accumulatedTime = 0
+			@fidelityControl.updateFps @fpsAverage
+		
 
 	addToScene: (node) ->
 		@scene.add node

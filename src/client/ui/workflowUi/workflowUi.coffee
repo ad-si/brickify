@@ -148,25 +148,15 @@ module.exports = class WorkflowUi
 		@buildButton.removeClass 'disabled'
 
 	_enableUiGroups: (groupsList) =>
-		if groupsList.indexOf('load') >= 0
-			$('#loadGroup').find('.btn, .panel').removeClass 'disabled'
-		else
-			$('#loadGroup').find('.btn, .panel').addClass 'disabled'
+		availableGroups = [
+			'load', 'edit', 'preview', 'export'
+		]
 
-		if groupsList.indexOf('edit') >= 0
-			$('#editGroup').find('.btn').removeClass 'disabled'
-		else
-			$('#editGroup').find('.btn').addClass 'disabled'
-
-		if groupsList.indexOf('preview') >= 0
-			$('#previewGroup').find('.btn').removeClass 'disabled'
-		else
-			$('#previewGroup').find('.btn').addClass 'disabled'
-
-		if groupsList.indexOf('export') >= 0
-			$('#exportGroup').find('.btn').removeClass 'disabled'
-		else
-			$('#exportGroup').find('.btn').addClass 'disabled'
+		for group in availableGroups
+			if groupsList.indexOf(group) >= 0
+				$("##{group}Group").find('.btn, .panel').removeClass 'disabled'
+			else
+				$("##{group}Group").find('.btn, .panel').addClass 'disabled'
 
 	_initNotImplementedMessages: () =>
 		alertCallback = () ->

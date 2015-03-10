@@ -1,4 +1,4 @@
-class UiObjects
+class BrushSelector
 	constructor: (@bundle) ->
 		@selectedNode = null
 
@@ -62,4 +62,4 @@ class UiObjects
 				return true
 		return false
 
-module.exports = UiObjects
+module.exports = BrushSelector

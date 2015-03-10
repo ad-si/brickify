@@ -1,10 +1,10 @@
 DownloadProvider = require './downloadProvider'
-UiObjects = require './objects'
+BrushSelector = require './brushSelector'
 
 module.exports = class WorkflowUi
 	constructor: (@bundle) ->
 		@downloadProvider = new DownloadProvider(@bundle)
-		@objects = new UiObjects(@bundle)
+		@brushSelector = new BrushSelector(@bundle)
 		@numObjects = 0
 
 	# Called by sceneManager when a node is added
@@ -23,15 +23,15 @@ module.exports = class WorkflowUi
 			@_enableUiGroups ['load']
 
 	onNodeSelect: (node) =>
-		@objects.onNodeSelect node
+		@brushSelector.onNodeSelect node
 
 	onNodeDeselect: (node) =>
-		@objects.onNodeDeselect node
+		@brushSelector.onNodeDeselect node
 
 	init: () =>
 		@sceneManager = @bundle.sceneManager
 		@downloadProvider.init('#downloadButton', @sceneManager)
-		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
+		@brushSelector.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 		@newBrickator = @bundle.getPlugin 'newBrickator'
 
 		@_initStabilityCheck()

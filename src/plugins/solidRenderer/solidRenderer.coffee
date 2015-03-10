@@ -69,6 +69,9 @@ class SolidRenderer
 			threeHelper.link node, object
 			threeHelper.applyNodeTransforms node, object
 
+			# prevent z-flickering on bottom
+			object.translateZ 0.5
+
 			@threejsNode.add object
 			@zoomToNode node
 

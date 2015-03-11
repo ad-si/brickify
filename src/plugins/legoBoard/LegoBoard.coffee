@@ -18,9 +18,21 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
+		@highQualMode = false
+
+		knobTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
+		knobTexture.wrapS = THREE.RepeatWrapping
+		knobTexture.wrapT = THREE.RepeatWrapping
+		knobTexture.repeat.set 50,50
+
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlate
+			color: globalConfig.colors.basePlate
 		)
+		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
+			map: knobTexture
+		)
+		@currentBaseplateMaterial = @baseplateTexturedMaterial
+
 		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlate
 				opacity: 0.4
@@ -39,6 +51,7 @@ module.exports = class LegoBoard
 		#create knobs
 		knobsContainer = new THREE.Object3D()
 		@threejsNode.add knobsContainer
+		knobsContainer.visible = false
 
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
@@ -64,8 +77,34 @@ module.exports = class LegoBoard
 			@threejsNode.children[0].material = @baseplateTransparentMaterial
 			@threejsNode.children[1].visible = false
 		else
-			@threejsNode.children[0].material = @baseplateMaterial
-			@threejsNode.children[1].visible = true
+			@threejsNode.children[0].material = @currentBaseplateMaterial
+			@threejsNode.children[1].visible = true if @highQualMode
 
 	toggleVisibility: () =>
 		@threejsNode.visible = !@threejsNode.visible
+
+	uglify: () =>
+		if @highQualMode
+			@highQualMode = false
+
+			#hide knobs
+			@threejsNode.children[1].visible = false
+			#change baseplate material to knob texture
+			@threejsNode.children[0].material = @baseplateTexturedMaterial
+			@currentBaseplateMaterial = @baseplateTexturedMaterial
+			return true
+
+		return false
+
+	beautify: () =>
+		if not @highQualMode
+			@highQualMode = true
+			
+			#show knobs
+			@threejsNode.children[1].visible = true
+			#remove texture because we have physical knobs
+			@threejsNode.children[0].material = @baseplateMaterial
+			@currentBaseplateMaterial = @baseplateMaterial
+			return true
+			
+		return false

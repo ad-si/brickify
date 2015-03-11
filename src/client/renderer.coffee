@@ -1,6 +1,7 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
+FidelityControl = require './fidelityControl'
 
 ###
 # @class Renderer
@@ -12,14 +13,17 @@ module.exports = class Renderer
 		@threeRenderer = null
 		@init globalConfig
 
+		@fidelityControl = new FidelityControl(@pluginHooks)
+
 	localRenderer: (timestamp) =>
 			@stats?.begin()
 			@threeRenderer.render @scene, @camera
 			@pluginHooks.on3dUpdate timestamp
 			@controls?.update()
-
 			@stats?.end()
 			requestAnimationFrame @localRenderer
+
+			@fidelityControl.renderTick timestamp
 
 	addToScene: (node) ->
 		@scene.add node

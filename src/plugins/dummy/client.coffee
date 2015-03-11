@@ -156,3 +156,25 @@ module.exports = class DummyPlugin
 		}]
 		###
 		return []
+
+	###
+	# When the framerate is very low, plugins may be asked to reduce their visual
+	# complexity, e.g. replacing geometry with simple textures.
+	# Plugins should return true, if they reduced quality, or false,
+	# if they were unable to reduce quality even further.
+	#
+	# @memberOf dummyClientPlugin
+	###
+	uglify: () =>
+		return false
+
+	###
+	# When the framerate is very high, plugins are encouraged
+	# to add more visual details and/or eye candy. Plugins should return true,
+	# if they were able to increase quality / add eye candy even further,
+	# or false otherwise.
+	#
+	# @memberOf dummyClientPlugin
+	###
+	beautify: () =>
+		return false

@@ -12,16 +12,14 @@ block body
 			a(href="http://enable-javascript.com", target="_blank")
 				| instructions how to enable JavaScript in your web browser
 
-		#canvasContainer
-			canvas#canvas.appCanvas(touch-action="none")
+		canvas#canvas.appCanvas(touch-action="none")
 
 		#commandContainer
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
 
-		.row
-			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-				h1#logo Brickolage
-				include ./sidebar.jade
+		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
+			h1#logo Brickolage
+			include ./sidebar.jade
 
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?

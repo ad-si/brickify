@@ -39,7 +39,7 @@ class FidelityControl
 			# assume that there is a way back if we can decrease quality
 			@canIncreaseVisualQuality = true
 
-			# if there is no plugin that can still decrease quality (return true), then
+			# if there is no plugin that decreased quality (return true), then
 			# we don't need to try it again
 			if not true in results
 				@canDecreaseVisualQuality = false

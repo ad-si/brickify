@@ -91,6 +91,8 @@ module.exports = class LegoBoard
 			#change baseplate material to knob texture
 			@threejsNode.children[0].material = @baseplateTexturedMaterial
 			@currentBaseplateMaterial = @baseplateTexturedMaterial
+			return true
+
 		return false
 
 	beautify: () =>
@@ -102,4 +104,6 @@ module.exports = class LegoBoard
 			#remove texture because we have physical knobs
 			@threejsNode.children[0].material = @baseplateMaterial
 			@currentBaseplateMaterial = @baseplateMaterial
+			return true
+			
 		return false

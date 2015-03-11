@@ -130,13 +130,13 @@
 # ## uglify
 # When the framerate is very low, plugins may be asked to reduce their visual complexity,
 # e.g. replacing geometry with simple textures. Plugins should return true, if
-# they can reduce quality even further, or false otherwise
+# they reduced quality, or false, if they were unable to reduce quality even further.
 
 - uglify
 
 # ## beautify
 # When the framerate is very high, plugins are encouraged to add more visual details
-# and/or eye candy. Plugins should return true, if they can increase quality / add
-# eye candy even further, or false otherwise
+# and/or eye candy. Plugins should return true, if they were able to increase quality / add
+# eye candy even further, or false otherwise.
 
 - beautify

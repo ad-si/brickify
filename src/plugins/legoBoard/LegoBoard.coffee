@@ -82,7 +82,7 @@ module.exports = class LegoBoard
 	toggleVisibility: () =>
 		@threejsNode.visible = !@threejsNode.visible
 
-	decreaseVisualQuality: () =>
+	uglify: () =>
 		if @highQualMode
 			@highQualMode = false
 
@@ -93,7 +93,7 @@ module.exports = class LegoBoard
 			@currentBaseplateMaterial = @baseplateTexturedMaterial
 		return false
 
-	increaseVisualQuality: () =>
+	beautify: () =>
 		if not @highQualMode
 			@highQualMode = true
 			

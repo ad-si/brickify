@@ -13,7 +13,7 @@ class FidelityControl
 
 		if fps < @minimalAcceptableFps and @canDecreaseVisualQuality
 			console.log 'Will decrease visual Quality because of bad framerate'
-			results = @pluginHooks.decreaseVisualQuality()
+			results = @pluginHooks.uglify()
 
 			# there must always a way back
 			@canIncreaseVisualQuality = true
@@ -25,7 +25,7 @@ class FidelityControl
 
 		else if fps > @upgradeThresholdFps and @canIncreaseVisualQuality
 			console.log 'Will increase visual quality because of good framerate'
-			results = @pluginHooks.increaseVisualQuality()
+			results = @pluginHooks.beautify()
 
 			@canDecreaseVisualQuality = true
 
@@ -42,12 +42,12 @@ class FidelityControl
 			title: 'Visual Quality'
 			events: [
 				{
-					description: 'Increase visual quality (turns off automatic adjustment)'
+					description: 'Increase visual complexity (turns off automatic adjustment)'
 					hotkey: 'i'
 					callback: @_manualIncrease
 				}
 				{
-					description: 'Decrease visual quality (turns off automatic adjustment)'
+					description: 'Decrease visual complexity (turns off automatic adjustment)'
 					hotkey: 'd'
 					callback: @_manualDecrease
 				}
@@ -56,10 +56,10 @@ class FidelityControl
 
 	_manualIncrease: =>
 		@autoAdjust = false
-		@pluginHooks.increaseVisualQuality()
+		@pluginHooks.beautify()
 
 	_manualDecrease: =>
 		@autoAdjust = false
-		@pluginHooks.decreaseVisualQuality()
+		@pluginHooks.uglify()
 
 module.exports = FidelityControl

@@ -38,15 +38,14 @@ module.exports = class Ui
 		@pointerDispatcher.init()
 
 		# event listener
-		@renderer.getDomElement().addEventListener(
+		document.body.addEventListener(
 			'dragover'
 			@dragOverHandler
 		)
 
-		@renderer.getDomElement().addEventListener(
+		document.body.addEventListener(
 			'drop'
 			@fileLoadHandler
-			false
 		)
 		$('#loadButton').on 'change', (event) =>
 			@fileLoadHandler event

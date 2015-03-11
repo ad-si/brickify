@@ -1,0 +1,40 @@
+/* Taken from bootstrap-stylus 
+   mixins/button.syl
+   with darker active background and custom disabled color */
+
+button-variant($color, $background, $border, $disabledBackground)
+  color $color
+  background-color $background
+  border-color $border
+
+  &:hover,
+  &:focus,
+  &.focus,
+  &:active,
+  &.active,
+  .open > .dropdown-toggle&
+    color $color
+    // darker background
+    background-color darken($background, 15%)
+    border-color darken($border, 12%)
+
+  &:active,
+  &.active,
+  .open > .dropdown-toggle&
+    background-image none
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] &
+    &,
+    &:hover,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active
+      background-color $disabledBackground
+      border-color $border
+
+  .badge
+    color $background
+    background-color $color

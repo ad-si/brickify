@@ -6,9 +6,8 @@ npm-debug.log
 *.js.map
 !/public/libs/**/*.js
 *.css
-!/public/libs/**/*.css
 /modelCache
 /doc
 /apidoc
-/batchTesting/models
-/batchTesting/results
+!karma.conf.js
+/batchtesting/models/*

@@ -1,11 +1,20 @@
-extends ../layoutWithoutNavbar
+extends ../rootLayout
 
-block content
-	include landingpageTeaser
+block styles
+	link(rel='stylesheet', href='/styles/screen.css')
 
-	include landingpageDetails
+block body
+	include teaser
+
+	include quickconvert
+
+	include footer
+
+	include dropoverlay
+
 
 block scripts
 	script(src='/node_modules/jquery/dist/jquery.js')
 	script(src='/node_modules/bootstrap/dist/js/bootstrap.js')
 	script(src='landingpage.js')
+	script(src='/node_modules/bootbox/bootbox.min.js')

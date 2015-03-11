@@ -27,12 +27,8 @@ winston.loggers.add 'buildLog',
 		colorize: true
 
 # *CakeUtilities* provides the build and start functions called below.<br>
-# See [cakeUtilities](src/server/cakeUtilities.html)
+# See [cakeUtilities](cakeUtilities.html)
 cakeUtilities = require './cakeUtilities'
-
-# *Lowfab* is the main server part which is responsible for delivering the
-# website and for server-side plugin integration and model processing
-lowfab = require './src/server/main'
 
 # Makes it possible to directly require coffee modules
 coffeeScript.register()
@@ -47,7 +43,7 @@ task 'linkHooks', 'Links git hooks into .git/hooks', ->
 
 # Build the server javascript files from all coffee-script files inside
 # `src/server`<br>
-# See [cakeUtilities](src/server/cakeUtilities.html)
+# See [cakeUtilities](cakeUtilities.html)
 task 'buildServer', 'Builds the server js files', ->
 	cakeUtilities.buildServer()
 
@@ -60,11 +56,6 @@ task 'build', 'Builds client and server js files', ->
 	cakeUtilities
 	.buildServer()
 
-# Run all batch tests on models
-task 'batchTest', 'Runs batch tests on models', ->
-    batchTester = require './batchTesting/batchTesting'
-    batchTester.startTesting()
-
 ###
   ##Building and starting
 
@@ -74,9 +65,12 @@ task 'batchTest', 'Runs batch tests on models', ->
   the server afterwards.
 ###
 task 'start', 'Links hooks and starts server', ->
+	# *Lowfab* is the main server part which is responsible for delivering the
+	# website and for server-side plugin integration and model processing
+	lowfab = require './src/server/main'
+
 	cakeUtilities.linkHooks()
 
-	lowfab.loadFrontendDependencies () ->
-		lowfab
-			.setupRouting()
-			.startServer()
+	lowfab
+		.setupRouting()
+		.startServer()

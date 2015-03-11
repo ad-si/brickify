@@ -1,28 +1,29 @@
-###
-# @module renderer
-###
-
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 Stats = require 'stats-js'
+FidelityControl = require './fidelityControl'
 
+###
+# @class Renderer
+###
 module.exports = class Renderer
-	constructor: (@pluginHooks) ->
+	constructor: (@pluginHooks, globalConfig) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
+		@init globalConfig
+
+		@fidelityControl = new FidelityControl(@pluginHooks)
 
 	localRenderer: (timestamp) =>
 			@stats?.begin()
-			@threeRenderer.render @.scene, @.camera
+			@threeRenderer.render @scene, @camera
 			@pluginHooks.on3dUpdate timestamp
-			results = @pluginHooks.newBoundingSphere()
-			for r in results
-				if r?
-					@adjustCameraToObject (r)
-
+			@controls?.update()
 			@stats?.end()
 			requestAnimationFrame @localRenderer
+
+			@fidelityControl.renderTick timestamp
 
 	addToScene: (node) ->
 		@scene.add node
@@ -41,7 +42,7 @@ module.exports = class Renderer
 
 		@threeRenderer.render @scene, @camera
 
-	adjustCameraToObject: (radiusAndPosition) ->
+	zoomToBoundingSphere: (radiusAndPosition) ->
 		# zooms out/in the camera so that the object is fully visible
 		radius = radiusAndPosition.radius
 		center = radiusAndPosition.center
@@ -56,12 +57,14 @@ module.exports = class Renderer
 		rv = rv.multiplyScalar(zoomAdjustmentFactor)
 
 		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
-		multCenter = center.clone().applyMatrix4(@scene.matrix)
-		position = multCenter.clone().add(rv)
+		target = center.clone().applyMatrix4(@scene.matrix)
+		position = target.clone().add(rv)
+		@setCamera position, target
 
+	setCamera: (position, target) ->
 		@controls.update()
 		@controls.target = @controls.target0 =
-			new THREE.Vector3(multCenter.x, multCenter.y, multCenter.z)
+			new THREE.Vector3(target.x, target.y, target.z)
 		@controls.position = @controls.position0 =
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
@@ -72,7 +75,6 @@ module.exports = class Renderer
 		@setupScene globalConfig
 		@setupLighting globalConfig
 		@setupCamera globalConfig
-		@setupControls globalConfig
 		@setupFPSCounter() if process.env.NODE_ENV is 'development'
 		requestAnimationFrame @localRenderer
 
@@ -99,7 +101,7 @@ module.exports = class Renderer
 		)
 
 		@threeRenderer.setSize @size().width, @size().height
-		@threeRenderer.setClearColor globalConfig.clearColor, 1
+
 
 	setupScene: (globalConfig) ->
 		@scene = new THREE.Scene()
@@ -112,7 +114,7 @@ module.exports = class Renderer
 		)
 		@scene.applyMatrix(sceneRotation)
 		@scene.fog = new THREE.Fog(
-			globalConfig.clearColor
+			globalConfig.colors.background
 			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)
@@ -132,9 +134,17 @@ module.exports = class Renderer
 		@camera.up.set(0, 1, 0)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-	setupControls: (globalConfig) ->
-		@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-		@controls.target.set(0, 0, 0)
+	setupControls: (globalConfig, controls) ->
+		if controls?
+			controls.addObject @camera
+			controls.addDomElement @threeRenderer.domElement
+			controls.update()
+			@controls = controls
+		else
+			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
+			@controls.autoRotate = globalConfig.autoRotate
+			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
+			@controls.target.set(0, 0, 0)
 
 	setupFPSCounter: () ->
 		@stats = new Stats()
@@ -156,3 +166,22 @@ module.exports = class Renderer
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, 0, 30
 		@scene.add directionalLight
+
+		directionalLight = new THREE.DirectionalLight(0x808080)
+		directionalLight.position.set 20, -20, -30
+		@scene.add directionalLight
+
+	loadCamera: (state) =>
+		if state.controls?
+			@setCamera state.controls.position, state.controls.target
+
+	saveCamera: (state) =>
+		p = @camera.position
+		t = @controls.target
+		state.controls = {
+			position: { x: p.x, y: p.y, z: p.z }
+			target: { x: t.x, y: t.y, z: t.z }
+		}
+
+	getControls: () =>
+		@controls

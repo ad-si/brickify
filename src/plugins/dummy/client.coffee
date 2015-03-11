@@ -47,71 +47,6 @@ module.exports = class DummyPlugin
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
-	# Provides the plugins the possibility to add elements to the UI.
-	# Receives several DOM elements to insert itself into.
-	#
-	# @param {Object} domElements an object of DOM elements to insert itself into
-	# @memberOf dummyClientPlugin
-	# @see pluginLoader
-	###
-	initUi: (domElements) =>
-		console.log 'Dummy Client Plugin initializes UI'
-
-	###
-	# Returns a json-schema which describes the json
-	# the ui-elements of the plugin are supposed to create.
-	# [json-editor](https://github.com/jdorn/json-editor) then creates the
-	# html elements accordingly.
-	###
-	getUiSchema: () =>
-		console.log('Dummy Client Plugin returns the UI schema.')
-
-		console.log('Example Plugin returns the UI schema.')
-
-		actioncallback = () ->
-			console.log 'Dummy Plugin performs an action!'
-
-		return {
-		title: 'Dummy Plugin'
-		type: 'object'
-		properties:
-			size:
-				description: 'Size of the elements'
-				type: 'number'
-		actions:
-			a1:
-				title: 'Derp'
-				callback: actioncallback
-		}
-
-	uiEnabled: (node) ->
-		console.log "Enabled Dummy Ui with node #{node.fileName}"
-
-	uiDisabled: (node) ->
-		console.log "Disabled Dummy Ui with node #{node.fileName}"
-
-	###
-	# The state synchronization module will call each plugin's
-	# `onStateUpdate` method (if provided) whenever the current state changes
-	# due to user input or calculation results on either server or client side.
-	#
-	# The hook provides the new complete state as an argument.
-	#
-	# `state.toolsValues` contains the values of the associated ui-elements
-	# in the tools-container.
-	#
-	# If the plugin does asynchronous work, it has to return a thenable (promise
-	# or promise like)object that resolves on completion of the plugins work.
-	#
-	# @param {Object} state the complete current state
-	# @memberOf dummyClientPlugin
-	# @see stateSynchronization
-	###
-	onStateUpdate: (state) =>
-		console.log 'Dummy Client Plugin state change'
-		return Promise.resolve()
-
-	###
 	# On each render frame the renderer will call the `on3dUpdate`
 	# method of all plugins that provide it.
 	#
@@ -122,6 +57,51 @@ module.exports = class DummyPlugin
 	###
 	on3dUpdate: (timestamp) =>
 		return undefined
+
+	###
+	# Each time a new node is added to the scene, the scene will inform plugins
+	# by calling onNodeAdd
+	#
+	# @memberOf dummyClientPlugin
+	# @param {Node} node the added node
+	###
+	onNodeAdd: (node) =>
+		console.log node, ' added'
+		return
+
+	###
+	# Each time a scene's node is selected, the scene will inform plugins by
+	# calling onNodeSelect
+	#
+	# @memberOf dummyClientPlugin
+	# @param {Node} node the selected node
+	###
+	onNodeSelect: (node) =>
+		console.log node, ' selected'
+		return
+
+	###
+	# Each time a scene's node is deselected, the scene will inform plugins by
+	# calling onNodeDeselect
+	#
+	# @memberOf dummyClientPlugin
+	# @param {Node} node the deselected node
+	###
+	onNodeDeselect: (node) =>
+		console.log node, ' deselected'
+		return
+
+	###
+	# When a node is removed from the scene, the scene will inform plugins by
+	# calling onNodeRemove
+	#
+	# @memberOf dummyClientPlugin
+	# @param {NodeStructure} node the removed node
+	###
+	onNodeRemove: (node) =>
+		console.log node, ' removed'
+		return
+
 
 	###
 	# When a file is loaded into lowfab, the `fileLoader` will try to import
@@ -136,3 +116,65 @@ module.exports = class DummyPlugin
 	importFile: (fileName, fileContent) ->
 		console.log 'Dummy Client Plugin imports a file'
 		return undefined
+
+	###
+	# Plugins should return an object with a title property (String) that is
+	# displayed in the help and an array of events. These should have an event
+	# (String) according to [Mousetrap]{https://github.com/ccampbell/mousetrap},
+	# a description (String) that is shown in the help dialog and a callback
+	# function.
+	###
+	getHotkeys: =>
+		return {
+		title: 'Dummy'
+		events: [
+			{
+				hotkey: '+'
+				description: 'display alert'
+				callback: ->
+					alert 'Dummy client plugin reports: \'+\' was pressed'
+			},
+			{
+				hotkey: '-'
+				description: 'display alert'
+				callback: ->
+					alert 'Dummy client plugin reports: \'-\' was pressed'
+			}
+		]
+		}
+
+	getBrushes: ->
+		###
+		return [{
+			text: 'dummy-brush'
+			icon: 'move'
+			mouseDownCallback: -> console.log 'dummy-brush modifies scene (mosue down)'
+			mouseMoveCallback: -> console.log 'dumy-brush modifies scene (move)'
+			mouseUpCallback: -> console.log 'dummy-brush modifies scene (mosue up)'
+			selectCallback: -> console.log 'dummy-brush was selected'
+			deselectCallback: -> console.log 'dummy-brush was deselected'
+		}]
+		###
+		return []
+
+	###
+	# When the framerate is very low, plugins may be asked to reduce their visual
+	# complexity, e.g. replacing geometry with simple textures.
+	# Plugins should return true, if they reduced quality, or false,
+	# if they were unable to reduce quality even further.
+	#
+	# @memberOf dummyClientPlugin
+	###
+	uglify: () =>
+		return false
+
+	###
+	# When the framerate is very high, plugins are encouraged
+	# to add more visual details and/or eye candy. Plugins should return true,
+	# if they were able to increase quality / add eye candy even further,
+	# or false otherwise.
+	#
+	# @memberOf dummyClientPlugin
+	###
+	beautify: () =>
+		return false

@@ -36,7 +36,8 @@ Following scripts are currently available:
 - `checkStyle`: Checks code-style of coffeescript files
 - `apiDocumentation`: Generates API documentation
 - `documentation`: Generates code documentation
-- `test`: Executes tests
+- `test`: Executes headless tests
+- `testClient`: Executes frontend tests in the browser
 - `batchTest`: Batch test all models and create a HTML report
 - `prepublish`: Prepares publication of project
 
@@ -44,8 +45,7 @@ Following scripts are currently available:
 ## Package management
 
 We use [npm](https://npmjs.org) for package management.
-In order to bundle the modules for the browser we use [browserify](http://browserify.org)
-The usage of bower is deprecated and we will remove the remaining libraries in the future.
+In order to bundle the modules for the browser we use [browserify](http://browserify.org).
 
 
 ## Documentation

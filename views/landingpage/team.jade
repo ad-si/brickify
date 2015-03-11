@@ -1,5 +1,9 @@
-extends ../layoutWithoutNavbar
-block content
+extends ../rootLayout
+
+block styles
+	link(rel='stylesheet', href='/styles/screen.css')
+
+block body
 	.container
 		h1 Team
 		img(src='img/bp.png')

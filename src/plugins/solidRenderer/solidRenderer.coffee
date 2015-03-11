@@ -5,102 +5,96 @@
 ###
 
 THREE = require 'three'
-objectTree = require '../../common/objectTree'
+threeHelper = require '../../client/threeHelper'
 modelCache = require '../../client/modelCache'
+LineMatGenerator = require '../newBrickator/visualization/LineMatGenerator'
+interactionHelper = require '../../client/interactionHelper'
 
-module.exports = class SolidRenderer
+class SolidRenderer
+	init: (@bundle) ->
+		@globalConfig = @bundle.globalConfig
+		@loadedModelsNodes = []
+		@objectMaterial = new THREE.MeshLambertMaterial(
+				color: @globalConfig.colors.object
+				ambient: @globalConfig.colors.object
+		)
+		if @globalConfig.createVisibleWireframe
+			@shadowMat = new THREE.MeshBasicMaterial(
+				color: 0x000000
+				transparent: true
+				opacity: 0.4
+				depthFunc: 'GREATER'
+			)
+			@shadowMat.polygonOffset = true
+			@shadowMat.polygonOffsetFactor = 5
+			@shadowMat.polygonoffsetUnits = -5
 
-	init: (bundle) ->
-		@globalConfig = bundle.globalConfig
+			lineMaterialGenerator = new LineMatGenerator()
+			@lineMat = lineMaterialGenerator.generate 0x000000
+			@lineMat.linewidth = 2
+			@lineMat.transparent = true
+			@lineMat.opacity = 0.1
+			@lineMat.depthFunc = 'GREATER'
+			@lineMat.depthWrite = false
 
 	init3d: (@threejsNode) ->
 		return
 
-	# check if there are any threejs objects that haven't been loaded yet
-	# if so, load the referenced model from the server
-	onStateUpdate: (state) =>
-		@removeDeletedObjects state
-		return Promise.all(
-			objectTree.forAllSubnodes state.rootNode, @loadModelIfNeeded, false
-		)
+	onNodeAdd: (node) =>
+		_addSolid = (geometry, parent) =>
+			solid = new THREE.Mesh geometry, @objectMaterial
+			parent.add solid
+			parent.solid = solid
 
-	removeDeletedObjects: (state) ->
-		nodeUuids = []
-		collectUuid = (node) =>
-			if node.pluginData.solidRenderer?
-				nodeUuids.push node.pluginData.solidRenderer.threeObjectUuid
-		objectTree.forAllSubnodes state.rootNode, collectUuid, false
-		threeUuids = @threejsNode.children.map (threenode) -> threenode.name
-		deleted = threeUuids.filter (uuid) => uuid not in nodeUuids
-		for d in deleted
-			obj =  @threejsNode.getObjectByName d
-			@threejsNode.remove obj
+		_addWireframe = (geometry, parent) =>
+			# ToDo: create fancy shader material / correct rendering pipeline
+			wireframe = new THREE.Object3D()
 
-	loadModelIfNeeded: (node) =>
-		if node.pluginData.solidRenderer?
-			properties = node.pluginData.solidRenderer
-			storedUuid = properties.threeObjectUuid
-			threeObject = @threejsNode.getObjectByName storedUuid, true
-			if not threeObject?
-				return @loadModelFromCache node, properties, true
-			else
-				return Promise.resolve()
-		else
-			node.pluginData.solidRenderer = {}
-			return @loadModelFromCache node, node.pluginData.solidRenderer, false
+			#shadow
+			shadow = new THREE.Mesh geometry, @shadowMat
+			wireframe.add shadow
 
-	loadModelFromCache: (node, properties, reload = false) ->
-		#Create object and override name
-		success = (optimizedModel) =>
-			console.log "Got model #{node.meshHash}"
-			threeObj = @addModelToThree optimizedModel
-			if reload
-				threeObj.name = properties.threeObjectUuid
-			else
-				properties.threeObjectUuid = threeObj.name
-			return optimizedModel
-		failure = () ->
-			console.error "Unable to get model #{node.meshHash}"
+			# visible black lines
+			lineObject = new THREE.Mesh geometry
+			lines = new THREE.EdgesHelper lineObject, 0x000000, 30
+			lines.material = @lineMat
+			wireframe.add lines
 
-		prom = modelCache.request node.meshHash
-		prom.catch failure
-		return prom.then success
+			parent.add wireframe
+			parent.wireframe = wireframe
 
-	# parses the binary geometry and adds it to the three scene
-	addModelToThree: (optimizedModel) ->
-		geometry = optimizedModel.convertToThreeGeometry()
-		objectMaterial = new THREE.MeshLambertMaterial(
-			{
-				color: @globalConfig.defaultObjectColor
-				ambient: @globalConfig.defaultObjectColor
-			}
-		)
-		object = new THREE.Mesh(geometry, objectMaterial)
-		object.name = object.uuid
-		@latestAddedObject = object
+		_addModel = (model) =>
+			geometry = model.convertToThreeGeometry()
+			object = new THREE.Object3D()
 
-		@threejsNode.add object
-		return object
+			_addSolid geometry, object
+			_addWireframe geometry, object if @globalConfig.createVisibleWireframe
 
-	newBoundingSphere: () =>
-		if @latestAddedObject
-			@latestAddedObject.geometry.computeBoundingSphere()
-			result =
-				radius: @latestAddedObject.geometry.boundingSphere.radius
-				center: @latestAddedObject.geometry.boundingSphere.center
-			@latestAddedObject = null
-			return result
-		else
-			return null
+			threeHelper.link node, object
+			threeHelper.applyNodeTransforms node, object
 
-	# copys stored transforms to the tree object.
-	# TODO: use
-	copyTransformDataToThree: (node, threeObject) ->
-		posd = node.positionData
-		threeObject.position.set(posd.position.x, posd.position.y, posd.position.z)
-		threeObject.rotation.set(
-			posd.rotation._x,
-			posd.rotation._y,
-			posd.rotation._z
-		)
-		threeObject.scale.set(posd.scale.x, posd.scale.y, posd.scale.z)
+			@threejsNode.add object
+			@zoomToNode node
+
+		node.getModel().then _addModel
+
+	zoomToNode: (node) =>
+		threeNode = threeHelper.find node, @threejsNode
+		boundingSphere = threeHelper.getBoundingSphere threeNode.solid
+		threeNode.updateMatrix()
+		boundingSphere.center.applyProjection threeNode.matrix
+		@bundle.renderer.zoomToBoundingSphere boundingSphere
+
+	onNodeRemove: (node) =>
+		@threejsNode.remove threeHelper.find node, @threejsNode
+
+	setNodeVisibility: (node, visible) =>
+		threeHelper.find(node, @threejsNode)?.visible = visible
+
+	setShadowVisibility: (node, visible) =>
+		threeHelper.find(node, @threejsNode)?.wireframe?.visible = visible
+
+	setNodeMaterial: (node, threeMaterial) =>
+		threeHelper.find(node, @threejsNode)?.solid.material = threeMaterial
+
+module.exports = SolidRenderer

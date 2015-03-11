@@ -1,52 +1,17 @@
-extends ../layoutWithoutNavbar
-block content
-	style.
-		canvas {
-			position: relative;
-		}
-
+section.quickConvert
 	.container
-		h1 Lowfab quick convert
-		p.
-			We think that you might like these conversions. You can download them directly or refine them using our online editor
-		.alert.alert-warning#importerrors(style='display: none')
-			| The file you provided contains some errors. We tried to import it, but the 3d-model might be broken. Please use Meshlab or other software to&nbsp;
-			a(target='_blank',href='https://www.google.com/search?q=fix+3d+model') fix
-			| &nbsp;your 3d-model.
 		.row
-			.col-lg-4
-			.col-lg-4
+			.col-lg-5.text-center
 				h3
 					center Original Model
 				canvas#renderArea1.quickConvertCanvas
-			.col-lg-4
-		.row
-			.col-lg-2
-			.col-lg-4
+			.col-lg-2.text-center.convert-arrow
+				img.img-responsive(src='/img/convertArrow.png')
+			.col-lg-5.text-center
 				h3
-					center To LEGO bricks
+					center With LEGO#[sup &reg;] bricks
 				canvas#renderArea2.quickConvertCanvas
-				p
-					center
-						a.btn.btn-primary Download
-						|&nbsp;
-						a.btn.btn-success.applink(href='app#legofy+') Customize
-			.col-lg-4
-				h3
-					center To lasercutter
-				canvas#renderArea3.quickConvertCanvas
-				p
-					center
-						a.btn.btn-primary Download
-						|&nbsp;
-						a.btn.btn-success.applink(href='app#platener+') Customize
-			.col-lg-2
-		p
-			center
-				a(href='../') Go back to lowfab.net
-block scripts
-	script(src='/node_modules/jquery/dist/jquery.js')
-	script(src='/node_modules/bootstrap/dist/js/bootstrap.js')
-
-	//load quickconvert script
-	script(src='quickconvert.js')
+				#applinks
+					a.btn.btn-success Download
+					|&nbsp;
+					a.btn.btn-primary.applink(href='app#initialModel=1c2395a3145ad77aee7479020b461ddf') Customize

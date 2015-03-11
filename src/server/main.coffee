@@ -4,27 +4,30 @@ http = require 'http'
 path = require 'path'
 url = require 'url'
 fs = require 'fs'
+
+bootstrap = require 'bootstrap-styl'
 winston = require 'winston'
 express = require 'express'
 bodyParser = require 'body-parser'
 compress = require 'compression'
 morgan = require 'morgan'
 errorHandler = require 'errorhandler'
-session = require 'express-session'
 favicon = require 'serve-favicon'
 compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
-bower = require 'bower'
-exec = require 'exec'
+exec = require('child_process').exec
 http = require 'http'
+
+yaml = require 'js-yaml'
 # Support mixing .coffee and .js files in lowfab-project
 coffeeify = require 'coffeeify'
 # Load yaml configuration into javascript file
 browserifyData = require 'browserify-data'
 envify = require 'envify'
 browserify = require 'browserify-middleware'
-
+urlSessions = require './urlSessions'
+cookieParser = require 'cookie-parser'
 
 # Make logger available to other modules.
 # Must be instantiated before requiring bundled modules
@@ -34,16 +37,16 @@ winston.loggers.add 'log',
 		colorize: true
 log = winston.loggers.get('log')
 
-
 pluginLoader = require './pluginLoader'
 app = require '../../routes/app'
 landingPage = require '../../routes/landingpage'
-statesync = require '../../routes/statesync'
 modelStorage = require './modelStorage'
 modelStorageApi = require '../../routes/modelStorageApi'
 dataPackets = require '../../routes/dataPackets'
-
-
+sharelinkGen = require '../../routes/share'
+globalConfig = yaml.safeLoad(
+	fs.readFileSync path.resolve(__dirname, '../common/globals.yaml')
+)
 webapp = express()
 
 # Express assumes that no env means develop.
@@ -69,52 +72,11 @@ port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
 sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
 
-links = {}
-sortedDependencies = [
-	'FileSaver',
-	'Blob'
-]
-
-module.exports.loadFrontendDependencies = (callback) ->
-	allDependencies = []
-
-	getDependencyPath = (depPath) ->
-		path.join.apply null, depPath.split('/').slice(1)
-
-	bower
-	.commands
-	.list {paths: true}
-	.on 'end', (dependencies) ->
-		for name, depPath of dependencies
-			if Array.isArray depPath
-				for subPath in depPath
-					allDependencies.push getDependencyPath subPath
-			else
-				allDependencies.push getDependencyPath depPath
-
-		isCss = (element) ->
-			path.extname(element) is '.css'
-		isJs = (element) ->
-			path.extname(element) is '.js'
-
-		links.styles = allDependencies.filter(isCss)
-		links.styles.push('styles/screen.css')
-
-		links.scripts = sortedDependencies.map (element, index) ->
-			if Array.isArray dependencies[element]
-				getDependencyPath dependencies[element].filter(isJs)[0]
-			else
-				getDependencyPath dependencies[element]
-		callback()
-
-
 module.exports.setupRouting = () ->
 	webapp.set 'hostname', if developmentMode then "localhost:#{port}" else
 		process.env.HOSTNAME or 'lowfab.net'
 
-
 	webapp.set 'views', path.normalize 'views'
-	webapp.locals.pretty = true
 	webapp.set 'view engine', 'jade'
 
 	webapp.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})
@@ -127,20 +89,54 @@ module.exports.setupRouting = () ->
 			stylus string
 			.set 'filename', path
 			.set 'compress', !developmentMode
+			.set 'sourcemap', {
+				comment: developmentMode
+				inline: true # Generating an extra map file doesn't seem to work
+			}
 			.set 'include css', true
 			.use nib()
-			.import 'nib'
+			.use bootstrap()
+			# Fugly because of github.com/LearnBoost/stylus/issues/1828
+			.define 'backgroundColor', '#' + ('000000' +
+				globalConfig.colors.background.toString 16).slice -6
 	)
+
+	webapp.use (req, res, next) ->
+		res.locals.app = webapp
+		next()
+
+	if developmentMode
+		shared = [
+			'blueimp-md5'
+			'bootstrap'
+			'clone'
+			'jquery'
+			'jsondiffpatch'
+			'path'
+			'stats-js'
+			'three'
+			'three-orbit-controls'
+			'zeroclipboard'
+		]
+		webapp.get '/shared.js', browserify(shared, {
+			cache: true
+			precompile: true
+			noParse: shared
+		})
 
 	webapp.get '/app.js', browserify('src/client/main.coffee', {
 		extensions: ['.coffee']
+		external: shared
+		insertGlobals: developmentMode
 	})
+
 	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
 		extensions: ['.coffee']
 	})
-	webapp.get '/quickconvert.js', browserify('src/quickconvert/main.coffee', {
-		extensions: ['.coffee']
-	})
+
+	fontAwesomeRegex = /\/fonts\/fontawesome-.*/
+	webapp.get fontAwesomeRegex, express.static('node_modules/font-awesome/')
+
 	webapp.use express.static('public')
 	webapp.use('/node_modules', express.static('node_modules'))
 
@@ -155,49 +151,43 @@ module.exports.setupRouting = () ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-
-	webapp.use session {
-		secret: sessionSecret
-		resave: true
-		saveUninitialized: true
-	}
-
 	modelStorage.init()
+
+	webapp.use cookieParser()
+	webapp.use urlSessions.middleware
 
 	jsonParser = bodyParser.json {limit: '100mb'}
 	urlParser = bodyParser.urlencoded {extended: true, limit: '100mb'}
 	rawParser = bodyParser.raw({limit: '100mb'})
 
-	landingPage.setLinks links
-
 	webapp.get '/', landingPage.getLandingpage
 	webapp.get '/contribute', landingPage.getContribute
 	webapp.get '/team', landingPage.getTeam
-	webapp.get '/quickconvert', urlParser, landingPage.getQuickConvertPage
-	webapp.get '/app', app(links)
-	webapp.get '/statesync/get', jsonParser, statesync.getState
-	webapp.post '/statesync/set', jsonParser, statesync.setState
-	webapp.get '/statesync/reset', jsonParser, statesync.resetState
+	webapp.get '/imprint', landingPage.getImprint
+	webapp.get '/educators', landingPage.getEducators
+	webapp.get '/app', app
+	webapp.get '/share', sharelinkGen
 	webapp.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists
 	webapp.get '/model/get/:hash', urlParser, modelStorageApi.getModel
 	webapp.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
 
-	webapp.post '/datapacket/packet/undefined',
-		jsonParser, dataPackets.createPacket
-	webapp.post '/datapacket/packet/:id', jsonParser, dataPackets.updatePacket
-	webapp.get  '/datapacket/packet/:id', jsonParser, dataPackets.getPacket
+	webapp.get '/datapacket/exists/:id', urlParser, dataPackets.exists
+	webapp.get '/datapacket/get/:id', urlParser, dataPackets.get
+	webapp.put '/datapacket/put/:id', jsonParser, dataPackets.put
+	webapp.get '/datapacket/create', urlParser, dataPackets.create
+	webapp.delete '/datapacket/delete', urlParser, dataPackets.delete
 
 	webapp.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?
 			ref = request.body.ref
 			if not (ref.indexOf('develop') >= 0 or ref.indexOf('master') >= 0)
 				log.debug 'Got a server restart command, but "ref" ' +
-									'did not contain develop or master'
+					'did not contain develop or master'
 				response.send ''
 				return
 		else
 			log.warn 'Got a server restart command without a "ref" ' +
-								'json member from ' + request.connection.remoteAddress
+				'json member from ' + request.connection.remoteAddress
 			response.send ''
 			return
 
@@ -206,15 +196,16 @@ module.exports.setupRouting = () ->
 			if error
 				log.warn "Error while updating server: #{error}"
 
-	pluginLoader.loadPlugins statesync, path.resolve(__dirname, '../plugins')
+	pluginLoader.loadPlugins path.resolve(__dirname, '../plugins')
 
 	if developmentMode
 		webapp.use errorHandler()
+		require('express-debug')(webapp, {extra_panels: ['nav']})
 
 	webapp.use (req, res) ->
 		res
 		.status(404)
-		.render '404', links
+		.render '404'
 	return module.exports
 
 module.exports.startServer = (_port, _ip) ->

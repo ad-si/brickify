@@ -1,0 +1,9 @@
+{
+  "name": "lego-board",
+  "version": "0.1.0",
+  "description": "Lego board as a workspace surface",
+  "lowfab": {
+    "type": "renderer"
+  },
+  "browser": "./LegoBoard.coffee"
+}

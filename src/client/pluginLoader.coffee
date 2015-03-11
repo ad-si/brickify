@@ -25,20 +25,8 @@ module.exports = class PluginLoader
 
 		if @pluginHooks.hasHook(instance, 'init3d')
 			threeNode = new THREE.Object3D()
+			threeNode.associatedPlugin = instance
 			instance.init3d threeNode
-
-		if @pluginHooks.hasHook(instance, 'initUi')
-			instance.initUi {
-				menuBar: document.getElementById 'navbarToggle'
-				toolsContainer: document.getElementById 'toolsContainer'
-				sceneGraphContainer: document.getElementById(
-					'sceneGraphContainer'
-				)
-			}
-
-		if @pluginHooks.hasHook(instance, 'getUiSchema')
-			if @bundle.pluginUiGenerator?
-				@bundle.pluginUiGenerator.createPluginUi instance
 
 		@pluginHooks.register instance
 
@@ -52,37 +40,34 @@ module.exports = class PluginLoader
 	loadPlugins: () ->
 		pluginInstances = []
 
-		pluginInstances.push @initPlugin(
-			require('../plugins/dummy'),
-			require('../plugins/dummy/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/example'),
-			require('../plugins/example/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/coordinateSystem'),
-			require('../plugins/coordinateSystem/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/solidRenderer'),
-			require('../plugins/solidRenderer/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/stlImport'),
-			require('../plugins/stlImport/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/stlExport'),
-			require('../plugins/stlExport/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/sceneGraph'),
-			require('../plugins/sceneGraph/package.json')
-		)
-		pluginInstances.push @initPlugin(
-			require('../plugins/faBrickator'),
-			require('../plugins/faBrickator/package.json')
-		)
-
+		if @globalConfig.plugins.dummy
+			pluginInstances.push @initPlugin(
+				require '../plugins/dummy'
+				require '../plugins/dummy/package.json'
+			)
+		if @globalConfig.plugins.stlImport
+			pluginInstances.push @initPlugin(
+				require '../plugins/stlImport'
+				require '../plugins/stlImport/package.json'
+			)
+		if @globalConfig.plugins.coordinateSystem
+			pluginInstances.push @initPlugin(
+				require '../plugins/coordinateSystem'
+				require '../plugins/coordinateSystem/package.json'
+			)
+		if @globalConfig.plugins.legoBoard
+			pluginInstances.push @initPlugin(
+				require '../plugins/legoBoard'
+				require '../plugins/legoBoard/package.json'
+			)
+		if @globalConfig.plugins.solidRenderer
+			pluginInstances.push @initPlugin(
+				require '../plugins/solidRenderer'
+				require '../plugins/solidRenderer/package.json'
+			)
+		if @globalConfig.plugins.newBrickator
+			pluginInstances.push @initPlugin(
+				require '../plugins/newBrickator'
+				require '../plugins/newBrickator/package.json'
+			)
 		return pluginInstances

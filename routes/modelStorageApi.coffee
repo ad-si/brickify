@@ -16,15 +16,17 @@ module.exports.getModel = (request, response) ->
 	hash = request.params.hash
 	modelStorage.hasModel hash, (hasModel) ->
 		if hasModel
-			modelStorage.loadModel hash, (error, data) ->
-				if error?
-					logger.warn 'Unable to load model ' +
-						hash + ': ' + JSON.stringify(error)
-					response.status(500).send error
-				else
-					logger.debug 'Sending model ' + hash
-					response.set 'Content-Type', 'application/octet-stream'
-					response.send data
+			modelStorage.loadModel(hash)
+			.then((data) ->
+				logger.debug 'Sending model ' + hash
+				response.set 'Content-Type', 'application/octet-stream'
+				response.send data
+			)
+			.catch((error) ->
+				logger.warn 'Unable to load model ' +
+					hash + ': ' + JSON.stringify(error)
+				response.status(500).send error
+			)
 		else
 			logger.warn 'Unable to load model ' +
 				hash + ': model not found'
@@ -39,11 +41,10 @@ module.exports.saveModel = (request, response) ->
 		response.status(500).send 'Calculated MD5 value does not match'
 	else
 		console.log 'Saving model ' + hash
-		modelStorage.saveModel hash, content, (error) ->
-			if err?
-				response.status(500).send 'Error while saving the file'
-			else
-				response.send 'Saved model'
-
-
-
+		modelStorage.saveModel(hash, content)
+		.then(() ->
+			response.send 'Saved model'
+		)
+		.catch(() ->
+			response.status(500).send 'Error while saving the file'
+		)

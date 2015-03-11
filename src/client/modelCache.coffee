@@ -1,5 +1,6 @@
+$ = require 'jquery'
 md5 = require('blueimp-md5').md5
-OptimizedModel = require '../common/OptimizedModel'
+meshlib = require 'meshlib'
 
 ##
 #  ModelCache
@@ -44,7 +45,7 @@ requestDataFromServer = (hash) ->
 
 buildModelPromise = (hash) ->
 	return requestDataFromServer(hash).then((data) ->
-		model = new OptimizedModel()
+		model = new meshlib.OptimizedModel()
 		model.fromBase64 data
 		return model
 	)

@@ -1,40 +1,39 @@
-extends ../layout
+extends ../rootLayout
 
-block content
+block styles
+	link(rel='stylesheet', href='/styles/screen.css')
 
-	#canvasContainer
-		canvas#canvas.appCanvas
-
-	#controls.row
-		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-			.panel.panel-default
-				.panel-heading
-					h3.collapseTitle.panel-title(data-toggle='collapse'
-						data-target='#collapseScenegraph') Scenegraph
-				#collapseScenegraph.panel-collapse.collapse.in
-					.panel-body
-						#sceneGraphContainer
-						#propertiesContainer
-		aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
-			div.panel-group#pluginsContainer(role='tablist')
-
-	#webGlWarning
-		p You should not see this text! Do you use a webGL ready browser?
+block body
+	#wrapper.row.container-fluid
+		noscript
+			| For full functionality of this site it is necessary to enable JavaScript.
+			| Here are the
 			= ' '
-			a(href='http://get.webgl.org') get.webgl.org
+			a(href="http://enable-javascript.com", target="_blank")
+				| instructions how to enable JavaScript in your web browser
 
-	#spinnerContainer
-		.spinner
-			div Loading...
+		#canvasContainer
+			canvas#canvas.appCanvas(touch-action="none")
 
+		#commandContainer
+			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
+
+		.row
+			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
+				h1#logo Brickolage
+				include ./sidebar.jade
+
+		#webGlWarning
+			p You should not see this text! Do you use a webGL ready browser?
+				= ' '
+				a(href='http://get.webgl.org') get.webgl.org
 
 block scripts
 	script(src='/libs/webglCheck.js')
-	script(src='/libs/FileSaver/FileSaver.js')
-	script(src='/libs/Blob/Blob.js')
-	script(src='/node_modules/json-editor/dist/jsoneditor.js')
+	script(src='node_modules/mousetrap/mousetrap.min.js')
+	if app.get('env') === 'development'
+		script(src='/shared.js')
 
 	// Include app script
 	script(src='app.js')
-	script(src='/libs/bootbox/bootbox.min.js')
-
+	script(src='/node_modules/bootbox/bootbox.min.js')

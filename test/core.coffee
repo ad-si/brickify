@@ -10,12 +10,13 @@ describe 'Lowfab', () ->
 	server = {}
 
 	before (done) ->
-		lowfab.loadFrontendDependencies () ->
-			server = lowfab
-				.setupRouting()
-				.startServer(3001)
+		this.timeout(5000)
 
-			done()
+		server = lowfab
+			.setupRouting()
+			.startServer(3001)
+
+		done()
 
 	describe 'Server', () ->
 		it 'should host the lowfab website', (done) ->

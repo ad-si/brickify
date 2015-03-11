@@ -8,7 +8,29 @@ class FidelityControl
 
 		@autoAdjust = true
 
-	updateFps: (fps) =>
+		@fpsAverage = 1
+		@accumulatedFrames = 0
+		@accumulatedTime = 0
+		@accumulationTime = 500
+
+	renderTick: (timestamp) =>
+		if not @_lastTimestamp?
+			@_lastTimestamp = timestamp
+			return
+
+		delta = timestamp - @_lastTimestamp
+
+		@_lastTimestamp = timestamp
+		@accumulatedTime += delta
+		@accumulatedFrames++
+
+		if @accumulatedTime > @accumulationTime
+			@fpsAverage = (@accumulatedFrames / @accumulatedTime) * 1000
+			@accumulatedFrames = 0
+			@accumulatedTime = 0
+			@_adjustFidelity @fpsAverage
+
+	_adjustFidelity: (fps) =>
 		return if not @autoAdjust
 
 		if fps < @minimalAcceptableFps and @canDecreaseVisualQuality

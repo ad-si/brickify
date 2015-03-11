@@ -35,10 +35,14 @@ class SceneManager
 				question = 'You already have a model in your scene.
 				 Loading the new model will replace the existing model!'
 				
-				bootbox.confirm question, (result) =>
-					if result
-						@remove scene.nodes[0]
-						@_addNodeToScene node
+				if not @bundle.globalConfig.autoReplaceModel
+					bootbox.confirm question, (result) =>
+						if result
+							@remove scene.nodes[0]
+							@_addNodeToScene node
+				else
+					@remove scene.nodes[0]
+					@_addNodeToScene node
 			else
 				@_addNodeToScene node
 

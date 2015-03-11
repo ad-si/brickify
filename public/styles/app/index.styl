@@ -60,7 +60,7 @@ input[readonly].not-readonly
 	width 60%
 	margin-left 5px
 	margin-right 5px
-	
+
 #leftSidebar
 	background-color rgba(0,0,0,0.4)
 	position absolute
@@ -86,7 +86,7 @@ input[readonly].not-readonly
 		padding-left 2px
 	:first-child
 		padding-right 2px
-		
+
 div.disabled
 	opacity 0.5
 
@@ -111,7 +111,7 @@ div.disabled
 .selectedObject
 	border-radius 5px
 	background-color #BBBBBB
-	
+
 //brushes
 #brushContainer
 	div
@@ -122,23 +122,58 @@ div.disabled
 	display block
 	text-align center
 
-	
-/* darker bootstrap buttons with custom disabled color */
+
+// Darker bootstrap buttons with custom disabled color
 @import "customButton.styl"
 $disabledBg = $btn-default-bg
 
 .btn-default
-	button-variant($btn-default-color, $btn-default-bg, $btn-default-border, $disabledBg)
+	button-variant(
+		$btn-default-color,
+		$btn-default-bg,
+		$btn-default-border,
+		$disabledBg
+	)
+
 .btn-primary
-	button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border, $disabledBg)
+	button-variant(
+		$btn-primary-color,
+		$btn-primary-bg,
+		$btn-primary-border,
+		$disabledBg
+	)
+
 .btn-success
-	button-variant($btn-success-color, $btn-success-bg, $btn-success-border, $disabledBg)
+	button-variant(
+		$btn-success-color,
+		$btn-success-bg,
+		$btn-success-border,
+		$disabledBg
+	)
+
 .btn-info
-	button-variant($btn-info-color, $btn-info-bg, $btn-info-border, $disabledBg)
+	button-variant(
+		$btn-info-color,
+		$btn-info-bg,
+		$btn-info-border,
+		$disabledBg
+	)
+
 .btn-warning
-	button-variant($btn-warning-color, $btn-warning-bg, $btn-warning-border, $disabledBg)
+	button-variant(
+		$btn-warning-color,
+		$btn-warning-bg,
+		$btn-warning-border,
+		$disabledBg
+	)
+
 .btn-danger
-	button-variant($btn-danger-color, $btn-danger-bg, $btn-danger-border, $disabledBg)
+	button-variant(
+		$btn-danger-color,
+		$btn-danger-bg,
+		$btn-danger-border,
+		$disabledBg
+	)
 
 //Taken from bootstrap-styl/button.styl
 .btn

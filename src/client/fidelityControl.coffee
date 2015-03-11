@@ -11,7 +11,10 @@ class FidelityControl
 		@fpsAverage = 1
 		@accumulatedFrames = 0
 		@accumulatedTime = 0
-		@accumulationTime = 500
+		@accumulationTime = 200
+
+		@timesBelowMinimumFps = 0
+		@timesBelowThreshold = 5
 
 	renderTick: (timestamp) =>
 		if not @_lastTimestamp?
@@ -34,6 +37,11 @@ class FidelityControl
 		return if not @autoAdjust
 
 		if fps < @minimalAcceptableFps and @canDecreaseVisualQuality
+			# we were one measurement below desired fps
+			@timesBelowMinimumFps++
+			return if @timesBelowMinimumFps < @timesBelowThreshold
+			@timesBelowMinimumFps = 0
+
 			results = @pluginHooks.uglify()
 
 			# assume that there is a way back if we can decrease quality
@@ -45,6 +53,9 @@ class FidelityControl
 				@canDecreaseVisualQuality = false
 
 		else if fps > @upgradeThresholdFps and @canIncreaseVisualQuality
+			# upgrade instantly, but reset downgrade counter
+			@timesBelowMinimumFps = 0
+			
 			results = @pluginHooks.beautify()
 
 			@canDecreaseVisualQuality = true

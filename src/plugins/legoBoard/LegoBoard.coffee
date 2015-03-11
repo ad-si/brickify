@@ -18,7 +18,7 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		@highQualMode = true
+		@highQualMode = false
 
 		knobTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		knobTexture.wrapS = THREE.RepeatWrapping
@@ -31,7 +31,7 @@ module.exports = class LegoBoard
 		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
 			map: knobTexture
 		)
-		@currentBaseplateMaterial = @baseplateMaterial
+		@currentBaseplateMaterial = @baseplateTexturedMaterial
 
 		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlate
@@ -51,6 +51,7 @@ module.exports = class LegoBoard
 		#create knobs
 		knobsContainer = new THREE.Object3D()
 		@threejsNode.add knobsContainer
+		knobsContainer.visible = false
 
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')

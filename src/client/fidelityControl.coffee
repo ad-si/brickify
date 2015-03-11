@@ -1,7 +1,7 @@
 class FidelityControl
 	constructor: (@pluginHooks) ->
 		@minimalAcceptableFps = 20
-		@upgradeThresholdFps = 50
+		@upgradeThresholdFps = 40
 
 		@canIncreaseVisualQuality = true
 		@canDecreaseVisualQuality = true
@@ -55,7 +55,7 @@ class FidelityControl
 		else if fps > @upgradeThresholdFps and @canIncreaseVisualQuality
 			# upgrade instantly, but reset downgrade counter
 			@timesBelowMinimumFps = 0
-			
+
 			results = @pluginHooks.beautify()
 
 			@canDecreaseVisualQuality = true

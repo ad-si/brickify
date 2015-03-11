@@ -12,25 +12,23 @@ class FidelityControl
 		return if not @autoAdjust
 
 		if fps < @minimalAcceptableFps and @canDecreaseVisualQuality
-			console.log 'Will decrease visual Quality because of bad framerate'
 			results = @pluginHooks.uglify()
 
-			# there must always a way back
+			# assume that there is a way back if we can decrease quality
 			@canIncreaseVisualQuality = true
 
 			# if there is no plugin that can still decrease quality (return true), then
 			# we don't need to try it again
-			if not results.indexOf(true) >= 0
+			if not true in results
 				@canDecreaseVisualQuality = false
 
 		else if fps > @upgradeThresholdFps and @canIncreaseVisualQuality
-			console.log 'Will increase visual quality because of good framerate'
 			results = @pluginHooks.beautify()
 
 			@canDecreaseVisualQuality = true
 
 			# same goes for increasing quality
-			if not results.indexOf(true) >= 0
+			if not true in results
 				@canIncreaseVisualQuality = false
 
 	getHotkeys: () =>

@@ -273,6 +273,7 @@ class NewBrickator
 
 			# show bricks and csg
 			cachedData.visualization.showBricks()
+			cachedData.visualization.setPossibleLegoBoxVisibility false
 
 			csg = @_createCSG cachedData.node, cachedData, true
 			cachedData.visualization.showCsg(csg)
@@ -299,6 +300,9 @@ class NewBrickator
 			solidRenderer = @bundle.getPlugin('solid-renderer')
 			solidRenderer?.setNodeVisibility cachedData.node, true
 			cachedData.visualization.showVoxels()
+			
+			if @brushHandler.legoBrushSelected
+				cachedData.visualization.setPossibleLegoBoxVisibility true
 
 
 module.exports = NewBrickator

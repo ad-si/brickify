@@ -5,6 +5,7 @@ class BrushHandler
 		})
 		
 		@interactionDisabled = false
+		@legoBrushSelected = false
 
 	getBrushes: () =>
 		return [{
@@ -26,6 +27,8 @@ class BrushHandler
 		}]
 
 	_legoSelect: (selectedNode) =>
+		@legoBrushSelected = true
+
 		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>
@@ -35,6 +38,8 @@ class BrushHandler
 			@_setModelShadowVisiblity selectedNode, false
 
 	_printSelect: (selectedNode) =>
+		@legoBrushSelected = false
+
 		return if @interactionDisabled
 		@newBrickator._getCachedData selectedNode
 		.then (cachedData) =>

@@ -93,22 +93,4 @@ class SolidRenderer
 	setNodeMaterial: (node, threeMaterial) =>
 		threeHelper.find(node, @threejsNode)?.solid.material = threeMaterial
 
-	intersectRayWithModel: (event, node) =>
-		obj = threeHelper.find(node, @threejsNode)?.solid
-		return [] unless obj?
-
-		# set two sided material to catch all sides
-		oldMaterialSide = obj.material.side
-		obj.material.side = THREE.DoubleSide
-
-		intersections = interactionHelper.getIntersections(
-				event
-				@bundle.renderer
-				[obj]
-			)
-
-		obj.material.side = oldMaterialSide
-
-		return intersections
-
 module.exports = SolidRenderer

@@ -27,6 +27,11 @@ class NewBrickator
 			transparent: true
 		})
 
+		# remove z-Fighting on baseplate
+		@printMaterial.polygonOffset = true
+		@printMaterial.polygonOffsetFactor = 5
+		@printMaterial.polygonoffsetUnits = 5
+
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)
 		@_initBuildButton()

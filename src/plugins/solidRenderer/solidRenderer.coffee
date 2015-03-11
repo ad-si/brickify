@@ -25,6 +25,10 @@ class SolidRenderer
 				opacity: 0.4
 				depthFunc: 'GREATER'
 			)
+			@shadowMat.polygonOffset = true
+			@shadowMat.polygonOffsetFactor = 5
+			@shadowMat.polygonoffsetUnits = -5
+
 			lineMaterialGenerator = new LineMatGenerator()
 			@lineMat = lineMaterialGenerator.generate 0x000000
 			@lineMat.linewidth = 2

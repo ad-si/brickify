@@ -70,4 +70,3 @@ Promise.resolve($.get '/share').then((link) ->
 	$('#cmdHelp').tooltip({placement: 'bottom'}).click () ->
 		bundle.ui.hotkeys.showHelp()
 )
-

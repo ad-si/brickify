@@ -1,7 +1,6 @@
 Hotkeys = require '../hotkeys'
-UiObjects = require './objects'
 PointerDispatcher = require './pointerDispatcher'
-DownloadProvider = require './downloadProvider'
+WorkflowUi = require './workflowUi/workflowUi.coffee'
 
 ###
 # @module ui
@@ -11,11 +10,10 @@ module.exports = class Ui
 	constructor: (@bundle) ->
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
-		@objects = new UiObjects(@bundle)
+		@workflowUi = new WorkflowUi(@bundle)
 		@pointerDispatcher = new PointerDispatcher(@bundle)
-		@downloadProvider = new DownloadProvider(@bundle)
 
-	dropHandler: (event) =>
+	fileLoadHandler: (event) =>
 		event.stopPropagation()
 		event.preventDefault()
 		files = event.target.files ? event.dataTransfer.files
@@ -32,31 +30,30 @@ module.exports = class Ui
 		@renderer.windowResizeHandler()
 
 	init: =>
+		@workflowUi.init()
 		@_initListeners()
-		@_initUiElements()
 		@_initHotkeys()
-		@downloadProvider.init('#downloadButton', @bundle.sceneManager)
 
 	_initListeners: =>
 		@pointerDispatcher.init()
 
 		# event listener
-		@renderer.getDomElement().addEventListener(
+		document.body.addEventListener(
 			'dragover'
 			@dragOverHandler
 		)
-		@renderer.getDomElement().addEventListener(
+
+		document.body.addEventListener(
 			'drop'
-			@dropHandler
+			@fileLoadHandler
 		)
+		$('#loadButton').on 'change', (event) =>
+			@fileLoadHandler event
 
 		window.addEventListener(
 			'resize'
 			@windowResizeHandler
 		)
-
-	_initUiElements: =>
-		@objects.init('#objectsContainer', '#brushContainer', '#visibilityContainer')
 
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks, @bundle.sceneManager)

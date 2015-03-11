@@ -17,7 +17,7 @@ class PointerDispatcher
 		@isBrushing = false
 		@brushToggled = false
 		@sceneManager = @bundle.sceneManager
-		@objects = @bundle.ui.objects
+		@brushSelector = @bundle.ui.workflowUi.brushSelector
 		@initListeners()
 
 	initListeners: =>
@@ -62,11 +62,11 @@ class PointerDispatcher
 
 		# toggle brush if it is the right mouse button
 		if(event.buttons & BUTTON_STATES.right)
-			@brushToggled = @objects.toggleBrush()
+			@brushToggled = @brushSelector.toggleBrush()
 
 		# perform brush action
 		@isBrushing = true
-		brush = @objects.getSelectedBrush()
+		brush = @brushSelector.getSelectedBrush()
 		if brush? and brush.mouseDownCallback?
 			brush.mouseDownCallback event, @sceneManager.selectedNode
 
@@ -83,7 +83,7 @@ class PointerDispatcher
 			return
 
 		# perform brush action
-		brush = @objects.getSelectedBrush()
+		brush = @brushSelector.getSelectedBrush()
 		return unless brush?
 
 		if @isBrushing and brush.mouseMoveCallback?
@@ -104,7 +104,7 @@ class PointerDispatcher
 		# end brush action
 		if @isBrushing
 			@isBrushing = false
-			brush = @objects.getSelectedBrush()
+			brush = @brushSelector.getSelectedBrush()
 			if brush? and brush.mouseUpCallback?
 				brush.mouseUpCallback event, @sceneManager.selectedNode
 
@@ -143,13 +143,13 @@ class PointerDispatcher
 
 	_untoggleBrush: =>
 		if @brushToggled
-			@objects.toggleBrush()
+			@brushSelector.toggleBrush()
 			@brushToggled = false
 
 	_cancelBrush: (event) =>
 		if @isBrushing
 			@isBrushing = false
-			brush = @objects.getSelectedBrush()
+			brush = @brushSelector.getSelectedBrush()
 			if brush? and brush.cancelCallback?
 				brush.cancelCallback event, @sceneManager.selectedNode
 

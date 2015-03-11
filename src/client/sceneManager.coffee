@@ -22,7 +22,7 @@ class SceneManager
 
 	_notify: (hook, node) =>
 		Promise.all @pluginHooks[hook] node
-		.then => @bundle.ui?.objects[hook] node
+		.then => @bundle.ui?.workflowUi[hook]? node
 
 #
 # Administration of nodes
@@ -30,13 +30,35 @@ class SceneManager
 
 	add: (node) =>
 		@scene
+		.then (scene) =>
+			if scene.nodes.length > 0
+				question = 'You already have a model in your scene.
+				 Loading the new model will replace the existing model!'
+				
+				if not @bundle.globalConfig.autoReplaceModel
+					bootbox.confirm question, (result) =>
+						if result
+							@remove scene.nodes[0]
+							@_addNodeToScene node
+				else
+					@remove scene.nodes[0]
+					@_addNodeToScene node
+			else
+				@_addNodeToScene node
+
+	_addNodeToScene: (node) =>
+		@scene
 		.then (scene) -> scene.addNode node
 		.then => @_notify 'onNodeAdd', node
+		.then => @select node
 
 	remove: (node) =>
 		@scene
 		.then (scene) -> scene.removeNode node
 		.then => @_notify 'onNodeRemove',  node
+		.then =>
+			if node == @selectedNode
+				@deselect node
 
 	clearScene: =>
 		@scene
@@ -53,7 +75,7 @@ class SceneManager
 
 	deselect: =>
 		if @selectedNode?
-			@pluginHooks.onNodeDeselect @selectedNode
+			@_notify 'onNodeDeselect', @selectedNode
 			@selectedNode = null
 		return
 

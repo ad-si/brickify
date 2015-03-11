@@ -26,6 +26,9 @@ globalConfig.plugins.newBrickator = true
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false
 
+#autoreplace model when loaded/dropped
+globalConfig.autoReplaceModel = true
+
 # clone global config 2 times
 config1 = clone globalConfig
 config2 = clone globalConfig

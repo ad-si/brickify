@@ -53,8 +53,9 @@ staticRendererHeight: 100
 # sync
 syncWithServer: true
 
-#ui
+#ui and interaction
 buildUi: true
+autoReplaceModel: false #replaces the currently loaded model without asking
 
 #newBrickator
 autoLegofy: true

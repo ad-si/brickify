@@ -113,7 +113,6 @@
 #	mouseHoverCallback: # when the mouse is moved, but not pressed
 #	mouseUpCallback: # when mouse is released
 #	cancelCallback: # when interaction is canceled (ESC, two buttons pressed)
-#	tooltip: ''
 # }
 #
 

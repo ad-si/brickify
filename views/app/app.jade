@@ -4,10 +4,7 @@ block styles
 	link(rel='stylesheet', href='/styles/screen.css')
 
 block body
-	#wrapper.container-fluid
-
-		h1#logo Brickolage
-
+	#wrapper.row.container-fluid
 		noscript
 			| For full functionality of this site it is necessary to enable JavaScript.
 			| Here are the
@@ -20,37 +17,12 @@ block body
 
 		#commandContainer
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
-			a#cmdShare.fa.fa-share-alt(href="#", title="Share your work")
-		#controls.row
+
+		.row
 			aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-				.panel.panel-default
-					.panel-heading
-						h4.panel-title.collapse-title(data-toggle='collapse'
-							data-target='#collapseObjects') Objects
-					#collapseObjects.panel-collapse.collapse.in
-						.panel-body
-							ul#objectsContainer
-				.btn-group.btn-group-justified(role='group')#brushContainer
-				br
-				button.btn.btn-success.btn-block#downloadButton
-					i.fa.fa-download
-					| &nbsp;
-					| Download for 3d printer
+				h1#logo Brickolage
+				include ./sidebar.jade
 
-				button.btn.btn-success.btn-block#buildButton
-					| Show me how to build with LEGO
-				#buildContainer.hidden
-					br
-					button.btn.btn-default.fa.fa-chevron-left#buildDecrement
-					| &nbsp;Showing Layer&nbsp;
-					span#currentBuildLayer 1
-					| &nbsp;of&nbsp;
-					span#maxBuildLayer 0
-					| &nbsp;
-					button.btn.btn-default.fa.fa-chevron-right#buildIncrement
-					input(type='range')#buildSlider
-
-			aside#rightSidebar.col-lg-offset-8.col-lg-2.col-md-offset-6.col-md-3.col-sm-offset-4.col-sm-4
 		#webGlWarning
 			p You should not see this text! Do you use a webGL ready browser?
 				= ' '

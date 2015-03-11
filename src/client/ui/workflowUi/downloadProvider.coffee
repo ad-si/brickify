@@ -1,5 +1,5 @@
 $ = require 'jquery'
-modelCache = require '../modelCache'
+modelCache = require '../../modelCache'
 saveAs = require 'filesaver.js'
 
 module.exports = class DownloadProvider

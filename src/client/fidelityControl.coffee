@@ -20,7 +20,7 @@ class FidelityControl
 
 			# if there is no plugin that can still decrease quality (return true), then
 			# we don't need to try it again
-			if not @_anyTrue results
+			if not results.indexOf(true) >= 0
 				@canDecreaseVisualQuality = false
 
 		else if fps > @upgradeThresholdFps and @canIncreaseVisualQuality
@@ -30,12 +30,8 @@ class FidelityControl
 			@canDecreaseVisualQuality = true
 
 			# same goes for increasing quality
-			if not @_anyTrue results
+			if not results.indexOf(true) >= 0
 				@canIncreaseVisualQuality = false
-
-	_anyTrue: (arrayOfBoolean) ->
-		return false if arrayOfBoolean.length == 0
-		return arrayOfBoolean.some (value) -> return value
 
 	getHotkeys: () =>
 		return {

@@ -30,10 +30,23 @@ class SceneManager
 
 	add: (node) =>
 		@scene
+		.then (scene) =>
+			if scene.nodes.length > 0
+				question = 'You already have a model in your scene.
+				 Loading the new model will replace the existing model!'
+				
+				bootbox.confirm question, (result) =>
+					if result
+						@remove scene.nodes[0]
+						@_addNodeToScene node
+			else
+				@_addNodeToScene node
+
+	_addNodeToScene: (node) =>
+		@scene
 		.then (scene) -> scene.addNode node
 		.then => @_notify 'onNodeAdd', node
-		.then =>
-			@select node
+		.then => @select node
 
 	remove: (node) =>
 		@scene
@@ -42,8 +55,6 @@ class SceneManager
 		.then =>
 			if node == @selectedNode
 				@deselect node
-				if (@scene.nodes.length > 0)
-					@select @scene.nodes[0]
 
 	clearScene: =>
 		@scene

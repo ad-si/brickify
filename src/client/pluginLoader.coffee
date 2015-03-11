@@ -70,4 +70,9 @@ module.exports = class PluginLoader
 				require '../plugins/newBrickator'
 				require '../plugins/newBrickator/package.json'
 			)
+		if @globalConfig.plugins.brickVisualizer
+			pluginInstances.push @initPlugin(
+				require '../plugins/brickVisualizer'
+				require '../plugins/brickVisualizer/package.json'
+			)
 		return pluginInstances

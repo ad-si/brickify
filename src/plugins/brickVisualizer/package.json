@@ -1,0 +1,9 @@
+{
+  "name": "brickVisualizer",
+  "version": "0.1.0",
+  "description": "visualizes voxels and bricks and makes them user selectable",
+  "lowfab": {
+    "type": "renderer"
+  },
+  "browser": "./brickVisualizer.coffee"
+}

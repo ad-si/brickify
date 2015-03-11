@@ -20,8 +20,6 @@ globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
-globalConfig.plugins.solidRenderer = true
-globalConfig.plugins.newBrickator = true
 
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false

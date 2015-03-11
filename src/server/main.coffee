@@ -77,7 +77,6 @@ module.exports.setupRouting = () ->
 		process.env.HOSTNAME or 'lowfab.net'
 
 	webapp.set 'views', path.normalize 'views'
-	webapp.locals.pretty = true
 	webapp.set 'view engine', 'jade'
 
 	webapp.use favicon(path.normalize 'public/img/favicon.png', {maxAge: 1000})

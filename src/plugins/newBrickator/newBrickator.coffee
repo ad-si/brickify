@@ -1,6 +1,5 @@
 modelCache = require '../../client/modelCache'
 LegoPipeline = require './pipeline/LegoPipeline'
-THREE = require 'three'
 NodeVisualization = require './visualization/NodeVisualization'
 PipelineSettings = require './pipeline/PipelineSettings'
 THREE = require 'three'
@@ -8,7 +7,6 @@ Brick = require './pipeline/Brick'
 meshlib = require 'meshlib'
 CsgExtractor = require './CsgExtractor'
 BrushHandler = require './BrushHandler'
-$ = require 'jquery'
 threeHelper = require '../../client/threeHelper'
 
 ###

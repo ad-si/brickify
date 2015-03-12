@@ -25,6 +25,9 @@ class Node extends SyncObject
 			@[key] = data
 			if transient and key not in @transientProperties
 				@transientProperties.push key
+			else if not transient and key in @transientProperties
+				index = @transientProperties.indexOf key
+				@transientProperties.splice index, 1
 
 	setModelHash: (hash) =>
 		return @next => @modelHash = hash

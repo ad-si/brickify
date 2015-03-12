@@ -33,7 +33,6 @@
     "jade": "^1.7.0",
     "jquery": "^2.1.1",
     "js-yaml": "^3.2.7",
-    "jsondiffpatch": "^0.1.17",
     "meshlib": "Lowfab/meshlib#0.2.3",
     "mkdirp": "^0.5.0",
     "morgan": "^1.4.1",

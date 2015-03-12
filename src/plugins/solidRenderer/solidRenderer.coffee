@@ -7,7 +7,7 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
 modelCache = require '../../client/modelCache'
-LineMatGenerator = require '../newBrickator/visualization/LineMatGenerator'
+LineMatGenerator = require '../brickVisualizer/visualization/LineMatGenerator'
 interactionHelper = require '../../client/interactionHelper'
 
 class SolidRenderer

@@ -17,18 +17,23 @@ module.exports = class NodeVisualization
 		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
 
-		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
-		@threeNode.add @voxelBrickSubnode
-
 		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
-		@geometryCreator = new GeometryCreator(@grid)
 
 		@currentlyTouchedVoxels = []
 		@modifiedVoxels = []
 
 		@solidRenderer = @bundle.getPlugin('solid-renderer')
 		@isStabilityView = false
+
+		@initialized = false
+
+	initialize: (@grid) =>
+		if not @initialized
+			@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
+			@threeNode.add @voxelBrickSubnode
+			@geometryCreator = new GeometryCreator(@grid)
+			@initialized = true
 
 	showVoxels: () =>
 		@voxelsSubnode.visible = true
@@ -118,7 +123,15 @@ module.exports = class NodeVisualization
 		@isStabilityView = enabled
 		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
 		@updateBrickVisualization(coloring)
+
+		# Turn off possible lego box during stability view
+		if enabled
+			@_legoBoxVisibilityBeforeStability = @voxelWireframe.isVisible()
+			@voxelWireframe.setVisibility false
+		else
+			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 		return
+
 
 	updateBrickVisualization: (coloring = @defaultColoring) =>
 		@bricksSubnode.children = []

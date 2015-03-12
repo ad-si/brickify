@@ -75,4 +75,5 @@ module.exports = class PluginLoader
 				require '../plugins/brickVisualizer'
 				require '../plugins/brickVisualizer/package.json'
 			)
+
 		return pluginInstances

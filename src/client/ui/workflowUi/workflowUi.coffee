@@ -181,4 +181,4 @@ module.exports = class WorkflowUi
 	_initScrollbar: () =>
 		sideBar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sideBar
-
+		window.addEventListener 'resize', -> perfectScrollbar.update sideBar

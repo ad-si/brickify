@@ -54,7 +54,7 @@ class NewBrickator
 			modifiedBricks = []
 			for v in modifiedVoxels
 				if v.gridEntry.brick?
-					if modifiedBricks.indexOf(v.gridEntry.brick) < 0
+					if v.gridEntry.brick not in modifiedBricks
 						modifiedBricks.push v.gridEntry.brick
 				else if createBricks
 					pos = v.voxelCoords

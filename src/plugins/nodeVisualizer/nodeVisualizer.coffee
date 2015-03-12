@@ -4,9 +4,9 @@ BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 
 ###
-# @class BrickVisualizer
+# @class NodeVisualizer
 ###
-class BrickVisualizer
+class NodeVisualizer
 	constructor: () ->
 		@printMaterial = new THREE.MeshLambertMaterial({
 			color: 0xeeeeee
@@ -186,4 +186,4 @@ class BrickVisualizer
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg(csg)
 
-module.exports = BrickVisualizer
+module.exports = NodeVisualizer

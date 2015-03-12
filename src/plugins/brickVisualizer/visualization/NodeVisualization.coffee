@@ -26,14 +26,10 @@ module.exports = class NodeVisualization
 		@solidRenderer = @bundle.getPlugin('solid-renderer')
 		@isStabilityView = false
 
-		@initialized = false
-
 	initialize: (@grid) =>
-		if not @initialized
-			@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
-			@threeNode.add @voxelBrickSubnode
-			@geometryCreator = new GeometryCreator(@grid)
-			@initialized = true
+		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
+		@threeNode.add @voxelBrickSubnode
+		@geometryCreator = new GeometryCreator(@grid)
 
 	showVoxels: () =>
 		@voxelsSubnode.visible = true

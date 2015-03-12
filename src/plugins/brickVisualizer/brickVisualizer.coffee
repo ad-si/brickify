@@ -34,19 +34,16 @@ class BrickVisualizer
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
 		.then (cachedData) =>
-			# initialize nodeVisualization with grid if necessary
-			if not cachedData.visualization.initialized
+			# initialize visualization with data from newBrickator
+			if not cachedData.initialized
 				cachedData.visualization.initialize newBrickatorData.grid
 				cachedData.numZLayers = newBrickatorData.grid.zLayers.length
-
-			@brushHandler.afterPipelineUpdate node, cachedData
-
+				cachedData.initialized = true
+				
 			# update bricks and make voxel same colors as bricks
 			cachedData.visualization.updateBricks newBrickatorData.brickGraph.bricks
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.showVoxels()
-
-			@_applyVoxelAndBrickVisibility cachedData
 
 			# instead of creating csg live, show original model semitransparent
 			@solidRenderer ?= @bundle.getPlugin('solid-renderer')
@@ -77,6 +74,7 @@ class BrickVisualizer
 		threeHelper.link node, threeNode
 
 		data = {
+			initialized: false
 			node: node
 			threeNode: threeNode
 			visualization: new NodeVisualization @bundle, threeNode

@@ -126,10 +126,6 @@ class BrushHandler
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
 
-	afterPipelineUpdate: (selectedNode, cachedData) =>
-		cachedData.visualization.updateVoxelVisualization()
-		cachedData.visualization.showVoxels()
-
 	_setModelShadowVisiblity: (selectedNode, visible) =>
 		if not @solidRenderer?
 			@solidRenderer = @bundle.getPlugin('solid-renderer')

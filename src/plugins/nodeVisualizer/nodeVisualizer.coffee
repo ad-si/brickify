@@ -49,6 +49,7 @@ class BrickVisualizer
 		# create visible node and zoom on to it
 		@_getCachedData(node)
 		.then (cachedData) =>
+			cachedData.modelVisualization.createVisualization()
 			cachedData.modelVisualization.afterCreation().then () =>
 				@zoomToNode cachedData.modelVisualization.getSolid()
 
@@ -88,8 +89,7 @@ class BrickVisualizer
 				selectedNode.storePluginData 'brickVisualizer', data, true
 				return data
 
-	# creates visualization datastructure, which also means creating a simple
-	# visualization of the model
+	# creates visualization datastructures
 	_createNodeDatastructure: (node) =>
 		threeNode = new THREE.Object3D()
 		@threejsRootNode.add threeNode

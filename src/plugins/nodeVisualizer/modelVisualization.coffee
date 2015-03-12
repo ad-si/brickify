@@ -9,8 +9,9 @@ class ModelVisualization
 		@threeNode = new THREE.Object3D()
 		threeNode.add @threeNode
 
+	createVisualization: () ->
 		@_createVisualization(@node, @threeNode)
-
+		
 	setSolidMaterial: (material) =>
 		@afterCreationPromise.then () =>
 			@threeNode.solid.material = material

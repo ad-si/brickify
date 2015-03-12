@@ -23,7 +23,6 @@ module.exports = class BrickVisualization
 		@currentlyTouchedVoxels = []
 		@modifiedVoxels = []
 
-		@solidRenderer = @bundle.getPlugin('solid-renderer')
 		@isStabilityView = false
 
 	initialize: (@grid) =>

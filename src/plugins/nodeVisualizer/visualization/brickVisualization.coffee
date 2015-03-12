@@ -7,7 +7,7 @@ VoxelWireframe = require './VoxelWireframe'
 
 # This class represents the visualization of Voxels and Bricks
 module.exports = class BrickVisualization
-	constructor: (@bundle, @threeNode, @grid) ->
+	constructor: (@bundle, @threeNode) ->
 		@csgSubnode = new THREE.Object3D()
 		@threeNode.add @csgSubnode
 

@@ -57,7 +57,8 @@ class BrickVisualizer
 	# called by mouse handler
 	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>
 		@newBrickator ?= @bundle.getPlugin 'newBrickator'
-		@newBrickator.relayoutModifiedParts cachedData.node, touchedVoxels, createBricks
+		@newBrickator.relayoutModifiedParts cachedData.node,
+			touchedVoxels, createBricks
 
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>

@@ -36,6 +36,10 @@ module.exports = class NodeVisualization
 		@bricksSubnode.visible = false
 
 	showBricks: () =>
+		# update visualization if needed
+		if @bricksVisualizationNeedsUpdate
+			@updateBrickVisualization()
+
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
@@ -111,8 +115,15 @@ module.exports = class NodeVisualization
 		else
 			threeBrick.setKnobVisibility true
 
+	# updates the brick reference datastructure and marks brick visualization dirty
+	# if bricks are not currently shown
 	updateBricks: (@bricks) =>
-		@updateBrickVisualization()
+		if @bricksSubnode.visible
+			# update visualization instantly because we are looking at bricks
+			@updateBrickVisualization()
+		else
+			# update visualization if we need it
+			@bricksVisualizationNeedsUpdate = true
 		return
 
 	setStabilityView: (enabled) =>
@@ -130,6 +141,7 @@ module.exports = class NodeVisualization
 
 
 	updateBrickVisualization: (coloring = @defaultColoring) =>
+		@bricksVisualizationNeedsUpdate = false
 		@bricksSubnode.children = []
 
 		for brickLayer in @bricks

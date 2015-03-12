@@ -34,22 +34,29 @@ class BrickVisualizer
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
 		.then (cachedData) =>
-			# initialize visualization with data from newBrickator
 			if not cachedData.initialized
-				cachedData.visualization.initialize newBrickatorData.grid
-				cachedData.numZLayers = newBrickatorData.grid.zLayers.length
-				cachedData.initialized = true
-				
-			# update bricks and make voxel same colors as bricks
+				@_initializeData node, cachedData, newBrickatorData
+
+			# update brick reference for later
 			cachedData.visualization.updateBricks newBrickatorData.brickGraph.bricks
+
+			# update voxel coloring and show them
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.showVoxels()
 
-			# instead of creating csg live, show original model semitransparent
-			@solidRenderer ?= @bundle.getPlugin('solid-renderer')
-			@solidRenderer?.setNodeMaterial node, @printMaterial
-
 			@_applyPrintVisibility cachedData
+
+	# initialize visualization with data from newBrickator
+	# change solid renderer appearance
+	_initializeData: (node, visualizationData, newBrickatorData) =>
+		# init node visualization
+		visualizationData.visualization.initialize newBrickatorData.grid
+		visualizationData.numZLayers = newBrickatorData.grid.zLayers.length
+		visualizationData.initialized = true
+
+		# instead of creating csg live, show original model semitransparent
+		@solidRenderer ?= @bundle.getPlugin('solid-renderer')
+		@solidRenderer?.setNodeMaterial node, @printMaterial
 
 	# called by mouse handler
 	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>

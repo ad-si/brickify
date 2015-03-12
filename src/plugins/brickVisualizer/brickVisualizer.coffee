@@ -1,6 +1,7 @@
 BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
 NodeVisualization = require './visualization/NodeVisualization'
+ModelVisualization = require './modelVisualization'
 
 ###
 # @class BrickVisualizer
@@ -41,6 +42,22 @@ class BrickVisualizer
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.showVoxels()
 
+	onNodeAdd: (node) =>
+		# create visible node and zoom on to it
+		@_getCachedData(node)
+		.then (cachedData) =>
+			cachedData.modelVisualization.afterCreation().then () =>
+				@zoomToNode cachedData.modelVisualization.getSolid()
+
+	onNodeRemove: (node) =>
+		@threejsRootNode.remove threeHelper.find node, @threejsNode
+
+	zoomToNode: (threeNode) =>
+		boundingSphere = threeHelper.getBoundingSphere threeNode
+		threeNode.updateMatrix()
+		boundingSphere.center.applyProjection threeNode.matrix
+		@bundle.renderer.zoomToBoundingSphere boundingSphere
+
 	# initialize visualization with data from newBrickator
 	# change solid renderer appearance
 	_initializeData: (node, visualizationData, newBrickatorData) =>
@@ -50,8 +67,7 @@ class BrickVisualizer
 		visualizationData.initialized = true
 
 		# instead of creating csg live, show original model semitransparent
-		@solidRenderer ?= @bundle.getPlugin('solid-renderer')
-		@solidRenderer?.setNodeMaterial node, @printMaterial
+		visualizationData.modelVisualization.setSolidMaterial @printMaterial
 
 	# called by mouse handler
 	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>
@@ -70,6 +86,8 @@ class BrickVisualizer
 				selectedNode.storePluginData 'brickVisualizer', data, true
 				return data
 
+	# creates visualization datastructure, which also means creating a simple
+	# visualization of the model
 	_createNodeDatastructure: (node) =>
 		threeNode = new THREE.Object3D()
 		@threejsRootNode.add threeNode
@@ -80,6 +98,7 @@ class BrickVisualizer
 			node: node
 			threeNode: threeNode
 			visualization: new NodeVisualization @bundle, threeNode
+			modelVisualization: new ModelVisualization @bundle.globalConfig, node, threeNode
 		}
 
 		return data
@@ -108,7 +127,7 @@ class BrickVisualizer
 					cachedData.visualization.setStabilityView(stabilityViewEnabled)
 					cachedData.visualization.showBricks()
 
-				@solidRenderer?.setNodeVisibility cachedData.node, false
+				cachedData.modelVisualization.setNodeVisibility false
 
 				@brushHandler.interactionDisabled = true
 			else
@@ -118,7 +137,7 @@ class BrickVisualizer
 				cachedData.visualization.showVoxels()
 				@brushHandler.interactionDisabled = false
 
-				@solidRenderer?.setNodeVisibility cachedData.node, true
+				cachedData.modelVisualization.setNodeVisibility true
 
 	# enables the build mode, which means that only bricks and CSG
 	# are shown
@@ -133,7 +152,7 @@ class BrickVisualizer
 
 			@_showCsg cachedData
 
-			@solidRenderer?.setNodeVisibility cachedData.node, false
+			cachedData.modelVisualization.setNodeVisibility false
 
 			return cachedData.numZLayers
 
@@ -152,7 +171,7 @@ class BrickVisualizer
 			# hide csg, show model, show voxels
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.hideCsg()
-			@solidRenderer?.setNodeVisibility cachedData.node, true
+			cachedData.modelVisualization.setNodeVisibility true
 			cachedData.visualization.showVoxels()
 			
 			if @brushHandler.legoBrushSelected

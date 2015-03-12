@@ -35,7 +35,7 @@ class BrushHandler
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.setPossibleLegoBoxVisibility true
-			@_setModelShadowVisiblity selectedNode, false
+			cachedData.modelVisualization.setShadowVisibility false
 
 	_printSelect: (selectedNode) =>
 		@legoBrushSelected = false
@@ -46,7 +46,7 @@ class BrushHandler
 			cachedData.visualization.showVoxels()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
-			@_setModelShadowVisiblity selectedNode, true
+			cachedData.modelVisualization.setShadowVisibility true
 
 	_legoMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -125,11 +125,5 @@ class BrushHandler
 			cachedData.visualization.resetTouchedVoxelsToLego()
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
-
-	_setModelShadowVisiblity: (selectedNode, visible) =>
-		if not @solidRenderer?
-			@solidRenderer = @bundle.getPlugin('solid-renderer')
-		if @solidRenderer?
-			@solidRenderer.setShadowVisibility selectedNode, visible
 
 module.exports = BrushHandler

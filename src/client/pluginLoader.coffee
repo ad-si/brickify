@@ -60,11 +60,6 @@ module.exports = class PluginLoader
 				require '../plugins/legoBoard'
 				require '../plugins/legoBoard/package.json'
 			)
-		if @globalConfig.plugins.solidRenderer
-			pluginInstances.push @initPlugin(
-				require '../plugins/solidRenderer'
-				require '../plugins/solidRenderer/package.json'
-			)
 		if @globalConfig.plugins.newBrickator
 			pluginInstances.push @initPlugin(
 				require '../plugins/newBrickator'

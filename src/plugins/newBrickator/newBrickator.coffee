@@ -17,7 +17,7 @@ class NewBrickator
 	init: (@bundle) => return
 
 	onNodeAdd: (node) =>
-		@brickVisualizer = @bundle.getPlugin 'brickVisualizer'
+		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
 		if @bundle.globalConfig.autoLegofy
 			@runLegoPipeline node
@@ -37,7 +37,7 @@ class NewBrickator
 			results = @pipeline.run data, settings, true
 			cachedData.brickGraph = results.accumulatedResults.brickGraph
 
-			@brickVisualizer?.objectModified selectedNode, cachedData
+			@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout
@@ -73,7 +73,7 @@ class NewBrickator
 			cachedData.brickGraph = results.accumulatedResults.brickGraph
 			cachedData.csgNeedsRecalculation = true
 
-			@brickVisualizer?.objectModified selectedNode, cachedData
+			@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	_createDataStructure: (selectedNode) =>
 		selectedNode.getModel().then (model) =>

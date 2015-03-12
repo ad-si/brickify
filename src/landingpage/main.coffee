@@ -31,14 +31,15 @@ globalConfig.autoReplaceModel = true
 config1 = clone globalConfig
 config2 = clone globalConfig
 
+# configure left bundle one to only show model
+config1.plugins.newBrickator = false
+
 # instantiate 2 lowfab bundles
 config1.renderAreaId = 'renderArea1'
-config1.plugins.newBrickator = false
 bundle1 = new Bundle config1
 b1 = bundle1.init().then ->
 	controls = bundle1.getControls()
 	config2.renderAreaId = 'renderArea2'
-	config2.plugins.solidRenderer = false
 	bundle2 = new Bundle config2, controls
 	b2 = bundle2.init()
 

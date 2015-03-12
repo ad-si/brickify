@@ -54,7 +54,7 @@ class BrickVisualizer
 				@zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
-		@threejsRootNode.remove threeHelper.find node, @threejsNode
+		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
 
 	zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode

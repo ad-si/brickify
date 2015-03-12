@@ -37,11 +37,11 @@ class ModelVisualization
 		)
 		
 		@shadowMat = new THREE.MeshBasicMaterial(
-				color: 0x000000
-				transparent: true
-				opacity: 0.4
-				depthFunc: 'GREATER'
-			)
+			color: 0x000000
+			transparent: true
+			opacity: 0.4
+			depthFunc: 'GREATER'
+		)
 		@shadowMat.polygonOffset = true
 		@shadowMat.polygonOffsetFactor = 5
 		@shadowMat.polygonoffsetUnits = -5

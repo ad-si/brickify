@@ -5,9 +5,9 @@ StabilityColoring = require './StabilityColoring'
 interactionHelper = require '../../../client/interactionHelper'
 VoxelWireframe = require './VoxelWireframe'
 
-# This class represents the visualization of a node in the scene
-module.exports = class NodeVisualization
-	constructor: (@bundle, @threeNode, @grid) ->
+# This class represents the visualization of Voxels and Bricks
+module.exports = class BrickVisualization
+	constructor: (@bundle, @threeNode) ->
 		@csgSubnode = new THREE.Object3D()
 		@threeNode.add @csgSubnode
 
@@ -17,24 +17,28 @@ module.exports = class NodeVisualization
 		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
 
-		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
-		@threeNode.add @voxelBrickSubnode
-
 		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
-		@geometryCreator = new GeometryCreator(@grid)
 
 		@currentlyTouchedVoxels = []
 		@modifiedVoxels = []
 
-		@solidRenderer = @bundle.getPlugin('solid-renderer')
 		@isStabilityView = false
+
+	initialize: (@grid) =>
+		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
+		@threeNode.add @voxelBrickSubnode
+		@geometryCreator = new GeometryCreator(@grid)
 
 	showVoxels: () =>
 		@voxelsSubnode.visible = true
 		@bricksSubnode.visible = false
 
 	showBricks: () =>
+		# update visualization if needed
+		if @bricksVisualizationNeedsUpdate
+			@updateBrickVisualization()
+
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
@@ -110,17 +114,33 @@ module.exports = class NodeVisualization
 		else
 			threeBrick.setKnobVisibility true
 
+	# updates the brick reference datastructure and marks brick visualization dirty
+	# if bricks are not currently shown
 	updateBricks: (@bricks) =>
-		@updateBrickVisualization()
+		if @bricksSubnode.visible
+			# update visualization instantly because we are looking at bricks
+			@updateBrickVisualization()
+		else
+			# update visualization if we need it
+			@bricksVisualizationNeedsUpdate = true
 		return
 
 	setStabilityView: (enabled) =>
 		@isStabilityView = enabled
 		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
 		@updateBrickVisualization(coloring)
+
+		# Turn off possible lego box during stability view
+		if enabled
+			@_legoBoxVisibilityBeforeStability = @voxelWireframe.isVisible()
+			@voxelWireframe.setVisibility false
+		else
+			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 		return
 
+
 	updateBrickVisualization: (coloring = @defaultColoring) =>
+		@bricksVisualizationNeedsUpdate = false
 		@bricksSubnode.children = []
 
 		for brickLayer in @bricks

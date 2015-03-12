@@ -32,7 +32,7 @@ module.exports = class WorkflowUi
 		@sceneManager = @bundle.sceneManager
 		@downloadProvider.init('#downloadButton', @sceneManager)
 		@brushSelector.init '#brushContainer'
-		@newBrickator = @bundle.getPlugin 'newBrickator'
+		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
 		@_initStabilityCheck()
 		@_initBuildButton()
@@ -57,7 +57,7 @@ module.exports = class WorkflowUi
 			@_enableNonStabilityUi()
 
 		@stabilityCheckButton.toggleClass 'active', @stabilityCheckModeEnabled
-		@newBrickator._setStabilityView(
+		@nodeVisualizer._setStabilityView(
 			@sceneManager.selectedNode, @stabilityCheckModeEnabled
 		)
 
@@ -111,7 +111,7 @@ module.exports = class WorkflowUi
 			@buildModeEnabled = !@buildModeEnabled
 
 	_enableBuildMode: (selectedNode) =>
-		@newBrickator.enableBuildMode(selectedNode).then (numZLayers) =>
+		@nodeVisualizer.enableBuildMode(selectedNode).then (numZLayers) =>
 			# disable other UI
 			@_disableNonBuildUi()
 	
@@ -127,10 +127,10 @@ module.exports = class WorkflowUi
 		layer = @buildLayerUi.slider.val()
 		@buildLayerUi.curLayer.html(Number(layer))
 
-		@newBrickator.showBuildLayer(selectedNode, layer)
+		@nodeVisualizer.showBuildLayer(selectedNode, layer)
 
 	_disableBuildMode: (selectedNode) =>
-		@newBrickator.disableBuildMode(selectedNode).then () =>
+		@nodeVisualizer.disableBuildMode(selectedNode).then () =>
 			# enable other ui
 			@_enableNonBuildUi()
 

@@ -18,9 +18,6 @@ class BrickVisualizer
 		@printMaterial.polygonOffsetFactor = 5
 		@printMaterial.polygonoffsetUnits = 5
 
-		@_brickVisibility = true
-		@_printVisibility = true
-
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)
 
@@ -43,8 +40,6 @@ class BrickVisualizer
 			# update voxel coloring and show them
 			cachedData.visualization.updateVoxelVisualization()
 			cachedData.visualization.showVoxels()
-
-			@_applyPrintVisibility cachedData
 
 	# initialize visualization with data from newBrickator
 	# change solid renderer appearance
@@ -162,38 +157,6 @@ class BrickVisualizer
 			
 			if @brushHandler.legoBrushSelected
 				cachedData.visualization.setPossibleLegoBoxVisibility true
-
-	_applyVoxelAndBrickVisibility: (cachedData) =>
-		solidRenderer = @bundle.getPlugin('solid-renderer')
-
-		if @_brickVisibility
-			cachedData.visualization.showVoxelAndBricks()
-			# if bricks are shown, show whole model instead of csg (faster)
-			cachedData.visualization.hideCsg()
-			if solidRenderer? and @_printVisibility
-				solidRenderer.setNodeVisibility(cachedData.node, true)
-		else
-			# if bricks are hidden, csg has to be generated because
-			# the user would else see the whole original model
-			if @_printVisibility
-				@_showCsg cachedData
-
-			if solidRenderer?
-				solidRenderer.setNodeVisibility(cachedData.node, false)
-			cachedData.visualization.hideVoxelAndBricks()
-
-	_applyPrintVisibility: (cachedData) =>
-		if @_printVisibility
-			if @_brickVisibility
-				# show face csg (original model) when bricks are visible
-				cachedData.visualization.hideCsg()
-				@solidRenderer?.setNodeVisibility(cachedData.node, true)
-			else
-				# show real csg
-				@_showCsg cachedData
-		else
-			cachedData.visualization.hideCsg()
-			@solidRenderer?.setNodeVisibility cachedData.node, false
 
 	_showCsg: (cachedData) =>
 		return @newBrickator.getCSG(cachedData.node, true)

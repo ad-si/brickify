@@ -32,9 +32,9 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.visualization.showVoxels()
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.setPossibleLegoBoxVisibility true
+			cachedData.brickVisualization.showVoxels()
+			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 			cachedData.modelVisualization.setShadowVisibility false
 
 	_printSelect: (selectedNode) =>
@@ -43,16 +43,16 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.visualization.showVoxels()
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.setPossibleLegoBoxVisibility false
+			cachedData.brickVisualization.showVoxels()
+			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 			cachedData.modelVisualization.setShadowVisibility true
 
 	_legoMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
+			voxel = cachedData.brickVisualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
@@ -60,7 +60,7 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.visualization.makeVoxelLego event, selectedNode
+			voxel = cachedData.brickVisualization.makeVoxelLego event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
@@ -68,7 +68,7 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 			
 			@brickVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
@@ -77,21 +77,21 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.visualization.highlightVoxel event, selectedNode, false
+			cachedData.brickVisualization.highlightVoxel event, selectedNode, false
 
 	_legoCancel: (event, selectedNode) =>
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.visualization.resetTouchedVoxelsTo3dPrinted()
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
+			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
+			voxel = cachedData.brickVisualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
@@ -99,7 +99,7 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.visualization.makeVoxel3dPrinted event, selectedNode
+			voxel = cachedData.brickVisualization.makeVoxel3dPrinted event, selectedNode
 			if voxel?
 				cachedData.csgNeedsRecalculation = true
 
@@ -107,7 +107,7 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			touchedVoxels = cachedData.visualization.updateModifiedVoxels()
+			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 
 			@brickVisualizer._relayoutModifiedParts cachedData, touchedVoxels, false
@@ -116,14 +116,14 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.visualization.highlightVoxel event, selectedNode, true
+			cachedData.brickVisualization.highlightVoxel event, selectedNode, true
 
 	_printCancel: (event, selectedNode) =>
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.visualization.resetTouchedVoxelsToLego()
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.updateBricks cachedData.brickGraph.bricks
+			cachedData.brickVisualization.resetTouchedVoxelsToLego()
+			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.updateBricks cachedData.brickGraph.bricks
 
 module.exports = BrushHandler

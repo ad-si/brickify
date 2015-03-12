@@ -5,8 +5,8 @@ StabilityColoring = require './StabilityColoring'
 interactionHelper = require '../../../client/interactionHelper'
 VoxelWireframe = require './VoxelWireframe'
 
-# This class represents the visualization of a node in the scene
-module.exports = class NodeVisualization
+# This class represents the visualization of Voxels and Bricks
+module.exports = class BrickVisualization
 	constructor: (@bundle, @threeNode, @grid) ->
 		@csgSubnode = new THREE.Object3D()
 		@threeNode.add @csgSubnode

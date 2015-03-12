@@ -1,6 +1,6 @@
 BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
-NodeVisualization = require './visualization/NodeVisualization'
+BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 
 ###
@@ -36,13 +36,16 @@ class BrickVisualizer
 				@_initializeData node, cachedData, newBrickatorData
 
 			# update brick reference for later
-			cachedData.visualization.updateBricks newBrickatorData.brickGraph.bricks
+			cachedData.brickVisualization.updateBricks newBrickatorData.brickGraph.bricks
 
 			# update voxel coloring and show them
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.showVoxels()
+			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.showVoxels()
 
 	onNodeAdd: (node) =>
+		# link other plugins
+		@newBrickator ?= @bundle.getPlugin 'newBrickator'
+
 		# create visible node and zoom on to it
 		@_getCachedData(node)
 		.then (cachedData) =>
@@ -62,7 +65,7 @@ class BrickVisualizer
 	# change solid renderer appearance
 	_initializeData: (node, visualizationData, newBrickatorData) =>
 		# init node visualization
-		visualizationData.visualization.initialize newBrickatorData.grid
+		visualizationData.brickVisualization.initialize newBrickatorData.grid
 		visualizationData.numZLayers = newBrickatorData.grid.zLayers.length
 		visualizationData.initialized = true
 
@@ -71,7 +74,6 @@ class BrickVisualizer
 
 	# called by mouse handler
 	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>
-		@newBrickator ?= @bundle.getPlugin 'newBrickator'
 		@newBrickator.relayoutModifiedParts cachedData.node,
 			touchedVoxels, createBricks
 
@@ -97,8 +99,10 @@ class BrickVisualizer
 			initialized: false
 			node: node
 			threeNode: threeNode
-			visualization: new NodeVisualization @bundle, threeNode
-			modelVisualization: new ModelVisualization @bundle.globalConfig, node, threeNode
+			brickVisualization: new BrickVisualization @bundle, threeNode
+			modelVisualization: new ModelVisualization(
+				@bundle.globalConfig, node, threeNode
+			)
 		}
 
 		return data
@@ -124,17 +128,17 @@ class BrickVisualizer
 				@_showCsg cachedData
 				.then () =>
 					# change coloring to stability coloring
-					cachedData.visualization.setStabilityView(stabilityViewEnabled)
-					cachedData.visualization.showBricks()
+					cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
+					cachedData.brickVisualization.showBricks()
 
 				cachedData.modelVisualization.setNodeVisibility false
 
 				@brushHandler.interactionDisabled = true
 			else
 				#show voxels
-				cachedData.visualization.setStabilityView(stabilityViewEnabled)
-				cachedData.visualization.hideCsg()
-				cachedData.visualization.showVoxels()
+				cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
+				cachedData.brickVisualization.hideCsg()
+				cachedData.brickVisualization.showVoxels()
 				@brushHandler.interactionDisabled = false
 
 				cachedData.modelVisualization.setNodeVisibility true
@@ -147,8 +151,8 @@ class BrickVisualizer
 			@brushHandler.interactionDisabled = true
 
 			# show bricks and csg
-			cachedData.visualization.showBricks()
-			cachedData.visualization.setPossibleLegoBoxVisibility false
+			cachedData.brickVisualization.showBricks()
+			cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 
 			@_showCsg cachedData
 
@@ -160,7 +164,7 @@ class BrickVisualizer
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
 		return @_getCachedData(selectedNode).then (cachedData) =>
-			cachedData.visualization.showBrickLayer layer - 1
+			cachedData.brickVisualization.showBrickLayer layer - 1
 
 	# disables build mode and shows voxels, hides csg
 	disableBuildMode: (selectedNode) =>
@@ -169,17 +173,17 @@ class BrickVisualizer
 			@brushHandler.interactionDisabled = false
 
 			# hide csg, show model, show voxels
-			cachedData.visualization.updateVoxelVisualization()
-			cachedData.visualization.hideCsg()
+			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.hideCsg()
 			cachedData.modelVisualization.setNodeVisibility true
-			cachedData.visualization.showVoxels()
+			cachedData.brickVisualization.showVoxels()
 			
 			if @brushHandler.legoBrushSelected
-				cachedData.visualization.setPossibleLegoBoxVisibility true
+				cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 
 	_showCsg: (cachedData) =>
 		return @newBrickator.getCSG(cachedData.node, true)
 				.then (csg) =>
-					cachedData.visualization.showCsg(csg)
+					cachedData.brickVisualization.showCsg(csg)
 
 module.exports = BrickVisualizer

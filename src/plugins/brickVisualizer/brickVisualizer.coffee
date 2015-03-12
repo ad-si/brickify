@@ -101,9 +101,8 @@ class BrickVisualizer
 		@_getCachedData(selectedNode).then (cachedData) =>
 			if stabilityViewEnabled
 				# only show bricks and csg
-				@newBrickator.getCSG(cachedData.node, cachedData, true)
-				.then (csg) =>
-					cachedData.visualization.showCsg(csg)
+				@_showCsg cachedData
+				.then () =>
 					# change coloring to stability coloring
 					cachedData.visualization.setStabilityView(stabilityViewEnabled)
 					cachedData.visualization.showBricks()
@@ -131,10 +130,7 @@ class BrickVisualizer
 			cachedData.visualization.showBricks()
 			cachedData.visualization.setPossibleLegoBoxVisibility false
 
-			#TODO extract to one method (is used 3 times)
-			@newBrickator.getCSG(cachedData.node, cachedData, true)
-				.then (csg) =>
-					cachedData.visualization.showCsg(csg)
+			@_showCsg cachedData
 
 			@solidRenderer?.setNodeVisibility cachedData.node, false
 
@@ -174,9 +170,7 @@ class BrickVisualizer
 			# if bricks are hidden, csg has to be generated because
 			# the user would else see the whole original model
 			if @_printVisibility
-				@newBrickator.getCSG(cachedData.node, cachedData, true)
-				.then (csg) =>
-					cachedData.visualization.showCsg(csg)
+				@_showCsg cachedData
 
 			if solidRenderer?
 				solidRenderer.setNodeVisibility(cachedData.node, false)
@@ -190,11 +184,14 @@ class BrickVisualizer
 				@solidRenderer?.setNodeVisibility(cachedData.node, true)
 			else
 				# show real csg
-				@newBrickator.getCSG(cachedData.node, cachedData, true)
-				.then (csg) =>
-					cachedData.visualization.showCsg(csg)
+				@_showCsg cachedData
 		else
 			cachedData.visualization.hideCsg()
 			@solidRenderer?.setNodeVisibility cachedData.node, false
+
+	_showCsg: (cachedData) =>
+		return @newBrickator.getCSG(cachedData.node, true)
+				.then (csg) =>
+					cachedData.visualization.showCsg(csg)
 
 module.exports = BrickVisualizer

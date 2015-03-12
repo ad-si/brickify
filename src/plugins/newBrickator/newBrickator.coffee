@@ -1,6 +1,5 @@
 modelCache = require '../../client/modelCache'
 LegoPipeline = require './pipeline/LegoPipeline'
-THREE = require 'three'
 NodeVisualization = require './visualization/NodeVisualization'
 PipelineSettings = require './pipeline/PipelineSettings'
 THREE = require 'three'
@@ -305,7 +304,7 @@ class NewBrickator
 			solidRenderer = @bundle.getPlugin('solid-renderer')
 			solidRenderer?.setNodeVisibility cachedData.node, true
 			cachedData.visualization.showVoxels()
-			
+
 			if @brushHandler.legoBrushSelected
 				cachedData.visualization.setPossibleLegoBoxVisibility true
 

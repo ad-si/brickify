@@ -161,6 +161,21 @@ describe 'Node tests', ->
 				to.deep.have.property('[0].packet.data.pluginName').
 				that.deep.equals(data)
 
+		it 'should store plugin data if transient set to false in later call', ->
+			dataPackets.nextIds.push 'abcdefgh'
+			dataPackets.nextPuts.push true
+			node = new Node()
+			data = {random: ['plugin', 'data']}
+			node
+			.storePluginData 'pluginName', {}, true
+			.storePluginData 'pluginName', data, false
+			node.save().then ->
+				expect(dataPackets.calls).to.equal(2)
+				expect(dataPackets.createCalls).to.have.length(1)
+				expect(dataPackets.putCalls).
+				to.deep.have.property('[0].packet.data.pluginName').
+				that.deep.equals(data)
+
 	describe 'node transform', ->
 		it 'should provide reasonable default transforms', ->
 			dataPackets.nextIds.push 'abcdefgh'

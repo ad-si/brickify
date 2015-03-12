@@ -1,3 +1,5 @@
+THREE = require 'three'
+
 # Provides an simple implementation on how to color voxels and bricks
 module.exports = class Coloring
 	constructor: () ->

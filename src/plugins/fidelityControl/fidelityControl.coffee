@@ -5,10 +5,13 @@
   accordingly via the `uglify()` and `beautify()` plugin hooks
 ###
 
+$ = require 'jquery'
+
 minimalAcceptableFps = 20
 upgradeThresholdFps = 40
 accumulationTime = 200
 timesBelowThreshold = 5
+fpsDisplayUpdateTime = 1000
 
 class FidelityControl
 	init: (bundle) =>
@@ -23,6 +26,8 @@ class FidelityControl
 		@accumulatedTime = 0
 
 		@timesBelowMinimumFps = 0
+
+		@_setupFpsDisplay() if process.env.NODE_ENV is 'development'
 
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
@@ -40,6 +45,7 @@ class FidelityControl
 			@accumulatedFrames = 0
 			@accumulatedTime %= accumulationTime
 			@_adjustFidelity fps
+			@_showFps timestamp, fps
 
 	_adjustFidelity: (fps) =>
 		return unless @autoAdjust
@@ -103,5 +109,15 @@ class FidelityControl
 	_manualDecrease: =>
 		@autoAdjust = false
 		@pluginHooks.uglify()
+
+	_setupFpsDisplay: =>
+		@lastDisplayUpdate = 0
+		@$fpsDisplay = $('<div class="fps-display"></div>')
+		$('body').append @$fpsDisplay
+
+	_showFps: (timestamp, fps) =>
+		if timestamp - @lastDisplayUpdate > fpsDisplayUpdateTime
+			@lastDisplayUpdate = timestamp
+			@$fpsDisplay.text Math.round(fps) if @$fpsDisplay?
 
 module.exports = FidelityControl

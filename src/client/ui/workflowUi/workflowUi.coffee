@@ -179,6 +179,6 @@ module.exports = class WorkflowUi
 		$('#shareButton').click alertCallback
 
 	_initScrollbar: () =>
-		sideBar = document.getElementById 'leftSidebar'
-		perfectScrollbar.initialize sideBar
-		window.addEventListener 'resize', -> perfectScrollbar.update sideBar
+		sidebar = document.getElementById 'leftSidebar'
+		perfectScrollbar.initialize sidebar
+		window.addEventListener 'resize', -> perfectScrollbar.update sidebar

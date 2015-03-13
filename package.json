@@ -42,7 +42,6 @@
     "pep": "Lowfab/PEP#0.3.1",
     "readdirp": "^1.1.0",
     "serve-favicon": "^2.1.6",
-    "stats-js": "^1.0.0-alpha1",
     "stylus": "^0.50.0",
     "three": "Lowfab/three.js#71dev-lowfabFeatures1",
     "three-orbit-controls": "Lowfab/three-orbit-controls#v69.2.0-beta",

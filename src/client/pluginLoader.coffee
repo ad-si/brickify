@@ -70,5 +70,10 @@ module.exports = class PluginLoader
 				require '../plugins/nodeVisualizer'
 				require '../plugins/nodeVisualizer/package.json'
 			)
+		if @globalConfig.plugins.fidelityControl
+			pluginInstances.push @initPlugin(
+				require '../plugins/fidelityControl'
+				require '../plugins/fidelityControl/package.json'
+			)
 
 		return pluginInstances

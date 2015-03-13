@@ -60,14 +60,14 @@ module.exports = class BrickVisualization
 		@voxelBrickSubnode.visible  = true
 
 	# (re)creates voxel visualization.
-	# hides disabled voxels, updates material and knob visibility
+	# hides disabled voxels, updates material and stud visibility
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
 		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
 		recreate
 			@_createVoxelVisualization coloring
 			return
 
-		# update materials and show/hide knobs
+		# update materials and show/hide studs
 		for v in @voxelsSubnode.children
 			# get material
 			material = coloring.getMaterialForVoxel v.gridEntry
@@ -103,16 +103,16 @@ module.exports = class BrickVisualization
 						@_updateVoxel threeBrick
 						@voxelsSubnode.add threeBrick
 
-	# makes disabled voxels invisible, toggles knob visibility
+	# makes disabled voxels invisible, toggles stud visibility
 	_updateVoxel: (threeBrick) =>
 		if not threeBrick.isLego()
 			threeBrick.visible = false
 
 		coords = threeBrick.voxelCoords
 		if @grid.getVoxel(coords.x, coords.y, coords.z + 1)?.enabled
-			threeBrick.setKnobVisibility false
+			threeBrick.setStudVisibility false
 		else
-			threeBrick.setKnobVisibility true
+			threeBrick.setStudVisibility true
 
 	# updates the brick reference datastructure and marks brick visualization dirty
 	# if bricks are not currently shown

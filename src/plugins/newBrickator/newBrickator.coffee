@@ -132,10 +132,10 @@ class NewBrickator
 
 		return dlPromise
 
-	getCSG: (node, addKnobs) =>
+	getCSG: (node, addStuds) =>
 		return @_getCachedData(node)
 		.then (cachedData) =>
-			csg = @_createCSG node, cachedData, addKnobs
+			csg = @_createCSG node, cachedData, addStuds
 			return csg
 
 	_createCSG: (selectedNode, cachedData, addStuds = true) =>
@@ -159,7 +159,7 @@ class NewBrickator
 		options = {
 			profile: true
 			grid: cachedData.grid
-			studSize: PipelineSettings.legoKnobSize
+			studSize: PipelineSettings.legoStudSize
 			addStuds: addStuds
 			transformedModel: threeModel
 		}

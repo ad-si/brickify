@@ -1,5 +1,5 @@
 module.exports  = class PipelineSettings
-	@legoKnobSize = {
+	@legoStudSize = {
 		radius: 2.4
 		height: 1.8
 	}

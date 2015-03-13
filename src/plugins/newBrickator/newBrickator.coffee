@@ -132,13 +132,13 @@ class NewBrickator
 
 		return dlPromise
 
-	getCSG: (node, addKnobs) =>
+	getCSG: (node, addStuds) =>
 		return @_getCachedData(node)
 		.then (cachedData) =>
-			csg = @_createCSG node, cachedData, addKnobs
+			csg = @_createCSG node, cachedData, addStuds
 			return csg
 
-	_createCSG: (selectedNode, cachedData, addKnobs = true) =>
+	_createCSG: (selectedNode, cachedData, addStuds = true) =>
 		# return cached version if grid was not modified
 		if not cachedData.csgNeedsRecalculation
 			return cachedData.cachedCsg
@@ -159,8 +159,8 @@ class NewBrickator
 		options = {
 			profile: true
 			grid: cachedData.grid
-			knobSize: PipelineSettings.legoKnobSize
-			addKnobs: addKnobs
+			studSize: PipelineSettings.legoStudSize
+			addStuds: addStuds
 			transformedModel: threeModel
 		}
 

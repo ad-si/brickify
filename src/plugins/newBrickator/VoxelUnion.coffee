@@ -12,9 +12,9 @@ class VoxelUnion
 	###
 	# creates csg out of voxels. Expects an array of voxels, where
 	# each voxel has to have x,y,z coordinates (in grid voxel coords) and may have
-	# knobOnTop / knobFromBelow flags.
+	# studOnTop / studFromBelow flags.
 	# @param {Object} options
-	# @param {Boolean} options.addKnobs
+	# @param {Boolean} options.addStuds
 	# @param {Boolean} options.profile
 	# @param {Boolean} options.threeBoxGeometryOnly
 	###
@@ -29,13 +29,13 @@ class VoxelUnion
 		if options.profile
 			console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
-		if options.addKnobs
+		if options.addStuds
 			d = new Date()
-			bspWithKnobs = @_addKnobs(
+			bspWithStuds = @_addStuds(
 				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
 			if options.profile
-				console.log "Geometrizer: knob geometry took #{new Date() - d}ms"
-			return bspWithKnobs
+				console.log "Geometrizer: stud geometry took #{new Date() - d}ms"
+			return bspWithStuds
 
 		return boxGeometryBsp
 
@@ -278,64 +278,64 @@ class VoxelUnion
 		return structure.zLayers[z][x][y].points
 
 	###
-	# adds knobs on top, subtracts knobs from below
+	# adds studs on top, subtracts studs from below
 	###
-	_addKnobs: (boxGeometry, options, voxelsToBeGeometrized, grid) ->
-		knobGeometry = @_createKnobGeometry @grid.spacing, options.knobSize
+	_addStuds: (boxGeometry, options, voxelsToBeGeometrized, grid) ->
+		studGeometry = @_createStudGeometry @grid.spacing, options.studSize
 		unionBsp = boxGeometry
 
 		for voxel in voxelsToBeGeometrized
 			# if this is the lowest voxel to be printed, or
-			# there is lego below this voxel, subtract a knob
+			# there is lego below this voxel, subtract a stud
 			# to make it fit to lego bricks
-			if voxel.knobFromBelow
-				knobMesh = new THREE.Mesh(knobGeometry.knobGeometryBottom, null)
-				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
-				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
-				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
+			if voxel.studFromBelow
+				studMesh = new THREE.Mesh(studGeometry.studGeometryBottom, null)
+				studMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
+				studMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
+				studMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
 
-				knobBsp = new ThreeBSP(knobMesh)
-				unionBsp = unionBsp.subtract knobBsp
+				studBsp = new ThreeBSP(studMesh)
+				unionBsp = unionBsp.subtract studBsp
 
-			# create a knob for lego above this voxel
-			if voxel.knobOnTop
-				knobMesh = new THREE.Mesh(knobGeometry.knobGeometryTop, null)
-				knobMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
-				knobMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
-				knobMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
+			# create a stud for lego above this voxel
+			if voxel.studOnTop
+				studMesh = new THREE.Mesh(studGeometry.studGeometryTop, null)
+				studMesh.translateX( grid.origin.x + grid.spacing.x * voxel.x )
+				studMesh.translateY( grid.origin.y + grid.spacing.y * voxel.y )
+				studMesh.translateZ( grid.origin.z + grid.spacing.z * voxel.z )
 
-				knobBsp = new ThreeBSP(knobMesh)
-				unionBsp = unionBsp.union knobBsp
+				studBsp = new ThreeBSP(studMesh)
+				unionBsp = unionBsp.union studBsp
 
 		return unionBsp
 
 	###
 	# creates Geometry needed for CSG operations
 	###
-	_createKnobGeometry: (gridSpacing, knobSize) ->
-		knobRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
-		dzBottom = -(gridSpacing.z / 2) + (knobSize.height / 2)
-		knobTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
-		dzTop = (gridSpacing.z / 2) + (knobSize.height / 2)
-		knobTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
+	_createStudGeometry: (gridSpacing, studSize) ->
+		studRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
+		dzBottom = -(gridSpacing.z / 2) + (studSize.height / 2)
+		studTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
+		dzTop = (gridSpacing.z / 2) + (studSize.height / 2)
+		studTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
 		
-		knobGeometryBottom = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 20
+		studGeometryBottom = new THREE.CylinderGeometry(
+			studSize.radius, studSize.radius, studSize.height, 20
 		)
-		knobGeometryTop = new THREE.CylinderGeometry(
-			knobSize.radius, knobSize.radius, knobSize.height, 20
+		studGeometryTop = new THREE.CylinderGeometry(
+			studSize.radius, studSize.radius, studSize.height, 20
 		)
 
-		knobGeometryBottom.applyMatrix(knobRotation)
-		knobGeometryTop.applyMatrix(knobRotation)
-		knobGeometryBottom.applyMatrix(knobTranslationBottom)
-		knobGeometryTop.applyMatrix(knobTranslationTop)
+		studGeometryBottom.applyMatrix(studRotation)
+		studGeometryTop.applyMatrix(studRotation)
+		studGeometryBottom.applyMatrix(studTranslationBottom)
+		studGeometryTop.applyMatrix(studTranslationTop)
 
 		return {
-			# The shape of a knob that is subtracted from the bottom of the voxel
-			knobGeometryBottom: knobGeometryBottom
-			# The shape of a knob that is added on top of a voxel
-			knobGeometryTop: knobGeometryTop
+			# The shape of a stud that is subtracted from the bottom of the voxel
+			studGeometryBottom: studGeometryBottom
+			# The shape of a stud that is added on top of a voxel
+			studGeometryTop: studGeometryTop
 		}
 
 module.exports = VoxelUnion

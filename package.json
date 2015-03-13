@@ -40,6 +40,7 @@
     "nib": "^1.0.4",
     "operative": "^0.4.0-rc1",
     "pep": "Lowfab/PEP#0.3.1",
+    "perfect-scrollbar": "^0.6.1",
     "readdirp": "^1.1.0",
     "serve-favicon": "^2.1.6",
     "stylus": "^0.50.0",

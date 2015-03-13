@@ -1,5 +1,7 @@
 DownloadProvider = require './downloadProvider'
 BrushSelector = require './brushSelector'
+perfectScrollbar = require 'perfect-scrollbar'
+
 
 module.exports = class WorkflowUi
 	constructor: (@bundle) ->
@@ -37,6 +39,7 @@ module.exports = class WorkflowUi
 		@_initStabilityCheck()
 		@_initBuildButton()
 		@_initNotImplementedMessages()
+		@_initScrollbar()
 
 		# only enable load ui until a model is loaded
 		@_enableUiGroups ['load']
@@ -48,7 +51,7 @@ module.exports = class WorkflowUi
 		@stabilityCheckButton.on 'click', () =>
 			@stabilityCheckModeEnabled = !@stabilityCheckModeEnabled
 			@_applyStabilityViewMode()
-	
+
 	_applyStabilityViewMode: () =>
 		#disable other UI
 		if @stabilityCheckModeEnabled
@@ -114,7 +117,7 @@ module.exports = class WorkflowUi
 		@nodeVisualizer.enableBuildMode(selectedNode).then (numZLayers) =>
 			# disable other UI
 			@_disableNonBuildUi()
-	
+
 			# apply grid size to layer view
 			@buildLayerUi.slider.attr('min', 0)
 			@buildLayerUi.slider.attr('max', numZLayers)
@@ -175,4 +178,7 @@ module.exports = class WorkflowUi
 		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback
 
-
+	_initScrollbar: () =>
+		sidebar = document.getElementById 'leftSidebar'
+		perfectScrollbar.initialize sidebar
+		window.addEventListener 'resize', -> perfectScrollbar.update sidebar

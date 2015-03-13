@@ -1,0 +1,93 @@
+// Colors
+$ps-rail-hover = #555
+$ps-bar-default = #ddd
+$ps-bar-hover = #eee
+
+// Helper mixins
+opacity($o)
+	ieValue = $o * 100
+	opacity: $o
+	-ms-filter: ("progid:DXImageTransform.Microsoft.Alpha(Opacity=" + ieValue + ")")
+	//filter: alpha(ieValue)
+border-radius($r)
+	-webkit-border-radius: $r
+	-moz-border-radius: $r
+	-ms-border-radius: $r
+	border-radius: $r
+transition()
+	-webkit-transition: $t
+	-moz-transition: $t
+	-o-transition: $t
+	transition: $t
+// Scrollbar mixins
+scrollbar-rail-default()
+	display: none
+	position: absolute
+	/* please don't change 'position' */
+	border-radius(4px)
+	opacity(0)
+	transition(background-color 0.2s linear, opacity 0.2s linear)
+scrollbar-rail-hover()
+	background-color: $ps-rail-hover
+	opacity(0.6)
+scrollbar-default()
+	position: absolute
+	/* please don't change 'position' */
+	background-color: $ps-bar-default
+	border-radius(4px)
+	transition(background-color 0.2s linear)
+
+scrollbar-hover()
+	background-color: $ps-bar-hover
+
+inScrolling()
+	&.ps-in-scrolling
+		pointer-events: none
+		&.ps-x > .ps-scrollbar-x-rail
+			scrollbar-rail-hover()
+			>.ps-scrollbar-x
+				scrollbar-hover()
+		&.ps-y > .ps-scrollbar-y-rail
+			scrollbar-rail-hover()
+			>.ps-scrollbar-y
+				scrollbar-hover()
+
+.ps-container
+	overflow: hidden !important
+	&.ps-active-x > .ps-scrollbar-x-rail,
+	&.ps-active-y > .ps-scrollbar-y-rail
+		display: block
+	inScrolling()
+	>.ps-scrollbar-x-rail
+		scrollbar-rail-default()
+		bottom: 3px
+		/* there must be 'bottom' for ps-scrollbar-x-rail */
+		height: 8px
+		>.ps-scrollbar-x
+			scrollbar-default()
+			bottom: 0
+			/* there must be 'bottom' for ps-scrollbar-x */
+			height: 8px
+	>.ps-scrollbar-y-rail
+		scrollbar-rail-default()
+		right: 3px
+		/* there must be 'right' for ps-scrollbar-y-rail */
+		width: 8px
+		>.ps-scrollbar-y
+			scrollbar-default()
+			right: 0
+			/* there must be 'right' for ps-scrollbar-y */
+			width: 8px
+	&:hover
+		inScrolling()
+		> .ps-scrollbar-x-rail,
+		> .ps-scrollbar-y-rail
+			opacity(0.3)
+		>.ps-scrollbar-x-rail:hover
+			scrollbar-rail-hover()
+			>.ps-scrollbar-x
+				scrollbar-hover()
+		>.ps-scrollbar-y-rail:hover
+			scrollbar-rail-hover()
+			>.ps-scrollbar-y
+				scrollbar-hover()

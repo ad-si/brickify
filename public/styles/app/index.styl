@@ -1,18 +1,15 @@
-html,
-body
+html
 	height 100%
 	width 100%
+
+#editor
+	height 100%
+	width 100%
+	overflow hidden // Should not be necessary, but is
 
 #logo
 	position relative
 	z-index 1
-
-.appCanvas
-	position fixed
-	top 0
-	left 0
-	width 100%
-	height 100%
 
 .panel-title.collapse-title
 	cursor pointer
@@ -44,9 +41,9 @@ body
 		top -50%
 
 #commandContainer
-	position fixed
-	top 0%
-	right 0%
+	position absolute
+	top 0
+	right 0
 	margin-top 15px
 	margin-right 10px
 	z-index 2
@@ -76,11 +73,17 @@ input[readonly].not-readonly
 	margin-right 5px
 
 #leftSidebar
+	height 100%
+	overflow hidden
 	background-color rgba(0,0,0,0.4)
 	position absolute
 	top 0
 	left 0
-	bottom 0
+	.btn
+		white-space normal
+
+#exportGroup
+	margin-bottom 2em
 
 /* Help dialog */
 
@@ -197,3 +200,5 @@ $disabledBg = $btn-default-bg
 		background-image none
 		//making shadow bigger
 		box-shadow inset 0 0 20px 3px rgba(0,0,0,0.40);
+
+@import scrollbar

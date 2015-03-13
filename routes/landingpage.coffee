@@ -1,7 +1,9 @@
 path = require 'path'
 
 module.exports.getLandingpage = (request, response) ->
-	response.render path.join('landingpage','landingpage')
+	response.render path.join('landingpage','landingpage'), {
+		page: 'landing'
+	}
 
 module.exports.getContribute = (request, response) ->
 	response.render path.join('landingpage','contribute')

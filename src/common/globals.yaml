@@ -68,6 +68,7 @@ plugins:
   legoBoard: true
   newBrickator: true
   nodeVisualizer: true
+  fidelityControl: true
 
 # shall solid renderer display shadows and wireframe?
 createVisibleWireframe: true

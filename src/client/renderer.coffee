@@ -1,7 +1,5 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
-Stats = require 'stats-js'
-FidelityControl = require './fidelityControl'
 
 ###
 # @class Renderer
@@ -13,17 +11,11 @@ module.exports = class Renderer
 		@threeRenderer = null
 		@init globalConfig
 
-		@fidelityControl = new FidelityControl(@pluginHooks)
-
 	localRenderer: (timestamp) =>
-			@stats?.begin()
 			@threeRenderer.render @scene, @camera
 			@pluginHooks.on3dUpdate timestamp
 			@controls?.update()
-			@stats?.end()
 			requestAnimationFrame @localRenderer
-
-			@fidelityControl.renderTick timestamp
 
 	addToScene: (node) ->
 		@scene.add node
@@ -75,7 +67,6 @@ module.exports = class Renderer
 		@setupScene globalConfig
 		@setupLighting globalConfig
 		@setupCamera globalConfig
-		@setupFPSCounter() if process.env.NODE_ENV is 'development'
 		requestAnimationFrame @localRenderer
 
 	setupSize: (globalConfig) ->
@@ -145,15 +136,6 @@ module.exports = class Renderer
 			@controls.autoRotate = globalConfig.autoRotate
 			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
 			@controls.target.set(0, 0, 0)
-
-	setupFPSCounter: () ->
-		@stats = new Stats()
-		# 0 means FPS, 1 means ms per frame
-		@stats.setMode(0)
-		@stats.domElement.style.position = 'absolute'
-		@stats.domElement.style.right = '0px'
-		@stats.domElement.style.bottom = '0px'
-		document.body.appendChild(@stats.domElement)
 
 	setupLighting: (globalConfig) ->
 		ambientLight = new THREE.AmbientLight(0x404040)

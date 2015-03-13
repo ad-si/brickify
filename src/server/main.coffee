@@ -116,7 +116,6 @@ module.exports.setupRouting = () ->
 		'operative'
 		'pep'
 		'path'
-		'stats-js'
 		'three'
 		'three-orbit-controls'
 		'zeroclipboard'

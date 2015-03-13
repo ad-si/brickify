@@ -55,7 +55,6 @@
     "chai-shallow-deep-equal": "^1.2.0",
     "coffeelint": "^1.6.1",
     "crojsdoc": "^0.8.11",
-    "express-debug": "^1.1.1",
     "groc": "^0.8.0",
     "jquery-mockjax": "^1.6.1",
     "karma": "^0.12.28",

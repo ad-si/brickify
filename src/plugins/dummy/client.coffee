@@ -140,7 +140,7 @@ class DummyPlugin
 		}
 
 	###
-	# Plugins can return an array of brush describer objects.
+	# Plugins can return an array of brush descriptor objects.
 	# @see BrushSelector
 	###
 	getBrushes: ->

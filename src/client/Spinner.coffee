@@ -1,3 +1,7 @@
+###
+# A reentrant-save spinner that can be invoked for a html target node.
+# @module Spinner
+###
 Spin = require 'spin'
 $ = require 'jquery'
 
@@ -11,6 +15,12 @@ options =
 	hwaccel: true
 	color: '#fff'
 
+###
+# Starts a spinner attached to the given target node.
+# @param {DOMNode} [target=document.body] the target node
+# @return {Number} the number of start invocations of this spinner
+# @memberOf Spinner
+###
 start = (target) ->
 	target ?= defaultTarget
 
@@ -21,11 +31,16 @@ start = (target) ->
 		spinnerState = spin: spin, count: 0
 		spinners.set target, spinnerState
 
-	spinnerState.count++
+	return ++spinnerState.count
 module.exports.start = start
 
-
-module.exports.startOverlay = (target) ->
+###
+# Starts a spinner located centered above the given target node.
+# @param {DOMNode} [target=document.body] the target node
+# @return {Number} the number of start invocations of this spinner
+# @memberOf Spinner
+###
+startOverlay = (target) ->
 	return start() unless target?
 
 	spinnerState = spinners.get target
@@ -44,15 +59,22 @@ module.exports.startOverlay = (target) ->
 		spinners.set target, spinnerState
 
 	spinnerState.count++
+module.exports.startOverlay = startOverlay
 
-module.exports.stop = (target) ->
+###
+# Stops a spinner associated with the given target node.
+# @param {DOMNode} [target=document.body] the target node
+# @return {Number} the number of remaining start invocations of this spinner
+# @memberOf Spinner
+###
+stop = (target) ->
 	target ?= defaultTarget
 
 	spinnerState = spinners.get target
 	return unless spinnerState
 
 	spinnerState.count--
-	return if spinnerState.count > 0
+	return spinnerState.count if spinnerState.count > 0
 
 	spinnerState.spin.stop()
 
@@ -60,3 +82,5 @@ module.exports.stop = (target) ->
 		document.body.removeChild spinnerState.overlay
 
 	spinners.delete target
+	return 0
+module.exports.stop = stop

@@ -13,6 +13,9 @@ accumulationTime = 200
 timesBelowThreshold = 5
 fpsDisplayUpdateTime = 1000
 
+###
+# @class FidelityControl
+###
 class FidelityControl
 	init: (bundle) =>
 		@pluginHooks = bundle.pluginHooks

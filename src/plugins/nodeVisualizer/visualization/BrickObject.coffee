@@ -1,5 +1,8 @@
 THREE = require 'three'
-module.exports = class BrickObject extends THREE.Object3D
+###
+# @class BrickObject
+###
+class BrickObject extends THREE.Object3D
 	constructor: (brickGeometry, studGeometry, @material) ->
 		super()
 		brickMesh = new THREE.Mesh(brickGeometry, @material)
@@ -50,3 +53,5 @@ module.exports = class BrickObject extends THREE.Object3D
 			@visible = @nonHighlightVisibility
 			@children[0].material = @material
 			@children[1].material = @material
+
+module.exports = BrickObject

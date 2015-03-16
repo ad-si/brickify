@@ -1,3 +1,6 @@
+###
+# @class BrushSelector
+###
 class BrushSelector
 	constructor: (@bundle) ->
 		@selectedNode = null
@@ -27,11 +30,10 @@ class BrushSelector
 	onNodeDeselect: (node) =>
 		@_deselectBrush node
 		@selectedNode = null
-			
+
 	_bindBrushEvent: (brush) ->
 		brush.jqueryObject.on 'click', () => @_brushSelect brush
 
-	
 	_brushSelect: (brush) =>
 		# deselect currently selected brush
 		@_deselectBrush @selectedNode

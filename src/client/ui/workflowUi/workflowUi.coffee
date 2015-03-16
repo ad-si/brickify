@@ -48,8 +48,7 @@ module.exports = class WorkflowUi
 		@stabilityCheckButton = $('#stabilityCheckButton')
 		@stabilityCheckModeEnabled = false
 
-		@stabilityCheckButton.on 'click', () =>
-			@toggleStabilityView()
+		@stabilityCheckButton.on 'click', @toggleStabilityView
 
 	_applyStabilityViewMode: () =>
 		#disable other UI

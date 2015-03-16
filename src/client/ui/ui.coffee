@@ -65,8 +65,12 @@ module.exports = class Ui
 				{
 					description: 'Toggle coordinate system / lego plate'
 					hotkey: 'g'
-					callback: =>
-						@_toggleGridVisibility()
+					callback: @_toggleGridVisibility
+				}
+				{
+					description: 'Toggle stability view'
+					hotkey: 's'
+					callback: @_toggleStabilityView
 				}
 			]
 		}
@@ -75,3 +79,6 @@ module.exports = class Ui
 	_toggleGridVisibility: () =>
 		@bundle.getPlugin('lego-board').toggleVisibility()
 		@bundle.getPlugin('coordinate-system').toggleVisibility()
+
+	_toggleStabilityView: =>
+		@workflowUi.toggleStabilityView()

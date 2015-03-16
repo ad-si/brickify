@@ -49,8 +49,7 @@ module.exports = class WorkflowUi
 		@stabilityCheckModeEnabled = false
 
 		@stabilityCheckButton.on 'click', () =>
-			@stabilityCheckModeEnabled = !@stabilityCheckModeEnabled
-			@_applyStabilityViewMode()
+			@toggleStabilityView()
 
 	_applyStabilityViewMode: () =>
 		#disable other UI
@@ -182,3 +181,7 @@ module.exports = class WorkflowUi
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar
 		window.addEventListener 'resize', -> perfectScrollbar.update sidebar
+
+	toggleStabilityView: =>
+		@stabilityCheckModeEnabled = !@stabilityCheckModeEnabled
+		@_applyStabilityViewMode()

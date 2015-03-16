@@ -3,6 +3,7 @@ Ui = require './ui/ui'
 Renderer = require './renderer'
 ModelLoader = require './modelLoader'
 SceneManager = require './sceneManager'
+Spinner = require './Spinner'
 
 SyncObject = require '../common/sync/syncObject'
 SyncObject.dataPacketProvider = require './sync/dataPackets'
@@ -14,6 +15,7 @@ Node.modelProvider = require './modelCache'
 ###
 module.exports = class Bundle
 	constructor: (@globalConfig, @controls) ->
+		Spinner.start()
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 		@modelLoader = new ModelLoader(@)
@@ -25,7 +27,7 @@ module.exports = class Bundle
 	init: =>
 		@ui?.init()
 		@renderer.setupControls @globalConfig, @controls
-		return @sceneManager.init()
+		return @sceneManager.init().then -> Spinner.stop()
 
 	getPlugin: (name) =>
 		for p in @pluginInstances

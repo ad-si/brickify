@@ -7,7 +7,7 @@ ModelVisualization = require './modelVisualization'
 # @class NodeVisualizer
 ###
 class NodeVisualizer
-	constructor: () ->
+	constructor: ->
 		@printMaterial = new THREE.MeshLambertMaterial({
 			color: 0xeeeeee
 			opacity: 0.8
@@ -25,7 +25,7 @@ class NodeVisualizer
 	init3d: (@threejsRootNode) =>
 		return
 
-	getBrushes: () =>
+	getBrushes: =>
 		return @brushHandler.getBrushes()
 
 	# called by newBrickator when an object's datastructure is modified
@@ -50,7 +50,7 @@ class NodeVisualizer
 		@_getCachedData(node)
 		.then (cachedData) =>
 			cachedData.modelVisualization.createVisualization()
-			cachedData.modelVisualization.afterCreation().then () =>
+			cachedData.modelVisualization.afterCreation().then =>
 				@zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
@@ -126,7 +126,7 @@ class NodeVisualizer
 			if stabilityViewEnabled
 				# only show bricks and csg
 				@_showCsg cachedData
-				.then () =>
+				.then =>
 					# change coloring to stability coloring
 					cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
 					cachedData.brickVisualization.showBricks()

@@ -20,13 +20,13 @@ module.exports = class Renderer
 	addToScene: (node) ->
 		@scene.add node
 
-	getDomElement: () ->
+	getDomElement: ->
 		return @threeRenderer.domElement
 
-	getCamera: () ->
+	getCamera: ->
 		return @camera
 
-	windowResizeHandler: () ->
+	windowResizeHandler: ->
 		if not @staticRendererSize
 			@camera.aspect = @size().width / @size().height
 			@camera.updateProjectionMatrix()
@@ -165,5 +165,5 @@ module.exports = class Renderer
 			target: { x: t.x, y: t.y, z: t.z }
 		}
 
-	getControls: () =>
+	getControls: =>
 		@controls

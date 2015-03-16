@@ -16,7 +16,7 @@ module.exports = class LineMatGenerator
 		mat = new THREE.ShaderMaterial(options)
 		return mat
 
-	_getVertexShader: () ->
+	_getVertexShader: ->
 		'
 		uniform float zDelta;
 		varying float zVal;
@@ -27,7 +27,7 @@ module.exports = class LineMatGenerator
 		}
 		'
 
-	_getFragmentShader: () ->
+	_getFragmentShader: ->
 		'
 		varying float zVal;
 		uniform vec3 linecolor;

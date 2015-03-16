@@ -165,7 +165,7 @@ module.exports = class DummyPlugin
 	#
 	# @memberOf dummyClientPlugin
 	###
-	uglify: () =>
+	uglify: =>
 		return false
 
 	###
@@ -176,5 +176,5 @@ module.exports = class DummyPlugin
 	#
 	# @memberOf dummyClientPlugin
 	###
-	beautify: () =>
+	beautify: =>
 		return false

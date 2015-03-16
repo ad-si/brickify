@@ -6,7 +6,7 @@ http = require('http')
 lowfab = require('../src/server/main')
 
 
-describe 'Lowfab', () ->
+describe 'Lowfab', ->
 	server = {}
 
 	before (done) ->
@@ -18,7 +18,7 @@ describe 'Lowfab', () ->
 
 		done()
 
-	describe 'Server', () ->
+	describe 'Server', ->
 		it 'should host the lowfab website', (done) ->
 			request = http.request(
 				{method: 'HEAD', host: 'localhost', port: 3001},
@@ -29,5 +29,5 @@ describe 'Lowfab', () ->
 
 			request.end()
 
-	after () ->
+	after ->
 		server.close()

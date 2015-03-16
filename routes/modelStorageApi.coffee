@@ -41,10 +41,6 @@ module.exports.saveModel = (request, response) ->
 		response.status(500).send 'Calculated MD5 value does not match'
 	else
 		console.log 'Saving model ' + hash
-		modelStorage.saveModel(hash, content)
-		.then(() ->
-			response.send 'Saved model'
-		)
-		.catch(() ->
-			response.status(500).send 'Error while saving the file'
-		)
+		modelStorage.saveModel hash, content
+		.then -> response.send 'Saved model'
+		.catch -> response.status(500).send 'Error while saving the file'

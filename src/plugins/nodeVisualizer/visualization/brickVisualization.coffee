@@ -30,11 +30,11 @@ module.exports = class BrickVisualization
 		@threeNode.add @voxelBrickSubnode
 		@geometryCreator = new GeometryCreator(@grid)
 
-	showVoxels: () =>
+	showVoxels: =>
 		@voxelsSubnode.visible = true
 		@bricksSubnode.visible = false
 
-	showBricks: () =>
+	showBricks: =>
 		# update visualization if needed
 		if @bricksVisualizationNeedsUpdate
 			@updateBrickVisualization()
@@ -50,13 +50,13 @@ module.exports = class BrickVisualization
 
 		@csgSubnode.visible = true
 
-	hideCsg: () =>
+	hideCsg: =>
 		@csgSubnode.visible = false
 
-	hideVoxelAndBricks: () =>
+	hideVoxelAndBricks: =>
 		@voxelBrickSubnode.visible = false
 
-	showVoxelAndBricks: () =>
+	showVoxelAndBricks: =>
 		@voxelBrickSubnode.visible  = true
 
 	# (re)creates voxel visualization.
@@ -211,7 +211,7 @@ module.exports = class BrickVisualization
 		@currentlyTouchedVoxels = []
 
 	# moves all currenly touched voxels to modified voxels
-	updateModifiedVoxels: () =>
+	updateModifiedVoxels: =>
 		for v in @currentlyTouchedVoxels
 			@modifiedVoxels.push v
 

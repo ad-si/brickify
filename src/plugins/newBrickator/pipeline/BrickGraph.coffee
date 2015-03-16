@@ -16,7 +16,7 @@ module.exports = class BrickGraph
 	# the @bricks list is an array consisting of an array for each z-layer,
 	# within a z-layer, the array is an unordered list of Bricks
 	# that belong to this z-layer
-	_initialize: () =>
+	_initialize: =>
 		for z in [0..@grid.numVoxelsZ - 1] by 1
 			@bricks[z] = []
 
@@ -148,7 +148,7 @@ module.exports = class BrickGraph
 			voxel.brick = null
 
 	# updates the 'voxel.brick' reference in each voxel in the grid
-	updateReferencesInGrid: () =>
+	updateReferencesInGrid: =>
 		# set references from brick list
 		@forEachBrick (brick) =>
 			@forEachVoxelInBrick brick, (voxel) =>

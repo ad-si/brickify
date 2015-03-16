@@ -16,7 +16,7 @@ module.exports = class ModelLoader
 	readFile: (file) ->
 		reader = new FileReader()
 		reader.readAsArrayBuffer file
-		reader.onload = () =>
+		reader.onload = =>
 			fileBuffer = reader.result
 			@importFile file.name, fileBuffer, (error, model) =>
 				if error or not model

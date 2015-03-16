@@ -9,7 +9,7 @@ module.exports = class Brick
 		Yp: 3
 	}
 
-	@getNextBrickIndex: () =>
+	@getNextBrickIndex: =>
 		return @_nextBrickIndex++
 
 	constructor: (@position, @size) ->
@@ -35,7 +35,7 @@ module.exports = class Brick
 		@neighbors = [[], [], [], []]
 		return
 
-	@availableBrickSizes: () =>
+	@availableBrickSizes: =>
 		return [
 			[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
 			[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
@@ -45,7 +45,7 @@ module.exports = class Brick
 		]
 
 	# Removes references to this brick from this brick's neighbors/connections
-	removeSelfFromSurrounding: () =>
+	removeSelfFromSurrounding: =>
 		# delete from connected and neighbor bricks
 		connectedBricks = @uniqueNeighbors()
 		connectedBricks = connectedBricks.concat @uniqueConnectedBricks()
@@ -67,7 +67,7 @@ module.exports = class Brick
 			if brickIndex >= 0
 				@neighbors[i].splice(brickIndex,1)
 
-	uniqueConnectedBricks: () =>
+	uniqueConnectedBricks: =>
 		upperBricks = Brick.uniqueBricksInSlots @upperSlots
 		lowerBricks = Brick.uniqueBricksInSlots @lowerSlots
 		return upperBricks.concat lowerBricks
@@ -80,7 +80,7 @@ module.exports = class Brick
 					bricks.push slotXY
 		return removeDuplicates bricks
 
-	uniqueNeighbors: () =>
+	uniqueNeighbors: =>
 		neighborsList = [].concat.apply([],@neighbors)
 		return neighborsList
 
@@ -204,7 +204,7 @@ module.exports = class Brick
 			array.splice i, 1
 		return
 
-	split: () =>
+	split: =>
 		newBricks = []
 		for x in [0..@size.x - 1] by 1
 			newBricks[x] = []
@@ -304,7 +304,7 @@ module.exports = class Brick
 
 		return
 
-	getStability: () =>
+	getStability: =>
 		# possible links at top and bottom
 		possibleLinks = 2 * @size.x * @size.y
 		links = 0

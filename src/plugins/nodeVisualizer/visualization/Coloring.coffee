@@ -2,7 +2,7 @@ THREE = require 'three'
 
 # Provides an simple implementation on how to color voxels and bricks
 module.exports = class Coloring
-	constructor: () ->
+	constructor: ->
 		@brickMaterial = new THREE.MeshLambertMaterial({
 			color: 0xfff000 #orange
 		})
@@ -67,11 +67,11 @@ module.exports = class Coloring
 	getStabilityMaterialForBrick: (brick) =>
 		 @getMaterialForBrick brick
 
-	_getRandomBrickMaterial: () =>
+	_getRandomBrickMaterial: =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
 		return @_brickMaterials[i]
 
-	_createBrickMaterials: () =>
+	_createBrickMaterials: =>
 		@_brickMaterials = []
 		@_brickMaterials.push @_createMaterial 0x530000
 		@_brickMaterials.push @_createMaterial 0xfe2020

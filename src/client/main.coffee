@@ -23,7 +23,7 @@ commandFunctions = {
 			console.warn 'Invalid value for initialModel'
 }
 
-postInitCallback = () ->
+postInitCallback = ->
 	#look at url hash and run commands
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
@@ -47,7 +47,7 @@ Promise.resolve($.get '/share').then((link) ->
 	ZeroClipboard.config(
 		{swfPath: '/node_modules/zeroclipboard/dist/ZeroClipboard.swf'})
 	url = document.location.origin + '/app?share=' + link
-	$('#cmdShare').tooltip({placement: 'bottom'}).click () ->
+	$('#cmdShare').tooltip({placement: 'bottom'}).click ->
 		bundle.saveChanges().then(
 			bootbox.dialog({
 				title: 'Share your work!'
@@ -67,6 +67,6 @@ Promise.resolve($.get '/share').then((link) ->
 				copyButton.addClass 'btn-success'
 
 	#init direct help
-	$('#cmdHelp').tooltip({placement: 'bottom'}).click () ->
+	$('#cmdHelp').tooltip({placement: 'bottom'}).click ->
 		bundle.ui.hotkeys.showHelp()
 )

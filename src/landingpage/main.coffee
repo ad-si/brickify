@@ -44,12 +44,12 @@ b1 = bundle1.init().then ->
 	b2 = bundle2.init()
 
 	loadAndConvert = (hash, animate) ->
-		b1.then(() ->
+		b1.then(->
 			bundle1.modelLoader.loadByHash hash)
-			.then(() ->
+			.then(->
 				document.getElementById('renderArea1').style.backgroundImage = 'none')
-		b2.then(() -> bundle2.modelLoader.loadByHash hash)
-			.then(() ->
+		b2.then(-> bundle2.modelLoader.loadByHash hash)
+			.then(->
 				document.getElementById('renderArea2').style.backgroundImage = 'none')
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
@@ -57,8 +57,8 @@ b1 = bundle1.init().then ->
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
 	loadModel = (hash, errors) ->
-		b1.then(() -> bundle1.sceneManager.clearScene())
-		b2.then(() -> bundle2.sceneManager.clearScene())
+		b1.then(-> bundle1.sceneManager.clearScene())
+		b2.then(-> bundle2.sceneManager.clearScene())
 		loadAndConvert(hash, true)
 
 	stlDropper = require './stlDropper'

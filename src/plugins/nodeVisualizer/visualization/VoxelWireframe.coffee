@@ -14,7 +14,7 @@ module.exports = class VoxelOutline
 	setVisibility: (isVisible) =>
 		@threeNode.visible = isVisible
 
-	isVisible: () =>
+	isVisible: =>
 		return @threeNode.visible
 
 	# creates a wireframe out of voxels

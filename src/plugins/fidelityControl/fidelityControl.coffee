@@ -85,7 +85,7 @@ class FidelityControl
 		# we don't need to try it again
 		@canDecreaseVisualQuality = true in results
 
-	getHotkeys: () =>
+	getHotkeys: =>
 		return {
 			title: 'Visual Complexity'
 			events: [

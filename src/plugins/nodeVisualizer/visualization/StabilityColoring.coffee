@@ -1,7 +1,7 @@
 Coloring = require './Coloring'
 
 module.exports = class StabilityColoring extends Coloring
-	constructor: () ->
+	constructor: ->
 		@_createStabilityMaterials()
 
 	_createStabilityMaterials: =>

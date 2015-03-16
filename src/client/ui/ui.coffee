@@ -72,6 +72,6 @@ module.exports = class Ui
 		}
 		@hotkeys.addEvents gridHotkeys
 
-	_toggleGridVisibility: () =>
+	_toggleGridVisibility: =>
 		@bundle.getPlugin('lego-board').toggleVisibility()
 		@bundle.getPlugin('coordinate-system').toggleVisibility()

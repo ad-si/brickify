@@ -22,7 +22,7 @@ compileAllCoffeeFiles = (directory, afterCompileCallback) ->
 	.on 'data', (entry) -> compileFile entry
 	.on 'error', (error) -> buildLog.error error
 	.on 'warn', (warning) -> buildLog.warn warning
-	.on 'end', () -> afterCompileCallback(directory) if afterCompileCallback?
+	.on 'end', -> afterCompileCallback(directory) if afterCompileCallback?
 
 compileFile = (inputfileEntry) ->
 	inputfile = inputfileEntry.fullPath
@@ -41,7 +41,7 @@ deleteAllJsFiles = (directory, afterDeleteCallback) ->
 	.on 'data', (entry) -> fs.unlinkSync entry.fullPath
 	.on 'error', (error) -> buildLog.error error
 	.on 'warn', (warning) -> buildLog.warn warning
-	.on 'end', () -> afterDeleteCallback(directory) if afterDeleteCallback?
+	.on 'end', -> afterDeleteCallback(directory) if afterDeleteCallback?
 
 module.exports.buildServer = (onlyDelete = false) ->
 	directories = [
@@ -57,7 +57,7 @@ module.exports.buildServer = (onlyDelete = false) ->
 
 	return module.exports
 
-module.exports.linkHooks = () ->
+module.exports.linkHooks = ->
 
 	# The first 9 hooks are taken from `git init` which creates .sample files
 	# even though some of them are not listed in the

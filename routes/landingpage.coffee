@@ -1,9 +1,7 @@
 path = require 'path'
 
 module.exports.getLandingpage = (request, response) ->
-	response.render path.join('landingpage','landingpage'), {
-		page: 'landing'
-	}
+	response.render path.join('landingpage','landingpage'), page: 'landing'
 
 module.exports.getContribute = (request, response) ->
 	response.render path.join('landingpage','contribute')
@@ -15,4 +13,4 @@ module.exports.getImprint = (request, response) ->
 	response.render path.join('landingpage','imprint')
 
 module.exports.getEducators = (request, response) ->
-	response.render path.join('landingpage','educators')
+	response.render path.join('landingpage','educators'), page: 'landing'

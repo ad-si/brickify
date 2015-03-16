@@ -18,6 +18,11 @@ module.exports = class WorkflowUi
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
+		if @stabilityCheckModeEnabled
+			@stabilityCheckModeEnabled = false
+			@_enableNonStabilityUi()
+			@_setStabilityCheckButtonActive false
+
 		@numObjects--
 
 		if @numObjects == 0
@@ -57,7 +62,7 @@ module.exports = class WorkflowUi
 		else
 			@_enableNonStabilityUi()
 
-		@stabilityCheckButton.toggleClass 'active', @stabilityCheckModeEnabled
+		@_setStabilityCheckButtonActive @stabilityCheckModeEnabled
 		@nodeVisualizer._setStabilityView(
 			@sceneManager.selectedNode, @stabilityCheckModeEnabled
 		)
@@ -162,6 +167,9 @@ module.exports = class WorkflowUi
 				$("##{group}Group").find('.btn, .panel').removeClass 'disabled'
 			else
 				$("##{group}Group").find('.btn, .panel').addClass 'disabled'
+
+	_setStabilityCheckButtonActive: (active) =>
+		@stabilityCheckButton.toggleClass 'active', active
 
 	_initNotImplementedMessages: () =>
 		alertCallback = () ->

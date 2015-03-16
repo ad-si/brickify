@@ -15,7 +15,7 @@ Node.modelProvider = require './modelCache'
 ###
 module.exports = class Bundle
 	constructor: (@globalConfig, @controls) ->
-		Spinner.start()
+		Spinner.startOverlay document.getElementById @globalConfig.renderAreaId
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 		@modelLoader = new ModelLoader(@)
@@ -27,7 +27,8 @@ module.exports = class Bundle
 	init: =>
 		@ui?.init()
 		@renderer.setupControls @globalConfig, @controls
-		return @sceneManager.init().then -> Spinner.stop()
+		return @sceneManager.init()
+		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId
 
 	getPlugin: (name) =>
 		for p in @pluginInstances

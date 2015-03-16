@@ -12,7 +12,7 @@ pattern = (length) ->
 acceptAllFilter = -> true
 
 ###
-# Generates an unique alphanumeric identifier
+# Generates a unique alphanumeric identifier
 #
 # @param {Function} filter a function that returns false for existent ids and
 #   true for unique ones.

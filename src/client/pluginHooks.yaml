@@ -5,7 +5,7 @@
 # The hooks must exist at load-time. Hooks that are added later during
 # run-time will not be called.
 #
-# See [dummyPlugin](plugins/dummy/dummy.html) for a example implementation
+# See [dummyPlugin](plugins/dummy/dummy.html) for an example implementation
 # and further documentation of the plugin API.
 
 # ## Plugin Initialization
@@ -91,7 +91,7 @@
 # ## Hotkeys
 #
 # Plugins should return an object with a title property (String) that is
-# displayed in the help and an array of events. Each event is a object with a
+# displayed in the help and an array of events. Each event is an object with a
 # *hotkey* (String) according to
 # [Mousetrap]{https://github.com/ccampbell/mousetrap},
 # a *description* (String) that is shown in the help dialog and a *callback*

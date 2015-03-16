@@ -1,6 +1,6 @@
 THREE = require 'three'
 
-# Provides an simple implementation on how to color voxels and bricks
+# Provides a simple implementation on how to color voxels and bricks
 module.exports = class Coloring
 	constructor: ->
 		@brickMaterial = new THREE.MeshLambertMaterial({

@@ -179,7 +179,7 @@ class VoxelUnion
 	###
 	# creates baseplate points in transformed world coordinates
 	# and adds them to geometry (if they don't exist yet)
-	# @returns indices
+	# @return {Array} indices Array of point indices [p0, p1, p2, p3]
 	###
 	_createGeoPoints: (x, y, z, structure, geometry) ->
 		# return points if they already exist

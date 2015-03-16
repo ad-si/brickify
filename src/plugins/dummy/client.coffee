@@ -9,15 +9,14 @@
 # The main file referenced in the module's `package.json`
 # will be loaded by the lowfab framework.
 #
-# This file must return a class which provides **hook-properties** and
-# **hook-methods** that specify the interaction between the lowfab framework
-# and the plugin.
-# E.g. `dummyPlugin.pluginName` or `dummyPlugin.on3dUpdate()`.#
+# This file must return a class which provides **hook-methods** that specify
+# the interaction between the lowfab framework and the plugin.
+# E.g. `dummyPlugin.on3dUpdate()`.
 #
-# @module dummyClientPlugin
+# @class DummyPlugin
 ###
 
-module.exports = class DummyPlugin
+class DummyPlugin
 	###
 	# The plugin loader will call each plugin's `init` method (if provided) after
 	# loading the plugin.
@@ -26,7 +25,6 @@ module.exports = class DummyPlugin
 	# configuration.
 	#
 	# @param {Bundle} bundle the bundle this plugin is loaded for
-	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
 	init: (bundle) ->
@@ -40,7 +38,6 @@ module.exports = class DummyPlugin
 	# because it won't be handed the node again later.
 	#
 	# @param {ThreeJsNode} threejsNode the plugin's node in the 3D-scenegraph
-	# @memberOf dummyClientPlugin
 	# @see pluginLoader
 	###
 	init3d: (threejsNode) =>
@@ -50,9 +47,8 @@ module.exports = class DummyPlugin
 	# On each render frame the renderer will call the `on3dUpdate`
 	# method of all plugins that provide it.
 	#
-	# @memberOf dummyClientPlugin
 	# @param {DOMHighResTimeStamp} timestamp the current time
-	# @see renderer
+	# @see Renderer
 	# @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
 	###
 	on3dUpdate: (timestamp) =>
@@ -62,8 +58,8 @@ module.exports = class DummyPlugin
 	# Each time a new node is added to the scene, the scene will inform plugins
 	# by calling onNodeAdd
 	#
-	# @memberOf dummyClientPlugin
 	# @param {Node} node the added node
+	# @see SceneManager
 	###
 	onNodeAdd: (node) =>
 		console.log node, ' added'
@@ -73,8 +69,8 @@ module.exports = class DummyPlugin
 	# Each time a scene's node is selected, the scene will inform plugins by
 	# calling onNodeSelect
 	#
-	# @memberOf dummyClientPlugin
 	# @param {Node} node the selected node
+	# @see SceneManager
 	###
 	onNodeSelect: (node) =>
 		console.log node, ' selected'
@@ -84,8 +80,8 @@ module.exports = class DummyPlugin
 	# Each time a scene's node is deselected, the scene will inform plugins by
 	# calling onNodeDeselect
 	#
-	# @memberOf dummyClientPlugin
 	# @param {Node} node the deselected node
+	# @see SceneManager
 	###
 	onNodeDeselect: (node) =>
 		console.log node, ' deselected'
@@ -95,8 +91,8 @@ module.exports = class DummyPlugin
 	# When a node is removed from the scene, the scene will inform plugins by
 	# calling onNodeRemove
 	#
-	# @memberOf dummyClientPlugin
-	# @param {NodeStructure} node the removed node
+	# @param {Node} node the removed node
+	# @see SceneManager
 	###
 	onNodeRemove: (node) =>
 		console.log node, ' removed'
@@ -110,8 +106,7 @@ module.exports = class DummyPlugin
 	#
 	# @param {String} fileName the name of the file to import
 	# @param {String} fileContent the content of the file to import
-	# @memberOf dummyClientPlugin
-	# @see fileLoader
+	# @see ModelLoader
 	###
 	importFile: (fileName, fileContent) ->
 		console.log 'Dummy Client Plugin imports a file'
@@ -120,9 +115,10 @@ module.exports = class DummyPlugin
 	###
 	# Plugins should return an object with a title property (String) that is
 	# displayed in the help and an array of events. These should have an event
-	# (String) according to [Mousetrap]{https://github.com/ccampbell/mousetrap},
+	# (String) according to [Mousetrap](https://github.com/ccampbell/mousetrap),
 	# a description (String) that is shown in the help dialog and a callback
 	# function.
+	# @see Hotkeys
 	###
 	getHotkeys: =>
 		return {
@@ -143,8 +139,11 @@ module.exports = class DummyPlugin
 		]
 		}
 
+	###
+	# Plugins can return an array of brush descriptor objects.
+	# @see BrushSelector
+	###
 	getBrushes: ->
-		###
 		return [{
 			text: 'dummy-brush'
 			icon: 'move'
@@ -154,16 +153,13 @@ module.exports = class DummyPlugin
 			selectCallback: -> console.log 'dummy-brush was selected'
 			deselectCallback: -> console.log 'dummy-brush was deselected'
 		}]
-		###
-		return []
 
 	###
 	# When the framerate is very low, plugins may be asked to reduce their visual
 	# complexity, e.g. replacing geometry with simple textures.
 	# Plugins should return true, if they reduced quality, or false,
 	# if they were unable to reduce quality even further.
-	#
-	# @memberOf dummyClientPlugin
+	# @see FidelityControl
 	###
 	uglify: =>
 		return false
@@ -173,8 +169,9 @@ module.exports = class DummyPlugin
 	# to add more visual details and/or eye candy. Plugins should return true,
 	# if they were able to increase quality / add eye candy even further,
 	# or false otherwise.
-	#
-	# @memberOf dummyClientPlugin
+	# @see FidelityControl
 	###
 	beautify: =>
 		return false
+
+module.exports = DummyPlugin

@@ -6,7 +6,10 @@ md5 = require('blueimp-md5').md5
 modelCache = require './modelCache'
 Node = require '../common/project/node'
 
-module.exports = class ModelLoader
+###
+# @class ModelLoader
+###
+class ModelLoader
 	constructor: (@bundle) ->
 		return
 
@@ -101,3 +104,5 @@ module.exports = class ModelLoader
 			y: -result.y
 			z: -result.z
 		}
+
+module.exports = ModelLoader

@@ -107,18 +107,6 @@ class NodeVisualizer
 
 		return data
 
-	getHotkeys: =>
-		return {
-			title: 'Bricks'
-			events: [
-				{
-					hotkey: 's'
-					description: 'toggle stability view'
-					callback: @_toggleStabilityView
-				}
-			]
-		}
-
 	_setStabilityView: (selectedNode, stabilityViewEnabled) =>
 		return if !selectedNode?
 

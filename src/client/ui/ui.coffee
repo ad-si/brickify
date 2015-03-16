@@ -49,7 +49,6 @@ module.exports = class Ui
 		)
 		$('#loadButton').on 'change', (event) =>
 			@fileLoadHandler event
-			$('#fileInput').val('')
 
 		window.addEventListener(
 			'resize'

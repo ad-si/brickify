@@ -144,7 +144,6 @@ class DummyPlugin
 	# @see BrushSelector
 	###
 	getBrushes: ->
-		###
 		return [{
 			text: 'dummy-brush'
 			icon: 'move'
@@ -154,8 +153,6 @@ class DummyPlugin
 			selectCallback: -> console.log 'dummy-brush was selected'
 			deselectCallback: -> console.log 'dummy-brush was deselected'
 		}]
-		###
-		return []
 
 	###
 	# When the framerate is very low, plugins may be asked to reduce their visual

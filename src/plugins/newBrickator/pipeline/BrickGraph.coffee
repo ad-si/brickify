@@ -123,6 +123,7 @@ module.exports = class BrickGraph
 				y: brick.position.y - upperBrick.position.y
 			}
 			upperBrick.lowerSlots[slot.x][slot.y] = brick
+			brick.upperSlots[0][0] = upperBrick
 
 		lowerBrick = @getBrickAt x, y, z - 1
 		if lowerBrick?
@@ -131,6 +132,7 @@ module.exports = class BrickGraph
 				y: brick.position.y - lowerBrick.position.y
 			}
 			lowerBrick.upperSlots[slot.x][slot.y] = brick
+			brick.lowerSlots[0][0] = lowerBrick
 
 		# add to list
 		@bricks[z].push brick

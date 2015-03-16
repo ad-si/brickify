@@ -4,7 +4,7 @@ OrbitControls = require('three-orbit-controls')(THREE)
 ###
 # @class Renderer
 ###
-module.exports = class Renderer
+class Renderer
 	constructor: (@pluginHooks, globalConfig) ->
 		@scene = null
 		@camera = null
@@ -167,3 +167,5 @@ module.exports = class Renderer
 
 	getControls: =>
 		@controls
+
+module.exports = Renderer

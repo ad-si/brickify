@@ -1,8 +1,8 @@
 ###
-#  @module Hotkeys
+#  @class Hotkeys
 ###
 
-module.exports = class Hotkeys
+class Hotkeys
 	constructor: (pluginHooks, @sceneManager) ->
 		@bootboxOpen = false
 		@events = []
@@ -55,3 +55,5 @@ module.exports = class Hotkeys
 	addEvents: (eventSpecs) ->
 		for event in eventSpecs.events
 			@bind(event.hotkey, eventSpecs.title, event.description, event.callback)
+
+module.exports = Hotkeys

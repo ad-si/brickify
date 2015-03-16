@@ -5,7 +5,7 @@
 #  The hooks must exist at load-time. Hooks that are added later during
 #  run-time will not be called.
 #
-#  See [dummyPlugin](plugins/dummy/dummy.html) for a example implementation
+#  See [dummyPlugin](plugins/dummy/dummy.html) for an example implementation
 #  and further documentation of the plugin API.
 
 #  ##Plugin Initialization##

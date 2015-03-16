@@ -42,7 +42,7 @@ class NewBrickator
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout
 	# needs to be locally regenerated
-	# @param cachedData reference to cachedData
+	# @param {Object} cachedData reference to cachedData
 	# @param {Array<BrickObject>} modifiedVoxels list of voxels that have
 	# been modified
 	# @param {Boolean} createBricks creates Bricks if a voxel has no associated

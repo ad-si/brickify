@@ -25,7 +25,7 @@ module.exports.getIntersections = getIntersections
 
 ###
 # Determines the responsible plugin for a screen space interaction based on
-# the first object that is intersected and has a associated plugin.
+# the first object that is intersected and has an associated plugin.
 # @param {Object} event usually a mouse or tap or pointer event
 # @param {Number} event.pageX the x coordinate on the screen
 # @param {Number} event.pageY the y coordinate on the screen

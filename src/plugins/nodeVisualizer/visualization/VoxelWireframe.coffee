@@ -2,7 +2,7 @@ THREE = require 'three'
 VoxelUnion = require '../../newBrickator/VoxelUnion'
 interactionHelper = require '../../../client/interactionHelper'
 
-# This class creates an wireframe representation with darkened sides
+# This class creates a wireframe representation with darkened sides
 # of a given set of voxels
 module.exports = class VoxelOutline
 	constructor: (@bundle, @grid, threeNode) ->
@@ -18,7 +18,8 @@ module.exports = class VoxelOutline
 		return @threeNode.visible
 
 	# creates a wireframe out of voxels
-	# @param {{x,y,z}[]} voxels
+	# @param {Array} voxels array of voxels {x, y, z}[] to create
+	# wireframe for
 	createWireframe: (voxels) =>
 		# clear old representations
 		@threeNode.children = []

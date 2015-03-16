@@ -44,26 +44,25 @@ b1 = bundle1.init().then ->
 	b2 = bundle2.init()
 
 	loadAndConvert = (hash, animate) ->
-		b1.then(->
-			bundle1.modelLoader.loadByHash hash)
-			.then(->
-				document.getElementById('renderArea1').style.backgroundImage = 'none')
-		b2.then(-> bundle2.modelLoader.loadByHash hash)
-			.then(->
-				document.getElementById('renderArea2').style.backgroundImage = 'none')
+		b1.then -> bundle1.modelLoader.loadByHash hash
+			.then ->
+				document.getElementById('renderArea1').style.backgroundImage = 'none'
+		b2.then -> bundle2.modelLoader.loadByHash hash
+			.then ->
+				document.getElementById('renderArea2').style.backgroundImage = 'none'
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
 	loadModel = (hash, errors) ->
-		b1.then(-> bundle1.sceneManager.clearScene())
-		b2.then(-> bundle2.sceneManager.clearScene())
-		loadAndConvert(hash, true)
+		b1.then -> bundle1.sceneManager.clearScene()
+		b2.then -> bundle2.sceneManager.clearScene()
+		loadAndConvert hash, true
 
 	stlDropper = require './stlDropper'
 	stlDropper.init $('body'), $('.dropper'), $('#dropoverlay'), loadModel
 
 	stlFileSelector = require './stlFileSelector'
 	stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel
-	$('.dropper').html('Drop an stl file')
+	$('.dropper').html 'Drop an stl file'

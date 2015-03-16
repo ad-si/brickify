@@ -37,7 +37,7 @@ module.exports.store = (optimizedModel) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
 	modelCache[hash] = Promise.resolve optimizedModel
-	return submitDataToServer(hash, modelData).then(-> hash)
+	return submitDataToServer(hash, modelData).then -> hash
 
 # requests a mesh with the given hash from the server
 requestDataFromServer = (hash) ->

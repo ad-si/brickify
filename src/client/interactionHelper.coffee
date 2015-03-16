@@ -36,7 +36,7 @@ module.exports.getIntersections = getIntersections
 # @return {Plugin|undefined} the name of the plugin
 # @memberOf interactionHelper
 ###
-getResponsiblePlugin = (event, renderer, objects, filter = () -> true) ->
+getResponsiblePlugin = (event, renderer, objects, filter = -> true) ->
 	for intersection in getIntersections event, renderer, objects
 		object = intersection.object
 

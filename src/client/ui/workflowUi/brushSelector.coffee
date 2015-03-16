@@ -29,7 +29,7 @@ class BrushSelector
 		@selectedNode = null
 			
 	_bindBrushEvent: (brush) ->
-		brush.jqueryObject.on 'click', () => @_brushSelect brush
+		brush.jqueryObject.on 'click', => @_brushSelect brush
 
 	
 	_brushSelect: (brush) =>

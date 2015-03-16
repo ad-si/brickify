@@ -37,7 +37,7 @@ module.exports = class PluginLoader
 
 	# Since browserify.js does not support dynamic require
 	# all plugins must be explicitly written down
-	loadPlugins: () ->
+	loadPlugins: ->
 		pluginInstances = []
 
 		if @globalConfig.plugins.dummy

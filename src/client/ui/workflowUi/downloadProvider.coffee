@@ -9,7 +9,7 @@ module.exports = class DownloadProvider
 	init: (jqueryString, @sceneManager) =>
 		@jqueryObject = $(jqueryString)
 
-		@jqueryObject.on 'click', () =>
+		@jqueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
 				@_createDownload selNode

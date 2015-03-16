@@ -173,7 +173,7 @@ describe 'brickLayouter split', ->
 		expect(bricks[0][0].neighbors[2]).to.be.empty
 		expect(bricks[0][0].neighbors[3]).to.be.empty
 
-	it 'should split one brick and relayout locally', () ->
+	it 'should split one brick and relayout locally', ->
 		# 01222
 		Brick.nextBrickIndex = 0
 		brickLayouter = new BrickLayouter(true)

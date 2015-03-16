@@ -9,19 +9,19 @@ class ModelVisualization
 		@threeNode = new THREE.Object3D()
 		threeNode.add @threeNode
 
-	createVisualization: () ->
+	createVisualization: ->
 		@_createVisualization(@node, @threeNode)
 		
 	setSolidMaterial: (material) =>
-		@afterCreationPromise.then () =>
+		@afterCreationPromise.then =>
 			@threeNode.solid.material = material
 
 	setNodeVisibility: (visible) =>
-		@afterCreationPromise.then () =>
+		@afterCreationPromise.then =>
 			@threeNode.visible = visible
 
 	setShadowVisibility: (visible) =>
-		@afterCreationPromise.then () =>
+		@afterCreationPromise.then =>
 			@threeNode.wireframe.visible = visible
 
 	afterCreation: =>

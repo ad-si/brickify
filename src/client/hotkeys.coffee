@@ -6,9 +6,9 @@ module.exports = class Hotkeys
 	constructor: (pluginHooks, @sceneManager) ->
 		@bootboxOpen = false
 		@events = []
-		@bind '?', 'General', 'Show this help', () =>
+		@bind '?', 'General', 'Show this help', =>
 			@showHelp()
-		@bind 'esc', 'General', 'Close modal window', () =>
+		@bind 'esc', 'General', 'Close modal window', =>
 			bootbox.hideAll()
 
 		@addEvents events for events in pluginHooks.getHotkeys()
@@ -22,7 +22,7 @@ module.exports = class Hotkeys
 				message += '<p><span class="keys"><kbd>' + event.hotkey +
 					'</kbd></span> <span>' + event.description + '</span></p>'
 			message += '</section>'
-		callback = () =>
+		callback = =>
 			@bootboxOpen = false
 			return true
 		@bootboxOpen = true

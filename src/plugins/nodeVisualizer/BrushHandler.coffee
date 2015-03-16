@@ -7,7 +7,7 @@ class BrushHandler
 		@interactionDisabled = false
 		@legoBrushSelected = false
 
-	getBrushes: () =>
+	getBrushes: =>
 		return [{
 			containerId: '#legoBrush'
 			selectCallback: @_legoSelect

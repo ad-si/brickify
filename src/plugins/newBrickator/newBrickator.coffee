@@ -11,7 +11,7 @@ threeHelper = require '../../client/threeHelper'
 # @class NewBrickator
 ###
 class NewBrickator
-	constructor: () ->
+	constructor: ->
 		@pipeline = new LegoPipeline()
 
 	init: (@bundle) => return

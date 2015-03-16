@@ -17,7 +17,7 @@ exists = (hash) ->
 # sends the model to the server if the server hasn't got a file
 # with the same hash value
 submitDataToServer = (hash, data) ->
-	send = () ->
+	send = ->
 		prom = Promise.resolve(
 			$.ajax(
 				'/model/submit/' + hash
@@ -27,8 +27,8 @@ submitDataToServer = (hash, data) ->
 			)
 		)
 		prom.then(
-			() -> console.log 'sent model to the server'
-			() -> console.error 'unable to send model to the server'
+			-> console.log 'sent model to the server'
+			-> console.error 'unable to send model to the server'
 		)
 		return prom
 	return exists(hash).catch(send)
@@ -37,7 +37,7 @@ module.exports.store = (optimizedModel) ->
 	modelData = optimizedModel.toBase64()
 	hash = md5(modelData)
 	modelCache[hash] = Promise.resolve optimizedModel
-	return submitDataToServer(hash, modelData).then(() -> hash)
+	return submitDataToServer(hash, modelData).then -> hash
 
 # requests a mesh with the given hash from the server
 requestDataFromServer = (hash) ->

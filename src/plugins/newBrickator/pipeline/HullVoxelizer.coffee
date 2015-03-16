@@ -1,7 +1,7 @@
 Grid = require './Grid'
 
 module.exports = class Voxelizer
-	constructor: () ->
+	constructor: ->
 		@voxelGrid = null
 
 	setDebugVoxel: (@debugVoxel) =>

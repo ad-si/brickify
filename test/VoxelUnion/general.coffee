@@ -7,7 +7,7 @@ describe 'VoxelUnion', ->
 	grid = new Grid()
 	grid.origin = {x: 0, y: 0, z: 0}
 
-	it 'should create a single cube csg', () ->
+	it 'should create a single cube csg', ->
 		vg = new VoxelUnion(grid)
 		bsp = vg.run [ {x: 0, y: 0, z: 0} ]
 		geometry = bsp.toMesh(null).geometry
@@ -20,7 +20,7 @@ describe 'VoxelUnion', ->
 		]
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a 2x2 plate csg', () ->
+	it 'should create a 2x2 plate csg', ->
 		vg = new VoxelUnion(grid)
 		bsp = vg.run [
 			{x: 0, y: 0, z: 0}
@@ -42,7 +42,7 @@ describe 'VoxelUnion', ->
 
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a 2x2x2 cube csg with 26 vertices', () ->
+	it 'should create a 2x2x2 cube csg with 26 vertices', ->
 		vg = new VoxelUnion(grid)
 		bsp = vg.run [
 			{x: 0, y: 0, z: 0}
@@ -69,7 +69,7 @@ describe 'VoxelUnion', ->
 		]
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a 2x2x2 cube THREE.Geometry with 27 vertices', () ->
+	it 'should create a 2x2x2 cube THREE.Geometry with 27 vertices', ->
 		# the algorithm creates a point in the middle of the cube,
 		# which is then not used in the geometry
 
@@ -99,7 +99,7 @@ describe 'VoxelUnion', ->
 		]
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a "+" with hole plate THREE.Geometry', () ->
+	it 'should create a "+" with hole plate THREE.Geometry', ->
 		#  #
 		# # #
 		#  #
@@ -126,7 +126,7 @@ describe 'VoxelUnion', ->
 		]
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a 3x3 plate THREE.Geometry', () ->
+	it 'should create a 3x3 plate THREE.Geometry', ->
 		vg = new VoxelUnion(grid)
 		geometry = vg._createVoxelGeometry [
 			{x: 0, y: 0, z: 0}
@@ -154,7 +154,7 @@ describe 'VoxelUnion', ->
 		]
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a filled "+" plate THREE.Geometry', () ->
+	it 'should create a filled "+" plate THREE.Geometry', ->
 		#  #
 		# ###
 		#  #
@@ -180,7 +180,7 @@ describe 'VoxelUnion', ->
 		]
 		expect(faceEquality(geometry.faces, expectedFaceIndices)).to.equal(true)
 
-	it 'should create a filled "+" plate datastructure', () ->
+	it 'should create a filled "+" plate datastructure', ->
 		#  #
 		# ###
 		#  #
@@ -222,7 +222,7 @@ describe 'VoxelUnion', ->
 		expect(data.zLayers[1][1][1].voxel).to.equal(false)
 		expect(data.zLayers[-1][1][1].voxel).to.equal(false)
 
-	it 'should create a filled "+" plate point list', () ->
+	it 'should create a filled "+" plate point list', ->
 		#  #
 		# ###
 		#  #

@@ -3,7 +3,7 @@ VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
 
 module.exports = class LegoPipeline
-	constructor: () ->
+	constructor: ->
 		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
 		@brickLayouter = new BrickLayouter()

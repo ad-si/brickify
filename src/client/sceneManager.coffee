@@ -7,7 +7,7 @@ class SceneManager
 		@project = Project.load()
 		@scene = @project.then (project) -> project.getScene()
 
-	init: () =>
+	init: =>
 		@scene
 		.then (scene) -> scene.getNodes()
 		.then (nodes) => @_notify 'onNodeAdd', node for node in nodes

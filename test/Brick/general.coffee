@@ -10,7 +10,7 @@ describe 'Brick', ->
 		height: 3.2
 	}
 
-	it 'should be completely removed', () ->
+	it 'should be completely removed', ->
 		# create a brick layout
 		grid = new Grid(baseBrick)
 		grid.numVoxelsX = 5

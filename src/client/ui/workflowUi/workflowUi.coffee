@@ -35,7 +35,7 @@ module.exports = class WorkflowUi
 	onNodeDeselect: (node) =>
 		@brushSelector.onNodeDeselect node
 
-	init: () =>
+	init: =>
 		@sceneManager = @bundle.sceneManager
 		@downloadProvider.init('#downloadButton', @sceneManager)
 		@brushSelector.init '#brushContainer'
@@ -49,13 +49,13 @@ module.exports = class WorkflowUi
 		# only enable load ui until a model is loaded
 		@_enableUiGroups ['load']
 
-	_initStabilityCheck: () =>
+	_initStabilityCheck: =>
 		@stabilityCheckButton = $('#stabilityCheckButton')
 		@stabilityCheckModeEnabled = false
 
 		@stabilityCheckButton.on 'click', @toggleStabilityView
 
-	_applyStabilityViewMode: () =>
+	_applyStabilityViewMode: =>
 		#disable other UI
 		if @stabilityCheckModeEnabled
 			@_disableNonStabilityUi()
@@ -67,7 +67,7 @@ module.exports = class WorkflowUi
 			@sceneManager.selectedNode, @stabilityCheckModeEnabled
 		)
 
-	_initBuildButton: () =>
+	_initBuildButton: =>
 		@buildButton = $('#buildButton')
 		@buildModeEnabled = false
 
@@ -83,26 +83,26 @@ module.exports = class WorkflowUi
 			maxLayer: $('#maxBuildLayer')
 			}
 
-		@buildLayerUi.slider.on 'input', () =>
+		@buildLayerUi.slider.on 'input', =>
 			selectedNode = @bundle.sceneManager.selectedNode
 			v = @buildLayerUi.slider.val()
 			@_updateBuildLayer(selectedNode)
 
-		@buildLayerUi.increment.on 'click', () =>
+		@buildLayerUi.increment.on 'click', =>
 			selectedNode = @bundle.sceneManager.selectedNode
 			v = @buildLayerUi.slider.val()
 			v++
 			@buildLayerUi.slider.val(v)
 			@_updateBuildLayer(selectedNode)
 
-		@buildLayerUi.decrement.on 'click', () =>
+		@buildLayerUi.decrement.on 'click', =>
 			selectedNode = @bundle.sceneManager.selectedNode
 			v = @buildLayerUi.slider.val()
 			v--
 			@buildLayerUi.slider.val(v)
 			@_updateBuildLayer(selectedNode)
 
-		@buildButton.click () =>
+		@buildButton.click =>
 			selectedNode = @bundle.sceneManager.selectedNode
 
 			if @buildModeEnabled
@@ -136,24 +136,24 @@ module.exports = class WorkflowUi
 		@nodeVisualizer.showBuildLayer(selectedNode, layer)
 
 	_disableBuildMode: (selectedNode) =>
-		@nodeVisualizer.disableBuildMode(selectedNode).then () =>
+		@nodeVisualizer.disableBuildMode(selectedNode).then =>
 			# enable other ui
 			@_enableNonBuildUi()
 
 
-	_disableNonBuildUi: () =>
+	_disableNonBuildUi: =>
 		@_enableUiGroups ['preview']
 		@stabilityCheckButton.addClass 'disabled'
 
-	_enableNonBuildUi: () =>
+	_enableNonBuildUi: =>
 		@_enableUiGroups ['load', 'edit', 'preview', 'export']
 		@stabilityCheckButton.removeClass 'disabled'
 
-	_disableNonStabilityUi: () =>
+	_disableNonStabilityUi: =>
 		@_enableUiGroups ['preview']
 		@buildButton.addClass 'disabled'
 
-	_enableNonStabilityUi: () =>
+	_enableNonStabilityUi: =>
 		@_enableUiGroups ['load', 'edit', 'preview', 'export']
 		@buildButton.removeClass 'disabled'
 
@@ -171,8 +171,8 @@ module.exports = class WorkflowUi
 	_setStabilityCheckButtonActive: (active) =>
 		@stabilityCheckButton.toggleClass 'active', active
 
-	_initNotImplementedMessages: () =>
-		alertCallback = () ->
+	_initNotImplementedMessages: =>
+		alertCallback = ->
 			bootbox.alert({
 					title: 'Not implemented yet'
 					message: 'We are sorry, but this feature is not implemented yet.
@@ -184,7 +184,7 @@ module.exports = class WorkflowUi
 		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback
 
-	_initScrollbar: () =>
+	_initScrollbar: =>
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar
 		window.addEventListener 'resize', -> perfectScrollbar.update sidebar

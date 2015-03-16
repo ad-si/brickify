@@ -19,7 +19,7 @@ describe 'BrickGraph', ->
 			for z in [0...grid.numVoxelsZ]
 				grid.setVoxel {x: x, y: y, z: z}
 
-	it 'should initialize with correct number of bricks', () ->
+	it 'should initialize with correct number of bricks', ->
 		brickLayouter = new BrickLayouter()
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 
@@ -28,7 +28,7 @@ describe 'BrickGraph', ->
 		for zLayer in bricks
 			expect(zLayer.length).to.equal(grid.numVoxelsX * grid.numVoxelsY)
 
-	it 'should initialize correct number of neighbors', () ->
+	it 'should initialize correct number of neighbors', ->
 		brickLayouter = new BrickLayouter()
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 
@@ -49,7 +49,7 @@ describe 'BrickGraph', ->
 				actualNeighbors = brick.uniqueNeighbors().length
 				expect(actualNeighbors).to.equal(expectedNeighbors)
 
-	it 'should initialize correct references to neighbors', () ->
+	it 'should initialize correct references to neighbors', ->
 		brickLayouter = new BrickLayouter()
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 

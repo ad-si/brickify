@@ -28,16 +28,16 @@ module.exports = class BrickObject extends THREE.Object3D
 		return
 
 	# makes the voxel being 3d printed
-	make3dPrinted: () =>
+	make3dPrinted: =>
 		@gridEntry.enabled = false
 		@nonHighlightVisibility = false
 
 	# makes the voxel being legotized
-	makeLego: () =>
+	makeLego: =>
 		@gridEntry.enabled = true
 		@nonHighlightVisibility = true
 
-	isLego: () =>
+	isLego: =>
 		return @gridEntry.enabled
 
 	# one may highlight this brick with a special material

@@ -64,7 +64,7 @@ module.exports = class LegoBoard
 					object.translateY y
 					studsContainer.add object
 
-	on3dUpdate: () =>
+	on3dUpdate: =>
 		# check if the camera is below z=0. if yes, make the plate transparent
 		# and hide studs
 		if not @bundle?
@@ -80,10 +80,10 @@ module.exports = class LegoBoard
 			@threejsNode.children[0].material = @currentBaseplateMaterial
 			@threejsNode.children[1].visible = true if @highQualMode
 
-	toggleVisibility: () =>
+	toggleVisibility: =>
 		@threejsNode.visible = !@threejsNode.visible
 
-	uglify: () =>
+	uglify: =>
 		if @highQualMode
 			@highQualMode = false
 
@@ -96,7 +96,7 @@ module.exports = class LegoBoard
 
 		return false
 
-	beautify: () =>
+	beautify: =>
 		if not @highQualMode
 			@highQualMode = true
 			

@@ -313,10 +313,10 @@ module.exports = class BrickVisualization
 		for intersection in voxelIntersects
 			voxel = intersection.object.parent
 			continue if not voxel.voxelCoords?
-			# cancel if we are above a voxel we just modified
-			return null if @currentlyTouchedVoxels.indexOf(voxel) >= 0
 
-			if voxel.isLego()
+			modified = voxel in @currentlyTouchedVoxels
+
+			if (voxel.isLego() and not modified) or (not voxel.isLego() and modified)
 				firstLegoVoxel = voxel
 				break
 			else

@@ -62,6 +62,7 @@ module.exports = class BrickVisualization
 	# (re)creates voxel visualization.
 	# hides disabled voxels, updates material and stud visibility
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
+		@unhighlightBigBrush()
 		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
 		recreate
 			@_createVoxelVisualization coloring
@@ -175,7 +176,7 @@ module.exports = class BrickVisualization
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
-			@_unhighlightBigBrush()
+			@unhighlightBigBrush()
 
 		return voxel
 
@@ -194,13 +195,14 @@ module.exports = class BrickVisualization
 		@bigBrushHighlight.position.copy voxel.position
 		@bigBrushHighlight.visible = true
 
-	_unhighlightBigBrush: =>
+	unhighlightBigBrush: =>
 		@bigBrushHighlight?.visible = false
 
 	# makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
-		mainVoxel = @getVoxel event, selectedNode, true
-		@_highlightBigBrush mainVoxel if mainVoxel?
+		if bigBrush
+			mainVoxel = @getVoxel event, selectedNode, true
+			@_highlightBigBrush mainVoxel if mainVoxel?
 		voxels = @getVoxels event, selectedNode, true, bigBrush
 		return null unless voxels
 
@@ -218,8 +220,9 @@ module.exports = class BrickVisualization
 
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
-		mainVoxel = @getVoxel event, selectedNode, false
-		@_highlightBigBrush mainVoxel if mainVoxel?
+		if bigBrush
+			mainVoxel = @getVoxel event, selectedNode, false
+			@_highlightBigBrush mainVoxel if mainVoxel?
 		voxels = @getVoxels event, selectedNode, false, bigBrush
 		return null unless voxels
 

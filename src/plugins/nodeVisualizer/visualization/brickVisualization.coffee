@@ -281,7 +281,7 @@ module.exports = class BrickVisualization
 			if not lastNonLegoVoxel?
 				return null
 
-			# to prevent unecpected selection behavior, it is required
+			# to prevent unexpected selection behavior, it is required
 			# that both voxels are neighbors (otherwise strange
 			# results appear if selecting lego through model geometry)
 			if @_voxelsAreNeighbor lastNonLegoVoxel, firstLegoVoxel

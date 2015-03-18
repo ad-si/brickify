@@ -89,7 +89,6 @@ class BrushHandler
 		.then (cachedData) =>
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
 			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.updateBricks cachedData.brickGraph.bricks
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -131,6 +130,5 @@ class BrushHandler
 		.then (cachedData) =>
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
 			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.updateBricks cachedData.brickGraph.bricks
 
 module.exports = BrushHandler

@@ -10,6 +10,7 @@
   "homepage": "http://lowfab.net",
   "bugs": "http://github.com/stuikomma/lowfab/issues",
   "dependencies": {
+    "array.prototype.find": "^1.0.0",
     "blueimp-md5": "^1.1.0",
     "body-parser": "^1.9.1",
     "bootbox": "^4.4.0",

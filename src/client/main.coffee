@@ -1,4 +1,4 @@
-require('es6-promise').polyfill()
+require '../common/polyfills'
 require 'PEP'
 
 path = require 'path'

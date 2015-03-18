@@ -1,4 +1,5 @@
 require('es6-promise').polyfill()
+require 'es6-collections'
 require 'PEP'
 
 path = require 'path'

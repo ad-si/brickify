@@ -22,7 +22,6 @@ describe 'Project tests', ->
 
 		it 'should be a Project and a SyncObject', ->
 			dataPackets.nextIds.push 'abcdefgh'
-			before = Date.now()
 			project = new Project()
 			project.done ->
 				expect(project).to.be.an.instanceof(Project)
@@ -30,7 +29,6 @@ describe 'Project tests', ->
 
 		it 'should have one scene that is active', ->
 			dataPackets.nextIds.push 'abcdefgh'
-			before = Date.now()
 			project = new Project()
 			project.done ->
 				expect(project).to.have.property('scenes').

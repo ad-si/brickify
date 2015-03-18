@@ -8,6 +8,7 @@ readingString = 'Reading file
 uploadString = 'Uploading file
 <img src="img/spinner.gif" id="spinner">'
 loadedString = 'File loaded!'
+errorString = 'Import failed!'
 
 module.exports.onLoadFile = (event, feedbackTargets, finishedCallback) ->
 	uploadFinishedCallback = finishedCallback
@@ -39,29 +40,26 @@ handleLoadedFile = (feedbackTargets, filename) ->
 	loadCallback = 	(event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
-		importErrors = false
 
 		meshlib.parse fileContent, null, (error, optimizedModel) ->
-			if error?
-				importErrors = true
-			else
-				# happens with empty files
-				if !optimizedModel
-					bootbox.alert({
-						title: 'Import failed'
-						message: 'Your file contains errors that we could not fix automatically.'
-					})
+			if error or !optimizedModel
+				bootbox.alert({
+					title: 'Import failed'
+					message: 'Your file contains errors that we could not fix automatically.'
+				})
+				feedbackTargets.each (i, el) -> el.innerHTML = errorString
+				return
 
-				optimizedModel.originalFileName = filename
+			optimizedModel.originalFileName = filename
 
-				feedbackTargets.each (i, el) -> el.innerHTML = uploadString
+			feedbackTargets.each (i, el) -> el.innerHTML = uploadString
 
-				ufc = (md5hash) ->
-					feedbackTargets.each (i, el) -> el.innerHTML = loadedString
-					if uploadFinishedCallback?
-						uploadFinishedCallback(md5hash, importErrors)
+			ufc = (md5hash) ->
+				feedbackTargets.each (i, el) -> el.innerHTML = loadedString
+				if uploadFinishedCallback?
+					uploadFinishedCallback(md5hash)
 
-				modelCache.store(optimizedModel).then(ufc)
+			modelCache.store(optimizedModel).then(ufc)
 
 		return
 

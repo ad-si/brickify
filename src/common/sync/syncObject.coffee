@@ -23,11 +23,11 @@ class SyncObject
 	# super(arguments[0]).
 	#
 	# @param {Object} params the named parameters
-	# @param {Boolean} [params._generateId=true] true for a new SyncObject
+	# @param {Boolean} [params._syncObjectLoad=false] false for a new SyncObject
 	# @memberOf SyncObject
 	###
-	constructor: ({_generateId} = {}) ->
-		if _generateId || not _generateId?
+	constructor: ({_syncObjectLoad} = {}) ->
+		unless _syncObjectLoad
 			@ready = SyncObject.dataPacketProvider.create()
 			.then (packet) => @id = packet.id
 		else
@@ -47,7 +47,7 @@ class SyncObject
 	###
 	@from: (syncObjectDescriptor) ->
 		_syncObjectFromPacket = (packet) =>
-			new @(_generateId: false).next (syncObject) ->
+			new @(_syncObjectLoad: true).next (syncObject) ->
 				syncObject[p] = packet.data[p] for own p of packet.data
 				syncObject.id = packet.id
 				syncObject._loadSubObjects()

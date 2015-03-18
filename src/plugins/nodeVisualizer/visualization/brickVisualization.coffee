@@ -225,9 +225,15 @@ module.exports = class BrickVisualization
 		mainVoxel = @getVoxel event, selectedNode, needsToBeLego
 		return null unless mainVoxel
 
-		voxels = []
-		voxels.push mainVoxel
+		size = @_getBrushSize bigBrush
+		voxels = @grid.getSurrounding mainVoxel.voxelCoords, size, -> true
+		voxels = voxels.map (voxel) -> voxel.visibleVoxel
 		return voxels
+
+	_getBrushSize: (bigBrush) =>
+		return 1 unless bigBrush
+		length = Math.max @grid.numVoxelsX, @grid.numVoxelsY, @grid.numVoxelsZ
+		return Math.sqrt length
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>
@@ -263,7 +269,7 @@ module.exports = class BrickVisualization
 		return @_getVoxelInMiddleOfPossibleLego event, selectedNode
 
 
-	# returnes the first intersected lego voxel and
+	# returns the first intersected lego voxel and
 	# the last intersected non-lego voxel.
 	# returns null, if cursor is above a currently modified voxel
 	_getIntersectedVoxels: (event, selectedNode) ->

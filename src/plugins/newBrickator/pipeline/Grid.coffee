@@ -152,6 +152,18 @@ module.exports = class Grid
 					list.push v
 		return list
 
+	getSurrounding: ({x, y, z}, size, selectionCallback) =>
+		list = []
 
+		_collect = (vx, vy, vz) =>
+			if @zLayers[vz]?[vx]?[vy]?
+				voxel = @zLayers[vz][vx][vy]
+				list.push voxel if selectionCallback voxel
 
+		size_2 = Math.floor size / 2
+		for vx in [x - size_2 .. x + size_2] by 1
+			for vy in [y - size_2 .. y + size_2] by 1
+				for vz in [z - size_2 .. z + size_2] by 1
+					_collect vx, vy, vz
 
+		return list

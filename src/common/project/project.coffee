@@ -18,6 +18,10 @@ class Project extends SyncObject
 		@scenes.active = new Scene()
 		@scenes.push @scenes.active
 
+	_loadSubObjects: =>
+		_loadScene = (reference) -> Scene.from reference
+		return Promise.all(@scenes.map _loadScene).then (scenes) => @scenes = scenes
+
 	getScene: ->
 		return @done => @scenes.active
 

@@ -74,3 +74,23 @@ describe 'Project tests', ->
 				scenes = project.scenes
 				expect(scenes).to.have.length(1)
 				expect(scenes[0]).to.shallowDeepEqual(scene.data)
+
+		it 'should not create a new scene on loading', ->
+			project = {
+				id: 'projectid'
+				data: {
+					scenes: [{dataPacketRef: 'sceneid'}]
+				}
+			}
+			dataPackets.nextGets.push project
+			scene = {
+				id: 'sceneid'
+				data: {
+					nodes: []
+				}
+			}
+			dataPackets.nextGets.push scene
+			request = Project.from('projectid')
+			expect(request).to.resolve
+			request.then (project) -> project.done ->
+				expect(dataPackets.createCalls).to.have.length(0)

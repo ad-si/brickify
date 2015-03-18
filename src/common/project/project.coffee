@@ -12,11 +12,12 @@ class Project extends SyncObject
 		#TODO: Load from share or session
 		return Promise.resolve new @()
 
-	constructor: ->
-		super arguments[0]
-		@scenes = []
-		@scenes.active = new Scene()
-		@scenes.push @scenes.active
+	constructor: (params = {}) ->
+		super params
+		unless params._syncObjectLoad
+			@scenes = []
+			@scenes.active = new Scene()
+			@scenes.push @scenes.active
 
 	_loadSubObjects: =>
 		_loadScene = (reference) -> Scene.from reference

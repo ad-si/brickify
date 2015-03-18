@@ -266,7 +266,7 @@ module.exports = class BrickVisualization
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>
 		# Get the first lego voxel. cancel if we are above a voxel that
 		# has been handeled in this brush action
-		voxels = @_getIntersectedVoxels event, selectedNode
+		voxels = @_getIntersectedVoxels event
 		return null if not voxels?
 		firstLegoVoxel = voxels[0]
 		lastNonLegoVoxel = voxels[1]
@@ -299,7 +299,7 @@ module.exports = class BrickVisualization
 	# returns the first intersected lego voxel and
 	# the last intersected non-lego voxel.
 	# returns null, if cursor is above a currently modified voxel
-	_getIntersectedVoxels: (event, selectedNode) ->
+	_getIntersectedVoxels: (event) ->
 		voxelIntersects =
 			interactionHelper.getIntersections(
 				event

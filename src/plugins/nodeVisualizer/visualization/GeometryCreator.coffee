@@ -11,7 +11,7 @@ module.exports = class GeometryCreator
 			#these numbers are made up to look good. don't use for csg operations
 			@grid.spacing.x * 0.3, @grid.spacing.y * 0.3, @grid.spacing.z * 0.7, 7
 		)
-		
+
 		rotation = new THREE.Matrix4()
 		rotation.makeRotationX(1.571)
 		@stud.applyMatrix(rotation)
@@ -58,6 +58,12 @@ module.exports = class GeometryCreator
 		brick.translateZ worldBrickPosition.z
 
 		return brick
+
+	getBrickBox: (boxDimensions, material) =>
+		geometry = @_getBrickGeometry boxDimensions
+		box = new THREE.Mesh geometry, material
+		box.dimensions = boxDimensions
+		return box
 
 	_getBrickGeometry: (brickDimensions) =>
 		# returns a box geometry for the given dimensions

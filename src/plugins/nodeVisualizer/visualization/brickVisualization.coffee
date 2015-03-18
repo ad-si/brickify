@@ -162,7 +162,7 @@ module.exports = class BrickVisualization
 		@showBricks()
 
 	# highlights the voxel below mouse and returns it
-	highlightVoxel: (event, selectedNode, needsToBeLego) =>
+	highlightVoxel: (event, selectedNode, needsToBeLego, bigBrush) =>
 		voxel = @getVoxel event, selectedNode, needsToBeLego
 		if voxel?
 			if @currentlyHighlightedVoxel?
@@ -170,12 +170,32 @@ module.exports = class BrickVisualization
 
 			@currentlyHighlightedVoxel = voxel
 			voxel.setHighlight true, @defaultColoring.highlightMaterial
+			@_highlightBigBrush voxel if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
+			@_unhighlightBigBrush()
 
 		return voxel
+
+	_highlightBigBrush: (voxel) =>
+		size = @_getBrushSize true
+		dimensions = new THREE.Vector3 size, size, size
+		unless @bigBrushHighlight? and
+		@bigBrushHighlight.dimensions.equals dimensions
+			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
+			@bigBrushHighlight = @geometryCreator.getBrickBox(
+				dimensions
+				@defaultColoring.boxHighlightMaterial
+			)
+			@voxelBrickSubnode.add @bigBrushHighlight
+
+		@bigBrushHighlight.position.copy voxel.position
+		@bigBrushHighlight.visible = true
+
+	_unhighlightBigBrush: =>
+		@bigBrushHighlight?.visible = false
 
 	# makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>

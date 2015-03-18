@@ -9,7 +9,7 @@ uploadString = 'Uploading file
 <img src="img/spinner.gif" id="spinner">'
 loadedString = 'File loaded!'
 
-module.exports.onModelDrop = (event, feedbackTargets, finishedCallback) ->
+module.exports.onLoadFile = (event, feedbackTargets, finishedCallback) ->
 	uploadFinishedCallback = finishedCallback
 
 	event.preventDefault()

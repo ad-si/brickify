@@ -8,7 +8,7 @@ bindDropHandler = (target, feedbackTargets, overlay, finishedCallback) ->
 	target.addEventListener 'drop',
 		(event) ->
 			hideOverlay(event, overlay)
-			fileLoader.onModelDrop(event, feedbackTargets, finishedCallback)
+			fileLoader.onLoadFile(event, feedbackTargets, finishedCallback)
 		false
 	target.addEventListener 'dragover',
 		(event) -> showOverlay(event, overlay),

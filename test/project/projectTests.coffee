@@ -94,3 +94,37 @@ describe 'Project tests', ->
 			expect(request).to.resolve
 			request.then (project) -> project.done ->
 				expect(dataPackets.createCalls).to.have.length(0)
+
+		it 'should create a scene if scenes array is missing on loading', ->
+			project = {
+				id: 'projectid'
+				data: {}
+			}
+			dataPackets.nextGets.push project
+			dataPackets.nextIds.push sceneId = 'sceneId'
+			request = Project.from('projectid')
+			expect(request).to.resolve
+			request.then (project) -> project.done ->
+				expect(project).to.have.property('scenes').that.is.an('array')
+				scenes = project.scenes
+				expect(scenes).to.have.length(1)
+				expect(scenes[0]).to.have.property('id', sceneId)
+				expect(dataPackets.createCalls).to.have.length(1)
+
+		it 'should create a scene if scenes array is empty on loading', ->
+			project = {
+				id: 'projectid'
+				data: {
+					scenes: []
+				}
+			}
+			dataPackets.nextGets.push project
+			dataPackets.nextIds.push sceneId = 'sceneId'
+			request = Project.from('projectid')
+			expect(request).to.resolve
+			request.then (project) -> project.done ->
+				expect(project).to.have.property('scenes').that.is.an('array')
+				scenes = project.scenes
+				expect(scenes).to.have.length(1)
+				expect(scenes[0]).to.have.property('id', sceneId)
+				expect(dataPackets.createCalls).to.have.length(1)

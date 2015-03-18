@@ -14,14 +14,20 @@ class Project extends SyncObject
 
 	constructor: (params = {}) ->
 		super params
-		unless params._syncObjectLoad
-			@scenes = []
-			@scenes.active = new Scene()
-			@scenes.push @scenes.active
+		@_initScenes() unless params._syncObjectLoad
+
+	_initScenes: =>
+		@scenes = []
+		@scenes.active = new Scene()
+		@scenes.push @scenes.active
 
 	_loadSubObjects: =>
 		_loadScene = (reference) -> Scene.from reference
-		return Promise.all(@scenes.map _loadScene).then (scenes) => @scenes = scenes
+		if Array.isArray(@scenes) and @scenes.length > 0
+			return Promise.all(@scenes.map _loadScene)
+				.then (scenes) => @scenes = scenes
+		else
+			@_initScenes()
 
 	getScene: ->
 		return @done => @scenes.active

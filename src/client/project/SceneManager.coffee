@@ -1,17 +1,13 @@
-Project = require '../common/project/project'
-
 ###
 # @class SceneManager
 ###
 class SceneManager
-	constructor: (@bundle) ->
+	constructor: (@bundle, @projectManager) ->
 		@selectedNode = null
 		@pluginHooks = @bundle.pluginHooks
-		@project = Project.load()
-		@scene = @project.then (project) -> project.getScene()
 
 	init: =>
-		@scene
+		@projectManager.getScene()
 		.then (scene) -> scene.getNodes()
 		.then (nodes) => @_notify 'onNodeAdd', node for node in nodes
 
@@ -32,7 +28,7 @@ class SceneManager
 #
 
 	add: (node) =>
-		@scene
+		@projectManager.getScene()
 		.then (scene) =>
 			if scene.nodes.length > 0
 				question = 'You already have a model in your scene.
@@ -50,13 +46,13 @@ class SceneManager
 				@_addNodeToScene node
 
 	_addNodeToScene: (node) =>
-		@scene
+		@projectManager.getScene()
 		.then (scene) -> scene.addNode node
 		.then => @_notify 'onNodeAdd', node
 		.then => @select node
 
 	remove: (node) =>
-		@scene
+		@projectManager.getScene()
 		.then (scene) -> scene.removeNode node
 		.then => @_notify 'onNodeRemove',  node
 		.then =>
@@ -64,7 +60,7 @@ class SceneManager
 				@deselect node
 
 	clearScene: =>
-		@scene
+		@projectManager.getScene()
 		.then (scene) -> scene.getNodes()
 		.then (nodes) => @remove node for node in nodes
 

@@ -32,7 +32,7 @@ class BrushHandler
 
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
-		.then (cachedData) =>
+		.then (cachedData) ->
 			cachedData.brickVisualization.showVoxels()
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.setPossibleLegoBoxVisibility true
@@ -43,7 +43,7 @@ class BrushHandler
 
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
-		.then (cachedData) =>
+		.then (cachedData) ->
 			cachedData.brickVisualization.showVoxels()
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.setPossibleLegoBoxVisibility false
@@ -53,16 +53,18 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.brickVisualization.makeVoxelLego event, selectedNode
-			if voxel?
+			voxels = cachedData.brickVisualization.
+				makeVoxelLego event, selectedNode, @bigBrushSelected
+			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.brickVisualization.makeVoxelLego event, selectedNode
-			if voxel?
+			voxels = cachedData.brickVisualization.
+				makeVoxelLego event, selectedNode, @bigBrushSelected
+			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseUp: (event, selectedNode) =>
@@ -78,7 +80,8 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.brickVisualization.highlightVoxel event, selectedNode, false
+			cachedData.brickVisualization.
+				highlightVoxel event, selectedNode, false, @bigBrushSelected
 
 	_legoCancel: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -92,16 +95,18 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.brickVisualization.makeVoxel3dPrinted event, selectedNode
-			if voxel?
+			voxels = cachedData.brickVisualization.
+				makeVoxel3dPrinted event, selectedNode, @bigBrushSelected
+			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseMove: (event, selectedNode) =>
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			voxel = cachedData.brickVisualization.makeVoxel3dPrinted event, selectedNode
-			if voxel?
+			voxels = cachedData.brickVisualization.
+				makeVoxel3dPrinted event, selectedNode, @bigBrushSelected
+			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
@@ -117,7 +122,8 @@ class BrushHandler
 		return if @interactionDisabled
 		@brickVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.brickVisualization.highlightVoxel event, selectedNode, true
+			cachedData.brickVisualization.
+				highlightVoxel event, selectedNode, true, @bigBrushSelected
 
 	_printCancel: (event, selectedNode) =>
 		return if @interactionDisabled

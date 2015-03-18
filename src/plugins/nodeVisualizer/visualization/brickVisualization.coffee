@@ -178,15 +178,16 @@ module.exports = class BrickVisualization
 		return voxel
 
 	# makes the voxel below mouse to be 3d printed
-	makeVoxel3dPrinted: (event, selectedNode) =>
-		voxel = @getVoxel event, selectedNode, true
+	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
+		voxels = @getVoxels event, selectedNode, true, bigBrush
+		return null unless voxels
 
-		if voxel and voxel.isLego()
-			voxel.make3dPrinted()
-			voxel.setMaterial @defaultColoring.deselectedMaterial
-			@currentlyTouchedVoxels.push voxel
-			return voxel
-		return null
+		for voxel in voxels
+			if voxel and voxel.isLego()
+				voxel.make3dPrinted()
+				voxel.setMaterial @defaultColoring.deselectedMaterial
+				@currentlyTouchedVoxels.push voxel
+		return voxels
 
 	resetTouchedVoxelsToLego: =>
 		for voxel in @currentlyTouchedVoxels
@@ -194,16 +195,17 @@ module.exports = class BrickVisualization
 		@currentlyTouchedVoxels = []
 
 	# makes the voxel below mouse to be made out of lego
-	makeVoxelLego: (event, selectedNode) =>
-		voxel = @getVoxel event, selectedNode, false
+	makeVoxelLego: (event, selectedNode, bigBrush) =>
+		voxels = @getVoxels event, selectedNode, false, bigBrush
+		return null unless voxels
 
-		if voxel and not voxel.isLego()
-			voxel.makeLego()
-			voxel.visible = true
-			voxel.setMaterial @defaultColoring.selectedMaterial
-			@currentlyTouchedVoxels.push voxel
-			return voxel
-		return null
+		for voxel in voxels
+			if voxel and not voxel.isLego()
+				voxel.makeLego()
+				voxel.visible = true
+				voxel.setMaterial @defaultColoring.selectedMaterial
+				@currentlyTouchedVoxels.push voxel
+		return voxels
 
 	resetTouchedVoxelsTo3dPrinted: =>
 		for voxel in @currentlyTouchedVoxels
@@ -218,6 +220,14 @@ module.exports = class BrickVisualization
 		touchedVoxels = @currentlyTouchedVoxels.slice 0
 		@currentlyTouchedVoxels = []
 		return touchedVoxels
+
+	getVoxels: (event, selectedNode, needsToBeLego, bigBrush) =>
+		mainVoxel = @getVoxel event, selectedNode, needsToBeLego
+		return null unless mainVoxel
+
+		voxels = []
+		voxels.push mainVoxel
+		return voxels
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>

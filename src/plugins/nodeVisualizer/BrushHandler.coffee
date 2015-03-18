@@ -3,9 +3,10 @@ class BrushHandler
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
 		})
-		
+
 		@interactionDisabled = false
 		@legoBrushSelected = false
+		@bigBrushSelected = false
 
 	getBrushes: =>
 		return [{
@@ -26,7 +27,7 @@ class BrushHandler
 			cancelCallback: @_printCancel
 		}]
 
-	_legoSelect: (selectedNode) =>
+	_legoSelect: (selectedNode, @bigBrushSelected) =>
 		@legoBrushSelected = true
 
 		return if @interactionDisabled
@@ -37,7 +38,7 @@ class BrushHandler
 			cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 			cachedData.modelVisualization.setShadowVisibility false
 
-	_printSelect: (selectedNode) =>
+	_printSelect: (selectedNode, @bigBrushSelected) =>
 		@legoBrushSelected = false
 
 		return if @interactionDisabled
@@ -70,7 +71,7 @@ class BrushHandler
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
-			
+
 			@brickVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
 
 	_legoMouseHover: (event, selectedNode) =>

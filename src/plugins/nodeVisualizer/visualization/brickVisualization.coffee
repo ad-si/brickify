@@ -199,6 +199,8 @@ module.exports = class BrickVisualization
 
 	# makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
+		mainVoxel = @getVoxel event, selectedNode, true
+		@_highlightBigBrush mainVoxel if mainVoxel?
 		voxels = @getVoxels event, selectedNode, true, bigBrush
 		return null unless voxels
 
@@ -216,6 +218,8 @@ module.exports = class BrickVisualization
 
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
+		mainVoxel = @getVoxel event, selectedNode, false
+		@_highlightBigBrush mainVoxel if mainVoxel?
 		voxels = @getVoxels event, selectedNode, false, bigBrush
 		return null unless voxels
 

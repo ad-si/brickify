@@ -18,18 +18,22 @@ class Project extends SyncObject
 
 	_initScenes: =>
 		@scenes = []
-		@scenes.active = new Scene()
-		@scenes.push @scenes.active
+		@activeScene = new Scene()
+		@scenes.push @activeScene
 
 	_loadSubObjects: =>
 		_loadScene = (reference) -> Scene.from reference
 		if Array.isArray(@scenes) and @scenes.length > 0
-			return Promise.all(@scenes.map _loadScene)
-				.then (scenes) => @scenes = scenes
+			return Promise.all(@scenes.map _loadScene).then (scenes) =>
+				@scenes = scenes
+				if @activeScene?
+					active = @scenes.find (scene) =>
+						scene.id is @activeScene.dataPacketRef
+				@activeScene = active || @scenes[0]
 		else
 			@_initScenes()
 
 	getScene: ->
-		return @done => @scenes.active
+		return @done => @activeScene
 
 module.exports = Project

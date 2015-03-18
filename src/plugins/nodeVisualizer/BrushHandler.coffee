@@ -75,6 +75,7 @@ class BrushHandler
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 
 			@nodeVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
+			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_legoMouseHover: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -89,6 +90,7 @@ class BrushHandler
 		.then (cachedData) =>
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
 			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -116,6 +118,7 @@ class BrushHandler
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 
 			@nodeVisualizer._relayoutModifiedParts cachedData, touchedVoxels, false
+			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_printMouseHover: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -130,5 +133,6 @@ class BrushHandler
 		.then (cachedData) =>
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
 			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.unhighlightBigBrush()
 
 module.exports = BrushHandler

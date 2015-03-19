@@ -13,6 +13,7 @@ class BrushSelector
 
 	init: (jQueryBrushContainerSelector) =>
 		@_selectedBrush = null
+		@_bigBrushSelected = false
 
 		@brushContainer = $(jQueryBrushContainerSelector)
 
@@ -25,6 +26,7 @@ class BrushSelector
 		@selectedNode = node
 
 		if not @_selectedBrush and @_brushList.length > 0
+			@_bigBrushSelected = false
 			@_brushSelect @_brushList[@_brushList.length - 1]
 
 	onNodeDeselect: (node) =>
@@ -33,17 +35,17 @@ class BrushSelector
 
 	_bindBrushEvent: (brush) ->
 		brush.jqueryObject.on 'click', (event) =>
-			bigBrushSelected = event.shiftKey
-			@_brushSelect brush, bigBrushSelected
+			@_bigBrushSelected = event.shiftKey
+			@_brushSelect brush
 
-	_brushSelect: (brush, bigBrushSelected) =>
+	_brushSelect: (brush) =>
 		# deselect currently selected brush
 		@_deselectBrush @selectedNode
 
 		#select new brush
 		@_selectedBrush = brush
 		brush.jqueryObject.addClass 'active'
-		brush.selectCallback? @selectedNode, bigBrushSelected
+		brush.selectCallback? @selectedNode, @_bigBrushSelected
 
 	_deselectBrush: (node) =>
 		if @_selectedBrush?

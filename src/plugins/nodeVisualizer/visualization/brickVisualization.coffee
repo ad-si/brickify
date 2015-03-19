@@ -35,10 +35,6 @@ module.exports = class BrickVisualization
 		@bricksSubnode.visible = false
 
 	showBricks: =>
-		# update visualization if needed
-		if @bricksVisualizationNeedsUpdate
-			@updateBrickVisualization()
-
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
@@ -114,16 +110,10 @@ module.exports = class BrickVisualization
 		else
 			threeBrick.setStudVisibility true
 
-	# updates the brick reference datastructure and marks brick visualization dirty
-	# if bricks are not currently shown
+	# updates the brick reference datastructure and updates
+	# visible brick visualization
 	updateBricks: (@bricks) =>
-		if @bricksSubnode.visible
-			# update visualization instantly because we are looking at bricks
 			@updateBrickVisualization()
-		else
-			# update visualization if we need it
-			@bricksVisualizationNeedsUpdate = true
-		return
 
 	setStabilityView: (enabled) =>
 		@isStabilityView = enabled
@@ -138,9 +128,7 @@ module.exports = class BrickVisualization
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 		return
 
-
 	updateBrickVisualization: (coloring = @defaultColoring) =>
-		@bricksVisualizationNeedsUpdate = false
 		@bricksSubnode.children = []
 
 		for brickLayer in @bricks

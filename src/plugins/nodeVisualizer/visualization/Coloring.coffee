@@ -27,6 +27,12 @@ module.exports = class Coloring
 			color: 0x00ff00
 		})
 
+		@boxHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0x00ff00
+			opacity: 0.3
+			transparent: true
+		})
+
 		@csgMaterial = new THREE.MeshLambertMaterial({
 			color: 0xb5ffb8 #greenish gray
 		})

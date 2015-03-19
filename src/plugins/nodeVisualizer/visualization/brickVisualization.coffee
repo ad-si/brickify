@@ -62,6 +62,7 @@ module.exports = class BrickVisualization
 	# (re)creates voxel visualization.
 	# hides disabled voxels, updates material and stud visibility
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
+		@unhighlightBigBrush()
 		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
 		recreate
 			@_createVoxelVisualization coloring
@@ -162,7 +163,7 @@ module.exports = class BrickVisualization
 		@showBricks()
 
 	# highlights the voxel below mouse and returns it
-	highlightVoxel: (event, selectedNode, needsToBeLego) =>
+	highlightVoxel: (event, selectedNode, needsToBeLego, bigBrush) =>
 		voxel = @getVoxel event, selectedNode, needsToBeLego
 		if voxel?
 			if @currentlyHighlightedVoxel?
@@ -170,23 +171,47 @@ module.exports = class BrickVisualization
 
 			@currentlyHighlightedVoxel = voxel
 			voxel.setHighlight true, @defaultColoring.highlightMaterial
+			@_highlightBigBrush voxel if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
+			@unhighlightBigBrush()
 
 		return voxel
 
-	# makes the voxel below mouse to be 3d printed
-	makeVoxel3dPrinted: (event, selectedNode) =>
-		voxel = @getVoxel event, selectedNode, true
+	_highlightBigBrush: (voxel) =>
+		size = @_getBrushSize true
+		dimensions = new THREE.Vector3 size.x, size.y, size.z
+		unless @bigBrushHighlight? and
+		@bigBrushHighlight.dimensions.equals dimensions
+			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
+			@bigBrushHighlight = @geometryCreator.getBrickBox(
+				dimensions
+				@defaultColoring.boxHighlightMaterial
+			)
+			@voxelBrickSubnode.add @bigBrushHighlight
 
-		if voxel and voxel.isLego()
-			voxel.make3dPrinted()
-			voxel.setMaterial @defaultColoring.deselectedMaterial
-			@currentlyTouchedVoxels.push voxel
-			return voxel
-		return null
+		@bigBrushHighlight.position.copy voxel.position
+		@bigBrushHighlight.visible = true
+
+	unhighlightBigBrush: =>
+		@bigBrushHighlight?.visible = false
+
+	# makes the voxel below mouse to be 3d printed
+	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
+		if bigBrush
+			mainVoxel = @getVoxel event, selectedNode, true
+			@_highlightBigBrush mainVoxel if mainVoxel?
+		voxels = @getVoxels event, selectedNode, true, bigBrush
+		return null unless voxels
+
+		for voxel in voxels
+			if voxel and voxel.isLego()
+				voxel.make3dPrinted()
+				voxel.setMaterial @defaultColoring.deselectedMaterial
+				@currentlyTouchedVoxels.push voxel
+		return voxels
 
 	resetTouchedVoxelsToLego: =>
 		for voxel in @currentlyTouchedVoxels
@@ -194,16 +219,20 @@ module.exports = class BrickVisualization
 		@currentlyTouchedVoxels = []
 
 	# makes the voxel below mouse to be made out of lego
-	makeVoxelLego: (event, selectedNode) =>
-		voxel = @getVoxel event, selectedNode, false
+	makeVoxelLego: (event, selectedNode, bigBrush) =>
+		if bigBrush
+			mainVoxel = @getVoxel event, selectedNode, false
+			@_highlightBigBrush mainVoxel if mainVoxel?
+		voxels = @getVoxels event, selectedNode, false, bigBrush
+		return null unless voxels
 
-		if voxel and not voxel.isLego()
-			voxel.makeLego()
-			voxel.visible = true
-			voxel.setMaterial @defaultColoring.selectedMaterial
-			@currentlyTouchedVoxels.push voxel
-			return voxel
-		return null
+		for voxel in voxels
+			if voxel and not voxel.isLego()
+				voxel.makeLego()
+				voxel.visible = true
+				voxel.setMaterial @defaultColoring.selectedMaterial
+				@currentlyTouchedVoxels.push voxel
+		return voxels
 
 	resetTouchedVoxelsTo3dPrinted: =>
 		for voxel in @currentlyTouchedVoxels
@@ -219,11 +248,27 @@ module.exports = class BrickVisualization
 		@currentlyTouchedVoxels = []
 		return touchedVoxels
 
+	getVoxels: (event, selectedNode, needsToBeLego, bigBrush) =>
+		mainVoxel = @getVoxel event, selectedNode, needsToBeLego
+		return null unless mainVoxel
+
+		size = @_getBrushSize bigBrush
+		voxels = @grid.getSurrounding mainVoxel.voxelCoords, size, -> true
+		voxels = voxels.map (voxel) -> voxel.visibleVoxel
+		return voxels
+
+	_getBrushSize: (bigBrush) =>
+		return 1 unless bigBrush
+		length = Math.max @grid.numVoxelsX, @grid.numVoxelsY, @grid.numVoxelsZ
+		size = Math.sqrt length
+		height = Math.round size * @grid.heightRatio
+		return x: size, y: size, z: height
+
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>
 		# Get the first lego voxel. cancel if we are above a voxel that
 		# has been handeled in this brush action
-		voxels = @_getIntersectedVoxels event, selectedNode
+		voxels = @_getIntersectedVoxels event
 		return null if not voxels?
 		firstLegoVoxel = voxels[0]
 		lastNonLegoVoxel = voxels[1]
@@ -238,7 +283,7 @@ module.exports = class BrickVisualization
 			if not lastNonLegoVoxel?
 				return null
 
-			# to prevent unecpected selection behavior, it is required
+			# to prevent unexpected selection behavior, it is required
 			# that both voxels are neighbors (otherwise strange
 			# results appear if selecting lego through model geometry)
 			if @_voxelsAreNeighbor lastNonLegoVoxel, firstLegoVoxel
@@ -253,10 +298,10 @@ module.exports = class BrickVisualization
 		return @_getVoxelInMiddleOfPossibleLego event, selectedNode
 
 
-	# returnes the first intersected lego voxel and
+	# returns the first intersected lego voxel and
 	# the last intersected non-lego voxel.
 	# returns null, if cursor is above a currently modified voxel
-	_getIntersectedVoxels: (event, selectedNode) ->
+	_getIntersectedVoxels: (event) ->
 		voxelIntersects =
 			interactionHelper.getIntersections(
 				event
@@ -270,10 +315,10 @@ module.exports = class BrickVisualization
 		for intersection in voxelIntersects
 			voxel = intersection.object.parent
 			continue if not voxel.voxelCoords?
-			# cancel if we are above a voxel we just modified
-			return null if @currentlyTouchedVoxels.indexOf(voxel) >= 0
 
-			if voxel.isLego()
+			modified = voxel in @currentlyTouchedVoxels
+
+			if (voxel.isLego() and not modified) or (not voxel.isLego() and modified)
 				firstLegoVoxel = voxel
 				break
 			else

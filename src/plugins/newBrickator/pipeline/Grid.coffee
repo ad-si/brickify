@@ -7,6 +7,7 @@ module.exports = class Grid
 		@numVoxelsY = 0
 		@numVoxelsZ = 0
 		@zLayers = []
+		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
 
 	setUpForModel: (optimizedModel, options) =>
 		@modelTransform = options.modelTransform
@@ -160,10 +161,12 @@ module.exports = class Grid
 				voxel = @zLayers[vz][vx][vy]
 				list.push voxel if selectionCallback voxel
 
-		size_2 = Math.floor size / 2
-		for vx in [x - size_2 .. x + size_2] by 1
-			for vy in [y - size_2 .. y + size_2] by 1
-				for vz in [z - size_2 .. z + size_2] by 1
+		sizeX_2 = Math.floor size.x / 2
+		sizeY_2 = Math.floor size.y / 2
+		sizeZ_2 = Math.floor size.z / 2
+		for vx in [x - sizeX_2 .. x + sizeX_2] by 1
+			for vy in [y - sizeY_2 .. y + sizeY_2] by 1
+				for vz in [z - sizeZ_2 .. z + sizeZ_2] by 1
 					_collect vx, vy, vz
 
 		return list

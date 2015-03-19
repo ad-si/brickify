@@ -182,7 +182,7 @@ module.exports = class BrickVisualization
 
 	_highlightBigBrush: (voxel) =>
 		size = @_getBrushSize true
-		dimensions = new THREE.Vector3 size, size, size
+		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
 		@bigBrushHighlight.dimensions.equals dimensions
 			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
@@ -260,7 +260,9 @@ module.exports = class BrickVisualization
 	_getBrushSize: (bigBrush) =>
 		return 1 unless bigBrush
 		length = Math.max @grid.numVoxelsX, @grid.numVoxelsY, @grid.numVoxelsZ
-		return Math.sqrt length
+		size = Math.sqrt length
+		height = Math.round size * @grid.heightRatio
+		return x: size, y: size, z: height
 
 	# returns the first visible or raycasterSelectable voxel below the mouse cursor
 	getVoxel: (event, selectedNode, needsToBeLego = false) =>

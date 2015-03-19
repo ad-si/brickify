@@ -97,7 +97,8 @@ class Renderer
 			antialias: true
 			preserveDrawingBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
-			logarithmicDepthBuffer: true
+			logarithmicDepthBuffer: false
+			additionalExtensions: ['EXT_frag_depth']
 		)
 
 		@threeRenderer.setSize @size().width, @size().height

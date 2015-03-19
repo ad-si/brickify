@@ -2,6 +2,7 @@ BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
+RttMaterialGenerator = require './rttMaterialGenerator.coffee'
 
 ###
 # @class NodeVisualizer
@@ -23,6 +24,54 @@ class NodeVisualizer
 		@brushHandler = new BrushHandler(@bundle, @)
 
 	init3d: (@threejsRootNode) =>
+		return
+
+	customRenderPass: (threeRenderer, camera) =>
+		# DEBUG
+
+		# render a cube to a texture
+		if not @debugScene?
+			# enable frag depth extension
+			@debugScene = new THREE.Scene()
+			@debugScene.add new THREE.AmbientLight(0x404040)
+			directionalLight = new THREE.DirectionalLight(0xffffff)
+			directionalLight.position.set 0, 20, 30
+			@debugScene.add directionalLight
+			box = new THREE.BoxGeometry 50, 50, 50
+			mat = new THREE.MeshLambertMaterial { color: 0xffff00 }
+			boxMesh = new THREE.Mesh box, mat
+			@debugScene.add boxMesh
+
+			renderWidth = threeRenderer.domElement.width
+			renderHeight = threeRenderer.domElement.height
+
+			@depthTexture = new THREE.DepthTexture renderWidth, renderHeight
+			@renderTargetTexture = new THREE.WebGLRenderTarget(
+				renderWidth
+				renderHeight
+				{
+					minFilter: THREE.LinearFilter
+					magFilter: THREE.NearestFilter
+					format: THREE.RGBFormat
+					depthTexture: @depthTexture
+				}
+			)
+
+		threeRenderer.render @debugScene, camera, @renderTargetTexture, true
+
+		# now display a quad in the visible scene and render texture on it
+		if not @planeScene?
+			@planeScene = new THREE.Scene()
+			plane = new THREE.PlaneBufferGeometry renderWidth, renderHeight
+			rttMat = RttMaterialGenerator.generateMaterial(
+				@renderTargetTexture, @depthTexture
+			)
+			planeMesh = new THREE.Mesh plane, rttMat
+			planeMesh.position.z = -100
+			@planeScene.add planeMesh
+
+		threeRenderer.render @planeScene, camera
+		# /DEBUG
 		return
 
 	getBrushes: =>

@@ -12,6 +12,9 @@ class Renderer
 		@init globalConfig
 
 	localRenderer: (timestamp) =>
+			# clear screen
+			@threeRenderer.clear()
+
 			# render the default scene (plugins add objects in the init3d hook)
 			@threeRenderer.render @scene, @camera
 
@@ -94,9 +97,11 @@ class Renderer
 			antialias: true
 			preserveDrawingBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
+			logarithmicDepthBuffer: true
 		)
 
 		@threeRenderer.setSize @size().width, @size().height
+		@threeRenderer.autoClear = false
 
 
 	setupScene: (globalConfig) ->

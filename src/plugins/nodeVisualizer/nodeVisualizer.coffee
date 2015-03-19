@@ -2,7 +2,7 @@ BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
-RttMaterialGenerator = require './rttMaterialGenerator.coffee'
+RenderTargetQuadGenerator = require './RenderTargetQuadGenerator'
 
 ###
 # @class NodeVisualizer
@@ -62,13 +62,10 @@ class NodeVisualizer
 		# now display a quad in the visible scene and render texture on it
 		if not @planeScene?
 			@planeScene = new THREE.Scene()
-			plane = new THREE.PlaneBufferGeometry renderWidth, renderHeight
-			rttMat = RttMaterialGenerator.generateMaterial(
+			rttPlane = RenderTargetQuadGenerator.generateQuad(
 				@renderTargetTexture, @depthTexture
 			)
-			planeMesh = new THREE.Mesh plane, rttMat
-			planeMesh.position.z = -100
-			@planeScene.add planeMesh
+			@planeScene.add rttPlane
 
 		threeRenderer.render @planeScene, camera
 		# /DEBUG

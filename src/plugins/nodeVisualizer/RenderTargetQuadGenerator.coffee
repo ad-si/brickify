@@ -1,6 +1,11 @@
 THREE = require 'three'
 
-module.exports.generateMaterial =  (rttTexture, rttDepthTexture) ->
+planeGeometry = new THREE.PlaneBufferGeometry(2,2)
+
+# Generates an THREE.Mesh that will be displayed as a screen aligned quad
+# and will draw the supplied rttTexture while setting the depth value to
+# the values specified in rttDepthTexture
+module.exports.generateQuad =  (rttTexture, rttDepthTexture) ->
 	mat = new THREE.ShaderMaterial({
 		uniforms: {
 			tDepth: { type: 't', value: rttDepthTexture }
@@ -10,14 +15,15 @@ module.exports.generateMaterial =  (rttTexture, rttDepthTexture) ->
 		fragmentShader: fragmentShader()
 	})
 
-	return mat
+	return new THREE.Mesh( planeGeometry, mat )
 
 vertexShader = ->
 	return '
 		varying vec2 vUv;
 		void main() {
 			vUv = uv;
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			/* Dont transform coordinates, make this a screen aligned quad */
+			gl_Position = vec4( position, 1.0 );
 		}
 	'
 fragmentShader = ->
@@ -30,9 +36,6 @@ fragmentShader = ->
 
 		void main() {
 			float depth = texture2D( tDepth, vUv).r;
-			/*depth = smoothstep(0.99, 1.00, depth);*/
-
-			gl_FragColor = vec4(depth, depth, depth, 1.0);
 			gl_FragColor = texture2D( tColor, vUv);
 			gl_FragDepthEXT = depth;
 		}'

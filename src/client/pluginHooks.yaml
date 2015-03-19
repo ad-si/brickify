@@ -25,6 +25,13 @@
 
 - init3d
 
+# ## Custom Render Pass
+# 
+# Plugins that need visuals beyond a node in a default scene (-> init3d) may
+# perform their custom render pass in this call. 
+
+- customRenderPass
+
 # ## Focus manipulation
 #
 # A Plugin can specify that its visualization has a new bounding sphere.

@@ -12,7 +12,12 @@ class Renderer
 		@init globalConfig
 
 	localRenderer: (timestamp) =>
+			# render the default scene (plugins add objects in the init3d hook)
 			@threeRenderer.render @scene, @camera
+
+			# allow for custom render passes
+			@pluginHooks.customRenderPass @threeRenderer, @camera
+
 			@pluginHooks.on3dUpdate timestamp
 			@controls?.update()
 			requestAnimationFrame @localRenderer

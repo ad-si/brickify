@@ -52,7 +52,7 @@ class PointerDispatcher
 		return unless @sceneManager.selectedNode?
 		# ignore interaction with empty space or with the base plane
 		plugin = @_getResponsiblePluginFor event
-		return if not plugin
+		#return if not plugin
 
 		# we have a valid plugin -> we will handle this!
 		@_capturePointerFor event

@@ -18,7 +18,10 @@ module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions = {})
 		}
 		vertexShader: vertexShader()
 		fragmentShader: fragmentShader(shaderOptions)
+		transparent: true
 	})
+
+	console.log mat.fragmentShader
 
 	return new THREE.Mesh( planeGeometry, mat )
 
@@ -36,7 +39,7 @@ fragmentShader = (options) ->
 		#extension GL_EXT_frag_depth : enable\n
 
 		#define OPACITY ' + options.opacity + '\n
-
+		
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tColor;
@@ -45,6 +48,6 @@ fragmentShader = (options) ->
 			float depth = texture2D( tDepth, vUv).r;
 
 			vec3 col = texture2D( tColor, vUv ).rgb;
-			gl_FragColor = vec4( col.r, col.g, col.b, OPACITY );
+			gl_FragColor = vec4( col.r, col.g, col.b, OPACITY);
 			gl_FragDepthEXT = depth;
 		}'

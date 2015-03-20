@@ -41,7 +41,7 @@ class NodeVisualizer
 
 		# Second pass: render object
 		if not @objectSceneTarget?
-			@objectSceneTarget = @_createRenderTarget(threeRenderer, { opacity: 0.5 })
+			@objectSceneTarget = @_createRenderTarget(threeRenderer, { opacity: 0.8 })
 		threeRenderer.render(
 			@objectScene, camera, @objectSceneTarget.renderTarget, true
 		)

@@ -36,49 +36,46 @@ class NodeVisualizer
 		return
 
 	customRenderPass: (threeRenderer, camera) =>
-		# DEBUG
+		# First render pass: render Bricks & Voxels
+		if not @brickSceneTarget?
+			@brickSceneTarget = @_createRenderTarget(threeRenderer)
 
-		# render a cube to a texture
-		if not @debugScene?
-			# enable frag depth extension
-			@debugScene = new THREE.Scene()
-			@debugScene.add new THREE.AmbientLight(0x404040)
-			directionalLight = new THREE.DirectionalLight(0xffffff)
-			directionalLight.position.set 0, 20, 30
-			@debugScene.add directionalLight
-			box = new THREE.BoxGeometry 50, 50, 50
-			mat = new THREE.MeshLambertMaterial { color: 0xffff00 }
-			boxMesh = new THREE.Mesh box, mat
-			@debugScene.add boxMesh
+		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
 
-			renderWidth = threeRenderer.domElement.width
-			renderHeight = threeRenderer.domElement.height
-
-			@depthTexture = new THREE.DepthTexture renderWidth, renderHeight
-			@renderTargetTexture = new THREE.WebGLRenderTarget(
-				renderWidth
-				renderHeight
-				{
-					minFilter: THREE.LinearFilter
-					magFilter: THREE.NearestFilter
-					format: THREE.RGBFormat
-					depthTexture: @depthTexture
-				}
-			)
-
-		threeRenderer.render @debugScene, camera, @renderTargetTexture, true
-
-		# now display a quad in the visible scene and render texture on it
-		if not @planeScene?
-			@planeScene = new THREE.Scene()
-			rttPlane = RenderTargetQuadGenerator.generateQuad(
-				@renderTargetTexture, @depthTexture
-			)
-			@planeScene.add rttPlane
-
-		threeRenderer.render @planeScene, camera
-		# /DEBUG
+		# finally render everything (on planes) on screen
+		threeRenderer.render @brickSceneTarget.planeScene, camera
 		return
+
+	_createRenderTarget: (threeRenderer) ->
+		# Create rendertarget
+		renderWidth = threeRenderer.domElement.width
+		renderHeight = threeRenderer.domElement.height
+
+		depthTexture = new THREE.DepthTexture renderWidth, renderHeight
+		renderTargetTexture = new THREE.WebGLRenderTarget(
+			renderWidth
+			renderHeight
+			{
+				minFilter: THREE.LinearFilter
+				magFilter: THREE.NearestFilter
+				format: THREE.RGBFormat
+				depthTexture: depthTexture
+			}
+		)
+
+		#create scene to render texture
+		planeScene = new THREE.Scene()
+		rttPlane = RenderTargetQuadGenerator.generateQuad(
+			renderTargetTexture, depthTexture
+		)
+		planeScene.add rttPlane
+
+		return {
+			depthTexture: depthTexture
+			renderTarget: renderTargetTexture
+			planeScene: planeScene
+		}
+		 
 
 	getBrushes: =>
 		return @brushHandler.getBrushes()

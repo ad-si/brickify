@@ -24,6 +24,15 @@ class NodeVisualizer
 		@brushHandler = new BrushHandler(@bundle, @)
 
 	init3d: (@threejsRootNode) =>
+		# Voxels / Bricks are rendered as a first render pass
+		@brickScene = @bundle.renderer.getDefaultScene()
+
+		# Objects are rendered in the 2nd / 3rd render pass
+		@objectScene = @bundle.renderer.getDefaultScene()
+
+		# LegoShadow is rendered as a 3rd rendering pass
+		@brickShadowScene = @bundle.renderer.getDefaultScene()
+		
 		return
 
 	customRenderPass: (threeRenderer, camera) =>
@@ -100,7 +109,9 @@ class NodeVisualizer
 				@zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
-		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
+		@brickScene.remove threeHelper.find node, @brickScene
+		@brickShadowScene.remove threeHelper.find node, @brickShadowScene
+		@objectScene.remove threeHelper.find node, @objectScene
 
 	zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode
@@ -137,17 +148,27 @@ class NodeVisualizer
 
 	# creates visualization datastructures
 	_createNodeDatastructure: (node) =>
-		threeNode = new THREE.Object3D()
-		@threejsRootNode.add threeNode
-		threeHelper.link node, threeNode
+		brickThreeNode = new THREE.Object3D()
+		@brickScene.add brickThreeNode
+
+		brickShadowThreeNode = new THREE.Object3D()
+		@brickShadowScene.add brickShadowThreeNode
+		
+		modelThreeNode = new THREE.Object3D()
+		@objectScene.add modelThreeNode
+
+		threeHelper.link node, brickThreeNode
+		threeHelper.link node, brickShadowThreeNode
+		threeHelper.link node, modelThreeNode
 
 		data = {
 			initialized: false
 			node: node
-			threeNode: threeNode
-			brickVisualization: new BrickVisualization @bundle, threeNode
+			brickVisualization: new BrickVisualization(
+				@bundle, brickThreeNode, brickShadowThreeNode
+			)
 			modelVisualization: new ModelVisualization(
-				@bundle.globalConfig, node, threeNode
+				@bundle.globalConfig, node, modelThreeNode
 			)
 		}
 

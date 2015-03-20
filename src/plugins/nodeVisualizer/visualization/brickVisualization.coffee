@@ -7,15 +7,16 @@ VoxelWireframe = require './VoxelWireframe'
 
 # This class represents the visualization of Voxels and Bricks
 module.exports = class BrickVisualization
-	constructor: (@bundle, @threeNode) ->
+	constructor: (@bundle, @brickThreeNode, @brickShadowThreeNode) ->
 		@csgSubnode = new THREE.Object3D()
-		@threeNode.add @csgSubnode
+		@brickThreeNode.add @csgSubnode
 
 		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @voxelsSubnode
 		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
+		@brickThreeNode.add @voxelBrickSubnode
 
 		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
@@ -26,8 +27,7 @@ module.exports = class BrickVisualization
 		@isStabilityView = false
 
 	initialize: (@grid) =>
-		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
-		@threeNode.add @voxelBrickSubnode
+		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @brickShadowThreeNode)
 		@geometryCreator = new GeometryCreator(@grid)
 
 	showVoxels: =>

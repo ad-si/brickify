@@ -5,11 +5,8 @@ planeGeometry = new THREE.PlaneBufferGeometry(2,2)
 # Generates an THREE.Mesh that will be displayed as a screen aligned quad
 # and will draw the supplied rttTexture while setting the depth value to
 # the values specified in rttDepthTexture
-module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions = {}) ->
-	if not shaderOptions.opacity?
-		shaderOptions.opacity = '1.00'
-	else
-		shaderOptions.opacity = parseFloat(shaderOptions.opacity).toFixed(2)
+module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
+	shaderOptions = setDefaultOptions shaderOptions
 
 	mat = new THREE.ShaderMaterial({
 		uniforms: {
@@ -20,8 +17,6 @@ module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions = {})
 		fragmentShader: fragmentShader(shaderOptions)
 		transparent: true
 	})
-
-	console.log mat.fragmentShader
 
 	return new THREE.Mesh( planeGeometry, mat )
 
@@ -39,15 +34,25 @@ fragmentShader = (options) ->
 		#extension GL_EXT_frag_depth : enable\n
 
 		#define OPACITY ' + options.opacity + '\n
-		
+
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tColor;
 
 		void main() {
-			float depth = texture2D( tDepth, vUv).r;
-
+			float depth  = texture2D( tDepth, vUv).r;
 			vec3 col = texture2D( tColor, vUv ).rgb;
+
 			gl_FragColor = vec4( col.r, col.g, col.b, OPACITY);
 			gl_FragDepthEXT = depth;
 		}'
+
+setDefaultOptions = (shaderOptions) ->
+	shaderOptions = {} if not shaderOptions?
+
+	if not shaderOptions.opacity?
+		shaderOptions.opacity = '1.00'
+	else
+		shaderOptions.opacity = parseFloat(shaderOptions.opacity).toFixed(2)
+
+	return shaderOptions

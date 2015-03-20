@@ -46,9 +46,26 @@ class NodeVisualizer
 			@objectScene, camera, @objectSceneTarget.renderTarget, true
 		)
 
+		# Third pass: render shadows
+		if not @brickShadowSceneTarget?
+			@brickShadowSceneTarget = @_createRenderTarget(
+				threeRenderer, { opacity: 0.5 }
+			)
+		threeRenderer.render(
+			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true
+		)
+
 		# finally render everything (on planes) on screen
+
+		# bricks
 		threeRenderer.render @brickSceneTarget.planeScene, camera
+		
+		# the visible parts of the object
 		threeRenderer.render @objectSceneTarget.planeScene, camera
+		
+		# this-could-be-lego-shadows
+		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
+
 		return
 
 	_createRenderTarget: (threeRenderer, shaderOptions) ->

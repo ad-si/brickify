@@ -173,12 +173,12 @@ module.exports = class BrickVisualization
 		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
 		@bigBrushHighlight.dimensions.equals dimensions
-			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
+			@brickShadowThreeNode.remove @bigBrushHighlight if @bigBrushHighlight
 			@bigBrushHighlight = @geometryCreator.getBrickBox(
 				dimensions
 				@defaultColoring.boxHighlightMaterial
 			)
-			@voxelBrickSubnode.add @bigBrushHighlight
+			@brickShadowThreeNode.add @bigBrushHighlight
 
 		@bigBrushHighlight.position.copy voxel.position
 		@bigBrushHighlight.visible = true

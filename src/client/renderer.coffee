@@ -69,12 +69,11 @@ class Renderer
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
 
-	init: (globalConfig) ->
-		@setupSize globalConfig
-		@setupRenderer globalConfig
-		@setupScene globalConfig
-		@setupLighting globalConfig
-		@setupCamera globalConfig
+	init: (@globalConfig) ->
+		@setupSize @globalConfig
+		@setupRenderer @globalConfig
+		@scene = @getDefaultScene()
+		@setupCamera @globalConfig
 		requestAnimationFrame @localRenderer
 
 	setupSize: (globalConfig) ->
@@ -106,7 +105,8 @@ class Renderer
 
 
 	setupScene: (globalConfig) ->
-		@scene = new THREE.Scene()
+		scene = new THREE.Scene()
+
 		# Scene rotation because orbit controls only works
 		# with up vector of 0, 1, 0
 		sceneRotation = new THREE.Matrix4()
@@ -114,12 +114,15 @@ class Renderer
 			new THREE.Vector3( 1, 0, 0 ),
 			(-Math.PI / 2)
 		)
-		@scene.applyMatrix(sceneRotation)
-		@scene.fog = new THREE.Fog(
+
+		scene.applyMatrix(sceneRotation)
+		scene.fog = new THREE.Fog(
 			globalConfig.colors.background
 			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)
+
+		return scene
 
 	setupCamera: (globalConfig) ->
 		@camera = new THREE.PerspectiveCamera(
@@ -148,21 +151,27 @@ class Renderer
 			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
 			@controls.target.set(0, 0, 0)
 
-	setupLighting: (globalConfig) ->
+	setupLighting: (scene) ->
 		ambientLight = new THREE.AmbientLight(0x404040)
-		@scene.add ambientLight
+		scene.add ambientLight
 
 		directionalLight = new THREE.DirectionalLight(0xffffff)
 		directionalLight.position.set 0, 20, 30
-		@scene.add directionalLight
+		scene.add directionalLight
 
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, 0, 30
-		@scene.add directionalLight
+		scene.add directionalLight
 
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, -20, -30
-		@scene.add directionalLight
+		scene.add directionalLight
+
+	# creates a scene wit default light and rotation settings
+	getDefaultScene: =>
+		scene = @setupScene(@globalConfig)
+		@setupLighting(scene)
+		return scene
 
 	loadCamera: (state) =>
 		if state.controls?

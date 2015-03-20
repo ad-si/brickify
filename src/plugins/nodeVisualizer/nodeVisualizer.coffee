@@ -11,8 +11,6 @@ class NodeVisualizer
 	constructor: ->
 		@printMaterial = new THREE.MeshLambertMaterial({
 			color: 0xeeeeee
-			opacity: 0.8
-			transparent: true
 		})
 
 		# remove z-Fighting on baseplate
@@ -39,14 +37,21 @@ class NodeVisualizer
 		# First render pass: render Bricks & Voxels
 		if not @brickSceneTarget?
 			@brickSceneTarget = @_createRenderTarget(threeRenderer)
-
 		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
+
+		# Second pass: render object
+		if not @objectSceneTarget?
+			@objectSceneTarget = @_createRenderTarget(threeRenderer, { opacity: 0.5 })
+		threeRenderer.render(
+			@objectScene, camera, @objectSceneTarget.renderTarget, true
+		)
 
 		# finally render everything (on planes) on screen
 		threeRenderer.render @brickSceneTarget.planeScene, camera
+		threeRenderer.render @objectSceneTarget.planeScene, camera
 		return
 
-	_createRenderTarget: (threeRenderer) ->
+	_createRenderTarget: (threeRenderer, shaderOptions) ->
 		# Create rendertarget
 		renderWidth = threeRenderer.domElement.width
 		renderHeight = threeRenderer.domElement.height
@@ -66,7 +71,7 @@ class NodeVisualizer
 		#create scene to render texture
 		planeScene = new THREE.Scene()
 		rttPlane = RenderTargetQuadGenerator.generateQuad(
-			renderTargetTexture, depthTexture
+			renderTargetTexture, depthTexture, shaderOptions
 		)
 		planeScene.add rttPlane
 
@@ -74,6 +79,7 @@ class NodeVisualizer
 			depthTexture: depthTexture
 			renderTarget: renderTargetTexture
 			planeScene: planeScene
+			blendingMaterial: rttPlane.material
 		}
 		 
 

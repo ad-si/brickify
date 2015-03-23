@@ -61,7 +61,7 @@ b1 = bundle1.init().then ->
 		b2.then -> bundle2.sceneManager.clearScene()
 		loadAndConvert hash, true
 
-	callback = -> fileLoader.onLoadFile(event, $('.dropper'), loadModel)
+	callback = (event) -> fileLoader.onLoadFile event, $('.dropper'), loadModel
 
 	fileDropper = require './fileDropper'
 	fileDropper.init callback

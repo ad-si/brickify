@@ -24,7 +24,7 @@ class BrickVisualization
 		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
 
-		@modifiedVoxels = []
+		@printVoxels = []
 
 		@isStabilityView = false
 
@@ -76,16 +76,8 @@ class BrickVisualization
 			@_updateVoxel v
 
 		# show not filled lego shape as outline
-		outlineVoxels = []
-		for v in @modifiedVoxels
-			if not v.isLego()
-				outlineVoxels.push {
-					x: v.voxelCoords.x
-					y: v.voxelCoords.y
-					z: v.voxelCoords.z
-				}
-
-		@voxelWireframe.createWireframe outlineVoxels
+		outlineCoords = @printVoxels.map (voxel) -> voxel.voxelCoords
+		@voxelWireframe.createWireframe outlineCoords
 
 	setPossibleLegoBoxVisibility: (isVisible) =>
 		@voxelWireframe.setVisibility isVisible
@@ -225,9 +217,11 @@ class BrickVisualization
 		voxel.make3dPrinted() for voxel in @voxelSelector.touchedVoxels
 		@voxelSelector.clearSelection()
 
-	# moves all currenly touched voxels to modified voxels
+	# clears the selection and updates the possibleLegoWireframe
 	updateModifiedVoxels: =>
-		@modifiedVoxels = @modifiedVoxels.concat @voxelSelector.touchedVoxels
+		@printVoxels = @printVoxels
+			.concat @voxelSelector.touchedVoxels
+			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
 
 module.exports = BrickVisualization

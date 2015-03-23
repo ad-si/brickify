@@ -35,7 +35,7 @@ class ModelVisualization
 			ambient: @globalConfig.colors.object
 		)
 
-		@lineMat = new THREE.MeshBasicMaterial({
+		@lineMat = new THREE.LineBasicMaterial({
 			color: 0x000000
 		})
 	_createVisualization: (node, threejsNode) =>

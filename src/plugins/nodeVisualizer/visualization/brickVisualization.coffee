@@ -147,8 +147,8 @@ class BrickVisualization
 		@showBricks()
 
 	# highlights the voxel below mouse and returns it
-	highlightVoxel: (event, selectedNode, needsToBeLego, bigBrush) =>
-		voxel = @voxelSelector.getVoxel event, {type: if needsToBeLego then 'lego' else '3d'}
+	highlightVoxel: (event, selectedNode, type, bigBrush) =>
+		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false

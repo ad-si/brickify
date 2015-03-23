@@ -38,10 +38,16 @@ fragmentShader = (options) ->
 	else
 		blackOpaque = ''
 
+	if options.expandBlack
+		expandBlack = '#define EXPAND_BLACK\n'
+	else
+		expandBlack = ''
+
 	return '
 		#extension GL_EXT_frag_depth : enable\n
 
 		' + blackOpaque + '
+		' + expandBlack + '
 
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
@@ -59,6 +65,7 @@ fragmentShader = (options) ->
 
 			vec3 col = texture2D( tColor, vUv ).rgb;
 
+			\n#ifdef EXPAND_BLACK\n
 			const int kernel = 2;
 			bool isLine = false;
  			
@@ -79,6 +86,7 @@ fragmentShader = (options) ->
 				col.g = 0.0;
 				col.b = 0.0;
 			}
+			\n#endif\n
 
 			col.r = col.r * colorMult.r;
 			col.g = col.g * colorMult.g;
@@ -102,5 +110,6 @@ setDefaultOptions = (shaderOptions) ->
 	shaderOptions.opacity ?= 1.0
 	shaderOptions.colorMult ?= new THREE.Vector3(1,1,1)
 	shaderOptions.blackAlwaysOpaque ?= false
+	shaderOptions.expandBlack ?= false
 
 	return shaderOptions

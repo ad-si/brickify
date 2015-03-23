@@ -49,7 +49,8 @@ class NodeVisualizer
 		# Second pass: render object
 		if not @objectSceneTarget?
 			@objectSceneTarget = @_createRenderTarget(
-				threeRenderer, { opacity: @objectOpacity }
+				threeRenderer,
+				{ opacity: @objectOpacity, expandBlack: true }
 			)
 		threeRenderer.render(
 			@objectScene, camera, @objectSceneTarget.renderTarget, true
@@ -58,7 +59,8 @@ class NodeVisualizer
 		# Third pass: render shadows
 		if not @brickShadowSceneTarget?
 			@brickShadowSceneTarget = @_createRenderTarget(
-				threeRenderer, { opacity: @brickShadowOpacity, blackAlwaysOpaque: true }
+				threeRenderer,
+				{ opacity: @brickShadowOpacity, blackAlwaysOpaque: true, expandBlack: true }
 			)
 		threeRenderer.render(
 			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true

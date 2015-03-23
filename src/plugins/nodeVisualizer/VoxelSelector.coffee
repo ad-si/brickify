@@ -11,6 +11,8 @@ class VoxelSelector
 		@grid = brickVisualization.grid
 		@voxelWireframe = brickVisualization.voxelWireframe
 
+		@touchedVoxels = []
+
 	###
 	# Gets the voxels to be processed in the given event.
 	# @param {Object} event usually a mouse or tap or pointer event
@@ -19,12 +21,18 @@ class VoxelSelector
 	# @param {String} [options.type='lego'] 'lego' or '3d'
 	###
 	getVoxels: (event, options) =>
+		type = options.type || 'lego'
+
 		mainVoxel = @getVoxel event, options
 		return null unless mainVoxel?.voxelCoords?
 
 		size = @getBrushSize options.bigBrush
-		voxels = @grid.getSurrounding mainVoxel.voxelCoords, size, -> true
-		return voxels.map (voxel) -> voxel.visibleVoxel
+		gridEntries = @grid.getSurrounding mainVoxel.voxelCoords, size, -> true
+		voxels = gridEntries
+			.map (voxel) -> voxel.visibleVoxel
+			.filter (voxel) => @_hasType voxel, type
+		@touchedVoxels = @touchedVoxels.concat voxels
+		return voxels
 
 	###
 	# Gets the voxel to be processed in the given event.
@@ -38,15 +46,13 @@ class VoxelSelector
 		intersections = @_getIntersections event
 		voxels = intersections.map (intersection) -> intersection.object.parent
 
-		frontierVoxel = @_getFrontierVoxel voxels, type
-		return frontierVoxel if frontierVoxel?
-		baseplateVoxel = @_getBaseplateVoxel type
-		return baseplateVoxel if baseplateVoxel?
+		voxel = @_getFrontierVoxel voxels, type
+		voxel ?= @_getBaseplateVoxel type
 		if type is '3d'
-			middleVoxel = @_getMiddleVoxel event
-			return middleVoxel if middleVoxel?
+			voxel ?= @_getMiddleVoxel event
 
-		return null
+		@touchedVoxels.push voxel if voxel?
+		return voxel
 
 	_getFrontierVoxel: (voxels, type) ->
 		frontier = voxels.findIndex (voxel) -> voxel.isLego()
@@ -64,9 +70,7 @@ class VoxelSelector
 		voxel = gridEntry?.visibleVoxel
 		return null unless voxel?
 
-		if type is '3d' and not voxel.isLego()
-			return voxel
-		else if type is 'lego' and voxel.isLego()
+		if @_hasType voxel, type
 			return voxel
 		else
 			return null
@@ -100,6 +104,10 @@ class VoxelSelector
 			@renderer
 			@node.children
 		)
+
+	_hasType: (voxel, type) ->
+		return voxel.isLego() and type is 'lego' or
+			not voxel.isLego() and type is '3d'
 
 	###
 	# Gets the brush size to be used dependent on the `bigBrush` flag

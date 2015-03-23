@@ -58,7 +58,7 @@ class NodeVisualizer
 		# Third pass: render shadows
 		if not @brickShadowSceneTarget?
 			@brickShadowSceneTarget = @_createRenderTarget(
-				threeRenderer, { opacity: @brickShadowOpacity }
+				threeRenderer, { opacity: @brickShadowOpacity, blackAlwaysOpaque: true }
 			)
 		threeRenderer.render(
 			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true

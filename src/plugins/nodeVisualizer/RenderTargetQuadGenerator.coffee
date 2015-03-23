@@ -33,8 +33,15 @@ vertexShader = (options) ->
 		}
 	'
 fragmentShader = (options) ->
+	if options.blackAlwaysOpaque
+		blackOpaque = '#define BLACK_ALWAYS_OPAQUE\n'
+	else
+		blackOpaque = ''
+
 	return '
 		#extension GL_EXT_frag_depth : enable\n
+
+		' + blackOpaque + '
 
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
@@ -77,17 +84,23 @@ fragmentShader = (options) ->
 			col.g = col.g * colorMult.g;
 			col.b = col.b * colorMult.b;
 
-			gl_FragColor = vec4( col.r, col.g, col.b, opacity);
+			float currentOpacity = opacity;
+			
+			\n#ifdef BLACK_ALWAYS_OPAQUE\n
+			if (col.r < 0.01 && col.g < 0.01 && col.b < 0.01){
+				currentOpacity = 1.0;
+			}
+			\n#endif\n
+
+			gl_FragColor = vec4( col.r, col.g, col.b, currentOpacity);
 			gl_FragDepthEXT = depth;
 		}'
 
 setDefaultOptions = (shaderOptions) ->
 	shaderOptions = {} if not shaderOptions?
 
-	if not shaderOptions.opacity?
-		shaderOptions.opacity = 1.0
-
-	if not shaderOptions.colorMult?
-		shaderOptions.colorMult = new THREE.Vector3(1,1,1)
+	shaderOptions.opacity ?= 1.0
+	shaderOptions.colorMult ?= new THREE.Vector3(1,1,1)
+	shaderOptions.blackAlwaysOpaque ?= false
 
 	return shaderOptions

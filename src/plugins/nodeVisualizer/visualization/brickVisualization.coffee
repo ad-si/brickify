@@ -5,8 +5,11 @@ StabilityColoring = require './StabilityColoring'
 interactionHelper = require '../../../client/interactionHelper'
 VoxelWireframe = require './VoxelWireframe'
 
-# This class represents the visualization of Voxels and Bricks
-module.exports = class BrickVisualization
+###
+# This class provides visualization for Voxels and Bricks
+# @class BrickVisualization
+###
+class BrickVisualization
 	constructor: (@bundle, @threeNode) ->
 		@csgSubnode = new THREE.Object3D()
 		@threeNode.add @csgSubnode
@@ -368,3 +371,4 @@ module.exports = class BrickVisualization
 			# no model selected / enough intersections to get a 'middle voxel'
 			return null
 
+module.exports = BrickVisualization

@@ -24,7 +24,6 @@ class BrickVisualization
 		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
 
-		@currentlyTouchedVoxels = []
 		@modifiedVoxels = []
 
 		@isStabilityView = false
@@ -200,16 +199,13 @@ class BrickVisualization
 		return null unless voxels
 
 		for voxel in voxels
-			if voxel and voxel.isLego()
-				voxel.make3dPrinted()
-				voxel.setMaterial @defaultColoring.deselectedMaterial
-				@currentlyTouchedVoxels.push voxel
+			voxel.make3dPrinted()
+			voxel.setMaterial @defaultColoring.deselectedMaterial
 		return voxels
 
 	resetTouchedVoxelsToLego: =>
-		for voxel in @currentlyTouchedVoxels
-			voxel.makeLego()
-		@currentlyTouchedVoxels = []
+		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
+		@voxelSelector.clearSelection()
 
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
@@ -220,25 +216,18 @@ class BrickVisualization
 		return null unless voxels
 
 		for voxel in voxels
-			if voxel and not voxel.isLego()
-				voxel.makeLego()
-				voxel.visible = true
-				voxel.setMaterial @defaultColoring.selectedMaterial
-				@currentlyTouchedVoxels.push voxel
+			voxel.makeLego()
+			voxel.visible = true
+			voxel.setMaterial @defaultColoring.selectedMaterial
 		return voxels
 
 	resetTouchedVoxelsTo3dPrinted: =>
-		for voxel in @currentlyTouchedVoxels
-			voxel.make3dPrinted()
-		@currentlyTouchedVoxels = []
+		voxel.make3dPrinted() for voxel in @voxelSelector.touchedVoxels
+		@voxelSelector.clearSelection()
 
 	# moves all currenly touched voxels to modified voxels
 	updateModifiedVoxels: =>
-		for v in @currentlyTouchedVoxels
-			@modifiedVoxels.push v
-
-		touchedVoxels = @currentlyTouchedVoxels.slice 0
-		@currentlyTouchedVoxels = []
-		return touchedVoxels
+		@modifiedVoxels = @modifiedVoxels.concat @voxelSelector.touchedVoxels
+		return @voxelSelector.clearSelection()
 
 module.exports = BrickVisualization

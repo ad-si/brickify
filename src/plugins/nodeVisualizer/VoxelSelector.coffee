@@ -120,4 +120,13 @@ class VoxelSelector
 		height = Math.round size * @grid.heightRatio
 		return x: size, y: size, z: height
 
+	###
+	# Clears the current collection of touched voxels.
+	# @return {Array<BrickObject>} the touched voxels before clearing
+	###
+	clearSelection: =>
+		tmp = @touchedVoxels
+		@touchedVoxels = []
+		return tmp
+
 module.exports = VoxelSelector

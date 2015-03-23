@@ -2,6 +2,7 @@ Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi'
 fileDropper = require '../fileDropper'
+fileLoader = require '../../landingpage/fileLoader'
 
 ###
 # @module ui
@@ -15,10 +16,7 @@ module.exports = class Ui
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) =>
-		event.stopPropagation()
-		event.preventDefault()
-		files = event.target.files ? event.dataTransfer.files
-		@bundle.modelLoader.readFiles files if files?
+		fileLoader.onLoadFile event, $('#loadButton'), @bundle.modelLoader.loadByHash
 
 	dragOverHandler: (event) =>
 		event.stopPropagation()
@@ -41,7 +39,7 @@ module.exports = class Ui
 		fileDropper.init @fileLoadHandler
 
 		# event listener
-		$('#loadButton').on 'change', (event) =>
+		$('#fileInput').on 'change', (event) =>
 			@fileLoadHandler event
 			$('#fileInput').val('')
 

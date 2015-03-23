@@ -38,14 +38,15 @@ class ModelLoader
 
 	load: (model) =>
 		modelData = model.toBase64()
-		hash = md5(modelData)
+		hash = md5 modelData
 		fileName = model.originalFileName
 		modelCache.store model
 		@addModelToScene fileName, hash, model
+
 	loadByHash: (hash) =>
 		modelCache
-		.request(hash)
-		.then(@load)
+		.request hash
+		.then @load
 		.catch (error) ->
 			console.error "Could not load model from hash #{hash}"
 			console.error error
@@ -79,10 +80,10 @@ class ModelLoader
 
 		model.forEachPolygon (p0, p1, p2, n) =>
 			#find lowest z value (for whole model)
-			minZ  = Math.min(p0.z, p1.z, p2.z)
+			minZ  = Math.min p0.z, p1.z, p2.z
 
 			result.z ?= minZ
-			result.z = Math.min(result.z, minZ)
+			result.z = Math.min result.z, minZ
 
 			xValues = [p0.x, p1.x, p2.x]
 			yValues = [p0.y, p1.y, p2.y]

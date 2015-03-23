@@ -66,7 +66,7 @@ b1 = bundle1.init().then ->
 	fileDropper = require '../client/fileDropper'
 	fileDropper.init callback
 
-	fileInput = document.getElementById('fileSelector')
+	fileInput = document.getElementById('fileInput')
 	fileInput.addEventListener 'change', (event) ->
 		callback event
 		@value = ''

@@ -16,7 +16,9 @@ module.exports = class Ui
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) =>
-		fileLoader.onLoadFile event, $('#loadButton'), @bundle.modelLoader.loadByHash
+		fileLoader.onLoadFile event,
+			document.getElementById 'loadButton'
+			@bundle.modelLoader.loadByHash
 
 	dragOverHandler: (event) =>
 		event.stopPropagation()

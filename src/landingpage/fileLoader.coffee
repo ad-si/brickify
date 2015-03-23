@@ -10,7 +10,7 @@ uploadString = 'Uploading file
 loadedString = 'File loaded!'
 errorString = 'Import failed!'
 
-module.exports.onLoadFile = (event, feedbackTargets, finishedCallback) ->
+module.exports.onLoadFile = (event, feedbackTarget, finishedCallback) ->
 	uploadFinishedCallback = finishedCallback
 
 	event.preventDefault()
@@ -22,8 +22,8 @@ module.exports.onLoadFile = (event, feedbackTargets, finishedCallback) ->
 
 		fn = file.name.toLowerCase()
 		if (fn.search('.stl') == fn.length - 4)
-			feedbackTargets.each (i, el) -> el.innerHTML = readingString
-			loadFile feedbackTargets, file
+			feedbackTarget.innerHTML = readingString
+			loadFile feedbackTarget, file
 		else
 			bootbox.alert({
 				title: 'Your file does not have the right format!'
@@ -31,12 +31,12 @@ module.exports.onLoadFile = (event, feedbackTargets, finishedCallback) ->
 adding more file formats'
 			})
 
-loadFile = (feedbackTargets, file) ->
+loadFile = (feedbackTarget, file) ->
 	reader = new FileReader()
-	reader.onload = handleLoadedFile(feedbackTargets, file.name)
+	reader.onload = handleLoadedFile(feedbackTarget, file.name)
 	reader.readAsArrayBuffer(file)
 
-handleLoadedFile = (feedbackTargets, filename) ->
+handleLoadedFile = (feedbackTarget, filename) ->
 	loadCallback = 	(event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
@@ -47,15 +47,15 @@ handleLoadedFile = (feedbackTargets, filename) ->
 					title: 'Import failed'
 					message: 'Your file contains errors that we could not fix automatically.'
 				})
-				feedbackTargets.each (i, el) -> el.innerHTML = errorString
+				feedbackTarget.innerHTML = errorString
 				return
 
 			optimizedModel.originalFileName = filename
 
-			feedbackTargets.each (i, el) -> el.innerHTML = uploadString
+			feedbackTarget.innerHTML = uploadString
 
 			ufc = (md5hash) ->
-				feedbackTargets.each (i, el) -> el.innerHTML = loadedString
+				feedbackTarget.innerHTML = loadedString
 				if uploadFinishedCallback?
 					uploadFinishedCallback(md5hash)
 

@@ -1,3 +1,5 @@
+lastTarget = null
+
 module.exports.init = (callback) ->
 	target = document.body
 	overlay = addOverlay target
@@ -19,12 +21,14 @@ bindDropHandler = (target, overlay, callback) ->
 		(event) ->
 			hideOverlay overlay
 			callback event
-	target.addEventListener 'dragover',
+	target.addEventListener 'dragenter',
 		(event) ->
 			ignoreEvent event
 			showOverlay overlay
+			lastTarget = event.target
 	target.addEventListener 'dragleave',
 		(event) ->
+			return unless event.target is lastTarget
 			ignoreEvent event
 			hideOverlay overlay
 

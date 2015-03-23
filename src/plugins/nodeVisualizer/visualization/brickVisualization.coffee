@@ -4,6 +4,7 @@ Coloring = require './Coloring'
 StabilityColoring = require './StabilityColoring'
 interactionHelper = require '../../../client/interactionHelper'
 VoxelWireframe = require './VoxelWireframe'
+VoxelSelector = require '../VoxelSelector'
 
 ###
 # This class provides visualization for Voxels and Bricks
@@ -32,6 +33,7 @@ class BrickVisualization
 		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
 		@threeNode.add @voxelBrickSubnode
 		@geometryCreator = new GeometryCreator(@grid)
+		@voxelSelector = new VoxelSelector @
 
 	showVoxels: =>
 		@voxelsSubnode.visible = true
@@ -155,7 +157,7 @@ class BrickVisualization
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, needsToBeLego, bigBrush) =>
-		voxel = @getVoxel event, selectedNode, needsToBeLego
+		voxel = @voxelSelector.getVoxel event, {type: if needsToBeLego then 'lego' else '3d'}
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
@@ -172,7 +174,7 @@ class BrickVisualization
 		return voxel
 
 	_highlightBigBrush: (voxel) =>
-		size = @_getBrushSize true
+		size = @voxelSelector.getBrushSize true
 		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
 		@bigBrushHighlight.dimensions.equals dimensions
@@ -192,9 +194,9 @@ class BrickVisualization
 	# makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
 		if bigBrush
-			mainVoxel = @getVoxel event, selectedNode, true
+			mainVoxel = @voxelSelector.getVoxel event, {type: 'lego'}
 			@_highlightBigBrush mainVoxel if mainVoxel?
-		voxels = @getVoxels event, selectedNode, true, bigBrush
+		voxels = @voxelSelector.getVoxels event, {type: 'lego', bigBrush: bigBrush}
 		return null unless voxels
 
 		for voxel in voxels
@@ -212,9 +214,9 @@ class BrickVisualization
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
 		if bigBrush
-			mainVoxel = @getVoxel event, selectedNode, false
+			mainVoxel = @voxelSelector.getVoxel event, {type: '3d'}
 			@_highlightBigBrush mainVoxel if mainVoxel?
-		voxels = @getVoxels event, selectedNode, false, bigBrush
+		voxels = @voxelSelector.getVoxels event, {type: '3d', bigBrush: bigBrush}
 		return null unless voxels
 
 		for voxel in voxels
@@ -238,137 +240,5 @@ class BrickVisualization
 		touchedVoxels = @currentlyTouchedVoxels.slice 0
 		@currentlyTouchedVoxels = []
 		return touchedVoxels
-
-	getVoxels: (event, selectedNode, needsToBeLego, bigBrush) =>
-		mainVoxel = @getVoxel event, selectedNode, needsToBeLego
-		return null unless mainVoxel
-
-		size = @_getBrushSize bigBrush
-		voxels = @grid.getSurrounding mainVoxel.voxelCoords, size, -> true
-		voxels = voxels.map (voxel) -> voxel.visibleVoxel
-		return voxels
-
-	_getBrushSize: (bigBrush) =>
-		return x: 1, y: 1, z: 1 unless bigBrush
-		length = Math.max @grid.numVoxelsX, @grid.numVoxelsY, @grid.numVoxelsZ
-		size = Math.sqrt length
-		height = Math.round size * @grid.heightRatio
-		return x: size, y: size, z: height
-
-	# returns the first visible or raycasterSelectable voxel below the mouse cursor
-	getVoxel: (event, selectedNode, needsToBeLego = false) =>
-		# Get the first lego voxel. cancel if we are above a voxel that
-		# has been handeled in this brush action
-		voxels = @_getIntersectedVoxels event
-		return null if not voxels?
-		firstLegoVoxel = voxels[0]
-		lastNonLegoVoxel = voxels[1]
-
-
-		# if we may only select lego voxels, we are done
-		if needsToBeLego
-			return firstLegoVoxel
-
-		# return the last non-visible voxel to prevent occlusion
-		if firstLegoVoxel?
-			if not lastNonLegoVoxel?
-				return null
-
-			# to prevent unexpected selection behavior, it is required
-			# that both voxels are neighbors (otherwise strange
-			# results appear if selecting lego through model geometry)
-			if @_voxelsAreNeighbor lastNonLegoVoxel, firstLegoVoxel
-				return lastNonLegoVoxel
-		else
-			# if there is no lego voxel, maybe we are pointing at the baseplate?
-			if @_pointsTowardsBaseplate event
-				return lastNonLegoVoxel
-
-		# no lego voxel and not pointing towards the baseplate.
-		# return voxel in middle of what could be lego as a last chance
-		return @_getVoxelInMiddleOfPossibleLego event, selectedNode
-
-
-	# returns the first intersected lego voxel and
-	# the last intersected non-lego voxel.
-	# returns null, if cursor is above a currently modified voxel
-	_getIntersectedVoxels: (event) ->
-		voxelIntersects =
-			interactionHelper.getIntersections(
-				event
-				@bundle.renderer
-				@voxelsSubnode.children
-			)
-
-		firstLegoVoxel = null
-		lastNonLegoVoxel = null
-
-		for intersection in voxelIntersects
-			voxel = intersection.object.parent
-			continue if not voxel.voxelCoords?
-
-			modified = voxel in @currentlyTouchedVoxels
-
-			if (voxel.isLego() and not modified) or (not voxel.isLego() and modified)
-				firstLegoVoxel = voxel
-				break
-			else
-				lastNonLegoVoxel = voxel
-
-		return [firstLegoVoxel, lastNonLegoVoxel]
-
-	# returns true if both voxels are neigbours, meaning there is
-	# a maximum square distance of two
-	_voxelsAreNeighbor: (a, b) ->
-		c0 = a.voxelCoords
-		c1 = b.voxelCoords
-
-		sqDistance = Math.pow (c0.x - c1.x), 2
-		sqDistance += Math.pow (c0.y - c1.y), 2
-		sqDistance += Math.pow (c0.z - c1.z), 2
-
-		return (sqDistance <= 2)
-
-	# returns true if the mouse points to a baseplate position where there
-	# is a voxel in the grid
-	_pointsTowardsBaseplate: (event) ->
-		baseplatePosition =
-			interactionHelper.getGridPosition event, @bundle.renderer
-		baseplateVoxelPosition =
-			@grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePosition
-
-		bpvp = baseplateVoxelPosition
-		return (@grid.zLayers[bpvp.z]?[bpvp.x]?[bpvp.y]?)
-
-	# returns the voxel in the middle of the model
-	_getVoxelInMiddleOfPossibleLego: (event, selectedNode) ->
-		modelIntersects = @voxelWireframe.intersectRay event
-
-		# calculate the middle of the first two intersections
-		# and return voxel at this position
-		if modelIntersects.length >= 2
-			modelStart = modelIntersects[0]
-			modelEnd = modelIntersects[1]
-
-			middle = {
-				x: (modelStart.point.x + modelEnd.point.x) / 2
-				y: (modelStart.point.y + modelEnd.point.y) / 2
-				z: (modelStart.point.z + modelEnd.point.z) / 2
-			}
-
-			# reverse scene transform
-			revTransform = new THREE.Matrix4()
-			revTransform.getInverse @bundle.renderer.scene.matrix
-			middle = new THREE.Vector3(middle.x, middle.y, middle.z)
-			middle.applyMatrix4(revTransform)
-
-			middleVoxel = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
-
-			gridEntry = @grid.zLayers[middleVoxel.z][middleVoxel.x][middleVoxel.y]
-			return gridEntry.visibleVoxel if gridEntry?
-			return null
-		else
-			# no model selected / enough intersections to get a 'middle voxel'
-			return null
 
 module.exports = BrickVisualization

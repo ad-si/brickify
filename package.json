@@ -11,6 +11,7 @@
   "bugs": "http://github.com/stuikomma/lowfab/issues",
   "dependencies": {
     "PEP": "Lowfab/PEP#0.3.1",
+    "array.prototype.findindex": "^1.0.0",
     "blueimp-md5": "^1.1.0",
     "body-parser": "^1.9.1",
     "bootbox": "^4.4.0",

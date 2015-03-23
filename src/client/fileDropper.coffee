@@ -24,9 +24,9 @@ bindDropHandler = (target, overlay, callback) ->
 			ignoreEvent event
 			showOverlay overlay
 	target.addEventListener 'dragleave',
-			(event) ->
-				ignoreEvent event
-				hideOverlay overlay
+		(event) ->
+			ignoreEvent event
+			hideOverlay overlay
 
 showOverlay = (overlay) ->
 	overlay.style.display = 'block'

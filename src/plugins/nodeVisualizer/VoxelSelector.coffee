@@ -10,6 +10,7 @@ class VoxelSelector
 		@node = brickVisualization.voxelsSubnode
 		@grid = brickVisualization.grid
 		@voxelWireframe = brickVisualization.voxelWireframe
+		@level = undefined
 
 		@touchedVoxels = []
 
@@ -31,7 +32,9 @@ class VoxelSelector
 		voxels = gridEntries
 			.map (voxel) -> voxel.visibleVoxel
 			.filter (voxel) => @_hasType voxel, type
+			.filter (voxel) => voxel not in @touchedVoxels
 		@touchedVoxels = @touchedVoxels.concat voxels
+		@level = mainVoxel.voxelCoords.z if options.bigBrush?
 		return voxels
 
 	###
@@ -39,6 +42,7 @@ class VoxelSelector
 	# @param {Object} event usually a mouse or tap or pointer event
 	# @param {Object} options some options for the voxel to be found
 	# @param {String} [options.type='lego'] 'lego' or '3d'
+	# @param {Boolean} [options.touch=true] false for highlighting
 	###
 	getVoxel: (event, options) =>
 		type = options.type || 'lego'
@@ -46,24 +50,33 @@ class VoxelSelector
 		intersections = @_getIntersections event
 		voxels = intersections.map (intersection) -> intersection.object.parent
 
-		voxel = @_getFrontierVoxel voxels, type
-		voxel ?= @_getBaseplateVoxel type
-		if type is '3d'
-			voxel ?= @_getMiddleVoxel event
+		return @_getLeveledVoxel voxels, type if @level
 
-		@touchedVoxels.push voxel if voxel?
+		voxel = @_getFrontierVoxel voxels, type
+		if type is '3d'
+			voxel ?= @_getBaseplateVoxel type
+			voxel ?= @_getMiddleVoxel event
 		return voxel
 
+	_getLeveledVoxel: (voxels, type) ->
+		return voxels.find (voxel) =>
+			voxel.voxelCoords.z == @level # and @_hasType voxel, type
+
 	_getFrontierVoxel: (voxels, type) ->
+		lastTouched = @touchedVoxels[-2...]
 		frontier = voxels.findIndex (voxel) -> voxel.isLego()
 		return null unless frontier > -1
 
-		if type is 'lego'
-			return voxels[frontier]
-		else
-			return voxels[frontier - 1]
+		prevVoxel = voxels[frontier - 1]
+		frontierVoxel = voxels[frontier]
 
-	_getBaseplateVoxel: (type) =>
+		if type is 'lego' and prevVoxel not in lastTouched or
+		type is '3d' and frontierVoxel in lastTouched
+			return frontierVoxel
+		else
+			return prevVoxel
+
+	_getBaseplateVoxel: (type) ->
 		baseplatePos = interactionHelper.getGridPosition event, @renderer
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePos
 		gridEntry = @grid.zLayers[voxelPos.z]?[voxelPos.x]?[voxelPos.y]
@@ -98,7 +111,7 @@ class VoxelSelector
 		else
 			return null
 
-	_getIntersections: (event) =>
+	_getIntersections: (event) ->
 		return interactionHelper.getIntersections(
 			event
 			@renderer
@@ -127,6 +140,7 @@ class VoxelSelector
 	clearSelection: =>
 		tmp = @touchedVoxels
 		@touchedVoxels = []
+		@level = undefined
 		return tmp
 
 module.exports = VoxelSelector

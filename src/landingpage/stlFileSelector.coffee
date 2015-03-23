@@ -1,15 +1,13 @@
 fileLoader = require './fileLoader'
 
-module.exports.init = (objects, feedbackTarget, finishedCallback) ->
+module.exports.init = (objects, callback) ->
 	objects.each (i, el) -> bindChangeHandler(
 		el
-		feedbackTarget
-		finishedCallback
+		callback
 		objects
 	)
 
-bindChangeHandler = (el, feedbackTarget, finishedCallback, fileInputs) ->
-	callback = (event) ->
-		fileLoader.onLoadFile(event, feedbackTarget, finishedCallback)
+bindChangeHandler = (el, callback, fileInputs) ->
+	el.addEventListener 'change', (event) ->
+		callback event
 		fileInputs.val('')
-	el.addEventListener 'change', callback

@@ -1,7 +1,5 @@
 THREE = require 'three'
 
-planeGeometry = new THREE.PlaneBufferGeometry(2,2)
-
 # Generates an THREE.Mesh that will be displayed as a screen aligned quad
 # and will draw the supplied rttTexture while setting the depth value to
 # the values specified in rttDepthTexture
@@ -21,6 +19,7 @@ module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 		transparent: true
 	})
 
+	planeGeometry = new THREE.PlaneBufferGeometry(2,2)
 	return new THREE.Mesh( planeGeometry, mat )
 
 vertexShader = (options) ->

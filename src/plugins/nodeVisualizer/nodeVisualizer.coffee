@@ -15,8 +15,8 @@ class NodeVisualizer
 
 		# remove z-Fighting on baseplate
 		@printMaterial.polygonOffset = true
-		@printMaterial.polygonOffsetFactor = 5
-		@printMaterial.polygonoffsetUnits = 5
+		@printMaterial.polygonOffsetFactor = 1
+		@printMaterial.polygonoffsetUnits = 1
 
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)

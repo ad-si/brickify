@@ -94,15 +94,22 @@ class Renderer
 		@threeRenderer = new THREE.WebGLRenderer(
 			alpha: true
 			antialias: true
+			stencil: true
 			preserveDrawingBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
 			logarithmicDepthBuffer: false
 			additionalExtensions: ['EXT_frag_depth']
 		)
 
+		# Stencil test
+		gl = @threeRenderer.context
+		contextAttributes = gl.getContextAttributes()
+		if not contextAttributes.stencil
+			console.warn 'The current WebGL context does not have a stencil buffer.
+			 Rendering will be (partly) broken'
+
 		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.autoClear = false
-
 
 	setupScene: (globalConfig) ->
 		scene = new THREE.Scene()

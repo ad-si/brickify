@@ -12,20 +12,19 @@ meshlib = require 'meshlib'
 modelCache = {}
 
 exists = (hash) ->
-	return Promise.resolve $.get('/model/exists/' + hash)
+	return Promise.resolve $.get '/model/exists/' + hash
+		.catch (jqXHR) -> throw new Error jqXHR.statusText
 
 # sends the model to the server if the server hasn't got a file
 # with the same hash value
 submitDataToServer = (hash, data) ->
 	send = ->
 		prom = Promise.resolve(
-			$.ajax(
-				'/model/submit/' + hash
+			$.ajax '/model/submit/' + hash,
 				data: data
 				type: 'POST'
 				contentType: 'application/octet-stream'
-			)
-		)
+		).catch (jqXHR) -> throw new Error jqXHR.statusText
 		prom.then(
 			-> console.log 'sent model to the server'
 			-> console.error 'unable to send model to the server'
@@ -41,7 +40,8 @@ module.exports.store = (optimizedModel) ->
 
 # requests a mesh with the given hash from the server
 requestDataFromServer = (hash) ->
-	return Promise.resolve $.get('/model/get/' + hash)
+	return Promise.resolve $.get '/model/get/' + hash
+		.catch (jqXHR) -> throw new Error jqXHR.statusText
 
 buildModelPromise = (hash) ->
 	return requestDataFromServer(hash).then((data) ->

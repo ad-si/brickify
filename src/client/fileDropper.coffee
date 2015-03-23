@@ -9,7 +9,8 @@ addOverlay = (target) ->
 	overlay = document.createElement 'div'
 	overlay.className = 'modal-backdrop'
 	overlay.id = 'dropoverlay'
-	overlay.style.display = 'none'
+	overlay.style.opacity = 0
+	overlay.style.transition = 'opacity .2s ease-in-out'
 	overlay.innerHTML = '<div id="dropborder">
 										<div id="dropinfo" class="text-center">drop here</div>
 										</div>'
@@ -21,6 +22,9 @@ bindDropHandler = (target, overlay, callback) ->
 		(event) ->
 			hideOverlay overlay
 			callback event
+	target.addEventListener 'dragover',
+		(event) ->
+			ignoreEvent event
 	target.addEventListener 'dragenter',
 		(event) ->
 			ignoreEvent event
@@ -33,10 +37,10 @@ bindDropHandler = (target, overlay, callback) ->
 			hideOverlay overlay
 
 showOverlay = (overlay) ->
-	overlay.style.display = 'block'
+	overlay.style.opacity = '0.8'
 
 hideOverlay = (overlay) ->
-	overlay.style.display = 'none'
+	overlay.style.opacity = '0'
 
 ignoreEvent = (event) ->
 	event.preventDefault()

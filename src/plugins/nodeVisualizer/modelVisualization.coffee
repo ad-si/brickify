@@ -1,6 +1,5 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
-LineMatGenerator = require './visualization/LineMatGenerator'
 
 class ModelVisualization
 	constructor: (@globalConfig, @node, threeNode) ->
@@ -36,10 +35,9 @@ class ModelVisualization
 			ambient: @globalConfig.colors.object
 		)
 
-		lineMaterialGenerator = new LineMatGenerator()
-		@lineMat = lineMaterialGenerator.generate 0x000000
-		@lineMat.linewidth = 2
-
+		@lineMat = new THREE.MeshBasicMaterial({
+			color: 0x000000
+		})
 	_createVisualization: (node, threejsNode) =>
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @objectMaterial
@@ -47,8 +45,6 @@ class ModelVisualization
 			parent.solid = solid
 
 		_addWireframe = (geometry, parent) =>
-			# ToDo: create fancy shader material / correct rendering pipeline
-
 			# visible black lines
 			lineObject = new THREE.Mesh geometry
 			lines = new THREE.EdgesHelper lineObject, 0x000000, 30

@@ -1,7 +1,7 @@
 Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi'
-fileDropper = require '../../landingpage/fileDropper'
+fileDropper = require '../fileDropper'
 
 ###
 # @module ui

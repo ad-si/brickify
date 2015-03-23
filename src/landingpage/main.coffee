@@ -63,7 +63,7 @@ b1 = bundle1.init().then ->
 
 	callback = (event) -> fileLoader.onLoadFile event, $('.dropper'), loadModel
 
-	fileDropper = require './fileDropper'
+	fileDropper = require '../client/fileDropper'
 	fileDropper.init callback
 
 	stlFileSelector = require './stlFileSelector'

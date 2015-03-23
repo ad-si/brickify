@@ -63,7 +63,7 @@ b1 = bundle1.init().then ->
 
 	fileDropper = require '../plugins/fileDropper/fileDropper'
 	callback = -> fileLoader.onLoadFile(event, $('.dropper'), loadModel)
-	fileDropper.init $('body'), $('#dropoverlay'), callback
+	fileDropper.init callback
 
 	stlFileSelector = require './stlFileSelector'
 	stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel

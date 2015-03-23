@@ -1,7 +1,8 @@
-module.exports.init = (objects, overlay, callback) ->
-	objects.each (i, el) ->
-		bindDropHandler(el, overlay, callback)
+module.exports.init = (callback) ->
+	target = document.body
 	overlay = addOverlay(target)
+	bindDropHandler(target, overlay, callback)
+
 addOverlay = (target) ->
 	overlay = document.createElement('div')
 	overlay.className = 'modal-backdrop'
@@ -16,23 +17,22 @@ addOverlay = (target) ->
 bindDropHandler = (target, overlay, callback) ->
 	target.addEventListener 'drop',
 		(event) ->
-			hideOverlay(event, overlay)
+			hideOverlay(overlay)
 			callback event
-		false
 	target.addEventListener 'dragover',
-		(event) -> showOverlay(event, overlay),
-		false
+		(event) ->
+			ignoreEvent(event)
+			showOverlay(overlay)
 	target.addEventListener 'dragleave',
-			(event) -> hideOverlay(event, overlay),
-			false
+			(event) ->
+				ignoreEvent(event)
+				hideOverlay(overlay)
 
-showOverlay = (event, overlay) ->
-	ignoreEvent event
-	overlay.show()
+showOverlay = (overlay) ->
+	overlay.style.display = 'block'
 
-hideOverlay = (event, overlay) ->
-	ignoreEvent event
-	overlay.hide()
+hideOverlay = (overlay) ->
+	overlay.style.display = 'none'
 
 ignoreEvent = (event) ->
 	event.preventDefault()

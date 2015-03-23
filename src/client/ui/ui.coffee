@@ -38,7 +38,7 @@ module.exports = class Ui
 	_initListeners: =>
 		@pointerDispatcher.init()
 
-		fileDropper.init $('body'), $('#dropoverlay'), @fileLoadHandler
+		fileDropper.init @fileLoadHandler
 
 		# event listener
 		$('#loadButton').on 'change', (event) =>

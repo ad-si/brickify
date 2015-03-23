@@ -16,7 +16,7 @@ class NodeVisualizer
 		# remove z-Fighting on baseplate
 		@printMaterial.polygonOffset = true
 		@printMaterial.polygonOffsetFactor = 1
-		@printMaterial.polygonoffsetUnits = 1
+		@printMaterial.polygonOffsetUnits = 1
 
 		# rendering properties
 		@brickShadowOpacity = 0.5

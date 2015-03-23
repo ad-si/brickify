@@ -66,7 +66,9 @@ b1 = bundle1.init().then ->
 	fileDropper = require '../client/fileDropper'
 	fileDropper.init callback
 
-	stlFileSelector = require './stlFileSelector'
-	stlFileSelector.init $('#fileSelector'), callback
+	fileInput = document.getElementById('fileSelector')
+	fileInput.addEventListener 'change', (event) ->
+		callback event
+		@value = ''
 
 	$('.dropper').html 'Drop an stl file'

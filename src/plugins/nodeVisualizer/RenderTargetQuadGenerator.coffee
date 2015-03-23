@@ -45,7 +45,11 @@ fragmentShader = (options) ->
 		uniform vec3 colorMult;
 
 		void main() {
-			float depth = texture2D( tDepth, vUv).r;
+			float depth = texture2D( tDepth, vUv ).r;
+			if (abs(1.0 - depth) < 0.00001){
+				discard;
+			}
+
 			vec3 col = texture2D( tColor, vUv ).rgb;
 
 			const int kernel = 2;

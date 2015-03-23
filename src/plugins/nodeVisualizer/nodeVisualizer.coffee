@@ -63,34 +63,33 @@ class NodeVisualizer
 		
 		# the visible parts of the object
 		# set stencil to 1 if object fails depth test
-		#gl.enable(gl.STENCIL_TEST)
-		#gl.stencilFunc(gl.ALWAYS, 1, 0xFF)
-		#gl.stencilOp(gl.ZERO, gl.ZERO, gl.ZERO)
-		#gl.stencilMask(0xFF)
+		gl.enable(gl.STENCIL_TEST)
+		gl.stencilFunc(gl.ALWAYS, 1, 0xFF)
+		gl.stencilOp(gl.ZERO, gl.REPLACE, gl.ZERO)
+		gl.stencilMask(0xFF)
 		threeRenderer.render @objectSceneTarget.planeScene, camera
-		#gl.stencilMask(0x00)
+		gl.stencilMask(0x00)
 
-		# this-could-be-lego-shadows
-		gl.disable(gl.STENCIL_TEST)
-		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
-
-		# Object behind lego
-		###
+		# Object behind lego		
 		if not @brushHandler.legoBrushSelected
 			# Only render where stencil is 1, set whole stencil buffer to 0
+			gl.disable(gl.DEPTH_TEST)
 			gl.enable(gl.STENCIL_TEST)
-			gl.stencilFunc(gl.NEVER, 1, 0xFF)
-			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+			gl.stencilFunc(gl.EQUAL, 1, 0xFF)
+			gl.stencilOp(gl.ZERO, gl.ZERO, gl.ZERO)
 			gl.stencilMask(0x00)
 
 			blendMat = @objectSceneTarget.planeScene.children[0].material
-			blendMat.uniforms.colorMult.value = new THREE.Vector3(0.1, 0.1, 1)
+			blendMat.uniforms.colorMult.value = new THREE.Vector3(0.1, 0.1, 0.1)
 			threeRenderer.render @objectSceneTarget.planeScene, camera
 			blendMat.uniforms.colorMult.value = new THREE.Vector3(1, 1, 1)
 
 			gl.disable(gl.STENCIL_TEST)
-		###
-
+			gl.enable(gl.DEPTH_TEST)
+		
+		# this-could-be-lego-shadows and brush highlight
+		gl.disable(gl.STENCIL_TEST)
+		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
 		return
 
 	_createRenderTarget: (threeRenderer, shaderOptions) ->

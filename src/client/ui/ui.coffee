@@ -1,6 +1,7 @@
 Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
-WorkflowUi = require './workflowUi/workflowUi.coffee'
+WorkflowUi = require './workflowUi/workflowUi'
+fileDropper = require '../../plugins/fileDropper/fileDropper'
 
 ###
 # @module ui
@@ -37,16 +38,9 @@ module.exports = class Ui
 	_initListeners: =>
 		@pointerDispatcher.init()
 
-		# event listener
-		document.body.addEventListener(
-			'dragover'
-			@dragOverHandler
-		)
+		fileDropper.init $('body'), $('#dropoverlay'), @fileLoadHandler
 
-		document.body.addEventListener(
-			'drop'
-			@fileLoadHandler
-		)
+		# event listener
 		$('#loadButton').on 'change', (event) =>
 			@fileLoadHandler event
 			$('#fileInput').val('')

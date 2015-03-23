@@ -8,6 +8,7 @@ $('#buttonContainer').fadeTo(500, 1)
 globalConfig = require '../common/globals.yaml'
 Bundle = require '../client/bundle'
 clone = require 'clone'
+fileLoader = require './fileLoader'
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -60,8 +61,9 @@ b1 = bundle1.init().then ->
 		b2.then -> bundle2.sceneManager.clearScene()
 		loadAndConvert hash, true
 
-	stlDropper = require './stlDropper'
-	stlDropper.init $('body'), $('.dropper'), $('#dropoverlay'), loadModel
+	fileDropper = require '../plugins/fileDropper/fileDropper'
+	callback = -> fileLoader.onLoadFile(event, $('.dropper'), loadModel)
+	fileDropper.init $('body'), $('#dropoverlay'), callback
 
 	stlFileSelector = require './stlFileSelector'
 	stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel

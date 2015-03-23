@@ -1,14 +1,12 @@
-fileLoader = require './fileLoader'
-
-module.exports.init = (objects, feedbackTarget, overlay, finishedCallback) ->
+module.exports.init = (objects, overlay, callback) ->
 	objects.each (i, el) ->
-		bindDropHandler(el, feedbackTarget, overlay, finishedCallback)
+		bindDropHandler(el, overlay, callback)
 
-bindDropHandler = (target, feedbackTargets, overlay, finishedCallback) ->
+bindDropHandler = (target, overlay, callback) ->
 	target.addEventListener 'drop',
 		(event) ->
 			hideOverlay(event, overlay)
-			fileLoader.onLoadFile(event, feedbackTargets, finishedCallback)
+			callback event
 		false
 	target.addEventListener 'dragover',
 		(event) -> showOverlay(event, overlay),

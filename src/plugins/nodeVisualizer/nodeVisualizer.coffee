@@ -70,7 +70,7 @@ class NodeVisualizer
 		threeRenderer.render @objectSceneTarget.planeScene, camera
 		gl.stencilMask(0x00)
 
-		# Object behind lego		
+		# Object behind lego
 		if not @brushHandler.legoBrushSelected
 			# Only render where stencil is 1, set whole stencil buffer to 0
 			gl.disable(gl.DEPTH_TEST)
@@ -81,7 +81,9 @@ class NodeVisualizer
 
 			blendMat = @objectSceneTarget.planeScene.children[0].material
 			blendMat.uniforms.colorMult.value = new THREE.Vector3(0.1, 0.1, 0.1)
+			blendMat.uniforms.opacity.value = 0.5
 			threeRenderer.render @objectSceneTarget.planeScene, camera
+			blendMat.uniforms.opacity.value = 0.8
 			blendMat.uniforms.colorMult.value = new THREE.Vector3(1, 1, 1)
 
 			gl.disable(gl.STENCIL_TEST)

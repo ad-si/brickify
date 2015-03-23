@@ -10,6 +10,7 @@ module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 		uniforms: {
 			tDepth: { type: 't', value: rttDepthTexture }
 			tColor: { type: 't', value: rttTexture }
+			opacity: { type: 'f', value: shaderOptions.opacity }
 			colorMult: { type: 'v3', value: shaderOptions.colorMult }
 			texelXDelta: { type: 'f', value: 1.0 / rttTexture.width }
 			texelYDelta: { type: 'f', value: 1.0 / rttTexture.height }
@@ -35,13 +36,12 @@ fragmentShader = (options) ->
 	return '
 		#extension GL_EXT_frag_depth : enable\n
 
-		#define OPACITY ' + options.opacity + '\n
-
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tColor;
 		uniform float texelXDelta;
 		uniform float texelYDelta;
+		uniform float opacity;
 		uniform vec3 colorMult;
 
 		void main() {
@@ -77,7 +77,7 @@ fragmentShader = (options) ->
 			col.g = col.g * colorMult.g;
 			col.b = col.b * colorMult.b;
 
-			gl_FragColor = vec4( col.r, col.g, col.b, OPACITY);
+			gl_FragColor = vec4( col.r, col.g, col.b, opacity);
 			gl_FragDepthEXT = depth;
 		}'
 
@@ -85,9 +85,7 @@ setDefaultOptions = (shaderOptions) ->
 	shaderOptions = {} if not shaderOptions?
 
 	if not shaderOptions.opacity?
-		shaderOptions.opacity = '1.00'
-	else
-		shaderOptions.opacity = parseFloat(shaderOptions.opacity).toFixed(2)
+		shaderOptions.opacity = 1.0
 
 	if not shaderOptions.colorMult?
 		shaderOptions.colorMult = new THREE.Vector3(1,1,1)

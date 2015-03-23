@@ -72,7 +72,7 @@ port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
 sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
 
-module.exports.setupRouting = () ->
+module.exports.setupRouting = ->
 	webapp.set 'hostname', if developmentMode then "localhost:#{port}" else
 		process.env.HOSTNAME or 'lowfab.net'
 
@@ -105,24 +105,26 @@ module.exports.setupRouting = () ->
 		res.locals.app = webapp
 		next()
 
-	if developmentMode
-		shared = [
-			'blueimp-md5'
-			'bootstrap'
-			'clone'
-			'jquery'
-			'jsondiffpatch'
-			'path'
-			'stats-js'
-			'three'
-			'three-orbit-controls'
-			'zeroclipboard'
-		]
-		webapp.get '/shared.js', browserify(shared, {
-			cache: true
-			precompile: true
-			noParse: shared
-		})
+	shared = [
+		'blueimp-md5'
+		'bootstrap'
+		'clone'
+		'es6-promise'
+		'filesaver.js'
+		'jquery'
+		'mousetrap'
+		'operative'
+		'PEP'
+		'path'
+		'three'
+		'three-orbit-controls'
+		'zeroclipboard'
+	]
+	webapp.get '/shared.js', browserify(shared, {
+		cache: true
+		precompile: true
+		noParse: shared
+	})
 
 	webapp.get '/app.js', browserify('src/client/main.coffee', {
 		extensions: ['.coffee']
@@ -200,7 +202,6 @@ module.exports.setupRouting = () ->
 
 	if developmentMode
 		webapp.use errorHandler()
-		require('express-debug')(webapp, {extra_panels: ['nav']})
 
 	webapp.use (req, res) ->
 		res
@@ -218,7 +219,7 @@ module.exports.startServer = (_port, _ip) ->
 		else
 			log.error 'Server could not be started:', error
 
-	server.listen port, ip, () ->
+	server.listen port, ip, ->
 		log.info "Server is listening on #{ip}:#{port}"
 
 	return server

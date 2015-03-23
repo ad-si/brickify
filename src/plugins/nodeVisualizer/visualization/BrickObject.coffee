@@ -1,11 +1,14 @@
 THREE = require 'three'
-module.exports = class BrickObject extends THREE.Object3D
-	constructor: (brickGeometry, knobGeometry, @material) ->
+###
+# @class BrickObject
+###
+class BrickObject extends THREE.Object3D
+	constructor: (brickGeometry, studGeometry, @material) ->
 		super()
 		brickMesh = new THREE.Mesh(brickGeometry, @material)
-		knobMesh = new THREE.Mesh(knobGeometry, @material)
+		studMesh = new THREE.Mesh(studGeometry, @material)
 		@add brickMesh
-		@add knobMesh
+		@add studMesh
 
 	setMaterial: (@material) =>
 		@children[0].material = @material
@@ -14,7 +17,7 @@ module.exports = class BrickObject extends THREE.Object3D
 		# material override resets highlight state
 		@_isHighlighted = false
 
-	setKnobVisibility: (boolean) =>
+	setStudVisibility: (boolean) =>
 		@children[1].visible = boolean
 
 	# stores a reference of this bricks voxel coordinates for
@@ -28,16 +31,16 @@ module.exports = class BrickObject extends THREE.Object3D
 		return
 
 	# makes the voxel being 3d printed
-	make3dPrinted: () =>
+	make3dPrinted: =>
 		@gridEntry.enabled = false
 		@nonHighlightVisibility = false
 
 	# makes the voxel being legotized
-	makeLego: () =>
+	makeLego: =>
 		@gridEntry.enabled = true
 		@nonHighlightVisibility = true
 
-	isLego: () =>
+	isLego: =>
 		return @gridEntry.enabled
 
 	# one may highlight this brick with a special material
@@ -50,3 +53,5 @@ module.exports = class BrickObject extends THREE.Object3D
 			@visible = @nonHighlightVisibility
 			@children[0].material = @material
 			@children[1].material = @material
+
+module.exports = BrickObject

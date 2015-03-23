@@ -20,8 +20,6 @@ globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
-globalConfig.plugins.solidRenderer = true
-globalConfig.plugins.newBrickator = true
 
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false
@@ -33,38 +31,38 @@ globalConfig.autoReplaceModel = true
 config1 = clone globalConfig
 config2 = clone globalConfig
 
+# configure left bundle one to only show model
+config1.plugins.newBrickator = false
+
 # instantiate 2 lowfab bundles
 config1.renderAreaId = 'renderArea1'
-config1.plugins.newBrickator = false
 bundle1 = new Bundle config1
 b1 = bundle1.init().then ->
 	controls = bundle1.getControls()
 	config2.renderAreaId = 'renderArea2'
-	config2.plugins.solidRenderer = false
 	bundle2 = new Bundle config2, controls
 	b2 = bundle2.init()
 
 	loadAndConvert = (hash, animate) ->
-		b1.then(() ->
-			bundle1.modelLoader.loadByHash hash)
-			.then(() ->
-				document.getElementById('renderArea1').style.backgroundImage = 'none')
-		b2.then(() -> bundle2.modelLoader.loadByHash hash)
-			.then(() ->
-				document.getElementById('renderArea2').style.backgroundImage = 'none')
+		b1.then -> bundle1.modelLoader.loadByHash hash
+			.then ->
+				document.getElementById('renderArea1').style.backgroundImage = 'none'
+		b2.then -> bundle2.modelLoader.loadByHash hash
+			.then ->
+				document.getElementById('renderArea2').style.backgroundImage = 'none'
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
-	loadModel = (hash, errors) ->
-		b1.then(() -> bundle1.sceneManager.clearScene())
-		b2.then(() -> bundle2.sceneManager.clearScene())
-		loadAndConvert(hash, true)
+	loadModel = (hash) ->
+		b1.then -> bundle1.sceneManager.clearScene()
+		b2.then -> bundle2.sceneManager.clearScene()
+		loadAndConvert hash, true
 
 	stlDropper = require './stlDropper'
 	stlDropper.init $('body'), $('.dropper'), $('#dropoverlay'), loadModel
 
 	stlFileSelector = require './stlFileSelector'
 	stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel
-	$('.dropper').html('Drop an stl file')
+	$('.dropper').html 'Drop an stl file'

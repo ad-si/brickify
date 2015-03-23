@@ -42,5 +42,5 @@ module.exports.delete = (request, response) ->
 ###
 # Use this only for testing!
 ###
-module.exports.clear = () ->
+module.exports.clear = ->
 	return dpStorage.clear()

@@ -5,16 +5,16 @@ BrickObject = require './BrickObject'
 module.exports = class GeometryCreator
 	constructor: (@grid) ->
 		@brickGeometryCache = {}
-		@knobGeometryCache = {}
+		@studGeometryCache = {}
 
-		@knob = new THREE.CylinderGeometry(
+		@stud = new THREE.CylinderGeometry(
 			#these numbers are made up to look good. don't use for csg operations
 			@grid.spacing.x * 0.3, @grid.spacing.y * 0.3, @grid.spacing.z * 0.7, 7
 		)
-		
+
 		rotation = new THREE.Matrix4()
 		rotation.makeRotationX(1.571)
-		@knob.applyMatrix(rotation)
+		@stud.applyMatrix(rotation)
 
 	getVoxel: (gridPosition, material) =>
 		brick = @getBrick gridPosition, {x: 1, y: 1, z: 1}, material
@@ -29,9 +29,9 @@ module.exports = class GeometryCreator
 		# returns a THREE.Geometry that uses the given material and is
 		# transformed to match the given grid position
 		brickGeometry = @_getBrickGeometry(brickDimensions)
-		knobGeometry = @_getKnobsGeometry(brickDimensions)
+		studGeometry = @_getStudsGeometry(brickDimensions)
 
-		brick = new BrickObject(brickGeometry, knobGeometry, material)
+		brick = new BrickObject(brickGeometry, studGeometry, material)
 
 		worldBrickSize = {
 			x: brickDimensions.x * @grid.spacing.x
@@ -59,6 +59,12 @@ module.exports = class GeometryCreator
 
 		return brick
 
+	getBrickBox: (boxDimensions, material) =>
+		geometry = @_getBrickGeometry boxDimensions
+		box = new THREE.Mesh geometry, material
+		box.dimensions = boxDimensions
+		return box
+
 	_getBrickGeometry: (brickDimensions) =>
 		# returns a box geometry for the given dimensions
 
@@ -75,14 +81,14 @@ module.exports = class GeometryCreator
 		@brickGeometryCache[ident] = brickGeometry
 		return brickGeometry
 
-	_getKnobsGeometry: (brickDimensions) =>
-		# returns knobs for the given brick size
+	_getStudsGeometry: (brickDimensions) =>
+		# returns studs for the given brick size
 
 		ident = @_getHash brickDimensions
-		if @knobGeometryCache[ident]?
-			return @knobGeometryCache[ident]
+		if @studGeometryCache[ident]?
+			return @studGeometryCache[ident]
 
-		knobs = new THREE.Geometry()
+		studs = new THREE.Geometry()
 
 		worldBrickSize = {
 			x: brickDimensions.x * @grid.spacing.x
@@ -99,10 +105,10 @@ module.exports = class GeometryCreator
 				translation = new THREE.Matrix4()
 				translation.makeTranslation(tx, ty, tz)
 
-				knobs.merge @knob, translation
+				studs.merge @stud, translation
 
-		@knobGeometryCache[ident] = knobs
-		return knobs
+		@studGeometryCache[ident] = studs
+		return studs
 
 	_getHash: (dimensions) =>
 		return dimensions.x + '-' + dimensions.y + '-' + dimensions.z

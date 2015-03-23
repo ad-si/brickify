@@ -1,5 +1,8 @@
 Project = require '../common/project/project'
 
+###
+# @class SceneManager
+###
 class SceneManager
 	constructor: (@bundle) ->
 		@selectedNode = null
@@ -7,7 +10,7 @@ class SceneManager
 		@project = Project.load()
 		@scene = @project.then (project) -> project.getScene()
 
-	init: () =>
+	init: =>
 		@scene
 		.then (scene) -> scene.getNodes()
 		.then (nodes) => @_notify 'onNodeAdd', node for node in nodes
@@ -34,7 +37,7 @@ class SceneManager
 			if scene.nodes.length > 0
 				question = 'You already have a model in your scene.
 				 Loading the new model will replace the existing model!'
-				
+
 				if not @bundle.globalConfig.autoReplaceModel
 					bootbox.confirm question, (result) =>
 						if result

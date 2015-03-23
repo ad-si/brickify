@@ -1,5 +1,5 @@
 class Response
-	constructor: () ->
+	constructor: ->
 		@whenSent = new Promise((resolve, reject) =>
 			@setContent = (type) => (@content) =>
 				@type = type

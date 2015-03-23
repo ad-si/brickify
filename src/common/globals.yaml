@@ -66,8 +66,9 @@ plugins:
   stlImport: true
   coordinateSystem: true
   legoBoard: true
-  solidRenderer: true
   newBrickator: true
+  nodeVisualizer: true
+  fidelityControl: true
 
 # shall solid renderer display shadows and wireframe?
 createVisibleWireframe: true

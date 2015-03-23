@@ -37,7 +37,7 @@ module.exports = class PluginLoader
 
 	# Since browserify.js does not support dynamic require
 	# all plugins must be explicitly written down
-	loadPlugins: () ->
+	loadPlugins: ->
 		pluginInstances = []
 
 		if @globalConfig.plugins.dummy
@@ -60,14 +60,20 @@ module.exports = class PluginLoader
 				require '../plugins/legoBoard'
 				require '../plugins/legoBoard/package.json'
 			)
-		if @globalConfig.plugins.solidRenderer
-			pluginInstances.push @initPlugin(
-				require '../plugins/solidRenderer'
-				require '../plugins/solidRenderer/package.json'
-			)
 		if @globalConfig.plugins.newBrickator
 			pluginInstances.push @initPlugin(
 				require '../plugins/newBrickator'
 				require '../plugins/newBrickator/package.json'
 			)
+		if @globalConfig.plugins.nodeVisualizer
+			pluginInstances.push @initPlugin(
+				require '../plugins/nodeVisualizer'
+				require '../plugins/nodeVisualizer/package.json'
+			)
+		if @globalConfig.plugins.fidelityControl
+			pluginInstances.push @initPlugin(
+				require '../plugins/fidelityControl'
+				require '../plugins/fidelityControl/package.json'
+			)
+
 		return pluginInstances

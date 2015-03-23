@@ -11,7 +11,7 @@ module.exports = class CsgExtractor
 		# options may be
 		# {
 		#	profiling: true/false # print performance values
-		#	addKnobs: true/fals # add lego knobs to csg (slow!)
+		#	addStuds: true/fals # add lego studs to csg (slow!)
 		# }
 
 		console.log 'Creating CSG...'
@@ -43,24 +43,24 @@ module.exports = class CsgExtractor
 
 		grid.forEachVoxel (voxel, x, y, z) =>
 			if not voxel.enabled
-				#check if the voxel above is legofied. if yes, add a knob to current voxel
-				knobOnTop = false
+				#check if the voxel above is legofied. if yes, add a stud to current voxel
+				studOnTop = false
 				if grid.zLayers[z + 1]?[x]?[y]? and grid.zLayers[z + 1][x][y].enabled
-					knobOnTop = true
+					studOnTop = true
 
 				# check if the voxel is the lowest voxel or has a lego brick below it
-				# if yes, create space for knob below
-				knobFromBelow = false
+				# if yes, create space for stud below
+				studFromBelow = false
 				if z == 0 or
 				(grid.zLayers[z - 1]?[x]?[y]? and grid.zLayers[z - 1][x][y].enabled)
-					knobFromBelow = true
+					studFromBelow = true
 
 				printVoxels.push {
 					x: x
 					y: y
 					z: z
-					knobOnTop: knobOnTop
-					knobFromBelow: knobFromBelow
+					studOnTop: studOnTop
+					studFromBelow: studFromBelow
 				}
 
 		return printVoxels

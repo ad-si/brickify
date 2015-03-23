@@ -20,16 +20,16 @@ module.exports = class LegoBoard
 	init3d: (@threejsNode) =>
 		@highQualMode = false
 
-		knobTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
-		knobTexture.wrapS = THREE.RepeatWrapping
-		knobTexture.wrapT = THREE.RepeatWrapping
-		knobTexture.repeat.set 50,50
+		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
+		studTexture.wrapS = THREE.RepeatWrapping
+		studTexture.wrapT = THREE.RepeatWrapping
+		studTexture.repeat.set 50,50
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
 			color: globalConfig.colors.basePlate
 		)
 		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
-			map: knobTexture
+			map: studTexture
 		)
 		@currentBaseplateMaterial = @baseplateTexturedMaterial
 
@@ -38,7 +38,7 @@ module.exports = class LegoBoard
 				opacity: 0.4
 				transparent: true
 		)
-		knobsMaterial = new THREE.MeshLambertMaterial(
+		studMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlateStud
 		)
 
@@ -48,10 +48,10 @@ module.exports = class LegoBoard
 		boxobj.translateZ -4
 		@threejsNode.add boxobj
 
-		#create knobs
-		knobsContainer = new THREE.Object3D()
-		@threejsNode.add knobsContainer
-		knobsContainer.visible = false
+		#create studs
+		studsContainer = new THREE.Object3D()
+		@threejsNode.add studsContainer
+		studsContainer.visible = false
 
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
@@ -59,14 +59,14 @@ module.exports = class LegoBoard
 			geo = model.convertToThreeGeometry()
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, knobsMaterial)
+					object = new THREE.Mesh(geo, studMaterial)
 					object.translateX x
 					object.translateY y
-					knobsContainer.add object
+					studsContainer.add object
 
-	on3dUpdate: () =>
+	on3dUpdate: =>
 		# check if the camera is below z=0. if yes, make the plate transparent
-		# and hide knobs
+		# and hide studs
 		if not @bundle?
 			return
 
@@ -80,29 +80,29 @@ module.exports = class LegoBoard
 			@threejsNode.children[0].material = @currentBaseplateMaterial
 			@threejsNode.children[1].visible = true if @highQualMode
 
-	toggleVisibility: () =>
+	toggleVisibility: =>
 		@threejsNode.visible = !@threejsNode.visible
 
-	uglify: () =>
+	uglify: =>
 		if @highQualMode
 			@highQualMode = false
 
-			#hide knobs
+			#hide studs
 			@threejsNode.children[1].visible = false
-			#change baseplate material to knob texture
+			#change baseplate material to stud texture
 			@threejsNode.children[0].material = @baseplateTexturedMaterial
 			@currentBaseplateMaterial = @baseplateTexturedMaterial
 			return true
 
 		return false
 
-	beautify: () =>
+	beautify: =>
 		if not @highQualMode
 			@highQualMode = true
 			
-			#show knobs
+			#show studs
 			@threejsNode.children[1].visible = true
-			#remove texture because we have physical knobs
+			#remove texture because we have physical studs
 			@threejsNode.children[0].material = @baseplateMaterial
 			@currentBaseplateMaterial = @baseplateMaterial
 			return true

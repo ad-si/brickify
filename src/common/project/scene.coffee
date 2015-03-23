@@ -8,7 +8,7 @@ Node = require './node'
 # @class Scene
 ###
 class Scene extends SyncObject
-	constructor: () ->
+	constructor: ->
 		super arguments[0]
 		@nodes = []
 		@_modify 'Scene creation'

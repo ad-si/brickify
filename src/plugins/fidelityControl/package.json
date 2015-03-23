@@ -1,0 +1,9 @@
+{
+  "name": "fidelity-control",
+  "version": "0.1.0",
+  "description": "Framerate-based rendering quality management",
+  "lowfab": {
+    "type": "controller"
+  },
+  "browser": "./fidelityControl.coffee"
+}

@@ -56,9 +56,6 @@ class PointerDispatcher
 
 		# we have a valid plugin -> we will handle this!
 		@_capturePointerFor event
-		clickedNode = @_getNodeFor event
-		if clickedNode? and clickedNode != @sceneManager.selectedNode
-			@sceneManager.select clickedNode
 
 		# toggle brush if it is the right mouse button
 		if(event.buttons & BUTTON_STATES.right)
@@ -167,13 +164,6 @@ class PointerDispatcher
 			@bundle.ui.renderer
 			@bundle.ui.renderer.scene.children
 			(plugin) -> plugin.name not in ['lego-board', 'coordinate-system']
-		)
-
-	_getNodeFor: (event) =>
-		return interactionHelper.getNode(
-			event
-			@bundle.ui.renderer
-			@bundle.ui.renderer.scene.children
 		)
 
 module.exports = PointerDispatcher

@@ -49,6 +49,7 @@ module.exports = class Ui
 		)
 		$('#loadButton').on 'change', (event) =>
 			@fileLoadHandler event
+			$('#fileInput').val('')
 
 		window.addEventListener(
 			'resize'
@@ -58,21 +59,27 @@ module.exports = class Ui
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks, @bundle.sceneManager)
 		@hotkeys.addEvents @bundle.sceneManager.getHotkeys()
-		@hotkeys.addEvents @renderer.fidelityControl.getHotkeys()
-		
+
 		gridHotkeys = {
 			title: 'UI'
 			events: [
 				{
 					description: 'Toggle coordinate system / lego plate'
 					hotkey: 'g'
-					callback: =>
-						@_toggleGridVisibility()
+					callback: @_toggleGridVisibility
+				}
+				{
+					description: 'Toggle stability view'
+					hotkey: 's'
+					callback: @_toggleStabilityView
 				}
 			]
 		}
 		@hotkeys.addEvents gridHotkeys
 
-	_toggleGridVisibility: () =>
+	_toggleGridVisibility: =>
 		@bundle.getPlugin('lego-board').toggleVisibility()
 		@bundle.getPlugin('coordinate-system').toggleVisibility()
+
+	_toggleStabilityView: =>
+		@workflowUi.toggleStabilityView()

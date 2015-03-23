@@ -16,7 +16,7 @@ module.exports = class BrickGraph
 	# the @bricks list is an array consisting of an array for each z-layer,
 	# within a z-layer, the array is an unordered list of Bricks
 	# that belong to this z-layer
-	_initialize: () =>
+	_initialize: =>
 		for z in [0..@grid.numVoxelsZ - 1] by 1
 			@bricks[z] = []
 
@@ -123,6 +123,7 @@ module.exports = class BrickGraph
 				y: brick.position.y - upperBrick.position.y
 			}
 			upperBrick.lowerSlots[slot.x][slot.y] = brick
+			brick.upperSlots[0][0] = upperBrick
 
 		lowerBrick = @getBrickAt x, y, z - 1
 		if lowerBrick?
@@ -131,6 +132,7 @@ module.exports = class BrickGraph
 				y: brick.position.y - lowerBrick.position.y
 			}
 			lowerBrick.upperSlots[slot.x][slot.y] = brick
+			brick.lowerSlots[0][0] = lowerBrick
 
 		# add to list
 		@bricks[z].push brick
@@ -148,7 +150,7 @@ module.exports = class BrickGraph
 			voxel.brick = null
 
 	# updates the 'voxel.brick' reference in each voxel in the grid
-	updateReferencesInGrid: () =>
+	updateReferencesInGrid: =>
 		# set references from brick list
 		@forEachBrick (brick) =>
 			@forEachVoxelInBrick brick, (voxel) =>

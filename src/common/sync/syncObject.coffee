@@ -147,7 +147,7 @@ class SyncObject
 
 	###
 	# ##Asynchronous task chaining
-	# A syncObject implements a access point to chain asynchronous tasks via
+	# A syncObject implements an access point to chain asynchronous tasks via
 	# promises.
 	###
 

@@ -18,6 +18,13 @@ class NodeVisualizer
 		@printMaterial.polygonOffsetFactor = 1
 		@printMaterial.polygonoffsetUnits = 1
 
+		# rendering properties
+		@brickShadowOpacity = 0.5
+		@objectOpacity = 0.8
+		@objectShadowOpacity = 0.5
+		@objectColorMult = new THREE.Vector3(1, 1, 1)
+		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
+
 	init: (@bundle) =>
 		@brushHandler = new BrushHandler(@bundle, @)
 
@@ -41,7 +48,9 @@ class NodeVisualizer
 
 		# Second pass: render object
 		if not @objectSceneTarget?
-			@objectSceneTarget = @_createRenderTarget(threeRenderer, { opacity: 0.8 })
+			@objectSceneTarget = @_createRenderTarget(
+				threeRenderer, { opacity: @objectOpacity }
+			)
 		threeRenderer.render(
 			@objectScene, camera, @objectSceneTarget.renderTarget, true
 		)
@@ -49,13 +58,13 @@ class NodeVisualizer
 		# Third pass: render shadows
 		if not @brickShadowSceneTarget?
 			@brickShadowSceneTarget = @_createRenderTarget(
-				threeRenderer, { opacity: 0.5 }
+				threeRenderer, { opacity: @brickShadowOpacity }
 			)
 		threeRenderer.render(
 			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true
 		)
 
-		# finally render everything (on planes) on screen
+		# finally render everything (on quads) on screen
 		gl = threeRenderer.context
 
 		# bricks
@@ -67,32 +76,31 @@ class NodeVisualizer
 		gl.stencilFunc(gl.ALWAYS, 1, 0xFF)
 		gl.stencilOp(gl.ZERO, gl.REPLACE, gl.ZERO)
 		gl.stencilMask(0xFF)
+
+		# render visible parts
 		threeRenderer.render @objectSceneTarget.planeScene, camera
-		gl.stencilMask(0x00)
 
-		# Object behind lego
+		# render invisble parts (object behind lego bricks)
 		if not @brushHandler.legoBrushSelected
-			# Only render where stencil is 1, set whole stencil buffer to 0
-			gl.disable(gl.DEPTH_TEST)
-			gl.enable(gl.STENCIL_TEST)
-			gl.stencilFunc(gl.EQUAL, 1, 0xFF)
-			gl.stencilOp(gl.ZERO, gl.ZERO, gl.ZERO)
-			gl.stencilMask(0x00)
-
+			# Adjust object material to be dark and more transparent
 			blendMat = @objectSceneTarget.planeScene.children[0].material
-			blendMat.uniforms.colorMult.value = new THREE.Vector3(0.1, 0.1, 0.1)
-			blendMat.uniforms.opacity.value = 0.5
-			threeRenderer.render @objectSceneTarget.planeScene, camera
-			blendMat.uniforms.opacity.value = 0.8
-			blendMat.uniforms.colorMult.value = new THREE.Vector3(1, 1, 1)
+			blendMat.uniforms.colorMult.value = @objectShadowColorMult
+			blendMat.uniforms.opacity.value = @objectShadowOpacity
 
-			gl.disable(gl.STENCIL_TEST)
+			# Only render where stencil is 1 and ignore depth buffer
+			gl.stencilFunc(gl.EQUAL, 1, 0xFF)
+			gl.disable(gl.DEPTH_TEST)
+			threeRenderer.render @objectSceneTarget.planeScene, camera
 			gl.enable(gl.DEPTH_TEST)
-		
-		# this-could-be-lego-shadows and brush highlight
+
+			# Reset material to non-shadow properties
+			blendMat.uniforms.opacity.value = @objectOpacity
+			blendMat.uniforms.colorMult.value = @objectColorMult
+
 		gl.disable(gl.STENCIL_TEST)
+
+		# render this-could-be-lego-shadows and brush highlight
 		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
-		return
 
 	_createRenderTarget: (threeRenderer, shaderOptions) ->
 		# Create rendertarget

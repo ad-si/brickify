@@ -65,7 +65,7 @@ module.exports = class LegoBoard
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
 
 		# adjust rendering to camera position
-		if camera.y < 0
+		if camera.position.y < 0
 			# hide knobs and render baseplate transparent if cam looks from below
 			@boardScene.children[1].visible = false
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4

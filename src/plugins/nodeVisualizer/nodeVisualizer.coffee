@@ -3,6 +3,7 @@ threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 RenderTargetQuadGenerator = require './RenderTargetQuadGenerator'
+pointerEnums = require '../../client/ui/pointerEnums'
 
 ###
 # @class NodeVisualizer
@@ -296,5 +297,16 @@ class NodeVisualizer
 		return @newBrickator.getCSG(cachedData.node, true)
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg(csg)
+
+	pointerEvent: (event, eventType) =>
+		switch eventType
+			when pointerEnums.PointerDown
+				return
+			when pointerEnums.PointerMove
+				return
+			when pointerEnums.PointerUp
+				return
+			when pointerEnums.PointerCancel
+				return
 
 module.exports = NodeVisualizer

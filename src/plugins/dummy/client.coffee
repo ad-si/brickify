@@ -140,21 +140,6 @@ class DummyPlugin
 		}
 
 	###
-	# Plugins can return an array of brush descriptor objects.
-	# @see BrushSelector
-	###
-	getBrushes: ->
-		return [{
-			text: 'dummy-brush'
-			icon: 'move'
-			mouseDownCallback: -> console.log 'dummy-brush modifies scene (mosue down)'
-			mouseMoveCallback: -> console.log 'dumy-brush modifies scene (move)'
-			mouseUpCallback: -> console.log 'dummy-brush modifies scene (mosue up)'
-			selectCallback: -> console.log 'dummy-brush was selected'
-			deselectCallback: -> console.log 'dummy-brush was deselected'
-		}]
-
-	###
 	# When the framerate is very low, plugins may be asked to reduce their visual
 	# complexity, e.g. replacing geometry with simple textures.
 	# Plugins should return true, if they reduced quality, or false,

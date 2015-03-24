@@ -30,9 +30,14 @@ class NodeVisualizer
 	init: (@bundle) =>
 		if @bundle.ui?
 			@brushHandler = new BrushHandler(@bundle, @)
+
+			# bind brushes to UI
+			brushSelector = @bundle.ui.workflowUi.brushSelector
+			brushSelector.setBrushes @brushHandler.getBrushes()
+
 			@pointEventHandler = new PointEventHandler(
 				@bundle.sceneManager
-				@bundle.ui.workflowUi.brushSelector
+				brushSelector
 			)
 
 	init3d: (@threejsRootNode) =>
@@ -140,11 +145,7 @@ class NodeVisualizer
 			renderTarget: renderTargetTexture
 			planeScene: planeScene
 			blendingMaterial: rttPlane.material
-		}
-		 
-	getBrushes: =>
-		return @brushHandler.getBrushes() if @brushHandler?
-		return []
+		}		
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

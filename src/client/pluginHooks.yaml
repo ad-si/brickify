@@ -106,25 +106,6 @@
 
 - getHotkeys
 
-# ## Brushes
-#
-# Plugins may return an array with an entry for each brush they provide
-# each brush should have the json structure like in this example:
-#
-# {
-#	text: 'Make Lego'
-#	selectCallback: # when the brush is selected, selectedNode as argument
-#	deselectCallback: # when the brush is deselected
-#	mouseDownCallback: # when a node is selected and mouse is pressed
-#	mouseMoveCallback: # after being pressed, when mouse is moved
-#	mouseHoverCallback: # when the mouse is moved, but not pressed
-#	mouseUpCallback: # when mouse is released
-#	cancelCallback: # when interaction is canceled (ESC, two buttons pressed)
-# }
-#
-
-- getBrushes
-
 # ## Subtractive CSG
 # When clicking on the download button, the user expects to download eyerything
 # he needs to 3d print. therefore, getSubtractiveCSG should return a solid geometry

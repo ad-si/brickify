@@ -11,16 +11,15 @@ class BrushSelector
 
 		@brushContainer = $(jQueryBrushContainerSelector)
 
-		@_brushList = []
+		@_brushList ?= []
 
-		for array in @bundle.pluginHooks.getBrushes()
-			for brush in array
-				@_brushList.push brush
-				
 		for brush in @_brushList
 			htmlContainer = @brushContainer.find brush.containerId
 			brush.jqueryObject = htmlContainer
 			@_bindBrushEvent brush
+
+	# binds the given brushes to the UI
+	setBrushes: (@_brushList) => return
 
 	onNodeSelect: (node) =>
 		@selectedNode = node

@@ -18,7 +18,7 @@ module.exports = class Ui
 	fileLoadHandler: (event) =>
 		fileLoader.onLoadFile(
 			event
-			document.getElementById 'loadButton'
+			document.getElementById 'loadButtonFeedback'
 			@bundle.modelLoader.loadByHash
 		)
 

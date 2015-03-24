@@ -1,14 +1,19 @@
 meshlib = require 'meshlib'
 modelCache = require './modelCache'
+Spinner = require '../Spinner'
 
 uploadFinishedCallback = null
 
-readingString = 'Reading file
-<img src="img/spinner.gif" id="spinner">'
-uploadString = 'Uploading file
-<img src="img/spinner.gif" id="spinner">'
+readingString = 'Reading file'
+uploadString = 'Uploading file'
 loadedString = 'File loaded!'
 errorString = 'Import failed!'
+
+spinnerOptions =
+	lines: 9
+	length: 5
+	radius: 3
+	width: 2
 
 module.exports.onLoadFile = (event, feedbackTarget, finishedCallback) ->
 	uploadFinishedCallback = finishedCallback
@@ -23,6 +28,7 @@ module.exports.onLoadFile = (event, feedbackTarget, finishedCallback) ->
 		fn = file.name.toLowerCase()
 		if (fn.search('.stl') == fn.length - 4)
 			feedbackTarget.innerHTML = readingString
+			Spinner.start feedbackTarget, spinnerOptions
 			loadFile feedbackTarget, file
 		else
 			bootbox.alert({
@@ -37,29 +43,31 @@ loadFile = (feedbackTarget, file) ->
 	reader.readAsArrayBuffer(file)
 
 handleLoadedFile = (feedbackTarget, filename) ->
-	loadCallback = 	(event) ->
+	loadCallback = (event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
 
 		meshlib.parse fileContent, null, (error, optimizedModel) ->
+			Spinner.stop feedbackTarget
 			if error or !optimizedModel
 				bootbox.alert({
 					title: 'Import failed'
 					message: 'Your file contains errors that we could not fix automatically.'
 				})
+
 				feedbackTarget.innerHTML = errorString
 				return
 
 			optimizedModel.originalFileName = filename
 
 			feedbackTarget.innerHTML = uploadString
+			Spinner.start feedbackTarget, spinnerOptions
 
-			ufc = (md5hash) ->
+			modelCache.store(optimizedModel).then (md5hash) ->
+				Spinner.stop feedbackTarget, spinnerOptions
 				feedbackTarget.innerHTML = loadedString
 				if uploadFinishedCallback?
 					uploadFinishedCallback(md5hash)
-
-			modelCache.store(optimizedModel).then(ufc)
 
 		return
 

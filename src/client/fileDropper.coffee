@@ -11,9 +11,10 @@ addOverlay = (target) ->
 	overlay.id = 'dropoverlay'
 	overlay.style.opacity = 0
 	overlay.style.transition = 'opacity .2s ease-in-out'
-	overlay.innerHTML = '<div id="dropborder">
-										<div id="dropinfo" class="text-center">drop here</div>
-										</div>'
+	overlay.innerHTML =
+	'<div id="dropborder">
+		<div id="dropinfo" class="text-center">drop here</div>
+	</div>'
 	target.appendChild overlay
 	return overlay
 

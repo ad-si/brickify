@@ -145,7 +145,7 @@ class NodeVisualizer
 			renderTarget: renderTargetTexture
 			planeScene: planeScene
 			blendingMaterial: rttPlane.material
-		}		
+		}
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

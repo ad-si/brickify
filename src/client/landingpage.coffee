@@ -8,7 +8,7 @@ $('#buttonContainer').fadeTo(500, 1)
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
 clone = require 'clone'
-fileLoader = require './fileLoader'
+fileLoader = require './modelLoading/fileLoader'
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -67,7 +67,7 @@ b1 = bundle1.init().then ->
 		loadModel
 	)
 
-	fileDropper = require './fileDropper'
+	fileDropper = require './modelLoading/fileDropper'
 	fileDropper.init callback
 
 	fileInput = document.getElementById('fileInput')

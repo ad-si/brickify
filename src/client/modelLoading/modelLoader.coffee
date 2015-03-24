@@ -4,7 +4,7 @@
 
 md5 = require('blueimp-md5').md5
 modelCache = require './modelCache'
-Node = require '../common/project/node'
+Node = require '../../common/project/node'
 
 ###
 # @class ModelLoader

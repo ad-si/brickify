@@ -1,5 +1,5 @@
 $ = require 'jquery'
-modelCache = require '../../modelCache'
+modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
 
 module.exports = class DownloadProvider
@@ -17,7 +17,7 @@ module.exports = class DownloadProvider
 
 	_createDownload: (selectedNode) =>
 		console.log 'Creating Download...'
-		
+
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode
 
 		Promise.all(promisesArray).then (resultsArray) =>

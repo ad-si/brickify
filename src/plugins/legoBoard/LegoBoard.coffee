@@ -33,13 +33,7 @@ module.exports = class LegoBoard
 		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
 			map: studTexture
 		)
-		@currentBaseplateMaterial = @baseplateTexturedMaterial
 
-		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlate
-				opacity: 0.4
-				transparent: true
-		)
 		studMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlateStud
 		)
@@ -69,27 +63,20 @@ module.exports = class LegoBoard
 	customRenderPass: (threeRenderer, camera) =>
 		if not @boardSceneTarget?
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
-		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
 
-		threeRenderer.render @boardSceneTarget.planeScene, camera
-
-	on3dUpdate: =>
-		return
-
-		# check if the camera is below z=0. if yes, make the plate transparent
-		# and hide studs
-		if not @bundle?
-			return
-
-		cam = @bundle.renderer.camera
-
-		# it should be z, but due to orbitcontrols the scene is rotated
-		if cam.position.y < 0
-			@boardScene.children[0].material = @baseplateTransparentMaterial
+		# adjust rendering to camera position
+		if camera.y < 0
+			# hide knobs and render baseplate transparent if cam looks from below
 			@boardScene.children[1].visible = false
+			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 		else
-			@boardScene.children[0].material = @currentBaseplateMaterial
 			@boardScene.children[1].visible = true if @highQualMode
+			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 1
+
+		# render to texture
+		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
+		# render texture to screen
+		threeRenderer.render @boardSceneTarget.planeScene, camera
 
 	toggleVisibility: =>
 		@boardScene.visible = !@boardScene.visible
@@ -102,7 +89,6 @@ module.exports = class LegoBoard
 			@boardScene.children[1].visible = false
 			#change baseplate material to stud texture
 			@boardScene.children[0].material = @baseplateTexturedMaterial
-			@currentBaseplateMaterial = @baseplateTexturedMaterial
 			return true
 
 		return false
@@ -115,7 +101,6 @@ module.exports = class LegoBoard
 			@boardScene.children[1].visible = true
 			#remove texture because we have physical studs
 			@boardScene.children[0].material = @baseplateMaterial
-			@currentBaseplateMaterial = @baseplateMaterial
 			return true
 			
 		return false

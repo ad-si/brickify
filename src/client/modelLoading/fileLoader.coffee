@@ -9,13 +9,7 @@ uploadString = 'Uploading file'
 loadedString = 'File loaded!'
 errorString = 'Import failed!'
 
-spinnerOptions =
-	lines: 9
-	length: 5
-	radius: 3
-	width: 2
-
-module.exports.onLoadFile = (event, feedbackTarget) ->
+module.exports.onLoadFile = (event, feedbackTarget, spinnerOptions) ->
 	event.preventDefault()
 	event.stopPropagation()
 
@@ -31,10 +25,10 @@ module.exports.onLoadFile = (event, feedbackTarget) ->
 			)
 			return Promise.reject('Wrong file format')
 
-		return loadFile feedbackTarget, file
-			.then handleLoadedFile feedbackTarget, file.name
+		return loadFile feedbackTarget, file, spinnerOptions
+			.then handleLoadedFile feedbackTarget, file.name, spinnerOptions
 
-loadFile = (feedbackTarget, file) ->
+loadFile = (feedbackTarget, file, spinnerOptions) ->
 	feedbackTarget.innerHTML = readingString
 	Spinner.start feedbackTarget, spinnerOptions
 	reader = new FileReader()
@@ -45,7 +39,7 @@ loadFile = (feedbackTarget, file) ->
 		reader.readAsArrayBuffer file
 
 
-handleLoadedFile = (feedbackTarget, filename) -> (event) ->
+handleLoadedFile = (feedbackTarget, filename, spinnerOptions) -> (event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
 
@@ -68,7 +62,7 @@ handleLoadedFile = (feedbackTarget, filename) -> (event) ->
 
 				modelCache.store(optimizedModel)
 				.then (md5hash) ->
-					Spinner.stop feedbackTarget, spinnerOptions
+					Spinner.stop feedbackTarget
 					feedbackTarget.innerHTML = loadedString
 					resolve md5hash
 				.catch reject

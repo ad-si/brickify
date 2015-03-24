@@ -46,18 +46,16 @@ b1 = bundle1.init().then ->
 
 	loadAndConvert = (hash, animate) ->
 		b1.then -> bundle1.modelLoader.loadByHash hash
-			.then ->
-				document.getElementById('renderArea1').style.backgroundImage = 'none'
+			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
 		b2.then -> bundle2.modelLoader.loadByHash hash
-			.then ->
-				document.getElementById('renderArea2').style.backgroundImage = 'none'
+			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
 	callback = (event) ->
-		fileLoader.onLoadFile event, document.getElementById('loadButton')
+		fileLoader.onLoadFile event, $('#loadButton')[0], shadow: false
 		.then (hash) ->
 			b1.then -> bundle1.sceneManager.clearScene()
 			b2.then -> bundle2.sceneManager.clearScene()

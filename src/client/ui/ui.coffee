@@ -16,9 +16,15 @@ module.exports = class Ui
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) =>
+		spinnerOptions =
+			length: 5
+			radius: 3
+			width: 2
+			shadow: false
 		fileLoader.onLoadFile(
 			event
 			document.getElementById 'loadButtonFeedback'
+			spinnerOptions
 		).then @bundle.modelLoader.loadByHash
 
 	dragOverHandler: (event) =>

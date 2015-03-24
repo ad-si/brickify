@@ -5,6 +5,7 @@ ModelVisualization = require './modelVisualization'
 RenderTargetQuadGenerator = require './RenderTargetQuadGenerator'
 pointerEnums = require '../../client/ui/pointerEnums'
 PointEventHandler = require './pointEventHandler'
+interactionHelper = require '../../client/interactionHelper'
 
 ###
 # @class NodeVisualizer
@@ -52,7 +53,9 @@ class NodeVisualizer
 		
 		return
 
-	customRenderPass: (threeRenderer, camera) =>
+	customRenderPass: (@threeRenderer, camera) =>
+		threeRenderer = @threeRenderer
+
 		# First render pass: render Bricks & Voxels
 		if not @brickSceneTarget?
 			@brickSceneTarget = @_createRenderTarget(threeRenderer)
@@ -128,7 +131,7 @@ class NodeVisualizer
 			{
 				minFilter: THREE.LinearFilter
 				magFilter: THREE.NearestFilter
-				format: THREE.RGBFormat
+				format: THREE.RGBAFormat
 				depthTexture: depthTexture
 			}
 		)
@@ -307,6 +310,7 @@ class NodeVisualizer
 
 	pointerEvent: (event, eventType) =>
 		return false if not @pointEventHandler?
+		return false if not @_pointerOverModel event
 
 		switch eventType
 			when pointerEnums.events.PointerDown
@@ -320,5 +324,69 @@ class NodeVisualizer
 			when pointerEnums.events.PointerCancel
 				@pointEventHandler.PointerCancel event
 				return true
+
+	#check whether the pointer is over the model
+	_pointerOverModel: (event) =>
+		# get NDC coordinates
+		return false if not @threeRenderer?
+
+		#Patch THREE nomenclature
+		#rendertarget.format is now rendertarget.texture.format
+		#but the method is not updated yet
+		rt = @objectSceneTarget.renderTarget
+		rt.format = rt.texture.format
+
+		rt = @brickSceneTarget.renderTarget
+		rt.format = rt.texture.format
+
+		# screen -> ndc
+		point = interactionHelper.calculatePositionInCanvasSpace(
+			event, @threeRenderer
+		)
+
+		#ndc -> renderTarget dimensions
+		objTargetDim = {
+			hw: @objectSceneTarget.renderTarget.width / 2
+			hh: @objectSceneTarget.renderTarget.height / 2
+		}
+		brickTargetDim = {
+			hw: @brickSceneTarget.renderTarget.width / 2
+			hh: @brickSceneTarget.renderTarget.height / 2
+		}
+
+		pObj = {
+			x: Math.round objTargetDim.hw + point.x * objTargetDim.hw
+			y: Math.round objTargetDim.hh + point.y * objTargetDim.hh
+		}
+		pBrick = {
+			x: Math.round brickTargetDim.hw + point.x * brickTargetDim.hw
+			y: Math.round brickTargetDim.hh + point.y * brickTargetDim.hh
+		}
+
+		# get depth values from last renderpass
+		pixelDataObject = new Uint8Array(4)
+		pixelDataBricks = new Uint8Array(4)
+		@threeRenderer.readRenderTargetPixels(
+			@objectSceneTarget.renderTarget, pObj.x, pObj.y, 1, 1, pixelDataObject
+		)
+		@threeRenderer.readRenderTargetPixels(
+			@brickSceneTarget.renderTarget, pBrick.x, pBrick.y, 1, 1, pixelDataBricks
+		)
+
+		#get the lightest color of both
+		col = {
+			r: Math.max pixelDataBricks[0], pixelDataObject[0]
+			g: Math.max pixelDataBricks[1], pixelDataObject[1]
+			b: Math.max pixelDataBricks[2], pixelDataObject[2]
+			a: Math.max pixelDataBricks[3], pixelDataObject[3]
+		}
+
+		# if it's not transparent and not completely black, there are bricks/object
+		# below pointer
+		if (col.a > 0.01 && col.r > 0.01 && col.g > 0.01 && col.b > 0.01)
+			return true
+		return false
+
+
 
 module.exports = NodeVisualizer

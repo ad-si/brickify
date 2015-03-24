@@ -92,7 +92,7 @@ module.exports.getPlanePosition = getPlanePosition
 # @memberOf interactionHelper
 ###
 calculatePositionInCanvasSpace = (event, renderer) ->
-	canvas = renderer.getDomElement()
+	canvas = renderer.domElement || renderer.getDomElement()
 
 	return new THREE.Vector3(
 		(event.pageX / canvas.width) * 2 - 1

@@ -5,5 +5,5 @@
   "lowfab": {
     "type": "controller"
   },
-  "browser": "./FidelityControl.coffee"
+  "browser": "./fidelityControl.coffee"
 }

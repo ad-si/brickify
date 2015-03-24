@@ -246,7 +246,7 @@ module.exports = class BrickVisualization
 		return voxels
 
 	_getBrushSize: (bigBrush) =>
-		return 1 unless bigBrush
+		return x: 1, y: 1, z: 1 unless bigBrush
 		length = Math.max @grid.numVoxelsX, @grid.numVoxelsY, @grid.numVoxelsZ
 		size = Math.sqrt length
 		height = Math.round size * @grid.heightRatio

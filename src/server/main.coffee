@@ -114,7 +114,7 @@ module.exports.setupRouting = ->
 		'jquery'
 		'mousetrap'
 		'operative'
-		'pep'
+		'PEP'
 		'path'
 		'three'
 		'three-orbit-controls'

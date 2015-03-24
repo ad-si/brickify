@@ -34,7 +34,7 @@ class VoxelSelector
 			.filter (voxel) => @_hasType voxel, type
 			.filter (voxel) => voxel not in @touchedVoxels
 		@touchedVoxels = @touchedVoxels.concat voxels
-		@level = mainVoxel.voxelCoords.z if options.bigBrush?
+		@level = mainVoxel.voxelCoords.z if options.bigBrush
 		return voxels
 
 	###
@@ -59,8 +59,7 @@ class VoxelSelector
 		return voxel
 
 	_getLeveledVoxel: (voxels, type) ->
-		return voxels.find (voxel) =>
-			voxel.voxelCoords.z == @level # and @_hasType voxel, type
+		return voxels.find (voxel) => voxel.voxelCoords.z == @level
 
 	_getFrontierVoxel: (voxels, type) ->
 		lastTouched = @touchedVoxels[-2...]

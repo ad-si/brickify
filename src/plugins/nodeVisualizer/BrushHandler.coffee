@@ -82,7 +82,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.
-				highlightVoxel event, selectedNode, false, @bigBrushSelected
+				highlightVoxel event, selectedNode, '3d', @bigBrushSelected
 
 	_legoCancel: (event, selectedNode) =>
 		return if @interactionDisabled
@@ -125,7 +125,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.
-				highlightVoxel event, selectedNode, true, @bigBrushSelected
+				highlightVoxel event, selectedNode, 'lego', @bigBrushSelected
 
 	_printCancel: (event, selectedNode) =>
 		return if @interactionDisabled

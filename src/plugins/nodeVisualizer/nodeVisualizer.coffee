@@ -4,6 +4,7 @@ BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 RenderTargetQuadGenerator = require './RenderTargetQuadGenerator'
 pointerEnums = require '../../client/ui/pointerEnums'
+PointEventHandler = require './pointEventHandler'
 
 ###
 # @class NodeVisualizer
@@ -27,7 +28,12 @@ class NodeVisualizer
 		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
 
 	init: (@bundle) =>
-		@brushHandler = new BrushHandler(@bundle, @)
+		if @bundle.ui?
+			@brushHandler = new BrushHandler(@bundle, @)
+			@pointEventHandler = new PointEventHandler(
+				@bundle.sceneManager
+				@bundle.ui.workflowUi.brushSelector
+			)
 
 	init3d: (@threejsRootNode) =>
 		# Voxels / Bricks are rendered as a first render pass
@@ -84,7 +90,7 @@ class NodeVisualizer
 		threeRenderer.render @objectSceneTarget.planeScene, camera
 
 		# render invisble parts (object behind lego bricks)
-		if not @brushHandler.legoBrushSelected
+		if @brushHandler? and not @brushHandler.legoBrushSelected
 			# Adjust object material to be dark and more transparent
 			blendMat = @objectSceneTarget.planeScene.children[0].material
 			blendMat.uniforms.colorMult.value = @objectShadowColorMult
@@ -136,9 +142,9 @@ class NodeVisualizer
 			blendingMaterial: rttPlane.material
 		}
 		 
-
 	getBrushes: =>
-		return @brushHandler.getBrushes()
+		return @brushHandler.getBrushes() if @brushHandler?
+		return []
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -299,14 +305,19 @@ class NodeVisualizer
 					cachedData.brickVisualization.showCsg(csg)
 
 	pointerEvent: (event, eventType) =>
+		return false if not @pointEventHandler?
+
 		switch eventType
-			when pointerEnums.PointerDown
-				return
-			when pointerEnums.PointerMove
-				return
-			when pointerEnums.PointerUp
-				return
-			when pointerEnums.PointerCancel
-				return
+			when pointerEnums.events.PointerDown
+				@pointEventHandler.pointerDown event
+				return true
+			when pointerEnums.events.PointerMove
+				return @pointEventHandler.pointerMove event
+			when pointerEnums.events.PointerUp
+				@pointEventHandler.pointerUp event
+				return true
+			when pointerEnums.events.PointerCancel
+				@pointEventHandler.PointerCancel event
+				return true
 
 module.exports = NodeVisualizer

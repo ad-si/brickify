@@ -57,16 +57,30 @@ module.exports.getResponsiblePlugin = getResponsiblePlugin
 # @return {Object} a vector {x, y, z}
 # @memberOf interactionHelper
 ###
-calculatePositionOnGrid = (event, renderer) ->
+getGridPosition = (event, renderer) ->
+	return getPlanePosition event, renderer, 0
+module.exports.getGridPosition = getGridPosition
+
+###
+# Determines the position of an event on the given z plane
+# @param {Object} event usually a mouse or tap or pointer event
+# @param {Number} event.pageX the x coordinate on the screen
+# @param {Number} event.pageY the y coordinate on the screen
+# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @param {Number} z the z plane on which the interaction takes place
+# @return {Object} a vector {x, y, z}
+# @memberOf interactionHelper
+###
+getPlanePosition = (event, renderer, z) ->
 	ray = calculateRay event, renderer
 
 	# we are calculating in camera coordinate system -> y and z are rotated
 	camera = renderer.getCamera()
-	ray.multiplyScalar -camera.position.y / ray.y
+	ray.multiplyScalar -(camera.position.y - z) / ray.y
 	posInWorld = camera.position.clone().add ray
 
 	return x: posInWorld.x, y: -posInWorld.z, z: posInWorld.y
-module.exports.getGridPosition = calculatePositionOnGrid
+module.exports.getPlanePosition = getPlanePosition
 
 ###
 # Determines the position of an event in canvas space

@@ -64,13 +64,11 @@ module.exports = class LegoBoard
 		if not @boardSceneTarget?
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
 
-		# adjust rendering to camera position
+
+		# render baseplate transparent if cam looks from below
 		if camera.position.y < 0
-			# hide knobs and render baseplate transparent if cam looks from below
-			@boardScene.children[1].visible = false
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 		else
-			@boardScene.children[1].visible = true if @highQualMode
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 1
 
 		# render to texture

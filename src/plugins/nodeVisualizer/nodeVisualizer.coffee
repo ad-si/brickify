@@ -7,6 +7,10 @@ pointerEnums = require '../../client/ui/pointerEnums'
 PointEventHandler = require './pointEventHandler'
 interactionHelper = require '../../client/interactionHelper'
 
+maskBit0 = 0x01
+maskBit1 = 0x01 << 1
+maskBit2 = 0x01 << 2
+
 ###
 # @class NodeVisualizer
 ###
@@ -84,15 +88,19 @@ class NodeVisualizer
 		# finally render everything (on quads) on screen
 		gl = threeRenderer.context
 
+		# everything that is visible lego gets the first bit set
+		gl.enable(gl.STENCIL_TEST)
+		gl.stencilFunc(gl.ALWAYS, 0xFF, 0xFF)
+		gl.stencilOp(gl.ZERO, gl.ZERO, gl.REPLACE)
+		gl.stencilMask(maskBit0)
+
 		# bricks
 		threeRenderer.render @brickSceneTarget.planeScene, camera
 		
-		# the visible parts of the object
-		# set stencil to 1 if object fails depth test
-		gl.enable(gl.STENCIL_TEST)
-		gl.stencilFunc(gl.ALWAYS, 1, 0xFF)
-		gl.stencilOp(gl.ZERO, gl.REPLACE, gl.ZERO)
-		gl.stencilMask(0xFF)
+		# everything that is 3d model and hidden gets the second bit set
+		gl.stencilFunc(gl.ALWAYS, 0xFF, 0xFF)
+		gl.stencilOp(gl.KEEP, gl.REPLACE, gl.KEEP)
+		gl.stencilMask(maskBit1)
 
 		# render visible parts
 		threeRenderer.render @objectSceneTarget.planeScene, camera
@@ -104,8 +112,10 @@ class NodeVisualizer
 			blendMat.uniforms.colorMult.value = @objectShadowColorMult
 			blendMat.uniforms.opacity.value = @objectShadowOpacity
 
-			# Only render where stencil is 1 and ignore depth buffer
-			gl.stencilFunc(gl.EQUAL, 1, 0xFF)
+			# Only render where hidden 3d model is
+			gl.stencilFunc(gl.EQUAL, maskBit1, maskBit1)
+			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+
 			gl.disable(gl.DEPTH_TEST)
 			threeRenderer.render @objectSceneTarget.planeScene, camera
 			gl.enable(gl.DEPTH_TEST)
@@ -118,6 +128,8 @@ class NodeVisualizer
 
 		# render this-could-be-lego-shadows and brush highlight
 		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
+
+		
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

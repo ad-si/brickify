@@ -15,9 +15,7 @@ spinnerOptions =
 	radius: 3
 	width: 2
 
-module.exports.onLoadFile = (event, feedbackTarget, finishedCallback) ->
-	uploadFinishedCallback = finishedCallback
-
+module.exports.onLoadFile = (event, feedbackTarget) ->
 	event.preventDefault()
 	event.stopPropagation()
 
@@ -25,50 +23,54 @@ module.exports.onLoadFile = (event, feedbackTarget, finishedCallback) ->
 	if files?
 		file = files[0]
 
-		fn = file.name.toLowerCase()
-		if (fn.search('.stl') == fn.length - 4)
-			feedbackTarget.innerHTML = readingString
-			Spinner.start feedbackTarget, spinnerOptions
-			loadFile feedbackTarget, file
-		else
-			bootbox.alert({
+		unless file.name.toLowerCase().endsWith '.stl'
+			bootbox.alert(
 				title: 'Your file does not have the right format!'
-				message: 'Only .stl files are supported at the moment. We are working on
-adding more file formats'
-			})
+				message: 'Only .stl files are supported at the moment.
+					We are working on adding more file formats'
+			)
+			return Promise.reject('Wrong file format')
+
+		return loadFile feedbackTarget, file
+			.then handleLoadedFile feedbackTarget, file.name
 
 loadFile = (feedbackTarget, file) ->
+	feedbackTarget.innerHTML = readingString
+	Spinner.start feedbackTarget, spinnerOptions
 	reader = new FileReader()
-	reader.onload = handleLoadedFile(feedbackTarget, file.name)
-	reader.readAsArrayBuffer(file)
+	return new Promise (resolve, reject) ->
+		reader.onload = resolve
+		reader.onerror = reject
+		reader.onabort = reject
+		reader.readAsArrayBuffer file
 
-handleLoadedFile = (feedbackTarget, filename) ->
-	loadCallback = (event) ->
+
+handleLoadedFile = (feedbackTarget, filename) -> (event) ->
 		console.log "File #{filename} loaded"
 		fileContent = event.target.result
 
-		meshlib.parse fileContent, null, (error, optimizedModel) ->
-			Spinner.stop feedbackTarget
-			if error or !optimizedModel
-				bootbox.alert({
-					title: 'Import failed'
-					message: 'Your file contains errors that we could not fix automatically.'
-				})
+		return new Promise (resolve, reject) ->
+			meshlib.parse fileContent, null, (error, optimizedModel) ->
+				Spinner.stop feedbackTarget
 
-				feedbackTarget.innerHTML = errorString
-				return
+				if error or !optimizedModel
+					bootbox.alert(
+						title: 'Import failed'
+						message: 'Your file contains errors that we could not fix.'
+					)
+					feedbackTarget.innerHTML = errorString
+					reject()
+					return
 
-			optimizedModel.originalFileName = filename
+				optimizedModel.originalFileName = filename
+				feedbackTarget.innerHTML = uploadString
+				Spinner.start feedbackTarget, spinnerOptions
 
-			feedbackTarget.innerHTML = uploadString
-			Spinner.start feedbackTarget, spinnerOptions
-
-			modelCache.store(optimizedModel).then (md5hash) ->
-				Spinner.stop feedbackTarget, spinnerOptions
-				feedbackTarget.innerHTML = loadedString
-				if uploadFinishedCallback?
-					uploadFinishedCallback(md5hash)
+				modelCache.store(optimizedModel)
+				.then (md5hash) ->
+					Spinner.stop feedbackTarget, spinnerOptions
+					feedbackTarget.innerHTML = loadedString
+					resolve md5hash
+				.catch reject
 
 		return
-
-	return loadCallback

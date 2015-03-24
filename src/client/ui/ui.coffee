@@ -19,8 +19,7 @@ module.exports = class Ui
 		fileLoader.onLoadFile(
 			event
 			document.getElementById 'loadButtonFeedback'
-			@bundle.modelLoader.loadByHash
-		)
+		).then @bundle.modelLoader.loadByHash
 
 	dragOverHandler: (event) =>
 		event.stopPropagation()

@@ -56,16 +56,12 @@ b1 = bundle1.init().then ->
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
-	loadModel = (hash) ->
-		b1.then -> bundle1.sceneManager.clearScene()
-		b2.then -> bundle2.sceneManager.clearScene()
-		loadAndConvert hash, true
-
-	callback = (event) -> fileLoader.onLoadFile(
-		event
-		document.getElementById('loadButton')
-		loadModel
-	)
+	callback = (event) ->
+		fileLoader.onLoadFile event, document.getElementById('loadButton')
+		.then (hash) ->
+			b1.then -> bundle1.sceneManager.clearScene()
+			b2.then -> bundle2.sceneManager.clearScene()
+			loadAndConvert hash, true
 
 	fileDropper = require './modelLoading/fileDropper'
 	fileDropper.init callback

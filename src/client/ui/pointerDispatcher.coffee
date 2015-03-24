@@ -1,13 +1,5 @@
 interactionHelper = require '../interactionHelper'
-
-BUTTON_STATES =
-	none: 0
-	left: 1
-	right: 2
-	middle: 4
-	x1: 8
-	x2: 16
-	eraser: 32
+pointerEnums = require './pointerEnums'
 
 class PointerDispatcher
 	constructor: (@bundle) ->
@@ -24,22 +16,8 @@ class PointerDispatcher
 		_registerEvent = (element, event) =>
 			element.addEventListener event.toLowerCase(), @['on' + event]
 
-		events = [
-			'PointerOver'
-			'PointerEnter'
-			'PointerDown'
-			'PointerMove'
-			'PointerUp'
-			'PointerCancel'
-			'PointerOut'
-			'PointerLeave'
-			'GotPointerCapture'
-			'LostPointerCapture'
-			'ContextMenu'
-		]
-
 		element = @bundle.ui.renderer.getDomElement()
-		_registerEvent element, event for event in events
+		_registerEvent element, event for event of pointerEnums.events
 
 	onPointerOver: (event) =>
 		return
@@ -58,7 +36,7 @@ class PointerDispatcher
 		@_capturePointerFor event
 
 		# toggle brush if it is the right mouse button
-		if(event.buttons & BUTTON_STATES.right)
+		if(event.buttons & pointerEnums.buttonStates.right)
 			@brushToggled = @brushSelector.toggleBrush()
 
 		# perform brush action
@@ -74,8 +52,11 @@ class PointerDispatcher
 		# don't call mouse events if there is no selected node
 		return unless @sceneManager.selectedNode?
 
-		if event.buttons not in
-		[BUTTON_STATES.none, BUTTON_STATES.left, BUTTON_STATES.right]
+		if event.buttons not in	[
+			pointerEnums.buttonStates.none,
+			pointerEnums.buttonStates.left,
+			pointerEnums.buttonStates.right
+		]
 			@_cancelBrush event
 			return
 
@@ -86,7 +67,8 @@ class PointerDispatcher
 		if @isBrushing and brush.mouseMoveCallback?
 			brush.mouseMoveCallback event, @sceneManager.selectedNode
 			@_stop event
-		else if event.buttons is BUTTON_STATES.none and brush.mouseHoverCallback?
+		else if event.buttons is pointerEnums.buttonStates.none and
+		brush.mouseHoverCallback?
 			brush.mouseHoverCallback event, @sceneManager.selectedNode
 			@_stop event
 

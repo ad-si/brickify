@@ -2,7 +2,7 @@ BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
-RenderTargetQuadGenerator = require './RenderTargetQuadGenerator'
+RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 pointerEnums = require '../../client/ui/pointerEnums'
 PointEventHandler = require './pointEventHandler'
 interactionHelper = require '../../client/interactionHelper'
@@ -58,12 +58,12 @@ class NodeVisualizer
 
 		# First render pass: render Bricks & Voxels
 		if not @brickSceneTarget?
-			@brickSceneTarget = @_createRenderTarget(threeRenderer)
+			@brickSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
 		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
 
 		# Second pass: render object
 		if not @objectSceneTarget?
-			@objectSceneTarget = @_createRenderTarget(
+			@objectSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				{ opacity: @objectOpacity, expandBlack: true }
 			)
@@ -73,7 +73,7 @@ class NodeVisualizer
 
 		# Third pass: render shadows
 		if not @brickShadowSceneTarget?
-			@brickShadowSceneTarget = @_createRenderTarget(
+			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				{ opacity: @brickShadowOpacity, blackAlwaysOpaque: true, expandBlack: true }
 			)
@@ -118,37 +118,6 @@ class NodeVisualizer
 
 		# render this-could-be-lego-shadows and brush highlight
 		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
-
-	_createRenderTarget: (threeRenderer, shaderOptions) ->
-		# Create rendertarget
-		renderWidth = threeRenderer.domElement.width
-		renderHeight = threeRenderer.domElement.height
-
-		depthTexture = new THREE.DepthTexture renderWidth, renderHeight
-		renderTargetTexture = new THREE.WebGLRenderTarget(
-			renderWidth
-			renderHeight
-			{
-				minFilter: THREE.LinearFilter
-				magFilter: THREE.NearestFilter
-				format: THREE.RGBAFormat
-				depthTexture: depthTexture
-			}
-		)
-
-		#create scene to render texture
-		planeScene = new THREE.Scene()
-		rttPlane = RenderTargetQuadGenerator.generateQuad(
-			renderTargetTexture, depthTexture, shaderOptions
-		)
-		planeScene.add rttPlane
-
-		return {
-			depthTexture: depthTexture
-			renderTarget: renderTargetTexture
-			planeScene: planeScene
-			blendingMaterial: rttPlane.material
-		}
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

@@ -1,9 +1,40 @@
 THREE = require 'three'
 
+module.exports.createRenderTarget = (threeRenderer, shaderOptions) ->
+	# Create rendertarget
+	renderWidth = threeRenderer.domElement.width
+	renderHeight = threeRenderer.domElement.height
+
+	depthTexture = new THREE.DepthTexture renderWidth, renderHeight
+	renderTargetTexture = new THREE.WebGLRenderTarget(
+		renderWidth
+		renderHeight
+		{
+			minFilter: THREE.LinearFilter
+			magFilter: THREE.NearestFilter
+			format: THREE.RGBAFormat
+			depthTexture: depthTexture
+		}
+	)
+
+	#create scene to render texture
+	planeScene = new THREE.Scene()
+	rttPlane = generateQuad(
+		renderTargetTexture, depthTexture, shaderOptions
+	)
+	planeScene.add rttPlane
+
+	return {
+		depthTexture: depthTexture
+		renderTarget: renderTargetTexture
+		planeScene: planeScene
+		blendingMaterial: rttPlane.material
+	}
+
 # Generates an THREE.Mesh that will be displayed as a screen aligned quad
 # and will draw the supplied rttTexture while setting the depth value to
 # the values specified in rttDepthTexture
-module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
+generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 	shaderOptions = setDefaultOptions shaderOptions
 
 	mat = new THREE.ShaderMaterial({
@@ -22,6 +53,7 @@ module.exports.generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 
 	planeGeometry = new THREE.PlaneBufferGeometry(2,2)
 	return new THREE.Mesh( planeGeometry, mat )
+module.exports.generateQuad = generateQuad
 
 vertexShader = (options) ->
 	return '

@@ -34,7 +34,10 @@ class VoxelSelector
 			.filter (voxel) => @_hasType voxel, type
 			.filter (voxel) => voxel not in @touchedVoxels
 		@touchedVoxels = @touchedVoxels.concat voxels
-		@level = mainVoxel.voxelCoords.z if options.bigBrush
+		if options.bigBrush
+			@level =
+				voxelZ: mainVoxel.voxelCoords.z
+				worldZ: mainVoxel.position.z
 		return voxels
 
 	###
@@ -50,7 +53,7 @@ class VoxelSelector
 		intersections = @_getIntersections event
 		voxels = intersections.map (intersection) -> intersection.object.parent
 
-		return @_getLeveledVoxel voxels, type if @level
+		return @_getLeveledVoxel event, voxels if @level
 
 		voxel = @_getFrontierVoxel voxels, type
 		if type is '3d'
@@ -58,8 +61,20 @@ class VoxelSelector
 			voxel ?= @_getMiddleVoxel event
 		return voxel
 
-	_getLeveledVoxel: (voxels, type) ->
-		return voxels.find (voxel) => voxel.voxelCoords.z == @level
+	_getLeveledVoxel: (event, voxels) ->
+		voxel =  voxels.find (voxel) => voxel.voxelCoords.z == @level.voxelZ
+		return voxel if voxel
+		position = interactionHelper.getPlanePosition(
+			event
+			@renderer
+			@level.worldZ
+		)
+		voxelCoords = @grid.mapGridToVoxel @grid.mapWorldToGrid position
+		position = @grid.mapVoxelToWorld voxelCoords
+		pseudoVoxel =
+			position: position
+			voxelCoords: voxelCoords
+		return pseudoVoxel
 
 	_getFrontierVoxel: (voxels, type) ->
 		lastTouched = @touchedVoxels[-2...]

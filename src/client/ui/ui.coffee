@@ -2,7 +2,7 @@ Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi'
 fileDropper = require '../fileDropper'
-fileLoader = require '../../landingpage/fileLoader'
+fileLoader = require '../fileLoader'
 
 ###
 # @module ui
@@ -16,9 +16,11 @@ module.exports = class Ui
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) =>
-		fileLoader.onLoadFile event,
+		fileLoader.onLoadFile(
+			event
 			document.getElementById 'loadButton'
 			@bundle.modelLoader.loadByHash
+		)
 
 	dragOverHandler: (event) =>
 		event.stopPropagation()

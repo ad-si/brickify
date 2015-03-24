@@ -3,6 +3,7 @@
 #
 # @module clientDataPacketsProxy
 ###
+$ = require 'jquery'
 
 module.exports.create = ->
 	return Promise.resolve $.ajax '/datapacket/create', type: 'GET'

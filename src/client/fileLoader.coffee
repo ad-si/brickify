@@ -1,5 +1,5 @@
 meshlib = require 'meshlib'
-modelCache = require '../client/modelCache'
+modelCache = require './modelCache'
 
 uploadFinishedCallback = null
 

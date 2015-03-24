@@ -1,4 +1,4 @@
-require('es6-promise').polyfill()
+require './polyfills'
 $ = require 'jquery'
 
 #fade in action buttons when javascript is ready
@@ -6,7 +6,7 @@ $('#buttonContainer').fadeTo(500, 1)
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
-Bundle = require '../client/bundle'
+Bundle = require './bundle'
 clone = require 'clone'
 fileLoader = require './fileLoader'
 
@@ -61,11 +61,13 @@ b1 = bundle1.init().then ->
 		b2.then -> bundle2.sceneManager.clearScene()
 		loadAndConvert hash, true
 
-	callback = (event) -> fileLoader.onLoadFile event,
-			document.getElementById('loadButton')
-			loadModel
+	callback = (event) -> fileLoader.onLoadFile(
+		event
+		document.getElementById('loadButton')
+		loadModel
+	)
 
-	fileDropper = require '../client/fileDropper'
+	fileDropper = require './fileDropper'
 	fileDropper.init callback
 
 	fileInput = document.getElementById('fileInput')

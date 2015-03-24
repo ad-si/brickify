@@ -1,6 +1,4 @@
-require('es6-promise').polyfill()
-require 'es6-collections'
-require 'PEP'
+require './polyfills'
 
 path = require 'path'
 $ = require 'jquery'

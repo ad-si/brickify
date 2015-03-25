@@ -72,13 +72,13 @@ class Renderer
 		@controls.reset()
 
 	init: (@globalConfig) ->
-		@setupSize @globalConfig
-		@setupRenderer @globalConfig
+		@_setupSize @globalConfig
+		@_setupRenderer @globalConfig
 		@scene = @getDefaultScene()
-		@setupCamera @globalConfig
+		@_setupCamera @globalConfig
 		requestAnimationFrame @localRenderer
 
-	setupSize: (globalConfig) ->
+	_setupSize: (globalConfig) ->
 		if not globalConfig.staticRendererSize
 			@staticRendererSize = false
 		else
@@ -86,13 +86,13 @@ class Renderer
 			@staticRendererWidth = globalConfig.staticRendererWidth
 			@staticRendererHeight = globalConfig.staticRendererHeight
 
-	size: ->
+	_size: ->
 		if @staticRendererSize
 			return {width: @staticRendererWidth, height: @staticRendererHeight}
 		else
 			return {width: window.innerWidth, height: window.innerHeight}
 
-	setupRenderer: (globalConfig) ->
+	_setupRenderer: (globalConfig) ->
 		@threeRenderer = new THREE.WebGLRenderer(
 			alpha: true
 			antialias: true
@@ -110,10 +110,10 @@ class Renderer
 			console.warn 'The current WebGL context does not have a stencil buffer.
 			 Rendering will be (partly) broken'
 
-		@threeRenderer.setSize @size().width, @size().height
+		@threeRenderer.setSize @_size().width, @_size().height
 		@threeRenderer.autoClear = false
 
-	setupScene: (globalConfig) ->
+	_setupScene: (globalConfig) ->
 		scene = new THREE.Scene()
 
 		# Scene rotation because orbit controls only works
@@ -133,10 +133,10 @@ class Renderer
 
 		return scene
 
-	setupCamera: (globalConfig) ->
+	_setupCamera: (globalConfig) ->
 		@camera = new THREE.PerspectiveCamera(
 			globalConfig.fov,
-			(@size().width / @size().height),
+			(@_size().width / @_size().height),
 			globalConfig.cameraNearPlane,
 			globalConfig.cameraFarPlane
 		)
@@ -160,7 +160,7 @@ class Renderer
 			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
 			@controls.target.set(0, 0, 0)
 
-	setupLighting: (scene) ->
+	_setupLighting: (scene) ->
 		ambientLight = new THREE.AmbientLight(0x404040)
 		scene.add ambientLight
 
@@ -176,10 +176,10 @@ class Renderer
 		directionalLight.position.set 20, -20, -30
 		scene.add directionalLight
 
-	# creates a scene wit default light and rotation settings
+	# creates a scene with default light and rotation settings
 	getDefaultScene: =>
-		scene = @setupScene(@globalConfig)
-		@setupLighting(scene)
+		scene = @_setupScene(@globalConfig)
+		@_setupLighting(scene)
 		return scene
 
 	loadCamera: (state) =>

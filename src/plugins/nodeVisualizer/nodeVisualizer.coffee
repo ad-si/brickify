@@ -96,7 +96,7 @@ class NodeVisualizer
 
 		# everything that is visible lego gets the first bit set
 		gl.enable(gl.STENCIL_TEST)
-		gl.stencilFunc(gl.ALWAYS, stencilBits.maskBit0, 0xFF)
+		gl.stencilFunc(gl.ALWAYS, stencilBits.legoMask, 0xFF)
 		gl.stencilOp(gl.ZERO, gl.ZERO, gl.REPLACE)
 		gl.stencilMask(0xFF)
 
@@ -106,9 +106,9 @@ class NodeVisualizer
 		# everything that is 3d model and hidden gets the third bit set
 		# every visible part of the 3d model gets the second bit set
 		# (via increase and not being allowed to remove the first bit)
-		gl.stencilFunc(gl.ALWAYS, stencilBits.maskBit2, 0xFF)
+		gl.stencilFunc(gl.ALWAYS, stencilBits.hiddenObjectMask, 0xFF)
 		gl.stencilOp(gl.KEEP, gl.REPLACE, gl.INCR)
-		gl.stencilMask(stencilBits.maskBit1 | stencilBits.maskBit2)
+		gl.stencilMask(stencilBits.visibleObjectMask | stencilBits.hiddenObjectMask)
 
 		# render visible parts
 		threeRenderer.render @objectSceneTarget.planeScene, camera
@@ -121,7 +121,9 @@ class NodeVisualizer
 			blendMat.uniforms.opacity.value = @objectShadowOpacity
 
 			# Only render where hidden 3d model is
-			gl.stencilFunc(gl.EQUAL, stencilBits.maskBit2, stencilBits.maskBit2)
+			gl.stencilFunc(
+				gl.EQUAL, stencilBits.hiddenObjectMask, stencilBits.hiddenObjectMask
+			)
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 
 			gl.disable(gl.DEPTH_TEST)
@@ -135,7 +137,7 @@ class NodeVisualizer
 		# everything shadowy gets the fourth bit set
 		gl.stencilFunc(gl.ALWAYS, 0xFF, 0xFF)
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE)
-		gl.stencilMask(stencilBits.maskBit3)
+		gl.stencilMask(stencilBits.visibleShadowMask)
 
 		# render this-could-be-lego-shadows and brush highlight
 		threeRenderer.render @brickShadowSceneTarget.planeScene, camera

@@ -84,7 +84,7 @@ module.exports = class LegoBoard
 			#render one pass transparent, where visible object or shadow is
 			# (= no lego)
 			gl.enable(gl.STENCIL_TEST)
-			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.maskBit0)
+			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.legoMask)
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 			gl.stencilMask(0x00)
 

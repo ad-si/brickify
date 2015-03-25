@@ -327,26 +327,25 @@ class NodeVisualizer
 				@pointEventHandler.PointerCancel event
 				return true
 
-	#check whether the pointer is over the model
+	# check whether the pointer is over the model
 	_pointerOverModel: (event) =>
-		# get NDC coordinates
 		return false if not @threeRenderer?
 
-		#Patch THREE nomenclature
-		#rendertarget.format is now rendertarget.texture.format
-		#but the method is not updated yet
+		# Patch THREE nomenclature
+		# rendertarget.format is now rendertarget.texture.format
+		# but the method is not updated yet
 		rt = @objectSceneTarget.renderTarget
 		rt.format = rt.texture.format
 
 		rt = @brickSceneTarget.renderTarget
 		rt.format = rt.texture.format
 
-		# screen -> ndc
+		# convert screen -> ndc coordinates
 		point = interactionHelper.calculatePositionInCanvasSpace(
 			event, @threeRenderer
 		)
 
-		#ndc -> renderTarget dimensions
+		# ndc -> renderTarget dimensions
 		objTargetDim = {
 			hw: @objectSceneTarget.renderTarget.width / 2
 			hh: @objectSceneTarget.renderTarget.height / 2
@@ -375,7 +374,7 @@ class NodeVisualizer
 			@brickSceneTarget.renderTarget, pBrick.x, pBrick.y, 1, 1, pixelDataBricks
 		)
 
-		#get the lightest color of both
+		# get the lightest color of both
 		col = {
 			r: Math.max pixelDataBricks[0], pixelDataObject[0]
 			g: Math.max pixelDataBricks[1], pixelDataObject[1]
@@ -385,10 +384,6 @@ class NodeVisualizer
 
 		# if it's not transparent and not completely black, there are bricks/object
 		# below pointer
-		if (col.a > 0.01 && col.r > 0.01 && col.g > 0.01 && col.b > 0.01)
-			return true
-		return false
-
-
+		return (col.a > 0.01 && col.r > 0.01 && col.g > 0.01 && col.b > 0.01)
 
 module.exports = NodeVisualizer

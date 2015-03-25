@@ -292,7 +292,7 @@ class NodeVisualizer
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg(csg)
 
-	pointerEvent: (event, eventType) =>
+	onPointerEvent: (event, eventType) =>
 		return false if not @pointEventHandler?
 
 		if not @_pointerOverModel event

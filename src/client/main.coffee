@@ -1,5 +1,4 @@
-require '../common/polyfills'
-require 'PEP'
+require './polyfills'
 
 path = require 'path'
 $ = require 'jquery'

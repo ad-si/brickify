@@ -1,4 +1,4 @@
-require('es6-promise').polyfill()
+require '../common/polyfills'
 
 http = require 'http'
 path = require 'path'
@@ -132,8 +132,10 @@ module.exports.setupRouting = ->
 		insertGlobals: developmentMode
 	})
 
-	webapp.get '/landingpage.js', browserify('src/landingpage/main.coffee', {
+	webapp.get '/landingpage.js', browserify('src/client/landingpage.coffee', {
 		extensions: ['.coffee']
+		external: shared
+		insertGlobals: developmentMode
 	})
 
 	fontAwesomeRegex = /\/fonts\/fontawesome-.*/

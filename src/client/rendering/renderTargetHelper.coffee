@@ -19,16 +19,16 @@ module.exports.createRenderTarget = (threeRenderer, shaderOptions) ->
 
 	#create scene to render texture
 	planeScene = new THREE.Scene()
-	rttPlane = generateQuad(
+	screenAlignedQuad = generateQuad(
 		renderTargetTexture, depthTexture, shaderOptions
 	)
-	planeScene.add rttPlane
+	planeScene.add screenAlignedQuad
 
 	return {
 		depthTexture: depthTexture
 		renderTarget: renderTargetTexture
 		planeScene: planeScene
-		blendingMaterial: rttPlane.material
+		blendingMaterial: screenAlignedQuad.material
 	}
 
 # Generates an THREE.Mesh that will be displayed as a screen aligned quad

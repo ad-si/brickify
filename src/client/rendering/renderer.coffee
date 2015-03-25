@@ -21,7 +21,7 @@ class Renderer
 			@threeRenderer.render @scene, @camera
 
 			# allow for custom render passes
-			@pluginHooks.customRenderPass @threeRenderer, @camera
+			@pluginHooks.onPaint @threeRenderer, @camera
 
 			@pluginHooks.on3dUpdate timestamp
 			@controls?.update()

@@ -61,7 +61,7 @@ module.exports = class LegoBoard
 					object.translateY y
 					studsContainer.add object
 
-	customRenderPass: (threeRenderer, camera) =>
+	onPaint: (threeRenderer, camera) =>
 		# render lego board to texture
 		if not @boardSceneTarget?
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)

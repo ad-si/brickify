@@ -54,7 +54,7 @@ class NodeVisualizer
 		
 		return
 
-	customRenderPass: (@threeRenderer, camera) =>
+	onPaint: (@threeRenderer, camera) =>
 		threeRenderer = @threeRenderer
 
 		# First render pass: render Bricks & Voxels

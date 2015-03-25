@@ -15,7 +15,8 @@ class BrushSelector
 
 		for brush in @_brushList
 			htmlContainer = @brushContainer.find brush.containerId
-			brush.jqueryObject = htmlContainer
+			brush.brushButton = htmlContainer
+			brush.bigBrushButton = brush.brushButton.find '.bigBrush'
 			@_bindBrushEvent brush
 
 	# binds the given brushes to the UI
@@ -33,9 +34,16 @@ class BrushSelector
 		@selectedNode = null
 
 	_bindBrushEvent: (brush) ->
-		brush.jqueryObject.on 'click', (event) =>
+		brush.brushButton.on 'click', (event) =>
 			@_bigBrushSelected = event.shiftKey
 			@_brushSelect brush
+		brush.bigBrushButton.on 'click', (event) =>
+			if brush is @_selectedBrush
+				@_bigBrushSelected = !@_bigBrushSelected
+			else
+				@_bigBrushSelected = true
+			@_brushSelect brush
+			event.stopImmediatePropagation()
 
 	_brushSelect: (brush) =>
 		# deselect currently selected brush
@@ -43,13 +51,15 @@ class BrushSelector
 
 		#select new brush
 		@_selectedBrush = brush
-		brush.jqueryObject.addClass 'active'
+		brush.brushButton.addClass 'active'
+		brush.bigBrushButton.addClass 'active' if @_bigBrushSelected
 		brush.selectCallback? @selectedNode, @_bigBrushSelected
 
 	_deselectBrush: (node) =>
 		if @_selectedBrush?
 			@_selectedBrush.deselectCallback? node
-			@_selectedBrush.jqueryObject.removeClass 'active'
+			@_selectedBrush.brushButton.removeClass 'active'
+			@_selectedBrush.bigBrushButton.removeClass 'active'
 			@_selectedBrush = null
 
 	getSelectedBrush: =>

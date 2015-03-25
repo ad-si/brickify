@@ -28,6 +28,7 @@ module.exports.getBoundingSphere = (threeNode) ->
 		center: geometry.boundingSphere.center
 
 	threeNode.updateMatrix()
-	result.center.applyProjection threeNode.matrix
+	threeNode.parent?.updateMatrixWorld()
+	result.center.applyProjection threeNode.matrixWorld
 
 	return result

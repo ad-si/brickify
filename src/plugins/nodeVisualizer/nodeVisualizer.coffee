@@ -187,8 +187,6 @@ class NodeVisualizer
 
 	zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode
-		threeNode.updateMatrix()
-		boundingSphere.center.applyProjection threeNode.matrix
 		@bundle.renderer.zoomToBoundingSphere boundingSphere
 
 	# initialize visualization with data from newBrickator
@@ -304,7 +302,7 @@ class NodeVisualizer
 			cachedData.brickVisualization.hideCsg()
 			cachedData.modelVisualization.setNodeVisibility true
 			cachedData.brickVisualization.showVoxels()
-			
+
 			if @brushHandler.legoBrushSelected
 				cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 

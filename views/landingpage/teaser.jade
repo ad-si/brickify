@@ -6,8 +6,8 @@ header
 			h1 Brickolage
 			h2 Extend your LEGO#[sup &reg;] with 3D-printed parts!
 			.drop
-				label(for='fileSelector').btn.btn-primary.dropper
+				label(for='fileInput').btn.btn-primary.dropper#loadButton
 					img(src='./img/spinner.gif' id="spinner")
 				input(type='file' accept=".stl"
-				style='display: none')#fileSelector
+				style='display: none')#fileInput
 		#makey.col-lg-4

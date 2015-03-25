@@ -6,7 +6,7 @@
 ###
 
 THREE = require 'three'
-modelCache = require '../../client/modelCache'
+modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
@@ -121,11 +121,11 @@ module.exports = class LegoBoard
 	beautify: =>
 		if not @highQualMode
 			@highQualMode = true
-			
+
 			#show studs
 			@boardScene.studs.visible = true
 			#remove texture because we have physical studs
 			@boardScene.baseplate.material = @baseplateMaterial
 			return true
-			
+
 		return false

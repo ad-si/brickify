@@ -1,4 +1,4 @@
-modelCache = require '../../client/modelCache'
+modelCache = require '../../client/modelLoading/modelCache'
 LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 THREE = require 'three'

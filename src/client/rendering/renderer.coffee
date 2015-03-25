@@ -13,6 +13,8 @@ class Renderer
 
 	localRenderer: (timestamp) =>
 			# clear screen
+			@threeRenderer.context.stencilMask(0xFF)
+			@threeRenderer.context.clearStencil(0x00)
 			@threeRenderer.clear()
 
 			# render the default scene (plugins add objects in the init3d hook)

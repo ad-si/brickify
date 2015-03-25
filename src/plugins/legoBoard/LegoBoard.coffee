@@ -9,6 +9,7 @@ THREE = require 'three'
 modelCache = require '../../client/modelCache'
 globalConfig = require '../../common/globals.yaml'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
+stencilBits = require '../../client/rendering/stencilBits'
 
 module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
@@ -61,20 +62,42 @@ module.exports = class LegoBoard
 					studsContainer.add object
 
 	customRenderPass: (threeRenderer, camera) =>
+		# render lego board to texture
 		if not @boardSceneTarget?
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
+		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
 
+		gl = threeRenderer.context
 
 		# render baseplate transparent if cam looks from below
 		if camera.position.y < 0
+			# one fully transparent render pass
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
+			threeRenderer.render @boardSceneTarget.planeScene, camera
 		else
+			# render one pass opaque, where no lego, object, shadow, is
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 1
 
-		# render to texture
-		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
-		# render texture to screen
-		threeRenderer.render @boardSceneTarget.planeScene, camera
+			gl.enable(gl.STENCIL_TEST)
+			gl.stencilFunc(gl.EQUAL, 0x00, 0xFF)
+			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+			gl.stencilMask(0x00)
+
+			threeRenderer.render @boardSceneTarget.planeScene, camera
+
+			#render one pass transparent, where visible object or shadow is
+			# (= no lego)
+			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.maskBit0)
+			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+			gl.stencilMask(0x00)
+
+			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
+
+			gl.disable(gl.DEPTH_TEST)
+			threeRenderer.render @boardSceneTarget.planeScene, camera
+			gl.enable(gl.DEPTH_TEST)
+
+			gl.disable(gl.STENCIL_TEST)
 
 	toggleVisibility: =>
 		@boardScene.visible = !@boardScene.visible

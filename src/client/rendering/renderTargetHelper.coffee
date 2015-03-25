@@ -145,5 +145,4 @@ getNextValidTextureDimension = (width, height) ->
 			difference = d
 			selectedDim = dim
 
-	console.log "Texture size will be #{selectedDim}"
 	return selectedDim

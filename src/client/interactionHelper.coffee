@@ -87,7 +87,8 @@ module.exports.getPlanePosition = getPlanePosition
 # @param {Object} event usually a mouse or tap or pointer event
 # @param {Number} event.pageX the x coordinate on the screen
 # @param {Number} event.pageY the y coordinate on the screen
-# @param {Renderer} renderer the renderer that provides the camera and canvas
+# @param {Renderer} renderer the renderer that provides the canvas. Can
+# also be a THREE.Renderer
 # @return {Object} a three vector
 # @memberOf interactionHelper
 ###

@@ -17,22 +17,32 @@ THREE = require 'three'
 # render the screen aligned quad to the screen
 # @memberOf renderTargetHelper
 ###
-module.exports.createRenderTarget = (threeRenderer, shaderOptions) ->
+module.exports.createRenderTarget = (
+	threeRenderer, shaderOptions, textureFilter = THREE.LinearFilter) ->
+
 	# Create rendertarget
 	renderWidth = threeRenderer.domElement.width
 	renderHeight = threeRenderer.domElement.height
 
-	depthTexture = new THREE.DepthTexture renderWidth, renderHeight
+	texSize = getNextValidTextureDimension renderWidth, renderHeight
+
+	depthTexture = new THREE.DepthTexture texSize, texSize
 	renderTargetTexture = new THREE.WebGLRenderTarget(
-		renderWidth
-		renderHeight
+		texSize
+		texSize
 		{
-			minFilter: THREE.LinearFilter
-			magFilter: THREE.NearestFilter
+			minFilter: textureFilter
+			magFilter: textureFilter
 			format: THREE.RGBAFormat
 			depthTexture: depthTexture
 		}
 	)
+
+	# apply values to parent, due to broken THREE implementation / WIP pullrequest
+	renderTargetTexture.wrapS = renderTargetTexture.texture.wrapS
+	renderTargetTexture.wrapT = renderTargetTexture.texture.wrapT
+	renderTargetTexture.magFilter = renderTargetTexture.texture.magFilter
+	renderTargetTexture.minFilter = renderTargetTexture.texture.minFilter
 
 	#create scene to render texture
 	quadScene = new THREE.Scene()
@@ -121,3 +131,19 @@ setDefaultOptions = (shaderOptions) ->
 	shaderOptions.fragmentInMain ?= ''
 
 	return shaderOptions
+
+# Choses the next 2^n size that matches the screen resolution best
+getNextValidTextureDimension = (width, height) ->
+	dims = [64, 128, 256, 512, 1024, 2048, 4096]
+	max = Math.max width, height
+
+	difference = 9999
+	selectedDim = 0
+	for dim in dims
+		d = Math.abs ( dim - max )
+		if d < difference
+			difference = d
+			selectedDim = dim
+
+	console.log "Texture size will be #{selectedDim}"
+	return selectedDim

@@ -69,7 +69,8 @@ class NodeVisualizer
 			)
 			@objectSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ opacity: @objectOpacity, fragmentInMain: customFrag }
+				{ opacity: @objectOpacity, fragmentInMain: customFrag },
+				THREE.NearestFilter
 			)
 
 		threeRenderer.render(

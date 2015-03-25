@@ -294,7 +294,15 @@ class NodeVisualizer
 
 	pointerEvent: (event, eventType) =>
 		return false if not @pointEventHandler?
-		return false if not @_pointerOverModel event
+
+		if not @_pointerOverModel event
+			# when we are not above model, call only move and up events
+			switch eventType
+				when pointerEnums.events.PointerMove
+					@pointEventHandler.pointerMove event
+				when pointerEnums.events.PointerUp
+					@pointEventHandler.pointerUp event
+			return false
 
 		switch eventType
 			when pointerEnums.events.PointerDown

@@ -6,7 +6,7 @@
 ###
 
 THREE = require 'three'
-modelCache = require '../../client/modelCache'
+modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
 
 
@@ -99,12 +99,12 @@ module.exports = class LegoBoard
 	beautify: =>
 		if not @highQualMode
 			@highQualMode = true
-			
+
 			#show studs
 			@threejsNode.children[1].visible = true
 			#remove texture because we have physical studs
 			@threejsNode.children[0].material = @baseplateMaterial
 			@currentBaseplateMaterial = @baseplateMaterial
 			return true
-			
+
 		return false

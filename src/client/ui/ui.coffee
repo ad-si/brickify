@@ -1,6 +1,8 @@
 Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
-WorkflowUi = require './workflowUi/workflowUi.coffee'
+WorkflowUi = require './workflowUi/workflowUi'
+fileDropper = require '../modelLoading/fileDropper'
+fileLoader = require '../modelLoading/fileLoader'
 
 ###
 # @module ui
@@ -14,10 +16,16 @@ module.exports = class Ui
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	fileLoadHandler: (event) =>
-		event.stopPropagation()
-		event.preventDefault()
-		files = event.target.files ? event.dataTransfer.files
-		@bundle.modelLoader.readFiles files if files?
+		spinnerOptions =
+			length: 5
+			radius: 3
+			width: 2
+			shadow: false
+		fileLoader.onLoadFile(
+			event
+			document.getElementById 'loadButtonFeedback'
+			spinnerOptions
+		).then @bundle.modelLoader.loadByHash
 
 	dragOverHandler: (event) =>
 		event.stopPropagation()
@@ -37,17 +45,10 @@ module.exports = class Ui
 	_initListeners: =>
 		@pointerDispatcher.init()
 
-		# event listener
-		document.body.addEventListener(
-			'dragover'
-			@dragOverHandler
-		)
+		fileDropper.init @fileLoadHandler
 
-		document.body.addEventListener(
-			'drop'
-			@fileLoadHandler
-		)
-		$('#loadButton').on 'change', (event) =>
+		# event listener
+		$('#fileInput').on 'change', (event) =>
 			@fileLoadHandler event
 			$('#fileInput').val('')
 

@@ -10,10 +10,30 @@ defaultTarget = document.createElement 'div'
 defaultTarget.id = 'body-spinner'
 document.body.appendChild defaultTarget
 
-options =
+defaults =
+	lines: 12
+	length: 7,
+	width: 5,
+	radius: 10,
+	rotate: 0,
+	corners: 1,
+	color: '#fff',
+	direction: 1,
+	speed: 1,
+	trail: 100,
+	opacity: 1 / 4,
+	fps: 20,
+	zIndex: 2e9,
+	className: 'spinner',
+	top: '50%',
+	left: '50%',
+	position: 'absolute'
 	shadow: true
 	hwaccel: true
-	color: '#fff'
+
+addDefaults = (options) ->
+	for key, value of defaults
+		options[key] ?= value
 
 ###
 # Starts a spinner attached to the given target node.
@@ -21,8 +41,9 @@ options =
 # @return {Number} the number of start invocations of this spinner
 # @memberOf Spinner
 ###
-start = (target) ->
+start = (target, options = {}) ->
 	target ?= defaultTarget
+	addDefaults options
 
 	spinnerState = spinners.get target
 	unless spinnerState?
@@ -40,8 +61,9 @@ module.exports.start = start
 # @return {Number} the number of start invocations of this spinner
 # @memberOf Spinner
 ###
-startOverlay = (target) ->
-	return start() unless target?
+startOverlay = (target, options = {}) ->
+	return start(null, options) unless target?
+	addDefaults options
 
 	spinnerState = spinners.get target
 	unless spinnerState?

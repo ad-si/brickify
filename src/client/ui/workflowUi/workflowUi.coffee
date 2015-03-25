@@ -2,7 +2,6 @@ DownloadProvider = require './downloadProvider'
 BrushSelector = require './brushSelector'
 perfectScrollbar = require 'perfect-scrollbar'
 
-
 module.exports = class WorkflowUi
 	constructor: (@bundle) ->
 		@downloadProvider = new DownloadProvider(@bundle)

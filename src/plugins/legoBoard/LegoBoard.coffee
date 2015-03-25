@@ -41,14 +41,16 @@ module.exports = class LegoBoard
 
 		#create baseplate
 		box = new THREE.BoxGeometry(400, 400, 8)
-		boxobj = new THREE.Mesh(box, @baseplateMaterial)
+		boxobj = new THREE.Mesh(box, @baseplateTexturedMaterial)
 		boxobj.translateZ -4
 		@boardScene.add boxobj
+		@boardScene.baseplate = boxobj
 
 		#create studs
 		studsContainer = new THREE.Object3D()
 		@boardScene.add studsContainer
-		studsContainer.visible = true
+		@boardScene.studs = studsContainer
+		studsContainer.visible = false
 
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
@@ -104,9 +106,9 @@ module.exports = class LegoBoard
 			@highQualMode = false
 
 			#hide studs
-			@boardScene.children[1].visible = false
+			@boardScene.studs.visible = false
 			#change baseplate material to stud texture
-			@boardScene.children[0].material = @baseplateTexturedMaterial
+			@boardScene.baseplate.material = @baseplateTexturedMaterial
 			return true
 
 		return false
@@ -116,9 +118,9 @@ module.exports = class LegoBoard
 			@highQualMode = true
 			
 			#show studs
-			@boardScene.children[1].visible = true
+			@boardScene.studs.visible = true
 			#remove texture because we have physical studs
-			@boardScene.children[0].material = @baseplateMaterial
+			@boardScene.baseplate.material = @baseplateMaterial
 			return true
 			
 		return false

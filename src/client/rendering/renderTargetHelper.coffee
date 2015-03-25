@@ -65,21 +65,8 @@ vertexShader = (options) ->
 		}
 	'
 fragmentShader = (options) ->
-	if options.blackAlwaysOpaque
-		blackOpaque = '#define BLACK_ALWAYS_OPAQUE\n'
-	else
-		blackOpaque = ''
-
-	if options.expandBlack
-		expandBlack = '#define EXPAND_BLACK\n'
-	else
-		expandBlack = ''
-
 	return '
 		#extension GL_EXT_frag_depth : enable\n
-
-		' + blackOpaque + '
-		' + expandBlack + '
 
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
@@ -90,47 +77,20 @@ fragmentShader = (options) ->
 		uniform vec3 colorMult;
 
 		void main() {
+			float currentOpacity = opacity;
 			float depth = texture2D( tDepth, vUv ).r;
 			if (abs(1.0 - depth) < 0.00001){
 				discard;
 			}
-
 			vec3 col = texture2D( tColor, vUv ).rgb;
 
-			\n#ifdef EXPAND_BLACK\n
-			const int kernel = 2;
-			bool isLine = false;
- 			
-			for (int x = -1 * (kernel - 1); x < kernel; x++){
-				for (int y = -1 * (kernel - 1); y < kernel; y++){
-					float tx = vUv.s + float(x) * texelXDelta;
-					float ty = vUv.t + float(y) * texelYDelta;
-					
-					vec3 c = texture2D( tColor, vec2(tx,ty)).rgb;
-
-					if (c.r < 0.1 && c.g < 0.1 && c.b < 0.1){
-						isLine = true;
-					}
-				}
-			}
-			if (isLine){
-				col.r = 0.0;
-				col.g = 0.0;
-				col.b = 0.0;
-			}
-			\n#endif\n
+			\n
+			' + options.fragmentInMain + '
+			\n
 
 			col.r = col.r * colorMult.r;
 			col.g = col.g * colorMult.g;
 			col.b = col.b * colorMult.b;
-
-			float currentOpacity = opacity;
-			
-			\n#ifdef BLACK_ALWAYS_OPAQUE\n
-			if (col.r < 0.01 && col.g < 0.01 && col.b < 0.01){
-				currentOpacity = 1.0;
-			}
-			\n#endif\n
 
 			gl_FragColor = vec4( col.r, col.g, col.b, currentOpacity);
 			gl_FragDepthEXT = depth;
@@ -141,7 +101,6 @@ setDefaultOptions = (shaderOptions) ->
 
 	shaderOptions.opacity ?= 1.0
 	shaderOptions.colorMult ?= new THREE.Vector3(1,1,1)
-	shaderOptions.blackAlwaysOpaque ?= false
-	shaderOptions.expandBlack ?= false
+	shaderOptions.fragmentInMain ?= ''
 
 	return shaderOptions

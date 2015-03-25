@@ -7,6 +7,7 @@ pointerEnums = require '../../client/ui/pointerEnums'
 PointEventHandler = require './pointEventHandler'
 interactionHelper = require '../../client/interactionHelper'
 stencilBits = require '../../client/rendering/stencilBits'
+shaderGenerator = require './shaderGenerator'
 
 ###
 # @class NodeVisualizer
@@ -64,20 +65,28 @@ class NodeVisualizer
 
 		# Second pass: render object
 		if not @objectSceneTarget?
+			customFrag = shaderGenerator.buildFragmentMainAdditions(
+				{ expandBlack: true }
+			)
 			@objectSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ opacity: @objectOpacity, expandBlack: true }
+				{ opacity: @objectOpacity, fragmentInMain: customFrag }
 			)
+
 		threeRenderer.render(
 			@objectScene, camera, @objectSceneTarget.renderTarget, true
 		)
 
 		# Third pass: render shadows
 		if not @brickShadowSceneTarget?
+			customFrag = shaderGenerator.buildFragmentMainAdditions(
+				{ expandBlack: true, blackAlwaysOpaque: true }
+			)
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ opacity: @brickShadowOpacity, blackAlwaysOpaque: true, expandBlack: true }
+				{ opacity: @brickShadowOpacity, fragmentInMain: customFrag }
 			)
+
 		threeRenderer.render(
 			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true
 		)

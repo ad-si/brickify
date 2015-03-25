@@ -24,12 +24,13 @@ module.exports.createRenderTarget = (
 	renderWidth = threeRenderer.domElement.width
 	renderHeight = threeRenderer.domElement.height
 
-	texSize = getNextValidTextureDimension renderWidth, renderHeight
+	texWidth = getNextValidTextureDimension renderWidth
+	texHeight = getNextValidTextureDimension renderHeight
 
-	depthTexture = new THREE.DepthTexture texSize, texSize
+	depthTexture = new THREE.DepthTexture texWidth, texHeight
 	renderTargetTexture = new THREE.WebGLRenderTarget(
-		texSize
-		texSize
+		texWidth
+		texHeight
 		{
 			minFilter: textureFilter
 			magFilter: textureFilter
@@ -133,14 +134,13 @@ setDefaultOptions = (shaderOptions) ->
 	return shaderOptions
 
 # Choses the next 2^n size that matches the screen resolution best
-getNextValidTextureDimension = (width, height) ->
+getNextValidTextureDimension = (size) ->
 	dims = [64, 128, 256, 512, 1024, 2048, 4096]
-	max = Math.max width, height
 
 	difference = 9999
 	selectedDim = 0
 	for dim in dims
-		d = Math.abs ( dim - max )
+		d = Math.abs ( dim - size )
 		if d < difference
 			difference = d
 			selectedDim = dim

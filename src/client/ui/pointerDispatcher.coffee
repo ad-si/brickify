@@ -108,7 +108,7 @@ class PointerDispatcher
 		)
 
 	# call plugin after plugin until a plugin reacts to this pointer event
-	# returns fals if no plugin handled this event
+	# returns false if no plugin handled this event
 	_dispatchEvent: (event, type) ->
 		for hook in @bundle.pluginHooks.get 'onPointerEvent'
 			if hook event, type

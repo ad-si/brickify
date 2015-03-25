@@ -17,7 +17,7 @@ module.exports = class LegoBoard
 		@globalConfig = @bundle.globalConfig
 		return
 
-	# Load the board (in seperate scene to be rendered in custom render pass)
+	# Load the board (in separate scene to be rendered in custom render pass)
 	init3d: (@threejsNode) =>
 		@boardScene = @bundle.renderer.getDefaultScene()
 

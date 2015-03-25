@@ -159,12 +159,15 @@ class DummyPlugin
 	beautify: =>
 		return false
 
-	# ## onPointerEvent
-	# When the user interacts with the application,
-	# plugins may react to pointerEvents.
+	###
+	# When the user interacts with the application, plugins
+	# may react to pointerEvents.
 	# They should return true, if they handled this event,
 	# and false, if they did not.
 	# If no plugin handled the event, orbit controls will handle it.
+	# @param {PointerEvent} event the pointerEvent
+	# @param {String} type type of the event, @see pointerEnums
+	###
 	onPointerEvent: (event, type) =>
 		return false
 

@@ -1,9 +1,13 @@
 THREE = require 'three'
+###
+# @module renderTargetHelper
+###
 
 ###
 # Creates a structure that can be used as a render target and later
 # to render the content of the render target
 # with a screen aligned quad to the screen.
+# @return {Object} the render target descriptor
 # @returnprop {THREE.WebGLRenderTarget} renderTarget the render target
 # @returnprop {THREE.DepthTexture} depthTexture depth texture used
 # with the render target
@@ -11,6 +15,7 @@ THREE = require 'three'
 # aligned quad
 # @returnprop {THREE.ShaderMaterial} blendingMaterial the material used to
 # render the screen aligned quad to the screen
+# @memberOf renderTargetHelper
 ###
 module.exports.createRenderTarget = (threeRenderer, shaderOptions) ->
 	# Create rendertarget

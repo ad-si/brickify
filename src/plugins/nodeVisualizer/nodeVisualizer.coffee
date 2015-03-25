@@ -59,8 +59,7 @@ class NodeVisualizer
 		threeRenderer = @threeRenderer
 
 		# First render pass: render Bricks & Voxels
-		if not @brickSceneTarget?
-			@brickSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
+		@brickSceneTarget ?= RenderTargetHelper.createRenderTarget(threeRenderer)
 		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
 
 		# Second pass: render object

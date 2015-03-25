@@ -36,11 +36,11 @@ class Renderer
 	getCamera: ->
 		return @camera
 
-	windowResizeHandler: ->
+	windowResizeHandler: =>
 		if not @staticRendererSize
-			@camera.aspect = @size().width / @size().height
+			@camera.aspect = @_size().width / @_size().height
 			@camera.updateProjectionMatrix()
-			@threeRenderer.setSize @size().width, @size().height
+			@threeRenderer.setSize @_size().width, @_size().height
 
 		@threeRenderer.render @scene, @camera
 

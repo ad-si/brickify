@@ -65,6 +65,8 @@ module.exports = class LegoBoard
 		# render lego board to texture
 		if not @boardSceneTarget?
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
+			m = @boardSceneTarget.blendingMaterial
+
 		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
 
 		gl = threeRenderer.context
@@ -75,18 +77,13 @@ module.exports = class LegoBoard
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @boardSceneTarget.planeScene, camera
 		else
-			# render one pass opaque, where no lego, object, shadow, is
+			# one default opaque pass
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 1
-
-			gl.enable(gl.STENCIL_TEST)
-			gl.stencilFunc(gl.EQUAL, 0x00, 0xFF)
-			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
-			gl.stencilMask(0x00)
-
 			threeRenderer.render @boardSceneTarget.planeScene, camera
 
 			#render one pass transparent, where visible object or shadow is
 			# (= no lego)
+			gl.enable(gl.STENCIL_TEST)
 			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.maskBit0)
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 			gl.stencilMask(0x00)

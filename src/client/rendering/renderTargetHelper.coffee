@@ -11,7 +11,7 @@ THREE = require 'three'
 # @returnprop {THREE.WebGLRenderTarget} renderTarget the render target
 # @returnprop {THREE.DepthTexture} depthTexture depth texture used
 # with the render target
-# @returnprop {THREE.Scene} planeScene a scene which contains the screen
+# @returnprop {THREE.Scene} quadScene a scene which contains the screen
 # aligned quad
 # @returnprop {THREE.ShaderMaterial} blendingMaterial the material used to
 # render the screen aligned quad to the screen
@@ -35,16 +35,16 @@ module.exports.createRenderTarget = (threeRenderer, shaderOptions) ->
 	)
 
 	#create scene to render texture
-	planeScene = new THREE.Scene()
+	quadScene = new THREE.Scene()
 	screenAlignedQuad = generateQuad(
 		renderTargetTexture, depthTexture, shaderOptions
 	)
-	planeScene.add screenAlignedQuad
+	quadScene.add screenAlignedQuad
 
 	return {
 		depthTexture: depthTexture
 		renderTarget: renderTargetTexture
-		planeScene: planeScene
+		quadScene: quadScene
 		blendingMaterial: screenAlignedQuad.material
 	}
 

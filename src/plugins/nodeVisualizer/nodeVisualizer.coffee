@@ -100,7 +100,7 @@ class NodeVisualizer
 		gl.stencilMask(0xFF)
 
 		# bricks
-		threeRenderer.render @brickSceneTarget.planeScene, camera
+		threeRenderer.render @brickSceneTarget.quadScene, camera
 		
 		# everything that is 3d model and hidden gets the third bit set
 		# every visible part of the 3d model gets the second bit set
@@ -110,7 +110,7 @@ class NodeVisualizer
 		gl.stencilMask(stencilBits.visibleObjectMask | stencilBits.hiddenObjectMask)
 
 		# render visible parts
-		threeRenderer.render @objectSceneTarget.planeScene, camera
+		threeRenderer.render @objectSceneTarget.quadScene, camera
 
 		# render invisble parts (object behind lego bricks)
 		if @brushHandler? and not @brushHandler.legoBrushSelected
@@ -126,7 +126,7 @@ class NodeVisualizer
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 
 			gl.disable(gl.DEPTH_TEST)
-			threeRenderer.render @objectSceneTarget.planeScene, camera
+			threeRenderer.render @objectSceneTarget.quadScene, camera
 			gl.enable(gl.DEPTH_TEST)
 
 			# Reset material to non-shadow properties
@@ -139,7 +139,7 @@ class NodeVisualizer
 		gl.stencilMask(stencilBits.visibleShadowMask)
 
 		# render this-could-be-lego-shadows and brush highlight
-		threeRenderer.render @brickShadowSceneTarget.planeScene, camera
+		threeRenderer.render @brickShadowSceneTarget.quadScene, camera
 
 		gl.disable(gl.STENCIL_TEST)
 		

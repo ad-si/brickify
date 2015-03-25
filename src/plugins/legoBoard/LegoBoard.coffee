@@ -75,11 +75,11 @@ module.exports = class LegoBoard
 		if camera.position.y < 0
 			# one fully transparent render pass
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
-			threeRenderer.render @boardSceneTarget.planeScene, camera
+			threeRenderer.render @boardSceneTarget.quadScene, camera
 		else
 			# one default opaque pass
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 1
-			threeRenderer.render @boardSceneTarget.planeScene, camera
+			threeRenderer.render @boardSceneTarget.quadScene, camera
 
 			#render one pass transparent, where visible object or shadow is
 			# (= no lego)
@@ -91,7 +91,7 @@ module.exports = class LegoBoard
 			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 
 			gl.disable(gl.DEPTH_TEST)
-			threeRenderer.render @boardSceneTarget.planeScene, camera
+			threeRenderer.render @boardSceneTarget.quadScene, camera
 			gl.enable(gl.DEPTH_TEST)
 
 			gl.disable(gl.STENCIL_TEST)

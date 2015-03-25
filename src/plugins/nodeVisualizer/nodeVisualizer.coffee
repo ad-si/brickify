@@ -19,8 +19,8 @@ class NodeVisualizer
 
 		# remove z-Fighting on baseplate
 		@printMaterial.polygonOffset = true
-		@printMaterial.polygonOffsetFactor = 1
-		@printMaterial.polygonOffsetUnits = 1
+		@printMaterial.polygonOffsetFactor = 5
+		@printMaterial.polygonOffsetUnits = 5
 
 		# rendering properties
 		@brickShadowOpacity = 0.5
@@ -107,7 +107,7 @@ class NodeVisualizer
 		# render invisble parts (object behind lego bricks)
 		if @brushHandler? and not @brushHandler.legoBrushSelected
 			# Adjust object material to be dark and more transparent
-			blendMat = @objectSceneTarget.planeScene.children[0].material
+			blendMat = @objectSceneTarget.blendingMaterial
 			blendMat.uniforms.colorMult.value = @objectShadowColorMult
 			blendMat.uniforms.opacity.value = @objectShadowOpacity
 

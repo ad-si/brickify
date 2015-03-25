@@ -5,7 +5,6 @@ html
 #editor
 	height 100%
 	width 100%
-	overflow hidden // Should not be necessary, but is
 
 	#logo
 		position relative
@@ -19,10 +18,15 @@ html
 		padding-left 170px
 		padding-right 170px
 
-	@import spinner
-	@import fps
 	@import share
 	@import sidebar
 	@import help
 
 	@import customButton
+
+#wrapper
+	padding-left 0
+	padding-right 0
+
+#canvas
+	display block

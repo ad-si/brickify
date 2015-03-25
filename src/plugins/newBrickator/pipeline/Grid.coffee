@@ -7,6 +7,7 @@ module.exports = class Grid
 		@numVoxelsY = 0
 		@numVoxelsZ = 0
 		@zLayers = []
+		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
 
 	setUpForModel: (optimizedModel, options) =>
 		@modelTransform = options.modelTransform
@@ -44,9 +45,9 @@ module.exports = class Grid
 		maxVoxel = @mapWorldToGrid bbMaxWorld
 		minVoxel = @mapWorldToGrid bbMinWorld
 
-		@numVoxelsX = (maxVoxel.x - minVoxel.x) + 1
-		@numVoxelsY = (maxVoxel.y - minVoxel.y) + 1
-		@numVoxelsZ = (maxVoxel.z - minVoxel.z) + 1
+		@numVoxelsX = Math.ceil (maxVoxel.x - minVoxel.x) / @spacing.x + 2
+		@numVoxelsY = Math.ceil (maxVoxel.y - minVoxel.y) / @spacing.y + 2
+		@numVoxelsZ = Math.ceil (maxVoxel.z - minVoxel.z) / @spacing.z + 1
 
 	mapWorldToGrid: (point) =>
 		# maps world coordinates to aligned grid coordinates
@@ -152,6 +153,20 @@ module.exports = class Grid
 					list.push v
 		return list
 
+	getSurrounding: ({x, y, z}, size, selectionCallback) =>
+		list = []
 
+		_collect = (vx, vy, vz) =>
+			if @zLayers[vz]?[vx]?[vy]?
+				voxel = @zLayers[vz][vx][vy]
+				list.push voxel if selectionCallback voxel
 
+		sizeX_2 = Math.floor size.x / 2
+		sizeY_2 = Math.floor size.y / 2
+		sizeZ_2 = Math.floor size.z / 2
+		for vx in [x - sizeX_2 .. x + sizeX_2] by 1
+			for vy in [y - sizeY_2 .. y + sizeY_2] by 1
+				for vz in [z - sizeZ_2 .. z + sizeZ_2] by 1
+					_collect vx, vy, vz
 
+		return list

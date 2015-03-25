@@ -3,6 +3,7 @@ Ui = require './ui/ui'
 Renderer = require './renderer'
 ModelLoader = require './modelLoader'
 ProjectManager = require './project/ProjectManager'
+Spinner = require './Spinner'
 
 SyncObject = require '../common/sync/syncObject'
 SyncObject.dataPacketProvider = require './sync/dataPackets'
@@ -14,6 +15,7 @@ Node.modelProvider = require './modelCache'
 ###
 module.exports = class Bundle
 	constructor: (@globalConfig, @controls) ->
+		Spinner.startOverlay document.getElementById @globalConfig.renderAreaId
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 		@modelLoader = new ModelLoader(@)
@@ -27,6 +29,7 @@ module.exports = class Bundle
 		@ui?.init()
 		@renderer.setupControls @globalConfig, @controls
 		return @sceneManager.init()
+		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId
 
 	getPlugin: (name) =>
 		for p in @pluginInstances

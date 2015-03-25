@@ -58,12 +58,16 @@ class NodeVisualizer
 	onPaint: (@threeRenderer, camera) =>
 		threeRenderer = @threeRenderer
 
-		# First render pass: render Bricks & Voxels
-		@brickSceneTarget ?= RenderTargetHelper.createRenderTarget(threeRenderer)
-		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
+		# recreate textures if either they havent been generated yet or
+		# the screen size has changed
+		if not (@renderTargetsInitialized? and
+		RenderTargetHelper.renderTargetHasRightSize(
+			@brickSceneTarget.renderTarget, threeRenderer
+		))
+			# bricks
+			@brickSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
 
-		# Second pass: render object
-		if not @objectSceneTarget?
+			# object
 			customFrag = shaderGenerator.buildFragmentMainAdditions(
 				{ expandBlack: true }
 			)
@@ -73,12 +77,7 @@ class NodeVisualizer
 				THREE.NearestFilter
 			)
 
-		threeRenderer.render(
-			@objectScene, camera, @objectSceneTarget.renderTarget, true
-		)
-
-		# Third pass: render shadows
-		if not @brickShadowSceneTarget?
+			# brick shadow
 			customFrag = shaderGenerator.buildFragmentMainAdditions(
 				{ expandBlack: true, blackAlwaysOpaque: true }
 			)
@@ -87,6 +86,17 @@ class NodeVisualizer
 				{ opacity: @brickShadowOpacity, fragmentInMain: customFrag }
 			)
 
+			@renderTargetsInitialized = true
+
+		# First render pass: render Bricks & Voxels
+		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
+
+		# Second pass: render object
+		threeRenderer.render(
+			@objectScene, camera, @objectSceneTarget.renderTarget, true
+		)
+
+		# Third pass: render shadows
 		threeRenderer.render(
 			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true
 		)

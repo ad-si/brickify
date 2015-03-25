@@ -64,11 +64,16 @@ module.exports = class LegoBoard
 					studsContainer.add object
 
 	onPaint: (threeRenderer, camera) =>
-		# render lego board to texture
-		if not @boardSceneTarget?
+		# recreate textures if either they havent been generated yet or
+		# the screen size has changed
+		if not (@renderTargetsInitialized? and
+		RenderTargetHelper.renderTargetHasRightSize(
+			@boardSceneTarget.renderTarget, threeRenderer
+		))
 			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
-			m = @boardSceneTarget.blendingMaterial
+			@renderTargetsInitialized = true
 
+		#render board
 		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
 
 		gl = threeRenderer.context

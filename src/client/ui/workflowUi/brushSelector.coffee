@@ -39,7 +39,10 @@ class BrushSelector
 			@_bigBrushSelected = event.shiftKey
 			@_brushSelect brush
 		brush.bigBrushButton.on 'click', (event) =>
-			@_bigBrushSelected = true
+			if brush is @_selectedBrush
+				@_bigBrushSelected = !@_bigBrushSelected
+			else
+				@_bigBrushSelected = true
 			@_brushSelect brush
 			event.stopImmediatePropagation()
 

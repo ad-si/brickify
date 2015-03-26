@@ -65,7 +65,7 @@ module.exports.createRenderTarget = (
 generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 	shaderOptions = setDefaultOptions shaderOptions
 
-	mat = new THREE.ShaderMaterial({
+	mat = new THREE.RawShaderMaterial({
 		uniforms: {
 			tDepth: { type: 't', value: rttDepthTexture }
 			tColor: { type: 't', value: rttTexture }
@@ -85,9 +85,17 @@ module.exports.generateQuad = generateQuad
 
 vertexShader = (options) ->
 	return '
+		precision highp float;
+		precision highp int;
+
+		attribute vec3 position;
+		attribute vec2 uv;
+
 		varying vec2 vUv;
+
 		void main() {
 			vUv = uv;
+
 			/* Dont transform coordinates, make this a screen aligned quad */
 			gl_Position = vec4( position, 1.0 );
 		}
@@ -95,6 +103,8 @@ vertexShader = (options) ->
 fragmentShader = (options) ->
 	return '
 		#extension GL_EXT_frag_depth : enable\n
+		precision highp float;
+		precision highp int;
 
 		varying vec2 vUv;
 		uniform sampler2D tDepth;

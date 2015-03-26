@@ -52,7 +52,7 @@ class SyncObject
 				syncObject.id = packet.id
 				syncObject._loadSubObjects()
 
-		_packetFromId = (id) => SyncObject.dataPacketProvider.get id
+		_packetFromId = (id) -> SyncObject.dataPacketProvider.get id
 
 		_fromOne = (descriptor) =>
 			if typeof descriptor is 'string'

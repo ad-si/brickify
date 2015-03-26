@@ -88,9 +88,9 @@ module.exports = class Coloring
 		@_brickMaterials.push @_createMaterial 0xfe3939
 		@_brickMaterials.push @_createMaterial 0xfe4d4d
 
-	_createMaterial: (color, opacity = 1) =>
-		return new THREE.MeshLambertMaterial({
+	_createMaterial: (color, opacity = 1) ->
+		return new THREE.MeshLambertMaterial(
 			color: color
 			opacity: opacity
 			transparent: opacity < 1.0
-		})
+		)

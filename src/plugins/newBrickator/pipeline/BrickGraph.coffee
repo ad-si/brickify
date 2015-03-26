@@ -53,7 +53,7 @@ module.exports = class BrickGraph
 
 	_connectToBrickBelow: (brick, x, y, z) =>
 		return if not @_voxelExistsAndIsEnabled z - 1, x, y
-		
+
 		brickBelow = @grid.zLayers[z - 1][x][y].brick
 		brick.lowerSlots[0][0] = brickBelow
 		brickBelow.upperSlots[0][0] = brick
@@ -66,7 +66,7 @@ module.exports = class BrickGraph
 
 	_connectToBrickYm: (brick, x, y, z) =>
 		return if not @_voxelExistsAndIsEnabled z, x, y - 1
-		
+
 		brick.neighbors[Brick.direction.Ym] = [@grid.zLayers[z][x][y - 1].brick]
 		@grid.zLayers[z][x][y - 1].brick.neighbors[Brick.direction.Yp] = [brick]
 
@@ -146,15 +146,13 @@ module.exports = class BrickGraph
 		# remove references to neighbors/connections
 		brick.removeSelfFromSurrounding()
 		# remove references in voxels
-		@forEachVoxelInBrick brick, (voxel) =>
-			voxel.brick = null
+		@forEachVoxelInBrick brick, (voxel) -> voxel.brick = null
 
 	# updates the 'voxel.brick' reference in each voxel in the grid
 	updateReferencesInGrid: =>
 		# set references from brick list
 		@forEachBrick (brick) =>
-			@forEachVoxelInBrick brick, (voxel) =>
-				voxel.brick = brick
+			@forEachVoxelInBrick brick, (voxel) -> voxel.brick = brick
 
 	forEachVoxelInBrick: (brick, callback) =>
 		for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1

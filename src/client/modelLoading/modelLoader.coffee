@@ -57,7 +57,7 @@ class ModelLoader
 		node = new Node name: fileName, modelHash: hash, transform: transform
 		@bundle.sceneManager.add node
 
-	_calculateModelPosition: (model) =>
+	_calculateModelPosition: (model) ->
 		# get biggest polygon, align it to xy-center
 		# align whole model to be on z=0
 
@@ -78,7 +78,7 @@ class ModelLoader
 			Area = Math.abs(Area / 2)
 			return Area
 
-		model.forEachPolygon (p0, p1, p2, n) =>
+		model.forEachPolygon (p0, p1, p2, n) ->
 			#find lowest z value (for whole model)
 			minZ  = Math.min p0.z, p1.z, p2.z
 

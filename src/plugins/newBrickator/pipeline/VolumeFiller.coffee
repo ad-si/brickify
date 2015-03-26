@@ -46,7 +46,7 @@ module.exports = class VolumeFiller
 					currentFillVoxelQueue.push {x: x, y: y, z: z}
 			z++
 
-	calculateVoxelDirection: (grid, x, y, z) =>
+	calculateVoxelDirection: (grid, x, y, z) ->
 		# determines whether all polygons related to this voxel are either
 		# all aligned upwards or all aligned downwards
 		dataEntrys = grid.zLayers[z]?[x]?[y].dataEntrys

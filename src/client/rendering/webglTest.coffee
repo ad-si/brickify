@@ -27,7 +27,7 @@ initGl = ->
 
 	# Initialize depth texture extension
 	gl.getExtension('EXT_frag_depth')
-	gl.getExtension('WEBKIT_WEBGL_depth_texture')
+	gl.getExtension('WEBGL_depth_texture')
 
 	return gl
 

@@ -8,6 +8,9 @@ class BrushHandler
 		@legoBrushSelected = false
 		@bigBrushSelected = false
 
+		document.getElementById('everythingLego').addEventListener 'click', =>
+			@_everythingLego @nodeVisualizer.selectedNode
+
 		document.getElementById('everythingPrinted').addEventListener 'click', =>
 			@_everythingPrint @nodeVisualizer.selectedNode
 
@@ -94,6 +97,16 @@ class BrushHandler
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
+
+	_everythingLego: (selectedNode) =>
+		return if @interactionDisabled
+		@nodeVisualizer._getCachedData selectedNode
+		.then (cachedData) =>
+			cachedData.brickVisualization.makeAllVoxelsLego selectedNode
+			cachedData.csgNeedsRecalculation = true
+			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
+			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			@nodeVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled

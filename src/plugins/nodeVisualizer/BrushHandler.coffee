@@ -102,7 +102,7 @@ class BrushHandler
 		return if @interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.brickVisualization.makeAllVoxelsLego selectedNode
+			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
 			@nodeVisualizer.rerunLegoPipeline selectedNode
 
 

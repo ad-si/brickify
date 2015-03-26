@@ -138,11 +138,14 @@ module.exports.setupRouting = ->
 		insertGlobals: developmentMode
 	})
 
-	webapp.get '/webgltest.js',browserify('src/client/rendering/webglTest.coffee', {
-		extensions: ['.coffee']
-		external: shared
-		insertGlobals: developmentMode
-	})
+	webapp.get '/webgltest.js',browserify(
+		'src/client/rendering/webglTest.coffee',
+		{
+			extensions: ['.coffee']
+			external: shared
+			insertGlobals: developmentMode
+		}
+	)
 
 	fontAwesomeRegex = /\/fonts\/fontawesome-.*/
 	webapp.get fontAwesomeRegex, express.static('node_modules/font-awesome/')

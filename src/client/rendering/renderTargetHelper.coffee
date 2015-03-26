@@ -36,6 +36,7 @@ module.exports.createRenderTarget = (
 			magFilter: textureFilter
 			format: THREE.RGBAFormat
 			depthTexture: depthTexture
+			stencilBuffer: false
 		}
 	)
 

@@ -2,11 +2,16 @@ DownloadProvider = require './downloadProvider'
 BrushSelector = require './brushSelector'
 perfectScrollbar = require 'perfect-scrollbar'
 
+LoadUi = require './LoadUi'
+
 module.exports = class WorkflowUi
 	constructor: (@bundle) ->
 		@downloadProvider = new DownloadProvider(@bundle)
 		@brushSelector = new BrushSelector(@bundle)
 		@numObjects = 0
+
+		@workflow =
+			load: new LoadUi()
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -158,7 +163,7 @@ module.exports = class WorkflowUi
 
 	_enableUiGroups: (groupsList) =>
 		availableGroups = [
-			'load', 'edit', 'preview', 'export'
+			'edit', 'preview', 'export'
 		]
 
 		for group in availableGroups
@@ -166,6 +171,9 @@ module.exports = class WorkflowUi
 				$("##{group}Group").find('.btn, .panel').removeClass 'disabled'
 			else
 				$("##{group}Group").find('.btn, .panel').addClass 'disabled'
+
+		for step, ui of @workflow
+			ui.setEnabled step in groupsList
 
 	_setStabilityCheckButtonActive: (active) =>
 		@stabilityCheckButton.toggleClass 'active', active

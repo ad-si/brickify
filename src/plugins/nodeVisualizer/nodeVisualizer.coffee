@@ -105,8 +105,9 @@ class NodeVisualizer
 
 		return data
 
-	_setStabilityView: (selectedNode, stabilityViewEnabled) =>
-		return if !selectedNode?
+	setStabilityView: (selectedNode, stabilityViewEnabled) =>
+		@brushHandler.interactionDisabled = false unless stabilityViewEnabled
+		return unless selectedNode
 
 		@_getCachedData(selectedNode).then (cachedData) =>
 			if stabilityViewEnabled
@@ -125,7 +126,6 @@ class NodeVisualizer
 				cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
 				cachedData.brickVisualization.hideCsg()
 				cachedData.brickVisualization.showVoxels()
-				@brushHandler.interactionDisabled = false
 
 				cachedData.modelVisualization.setNodeVisibility true
 
@@ -154,10 +154,10 @@ class NodeVisualizer
 
 	# disables build mode and shows voxels, hides csg
 	disableBuildMode: (selectedNode) =>
+		#enable interaction
+		@brushHandler.interactionDisabled = false
+		return Promise.resolve() unless selectedNode
 		return @_getCachedData(selectedNode).then (cachedData) =>
-			#enable interaction
-			@brushHandler.interactionDisabled = false
-
 			# hide csg, show model, show voxels
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.hideCsg()

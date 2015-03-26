@@ -80,6 +80,9 @@ class NodeVisualizer
 		@newBrickator.relayoutModifiedParts cachedData.node,
 			touchedVoxels, createBricks
 
+	rerunLegoPipeline: (selectedNode) =>
+		@newBrickator.runLegoPipeline selectedNode
+
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'brickVisualizer'

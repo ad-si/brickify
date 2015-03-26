@@ -103,10 +103,8 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.makeAllVoxelsLego selectedNode
-			cachedData.csgNeedsRecalculation = true
-			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
-			console.log "Will re-layout #{touchedVoxels.length} voxel"
-			@nodeVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
+			@nodeVisualizer.rerunLegoPipeline selectedNode
+
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled

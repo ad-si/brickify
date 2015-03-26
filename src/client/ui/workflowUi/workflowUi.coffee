@@ -3,6 +3,7 @@ BrushSelector = require './brushSelector'
 perfectScrollbar = require 'perfect-scrollbar'
 
 LoadUi = require './LoadUi'
+EditUi = require './EditUi'
 
 module.exports = class WorkflowUi
 	constructor: (@bundle) ->
@@ -12,6 +13,7 @@ module.exports = class WorkflowUi
 
 		@workflow =
 			load: new LoadUi()
+			edit: new EditUi()
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -163,7 +165,7 @@ module.exports = class WorkflowUi
 
 	_enableUiGroups: (groupsList) =>
 		availableGroups = [
-			'edit', 'preview', 'export'
+			'preview', 'export'
 		]
 
 		for group in availableGroups

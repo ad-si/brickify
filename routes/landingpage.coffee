@@ -14,3 +14,6 @@ module.exports.getImprint = (request, response) ->
 
 module.exports.getEducators = (request, response) ->
 	response.render path.join('landingpage','educators'), page: 'landing'
+
+module.exports.getWebglTest = (request, response) ->
+	response.render 'webgltest'

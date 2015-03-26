@@ -138,6 +138,12 @@ module.exports.setupRouting = ->
 		insertGlobals: developmentMode
 	})
 
+	webapp.get '/webgltest.js',browserify('src/client/rendering/webglTest.coffee', {
+		extensions: ['.coffee']
+		external: shared
+		insertGlobals: developmentMode
+	})
+
 	fontAwesomeRegex = /\/fonts\/fontawesome-.*/
 	webapp.get fontAwesomeRegex, express.static('node_modules/font-awesome/')
 
@@ -169,6 +175,7 @@ module.exports.setupRouting = ->
 	webapp.get '/team', landingPage.getTeam
 	webapp.get '/imprint', landingPage.getImprint
 	webapp.get '/educators', landingPage.getEducators
+	webapp.get '/webgltest', landingPage.getWebglTest
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
 	webapp.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists

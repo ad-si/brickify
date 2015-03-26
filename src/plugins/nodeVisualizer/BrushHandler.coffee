@@ -153,7 +153,9 @@ class BrushHandler
 		return if @interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			cachedData.brickVisualization.makeAllVoxels3dPrinted selectedNode
+			return unless cachedData.
+			brickVisualization.makeAllVoxels3dPrinted selectedNode
+
 			cachedData.csgNeedsRecalculation = true
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 			console.log "Will re-layout #{touchedVoxels.length} voxel"

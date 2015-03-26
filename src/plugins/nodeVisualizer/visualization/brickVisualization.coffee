@@ -195,12 +195,16 @@ class BrickVisualization
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 		return voxels
 
+	###
+	# @return {Boolean} true if anything changed, false otherwise
+	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		everythingPrint = true
 		for voxel in voxels
+			everythingPrint = everythingPrint && voxel.isLego()
 			voxel.make3dPrinted()
-			voxel.setMaterial @defaultColoring.deselectedMaterial
-		return voxels
+		return everythingPrint
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
@@ -221,7 +225,7 @@ class BrickVisualization
 		return voxels
 
 	###
-	# @return {Boolean} true if something changed, false otherwise
+	# @return {Boolean} true if anything changed, false otherwise
 	###
 	makeAllVoxelsLego: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)

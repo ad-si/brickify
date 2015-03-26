@@ -168,6 +168,6 @@ primaryShaderProgram = initShaderProgram(
 secondaryShaderProgram = initShaderProgram(
 	shaderSources.vertexPrimary,shaderSources.fragmentSecondary
 )
-frameBuffer = createFramebuffer(2048, 1024)
+frameBuffer = createFramebuffer(4096, 4096)
 
 window.requestAnimationFrame onPaint

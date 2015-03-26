@@ -13,6 +13,7 @@ updateFps = (timestamp) ->
 	window.document.title = fps.toFixed(2)
 
 initGl = ->
+	# Initialize GL
 	canvas = document.getElementById 'glCanvas'
 	gl = canvas.getContext('webgl', {stencil: true})
 
@@ -21,6 +22,12 @@ initGl = ->
 	gl.depthFunc(gl.LEQUAL)
 
 	gl.viewport(0,0, canvas.width, canvas.height)
+	gl.viewportWidth = canvas.width
+	gl.viewportHeight = canvas.height
+
+	# Initialize depth texture extension
+	gl.getExtension('EXT_frag_depth')
+	gl.getExtension('WEBKIT_WEBGL_depth_texture')
 
 	return gl
 
@@ -74,15 +81,50 @@ initShaderProgram = (vertex, fragment) ->
 
 	return program
 
-paintPrimaryQuad = ->
+createFramebuffer = (width, height) ->
+	colorTexture = gl.createTexture()
+	gl.bindTexture(gl.TEXTURE_2D, colorTexture)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	gl.texImage2D(
+		gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null
+	)
+
+	depthTexture = gl.createTexture()
+	gl.bindTexture(gl.TEXTURE_2D, depthTexture)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	gl.texImage2D(
+		gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, width, height, 0,
+		gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null
+	)
+
+	framebuffer = gl.createFramebuffer()
+	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
+	gl.framebufferTexture2D(
+		gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorTexture, 0
+	)
+	gl.framebufferTexture2D(
+		gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0
+	)
+
+	framebuffer.colorTexture = colorTexture
+	framebuffer.depthTexture = depthTexture
+	return framebuffer
+
+paintQuadWithShader = (shader)->
 	# bind shader
-	gl.useProgram primaryShaderProgram
-	gl.enableVertexAttribArray primaryShaderProgram.positionAttribute
+	gl.useProgram shader
+	gl.enableVertexAttribArray shader.positionAttribute
 
 	# draw quad
 	gl.bindBuffer(gl.ARRAY_BUFFER, visibleQuadBuffer)
 	gl.vertexAttribPointer(
-		primaryShaderProgram.positionAttribute
+		shader.positionAttribute
 		visibleQuadBuffer.itemSize, gl.FLOAT, false, 0, 0
 	)
 	
@@ -91,10 +133,19 @@ paintPrimaryQuad = ->
 onPaint = (timestamp) ->
 	updateFps timestamp
 
-	# init viewport
+	# bind framebuffer, clear
+	gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
 	gl.clear( gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT, gl.STENCIL_BUFFER_BIT)
 
-	paintPrimaryQuad()
+	# render quad to framebuffer
+	paintQuadWithShader(primaryShaderProgram)
+
+	# render to screen
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+	gl.clear( gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT, gl.STENCIL_BUFFER_BIT)
+
+	# render quad
+	paintQuadWithShader(primaryShaderProgram)
 
 	requestAnimationFrame onPaint
 
@@ -103,5 +154,6 @@ visibleQuadBuffer = initQuadBuffer(0.8)
 primaryShaderProgram = initShaderProgram(
 	shaderSources.vertexPrimary,shaderSources.fragmentPrimary
 )
+frameBuffer = createFramebuffer(2048, 1024)
 
 window.requestAnimationFrame onPaint

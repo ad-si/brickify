@@ -338,61 +338,21 @@ class NodeVisualizer
 
 	# check whether the pointer is over the model
 	_pointerOverModel: (event) =>
-		return false if not @threeRenderer?
+		# make this the old fashioned raycasting way
+		# because reading pixels is awfully slow
 
-		# Patch THREE nomenclature
-		# rendertarget.format is now rendertarget.texture.format
-		# but the method is not updated yet
-		rt = @objectSceneTarget.renderTarget
-		rt.format = rt.texture.format
-
-		rt = @brickSceneTarget.renderTarget
-		rt.format = rt.texture.format
-
-		# convert screen -> ndc coordinates
-		point = interactionHelper.calculatePositionInCanvasSpace(
-			event, @threeRenderer
+		# intersect with model
+		modelIntersections = interactionHelper.getIntersections(
+			event, @bundle.renderer, @objectScene.children
 		)
+		return true if modelIntersections.length > 0
 
-		# ndc -> renderTarget dimensions
-		objTargetDim = {
-			hw: @objectSceneTarget.renderTarget.width / 2
-			hh: @objectSceneTarget.renderTarget.height / 2
-		}
-		brickTargetDim = {
-			hw: @brickSceneTarget.renderTarget.width / 2
-			hh: @brickSceneTarget.renderTarget.height / 2
-		}
-
-		pObj = {
-			x: Math.round objTargetDim.hw + point.x * objTargetDim.hw
-			y: Math.round objTargetDim.hh + point.y * objTargetDim.hh
-		}
-		pBrick = {
-			x: Math.round brickTargetDim.hw + point.x * brickTargetDim.hw
-			y: Math.round brickTargetDim.hh + point.y * brickTargetDim.hh
-		}
-
-		# get depth values from last renderpass
-		pixelDataObject = new Uint8Array(4)
-		pixelDataBricks = new Uint8Array(4)
-		@threeRenderer.readRenderTargetPixels(
-			@objectSceneTarget.renderTarget, pObj.x, pObj.y, 1, 1, pixelDataObject
+		#intersect with bricks
+		brickIntersections = interactionHelper.getIntersections(
+			event, @bundle.renderer, @brickScene.children
 		)
-		@threeRenderer.readRenderTargetPixels(
-			@brickSceneTarget.renderTarget, pBrick.x, pBrick.y, 1, 1, pixelDataBricks
-		)
-
-		# get the lightest color of both
-		col = {
-			r: Math.max pixelDataBricks[0], pixelDataObject[0]
-			g: Math.max pixelDataBricks[1], pixelDataObject[1]
-			b: Math.max pixelDataBricks[2], pixelDataObject[2]
-			a: Math.max pixelDataBricks[3], pixelDataObject[3]
-		}
-
-		# if it's not transparent and not completely black, there are bricks/object
-		# below pointer
-		return (col.a > 0.01 && col.r > 0.01 && col.g > 0.01 && col.b > 0.01)
+		return true if brickIntersections.length > 0
+		
+		return false
 
 module.exports = NodeVisualizer

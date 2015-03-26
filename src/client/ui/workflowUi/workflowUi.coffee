@@ -5,6 +5,7 @@ perfectScrollbar = require 'perfect-scrollbar'
 LoadUi = require './LoadUi'
 EditUi = require './EditUi'
 PreviewUi = require './PreviewUi'
+ExportUi = require './ExportUi'
 
 module.exports = class WorkflowUi
 	constructor: (@bundle) ->
@@ -16,6 +17,7 @@ module.exports = class WorkflowUi
 			load: new LoadUi()
 			edit: new EditUi()
 			preview: new PreviewUi()
+			export: new ExportUi()
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -166,16 +168,6 @@ module.exports = class WorkflowUi
 		@buildButton.removeClass 'disabled'
 
 	_enableUiGroups: (groupsList) =>
-		availableGroups = [
-			'export'
-		]
-
-		for group in availableGroups
-			if groupsList.indexOf(group) >= 0
-				$("##{group}Group").find('.btn, .panel').removeClass 'disabled'
-			else
-				$("##{group}Group").find('.btn, .panel').addClass 'disabled'
-
 		for step, ui of @workflow
 			ui.setEnabled step in groupsList
 

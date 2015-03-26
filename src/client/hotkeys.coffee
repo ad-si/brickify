@@ -8,8 +8,7 @@ class Hotkeys
 		@events = []
 		@bind '?', 'General', 'Show this help', =>
 			@showHelp()
-		@bind 'esc', 'General', 'Close modal window', =>
-			bootbox.hideAll()
+		@bind 'esc', 'General', 'Close modal window', -> bootbox.hideAll()
 
 		@addEvents events for events in pluginHooks.getHotkeys()
 

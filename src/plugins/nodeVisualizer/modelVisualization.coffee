@@ -11,7 +11,7 @@ class ModelVisualization
 
 	createVisualization: ->
 		@_createVisualization(@node, @threeNode)
-		
+
 	setSolidMaterial: (material) =>
 		@afterCreationPromise.then =>
 			@threeNode.solid.material = material
@@ -35,7 +35,7 @@ class ModelVisualization
 			color: @globalConfig.colors.object
 			ambient: @globalConfig.colors.object
 		)
-		
+
 		@shadowMat = new THREE.MeshBasicMaterial(
 			color: 0x000000
 			transparent: true

@@ -14,13 +14,10 @@ module.exports = class DownloadProvider
 			if selNode?
 				@_createDownload selNode
 
-
 	_createDownload: (selectedNode) =>
 		console.log 'Creating Download...'
 
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode
 
-		Promise.all(promisesArray).then (resultsArray) =>
-			for r in resultsArray
-				saveAs r.data, r.fileName
-
+		Promise.all(promisesArray).then (resultsArray) ->
+			saveAs result.data, result.fileName for result in resultsArray

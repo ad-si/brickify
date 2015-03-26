@@ -87,7 +87,7 @@ class BrushHandler
 	_legoCancel: (event, selectedNode) =>
 		return if @interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
-		.then (cachedData) =>
+		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
@@ -130,7 +130,7 @@ class BrushHandler
 	_printCancel: (event, selectedNode) =>
 		return if @interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
-		.then (cachedData) =>
+		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()

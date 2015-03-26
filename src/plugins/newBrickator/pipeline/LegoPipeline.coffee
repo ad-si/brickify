@@ -11,28 +11,28 @@ module.exports = class LegoPipeline
 		@pipelineSteps = []
 		@pipelineSteps.push {
 			name: 'Hull voxelizing'
-			decision: (options) => return (options.voxelizing)
+			decision: (options) -> return options.voxelizing
 			worker: (lastResult, options) =>
 				return @voxelizer.voxelize lastResult.optimizedModel, options
 		}
 
 		@pipelineSteps.push {
 			name: 'Volume filling'
-			decision: (options) => return options.voxelizing
+			decision: (options) -> return options.voxelizing
 			worker: (lastResult, options) =>
 				return @volumeFiller.fillGrid lastResult.grid, options
 		}
 
 		@pipelineSteps.push {
 			name: 'Layout graph initialization'
-			decision: (options) => return options.layouting
+			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 		}
 
 		@pipelineSteps.push {
 			name: 'Layout greedy merge'
-			decision: (options) => return options.layouting
+			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
 				return @brickLayouter.layoutByGreedyMerge lastResult.brickGraph,
 				lastResult.brickGraph.bricks
@@ -40,7 +40,7 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Local reLayout'
-			decision: (options) => return options.reLayout
+			decision: (options) -> return options.reLayout
 			worker: (lastResult, options) =>
 				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
 				lastResult.brickGraph, lastResult.grid
@@ -49,8 +49,8 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Update Lego references in Grid'
-			decision: (options) => return (options.reLayout or options.layouting)
-			worker: (lastResult, options) =>
+			decision: (options) -> return options.reLayout or options.layouting
+			worker: (lastResult, options) ->
 				lastResult.brickGraph.updateReferencesInGrid()
 				return lastResult
 		}

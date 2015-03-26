@@ -242,7 +242,7 @@ describe 'brickLayouter merge', ->
 
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 		brickLayouter.layoutByGreedyMerge(brickGraph)
-	
+
 		expect(brickGraph.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
 		expect(brickGraph.bricks[0][0].size).to.eql({x: 1, y: 1, z: 1})
 		done()
@@ -255,7 +255,7 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 5, y: 5, z: 0}
 		grid.setVoxel {x: 5, y: 6, z: 0}
 		brickLayouter = new BrickLayouter()
-		
+
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 		brickLayouter.layoutByGreedyMerge(brickGraph).brickGraph
 
@@ -277,7 +277,7 @@ describe 'brickLayouter merge', ->
 		brickLayouter = new BrickLayouter()
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 		brickLayouter.layoutByGreedyMerge(brickGraph)
-		
+
 		expect(brickGraph.bricks[0]).to.have.length(1)
 		expect(brickGraph.bricks[0][0].position).to.eql({x: 5, y: 5, z: 0})
 		expect(brickGraph.bricks[0][0].size).to.eql({x: 2, y: 2, z: 1})

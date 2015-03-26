@@ -186,9 +186,9 @@ describe 'brickLayouter split', ->
 		brick0.neighbors = [[], [brick1], [], []]
 		brick1.neighbors = [[brick0], [brick2], [], []]
 		brick2.neighbors = [[brick1], [], [], []]
-		
+
 		brickLayouter.splitBricksAndRelayoutLocally [brick0], brickGraph
-	
+
 		expect(bricks[0]).to.have.length(2)
 		expect(bricks[0][0]).to.equal(brick2)
 		expect(bricks[0][1].position).to.eql({x: 0, y: 0, z: 0})

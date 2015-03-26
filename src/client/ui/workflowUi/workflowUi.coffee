@@ -156,7 +156,7 @@ module.exports = class WorkflowUi
 		@_enableUiGroups ['load', 'edit', 'preview', 'export']
 		@buildButton.removeClass 'disabled'
 
-	_enableUiGroups: (groupsList) =>
+	_enableUiGroups: (groupsList) ->
 		availableGroups = [
 			'load', 'edit', 'preview', 'export'
 		]
@@ -170,7 +170,7 @@ module.exports = class WorkflowUi
 	_setStabilityCheckButtonActive: (active) =>
 		@stabilityCheckButton.toggleClass 'active', active
 
-	_initNotImplementedMessages: =>
+	_initNotImplementedMessages: ->
 		alertCallback = ->
 			bootbox.alert({
 					title: 'Not implemented yet'
@@ -183,7 +183,7 @@ module.exports = class WorkflowUi
 		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback
 
-	_initScrollbar: =>
+	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar
 		window.addEventListener 'resize', -> perfectScrollbar.update sidebar

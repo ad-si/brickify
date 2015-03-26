@@ -8,6 +8,9 @@ class BrushHandler
 		@legoBrushSelected = false
 		@bigBrushSelected = false
 
+		document.getElementById('everythingPrinted').addEventListener 'click', =>
+			@_everythingPrint @nodeVisualizer.selectedNode
+
 	getBrushes: =>
 		return [{
 			containerId: '#legoBrush'
@@ -134,5 +137,15 @@ class BrushHandler
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
+
+	_everythingPrint: (selectedNode) =>
+		return if @interactionDisabled
+		@nodeVisualizer._getCachedData selectedNode
+		.then (cachedData) =>
+			cachedData.brickVisualization.makeAllVoxels3dPrinted selectedNode
+			cachedData.csgNeedsRecalculation = true
+			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
+			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			@nodeVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
 
 module.exports = BrushHandler

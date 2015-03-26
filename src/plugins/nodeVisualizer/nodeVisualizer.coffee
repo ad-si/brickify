@@ -56,6 +56,10 @@ class NodeVisualizer
 	onNodeRemove: (node) =>
 		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
 
+	onNodeSelect: (@selectedNode) => return
+
+	onNodeDeselect: => @selectedNode = null
+
 	zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode
 		@bundle.renderer.zoomToBoundingSphere boundingSphere

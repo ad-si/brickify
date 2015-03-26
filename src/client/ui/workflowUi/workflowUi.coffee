@@ -178,7 +178,6 @@ module.exports = class WorkflowUi
 					 Please check back later.'
 			})
 
-		$('#everythingPrinted').click alertCallback
 		$('#everythingLego').click alertCallback
 		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback

@@ -195,6 +195,13 @@ class BrickVisualization
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 		return voxels
 
+	makeAllVoxels3dPrinted: (selectedNode) =>
+		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		for voxel in voxels
+			voxel.make3dPrinted()
+			voxel.setMaterial @defaultColoring.deselectedMaterial
+		return voxels
+
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
 		@voxelSelector.clearSelection()

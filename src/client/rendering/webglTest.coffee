@@ -118,7 +118,7 @@ createFramebuffer = (width, height) ->
 	framebuffer.depthTexture = depthTexture
 	return framebuffer
 
-paintQuadWithShader = (shader)->
+paintQuadWithShader = (shader) ->
 	# bind shader
 	gl.useProgram shader
 	gl.enableVertexAttribArray shader.positionAttribute

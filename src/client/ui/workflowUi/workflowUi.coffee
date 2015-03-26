@@ -19,12 +19,14 @@ module.exports = class WorkflowUi
 			preview: new PreviewUi()
 			export: new ExportUi()
 
+		@enableOnly @workflow.load
+
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
 		@numObjects++
 
 		# enable rest of UI
-		@_enableUiGroups ['load', 'edit', 'preview', 'export']
+		@_enable ['load', 'edit', 'preview', 'export']
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
@@ -37,13 +39,24 @@ module.exports = class WorkflowUi
 
 		if @numObjects == 0
 			# disable rest of UI
-			@_enableUiGroups ['load']
+			@_enable ['load']
 
 	onNodeSelect: (node) =>
 		@brushSelector.onNodeSelect node
 
 	onNodeDeselect: (node) =>
 		@brushSelector.onNodeDeselect node
+
+	enableOnly: (groupUi) =>
+		for step, ui of @workflow
+			ui.setEnabled ui is groupUi
+
+	enableAll: =>
+		@_enable Object.keys @workflow
+
+	_enable: (groupsList) =>
+		for step, ui of @workflow
+			ui.setEnabled step in groupsList
 
 	init: =>
 		@sceneManager = @bundle.sceneManager
@@ -55,9 +68,6 @@ module.exports = class WorkflowUi
 		@_initBuildButton()
 		@_initNotImplementedMessages()
 		@_initScrollbar()
-
-		# only enable load ui until a model is loaded
-		@_enableUiGroups ['load']
 
 	_initStabilityCheck: =>
 		@stabilityCheckButton = $('#stabilityCheckButton')
@@ -152,24 +162,20 @@ module.exports = class WorkflowUi
 
 
 	_disableNonBuildUi: =>
-		@_enableUiGroups ['preview']
+		@_enable ['preview']
 		@stabilityCheckButton.addClass 'disabled'
 
 	_enableNonBuildUi: =>
-		@_enableUiGroups ['load', 'edit', 'preview', 'export']
+		@_enable ['load', 'edit', 'preview', 'export']
 		@stabilityCheckButton.removeClass 'disabled'
 
 	_disableNonStabilityUi: =>
-		@_enableUiGroups ['preview']
+		@_enable ['preview']
 		@buildButton.addClass 'disabled'
 
 	_enableNonStabilityUi: =>
-		@_enableUiGroups ['load', 'edit', 'preview', 'export']
+		@_enable ['load', 'edit', 'preview', 'export']
 		@buildButton.removeClass 'disabled'
-
-	_enableUiGroups: (groupsList) =>
-		for step, ui of @workflow
-			ui.setEnabled step in groupsList
 
 	_setStabilityCheckButtonActive: (active) =>
 		@stabilityCheckButton.toggleClass 'active', active

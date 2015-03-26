@@ -140,21 +140,6 @@ class DummyPlugin
 		}
 
 	###
-	# Plugins can return an array of brush descriptor objects.
-	# @see BrushSelector
-	###
-	getBrushes: ->
-		return [{
-			text: 'dummy-brush'
-			icon: 'move'
-			mouseDownCallback: -> console.log 'dummy-brush modifies scene (mosue down)'
-			mouseMoveCallback: -> console.log 'dumy-brush modifies scene (move)'
-			mouseUpCallback: -> console.log 'dummy-brush modifies scene (mosue up)'
-			selectCallback: -> console.log 'dummy-brush was selected'
-			deselectCallback: -> console.log 'dummy-brush was deselected'
-		}]
-
-	###
 	# When the framerate is very low, plugins may be asked to reduce their visual
 	# complexity, e.g. replacing geometry with simple textures.
 	# Plugins should return true, if they reduced quality, or false,
@@ -172,6 +157,18 @@ class DummyPlugin
 	# @see FidelityControl
 	###
 	beautify: =>
+		return false
+
+	###
+	# When the user interacts with the application, plugins
+	# may react to pointerEvents.
+	# They should return true, if they handled this event,
+	# and false, if they did not.
+	# If no plugin handled the event, orbit controls will handle it.
+	# @param {PointerEvent} event the pointerEvent
+	# @param {String} type type of the event, @see pointerEnums
+	###
+	onPointerEvent: (event, type) =>
 		return false
 
 module.exports = DummyPlugin

@@ -1,6 +1,5 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
-LineMatGenerator = require './visualization/LineMatGenerator'
 
 class ModelVisualization
 	constructor: (@globalConfig, @node, threeNode) ->
@@ -35,25 +34,10 @@ class ModelVisualization
 			color: @globalConfig.colors.object
 			ambient: @globalConfig.colors.object
 		)
-		
-		@shadowMat = new THREE.MeshBasicMaterial(
+
+		@lineMat = new THREE.LineBasicMaterial({
 			color: 0x000000
-			transparent: true
-			opacity: 0.4
-			depthFunc: 'GREATER'
-		)
-		@shadowMat.polygonOffset = true
-		@shadowMat.polygonOffsetFactor = 5
-		@shadowMat.polygonoffsetUnits = -5
-
-		lineMaterialGenerator = new LineMatGenerator()
-		@lineMat = lineMaterialGenerator.generate 0x000000
-		@lineMat.linewidth = 2
-		@lineMat.transparent = true
-		@lineMat.opacity = 0.1
-		@lineMat.depthFunc = 'GREATER'
-		@lineMat.depthWrite = false
-
+		})
 	_createVisualization: (node, threejsNode) =>
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @objectMaterial
@@ -61,21 +45,13 @@ class ModelVisualization
 			parent.solid = solid
 
 		_addWireframe = (geometry, parent) =>
-			# ToDo: create fancy shader material / correct rendering pipeline
-			wireframe = new THREE.Object3D()
-
-			#shadow
-			shadow = new THREE.Mesh geometry, @shadowMat
-			wireframe.add shadow
-
 			# visible black lines
 			lineObject = new THREE.Mesh geometry
 			lines = new THREE.EdgesHelper lineObject, 0x000000, 30
 			lines.material = @lineMat
-			wireframe.add lines
 
-			parent.add wireframe
-			parent.wireframe = wireframe
+			parent.add lines
+			parent.wireframe = lines
 
 		_addModel = (model) =>
 			geometry = model.convertToThreeGeometry()

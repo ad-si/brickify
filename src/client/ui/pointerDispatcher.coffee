@@ -1,21 +1,11 @@
 interactionHelper = require '../interactionHelper'
-
-BUTTON_STATES =
-	none: 0
-	left: 1
-	right: 2
-	middle: 4
-	x1: 8
-	x2: 16
-	eraser: 32
+pointerEnums = require './pointerEnums'
 
 class PointerDispatcher
 	constructor: (@bundle) ->
 		return
 
 	init: =>
-		@isBrushing = false
-		@brushToggled = false
 		@sceneManager = @bundle.sceneManager
 		@brushSelector = @bundle.ui.workflowUi.brushSelector
 		@initListeners()
@@ -24,22 +14,8 @@ class PointerDispatcher
 		_registerEvent = (element, event) =>
 			element.addEventListener event.toLowerCase(), @['on' + event]
 
-		events = [
-			'PointerOver'
-			'PointerEnter'
-			'PointerDown'
-			'PointerMove'
-			'PointerUp'
-			'PointerCancel'
-			'PointerOut'
-			'PointerLeave'
-			'GotPointerCapture'
-			'LostPointerCapture'
-			'ContextMenu'
-		]
-
 		element = @bundle.ui.renderer.getDomElement()
-		_registerEvent element, event for event in events
+		_registerEvent element, event for event of pointerEnums.events
 
 	onPointerOver: (event) =>
 		return
@@ -50,45 +26,27 @@ class PointerDispatcher
 	onPointerDown: (event) =>
 		# don't call mouse events if there is no selected node
 		return unless @sceneManager.selectedNode?
-		# ignore interaction with empty space or with the base plane
-		plugin = @_getResponsiblePluginFor event
-		return if not plugin
 
-		# we have a valid plugin -> we will handle this!
+		# capture event in all cases
 		@_capturePointerFor event
 
-		# toggle brush if it is the right mouse button
-		if(event.buttons & BUTTON_STATES.right)
-			@brushToggled = @brushSelector.toggleBrush()
+		# dispatch event
+		handled = @_dispatchEvent event, pointerEnums.events.PointerDown
 
-		# perform brush action
-		@isBrushing = true
-		brush = @brushSelector.getSelectedBrush()
-		if brush? and brush.mouseDownCallback?
-			brush.mouseDownCallback event, @sceneManager.selectedNode
+		# stop event if a plugin handled it (else let orbit controls work)
+		@_stop event if handled
 
-		@_stop event
 		return
 
 	onPointerMove: (event) =>
 		# don't call mouse events if there is no selected node
 		return unless @sceneManager.selectedNode?
 
-		if event.buttons not in
-		[BUTTON_STATES.none, BUTTON_STATES.left, BUTTON_STATES.right]
-			@_cancelBrush event
-			return
+		# dispatch event
+		handled = @_dispatchEvent event, pointerEnums.events.PointerMove
 
-		# perform brush action
-		brush = @brushSelector.getSelectedBrush()
-		return unless brush?
-
-		if @isBrushing and brush.mouseMoveCallback?
-			brush.mouseMoveCallback event, @sceneManager.selectedNode
-			@_stop event
-		else if event.buttons is BUTTON_STATES.none and brush.mouseHoverCallback?
-			brush.mouseHoverCallback event, @sceneManager.selectedNode
-			@_stop event
+		# stop event if a plugin handled it (else let orbit controls work)
+		@_stop event if handled
 
 		return
 
@@ -98,20 +56,18 @@ class PointerDispatcher
 		# don't call mouse events if there is no selected node
 		return unless @sceneManager.selectedNode?
 
-		# end brush action
-		if @isBrushing
-			@isBrushing = false
-			brush = @brushSelector.getSelectedBrush()
-			if brush? and brush.mouseUpCallback?
-				brush.mouseUpCallback event, @sceneManager.selectedNode
+		# dispatch event
+		handled = @_dispatchEvent event, pointerEnums.events.PointerUp
 
-			@_untoggleBrush()
+		# stop event if a plugin handled it (else let orbit controls work)
+		@_stop event if handled
+
 		return
 
 	onPointerCancel: (event) =>
 		# Pointer capture will be implicitly released
+		@_dispatchEvent event, pointerEnums.events.PointerCancel
 
-		@_cancelBrush event
 		return
 
 	onPointerOut: (event) =>
@@ -138,21 +94,6 @@ class PointerDispatcher
 		# this event sometimes interferes with right clicks
 		@_stop event
 
-	_untoggleBrush: =>
-		if @brushToggled
-			@brushSelector.toggleBrush()
-			@brushToggled = false
-
-	_cancelBrush: (event) =>
-		if @isBrushing
-			@isBrushing = false
-			brush = @brushSelector.getSelectedBrush()
-			if brush? and brush.cancelCallback?
-				brush.cancelCallback event, @sceneManager.selectedNode
-
-			@_untoggleBrush()
-			@_stop event
-
 	_stop: (event) =>
 		event.stopPropagation()
 		event.stopImmediatePropagation()
@@ -165,5 +106,14 @@ class PointerDispatcher
 			@bundle.ui.renderer.scene.children
 			(plugin) -> plugin.name not in ['lego-board', 'coordinate-system']
 		)
+
+	# call plugin after plugin until a plugin reacts to this pointer event
+	# returns false if no plugin handled this event
+	_dispatchEvent: (event, type) ->
+		for hook in @bundle.pluginHooks.get 'onPointerEvent'
+			if hook event, type
+				return true
+		return false
+
 
 module.exports = PointerDispatcher

@@ -1,6 +1,6 @@
 PluginLoader = require '../client/pluginLoader'
 Ui = require './ui/ui'
-Renderer = require './renderer'
+Renderer = require './rendering/renderer'
 ModelLoader = require './modelLoading/modelLoader'
 SceneManager = require './sceneManager'
 Spinner = require './Spinner'
@@ -21,8 +21,8 @@ module.exports = class Bundle
 		@modelLoader = new ModelLoader(@)
 		@sceneManager = new SceneManager(@)
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
-		@pluginInstances = @pluginLoader.loadPlugins()
 		@ui = new Ui(@) if @globalConfig.buildUi
+		@pluginInstances = @pluginLoader.loadPlugins()
 
 	init: =>
 		@ui?.init()

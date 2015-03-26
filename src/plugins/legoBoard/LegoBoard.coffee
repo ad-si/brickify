@@ -8,7 +8,8 @@
 THREE = require 'three'
 modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
-
+RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
+stencilBits = require '../../client/rendering/stencilBits'
 
 module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
@@ -16,8 +17,10 @@ module.exports = class LegoBoard
 		@globalConfig = @bundle.globalConfig
 		return
 
-	# Load the board
+	# Load the board (in separate scene to be rendered in custom render pass)
 	init3d: (@threejsNode) =>
+		@boardScene = @bundle.renderer.getDefaultScene()
+
 		@highQualMode = false
 
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
@@ -31,26 +34,22 @@ module.exports = class LegoBoard
 		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
 			map: studTexture
 		)
-		@currentBaseplateMaterial = @baseplateTexturedMaterial
 
-		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlate
-				opacity: 0.4
-				transparent: true
-		)
 		studMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlateStud
 		)
 
 		#create baseplate
 		box = new THREE.BoxGeometry(400, 400, 8)
-		boxobj = new THREE.Mesh(box, @baseplateMaterial)
+		boxobj = new THREE.Mesh(box, @baseplateTexturedMaterial)
 		boxobj.translateZ -4
-		@threejsNode.add boxobj
+		@boardScene.add boxobj
+		@boardScene.baseplate = boxobj
 
 		#create studs
 		studsContainer = new THREE.Object3D()
-		@threejsNode.add studsContainer
+		@boardScene.add studsContainer
+		@boardScene.studs = studsContainer
 		studsContainer.visible = false
 
 		modelCache
@@ -64,34 +63,57 @@ module.exports = class LegoBoard
 					object.translateY y
 					studsContainer.add object
 
-	on3dUpdate: =>
-		# check if the camera is below z=0. if yes, make the plate transparent
-		# and hide studs
-		if not @bundle?
-			return
+	onPaint: (threeRenderer, camera) =>
+		# recreate textures if either they havent been generated yet or
+		# the screen size has changed
+		if not (@renderTargetsInitialized? and
+		RenderTargetHelper.renderTargetHasRightSize(
+			@boardSceneTarget.renderTarget, threeRenderer
+		))
+			@boardSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
+			@renderTargetsInitialized = true
 
-		cam = @bundle.renderer.camera
+		#render board
+		threeRenderer.render @boardScene, camera, @boardSceneTarget.renderTarget, true
 
-		# it should be z, but due to orbitcontrols the scene is rotated
-		if cam.position.y < 0
-			@threejsNode.children[0].material = @baseplateTransparentMaterial
-			@threejsNode.children[1].visible = false
+		gl = threeRenderer.context
+
+		# render baseplate transparent if cam looks from below
+		if camera.position.y < 0
+			# one fully transparent render pass
+			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
+			threeRenderer.render @boardSceneTarget.quadScene, camera
 		else
-			@threejsNode.children[0].material = @currentBaseplateMaterial
-			@threejsNode.children[1].visible = true if @highQualMode
+			# one default opaque pass
+			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 1
+			threeRenderer.render @boardSceneTarget.quadScene, camera
+
+			#render one pass transparent, where visible object or shadow is
+			# (= no lego)
+			gl.enable(gl.STENCIL_TEST)
+			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.legoMask)
+			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+			gl.stencilMask(0x00)
+
+			@boardSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
+
+			gl.disable(gl.DEPTH_TEST)
+			threeRenderer.render @boardSceneTarget.quadScene, camera
+			gl.enable(gl.DEPTH_TEST)
+
+			gl.disable(gl.STENCIL_TEST)
 
 	toggleVisibility: =>
-		@threejsNode.visible = !@threejsNode.visible
+		@boardScene.visible = !@boardScene.visible
 
 	uglify: =>
 		if @highQualMode
 			@highQualMode = false
 
 			#hide studs
-			@threejsNode.children[1].visible = false
+			@boardScene.studs.visible = false
 			#change baseplate material to stud texture
-			@threejsNode.children[0].material = @baseplateTexturedMaterial
-			@currentBaseplateMaterial = @baseplateTexturedMaterial
+			@boardScene.baseplate.material = @baseplateTexturedMaterial
 			return true
 
 		return false
@@ -101,10 +123,9 @@ module.exports = class LegoBoard
 			@highQualMode = true
 
 			#show studs
-			@threejsNode.children[1].visible = true
+			@boardScene.studs.visible = true
 			#remove texture because we have physical studs
-			@threejsNode.children[0].material = @baseplateMaterial
-			@currentBaseplateMaterial = @baseplateMaterial
+			@boardScene.baseplate.material = @baseplateMaterial
 			return true
 
 		return false

@@ -25,6 +25,13 @@
 
 - init3d
 
+# ## onPaint
+# 
+# Plugins that need visuals beyond a node in a default scene (-> init3d) may
+# perform their custom render pass in this call. 
+
+- onPaint
+
 # ## Focus manipulation
 #
 # A Plugin can specify that its visualization has a new bounding sphere.
@@ -99,25 +106,6 @@
 
 - getHotkeys
 
-# ## Brushes
-#
-# Plugins may return an array with an entry for each brush they provide
-# each brush should have the json structure like in this example:
-#
-# {
-#	text: 'Make Lego'
-#	selectCallback: # when the brush is selected, selectedNode as argument
-#	deselectCallback: # when the brush is deselected
-#	mouseDownCallback: # when a node is selected and mouse is pressed
-#	mouseMoveCallback: # after being pressed, when mouse is moved
-#	mouseHoverCallback: # when the mouse is moved, but not pressed
-#	mouseUpCallback: # when mouse is released
-#	cancelCallback: # when interaction is canceled (ESC, two buttons pressed)
-# }
-#
-
-- getBrushes
-
 # ## Subtractive CSG
 # When clicking on the download button, the user expects to download eyerything
 # he needs to 3d print. therefore, getSubtractiveCSG should return a solid geometry
@@ -139,3 +127,9 @@
 # eye candy even further, or false otherwise.
 
 - beautify
+
+# ## onPointerEvent
+# When the user interacts with the application, plugins may react to pointerEvents.
+# They should return true, if they handled this event, and false, if they did not.
+# If no plugin handled the event, orbit controls will handle it.
+- onPointerEvent

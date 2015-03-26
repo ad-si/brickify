@@ -5,23 +5,22 @@ class BrushSelector
 	constructor: (@bundle) ->
 		@selectedNode = null
 
-		@_brushList = []
-
-		for array in @bundle.pluginHooks.getBrushes()
-			for brush in array
-				@_brushList.push brush
-
 	init: (jQueryBrushContainerSelector) =>
 		@_selectedBrush = null
 		@_bigBrushSelected = false
 
 		@brushContainer = $(jQueryBrushContainerSelector)
 
+		@_brushList ?= []
+
 		for brush in @_brushList
 			htmlContainer = @brushContainer.find brush.containerId
 			brush.brushButton = htmlContainer
 			brush.bigBrushButton = brush.brushButton.find '.bigBrush'
 			@_bindBrushEvent brush
+
+	# binds the given brushes to the UI
+	setBrushes: (@_brushList) => return
 
 	onNodeSelect: (node) =>
 		@selectedNode = node

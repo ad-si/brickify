@@ -55,11 +55,6 @@ module.exports = class PluginLoader
 				require '../plugins/coordinateSystem'
 				require '../plugins/coordinateSystem/package.json'
 			)
-		if @globalConfig.plugins.legoBoard
-			pluginInstances.push @initPlugin(
-				require '../plugins/legoBoard'
-				require '../plugins/legoBoard/package.json'
-			)
 		if @globalConfig.plugins.newBrickator
 			pluginInstances.push @initPlugin(
 				require '../plugins/newBrickator'
@@ -74,6 +69,11 @@ module.exports = class PluginLoader
 			pluginInstances.push @initPlugin(
 				require '../plugins/fidelityControl'
 				require '../plugins/fidelityControl/package.json'
+			)
+		if @globalConfig.plugins.legoBoard
+			pluginInstances.push @initPlugin(
+				require '../plugins/legoBoard'
+				require '../plugins/legoBoard/package.json'
 			)
 
 		return pluginInstances

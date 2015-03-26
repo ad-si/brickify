@@ -2,6 +2,12 @@ BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
+RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
+pointerEnums = require '../../client/ui/pointerEnums'
+PointEventHandler = require './pointEventHandler'
+interactionHelper = require '../../client/interactionHelper'
+stencilBits = require '../../client/rendering/stencilBits'
+shaderGenerator = require './shaderGenerator'
 
 ###
 # @class NodeVisualizer
@@ -10,23 +16,144 @@ class NodeVisualizer
 	constructor: ->
 		@printMaterial = new THREE.MeshLambertMaterial({
 			color: 0xeeeeee
-			opacity: 0.8
-			transparent: true
 		})
 
 		# remove z-Fighting on baseplate
 		@printMaterial.polygonOffset = true
 		@printMaterial.polygonOffsetFactor = 5
-		@printMaterial.polygonoffsetUnits = 5
+		@printMaterial.polygonOffsetUnits = 5
+
+		# rendering properties
+		@brickShadowOpacity = 0.5
+		@objectOpacity = 0.8
+		@objectShadowOpacity = 0.5
+		@objectColorMult = new THREE.Vector3(1, 1, 1)
+		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
 
 	init: (@bundle) =>
-		@brushHandler = new BrushHandler(@bundle, @)
+		if @bundle.ui?
+			@brushHandler = new BrushHandler(@bundle, @)
+
+			# bind brushes to UI
+			brushSelector = @bundle.ui.workflowUi.brushSelector
+			brushSelector.setBrushes @brushHandler.getBrushes()
+
+			@pointEventHandler = new PointEventHandler(
+				@bundle.sceneManager
+				brushSelector
+			)
 
 	init3d: (@threejsRootNode) =>
+		# Voxels / Bricks are rendered as a first render pass
+		@brickScene = @bundle.renderer.getDefaultScene()
+
+		# Objects are rendered in the 2nd / 3rd render pass
+		@objectScene = @bundle.renderer.getDefaultScene()
+
+		# LegoShadow is rendered as a 3rd rendering pass
+		@brickShadowScene = @bundle.renderer.getDefaultScene()
+		
 		return
 
-	getBrushes: =>
-		return @brushHandler.getBrushes()
+	onPaint: (@threeRenderer, camera) =>
+		threeRenderer = @threeRenderer
+
+		# recreate textures if either they havent been generated yet or
+		# the screen size has changed
+		if not (@renderTargetsInitialized? and
+		RenderTargetHelper.renderTargetHasRightSize(
+			@brickSceneTarget.renderTarget, threeRenderer
+		))
+			# bricks
+			@brickSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
+
+			# object
+			customFrag = shaderGenerator.buildFragmentMainAdditions(
+				{ expandBlack: true }
+			)
+			@objectSceneTarget = RenderTargetHelper.createRenderTarget(
+				threeRenderer,
+				{ opacity: @objectOpacity, fragmentInMain: customFrag },
+				THREE.NearestFilter
+			)
+
+			# brick shadow
+			customFrag = shaderGenerator.buildFragmentMainAdditions(
+				{ expandBlack: true, blackAlwaysOpaque: true }
+			)
+			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
+				threeRenderer,
+				{ opacity: @brickShadowOpacity, fragmentInMain: customFrag }
+			)
+
+			@renderTargetsInitialized = true
+
+		# First render pass: render Bricks & Voxels
+		threeRenderer.render @brickScene, camera, @brickSceneTarget.renderTarget, true
+
+		# Second pass: render object
+		threeRenderer.render(
+			@objectScene, camera, @objectSceneTarget.renderTarget, true
+		)
+
+		# Third pass: render shadows
+		threeRenderer.render(
+			@brickShadowScene, camera, @brickShadowSceneTarget.renderTarget, true
+		)
+
+		# finally render everything (on quads) on screen
+		gl = threeRenderer.context
+
+		# everything that is visible lego gets the first bit set
+		gl.enable(gl.STENCIL_TEST)
+		gl.stencilFunc(gl.ALWAYS, stencilBits.legoMask, 0xFF)
+		gl.stencilOp(gl.ZERO, gl.ZERO, gl.REPLACE)
+		gl.stencilMask(0xFF)
+
+		# bricks
+		threeRenderer.render @brickSceneTarget.quadScene, camera
+		
+		# everything that is 3d model and hidden gets the third bit set
+		# every visible part of the 3d model gets the second bit set
+		# (via increase and not being allowed to remove the first bit)
+		gl.stencilFunc(gl.ALWAYS, stencilBits.hiddenObjectMask, 0xFF)
+		gl.stencilOp(gl.KEEP, gl.REPLACE, gl.INCR)
+		gl.stencilMask(stencilBits.visibleObjectMask | stencilBits.hiddenObjectMask)
+
+		# render visible parts
+		threeRenderer.render @objectSceneTarget.quadScene, camera
+
+		# render invisble parts (object behind lego bricks)
+		if @brushHandler? and not @brushHandler.legoBrushSelected
+			# Adjust object material to be dark and more transparent
+			blendMat = @objectSceneTarget.blendingMaterial
+			blendMat.uniforms.colorMult.value = @objectShadowColorMult
+			blendMat.uniforms.opacity.value = @objectShadowOpacity
+
+			# Only render where hidden 3d model is
+			gl.stencilFunc(
+				gl.EQUAL, stencilBits.hiddenObjectMask, stencilBits.hiddenObjectMask
+			)
+			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
+
+			gl.disable(gl.DEPTH_TEST)
+			threeRenderer.render @objectSceneTarget.quadScene, camera
+			gl.enable(gl.DEPTH_TEST)
+
+			# Reset material to non-shadow properties
+			blendMat.uniforms.opacity.value = @objectOpacity
+			blendMat.uniforms.colorMult.value = @objectColorMult
+
+		# everything shadowy gets the fourth bit set
+		gl.stencilFunc(gl.ALWAYS, 0xFF, 0xFF)
+		gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE)
+		gl.stencilMask(stencilBits.visibleShadowMask)
+
+		# render this-could-be-lego-shadows and brush highlight
+		threeRenderer.render @brickShadowSceneTarget.quadScene, camera
+
+		gl.disable(gl.STENCIL_TEST)
+		
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -54,7 +181,9 @@ class NodeVisualizer
 				@zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
-		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
+		@brickScene.remove threeHelper.find node, @brickScene
+		@brickShadowScene.remove threeHelper.find node, @brickShadowScene
+		@objectScene.remove threeHelper.find node, @objectScene
 
 	zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode
@@ -89,17 +218,27 @@ class NodeVisualizer
 
 	# creates visualization datastructures
 	_createNodeDatastructure: (node) =>
-		threeNode = new THREE.Object3D()
-		@threejsRootNode.add threeNode
-		threeHelper.link node, threeNode
+		brickThreeNode = new THREE.Object3D()
+		@brickScene.add brickThreeNode
+
+		brickShadowThreeNode = new THREE.Object3D()
+		@brickShadowScene.add brickShadowThreeNode
+		
+		modelThreeNode = new THREE.Object3D()
+		@objectScene.add modelThreeNode
+
+		threeHelper.link node, brickThreeNode
+		threeHelper.link node, brickShadowThreeNode
+		threeHelper.link node, modelThreeNode
 
 		data = {
 			initialized: false
 			node: node
-			threeNode: threeNode
-			brickVisualization: new BrickVisualization @bundle, threeNode
+			brickVisualization: new BrickVisualization(
+				@bundle, brickThreeNode, brickShadowThreeNode
+			)
 			modelVisualization: new ModelVisualization(
-				@bundle.globalConfig, node, threeNode
+				@bundle.globalConfig, node, modelThreeNode
 			)
 		}
 
@@ -171,5 +310,49 @@ class NodeVisualizer
 		return @newBrickator.getCSG(cachedData.node, true)
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg(csg)
+
+	onPointerEvent: (event, eventType) =>
+		return false if not @pointEventHandler?
+
+		if not @_pointerOverModel event
+			# when we are not above model, call only move and up events
+			switch eventType
+				when pointerEnums.events.PointerMove
+					@pointEventHandler.pointerMove event
+				when pointerEnums.events.PointerUp
+					@pointEventHandler.pointerUp event
+			return false
+
+		switch eventType
+			when pointerEnums.events.PointerDown
+				@pointEventHandler.pointerDown event
+				return true
+			when pointerEnums.events.PointerMove
+				return @pointEventHandler.pointerMove event
+			when pointerEnums.events.PointerUp
+				@pointEventHandler.pointerUp event
+				return true
+			when pointerEnums.events.PointerCancel
+				@pointEventHandler.PointerCancel event
+				return true
+
+	# check whether the pointer is over the model
+	_pointerOverModel: (event) =>
+		# make this the old fashioned raycasting way
+		# because reading pixels is awfully slow
+
+		# intersect with model
+		modelIntersections = interactionHelper.getIntersections(
+			event, @bundle.renderer, @objectScene.children
+		)
+		return true if modelIntersections.length > 0
+
+		#intersect with bricks
+		brickIntersections = interactionHelper.getIntersections(
+			event, @bundle.renderer, @brickScene.children
+		)
+		return true if brickIntersections.length > 0
+		
+		return false
 
 module.exports = NodeVisualizer

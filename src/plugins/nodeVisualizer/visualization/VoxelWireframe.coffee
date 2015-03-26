@@ -32,10 +32,13 @@ module.exports = class VoxelOutline
 
 		# add black sides to make volume more visible
 		shadowMat = new THREE.MeshBasicMaterial({
-			color: 0x000000
-			transparent: true
-			opacity: 0.3
+			color: 0x303030
 		})
+		# push the shadow a bit to the back to prevent z-fighting with lines
+		shadowMat.polygonOffset = true
+		shadowMat.polygonOffsetUnits = 2
+		shadowMat.polygonOffsetFactor = 2
+
 		shadowBox = new THREE.Mesh(boxGeometry, shadowMat)
 		@threeNode.add shadowBox
 		@threeNode.shadowBox = shadowBox

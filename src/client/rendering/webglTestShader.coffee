@@ -14,8 +14,8 @@ module.exports.vertexPrimary = '
 	varying vec2 texCoords;
 
 	void main(void){
-		float tx = position.x;
-		float ty = position.y;
+		float tx = position.x * 5.0;
+		float ty = position.y * 5.0;
 		texCoords = vec2(tx, ty);
 
 		gl_Position = vec4(position, 1.0);

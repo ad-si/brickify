@@ -40,6 +40,7 @@ initQuadBuffer = (size = 1.0) ->
 		 1 * size,  -1 * size, 0,
 		-1 * size,  -1 * size, 0
 	]
+	
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 	quadBuffer.itemSize = 3
 	quadBuffer.numItems = 4
@@ -88,8 +89,8 @@ createFramebuffer = (width, height) ->
 	gl.bindTexture(gl.TEXTURE_2D, colorTexture)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
 	gl.texImage2D(
 		gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null
 	)
@@ -116,6 +117,8 @@ createFramebuffer = (width, height) ->
 
 	framebuffer.colorTexture = colorTexture
 	framebuffer.depthTexture = depthTexture
+	framebuffer.width = width
+	framebuffer.height = height
 	return framebuffer
 
 paintQuadWithShader = (shader) ->
@@ -137,7 +140,8 @@ onPaint = (timestamp) ->
 
 	# bind framebuffer, clear
 	gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+	gl.viewport(0, 0, frameBuffer.width, frameBuffer.height)
+	gl.clearColor(0.0, 0.0, 0.0, 1.0)
 	gl.clear( gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT, gl.STENCIL_BUFFER_BIT)
 
 	# render quad to framebuffer
@@ -145,6 +149,8 @@ onPaint = (timestamp) ->
 
 	# render to screen
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+	gl.clearColor(0.3, 0.3, 0.3, 1.0)
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear( gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT, gl.STENCIL_BUFFER_BIT)
 
 	# Bind textures
@@ -168,6 +174,6 @@ primaryShaderProgram = initShaderProgram(
 secondaryShaderProgram = initShaderProgram(
 	shaderSources.vertexPrimary,shaderSources.fragmentSecondary
 )
-frameBuffer = createFramebuffer(4096, 4096)
+frameBuffer = createFramebuffer(1024, 1024)
 
 window.requestAnimationFrame onPaint

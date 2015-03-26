@@ -1,6 +1,7 @@
 shaderSources = require './webglTestShader'
 
 lastTime = 0
+avgFps = 60
 updateFps = (timestamp) ->
 	if not lastTime > 0
 		lastTime = timestamp
@@ -10,7 +11,8 @@ updateFps = (timestamp) ->
 	lastTime = timestamp
 
 	fps = 1000 / delta
-	window.document.title = fps.toFixed(2)
+	avgFps =  (fps * 0.02) + ( avgFps * 0.98 )
+	window.document.title = avgFps.toFixed(2)
 
 initGl = ->
 	# Initialize GL
@@ -40,7 +42,7 @@ initQuadBuffer = (size = 1.0) ->
 		 1 * size,  -1 * size, 0,
 		-1 * size,  -1 * size, 0
 	]
-	
+
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 	quadBuffer.itemSize = 3
 	quadBuffer.numItems = 4

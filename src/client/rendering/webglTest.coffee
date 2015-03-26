@@ -76,8 +76,10 @@ initShaderProgram = (vertex, fragment) ->
 		console.warn 'Unable to initialize shader program'
 		return null
 
-	# Link common attributes
+	# Link common attributes and uniforms
 	program.positionAttribute = gl.getAttribLocation(program, 'position')
+	program.colorTextureUnifom = gl.getUniformLocation(program, 'colorTexture')
+	program.depthTextureUnifom = gl.getUniformLocation(program, 'depthTexture')
 
 	return program
 
@@ -135,6 +137,7 @@ onPaint = (timestamp) ->
 
 	# bind framebuffer, clear
 	gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear( gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT, gl.STENCIL_BUFFER_BIT)
 
 	# render quad to framebuffer
@@ -144,8 +147,16 @@ onPaint = (timestamp) ->
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 	gl.clear( gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT, gl.STENCIL_BUFFER_BIT)
 
+	# Bind textures
+	gl.activeTexture(gl.TEXTURE0)
+	gl.bindTexture(gl.TEXTURE_2D, frameBuffer.colorTexture)
+	gl.uniform1i(secondaryShaderProgram.colorTextureUniform, 0)
+	gl.activeTexture(gl.TEXTURE1)
+	gl.bindTexture(gl.TEXTURE_2D, frameBuffer.depthTexture)
+	gl.uniform1i(secondaryShaderProgram.depthTextureUniform, 1)
+
 	# render quad
-	paintQuadWithShader(primaryShaderProgram)
+	paintQuadWithShader(secondaryShaderProgram)
 
 	requestAnimationFrame onPaint
 
@@ -153,6 +164,9 @@ gl = initGl()
 visibleQuadBuffer = initQuadBuffer(0.8)
 primaryShaderProgram = initShaderProgram(
 	shaderSources.vertexPrimary,shaderSources.fragmentPrimary
+)
+secondaryShaderProgram = initShaderProgram(
+	shaderSources.vertexPrimary,shaderSources.fragmentSecondary
 )
 frameBuffer = createFramebuffer(2048, 1024)
 

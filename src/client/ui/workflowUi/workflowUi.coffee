@@ -45,6 +45,7 @@ class WorkflowUi
 	init: =>
 		@_initNotImplementedMessages()
 		@_initScrollbar()
+		@_initToggleButton()
 
 	_initNotImplementedMessages: ->
 		alertCallback = ->
@@ -63,6 +64,13 @@ class WorkflowUi
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar
 		window.addEventListener 'resize', -> perfectScrollbar.update sidebar
+
+	_initToggleButton: ->
+		$('#toggleMenu').click => @toggleMenu()
+
+	toggleMenu: ->
+		$('#sidebar-content').slideToggle()
+		$('#leftSidebar').toggleClass 'collapsed-sidebar'
 
 	toggleStabilityView: =>
 		@workflow.preview.toggleStabilityView()

@@ -14,11 +14,10 @@ block body
 
 		canvas#canvas.appCanvas(touch-action="none")
 
-		#commandContainer
+		#commandContainer.hidden-xs
 			a#cmdHelp.fa.fa-keyboard-o(href="#", title="Open keyboard shortcuts")
 
-		aside#leftSidebar.col-lg-2.col-md-3.col-sm-4
-			h1#logo Brickolage
+		aside#leftSidebar.col-xs-12.col-sm-4.col-md-3.col-lg-2
 			include ./sidebar.jade
 
 		#webGlWarning

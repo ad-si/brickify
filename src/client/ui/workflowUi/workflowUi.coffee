@@ -1,4 +1,3 @@
-DownloadProvider = require './downloadProvider'
 perfectScrollbar = require 'perfect-scrollbar'
 
 LoadUi = require './LoadUi'
@@ -8,7 +7,6 @@ ExportUi = require './ExportUi'
 
 class WorkflowUi
 	constructor: (@bundle) ->
-		@downloadProvider = new DownloadProvider(@bundle)
 		@numObjects = 0
 
 		@workflow =
@@ -54,9 +52,6 @@ class WorkflowUi
 			ui.setEnabled step in groupsList
 
 	init: =>
-		@sceneManager = @bundle.sceneManager
-		@downloadProvider.init('#downloadButton', @sceneManager)
-
 		@_initNotImplementedMessages()
 		@_initScrollbar()
 

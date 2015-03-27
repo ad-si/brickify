@@ -7,8 +7,6 @@ ExportUi = require './ExportUi'
 
 class WorkflowUi
 	constructor: (@bundle) ->
-		@numObjects = 0
-
 		@workflow =
 			load: new LoadUi @
 			edit: new EditUi @
@@ -19,20 +17,13 @@ class WorkflowUi
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		@numObjects++
-
-		# enable rest of UI
 		@_enable ['load', 'edit', 'preview', 'export']
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
 		@workflow.preview.quit()
-
-		@numObjects--
-
-		if @numObjects == 0
-			# disable rest of UI
-			@_enable ['load']
+		@bundle.sceneManager.scene.then (scene) =>
+			@enableOnly @workflow.load if scene.nodes.length == 0
 
 	onNodeSelect: (node) =>
 		@workflow.edit.onNodeSelect node

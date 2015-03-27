@@ -1,7 +1,9 @@
 class Voxel
-	constructor: (dataEntrys = []) ->
+	constructor: (@position, dataEntrys = []) ->
 		@dataEntrys = dataEntrys
 		@brick = false
-		@enabld = true
+		@enabled = true
+		@definitelyUp = false
+		@definitelyDown = false
 
 module.exports = Voxel

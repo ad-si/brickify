@@ -94,10 +94,10 @@ module.exports = class BrickLayouter
 		legoBricks = []
 		for brick in newBricks
 			p = brick.position
-			if grid? and not grid.zLayers[p.z]?[p.x]?[p.y]?
+			if grid? and not grid.hasVoxelAt p.x, p.y, p.z
 				# This brick does not belong to any voxel --> delete brick
 				brickGraph.deleteBrick brick
-			else if grid? and not grid.zLayers[p.z][p.x][p.y].enabled
+			else if grid? and not grid.getVoxel(p.x, p.y, p.z).enabled
 				# This voxel is going to be 3d printed --> delete brick
 				brickGraph.deleteBrick brick
 			else

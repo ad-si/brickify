@@ -21,54 +21,52 @@ module.exports = class BrickGraph
 			@bricks[z] = []
 
 		# create all bricks
-		for z in [0..@grid.numVoxelsZ - 1] by 1
-			for x in [0..@grid.numVoxelsX - 1] by 1
-				for y in [0..@grid.numVoxelsY - 1] by 1
+		for z in [0...@grid.numVoxelsZ] by 1
+			for x in [0...@grid.numVoxelsX] by 1
+				for y in [0...@grid.numVoxelsY] by 1
+					voxel = @grid.getVoxel x, y, z
+					if voxel?.enabled
+						# create brick
+						position = voxel.position
+						size = {x: 1,y: 1,z: 1}
 
-					if @grid.zLayers[z]?[x]?[y]?
-						if @_voxelExistsAndIsEnabled z, x, y
+						brick = new Brick position, size
+						voxel.brick = brick
 
-							# create brick
-							position = {x: x, y: y, z: z}
-							size = {x: 1,y: 1,z: 1}
-							brick = new Brick position, size
-							@grid.zLayers[z][x][y].brick = brick
+						@_connectToBrickBelow brick, position.x, position.y, position.z
+						@_connectToBrickXm brick, position.x, position.y, position.z
+						@_connectToBrickYm brick, position.x, position.y, position.z
 
-							@_connectToBrickBelow brick, x,y,z
-							@_connectToBrickXm brick, x,y,z
-							@_connectToBrickYm brick, x,y,z
-
-							@bricks[z].push brick
+						@bricks[position.z].push brick
 
 		# remove references to bricks that will later become invalid
-		for z in [0..@grid.numVoxelsZ - 1] by 1
-			for x in [0..@grid.numVoxelsX - 1] by 1
-				for y in [0..@grid.numVoxelsY - 1] by 1
-					if @grid.zLayers[z]?[x]?[y]?
-						delete @grid.zLayers[z][x][y].brick
+		@grid.forEachVoxel (voxel) ->
+			delete voxel.brick
 
-	_voxelExistsAndIsEnabled: (z, x, y) =>
+	_voxelExistsAndIsEnabled: (x, y, z) =>
 		# !! makes sure a boolean is returned
-		return !!@grid.zLayers[z]?[x]?[y]?.enabled
+		return !!@grid.getVoxel(x, y, z)?.enabled
 
 	_connectToBrickBelow: (brick, x, y, z) =>
-		return if not @_voxelExistsAndIsEnabled z - 1, x, y
+		return if not @_voxelExistsAndIsEnabled x, y, z - 1
 
-		brickBelow = @grid.zLayers[z - 1][x][y].brick
+		brickBelow = @grid.getVoxel(x, y, z - 1).brick
 		brick.lowerSlots[0][0] = brickBelow
 		brickBelow.upperSlots[0][0] = brick
 
 	_connectToBrickXm: (brick, x, y, z) =>
-		return if not @_voxelExistsAndIsEnabled z, x - 1, y
+		return if not @_voxelExistsAndIsEnabled x - 1, y, z
+		voxel = @grid.getVoxel(x - 1, y, z)
 
-		brick.neighbors[Brick.direction.Xm] = [@grid.zLayers[z][x - 1][y].brick]
-		@grid.zLayers[z][x - 1][y].brick.neighbors[Brick.direction.Xp] = [brick]
+		brick.neighbors[Brick.direction.Xm] = [voxel.brick]
+		voxel.brick.neighbors[Brick.direction.Xp] = [brick]
 
 	_connectToBrickYm: (brick, x, y, z) =>
-		return if not @_voxelExistsAndIsEnabled z, x, y - 1
+		return if not @_voxelExistsAndIsEnabled x, y - 1, z
+		voxel = @grid.getVoxel(x, y - 1, z)
 
-		brick.neighbors[Brick.direction.Ym] = [@grid.zLayers[z][x][y - 1].brick]
-		@grid.zLayers[z][x][y - 1].brick.neighbors[Brick.direction.Yp] = [brick]
+		brick.neighbors[Brick.direction.Ym] = [voxel.brick]
+		voxel.brick.neighbors[Brick.direction.Yp] = [brick]
 
 	forEachBrick: (callback) =>
 		for layer in @bricks
@@ -158,7 +156,7 @@ module.exports = class BrickGraph
 		for x in [brick.position.x..((brick.position.x + brick.size.x) - 1)] by 1
 			for y in [brick.position.y..((brick.position.y + brick.size.y) - 1)] by 1
 				for z in [brick.position.z..((brick.position.z + brick.size.z) - 1)] by 1
-					voxel = @grid?.zLayers[z][x][y]
+					voxel = @grid?.getVoxel x, y, z
 					if voxel?
 						callback(voxel)
 					else

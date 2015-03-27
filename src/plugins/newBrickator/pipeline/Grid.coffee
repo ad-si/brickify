@@ -9,9 +9,6 @@ module.exports = class Grid
 		@numVoxelsZ = 0
 		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
 
-		# old datastructure, only for compatibility purposes
-		@zLayers = []
-		# new voxel hashmap
 		@voxels = {}
 
 	setUpForModel: (optimizedModel, options) =>
@@ -110,25 +107,30 @@ module.exports = class Grid
 	_generateKey: (x, y, z) ->
 		return x + '-' + y + '-' + z
 
-	setVoxel: (voxel, data = true) ->
-		key = @_generateKey voxel.x, voxel.y, voxel.z
+	setVoxel: (position, data = true) ->
+		key = @_generateKey position.x, position.y, position.z
 		v = @voxels[key]
 
 		if not v?
-			v = new Voxel([data])
+			v = new Voxel(position, [data])
 			@voxels[key] = v
 		else
 			v.dataEntrys.push data
 
+	# TODO: check whether getVoxel(position) is used, probably getVoxel(x,y,z)
+	# is enough
 	getVoxel: (positionOrX, y, z) =>
 		if y? and z?
 			return @voxels[@_generateKey positionOrX, y, z]
 		else
 			return @voxels[@_generateKey positionOrX.x, positionOrX.y, positionOrX.z]
 
+	hasVoxelAt: (x, y, z) =>
+		return @voxels[@_generateKey x, y, z]?
+
 	forEachVoxel: (callback) =>
 		for own key of @voxels
-			callback @voxels[key], x, y, z
+			callback @voxels[key]
 
 	getNeighbors: (x, y, z, selectionCallback) =>
 		# returns a list of neighbors for this voxel position.

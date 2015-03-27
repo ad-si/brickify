@@ -58,6 +58,7 @@ describe 'brickLayouter merge', ->
 		grid.setVoxel {x: 1, y: 2, z: 0}
 		grid.setVoxel {x: 0, y: 1, z: 0}
 		grid.setVoxel {x: 2, y: 1, z: 0}
+
 		brickLayouter = new BrickLayouter()
 		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.bricks
 

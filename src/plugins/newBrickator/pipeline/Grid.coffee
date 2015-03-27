@@ -1,4 +1,5 @@
 THREE = require 'three'
+Voxel = require './Voxel'
 
 module.exports = class Grid
 	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
@@ -6,8 +7,12 @@ module.exports = class Grid
 		@numVoxelsX = 0
 		@numVoxelsY = 0
 		@numVoxelsZ = 0
-		@zLayers = []
 		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
+
+		# old datastructure, only for compatibility purposes
+		@zLayers = []
+		# new voxel hashmap
+		@voxels = {}
 
 	setUpForModel: (optimizedModel, options) =>
 		@modelTransform = options.modelTransform
@@ -101,34 +106,29 @@ module.exports = class Grid
 			z: relative.z + @origin.z
 		}
 
-	setVoxel: (voxel, data = true) =>
-		# sets the voxel with the given indices to true
-		# the voxel may also contain data.
-		if not @zLayers[voxel.z]
-			@zLayers[voxel.z] = []
-		if not @zLayers[voxel.z][voxel.x]
-			@zLayers[voxel.z][voxel.x] = []
+	# generates a key for a hashmap from the given coordinates
+	_generateKey: (x, y, z) ->
+		return x + '-' + y + '-' + z
 
-		if not @zLayers[voxel.z][voxel.x][voxel.y]?
-			voxData = {dataEntrys: [data], enabled: true, brick: false}
-			@zLayers[voxel.z][voxel.x][voxel.y] = voxData
+	setVoxel: (voxel, data = true) ->
+		key = @_generateKey voxel.x, voxel.y, voxel.z
+		v = @voxels[key]
+
+		if not v?
+			v = new Voxel([data])
+			@voxels[key] = v
 		else
-			#if the voxel already exists, push new data to existing array
-			@zLayers[voxel.z][voxel.x][voxel.y].dataEntrys.push data
+			v.dataEntrys.push data
 
 	getVoxel: (positionOrX, y, z) =>
 		if y? and z?
-			return @zLayers[z]?[positionOrX]?[y]
+			return @voxels[@_generateKey positionOrX, y, z]
 		else
-			return @zLayers[positionOrX.z]?[positionOrX.x]?[positionOrX.y]
+			return @voxels[@_generateKey positionOrX.x, positionOrX.y, positionOrX.z]
 
 	forEachVoxel: (callback) =>
-		for z in [0..@numVoxelsZ - 1] by 1
-			for y in [0..@numVoxelsY - 1] by 1
-				for x in [0..@numVoxelsX - 1] by 1
-					if @zLayers[z]?[x]?[y]?
-						vox = @zLayers[z][x][y]
-						callback vox, x, y, z
+		for own key of @voxels
+			callback @voxels[key], x, y, z
 
 	getNeighbors: (x, y, z, selectionCallback) =>
 		# returns a list of neighbors for this voxel position.
@@ -146,19 +146,18 @@ module.exports = class Grid
 		]
 
 		for p in pos
-			if @zLayers[p[2]]?[p[0]]?[p[1]]?
-				v = @zLayers[p[2]][p[0]][p[1]]
+			v = @voxel[@_generateKey p[0], p[1], p[2]]
+			if v? and selectionCallback(v)
+				list.push v
 
-				if selectionCallback(v)
-					list.push v
 		return list
 
 	getSurrounding: ({x, y, z}, size, selectionCallback) =>
 		list = []
 
 		_collect = (vx, vy, vz) =>
-			if @zLayers[vz]?[vx]?[vy]?
-				voxel = @zLayers[vz][vx][vy]
+			voxel = @voxels[@_generateKey vx, vy, vz]
+			if voxel?
 				list.push voxel if selectionCallback voxel
 
 		sizeX_2 = Math.floor size.x / 2

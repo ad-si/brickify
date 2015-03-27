@@ -1,6 +1,6 @@
 class LoadUi
 	constructor: ->
-		@$panel = $("#loadGroup")
+		@$panel = $('#loadGroup')
 
 	setEnabled: (enabled) =>
 		@$panel.find('.btn, .panel').toggleClass 'disabled', !enabled

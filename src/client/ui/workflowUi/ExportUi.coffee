@@ -2,7 +2,7 @@ DownloadProvider = require './downloadProvider'
 
 class ExportUi
 	constructor: (@workflowUi) ->
-		@$panel = $("#exportGroup")
+		@$panel = $('#exportGroup')
 		@_initDownloadButton()
 
 	setEnabled: (enabled) =>

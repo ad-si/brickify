@@ -2,7 +2,7 @@ PreviewAssemblyUi = require './PreviewAssemblyUi'
 
 class PreviewUi
 	constructor: (@workflowUi) ->
-		@$panel = $("#previewGroup")
+		@$panel = $('#previewGroup')
 		bundle = @workflowUi.bundle
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
 		@sceneManager = bundle.sceneManager

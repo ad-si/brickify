@@ -2,7 +2,7 @@ EditBrushUi = require './EditBrushUi'
 
 class EditUi
 	constructor: (@workflowUi) ->
-		@$panel = $("#editGroup")
+		@$panel = $('#editGroup')
 		@_initBrushes()
 
 	setEnabled: (enabled) =>

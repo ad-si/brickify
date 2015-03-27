@@ -33,7 +33,7 @@ describe 'BrickGraph', ->
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 
 		bricks = brickGraph.bricks
-		
+
 		for zLayer in bricks
 			for brick in zLayer
 				expectedNeighbors = 0
@@ -54,7 +54,7 @@ describe 'BrickGraph', ->
 		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
 
 		bricks = brickGraph.bricks
-		
+
 		for zLayer in bricks
 			for brick in zLayer
 
@@ -78,8 +78,3 @@ describe 'BrickGraph', ->
 					expect(n.position.x).to.equal(brick.position.x)
 					expect(n.position.y).to.equal(brick.position.y + 1)
 					expect(n.position.z).to.equal(brick.position.z)
-
-
-
-
-

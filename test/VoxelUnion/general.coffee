@@ -139,7 +139,7 @@ describe 'VoxelUnion', ->
 			{x: 1, y: 2, z: 0}
 			{x: 2, y: 2, z: 0}
 		]
-		
+
 		expect(geometry.vertices.length).to.equal(32)
 		expect(geometry.faces.length).to.equal(18 + 24 + 18)
 
@@ -167,7 +167,7 @@ describe 'VoxelUnion', ->
 			{x: 2, y: 1, z: 0}
 			{x: 1, y: 2, z: 0}
 		]
-		
+
 		expect(geometry.vertices.length).to.equal(24)
 		expect(geometry.faces.length).to.equal(10 + 24 + 10)
 
@@ -193,7 +193,7 @@ describe 'VoxelUnion', ->
 			{x: 2, y: 1, z: 0}
 			{x: 1, y: 2, z: 0}
 		]
-		
+
 		expect(data.minX).to.equal(0)
 		expect(data.minY).to.equal(0)
 		expect(data.minZ).to.equal(0)

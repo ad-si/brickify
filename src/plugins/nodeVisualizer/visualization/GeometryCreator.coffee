@@ -110,5 +110,5 @@ module.exports = class GeometryCreator
 		@studGeometryCache[ident] = studs
 		return studs
 
-	_getHash: (dimensions) =>
+	_getHash: (dimensions) ->
 		return dimensions.x + '-' + dimensions.y + '-' + dimensions.z

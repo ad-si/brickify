@@ -1,14 +1,14 @@
 PluginLoader = require '../client/pluginLoader'
 Ui = require './ui/ui'
 Renderer = require './renderer'
-ModelLoader = require './modelLoader'
+ModelLoader = require './modelLoading/modelLoader'
 SceneManager = require './sceneManager'
 Spinner = require './Spinner'
 
 SyncObject = require '../common/sync/syncObject'
 SyncObject.dataPacketProvider = require './sync/dataPackets'
 Node = require '../common/project/node'
-Node.modelProvider = require './modelCache'
+Node.modelProvider = require './modelLoading/modelCache'
 
 ###
 # @class Bundle

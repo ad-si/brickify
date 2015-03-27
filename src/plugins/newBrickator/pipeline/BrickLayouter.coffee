@@ -9,9 +9,8 @@ module.exports = class BrickLayouter
 			@_random = @_pseudoRandom
 		return
 
-	initializeBrickGraph: (grid) =>
-		brickGraph = new BrickGraph(grid)
-		return {brickGraph: brickGraph}
+	initializeBrickGraph: (grid) ->
+		return brickGraph: new BrickGraph(grid)
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -115,7 +114,7 @@ module.exports = class BrickLayouter
 			newBricks: legoBricks
 		}
 
-	_splitBricks: (bricksToSplit, brickGraph) =>
+	_splitBricks: (bricksToSplit, brickGraph) ->
 		newBricks = []
 
 		for brick in bricksToSplit
@@ -127,7 +126,7 @@ module.exports = class BrickLayouter
 
 		return newBricks
 
-	_anyDefined: (mergeableNeighbors) =>
+	_anyDefined: (mergeableNeighbors) ->
 		return mergeableNeighbors.some (entry) -> entry?
 
 	_chooseRandomBrick: (brickLayers) =>
@@ -142,10 +141,10 @@ module.exports = class BrickLayouter
 		brick = brickList[@_random(brickList.length)]
 		return brick
 
-	_random: (max) =>
-		Math.floor(Math.random() * max)
+	_random: (max) ->
+		Math.floor Math.random() * max
 
-	_pseudoRandom: (max) =>
+	_pseudoRandom: (max) ->
 		@seed = (1103515245 * @seed + 12345) % 2 ^ 31
 		@seed % max
 
@@ -179,7 +178,7 @@ module.exports = class BrickLayouter
 
 		return mergeableNeighbors
 
-	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) =>
+	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		if brick.neighbors[dir].length > 0
 			width = 0
 			ids = []
@@ -219,7 +218,7 @@ module.exports = class BrickLayouter
 		for neighbors, i in mergeableNeighbors
 			connectedBricks = []
 			continue if not neighbors
-			
+
 			for neighbor in neighbors
 				connectedBricks = connectedBricks.concat neighbor.uniqueConnectedBricks()
 			connectedBricks = arrayHelper.removeDuplicates connectedBricks
@@ -237,7 +236,7 @@ module.exports = class BrickLayouter
 		return randomOfLargest.index
 
 	_mergeBricksAndUpdateGraphConnections: (
-		brick, mergeableNeighbors, mergeIndex, brickGraph, bricksToLayout ) =>
+		brick, mergeableNeighbors, mergeIndex, brickGraph, bricksToLayout ) ->
 
 		mergeNeighbors = mergeableNeighbors[mergeIndex]
 

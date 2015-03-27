@@ -1,4 +1,4 @@
-modelCache = require '../../client/modelCache'
+modelCache = require '../../client/modelLoading/modelCache'
 LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 THREE = require 'three'
@@ -103,8 +103,8 @@ class NewBrickator
 			}
 			return data
 
-	_checkDataStructure: (selectedNode, data) =>
-		return yes
+	_checkDataStructure: (selectedNode, data) ->
+		return yes # Later: Check for node transforms
 
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'newBrickator'
@@ -113,7 +113,7 @@ class NewBrickator
 				return data
 			else
 				@_createDataStructure selectedNode
-				.then (data) =>
+				.then (data) ->
 					selectedNode.storePluginData 'newBrickator', data, true
 					return data
 

@@ -9,6 +9,9 @@ button-variant($color, $background, $border, $disabledBackground)
 	background-color $background
 	border-color $border
 
+	.bigBrush
+		border-color inherit
+
 	&:hover,
 	&:focus,
 	&.focus,
@@ -19,6 +22,11 @@ button-variant($color, $background, $border, $disabledBackground)
 		// darker background
 		background-color darken($background, 15%)
 		border-color darken($border, 12%)
+		.bigBrush
+			border-color inherit
+			background-color darken($background, 5%)
+			&:hover, &:focus, &.focus, &:active, &.active
+				background-color inherit
 
 	&:active,
 	&.active,
@@ -36,6 +44,9 @@ button-variant($color, $background, $border, $disabledBackground)
 		&.active
 			background-color $disabledBackground
 			border-color $border
+
+			.bigBrush
+				background-color inherit
 
 	.badge
 		color $background
@@ -100,3 +111,6 @@ $disabledBg = $btn-default-bg
 		background-image none
 		//making shadow bigger
 		box-shadow inset 0 0 20px 3px rgba(0,0,0,0.40);
+		.bigBrush
+			&:active, &.active
+				background none

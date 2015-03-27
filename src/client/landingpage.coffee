@@ -1,4 +1,4 @@
-require('es6-promise').polyfill()
+require './polyfills'
 $ = require 'jquery'
 
 #fade in action buttons when javascript is ready
@@ -6,8 +6,9 @@ $('#buttonContainer').fadeTo(500, 1)
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
-Bundle = require '../client/bundle'
+Bundle = require './bundle'
 clone = require 'clone'
+fileLoader = require './modelLoading/fileLoader'
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -23,9 +24,6 @@ globalConfig.plugins.legoBoard = false
 
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false
-
-#autoreplace model when loaded/dropped
-globalConfig.autoReplaceModel = true
 
 # clone global config 2 times
 config1 = clone globalConfig
@@ -45,24 +43,28 @@ b1 = bundle1.init().then ->
 
 	loadAndConvert = (hash, animate) ->
 		b1.then -> bundle1.modelLoader.loadByHash hash
-			.then ->
-				document.getElementById('renderArea1').style.backgroundImage = 'none'
+			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
 		b2.then -> bundle2.modelLoader.loadByHash hash
-			.then ->
-				document.getElementById('renderArea2').style.backgroundImage = 'none'
+			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
-	loadModel = (hash) ->
-		b1.then -> bundle1.sceneManager.clearScene()
-		b2.then -> bundle2.sceneManager.clearScene()
-		loadAndConvert hash, true
+	callback = (event) ->
+		files = event.target.files ? event.dataTransfer.files
+		fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
+		.then (hash) ->
+			b1.then -> bundle1.sceneManager.clearScene()
+			b2.then -> bundle2.sceneManager.clearScene()
+			loadAndConvert hash, true
 
-	stlDropper = require './stlDropper'
-	stlDropper.init $('body'), $('.dropper'), $('#dropoverlay'), loadModel
+	fileDropper = require './modelLoading/fileDropper'
+	fileDropper.init callback
 
-	stlFileSelector = require './stlFileSelector'
-	stlFileSelector.init $('#fileSelector'),  $('.dropper'), loadModel
+	fileInput = document.getElementById('fileInput')
+	fileInput.addEventListener 'change', (event) ->
+		callback event
+		@value = ''
+
 	$('.dropper').html 'Drop an stl file'

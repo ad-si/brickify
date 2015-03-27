@@ -1,4 +1,5 @@
 #editGroup
+	h4 1. Edit
 	.row.twoButtonRow
 		.col-xs-6
 			.btn.btn-primary.btn-block#everythingLego
@@ -13,10 +14,16 @@
 
 	.btn-group.btn-group-justified(role='group')#brushContainer
 		.btn.btn-primary#legoBrush
-			| Make LEGO
-			br
-			img(src='img/legoBrush.png' width=64 height=64)
+			.smallBrush
+				| Make LEGO
+				br
+				img(src='img/legoBrush.png' width=64 height=64)
+			.bigBrush
+				| Big Brush
 		.btn.btn-primary#printBrush
-			| Make 3D-print
-			br
-			img(src='img/printBrush.png' width=64 height=64)
+			.smallBrush
+				| Make 3D-print
+				br
+				img(src='img/printBrush.png' width=64 height=64)
+			.bigBrush
+				| Big Brush

@@ -8,25 +8,41 @@
 	.btn
 		white-space normal
 
-.twoButtonRow
-	margin-bottom 5px
-	:last-child
-		padding-left 2px
-	:first-child
-		padding-right 2px
+	.twoButtonRow
+		margin-bottom 5px
+		:last-child
+			padding-left 2px
+		:first-child
+			padding-right 2px
 
-div.disabled
-	opacity 0.5
+	div.disabled, h4.disabled
+		opacity 0.5
 
-#brushContainer
-	div
-		font-size 0.90em
+	#loadGroup
+		#loadButtonFeedback .spinner
+			display inline-block
+			margin-left 20px
+			top -5px
 
-#buildContainer
-	display block
-	text-align center
+	#brushContainer
+		div
+			font-size 0.90em
+		.bigBrush
+			border-top-width 1px
+			border-top-style solid
+			$spacing = 10px
+			margin $spacing $padding-base-horizontal*-1 $padding-base-vertical*-1
+			padding $spacing $padding-base-horizontal $padding-base-vertical
+		:first-child .bigBrush
+			border-bottom-left-radius $border-radius-base
+		:last-child .bigBrush
+			border-bottom-right-radius $border-radius-base
 
-#exportGroup
-	margin-bottom 2em
+	#buildContainer
+		display block
+		text-align center
+
+	#exportGroup
+		margin-bottom 2em
 
 @import scrollbar

@@ -1,6 +1,6 @@
 {
   "name": "Lowfab",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Combine various fabrication techniques to materialize your 3D-models",
   "keywords": [
     "fabrication",
@@ -11,6 +11,8 @@
   "bugs": "http://github.com/stuikomma/lowfab/issues",
   "dependencies": {
     "PEP": "Lowfab/PEP#0.3.1",
+    "array.prototype.find": "^1.0.0",
+    "array.prototype.findindex": "^1.0.0",
     "blueimp-md5": "^1.1.0",
     "body-parser": "^1.9.1",
     "bootbox": "^4.4.0",
@@ -45,6 +47,7 @@
     "readdirp": "^1.1.0",
     "serve-favicon": "^2.1.6",
     "spin": "0.0.1",
+    "string.prototype.endswith": "^0.2.0",
     "stylus": "^0.50.0",
     "three": "Lowfab/three.js#71dev-lowfabFeatures1",
     "three-orbit-controls": "Lowfab/three-orbit-controls#v69.2.0-beta",

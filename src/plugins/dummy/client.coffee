@@ -40,7 +40,7 @@ class DummyPlugin
 	# @param {ThreeJsNode} threejsNode the plugin's node in the 3D-scenegraph
 	# @see pluginLoader
 	###
-	init3d: (threejsNode) =>
+	init3d: (threejsNode) ->
 		console.log 'Dummy Client Plugin initializes 3d'
 
 	###
@@ -51,7 +51,7 @@ class DummyPlugin
 	# @see Renderer
 	# @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
 	###
-	on3dUpdate: (timestamp) =>
+	on3dUpdate: (timestamp) ->
 		return undefined
 
 	###
@@ -61,7 +61,7 @@ class DummyPlugin
 	# @param {Node} node the added node
 	# @see SceneManager
 	###
-	onNodeAdd: (node) =>
+	onNodeAdd: (node) ->
 		console.log node, ' added'
 		return
 
@@ -72,7 +72,7 @@ class DummyPlugin
 	# @param {Node} node the selected node
 	# @see SceneManager
 	###
-	onNodeSelect: (node) =>
+	onNodeSelect: (node) ->
 		console.log node, ' selected'
 		return
 
@@ -83,7 +83,7 @@ class DummyPlugin
 	# @param {Node} node the deselected node
 	# @see SceneManager
 	###
-	onNodeDeselect: (node) =>
+	onNodeDeselect: (node) ->
 		console.log node, ' deselected'
 		return
 
@@ -94,7 +94,7 @@ class DummyPlugin
 	# @param {Node} node the removed node
 	# @see SceneManager
 	###
-	onNodeRemove: (node) =>
+	onNodeRemove: (node) ->
 		console.log node, ' removed'
 		return
 
@@ -120,7 +120,7 @@ class DummyPlugin
 	# function.
 	# @see Hotkeys
 	###
-	getHotkeys: =>
+	getHotkeys: ->
 		return {
 		title: 'Dummy'
 		events: [
@@ -141,7 +141,7 @@ class DummyPlugin
 
 	###
 	# Plugins can return an array of brush descriptor objects.
-	# @see BrushSelector
+	# @see EditBrushUi
 	###
 	getBrushes: ->
 		return [{
@@ -161,7 +161,7 @@ class DummyPlugin
 	# if they were unable to reduce quality even further.
 	# @see FidelityControl
 	###
-	uglify: =>
+	uglify: ->
 		return false
 
 	###
@@ -171,7 +171,7 @@ class DummyPlugin
 	# or false otherwise.
 	# @see FidelityControl
 	###
-	beautify: =>
+	beautify: ->
 		return false
 
 module.exports = DummyPlugin

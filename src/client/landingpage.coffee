@@ -25,9 +25,6 @@ globalConfig.plugins.legoBoard = false
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false
 
-#autoreplace model when loaded/dropped
-globalConfig.autoReplaceModel = true
-
 # clone global config 2 times
 config1 = clone globalConfig
 config2 = clone globalConfig
@@ -55,7 +52,8 @@ b1 = bundle1.init().then ->
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
 	callback = (event) ->
-		fileLoader.onLoadFile event, $('#loadButton')[0], shadow: false
+		files = event.target.files ? event.dataTransfer.files
+		fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
 		.then (hash) ->
 			b1.then -> bundle1.sceneManager.clearScene()
 			b2.then -> bundle2.sceneManager.clearScene()

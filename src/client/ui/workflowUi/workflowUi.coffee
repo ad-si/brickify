@@ -69,8 +69,10 @@ class WorkflowUi
 		$('#toggleMenu').click => @toggleMenu()
 
 	toggleMenu: ->
-		$('#sidebar-content').slideToggle()
-		$('#leftSidebar').toggleClass 'collapsed-sidebar'
+		$('#leftSidebar').css('height': 'auto')
+		$('#sidebar-content').slideToggle null, ->
+			$('#leftSidebar').toggleClass 'collapsed-sidebar'
+			$('#leftSidebar').css('height': '')
 
 	toggleStabilityView: =>
 		@workflow.preview.toggleStabilityView()

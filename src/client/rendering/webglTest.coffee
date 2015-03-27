@@ -167,13 +167,21 @@ onPaint = (timestamp) ->
 	gl.enable(gl.STENCIL_TEST)
 	gl.stencilFunc(gl.ALWAYS, 0xFF, 0xFF)
 	gl.stencilOp(gl.ZERO, gl.REPLACE, gl.REPLACE)
+	gl.stencilMask(0xFF)
 
 	# render quad
 	paintQuadWithShader(secondaryShaderProgram)
 
+	gl.stencilFunc(gl.EQUAL, 0x00, 0xFF)
+	gl.stencilOp(gl.INCR, gl.INCR, gl.KEEP)
+
+	# render quad a second time, just to test stencil buffer
+	# comparison overhead
+	paintQuadWithShader(secondaryShaderProgram)
+
 	# disable Stencil buffer
 	gl.disable(gl.STENCIL_TEST)
-	
+
 	requestAnimationFrame onPaint
 
 gl = initGl()

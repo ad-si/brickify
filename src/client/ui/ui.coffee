@@ -27,7 +27,7 @@ module.exports = class Ui
 			spinnerOptions
 		).then @bundle.modelLoader.loadByHash
 
-	dragOverHandler: (event) =>
+	dragOverHandler: (event) ->
 		event.stopPropagation()
 		event.preventDefault()
 		event.dataTransfer.dropEffect = 'copy'

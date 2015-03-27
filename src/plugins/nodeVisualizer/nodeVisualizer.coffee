@@ -113,9 +113,9 @@ class NodeVisualizer
 			if stabilityViewEnabled
 				# only show bricks and csg
 				@_showCsg cachedData
-				.then =>
+				.then ->
 					# change coloring to stability coloring
-					cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
+					cachedData.brickVisualization.setStabilityView stabilityViewEnabled
 					cachedData.brickVisualization.showBricks()
 
 				cachedData.modelVisualization.setNodeVisibility false
@@ -123,7 +123,7 @@ class NodeVisualizer
 				@brushHandler.interactionDisabled = true
 			else
 				#show voxels
-				cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
+				cachedData.brickVisualization.setStabilityView stabilityViewEnabled
 				cachedData.brickVisualization.hideCsg()
 				cachedData.brickVisualization.showVoxels()
 
@@ -149,7 +149,7 @@ class NodeVisualizer
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @_getCachedData(selectedNode).then (cachedData) =>
+		return @_getCachedData(selectedNode).then (cachedData) ->
 			cachedData.brickVisualization.showBrickLayer layer - 1
 
 	# disables build mode and shows voxels, hides csg
@@ -169,7 +169,6 @@ class NodeVisualizer
 
 	_showCsg: (cachedData) =>
 		return @newBrickator.getCSG(cachedData.node, true)
-				.then (csg) =>
-					cachedData.brickVisualization.showCsg(csg)
+				.then (csg) -> cachedData.brickVisualization.showCsg csg
 
 module.exports = NodeVisualizer

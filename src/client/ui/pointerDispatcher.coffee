@@ -41,10 +41,10 @@ class PointerDispatcher
 		element = @bundle.ui.renderer.getDomElement()
 		_registerEvent element, event for event in events
 
-	onPointerOver: (event) =>
+	onPointerOver: (event) ->
 		return
 
-	onPointerEnter: (event) =>
+	onPointerEnter: (event) ->
 		return
 
 	onPointerDown: (event) =>
@@ -114,16 +114,16 @@ class PointerDispatcher
 		@_cancelBrush event
 		return
 
-	onPointerOut: (event) =>
+	onPointerOut: (event) ->
 		return
 
-	onPointerLeave: (event) =>
+	onPointerLeave: (event) ->
 		return
 
-	onGotPointerCapture: (event) =>
+	onGotPointerCapture: (event) ->
 		return
 
-	onLostPointerCapture: (event) =>
+	onLostPointerCapture: (event) ->
 		return
 
 	_capturePointerFor: (event) =>
@@ -153,7 +153,7 @@ class PointerDispatcher
 			@_untoggleBrush()
 			@_stop event
 
-	_stop: (event) =>
+	_stop: (event) ->
 		event.stopPropagation()
 		event.stopImmediatePropagation()
 		event.preventDefault()

@@ -46,7 +46,7 @@ class WorkflowUi
 		@_initNotImplementedMessages()
 		@_initScrollbar()
 
-	_initNotImplementedMessages: =>
+	_initNotImplementedMessages: ->
 		alertCallback = ->
 			bootbox.alert({
 					title: 'Not implemented yet'
@@ -59,7 +59,7 @@ class WorkflowUi
 		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback
 
-	_initScrollbar: =>
+	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar
 		window.addEventListener 'resize', -> perfectScrollbar.update sidebar

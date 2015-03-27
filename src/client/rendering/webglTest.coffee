@@ -163,9 +163,17 @@ onPaint = (timestamp) ->
 	gl.bindTexture(gl.TEXTURE_2D, frameBuffer.depthTexture)
 	gl.uniform1i(secondaryShaderProgram.depthTextureUniform, 1)
 
+	# add stencilbuffer overhead
+	gl.enable(gl.STENCIL_TEST)
+	gl.stencilFunc(gl.ALWAYS, 0xFF, 0xFF)
+	gl.stencilOp(gl.ZERO, gl.REPLACE, gl.REPLACE)
+
 	# render quad
 	paintQuadWithShader(secondaryShaderProgram)
 
+	# disable Stencil buffer
+	gl.disable(gl.STENCIL_TEST)
+	
 	requestAnimationFrame onPaint
 
 gl = initGl()

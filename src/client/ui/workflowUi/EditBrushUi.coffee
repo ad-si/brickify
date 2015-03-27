@@ -1,7 +1,7 @@
 ###
-# @class BrushSelector
+# @class EditBrushUi
 ###
-class BrushSelector
+class EditBrushUi
 	constructor: (@bundle) ->
 		@selectedNode = null
 
@@ -73,4 +73,4 @@ class BrushSelector
 				return true
 		return false
 
-module.exports = BrushSelector
+module.exports = EditBrushUi

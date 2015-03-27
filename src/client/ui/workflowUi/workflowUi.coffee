@@ -1,5 +1,4 @@
 DownloadProvider = require './downloadProvider'
-BrushSelector = require './brushSelector'
 perfectScrollbar = require 'perfect-scrollbar'
 
 LoadUi = require './LoadUi'
@@ -10,7 +9,6 @@ ExportUi = require './ExportUi'
 class WorkflowUi
 	constructor: (@bundle) ->
 		@downloadProvider = new DownloadProvider(@bundle)
-		@brushSelector = new BrushSelector(@bundle)
 		@numObjects = 0
 
 		@workflow =
@@ -39,10 +37,10 @@ class WorkflowUi
 			@_enable ['load']
 
 	onNodeSelect: (node) =>
-		@brushSelector.onNodeSelect node
+		@workflow.edit.onNodeSelect node
 
 	onNodeDeselect: (node) =>
-		@brushSelector.onNodeDeselect node
+		@workflow.edit.onNodeDeselect node
 
 	enableOnly: (groupUi) =>
 		for step, ui of @workflow
@@ -58,7 +56,6 @@ class WorkflowUi
 	init: =>
 		@sceneManager = @bundle.sceneManager
 		@downloadProvider.init('#downloadButton', @sceneManager)
-		@brushSelector.init '#brushContainer'
 
 		@_initNotImplementedMessages()
 		@_initScrollbar()

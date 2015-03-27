@@ -117,13 +117,8 @@ module.exports = class Grid
 		else
 			v.dataEntrys.push data
 
-	# TODO: check whether getVoxel(position) is used, probably getVoxel(x,y,z)
-	# is enough
-	getVoxel: (positionOrX, y, z) =>
-		if y? and z?
-			return @voxels[@_generateKey positionOrX, y, z]
-		else
-			return @voxels[@_generateKey positionOrX.x, positionOrX.y, positionOrX.z]
+	getVoxel: (x, y, z) =>
+		return @voxels[@_generateKey x, y, z]
 
 	hasVoxelAt: (x, y, z) =>
 		return @voxels[@_generateKey x, y, z]?

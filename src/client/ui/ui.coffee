@@ -1,8 +1,6 @@
 Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi'
-fileDropper = require '../modelLoading/fileDropper'
-fileLoader = require '../modelLoading/fileLoader'
 
 ###
 # @module ui
@@ -14,23 +12,6 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@workflowUi = new WorkflowUi(@bundle)
 		@pointerDispatcher = new PointerDispatcher(@bundle)
-
-	fileLoadHandler: (event) =>
-		spinnerOptions =
-			length: 5
-			radius: 3
-			width: 2
-			shadow: false
-		fileLoader.onLoadFile(
-			event
-			document.getElementById 'loadButtonFeedback'
-			spinnerOptions
-		).then @bundle.modelLoader.loadByHash
-
-	dragOverHandler: (event) ->
-		event.stopPropagation()
-		event.preventDefault()
-		event.dataTransfer.dropEffect = 'copy'
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.
@@ -44,13 +25,6 @@ module.exports = class Ui
 
 	_initListeners: =>
 		@pointerDispatcher.init()
-
-		fileDropper.init @fileLoadHandler
-
-		# event listener
-		$('#fileInput').on 'change', (event) =>
-			@fileLoadHandler event
-			$('#fileInput').val('')
 
 		window.addEventListener(
 			'resize'

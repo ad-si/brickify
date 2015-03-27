@@ -5,5 +5,13 @@ class Voxel
 		@enabled = true
 		@definitelyUp = false
 		@definitelyDown = false
+		@neighbors = {
+			Zp: null
+			Zm: null
+			Xp: null
+			Xm: null
+			Yp: null
+			Ym: null
+		}
 
 module.exports = Voxel

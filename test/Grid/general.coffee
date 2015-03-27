@@ -59,3 +59,28 @@ describe 'Grid', ->
 
 		v = grid.getVoxel 1, 2, 3
 		expect(v.dataEntrys[0]).to.equal('v1')
+
+	it 'should link voxels correctly', ->
+		grid = new Grid()
+
+		c = grid.setVoxel {x: 1, y: 1, z: 1}
+		xp = grid.setVoxel {x: 2, y: 1, z: 1}
+		xm = grid.setVoxel {x: 0, y: 1, z: 1}
+		yp = grid.setVoxel {x: 1, y: 2, z: 1}
+		ym = grid.setVoxel {x: 1, y: 0, z: 1}
+		zp = grid.setVoxel {x: 1, y: 1, z: 2}
+		zm = grid.setVoxel {x: 1, y: 1, z: 0}
+
+		expect(c.neighbors.Xp).to.equal(xp)
+		expect(c.neighbors.Xm).to.equal(xm)
+		expect(c.neighbors.Yp).to.equal(yp)
+		expect(c.neighbors.Ym).to.equal(ym)
+		expect(c.neighbors.Zp).to.equal(zp)
+		expect(c.neighbors.Zm).to.equal(zm)
+
+		expect(xp.neighbors.Xm).to.equal(c)
+		expect(xm.neighbors.Xp).to.equal(c)
+		expect(yp.neighbors.Ym).to.equal(c)
+		expect(ym.neighbors.Yp).to.equal(c)
+		expect(zp.neighbors.Zm).to.equal(c)
+		expect(zm.neighbors.Zp).to.equal(c)

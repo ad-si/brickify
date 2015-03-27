@@ -113,9 +113,47 @@ module.exports = class Grid
 
 		if not v?
 			v = new Voxel(position, [data])
+			@_linkNeighbors v
 			@voxels[key] = v
 		else
 			v.dataEntrys.push data
+
+		return v
+
+	# links neighbours of this voxel with this voxel
+	_linkNeighbors: (voxel) ->
+		p = voxel.position
+
+		zp = @getVoxel p.x, p.y, p.z + 1
+		zm = @getVoxel p.x, p.y, p.z - 1
+		xp = @getVoxel p.x + 1, p.y, p.z
+		xm = @getVoxel p.x - 1, p.y, p.z
+		yp = @getVoxel p.x, p.y + 1, p.z
+		ym = @getVoxel p.x, p.y - 1, p.z
+
+		if zp?
+			voxel.neighbors.Zp = zp
+			zp.neighbors.Zm = voxel
+
+		if zm?
+			voxel.neighbors.Zm = zm
+			zm.neighbors.Zp = voxel
+
+		if xp?
+			voxel.neighbors.Xp = xp
+			xp.neighbors.Xm = voxel
+
+		if xm?
+			voxel.neighbors.Xm = xm
+			xm.neighbors.Xp = voxel
+
+		if yp?
+			voxel.neighbors.Yp = yp
+			yp.neighbors.Ym = voxel
+
+		if ym?
+			voxel.neighbors.Ym = ym
+			ym.neighbors.Yp = voxel
 
 	getVoxel: (x, y, z) =>
 		return @voxels[@_generateKey x, y, z]

@@ -79,8 +79,8 @@ module.exports = class BrickLayouter
 		@layoutByGreedyMerge bricks
 		return
 
+	# split up all bricks into single bricks
 	splitBricksAndRelayoutLocally: (oldBricks, brickGraph, grid) =>
-		# split up all bricks into single bricks
 		bricksToSplit = []
 
 		for brick in oldBricks
@@ -114,6 +114,7 @@ module.exports = class BrickLayouter
 			newBricks: legoBricks
 		}
 
+	# splits each brick in bricks to split, updates reference in brickGraph
 	_splitBricks: (bricksToSplit, brickGraph) ->
 		newBricks = []
 
@@ -129,6 +130,7 @@ module.exports = class BrickLayouter
 	_anyDefined: (mergeableNeighbors) ->
 		return mergeableNeighbors.some (entry) -> entry?
 
+	# choses a random brick out of brickLayers
 	_chooseRandomBrick: (brickLayers) =>
 		i = 0
 		brickList = brickLayers[@_random(brickLayers.length)]
@@ -148,6 +150,8 @@ module.exports = class BrickLayouter
 		@seed = (1103515245 * @seed + 12345) % 2 ^ 31
 		@seed % max
 
+	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
+	# and returns an array out of arrays of IDs for each direction
 	_findMergeableNeighbors: (brick) =>
 		mergeableNeighbors = []
 
@@ -178,6 +182,7 @@ module.exports = class BrickLayouter
 
 		return mergeableNeighbors
 
+	# Johannes/Yannis: please document
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		if brick.neighbors[dir].length > 0
 			width = 0
@@ -278,6 +283,7 @@ module.exports = class BrickLayouter
 					@_tarjanAlgorithm brick, biconnectedComponents, stack
 		biconnectedComponents
 
+	# Johannes/Yannis: what does the algorithm? How is it used?
 	_tarjanAlgorithm: (brick, biconnectedComponents, stack) =>
 		brick.biconnectedComponentId = @index
 		brick.lowlink = @index
@@ -305,6 +311,7 @@ module.exports = class BrickLayouter
 		# filter out trivial articulation points
 		return @_getArticulationPoints bricks
 
+	# Johannes/Yannis: what are articulation points and for what do we need them?
 	_getArticulationPoints: (bricks) =>
 		@time = 0
 		articulationPoints = []
@@ -319,6 +326,7 @@ module.exports = class BrickLayouter
 					@_articulationPointAlgorithm brick, articulationPoints
 		articulationPoints
 
+	# Johannes/Yannis: an algorithm that does... what?
 	_articulationPointAlgorithm: (brick, articulationPoints) =>
 		brick.discoveryTime = brick.lowlink = ++@time
 		brick.discovered = true

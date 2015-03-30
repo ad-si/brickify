@@ -23,13 +23,23 @@ module.exports = class Coloring
 			transparent: true
 		})
 
-		@highlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0x00ff00
+		@legoHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xff7755
 		})
 
-		@boxHighlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0x00ff00
-			opacity: 0.3
+		@printHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xeeeeee
+		})
+
+		@legoBoxHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xff7755
+			opacity: 0.5
+			transparent: true
+		})
+
+		@printBoxHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xeeeeee
+			opacity: 0.4
 			transparent: true
 		})
 
@@ -38,6 +48,24 @@ module.exports = class Coloring
 		})
 
 		@_createBrickMaterials()
+
+	###
+	# Returns the highlight material collection for the current type of voxel
+	# @param {String} type contains 'lego' for this could be lego highlight
+	# 3d for this could be 3d printed highlight
+	###
+	getHighlightMaterial: (type) =>
+		if type == 'lego'
+			return {
+				highlight: @legoHighlightMaterial
+				box: @legoBoxHighlightMaterial
+			}
+		else if type == '3d'
+			return {
+				highlight: @printHighlightMaterial
+				box: @printBoxHighlightMaterial
+			}
+		return null
 
 	getMaterialForVoxel: (gridEntry) =>
 		if gridEntry.enabled

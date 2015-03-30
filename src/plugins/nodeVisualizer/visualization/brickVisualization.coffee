@@ -148,14 +148,23 @@ class BrickVisualization
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
+		# invert type, because if we are highlighting a 'lego' voxel
+		# we want to display it as 'could be 3d printed'
+		highlightType = '3d'
+		highlightType = 'lego' if type == '3d'
+
+		highlightMaterial = @defaultColoring.getHighlightMaterial highlightType
+		hVoxel = highlightMaterial.highlight
+		hBrush = highlightMaterial.box
+
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
 
 			@currentlyHighlightedVoxel = voxel
-			voxel.setHighlight true, @defaultColoring.highlightMaterial
-			@_highlightBigBrush voxel if bigBrush
+			voxel.setHighlight true, hVoxel
+			@_highlightBigBrush voxel, hBrush if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?
@@ -164,7 +173,8 @@ class BrickVisualization
 
 		return voxel
 
-	_highlightBigBrush: (voxel) =>
+
+	_highlightBigBrush: (voxel, material) =>
 		size = @voxelSelector.getBrushSize true
 		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
@@ -177,6 +187,7 @@ class BrickVisualization
 			@voxelBrickSubnode.add @bigBrushHighlight
 
 		@bigBrushHighlight.position.copy voxel.position
+		@bigBrushHighlight.material = material
 		@bigBrushHighlight.visible = true
 
 	unhighlightBigBrush: =>

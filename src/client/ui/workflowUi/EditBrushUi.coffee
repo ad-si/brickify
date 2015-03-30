@@ -11,16 +11,16 @@ class EditBrushUi
 			for brush in array
 				@_brushList.push brush
 
-	init: (jQueryBrushContainerSelector) =>
+	init: (jQueryBrushContainerSelector, jQueryBigBrushContainerSelector) =>
 		@_selectedBrush = null
 		@_bigBrushSelected = false
 
 		@brushContainer = $(jQueryBrushContainerSelector)
+		@bigBrushContainer = $(jQueryBigBrushContainerSelector)
 
 		for brush in @_brushList
-			htmlContainer = @brushContainer.find brush.containerId
-			brush.brushButton = htmlContainer
-			brush.bigBrushButton = brush.brushButton.find '.bigBrush'
+			brush.brushButton = @brushContainer.find brush.containerId
+			brush.bigBrushButton = @bigBrushContainer.find brush.containerId
 			@_bindBrushEvent brush
 
 	onNodeSelect: (node) =>

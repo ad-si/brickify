@@ -36,7 +36,7 @@ class EditBrushUi
 
 	_bindBrushEvent: (brush) ->
 		brush.brushButton.on 'click', (event) =>
-			@_bigBrushSelected = event.shiftKey
+			@_bigBrushSelected = false
 			@_brushSelect brush
 		brush.bigBrushButton.on 'click', (event) =>
 			if brush is @_selectedBrush
@@ -52,7 +52,7 @@ class EditBrushUi
 
 		#select new brush
 		@_selectedBrush = brush
-		brush.brushButton.addClass 'active'
+		brush.brushButton.addClass 'active' if not @_bigBrushSelected
 		brush.bigBrushButton.addClass 'active' if @_bigBrushSelected
 		brush.selectCallback? @selectedNode, @_bigBrushSelected
 

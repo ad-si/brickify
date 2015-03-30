@@ -55,7 +55,7 @@ module.exports = class LegoBoard
 
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
-		.then (model) =>
+		.then (model) ->
 			geo = model.convertToThreeGeometry()
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80

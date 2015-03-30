@@ -1,13 +1,13 @@
 ###
-# @class BrushSelector
+# @class EditBrushUi
 ###
-class BrushSelector
-	constructor: (@bundle) ->
+class EditBrushUi
+	constructor: (@workflowUi) ->
 		@selectedNode = null
 
 		@_brushList = []
 
-		for array in @bundle.pluginHooks.getBrushes()
+		for array in @workflowUi.bundle.pluginHooks.getBrushes()
 			for brush in array
 				@_brushList.push brush
 
@@ -38,6 +38,7 @@ class BrushSelector
 		brush.brushButton.on 'click', (event) =>
 			@_bigBrushSelected = event.shiftKey
 			@_brushSelect brush
+			@workflowUi.toggleMenu()
 		brush.bigBrushButton.on 'click', (event) =>
 			if brush is @_selectedBrush
 				@_bigBrushSelected = !@_bigBrushSelected
@@ -45,6 +46,7 @@ class BrushSelector
 				@_bigBrushSelected = true
 			@_brushSelect brush
 			event.stopImmediatePropagation()
+			@workflowUi.toggleMenu()
 
 	_brushSelect: (brush) =>
 		# deselect currently selected brush
@@ -73,4 +75,4 @@ class BrushSelector
 				return true
 		return false
 
-module.exports = BrushSelector
+module.exports = EditBrushUi

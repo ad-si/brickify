@@ -20,7 +20,7 @@ class VoxelUnion
 	###
 	run: (voxelsToBeGeometrized, options = {}) =>
 		d = new Date()
-		
+
 		boxGeometry = @_createVoxelGeometry(voxelsToBeGeometrized)
 		if options.threeBoxGeometryOnly
 			return boxGeometry
@@ -84,7 +84,7 @@ class VoxelUnion
 				@_createGeoPoints x, y, z, s, geo
 				#create points for the voxel baseplate above this voxel
 				upperIndices = @_createGeoPoints x, y, z + 1, s, geo
-				
+
 				# create a sideplate if there is no voxel at this side
 				# +x direction
 				if not s.zLayers[z][x + 1][y].voxel
@@ -318,7 +318,7 @@ class VoxelUnion
 		studTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
 		dzTop = (gridSpacing.z / 2) + (studSize.height / 2)
 		studTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
-		
+
 		studGeometryBottom = new THREE.CylinderGeometry(
 			studSize.radius, studSize.radius, studSize.height, 20
 		)

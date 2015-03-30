@@ -115,16 +115,17 @@ class NodeVisualizer
 
 		return data
 
-	_setStabilityView: (selectedNode, stabilityViewEnabled) =>
-		return if !selectedNode?
+	setStabilityView: (selectedNode, stabilityViewEnabled) =>
+		@brushHandler.interactionDisabled = false unless stabilityViewEnabled
+		return unless selectedNode
 
 		@_getCachedData(selectedNode).then (cachedData) =>
 			if stabilityViewEnabled
 				# only show bricks and csg
 				@_showCsg cachedData
-				.then =>
+				.then ->
 					# change coloring to stability coloring
-					cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
+					cachedData.brickVisualization.setStabilityView stabilityViewEnabled
 					cachedData.brickVisualization.showBricks()
 
 				cachedData.modelVisualization.setNodeVisibility false
@@ -132,10 +133,9 @@ class NodeVisualizer
 				@brushHandler.interactionDisabled = true
 			else
 				#show voxels
-				cachedData.brickVisualization.setStabilityView(stabilityViewEnabled)
+				cachedData.brickVisualization.setStabilityView stabilityViewEnabled
 				cachedData.brickVisualization.hideCsg()
 				cachedData.brickVisualization.showVoxels()
-				@brushHandler.interactionDisabled = false
 
 				cachedData.modelVisualization.setNodeVisibility true
 
@@ -159,15 +159,15 @@ class NodeVisualizer
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @_getCachedData(selectedNode).then (cachedData) =>
+		return @_getCachedData(selectedNode).then (cachedData) ->
 			cachedData.brickVisualization.showBrickLayer layer - 1
 
 	# disables build mode and shows voxels, hides csg
 	disableBuildMode: (selectedNode) =>
+		#enable interaction
+		@brushHandler.interactionDisabled = false
+		return Promise.resolve() unless selectedNode
 		return @_getCachedData(selectedNode).then (cachedData) =>
-			#enable interaction
-			@brushHandler.interactionDisabled = false
-
 			# hide csg, show model, show voxels
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.hideCsg()
@@ -179,7 +179,6 @@ class NodeVisualizer
 
 	_showCsg: (cachedData) =>
 		return @newBrickator.getCSG(cachedData.node, true)
-				.then (csg) =>
-					cachedData.brickVisualization.showCsg(csg)
+				.then (csg) -> cachedData.brickVisualization.showCsg csg
 
 module.exports = NodeVisualizer

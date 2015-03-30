@@ -17,7 +17,7 @@ class PointerDispatcher
 		@isBrushing = false
 		@brushToggled = false
 		@sceneManager = @bundle.sceneManager
-		@brushSelector = @bundle.ui.workflowUi.brushSelector
+		@brushUi = @bundle.ui.workflowUi.workflow.edit.brushUi
 		@initListeners()
 
 	initListeners: =>
@@ -41,10 +41,10 @@ class PointerDispatcher
 		element = @bundle.ui.renderer.getDomElement()
 		_registerEvent element, event for event in events
 
-	onPointerOver: (event) =>
+	onPointerOver: (event) ->
 		return
 
-	onPointerEnter: (event) =>
+	onPointerEnter: (event) ->
 		return
 
 	onPointerDown: (event) =>
@@ -59,11 +59,11 @@ class PointerDispatcher
 
 		# toggle brush if it is the right mouse button
 		if(event.buttons & BUTTON_STATES.right)
-			@brushToggled = @brushSelector.toggleBrush()
+			@brushToggled = @brushUi.toggleBrush()
 
 		# perform brush action
 		@isBrushing = true
-		brush = @brushSelector.getSelectedBrush()
+		brush = @brushUi.getSelectedBrush()
 		if brush? and brush.mouseDownCallback?
 			brush.mouseDownCallback event, @sceneManager.selectedNode
 
@@ -80,7 +80,7 @@ class PointerDispatcher
 			return
 
 		# perform brush action
-		brush = @brushSelector.getSelectedBrush()
+		brush = @brushUi.getSelectedBrush()
 		return unless brush?
 
 		if @isBrushing and brush.mouseMoveCallback?
@@ -101,7 +101,7 @@ class PointerDispatcher
 		# end brush action
 		if @isBrushing
 			@isBrushing = false
-			brush = @brushSelector.getSelectedBrush()
+			brush = @brushUi.getSelectedBrush()
 			if brush? and brush.mouseUpCallback?
 				brush.mouseUpCallback event, @sceneManager.selectedNode
 
@@ -114,16 +114,16 @@ class PointerDispatcher
 		@_cancelBrush event
 		return
 
-	onPointerOut: (event) =>
+	onPointerOut: (event) ->
 		return
 
-	onPointerLeave: (event) =>
+	onPointerLeave: (event) ->
 		return
 
-	onGotPointerCapture: (event) =>
+	onGotPointerCapture: (event) ->
 		return
 
-	onLostPointerCapture: (event) =>
+	onLostPointerCapture: (event) ->
 		return
 
 	_capturePointerFor: (event) =>
@@ -140,20 +140,20 @@ class PointerDispatcher
 
 	_untoggleBrush: =>
 		if @brushToggled
-			@brushSelector.toggleBrush()
+			@brushUi.toggleBrush()
 			@brushToggled = false
 
 	_cancelBrush: (event) =>
 		if @isBrushing
 			@isBrushing = false
-			brush = @brushSelector.getSelectedBrush()
+			brush = @brushUi.getSelectedBrush()
 			if brush? and brush.cancelCallback?
 				brush.cancelCallback event, @sceneManager.selectedNode
 
 			@_untoggleBrush()
 			@_stop event
 
-	_stop: (event) =>
+	_stop: (event) ->
 		event.stopPropagation()
 		event.stopImmediatePropagation()
 		event.preventDefault()

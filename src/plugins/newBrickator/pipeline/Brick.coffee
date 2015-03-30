@@ -35,7 +35,7 @@ module.exports = class Brick
 		@neighbors = [[], [], [], []]
 		return
 
-	@availableBrickSizes: =>
+	@availableBrickSizes: ->
 		return [
 			[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
 			[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
@@ -72,7 +72,7 @@ module.exports = class Brick
 		lowerBricks = Brick.uniqueBricksInSlots @lowerSlots
 		return upperBricks.concat lowerBricks
 
-	@uniqueBricksInSlots: (upperOrLowerSlots) =>
+	@uniqueBricksInSlots: (upperOrLowerSlots) ->
 		bricks = []
 		for slotsX in upperOrLowerSlots
 			for slotXY in slotsX
@@ -84,7 +84,7 @@ module.exports = class Brick
 		neighborsList = [].concat.apply([],@neighbors)
 		return neighborsList
 
-	@isValidSize: (width, length, height) =>
+	@isValidSize: (width, length, height) ->
 		for validSize in Brick.availableBrickSizes()
 			if validSize[0] == width and validSize[1] == length and
 			validSize[2] == height
@@ -198,7 +198,7 @@ module.exports = class Brick
 
 		return {position: position, size: size}
 
-	_removeFirstOccurenceFromArray: (object, array) =>
+	_removeFirstOccurenceFromArray: (object, array) ->
 		i = array.indexOf object
 		if i != -1
 			array.splice i, 1
@@ -283,7 +283,7 @@ module.exports = class Brick
 				opposite = Brick.direction.Yp
 			when Brick.direction.Yp
 				opposite = Brick.direction.Ym
-		
+
 		if direction in [Brick.direction.Xm,Brick.direction.Xp]
 			minY = newBrick.position.y
 			maxY = newBrick.position.y + newBrick.size.y

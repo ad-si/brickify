@@ -22,15 +22,16 @@ bindDropHandler = (target, overlay, callback) ->
 	target.addEventListener 'drop', (event) ->
 		hideOverlay overlay
 		callback event
+		stopEvent event
 	target.addEventListener 'dragover', (event) ->
-		ignoreEvent event
+		stopEvent event
 	target.addEventListener 'dragenter', (event) ->
-		ignoreEvent event
+		stopEvent event
 		showOverlay overlay
 		lastTarget = event.target
 	target.addEventListener 'dragleave', (event) ->
 		return unless event.target is lastTarget
-		ignoreEvent event
+		stopEvent event
 		hideOverlay overlay
 
 showOverlay = (overlay) ->
@@ -39,6 +40,6 @@ showOverlay = (overlay) ->
 hideOverlay = (overlay) ->
 	overlay.style.opacity = '0'
 
-ignoreEvent = (event) ->
+stopEvent = (event) ->
 	event.preventDefault()
 	event.stopPropagation()

@@ -116,3 +116,19 @@ describe 'newBrick', ->
 
 		expect(b0.voxels.size).to.equal(4)
 		expect(b1.voxels.size).to.equal(0)
+
+	it 'should report correct size', ->
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...4] by 1
+			for y in [0...3] by 1
+				for z in [0...2] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		size = b.getSize()
+
+		expect(size.x).to.equal(4)
+		expect(size.y).to.equal(3)
+		expect(size.z).to.equal(2)

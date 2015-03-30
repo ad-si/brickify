@@ -9,7 +9,7 @@ class EditUi
 		@$panel.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
 
 	_initBrushes: =>
-		@brushUi = new EditBrushUi @workflowUi.bundle
+		@brushUi = new EditBrushUi @workflowUi
 		@brushUi.init '#brushContainer', '#bigBrushContainer'
 
 	onNodeSelect: (node) =>

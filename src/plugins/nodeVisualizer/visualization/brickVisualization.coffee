@@ -200,11 +200,12 @@ class BrickVisualization
 	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
-		everythingPrint = true
+		anythingChanged = false
 		for voxel in voxels
-			everythingPrint = everythingPrint && voxel.isLego()
+			anythingChanged = anythingChanged || voxel.isLego()
 			voxel.make3dPrinted()
-		return everythingPrint
+			@voxelSelector.touch voxel
+		return anythingChanged
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels

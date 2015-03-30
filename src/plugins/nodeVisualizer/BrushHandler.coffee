@@ -103,6 +103,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
+			cachedData.brickVisualization.updateModifiedVoxels()
 			@nodeVisualizer.rerunLegoPipeline selectedNode
 
 

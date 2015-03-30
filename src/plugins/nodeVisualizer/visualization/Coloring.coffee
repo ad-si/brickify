@@ -57,12 +57,12 @@ module.exports = class Coloring
 	getHighlightMaterial: (type) =>
 		if type == 'lego'
 			return {
-				highlight: @legoHighlightMaterial
+				voxel: @legoHighlightMaterial
 				box: @legoBoxHighlightMaterial
 			}
 		else if type == '3d'
 			return {
-				highlight: @printHighlightMaterial
+				voxel: @printHighlightMaterial
 				box: @printBoxHighlightMaterial
 			}
 		return null

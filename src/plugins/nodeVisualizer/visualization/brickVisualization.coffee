@@ -150,12 +150,12 @@ class BrickVisualization
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
 		# invert type, because if we are highlighting a 'lego' voxel
 		# we want to display it as 'could be 3d printed'
-		highlightType = '3d'
-		highlightType = 'lego' if type == '3d'
+		voxelType = '3d'
+		voxelType = 'lego' if type == '3d'
 
-		highlightMaterial = @defaultColoring.getHighlightMaterial highlightType
-		hVoxel = highlightMaterial.highlight
-		hBrush = highlightMaterial.box
+		highlightMaterial = @defaultColoring.getHighlightMaterial voxelType
+		hVoxel = highlightMaterial.voxel
+		hBox = highlightMaterial.box
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
@@ -164,7 +164,7 @@ class BrickVisualization
 
 			@currentlyHighlightedVoxel = voxel
 			voxel.setHighlight true, hVoxel
-			@_highlightBigBrush voxel, hBrush if bigBrush
+			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?

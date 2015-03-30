@@ -48,4 +48,18 @@ class Brick
 
 		@voxels.clear()
 
+	# merges this brick with the other brick specified,
+	# the other brick gets deleted in the process
+	mergeWith: (otherBrick) =>
+		newVoxels = new Set()
+
+		otherBrick.forEachVoxel (voxel) =>
+			newVoxels.add voxel
+
+		otherBrick.clear()
+
+		newVoxels.forEach (voxel) =>
+			voxel.brick = @
+			@voxels.add voxel
+
 module.exports = Brick

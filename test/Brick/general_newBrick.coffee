@@ -98,3 +98,21 @@ describe 'newBrick', ->
 		b.clear()
 		expect(v0.brick).to.equal(false)
 		expect(b.voxels.size).to.equal(0)
+
+	it 'should correctly merge', ->
+		grid = new Grid()
+		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
+		v1 = grid.setVoxel {x: 1, y: 0, z: 0}
+		v2 = grid.setVoxel {x: 0, y: 1, z: 0}
+		v3 = grid.setVoxel {x: 1, y: 2, z: 0}
+
+		b0 = new NewBrick([v0, v1])
+		b1 = new NewBrick([v2, v3])
+
+		b0.mergeWith b1
+
+		expect(v2.brick).to.equal(b0)
+		expect(v3.brick).to.equal(b0)
+
+		expect(b0.voxels.size).to.equal(4)
+		expect(b1.voxels.size).to.equal(0)

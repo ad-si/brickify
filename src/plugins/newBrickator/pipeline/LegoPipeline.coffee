@@ -25,7 +25,7 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Layout graph initialization'
-			decision: (options) => return options.layouting
+			decision: (options) => return options.initLayout
 			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 		}

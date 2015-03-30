@@ -156,10 +156,7 @@ class BrushHandler
 		.then (cachedData) =>
 			return unless cachedData.
 			brickVisualization.makeAllVoxels3dPrinted selectedNode
-
-			cachedData.csgNeedsRecalculation = true
-			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
-			console.log "Will re-layout #{touchedVoxels.length} voxel"
-			@nodeVisualizer._relayoutModifiedParts cachedData, touchedVoxels, true
+			cachedData.brickVisualization.updateModifiedVoxels()
+			@nodeVisualizer._everythingPrint selectedNode
 
 module.exports = BrushHandler

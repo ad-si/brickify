@@ -78,6 +78,20 @@ class NewBrickator
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData
 
+	everythingPrint: (selectedNode) =>
+		@_getCachedData selectedNode
+		.then (cachedData) =>
+			settings = new PipelineSettings()
+			settings.onlyInitLayout()
+
+			data = grid: cachedData.grid
+
+			results = @pipeline.run data, settings, true
+			cachedData.brickGraph = results.accumulatedResults.brickGraph
+			cachedData.csgNeedsRecalculation = true
+
+			@nodeVisualizer?.objectModified selectedNode, cachedData
+
 	_createDataStructure: (selectedNode) =>
 		selectedNode.getModel().then (model) =>
 			# create grid

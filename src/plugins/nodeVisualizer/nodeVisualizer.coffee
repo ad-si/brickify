@@ -83,6 +83,9 @@ class NodeVisualizer
 	rerunLegoPipeline: (selectedNode) =>
 		@newBrickator.runLegoPipeline selectedNode
 
+	_everythingPrint: (selectedNode) =>
+		@newBrickator.everythingPrint selectedNode
+
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'brickVisualizer'

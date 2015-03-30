@@ -38,6 +38,7 @@ class NewBrickator
 			}
 			results = @pipeline.run data, settings, true
 			cachedData.brickGraph = results.accumulatedResults.brickGraph
+			cachedData.csgNeedsRecalculation = true
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData
 			Spinner.stop @bundle.renderer.getDomElement()

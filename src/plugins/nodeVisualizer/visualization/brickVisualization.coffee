@@ -42,11 +42,10 @@ class BrickVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	showCsg: (newCsgMesh = null) =>
-		if newCsgMesh?
-			@csgSubnode.children = []
-			@csgSubnode.add newCsgMesh
-			newCsgMesh.material = @defaultColoring.csgMaterial
+	showCsg: (newCsgMesh) =>
+		@csgSubnode.children = []
+		@csgSubnode.add newCsgMesh
+		newCsgMesh.material = @defaultColoring.csgMaterial
 
 		@csgSubnode.visible = true
 

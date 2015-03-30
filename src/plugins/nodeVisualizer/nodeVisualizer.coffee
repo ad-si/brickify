@@ -56,6 +56,10 @@ class NodeVisualizer
 	onNodeRemove: (node) =>
 		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
 
+	onNodeSelect: (@selectedNode) => return
+
+	onNodeDeselect: => @selectedNode = null
+
 	zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode
 		@bundle.renderer.zoomToBoundingSphere boundingSphere
@@ -75,6 +79,12 @@ class NodeVisualizer
 	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>
 		@newBrickator.relayoutModifiedParts cachedData.node,
 			touchedVoxels, createBricks
+
+	rerunLegoPipeline: (selectedNode) =>
+		@newBrickator.runLegoPipeline selectedNode
+
+	_everythingPrint: (selectedNode) =>
+		@newBrickator.everythingPrint selectedNode
 
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>

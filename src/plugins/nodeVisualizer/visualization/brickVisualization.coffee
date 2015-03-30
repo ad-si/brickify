@@ -42,11 +42,10 @@ class BrickVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	showCsg: (newCsgMesh = null) =>
-		if newCsgMesh?
-			@csgSubnode.children = []
-			@csgSubnode.add newCsgMesh
-			newCsgMesh.material = @defaultColoring.csgMaterial
+	showCsg: (newCsgMesh) =>
+		@csgSubnode.children = []
+		@csgSubnode.add newCsgMesh
+		newCsgMesh.material = @defaultColoring.csgMaterial
 
 		@csgSubnode.visible = true
 
@@ -195,6 +194,18 @@ class BrickVisualization
 			voxel.setMaterial @defaultColoring.deselectedMaterial
 		return voxels
 
+	###
+	# @return {Boolean} true if anything changed, false otherwise
+	###
+	makeAllVoxels3dPrinted: (selectedNode) =>
+		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		anythingChanged = false
+		for voxel in voxels
+			anythingChanged = anythingChanged || voxel.isLego()
+			voxel.make3dPrinted()
+			@voxelSelector.touch voxel
+		return anythingChanged
+
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
 		@voxelSelector.clearSelection()
@@ -212,6 +223,18 @@ class BrickVisualization
 			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
 		return voxels
+
+	###
+	# @return {Boolean} true if anything changed, false otherwise
+	###
+	makeAllVoxelsLego: (selectedNode) =>
+		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		everythingLego = true
+		for voxel in voxels
+			everythingLego = everythingLego && voxel.isLego()
+			voxel.makeLego()
+			voxel.visible = true
+		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>
 		voxel.make3dPrinted() for voxel in @voxelSelector.touchedVoxels

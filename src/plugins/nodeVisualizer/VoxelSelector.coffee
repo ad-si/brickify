@@ -14,6 +14,11 @@ class VoxelSelector
 
 		@touchedVoxels = []
 
+	getAllVoxels: =>
+		voxels = []
+		@grid.forEachVoxel (voxel) => voxels.push voxel.visibleVoxel
+		return voxels
+
 	###
 	# Gets the voxels to be processed in the given event.
 	# @param {Object} event usually a mouse or tap or pointer event
@@ -156,5 +161,8 @@ class VoxelSelector
 		@touchedVoxels = []
 		@level = undefined
 		return tmp
+
+	touch: (voxel) =>
+		@touchedVoxels.push voxel
 
 module.exports = VoxelSelector

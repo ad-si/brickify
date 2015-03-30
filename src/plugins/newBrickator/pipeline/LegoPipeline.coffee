@@ -25,7 +25,7 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Layout graph initialization'
-			decision: (options) -> return options.layouting
+			decision: (options) => return options.initLayout
 			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 		}
@@ -49,7 +49,8 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Update Lego references in Grid'
-			decision: (options) -> return options.reLayout or options.layouting
+			decision: (options) -> return options.reLayout or options.layouting or
+					options.initLayout
 			worker: (lastResult, options) ->
 				lastResult.brickGraph.updateReferencesInGrid()
 				return lastResult

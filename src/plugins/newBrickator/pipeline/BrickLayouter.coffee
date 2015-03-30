@@ -2,7 +2,11 @@ Brick = require './Brick'
 BrickGraph = require './BrickGraph'
 arrayHelper = require './arrayHelper'
 
-module.exports = class BrickLayouter
+###
+# @class BrickLayouter
+###
+
+class BrickLayouter
 	constructor: (pseudoRandom = false) ->
 		if pseudoRandom
 			@seed = 42
@@ -74,12 +78,25 @@ module.exports = class BrickLayouter
 
 		#console.log @_findWeakArticulationPoints bricks
 
+	###
+	# Split up all supplied bricks into single bricks and relayout. This means
+	# that all bricks will be relayouted.
+	#
+	# @param {Array<Brick>} oldBricks
+	# @param {Array<Array<Brick>>} bricks
+	###
 	_splitBricksAndRelayout: (oldBricks, bricks) =>
 		newBricks = @_splitBricks oldBricks, bricks
 		@layoutByGreedyMerge bricks
 		return
 
-	# split up all bricks into single bricks
+	###
+	# Split up all supplied bricks into single bricks and relayout locally. This
+	# means that all supplied bricks and their neighbors will be relayouted.
+	#
+	# @param {Array<Brick>} oldBricks
+	# @param {BrickGraph} brickGraph
+	###
 	splitBricksAndRelayoutLocally: (oldBricks, brickGraph, grid) =>
 		bricksToSplit = []
 
@@ -182,7 +199,17 @@ module.exports = class BrickLayouter
 
 		return mergeableNeighbors
 
-	# Johannes/Yannis: please document
+	###
+	# Checks if brick can merge in the direction specified.
+	#
+	# @param {Brick} brick the brick whose neighbors to check
+	# @param {Number} dir the merge direction as specified in Brick.direction
+	# @param {Function} widthFn the function to determine the brick's width
+	# @param {Function} lengthFn the function to determine the brick's height
+	# @return {Array<Brick>} Bricks in the merge direction if this brick can merge
+	# in this dir undefined otherwise.
+	# @see Brick
+	###
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		if brick.neighbors[dir].length > 0
 			width = 0
@@ -280,18 +307,27 @@ module.exports = class BrickLayouter
 		for zLayer in bricks
 			for brick in zLayer
 				if brick.biconnectedComponentId == undefined
-					@_tarjanAlgorithm brick, biconnectedComponents, stack
-		biconnectedComponents
+					@_findBiconnectedComponents brick, biconnectedComponents, stack
+		return biconnectedComponents
 
-	# Johannes/Yannis: what does the algorithm? How is it used?
-	_tarjanAlgorithm: (brick, biconnectedComponents, stack) =>
+	###
+	# This algorithm searches for biconnected components in the subgraph that is
+	# reachable from the supplied brick.
+	# see http://en.algoritmy.net/article/44220/Tarjans-algorithm
+	#
+	# @param {Brick} brick
+	# @param {Array<Array<Brick>>} biconnectedComponents
+	# @param {Array<Brick>} stack
+	# @param {Brick} brick
+	###
+	_findBiconnectedComponents: (brick, biconnectedComponents, stack) =>
 		brick.biconnectedComponentId = @index
 		brick.lowlink = @index
 		@index++
 		stack.push(brick)
 		for connectedBrick in brick.uniqueConnectedBricks()
 			if connectedBrick.biconnectedComponentId == undefined
-				@_tarjanAlgorithm(connectedBrick, biconnectedComponents, stack)
+				@_findBiconnectedComponents(connectedBrick, biconnectedComponents, stack)
 				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
 				then brick.lowlink else connectedBrick.lowlink
 			else if stack.indexOf(connectedBrick) > -1
@@ -307,11 +343,22 @@ module.exports = class BrickLayouter
 				break if otherBrick == brick
 			biconnectedComponents.push component
 
+	###
+	# Find weak articulation points in the graph.
+	#
+	# @param {Array<Brick>} bricks All bricks in the graph
+	# @return {Array<Brick>} Bricks that are weak articulation points
+	###
 	_findWeakArticulationPoints: (bricks) =>
-		# filter out trivial articulation points
+		# TODO filter out trivial articulation points
 		return @_getArticulationPoints bricks
 
-	# Johannes/Yannis: what are articulation points and for what do we need them?
+	###
+	# Find potentially weak points (articulation points) in the graph.
+	#
+	# @param {Array<Brick>} bricks All bricks in the graph
+	# @return {Array<Brick>} Bricks that are articulation points
+	###
 	_getArticulationPoints: (bricks) =>
 		@time = 0
 		articulationPoints = []
@@ -323,11 +370,18 @@ module.exports = class BrickLayouter
 		for zLayer in bricks
 			for brick in zLayer
 				if brick.discovered == undefined or !brick.discovered
-					@_articulationPointAlgorithm brick, articulationPoints
+					@_findArticulationPoints brick, articulationPoints
 		articulationPoints
 
-	# Johannes/Yannis: an algorithm that does... what?
-	_articulationPointAlgorithm: (brick, articulationPoints) =>
+	###
+	# Find potentially weak points in the subgraph that is reachable from the
+	# supplied brick.
+	#
+	# @param {Brick} brick the start brick
+	# @param {Array} articulationPoints An Array of previously found articulation
+	# points. The results are appended to this array.
+	###
+	_findArticulationPoints: (brick, articulationPoints) =>
 		brick.discoveryTime = brick.lowlink = ++@time
 		brick.discovered = true
 		children = 0
@@ -335,7 +389,7 @@ module.exports = class BrickLayouter
 			if otherBrick.discovered is undefined or !otherBrick.discovered
 				otherBrick.parent = brick
 				children++
-				@_articulationPointAlgorithm otherBrick, articulationPoints
+				@_findArticulationPoints otherBrick, articulationPoints
 				brick.lowlink = Math.min brick.lowlink, otherBrick.lowlink
 				if !brick.parent? and children > 1
 					articulationPoints.push brick
@@ -344,3 +398,5 @@ module.exports = class BrickLayouter
 						articulationPoints.push brick
 			else if otherBrick.parent != brick
 				brick.lowlink = Math.min brick.lowlink, otherBrick.discoveryTime
+
+module.exports = BrickLayouter

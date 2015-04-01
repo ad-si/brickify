@@ -22,7 +22,7 @@ class PreviewUi
 		@$stabilityViewButton = $('#stabilityCheckButton')
 		@$stabilityViewButton.click =>
 			@toggleStabilityView()
-			@workflowUi.toggleMenu()
+			@workflowUi.hideMenuIfPossible()
 
 	_quitStabilityView: =>
 		@$stabilityViewButton.removeClass 'active disabled'

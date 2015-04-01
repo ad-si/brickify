@@ -10,7 +10,7 @@ class EditUi
 
 	_initBrushes: =>
 		@brushUi = new EditBrushUi @workflowUi
-		@brushUi.init '#brushContainer'
+		@brushUi.init '#brushContainer', '#bigBrushContainer'
 
 	onNodeSelect: (node) =>
 		@brushUi.onNodeSelect node

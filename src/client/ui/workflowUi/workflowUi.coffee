@@ -67,10 +67,16 @@ class WorkflowUi
 		$('#toggleMenu').click => @toggleMenu()
 
 	toggleMenu: ->
-		return unless $('#toggleMenu:visible').length > 0
 		$('#leftSidebar').css('height': 'auto')
 		$('#sidebar-content').slideToggle null, ->
 			$('#leftSidebar').toggleClass 'collapsed-sidebar'
+			$('#leftSidebar').css('height': '')
+
+	hideMenuIfPossible: ->
+		return unless $('#toggleMenu:visible').length > 0
+		$('#leftSidebar').css('height': 'auto')
+		$('#sidebar-content').slideUp null, ->
+			$('#leftSidebar').addClass 'collapsed-sidebar'
 			$('#leftSidebar').css('height': '')
 
 	toggleStabilityView: =>

@@ -42,13 +42,10 @@ class PreviewUi
 		@$assemblyViewButton.toggleClass 'disabled', @stabilityViewEnabled
 
 		if @stabilityViewEnabled
-			@editControl.brushHandler.interactionDisabled = true
+			@editControl.disableInteraction()
 			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
 		else
-			@editControl.brushHandler.interactionDisabled = false
-			mode = 'printBrush'
-			mode = 'legoBrush' if @editControl.brushHandler.legoBrushSelected
-			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, mode
+			@editControl.enableInteraction()
 
 	_initAssemblyView: =>
 		@assemblyViewEnabled = no
@@ -75,11 +72,8 @@ class PreviewUi
 		@previewAssemblyUi.setEnabled @assemblyViewEnabled
 
 		if @assemblyViewEnabled
-			@editControl.brushHandler.interactionDisabled = true
+			@editControl.disableInteraction()
 		else
-			@editControl.brushHandler.interactionDisabled = false
-			mode = 'printBrush'
-			mode = 'legoBrush' if @editControl.brushHandler.legoBrushSelected
-			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, mode
+			@editControl.enableInteraction()
 
 module.exports = PreviewUi

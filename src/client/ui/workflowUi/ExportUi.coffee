@@ -30,8 +30,23 @@ class ExportUi
 			@downloadModal.modal 'hide'
 
 	_initDownloadModalContent: =>
+		# stl download
 		@downloadProvider = new DownloadProvider @workflowUi.bundle
-		@downloadProvider.init '#downloadButton', @workflowUi.bundle.sceneManager
+		@downloadProvider.init(
+			'#stlDownloadButton', @, @workflowUi.bundle.sceneManager
+		)
 
+		@stripeSlider = $('#stripeSlider')
+		@stripeText = $('#stripeText')
+
+		@studRadius = 2.4
+		@stripeSlider.on 'input', =>
+			v = parseInt(@stripeSlider.val())
+			# stud radius is set in mm and to match the test strip
+			@studRadius = 2.4 + 0.05 * v
+			v = '+' + v if v > 0
+			v = '±0' if v == 0
+			v = v.toFixed(0) if v < 0
+			@stripeText.html(v)
 
 module.exports = ExportUi

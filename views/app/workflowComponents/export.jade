@@ -22,10 +22,11 @@
 					| .
 				img(src="/img/testStrip.png" width=558)
 				div(style="margin-left:42px; margin-right:42px")
-					input(type="range" min=0 max=8)
+					input(type="range" value=0 min=-4 max=4)#stripeSlider
+				div(style="text-align: center")
+					p#stripeText ± 0
 				br
-				br
-				.btn.btn-success.btn-block#downloadButton
+				.btn.btn-success.btn-block#stlDownloadButton
 					span.fa.fa-download
 					| &nbsp;&nbsp;Download stl for 3D printer
 

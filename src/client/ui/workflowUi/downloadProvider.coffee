@@ -6,18 +6,21 @@ module.exports = class DownloadProvider
 	constructor: (@bundle) ->
 		return
 
-	init: (jqueryString, @sceneManager) =>
+	init: (jqueryString, @exportUi, @sceneManager) =>
 		@jqueryObject = $(jqueryString)
 
 		@jqueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
-				@_createDownload selNode
+				@_createDownload 'stl', selNode
 
-	_createDownload: (selectedNode) =>
-		console.log 'Creating Download...'
+	_createDownload: (fileType, selectedNode) =>
+		downloadOptions = {
+			fileType: fileType
+			studRadius: @exportUi.studRadius
+		}
 
-		promisesArray = @bundle.pluginHooks.getDownload selectedNode
+		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
 
 		Promise.all(promisesArray).then (resultsArray) ->
 			saveAs result.data, result.fileName for result in resultsArray

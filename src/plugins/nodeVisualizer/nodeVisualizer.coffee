@@ -69,7 +69,7 @@ class NodeVisualizer
 	_initializeData: (node, visualizationData, newBrickatorData) =>
 		# init node visualization
 		visualizationData.brickVisualization.initialize newBrickatorData.grid
-		visualizationData.numZLayers = newBrickatorData.grid.zLayers.length
+		visualizationData.numZLayers = newBrickatorData.grid.numVoxelsZ
 		visualizationData.initialized = true
 
 		# instead of creating csg live, show original model semitransparent

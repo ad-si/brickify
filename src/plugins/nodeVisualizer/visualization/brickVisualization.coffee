@@ -85,15 +85,12 @@ class BrickVisualization
 	_createVoxelVisualization: (coloring) =>
 		@voxelsSubnode.children = []
 
-		for z in [0..@grid.numVoxelsZ - 1] by 1
-			for x in [0..@grid.numVoxelsX - 1] by 1
-				for y in [0..@grid.numVoxelsY - 1] by 1
-					if @grid.zLayers[z]?[x]?[y]?
-						voxel = @grid.zLayers[z][x][y]
-						material = coloring.getMaterialForVoxel voxel
-						threeBrick = @geometryCreator.getVoxel {x: x, y: y, z: z}, material
-						@_updateVoxel threeBrick
-						@voxelsSubnode.add threeBrick
+		@grid.forEachVoxel (voxel) =>
+			material = coloring.getMaterialForVoxel voxel
+			p = voxel.position
+			threeBrick = @geometryCreator.getVoxel {x: p.x, y: p.y, z: p.z}, material
+			@_updateVoxel threeBrick
+			@voxelsSubnode.add threeBrick
 
 	# makes disabled voxels invisible, toggles stud visibility
 	_updateVoxel: (threeBrick) =>

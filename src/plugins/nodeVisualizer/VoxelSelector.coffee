@@ -62,7 +62,7 @@ class VoxelSelector
 
 		voxel = @_getFrontierVoxel voxels, type
 		if type is '3d'
-			voxel ?= @_getBaseplateVoxel type
+			voxel ?= @_getBaseplateVoxel event, type
 			voxel ?= @_getMiddleVoxel event
 		return voxel
 
@@ -95,10 +95,10 @@ class VoxelSelector
 		else
 			return prevVoxel
 
-	_getBaseplateVoxel: (type) ->
+	_getBaseplateVoxel: (event, type) ->
 		baseplatePos = interactionHelper.getGridPosition event, @renderer
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePos
-		gridEntry = @grid.zLayers[voxelPos.z]?[voxelPos.x]?[voxelPos.y]
+		gridEntry = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 		voxel = gridEntry?.visibleVoxel
 		return null unless voxel?
 
@@ -124,7 +124,7 @@ class VoxelSelector
 		)
 		middle.applyMatrix4 revTransform
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
-		gridEntry = @grid.zLayers[voxelPos.z]?[voxelPos.x]?[voxelPos.y]
+		gridEntry = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 		unless gridEntry?.visibleVoxel?.isLego()
 			return gridEntry.visibleVoxel
 		else

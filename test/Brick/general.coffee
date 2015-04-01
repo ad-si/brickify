@@ -25,6 +25,7 @@ describe 'Brick', ->
 
 		# chose a brick and delete it
 		brickToBeDeleted = brickGraph.bricks[3][1]
+
 		brickGraph.deleteBrick brickToBeDeleted
 
 		# check that there are no references to this brick anymore

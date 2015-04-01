@@ -12,6 +12,33 @@ module.exports = class Brick
 	@getNextBrickIndex: =>
 		return @_nextBrickIndex++
 
+	@availableBrickSizes: ->
+		return [
+			[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
+			[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
+			[1, 1, 3], [1, 2, 3], [1, 3, 3], [1, 4, 3],
+			[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
+			[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
+		]
+
+	@isValidSize: (width, length, height) ->
+		for validSize in Brick.availableBrickSizes()
+			if validSize[0] == width and validSize[1] == length and
+			validSize[2] == height
+				return true
+			if validSize[0] == length and validSize[1] == width and
+			validSize[2] == height
+				return true
+		return false
+
+	@uniqueBricksInSlots: (upperOrLowerSlots) ->
+		bricks = []
+		for slotsX in upperOrLowerSlots
+			for slotXY in slotsX
+				if slotXY != false
+					bricks.push slotXY
+		return removeDuplicates bricks
+
 	constructor: (@position, @size) ->
 		# position always contains smallest x & smallest y
 
@@ -34,15 +61,6 @@ module.exports = class Brick
 		# x-, x+, y-, y+
 		@neighbors = [[], [], [], []]
 		return
-
-	@availableBrickSizes: ->
-		return [
-			[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
-			[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
-			[1, 1, 3], [1, 2, 3], [1, 3, 3], [1, 4, 3],
-			[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
-			[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
-		]
 
 	# Removes references to this brick from this brick's neighbors/connections
 	removeSelfFromSurrounding: =>
@@ -72,27 +90,9 @@ module.exports = class Brick
 		lowerBricks = Brick.uniqueBricksInSlots @lowerSlots
 		return upperBricks.concat lowerBricks
 
-	@uniqueBricksInSlots: (upperOrLowerSlots) ->
-		bricks = []
-		for slotsX in upperOrLowerSlots
-			for slotXY in slotsX
-				if slotXY != false
-					bricks.push slotXY
-		return removeDuplicates bricks
-
 	uniqueNeighbors: =>
 		neighborsList = [].concat.apply([],@neighbors)
 		return neighborsList
-
-	@isValidSize: (width, length, height) ->
-		for validSize in Brick.availableBrickSizes()
-			if validSize[0] == width and validSize[1] == length and
-			validSize[2] == height
-				return true
-			if validSize[0] == length and validSize[1] == width and
-			validSize[2] == height
-				return true
-		return false
 
 	# helper method, to be moved somewhere more appropriate
 	removeDuplicates = (array) ->

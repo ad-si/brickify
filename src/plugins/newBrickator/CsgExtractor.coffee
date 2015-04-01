@@ -41,19 +41,23 @@ module.exports = class CsgExtractor
 		# creates a list of voxels to be printed
 		printVoxels = []
 
-		grid.forEachVoxel (voxel, x, y, z) ->
+		grid.forEachVoxel (voxel) ->
 			return if voxel.enabled # ignore lego voxels
+
+			x = voxel.position.x
+			y = voxel.position.y
+			z = voxel.position.z
 
 			#check if the voxel above is legofied. if yes, add a stud to current voxel
 			studOnTop = false
-			if grid.zLayers[z + 1]?[x]?[y]? and grid.zLayers[z + 1][x][y].enabled
+			if grid.hasVoxelAt(x, y, z + 1) and grid.getVoxel(x, y, z + 1).enabled
 				studOnTop = true
 
 			# check if the voxel is the lowest voxel or has a lego brick below it
 			# if yes, create space for stud below
 			studFromBelow = false
 			if z == 0 or
-			(grid.zLayers[z - 1]?[x]?[y]? and grid.zLayers[z - 1][x][y].enabled)
+			(grid.hasVoxelAt(x, y, z - 1) and grid.getVoxel(x, y, z - 1).enabled)
 				studFromBelow = true
 
 			printVoxels.push {

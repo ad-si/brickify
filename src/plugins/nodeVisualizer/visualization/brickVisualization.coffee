@@ -44,6 +44,8 @@ class BrickVisualization
 
 	showCsg: (newCsgMesh) =>
 		@csgSubnode.children = []
+		return if not newCsgMesh?
+
 		@csgSubnode.add newCsgMesh
 		newCsgMesh.material = @defaultColoring.csgMaterial
 

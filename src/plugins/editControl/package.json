@@ -1,0 +1,9 @@
+{
+  "name": "edit-control",
+  "version": "0.1.0",
+  "description": "Controls user interaction with brushes",
+  "lowfab": {
+    "type": "ui"
+  },
+  "browser": "./editControl.coffee"
+}

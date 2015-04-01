@@ -75,5 +75,10 @@ module.exports = class PluginLoader
 				require '../plugins/fidelityControl'
 				require '../plugins/fidelityControl/package.json'
 			)
+		if @globalConfig.plugins.editControl
+			pluginInstances.push @initPlugin(
+				require '../plugins/editControl'
+				require '../plugins/editControl/package.json'
+			)
 
 		return pluginInstances

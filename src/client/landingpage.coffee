@@ -1,9 +1,6 @@
 require './polyfills'
 $ = require 'jquery'
 
-#fade in action buttons when javascript is ready
-$('#buttonContainer').fadeTo(500, 1)
-
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
@@ -13,7 +10,7 @@ fileLoader = require './modelLoading/fileLoader'
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
-globalConfig.staticRendererHeight = 388
+globalConfig.staticRendererHeight = 300
 globalConfig.syncWithServer = false
 globalConfig.buildUi = false
 globalConfig.autoRotate = true

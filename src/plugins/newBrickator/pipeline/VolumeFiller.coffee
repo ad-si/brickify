@@ -18,7 +18,7 @@ module.exports = class VolumeFiller
 		currentFillVoxelQueue = []
 
 		while z < grid.numVoxelsZ
-			if grid.zLayers[z]?[x]?[y]?
+			if grid.hasVoxelAt x, y, z
 				# current voxel already exists (shell voxel)
 				dir = @calculateVoxelDirection grid, x, y, z
 
@@ -49,10 +49,11 @@ module.exports = class VolumeFiller
 	calculateVoxelDirection: (grid, x, y, z) ->
 		# determines whether all polygons related to this voxel are either
 		# all aligned upwards or all aligned downwards
-		dataEntrys = grid.zLayers[z]?[x]?[y].dataEntrys
+		voxel = grid.getVoxel x, y, z
 		numUp = 0
 		numDown = 0
-		for e in dataEntrys
+
+		for e in voxel.dataEntrys
 			if e.up? and e.up == true
 				numUp++
 			else if e.up? and e.up == false
@@ -68,8 +69,8 @@ module.exports = class VolumeFiller
 		else
 			definitelyDown = false
 
-		grid.zLayers[z][x][y].definitelyUp = definitelyUp
-		grid.zLayers[z][x][y].definitelyDown = definitelyDown
+		voxel.definitelyUp = definitelyUp
+		voxel.definitelyDown = definitelyDown
 
 		return {
 			definitelyUp: definitelyUp

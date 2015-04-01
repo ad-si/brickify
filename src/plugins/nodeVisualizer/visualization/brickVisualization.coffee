@@ -44,6 +44,8 @@ class BrickVisualization
 
 	showCsg: (newCsgMesh) =>
 		@csgSubnode.children = []
+		return if not newCsgMesh?
+
 		@csgSubnode.add newCsgMesh
 		newCsgMesh.material = @defaultColoring.csgMaterial
 
@@ -85,15 +87,12 @@ class BrickVisualization
 	_createVoxelVisualization: (coloring) =>
 		@voxelsSubnode.children = []
 
-		for z in [0..@grid.numVoxelsZ - 1] by 1
-			for x in [0..@grid.numVoxelsX - 1] by 1
-				for y in [0..@grid.numVoxelsY - 1] by 1
-					if @grid.zLayers[z]?[x]?[y]?
-						voxel = @grid.zLayers[z][x][y]
-						material = coloring.getMaterialForVoxel voxel
-						threeBrick = @geometryCreator.getVoxel {x: x, y: y, z: z}, material
-						@_updateVoxel threeBrick
-						@voxelsSubnode.add threeBrick
+		@grid.forEachVoxel (voxel) =>
+			material = coloring.getMaterialForVoxel voxel
+			p = voxel.position
+			threeBrick = @geometryCreator.getVoxel {x: p.x, y: p.y, z: p.z}, material
+			@_updateVoxel threeBrick
+			@voxelsSubnode.add threeBrick
 
 	# makes disabled voxels invisible, toggles stud visibility
 	_updateVoxel: (threeBrick) =>
@@ -147,14 +146,23 @@ class BrickVisualization
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
+		# invert type, because if we are highlighting a 'lego' voxel
+		# we want to display it as 'could be 3d printed'
+		voxelType = '3d'
+		voxelType = 'lego' if type == '3d'
+
+		highlightMaterial = @defaultColoring.getHighlightMaterial voxelType
+		hVoxel = highlightMaterial.voxel
+		hBox = highlightMaterial.box
+
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
 
 			@currentlyHighlightedVoxel = voxel
-			voxel.setHighlight true, @defaultColoring.highlightMaterial
-			@_highlightBigBrush voxel if bigBrush
+			voxel.setHighlight true, hVoxel
+			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?
@@ -163,7 +171,8 @@ class BrickVisualization
 
 		return voxel
 
-	_highlightBigBrush: (voxel) =>
+
+	_highlightBigBrush: (voxel, material) =>
 		size = @voxelSelector.getBrushSize true
 		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
@@ -176,6 +185,7 @@ class BrickVisualization
 			@voxelBrickSubnode.add @bigBrushHighlight
 
 		@bigBrushHighlight.position.copy voxel.position
+		@bigBrushHighlight.material = material
 		@bigBrushHighlight.visible = true
 
 	unhighlightBigBrush: =>

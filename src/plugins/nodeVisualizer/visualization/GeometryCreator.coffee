@@ -21,7 +21,9 @@ module.exports = class GeometryCreator
 
 		#store references (voxel) for further use
 		brick.setVoxelCoords gridPosition
-		brick.setGridReference @grid.getVoxel gridPosition
+		brick.setGridReference @grid.getVoxel(
+			gridPosition.x, gridPosition.y, gridPosition.z
+		)
 
 		return brick
 

@@ -38,7 +38,7 @@ class EditBrushUi
 		brush.brushButton.on 'click', (event) =>
 			@_bigBrushSelected = false
 			@_brushSelect brush
-			@workflowUi.toggleMenu()
+			@workflowUi.hideMenuIfPossible()
 		brush.bigBrushButton.on 'click', (event) =>
 			if brush is @_selectedBrush
 				@_bigBrushSelected = !@_bigBrushSelected
@@ -46,7 +46,7 @@ class EditBrushUi
 				@_bigBrushSelected = true
 			@_brushSelect brush
 			event.stopImmediatePropagation()
-			@workflowUi.toggleMenu()
+			@workflowUi.hideMenuIfPossible()
 
 	_brushSelect: (brush) =>
 		# deselect currently selected brush

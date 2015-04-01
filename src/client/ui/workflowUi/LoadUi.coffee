@@ -15,7 +15,7 @@ class LoadUi
 		$('#fileInput').on 'change', (event) =>
 			@fileLoadHandler(event).then =>
 				$('#fileInput').val('')
-				@workflowUi.toggleMenu()
+				@workflowUi.hideMenuIfPossible()
 
 	fileLoadHandler: (event) =>
 		files = event.target.files ? event.dataTransfer.files

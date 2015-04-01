@@ -111,67 +111,81 @@ class NodeVisualizer
 
 		return data
 
-	setStabilityView: (selectedNode, stabilityViewEnabled) =>
-		@brushHandler.interactionDisabled = false unless stabilityViewEnabled
-		return unless selectedNode
+	###
+	# Sets the overall display mode
+	# @param {Node} selectedNode the currently selected node
+	# @param {String} mode the mode: 'legoBrush'/'printBrush'/'stability'/'build'
+	###
+	setDisplayMode: (selectedNode, mode) =>
+		return unless selectedNode?
 
-		@_getCachedData(selectedNode).then (cachedData) =>
-			if stabilityViewEnabled
-				# only show bricks and csg
-				@_showCsg cachedData
-				.then ->
-					# change coloring to stability coloring
-					cachedData.brickVisualization.setStabilityView stabilityViewEnabled
-					cachedData.brickVisualization.showBricks()
+		return @_getCachedData selectedNode
+		.then (cachedData) =>
+			switch mode
+				when 'legoBrush'
+					@_resetStabilityView cachedData
+					@_resetBuildMode cachedData
+					@_applyLegoBrushMode cachedData
+				when 'printBrush'
+					@_resetStabilityView cachedData
+					@_resetBuildMode cachedData
+					@_applyPrintBrushMode cachedData
+				when 'stability'
+					@_resetBuildMode cachedData
+					@_applyStabilityView cachedData
+				when 'build'
+					@_resetStabilityView cachedData
+					return @_applyBuildMode cachedData
 
-				cachedData.modelVisualization.setNodeVisibility false
+	_applyLegoBrushMode: (cachedData) =>
+		cachedData.brickVisualization.showVoxels()
+		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
+		cachedData.modelVisualization.setShadowVisibility false
 
-				@brushHandler.interactionDisabled = true
-			else
-				#show voxels
-				cachedData.brickVisualization.setStabilityView stabilityViewEnabled
-				cachedData.brickVisualization.hideCsg()
-				cachedData.brickVisualization.showVoxels()
+	_applyPrintBrushMode: (cachedData) =>
+		cachedData.brickVisualization.showVoxels()
+		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
+		cachedData.modelVisualization.setShadowVisibility true
 
-				cachedData.modelVisualization.setNodeVisibility true
+	_applyStabilityView: (cachedData) =>
+		cachedData.stabilityViewEnabled  = true
 
-	# enables the build mode, which means that only bricks and CSG
-	# are shown
-	enableBuildMode: (selectedNode) =>
-		return @_getCachedData(selectedNode).then (cachedData) =>
-			# disable interaction
-			@brushHandler.interactionDisabled = true
-
-			# show bricks and csg
+		@_showCsg cachedData
+		.then ->
+			# change coloring to stability coloring
+			cachedData.brickVisualization.setStabilityView true
 			cachedData.brickVisualization.showBricks()
-			cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 
-			@_showCsg cachedData
+		cachedData.modelVisualization.setNodeVisibility false
 
-			cachedData.modelVisualization.setNodeVisibility false
+	_resetStabilityView: (cachedData) =>
+		if cachedData.stabilityViewEnabled
+			cachedData.brickVisualization.setStabilityView false
+			cachedData.brickVisualization.hideCsg()
+			cachedData.modelVisualization.setNodeVisibility true
+			cachedData.stabilityViewEnabled = false
 
-			return cachedData.numZLayers
+	_applyBuildMode: (cachedData) =>
+		# show bricks and csg
+		cachedData.brickVisualization.showBricks()
+		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
+
+		@_showCsg cachedData
+
+		cachedData.modelVisualization.setNodeVisibility false
+		return cachedData.numZLayers
+
+	_resetBuildMode: (cachedData) =>
+		cachedData.brickVisualization.hideCsg()
+		cachedData.modelVisualization.setNodeVisibility true
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
 		return @_getCachedData(selectedNode).then (cachedData) ->
 			cachedData.brickVisualization.showBrickLayer layer - 1
-
-	# disables build mode and shows voxels, hides csg
-	disableBuildMode: (selectedNode) =>
-		#enable interaction
-		@brushHandler.interactionDisabled = false
-		return Promise.resolve() unless selectedNode
-		return @_getCachedData(selectedNode).then (cachedData) =>
-			# hide csg, show model, show voxels
-			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.hideCsg()
-			cachedData.modelVisualization.setNodeVisibility true
-			cachedData.brickVisualization.showVoxels()
-
-			if @brushHandler.legoBrushSelected
-				cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 
 	_showCsg: (cachedData) =>
 		return @newBrickator.getCSG(cachedData.node, true)

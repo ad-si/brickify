@@ -4,6 +4,7 @@ class BrushHandler
 			color: 0x00ff00
 		})
 
+		#ToDo move to EditControl
 		@interactionDisabled = false
 		@legoBrushSelected = false
 		@bigBrushSelected = false
@@ -35,25 +36,13 @@ class BrushHandler
 
 	_legoSelect: (selectedNode, @bigBrushSelected) =>
 		@legoBrushSelected = true
-
 		return if @interactionDisabled
-		@nodeVisualizer._getCachedData selectedNode
-		.then (cachedData) ->
-			cachedData.brickVisualization.showVoxels()
-			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.setPossibleLegoBoxVisibility true
-			cachedData.modelVisualization.setShadowVisibility false
+		@nodeVisualizer.setDisplayMode selectedNode, 'legoBrush'
 
 	_printSelect: (selectedNode, @bigBrushSelected) =>
 		@legoBrushSelected = false
-
 		return if @interactionDisabled
-		@nodeVisualizer._getCachedData selectedNode
-		.then (cachedData) ->
-			cachedData.brickVisualization.showVoxels()
-			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.setPossibleLegoBoxVisibility false
-			cachedData.modelVisualization.setShadowVisibility true
+		@nodeVisualizer.setDisplayMode selectedNode, 'printBrush'
 
 	_legoMouseDown: (event, selectedNode) =>
 		return if @interactionDisabled

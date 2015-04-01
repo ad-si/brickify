@@ -5,6 +5,7 @@ class PreviewUi
 		@$panel = $('#previewGroup')
 		bundle = @workflowUi.bundle
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
+		@editControl = bundle.getPlugin 'editControl'
 		@sceneManager = bundle.sceneManager
 		@_initStabilityView()
 		@_initAssemblyView()
@@ -40,9 +41,14 @@ class PreviewUi
 		@$stabilityViewButton.toggleClass 'active', @stabilityViewEnabled
 		@$assemblyViewButton.toggleClass 'disabled', @stabilityViewEnabled
 
-		@nodeVisualizer.setStabilityView(
-			@sceneManager.selectedNode, @stabilityViewEnabled
-		)
+		if @stabilityViewEnabled
+			@editControl.brushHandler.interactionDisabled = true
+			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
+		else
+			@editControl.brushHandler.interactionDisabled = false
+			mode = 'printBrush'
+			mode = 'legoBrush' if @editControl.brushHandler.legoBrushSelected
+			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, mode
 
 	_initAssemblyView: =>
 		@assemblyViewEnabled = no
@@ -67,5 +73,13 @@ class PreviewUi
 		@$stabilityViewButton.toggleClass 'disabled', @assemblyViewEnabled
 
 		@previewAssemblyUi.setEnabled @assemblyViewEnabled
+
+		if @assemblyViewEnabled
+			@editControl.brushHandler.interactionDisabled = true
+		else
+			@editControl.brushHandler.interactionDisabled = false
+			mode = 'printBrush'
+			mode = 'legoBrush' if @editControl.brushHandler.legoBrushSelected
+			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, mode
 
 module.exports = PreviewUi

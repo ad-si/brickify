@@ -14,9 +14,22 @@
 				button.bootbox-close-button.close(data-dismiss="modal") ×
 				h4.modal-title Download
 			.modal-body
+				h4 Download stl for 3d printer
+				p
+					| Select the stud size that works best for your 3d printer.
+					| If you don't know the size, download and print the &nbsp;
+					a(href="/download/testStrip.zip") test strip
+					| .
+				img(src="/img/testStrip.png" width=558)
+				div(style="margin-left:42px; margin-right:42px")
+					input(type="range" min=0 max=8)
+				br
+				br
 				.btn.btn-success.btn-block#downloadButton
 					span.fa.fa-download
 					| &nbsp;&nbsp;Download stl for 3D printer
+
+				h4 Download Instructions
 				.btn.btn-success.btn-block#downloadPdfButton
 					span.fa.fa-download
 					| &nbsp;&nbsp;Download pdf LEGO instructions

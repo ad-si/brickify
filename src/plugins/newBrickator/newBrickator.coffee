@@ -132,10 +132,15 @@ class NewBrickator
 					selectedNode.storePluginData 'newBrickator', data, true
 					return data
 
-	getDownload: (selectedNode) =>
+	getDownload: (selectedNode, downloadOptions) =>
+		csgOptions = {
+			studRadius: downloadOptions.studRadius
+			addStuds: true
+		}
+
 		dlPromise = new Promise (resolve) =>
 			@_getCachedData(selectedNode).then (cachedData) =>
-				detailedCsg = @_createCSG selectedNode, cachedData, true
+				detailedCsg = @_createCSG selectedNode, cachedData, csgOptions
 
 				optimizedModel = new meshlib.OptimizedModel()
 				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
@@ -153,10 +158,10 @@ class NewBrickator
 	getCSG: (node, addStuds) =>
 		return @_getCachedData(node)
 		.then (cachedData) =>
-			csg = @_createCSG node, cachedData, addStuds
+			csg = @_createCSG node, cachedData, {addStuds: addStuds}
 			return csg
 
-	_createCSG: (selectedNode, cachedData, addStuds = true) =>
+	_createCSG: (selectedNode, cachedData, options) =>
 		# return cached version if grid was not modified
 		if not cachedData.csgNeedsRecalculation
 			return cachedData.cachedCsg
@@ -174,11 +179,19 @@ class NewBrickator
 		# create the intersection of selected voxels and the model mesh
 		@csgExtractor ?= new CsgExtractor()
 
+		if options.studRadius?
+			studSize = {
+				radius: options.studRadius
+				height: PipelineSettings.legoStudSize.height
+			}
+		else
+			studSize = PipelineSettings.legoStudSize
+
 		options = {
 			profile: true
 			grid: cachedData.grid
-			studSize: PipelineSettings.legoStudSize
-			addStuds: addStuds
+			studSize: studSize
+			addStuds: options.addStuds
 			transformedModel: threeModel
 		}
 

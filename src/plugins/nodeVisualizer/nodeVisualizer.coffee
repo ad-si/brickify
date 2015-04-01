@@ -20,7 +20,8 @@ class NodeVisualizer
 		@printMaterial.polygonoffsetUnits = 5
 
 	init: (@bundle) =>
-		@brushHandler = new BrushHandler(@bundle, @)
+		if @bundle.globalConfig.buildUi
+			@brushHandler = new BrushHandler(@bundle, @)
 
 	init3d: (@threejsRootNode) =>
 		return

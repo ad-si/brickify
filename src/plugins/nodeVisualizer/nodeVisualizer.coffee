@@ -1,9 +1,6 @@
-BrushHandler = require './BrushHandler'
 threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
-PointEventHandler = require './pointEventHandler'
-pointerEnums = require '../../client/ui/pointerEnums'
 interactionHelper = require '../../client/interactionHelper'
 
 ###
@@ -22,44 +19,10 @@ class NodeVisualizer
 		@printMaterial.polygonOffsetFactor = 5
 		@printMaterial.polygonoffsetUnits = 5
 
-	init: (@bundle) =>
-		@brushHandler = new BrushHandler(@bundle, @)
-
-		brushUi = @bundle.ui.workflowUi.workflow.edit.brushUi
-		brushUi.setBrushes @brushHandler.getBrushes()
-
-		@pointEventHandler = new PointEventHandler(
-			@bundle.sceneManager
-			brushUi
-		)
+	init: (@bundle) => return
 
 	init3d: (@threejsRootNode) =>
 		return
-
-	onPointerEvent: (event, eventType) =>
-		return false if not @pointEventHandler?
-
-		if not @_pointerOverModel event
-			# when we are not above model, call only move and up events
-			switch eventType
-				when pointerEnums.events.PointerMove
-					@pointEventHandler.pointerMove event
-				when pointerEnums.events.PointerUp
-					@pointEventHandler.pointerUp event
-			return false
-
-		switch eventType
-			when pointerEnums.events.PointerDown
-				@pointEventHandler.pointerDown event
-				return true
-			when pointerEnums.events.PointerMove
-				return @pointEventHandler.pointerMove event
-			when pointerEnums.events.PointerUp
-				@pointEventHandler.pointerUp event
-				return true
-			when pointerEnums.events.PointerCancel
-				@pointEventHandler.PointerCancel event
-				return true
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -215,8 +178,8 @@ class NodeVisualizer
 				.then (csg) -> cachedData.brickVisualization.showCsg csg
 
 
-	# check whether the pointer is over the model
-	_pointerOverModel: (event) =>
+	# check whether the pointer is over a model/brick visualization
+	pointerOverModel: (event) =>
 		intersections = interactionHelper.getIntersections(
 			event, @bundle.renderer, @threejsRootNode.children
 		)

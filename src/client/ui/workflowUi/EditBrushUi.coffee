@@ -7,9 +7,11 @@ class EditBrushUi
 
 		@_brushList = []
 
-		for array in @workflowUi.bundle.pluginHooks.getBrushes()
-			for brush in array
-				@_brushList.push brush
+	setBrushes: (@_brushList) =>
+		for brush in @_brushList
+			brush.brushButton = @brushContainer.find brush.containerId
+			brush.bigBrushButton = @bigBrushContainer.find brush.containerId
+			@_bindBrushEvent brush
 
 	init: (jQueryBrushContainerSelector, jQueryBigBrushContainerSelector) =>
 		@_selectedBrush = null
@@ -17,11 +19,6 @@ class EditBrushUi
 
 		@brushContainer = $(jQueryBrushContainerSelector)
 		@bigBrushContainer = $(jQueryBigBrushContainerSelector)
-
-		for brush in @_brushList
-			brush.brushButton = @brushContainer.find brush.containerId
-			brush.bigBrushButton = @bigBrushContainer.find brush.containerId
-			@_bindBrushEvent brush
 
 	onNodeSelect: (node) =>
 		@selectedNode = node

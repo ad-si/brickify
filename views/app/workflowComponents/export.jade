@@ -21,9 +21,8 @@
 					a(href="/download/testStrip.zip") test strip
 					| .
 				img(src="/img/testStrip.png" width=558)
-				div(style="margin-left:42px; margin-right:42px")
-					input(type="range" value=0 min=-4 max=4)#stripeSlider
-				div(style="text-align: center")
+				.stripeSliderContainer
+					input(type="range" value=0 min=-4 max=4)#stripeSlider				
 					p#stripeText ± 0
 				br
 				.btn.btn-success.btn-block#stlDownloadButton

@@ -18,7 +18,7 @@ class ExportUi
 		@downloadModal.modal ({
 			backdrop: 'static'
 			keybaord: true
-			show: true
+			show: false
 		})
 
 		#show modal when clicking on download button

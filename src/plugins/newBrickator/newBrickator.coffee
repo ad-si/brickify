@@ -138,9 +138,12 @@ class NewBrickator
 			addStuds: true
 		}
 
-		dlPromise = new Promise (resolve) =>
+		dlPromise = new Promise (resolve, reject) =>
 			@_getCachedData(selectedNode).then (cachedData) =>
 				detailedCsg = @_createCSG selectedNode, cachedData, csgOptions
+				if not detailedCsg?
+					resolve { data: '', fileName: '' }
+					return
 
 				optimizedModel = new meshlib.OptimizedModel()
 				optimizedModel.fromThreeGeometry(detailedCsg.geometry)

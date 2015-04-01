@@ -50,10 +50,9 @@ module.exports = class Coloring
 		@_createBrickMaterials()
 
 	###
-	# Returns the highlight material collection for the current type of voxel
-	# @param {String} type contains 'lego' for this could be lego highlight
-	# 3d for this could be 3d printed highlight
-	###
+    # Returns the highlight material collection for the supplied type of voxel
+    # @param {String} type either 'lego' or '3d' to get the respective material
+    ###
 	getHighlightMaterial: (type) =>
 		if type == 'lego'
 			return {

@@ -162,10 +162,21 @@ class NewBrickator
 			return csg
 
 	_createCSG: (selectedNode, cachedData, options) =>
+		# set studSize
+		if options.studRadius?
+			studSize = {
+				radius: options.studRadius
+				height: PipelineSettings.legoStudSize.height
+			}
+		else
+			studSize = PipelineSettings.legoStudSize
+
 		# return cached version if grid was not modified
-		if not cachedData.csgNeedsRecalculation
+		if not @_csgNeedsRecalculation studSize.radius, cachedData
 			return cachedData.cachedCsg
 		cachedData.csgNeedsRecalculation = false
+
+		console.log 'Recalculating csg with radius',studSize.radius
 
 		# get optimized model and transform to actual position
 		if not cachedData.optimizedThreeModel?
@@ -179,14 +190,7 @@ class NewBrickator
 		# create the intersection of selected voxels and the model mesh
 		@csgExtractor ?= new CsgExtractor()
 
-		if options.studRadius?
-			studSize = {
-				radius: options.studRadius
-				height: PipelineSettings.legoStudSize.height
-			}
-		else
-			studSize = PipelineSettings.legoStudSize
-
+		cachedData.csgStudRadius = studSize.radius
 		options = {
 			profile: true
 			grid: cachedData.grid
@@ -199,5 +203,12 @@ class NewBrickator
 
 		cachedData.cachedCsg = printThreeMesh
 		return printThreeMesh
+
+	_csgNeedsRecalculation: (studRadius, cachedData) ->
+		sizeEqual = true if cachedData.csgStudRadius == studRadius
+		return false if (not cachedData.csgNeedsRecalculation) and sizeEqual
+		return true
+
+
 
 module.exports = NewBrickator

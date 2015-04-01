@@ -17,7 +17,7 @@ class ExportUi
 		#init modal
 		@downloadModal.modal ({
 			backdrop: 'static'
-			keybaord: true
+			keyboard: true
 			show: false
 		})
 

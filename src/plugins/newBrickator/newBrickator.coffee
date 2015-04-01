@@ -179,8 +179,6 @@ class NewBrickator
 			return cachedData.cachedCsg
 		cachedData.csgNeedsRecalculation = false
 
-		console.log 'Recalculating csg with radius',studSize.radius
-
 		# get optimized model and transform to actual position
 		if not cachedData.optimizedThreeModel?
 			cachedData.optimizedThreeModel=
@@ -208,8 +206,8 @@ class NewBrickator
 		return printThreeMesh
 
 	_csgNeedsRecalculation: (studRadius, cachedData) ->
-		sizeEqual = true if cachedData.csgStudRadius == studRadius
-		return false if (not cachedData.csgNeedsRecalculation) and sizeEqual
+		sizeEqual = true if cachedData.csgStudRadius is studRadius
+		return false if not cachedData.csgNeedsRecalculation and sizeEqual
 		return true
 
 

@@ -3,10 +3,22 @@
 	.btn.btn-success.btn-block#shareButton
 		span.fa.fa-share
 		| &nbsp;&nbsp;Share your work
-	br
 	.btn.btn-success.btn-block#downloadButton
 		span.fa.fa-download
-		| &nbsp;&nbsp;Download stl for 3D printer
-	.btn.btn-success.btn-block#downloadPdfButton
-		span.fa.fa-download
-		| &nbsp;&nbsp;Download pdf LEGO instructions
+		| &nbsp;&nbsp;Download
+
+.modal.fade#downloadModal
+	.modal-dialog
+		.modal-content
+			.modal-header
+				button.bootbox-close-button.close(data-dismiss="modal") ×
+				h4.modal-title Download
+			.modal-body
+				.btn.btn-success.btn-block#downloadButton
+					span.fa.fa-download
+					| &nbsp;&nbsp;Download stl for 3D printer
+				.btn.btn-success.btn-block#downloadPdfButton
+					span.fa.fa-download
+					| &nbsp;&nbsp;Download pdf LEGO instructions
+			.modal-footer
+				button.btn.btn-primary#downloadCloseButton Close

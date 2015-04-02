@@ -11,13 +11,6 @@ module.exports = class Coloring
 			color: 0xff0000
 		})
 
-		@deselectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xb5ffb8 #greenish gray
-			opacity: 0.4
-			transparent: true
-			visible: false
-		})
-
 		@hiddenMaterial = new THREE.MeshLambertMaterial({
 			color: 0xffaaaa #gray
 			opacity: 0.0

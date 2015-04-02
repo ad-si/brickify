@@ -203,6 +203,10 @@ class BrickVisualization
 		for voxel in voxels
 			voxel.make3dPrinted()
 			voxel.setMaterial @defaultColoring.deselectedMaterial
+			coords = voxel.voxelCoords
+			voxelBelow = @grid.getVoxel(coords.x, coords.y, coords.z - 1)
+			if voxelBelow?.enabled
+				voxelBelow.visibleVoxel.setStudVisibility true
 		return voxels
 
 	###

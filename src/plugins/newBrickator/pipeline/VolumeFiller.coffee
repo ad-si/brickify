@@ -46,7 +46,7 @@ module.exports = class VolumeFiller
 					currentFillVoxelQueue.push {x: x, y: y, z: z}
 			z++
 
-	calculateVoxelDirection: (grid, x, y, z) ->
+	calculateVoxelDirection: (grid, x, y, z, tolerance = 0.1) ->
 		# determines whether all polygons related to this voxel are either
 		# all aligned upwards or all aligned downwards
 		voxel = grid.getVoxel x, y, z
@@ -54,10 +54,8 @@ module.exports = class VolumeFiller
 		numDown = 0
 
 		for e in voxel.dataEntrys
-			if e.up? and e.up == true
-				numUp++
-			else if e.up? and e.up == false
-				numDown++
+			# everything smaller than tolerance is considered level
+			if e.dZ > tolerance then numUp++ else if e.dZ < -tolerance then numDown++
 
 		if numUp > 0 and numDown == 0
 			definitelyUp = true

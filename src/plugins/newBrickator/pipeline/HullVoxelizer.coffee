@@ -28,13 +28,8 @@ module.exports = class Voxelizer
 		p2 = @voxelGrid.mapModelToGrid p2
 
 		#store information for filling solids
-		if n.z >= 0
-			upwards = true
-		else
-			upwards = false
-
 		voxelData = {
-			up: upwards
+			dZ: n.z
 		}
 
 		#voxelize outer lines

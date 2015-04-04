@@ -180,7 +180,7 @@ class BrickVisualization
 			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
 			@bigBrushHighlight = @geometryCreator.getBrickBox(
 				dimensions
-				@defaultColoring.boxHighlightMaterial
+				material
 			)
 			@voxelBrickSubnode.add @bigBrushHighlight
 
@@ -195,13 +195,18 @@ class BrickVisualization
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: 'lego'}
-			@_highlightBigBrush mainVoxel if mainVoxel?
+			mat = @defaultColoring.getHighlightMaterial '3d'
+			@_highlightBigBrush mainVoxel, mat.box if mainVoxel?
 		voxels = @voxelSelector.getVoxels event, {type: 'lego', bigBrush: bigBrush}
 		return null unless voxels
 
 		for voxel in voxels
 			voxel.make3dPrinted()
-			voxel.setMaterial @defaultColoring.deselectedMaterial
+			voxel.visible = false
+			coords = voxel.voxelCoords
+			voxelBelow = @grid.getVoxel(coords.x, coords.y, coords.z - 1)
+			if voxelBelow?.enabled
+				voxelBelow.visibleVoxel.setStudVisibility true
 		return voxels
 
 	###
@@ -224,7 +229,8 @@ class BrickVisualization
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: '3d'}
-			@_highlightBigBrush mainVoxel if mainVoxel?
+			mat = @defaultColoring.getHighlightMaterial 'lego'
+			@_highlightBigBrush mainVoxel, mat.box if mainVoxel?
 		voxels = @voxelSelector.getVoxels event, {type: '3d', bigBrush: bigBrush}
 		return null unless voxels
 

@@ -32,3 +32,18 @@ module.exports.getBoundingSphere = (threeNode) ->
 	result.center.applyProjection threeNode.matrixWorld
 
 	return result
+
+# see http://stackoverflow.com/questions/1410525
+module.exports.getVolume = (threeGeometry) ->
+	volume = 0
+	faces = threeGeometry.faces
+	vertices = threeGeometry.vertices
+
+	for face in faces
+		a = vertices[face.a]
+		b = vertices[face.b]
+		c = vertices[face.c]
+		volume += (a.x * b.y * c.z) + (a.y * b.z * c.x) + (a.z * b.x * c.y)\
+		- (a.x * b.z * c.y) - (a.y * b.x * c.z) - (a.z * b.y * c.x)
+
+	return volume / 6

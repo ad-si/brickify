@@ -22,6 +22,16 @@ class NodeVisualizer
 	init: (@bundle) =>
 		if @bundle.globalConfig.buildUi
 			@brushHandler = new BrushHandler(@bundle, @)
+			estimates = $('<div id="estimates" class="hidden-xs">
+												<span class="estimate" id="brickCount">0</span>
+												<span>bricks</span>
+												<span class="fa fa-clock-o"/>
+												<span class="estimate" id="timeEstimate">0</span>
+												<span>cm<sup>3</sup></span>
+											</div>')
+			$('body').append estimates
+			@brickCounter = estimates.find '#brickCount'
+			@timeEstimate = estimates.find '#timeEstimate'
 
 	init3d: (@threejsRootNode) =>
 		return
@@ -42,6 +52,7 @@ class NodeVisualizer
 			# update voxel coloring and show them
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.showVoxels()
+			@_updateBrickCount newBrickatorData.brickGraph.bricks
 
 	onNodeAdd: (node) =>
 		# link other plugins
@@ -180,6 +191,18 @@ class NodeVisualizer
 
 	_showCsg: (cachedData) =>
 		return @newBrickator.getCSG(cachedData.node, true)
-				.then (csg) -> cachedData.brickVisualization.showCsg csg
+				.then (csg) =>
+						cachedData.brickVisualization.showCsg csg
+						@_updatePrintTime csg.geometry
+
+	_updateBrickCount: (bricks) =>
+		brickCount = 0
+		for brickLayer in bricks
+			brickCount += brickLayer.length
+		@brickCounter.text brickCount
+
+	_updatePrintTime: (threeGeometry) =>
+		volume = threeHelper.getVolume threeGeometry
+		@timeEstimate.text volume.toFixed 2
 
 module.exports = NodeVisualizer

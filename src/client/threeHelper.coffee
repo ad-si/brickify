@@ -43,7 +43,7 @@ module.exports.getVolume = (threeGeometry) ->
 		a = vertices[face.a]
 		b = vertices[face.b]
 		c = vertices[face.c]
-		volume += (a.x * b.y * c.z) + (a.y * b.z * c.x) + (a.z * b.x * c.y)\
-		- (a.x * b.z * c.y) - (a.y * b.x * c.z) - (a.z * b.y * c.x)
+		volume += (a.x * b.y * c.z) + (a.y * b.z * c.x) + (a.z * b.x * c.y) -\
+		(a.x * b.z * c.y) - (a.y * b.x * c.z) - (a.z * b.y * c.x)
 
 	return volume / 6 / 1000 # return volume in cm^3

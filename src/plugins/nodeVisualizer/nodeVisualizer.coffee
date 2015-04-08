@@ -193,7 +193,7 @@ class NodeVisualizer
 		return @newBrickator.getCSG(cachedData.node, true)
 				.then (csg) =>
 						cachedData.brickVisualization.showCsg csg
-						@_updatePrintTime csg.geometry
+						@_updatePrintTime csg?.geometry
 
 	_updateBrickCount: (bricks) =>
 		brickCount = 0
@@ -202,7 +202,10 @@ class NodeVisualizer
 		@brickCounter.text brickCount
 
 	_updatePrintTime: (threeGeometry) =>
-		volume = threeHelper.getVolume threeGeometry
-		@timeEstimate.text volume.toFixed 2
+		if threeGeometry?
+			volume = threeHelper.getVolume threeGeometry
+			@timeEstimate.text volume.toFixed 2
+		else
+			@timeEstimate.text 0
 
 module.exports = NodeVisualizer

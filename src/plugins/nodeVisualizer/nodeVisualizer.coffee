@@ -25,7 +25,6 @@ class NodeVisualizer
 			estimates = $('<div id="estimates" class="hidden-xs">
 												<span class="estimate" id="brickCount">0</span>
 												<span>bricks</span>
-												<span class="fa fa-clock-o"/>
 												<span class="estimate" id="timeEstimate">0</span>
 												<span>cm<sup>3</sup></span>
 											</div>')

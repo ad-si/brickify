@@ -36,17 +36,51 @@ class ExportUi
 			'#stlDownloadButton', @, @workflowUi.bundle.sceneManager
 		)
 
-		@stripeSlider = $('#stripeSlider')
-		@stripeText = $('#stripeText')
+		@studSizeSelect = $('#studSizeSelect')
+		@holeSizeSelect = $('#holeSizeSelect')
 
-		@studRadius = 2.4
-		@stripeSlider.on 'input', =>
-			v = parseInt(@stripeSlider.val())
-			# stud radius is set in mm and to match the test strip
-			@studRadius = 2.4 + 0.05 * v
-			v = '+' + v if v > 0
-			v = '±0' if v == 0
-			v = v.toFixed(0) if v < 0
-			@stripeText.html(v)
+		@studSizeSelect.on 'input', =>
+			@_updateStudRadius()
+		@holeSizeSelect.on 'input', =>
+			@_updateStudRadius()
+
+		@_updateStudRadius()
+
+	_updateStudRadius: =>
+		studSelection = @studSizeSelect.val()
+		holeSelection = @holeSizeSelect.val()
+
+		switch studSelection
+			when '-3'
+				@studRadius = 2.301
+			when '-2'
+				@studRadius = 2.334
+			when '-1'
+				@studRadius = 2.367
+			when '0'
+				@studRadius = 2.4
+			when '+1'
+				@studRadius = 2.433
+			when '+2'
+				@studRadius = 2.466
+			when '+3'
+				@studRadius = 2.499
+
+		switch holeSelection
+			when '-3'
+				@holeRadius = 2.534
+			when '-2'
+				@holeRadius = 2.567
+			when '-1'
+				@holeRadius = 2.6
+			when '0'
+				@holeRadius = 2.633
+			when '+1'
+				@holeRadius = 2.666
+			when '+2'
+				@holeRadius = 2.699
+			when '+3'
+				@holeRadius = 2.732
+
 
 module.exports = ExportUi

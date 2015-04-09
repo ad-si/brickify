@@ -18,6 +18,7 @@ module.exports = class DownloadProvider
 		downloadOptions = {
 			fileType: fileType
 			studRadius: @exportUi.studRadius
+			holeRadius: @exportUi.holeRadius
 		}
 
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions

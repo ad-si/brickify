@@ -59,9 +59,6 @@ class PointerDispatcher
 		# dispatch event
 		handled = @_dispatchEvent event, pointerEnums.events.PointerUp
 
-		# stop event if a plugin handled it (else let orbit controls work)
-		@_stop event if handled
-
 		return
 
 	onPointerCancel: (event) =>

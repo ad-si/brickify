@@ -6,6 +6,8 @@ class PointEventHandler
 		@brushToggled = false
 
 	pointerDown: (event) =>
+		return false if not @_validBrushButton event
+
 		# toggle brush if it is the right mouse button
 		if(event.buttons & pointerEnums.buttonStates.right)
 			@brushToggled = @brushUi.toggleBrush()
@@ -17,11 +19,7 @@ class PointEventHandler
 			brush.mouseDownCallback event, @sceneManager.selectedNode
 
 	pointerMove: (event) =>
-		if event.buttons not in	[
-			pointerEnums.buttonStates.none,
-			pointerEnums.buttonStates.left,
-			pointerEnums.buttonStates.right
-		]
+		if not @_validBrushButton event
 			@pointerCancel event
 			return false
 
@@ -60,6 +58,14 @@ class PointEventHandler
 		if @brushToggled
 			@brushUi.toggleBrush()
 			@brushToggled = false
+
+	_validBrushButton: (event) ->
+		return true if event.buttons in	[
+			pointerEnums.buttonStates.none,
+			pointerEnums.buttonStates.left,
+			pointerEnums.buttonStates.right
+		]
+		return false
 
 module.exports = PointEventHandler
 

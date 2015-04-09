@@ -20,10 +20,28 @@
 					| If you don't know the size, download and print the &nbsp;
 					a(href="/download/testStrip.zip") test strip
 					| .
-				img(src="/img/testStrip.png" width=558)
-				.stripeSliderContainer
-					input(type="range" value=0 min=-4 max=4)#stripeSlider
-					p#stripeText ± 0
+				center
+					img(src="/img/testStrip.png" width=300)
+				p
+					| To connect LEGO studs into the test strip, this size works best:
+					select.form-control#studSizeSelect
+						option -3
+						option -2
+						option -1
+						option(selected="selected") 0
+						option +1
+						option +2
+						option +3
+				p
+					| To connect test strip studs into LEGO bricks, this size works best:
+					select.form-control#holeSizeSelect
+						option -3
+						option -2
+						option -1
+						option(selected="selected") 0
+						option +1
+						option +2
+						option +3
 				br
 				.btn.btn-success.btn-block#stlDownloadButton
 					span.fa.fa-download

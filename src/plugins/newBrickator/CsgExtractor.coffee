@@ -12,6 +12,8 @@ module.exports = class CsgExtractor
 		# {
 		#	profiling: true/false # print performance values
 		#	addStuds: true/fals # add lego studs to csg (slow!)
+		#	studSize: {radius, height} of studs
+		# 	holeSize: {radius, height} of holes (to fit lego studs into)
 		# }
 
 		console.log 'Creating CSG...'

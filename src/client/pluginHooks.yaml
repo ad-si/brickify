@@ -118,11 +118,11 @@
 
 - getBrushes
 
-# ## Subtractive CSG
-# When clicking on the download button, the user expects to download eyerything
-# he needs to 3d print. therefore, getSubtractiveCSG should return a solid geometry
-# that replaces the original 3d model (partly). everything that is not replaced gets
-# 3d printed
+# ## getDownload
+# (parameters: see example plugin)
+# If plugins can provide something downloadable to the user, they should return
+# an object consisting out of a filename and data property, which is then offered
+# to the user to download.
 
 - getDownload
 

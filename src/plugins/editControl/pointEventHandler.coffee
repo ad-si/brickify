@@ -22,7 +22,7 @@ class PointEventHandler
 			pointerEnums.buttonStates.left,
 			pointerEnums.buttonStates.right
 		]
-			@_cancelBrush event
+			@pointerCancel event
 			return false
 
 		# perform brush action
@@ -55,7 +55,6 @@ class PointEventHandler
 				brush.cancelCallback event, @sceneManager.selectedNode
 
 			@_untoggleBrush()
-			@_stop event
 
 	_untoggleBrush: =>
 		if @brushToggled
@@ -63,3 +62,4 @@ class PointEventHandler
 			@brushToggled = false
 
 module.exports = PointEventHandler
+

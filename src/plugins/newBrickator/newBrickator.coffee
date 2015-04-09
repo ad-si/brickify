@@ -135,6 +135,7 @@ class NewBrickator
 	getDownload: (selectedNode, downloadOptions) =>
 		csgOptions = {
 			studRadius: downloadOptions.studRadius
+			holeRadius: downloadOptions.holeRadius
 			addStuds: true
 		}
 
@@ -165,7 +166,7 @@ class NewBrickator
 			return csg
 
 	_createCSG: (selectedNode, cachedData, options) =>
-		# set studSize
+		# set stud and hole size
 		if options.studRadius?
 			studSize = {
 				radius: options.studRadius
@@ -174,8 +175,16 @@ class NewBrickator
 		else
 			studSize = PipelineSettings.legoStudSize
 
+		if options.holeRadius?
+			holeSize = {
+				radius: options.holeRadius
+				height: PipelineSettings.legoHoleSize.height
+			}
+		else
+			holeSize = PipelineSettings.legoHoleSize
+
 		# return cached version if grid was not modified
-		if not @_csgNeedsRecalculation studSize.radius, cachedData
+		if not @_csgNeedsRecalculation studSize.radius, holeSize.radius, cachedData
 			return cachedData.cachedCsg
 		cachedData.csgNeedsRecalculation = false
 
@@ -192,10 +201,13 @@ class NewBrickator
 		@csgExtractor ?= new CsgExtractor()
 
 		cachedData.csgStudRadius = studSize.radius
+		cachedData.csgHoleRadius = holeSize.radius
+
 		options = {
 			profile: true
 			grid: cachedData.grid
 			studSize: studSize
+			holeSize: holeSize
 			addStuds: options.addStuds
 			transformedModel: threeModel
 		}
@@ -205,9 +217,13 @@ class NewBrickator
 		cachedData.cachedCsg = printThreeMesh
 		return printThreeMesh
 
-	_csgNeedsRecalculation: (studRadius, cachedData) ->
-		sizeEqual = true if cachedData.csgStudRadius is studRadius
-		return false if not cachedData.csgNeedsRecalculation and sizeEqual
+	_csgNeedsRecalculation: (studRadius, holeRadius, cachedData) ->
+		studSizeEqual = true if cachedData.csgStudRadius is studRadius
+		holeSizeEqual = true if cachedData.csgHoleRadius is holeRadius
+
+		return false if not cachedData.csgNeedsRecalculation and
+		studSizeEqual and holeSizeEqual
+
 		return true
 
 

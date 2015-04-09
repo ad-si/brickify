@@ -281,7 +281,9 @@ class VoxelUnion
 	# adds studs on top, subtracts studs from below
 	###
 	_addStuds: (boxGeometry, options, voxelsToBeGeometrized, grid) ->
-		studGeometry = @_createStudGeometry @grid.spacing, options.studSize
+		studGeometry = @_createStudGeometry(
+			@grid.spacing, options.studSize, options.holeSize
+		)
 		unionBsp = boxGeometry
 
 		for voxel in voxelsToBeGeometrized
@@ -312,15 +314,15 @@ class VoxelUnion
 	###
 	# creates Geometry needed for CSG operations
 	###
-	_createStudGeometry: (gridSpacing, studSize) ->
+	_createStudGeometry: (gridSpacing, studSize, holeSize) ->
 		studRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
-		dzBottom = -(gridSpacing.z / 2) + (studSize.height / 2)
+		dzBottom = -(gridSpacing.z / 2) + (holeSize.height / 2)
 		studTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
 		dzTop = (gridSpacing.z / 2) + (studSize.height / 2)
 		studTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
 
 		studGeometryBottom = new THREE.CylinderGeometry(
-			studSize.radius, studSize.radius, studSize.height, 20
+			holeSize.radius, holeSize.radius, holeSize.height, 20
 		)
 		studGeometryTop = new THREE.CylinderGeometry(
 			studSize.radius, studSize.radius, studSize.height, 20

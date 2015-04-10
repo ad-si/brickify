@@ -47,17 +47,15 @@ class BrickLayouter
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					console.log " - randomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
-					# done with initial layout
-					break
+					break # done with initial layout
 				else
-					# randomly choose a new brick
-					continue
+					continue # randomly choose a new brick
 
 			while(@_anyDefinedInArray(mergeableNeighbors))
 				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
-				brick = @_mergeBricksAndUpdateGraphConnections brick,
+				@_mergeBricksAndUpdateGraphConnections brick,
 					neighborsToMergeWith, bricksToLayout
 				mergeableNeighbors = @_findMergeableNeighbors brick
 
@@ -67,53 +65,56 @@ class BrickLayouter
 	# Split up all supplied bricks into single bricks and relayout locally. This
 	# means that all supplied bricks and their neighbors will be relayouted.
 	#
-	# @param {Array<Brick>} oldBricks
-	# @param {BrickGraph} brickGraph
+	# @param {Array<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (oldBricks, brickGraph, grid) =>
-		bricksToSplit = []
+	splitBricksAndRelayoutLocally: (bricks, grid, brickGraph) =>
+		bricksToSplit = new Set()
 
-		for brick in oldBricks
-			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbors()
-			bricksToSplit.push brick
+		for brick in bricks
+			# add this brick to be splitted
+			bricksToSplit.add brick
 
-		bricksToSplit = arrayHelper.removeDuplicates bricksToSplit
+			# get neighbours in same z layer
+			xp = brick.getNeighbors(Brick.direction.Xp)
+			xm = brick.getNeighbors(Brick.direction.Xm)
+			yp = brick.getNeighbors(Brick.direction.Yp)
+			ym = brick.getNeighbors(Brick.direction.Ym)
 
-		newBricks = @_splitBricks bricksToSplit, brickGraph
+			# add them all to be splitted as well
+			xp.forEach (brick) -> bricksToSplit.add brick
+			xm.forEach (brick) -> bricksToSplit.add brick
+			yp.forEach (brick) -> bricksToSplit.add brick
+			ym.forEach (brick) -> bricksToSplit.add brick
 
-		legoBricks = []
-		for brick in newBricks
-			p = brick.position
-			if grid? and not grid.hasVoxelAt p.x, p.y, p.z
-				# This brick does not belong to any voxel --> delete brick
-				brickGraph.deleteBrick brick
-			else if grid? and not grid.getVoxel(p.x, p.y, p.z).enabled
-				# This voxel is going to be 3d printed --> delete brick
-				brickGraph.deleteBrick brick
-			else
-				legoBricks.push brick
+		newBricks = @_splitBricks bricksToSplit
 
-		# reset visible material
-		for brick in legoBricks
-			brick.visualizationMaterial = null
+		bricksToBeDeleted = []
+		newBricks.forEach (brick) ->
+			voxel = brick.getVoxel()
 
-		@layoutByGreedyMerge brickGraph, [legoBricks]
+			# delete bricks where voxels are disabled (3d printed)
+			if not voxel.enabled
+				bricksToBeDeleted.push voxel
+
+		for brick in bricksToBeDeleted
+			newBricks.delete brick
+
+		@layoutByGreedyMerge brickGraph, newBricks
 
 		return {
 			removedBricks: bricksToSplit
-			newBricks: legoBricks
+			newBricks: newBricks
 		}
 
-	# splits each brick in bricks to split, updates reference in brickGraph
-	_splitBricks: (bricksToSplit, brickGraph) ->
-		newBricks = []
+	# splits each brick in bricks to split, returns all newly generated
+	# bricks as a set
+	_splitBricks: (bricksToSplit) ->
+		newBricks = new Set()
 
-		for brick in bricksToSplit
-			newBricks = newBricks.concat brick.split()
-			brickGraph.deleteBrick brick
-
-		for newBrick in newBricks
-			brickGraph.bricks[newBrick.position.z].push newBrick
+		bricksToSplit.forEach (brick) ->
+			splitGenerated = brick.splitUp()
+			splitGenerated.forEach (brick) ->
+				newBricks.add brick
 
 		return newBricks
 
@@ -122,12 +123,16 @@ class BrickLayouter
 
 	# choses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) =>
+		if setOfBricks.size == 0
+			return null
+
 		rnd = @_random(setOfBricks.size)
 
 		iterator = setOfBricks.entries()
 		brick = iterator.next().value[0]
 		while rnd > 0
 			brick = iterator.next().value[0]
+			rnd--
 
 		return brick
 
@@ -194,19 +199,17 @@ class BrickLayouter
 				minWidth = widthFn brick.getPosition()
 				maxWidth = widthFn(brick.getPosition()) + widthFn(brick.getSize()) - 1
 				
-				# It should not matter which neighbor to take?
-				#length = lengthFn(brick.neighbors[dir][0].size)
 				length = null
 
 				neighborsInDirection.forEach (neighbor) ->
 					length ?= lengthFn neighbor.getSize()
 
 					if widthFn(neighbor.getPosition()) < minWidth
-						return
+						return null
 					else if widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1 > maxWidth
-						return
+						return null
 					if lengthFn(neighbor.getSize()) != length
-						return
+						return null
 
 				if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
 				length, brick.getSize().z)
@@ -249,5 +252,7 @@ class BrickLayouter
 		mergeNeighbors.forEach (neighborToMergeWith) ->
 			bricksToLayout.delete neighborToMergeWith
 			brick.mergeWith neighborToMergeWith
+
+		return brick
 
 module.exports = BrickLayouter

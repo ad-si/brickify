@@ -33,5 +33,3 @@ describe 'brickLayouter', ->
 		expect(position.x).to.equal(0)
 		expect(position.y).to.equal(0)
 		expect(position.z).to.equal(0)
-
-

@@ -36,6 +36,14 @@ class Brick
 	forEachVoxel: (callback) =>
 		@voxels.forEach callback
 
+	# returns the voxel the brick consists of, if it consists out
+	# of one voxel. else returns null
+	getVoxel: =>
+		if @voxels.size > 1
+			return null
+		iterator = @voxels.entries()
+		return iterator.next().value[0]
+
 	# returns the {x, y, z} values of the voxel with
 	# the smallest x, y and z.
 	# To work properly, this function assumes that there
@@ -95,9 +103,10 @@ class Brick
 	getNeighbors: (direction) =>
 		neighbors = new Set()
 
-		@forEachVoxel (voxel) ->
-			neighborBrick = voxel.neighbors[direction].brick
-			neighbors.add neighborBrick if neighborBrick? and neighborBrick != @
+		@forEachVoxel (voxel) =>
+			if voxel.neighbors[direction]?
+				neighborBrick = voxel.neighbors[direction].brick
+				neighbors.add neighborBrick if neighborBrick? and neighborBrick != @
 
 		return neighbors
 

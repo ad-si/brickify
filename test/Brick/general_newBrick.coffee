@@ -1,5 +1,6 @@
 expect = require('chai').expect
 NewBrick = require '../../src/plugins/newBrickator/pipeline/newBrick'
+BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'newBrick', ->
@@ -75,6 +76,46 @@ describe 'newBrick', ->
 		nZp = b.getNeighbors(NewBrick.direction.Zp)
 		expect(nZp.size).to.equal(1)
 		expect(nZp.has(vZp.brick)).to.equal(true)
+
+	it 'should return the right connectedBricks', ->
+		grid = new Grid()
+		grid.numVoxelsX = 1
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 1
+		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
+
+		brickLayouter = new BrickLayouter()
+		brickLayouter.initializeBrickGraph(grid)
+
+		connectedBricks = v0.brick.connectedBricks()
+		expect(connectedBricks.size).to.equal(0)
+
+		grid = new Grid()
+		grid.numVoxelsX = 1
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 2
+		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
+		v1 = grid.setVoxel {x: 0, y: 0, z: 1}
+
+		brickLayouter = new BrickLayouter()
+		brickLayouter.initializeBrickGraph(grid)
+
+		connectedBricks = v0.brick.connectedBricks()
+		expect(connectedBricks.size).to.equal(1)
+
+		grid = new Grid()
+		grid.numVoxelsX = 1
+		grid.numVoxelsY = 1
+		grid.numVoxelsZ = 3
+		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
+		v1 = grid.setVoxel {x: 0, y: 0, z: 1}
+		v2 = grid.setVoxel {x: 0, y: 0, z: 2}
+
+		brickLayouter = new BrickLayouter()
+		brickLayouter.initializeBrickGraph(grid)
+
+		connectedBricks = v1.brick.connectedBricks()
+		expect(connectedBricks.size).to.equal(2)
 
 	it 'should split up', ->
 		grid = new Grid()

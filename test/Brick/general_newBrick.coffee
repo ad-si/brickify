@@ -132,3 +132,138 @@ describe 'newBrick', ->
 		expect(size.x).to.equal(4)
 		expect(size.y).to.equal(3)
 		expect(size.z).to.equal(2)
+
+		grid = new Grid()
+		voxels = []
+
+		for x in [1...4] by 1
+			for y in [1...3] by 1
+				for z in [1...2] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		size = b.getSize()
+
+		expect(size.x).to.equal(3)
+		expect(size.y).to.equal(2)
+		expect(size.z).to.equal(1)
+
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...2] by 1
+			for y in [0...4] by 1
+				for z in [0...3] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		size = b.getSize()
+
+		expect(size.x).to.equal(2)
+		expect(size.y).to.equal(4)
+		expect(size.z).to.equal(3)
+
+	it 'should report correct position', ->
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...4] by 1
+			for y in [1...3] by 1
+				for z in [2...3] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		position = b.getPosition()
+
+		expect(position.x).to.equal(0)
+		expect(position.y).to.equal(1)
+		expect(position.z).to.equal(2)
+
+	it 'should report whether it has a valid size', ->
+		# [2, 4, 3] is a valid lego brick
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...2] by 1
+			for y in [0...4] by 1
+				for z in [0...3] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.hasValidSize()).to.equal(true)
+
+		#[1, 4, 4] is not a valid lego brick
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...1] by 1
+			for y in [0...4] by 1
+				for z in [0...4] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.hasValidSize()).to.equal(false)
+
+	it 'should report whether it is valid', ->
+		# [2, 4, 3] is a valid lego brick
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...2] by 1
+			for y in [0...4] by 1
+				for z in [0...3] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.isValid()).to.equal(true)
+
+		# [2, 4, 3] is a valid lego brick
+		# but give this one a hole
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...2] by 1
+			for y in [0...4] by 1
+				for z in [0...3] by 1
+					if not (x == 0 and y == 0 and z == 0)
+						voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.isValid()).to.equal(false)
+
+		#[1, 4, 4] is not a valid lego brick
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...1] by 1
+			for y in [0...4] by 1
+				for z in [0...4] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.isValid()).to.equal(false)
+
+	it 'should report whether it is hole free', ->
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...2] by 1
+			for y in [0...4] by 1
+				for z in [0...3] by 1
+					voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.isHoleFree()).to.equal(true)
+
+		# give this one a hole
+		grid = new Grid()
+		voxels = []
+
+		for x in [0...2] by 1
+			for y in [0...4] by 1
+				for z in [0...3] by 1
+					if not (x == 0 and y == 0 and z == 0)
+						voxels.push grid.setVoxel {x: x, y: y, z: z}
+
+		b = new NewBrick(voxels)
+		expect(b.isHoleFree()).to.equal(false)

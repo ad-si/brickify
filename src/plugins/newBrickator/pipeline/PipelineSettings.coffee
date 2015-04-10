@@ -4,6 +4,11 @@ module.exports  = class PipelineSettings
 		height: 1.8
 	}
 
+	@legoHoleSize = {
+		radius: 2.6
+		height: 2.3
+	}
+
 	constructor: ->
 		@gridSpacing = {
 			x: 8
@@ -13,14 +18,22 @@ module.exports  = class PipelineSettings
 		@debugVoxel = null
 		@modelTransform = null
 		@voxelizing = true
+		@initLayout = true
 		@layouting = true
 		@reLayout = false
 
 	deactivateLayouting: =>
+		@initLayout = false
 		@layouting = false
 
 	deactivateVoxelizing: =>
 		@voxelizing = false
+
+	onlyInitLayout: =>
+		@deactivateVoxelizing()
+		@deactivateLayouting()
+		@reLayout = false
+		@initLayout = true
 
 	onlyRelayout: =>
 		@deactivateVoxelizing()

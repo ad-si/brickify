@@ -42,11 +42,12 @@ class BrickVisualization
 		@bricksSubnode.visible = true
 		@voxelsSubnode.visible = false
 
-	showCsg: (newCsgMesh = null) =>
-		if newCsgMesh?
-			@csgSubnode.children = []
-			@csgSubnode.add newCsgMesh
-			newCsgMesh.material = @defaultColoring.csgMaterial
+	showCsg: (newCsgMesh) =>
+		@csgSubnode.children = []
+		return if not newCsgMesh?
+
+		@csgSubnode.add newCsgMesh
+		newCsgMesh.material = @defaultColoring.csgMaterial
 
 		@csgSubnode.visible = true
 
@@ -145,14 +146,23 @@ class BrickVisualization
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
+		# invert type, because if we are highlighting a 'lego' voxel
+		# we want to display it as 'could be 3d printed'
+		voxelType = '3d'
+		voxelType = 'lego' if type == '3d'
+
+		highlightMaterial = @defaultColoring.getHighlightMaterial voxelType
+		hVoxel = highlightMaterial.voxel
+		hBox = highlightMaterial.box
+
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
 			if @currentlyHighlightedVoxel?
 				@currentlyHighlightedVoxel.setHighlight false
 
 			@currentlyHighlightedVoxel = voxel
-			voxel.setHighlight true, @defaultColoring.highlightMaterial
-			@_highlightBigBrush voxel if bigBrush
+			voxel.setHighlight true, hVoxel
+			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
 			if @currentlyHighlightedVoxel?
@@ -161,7 +171,8 @@ class BrickVisualization
 
 		return voxel
 
-	_highlightBigBrush: (voxel) =>
+
+	_highlightBigBrush: (voxel, material) =>
 		size = @voxelSelector.getBrushSize true
 		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
@@ -169,11 +180,12 @@ class BrickVisualization
 			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
 			@bigBrushHighlight = @geometryCreator.getBrickBox(
 				dimensions
-				@defaultColoring.boxHighlightMaterial
+				material
 			)
 			@voxelBrickSubnode.add @bigBrushHighlight
 
 		@bigBrushHighlight.position.copy voxel.position
+		@bigBrushHighlight.material = material
 		@bigBrushHighlight.visible = true
 
 	unhighlightBigBrush: =>
@@ -183,14 +195,31 @@ class BrickVisualization
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: 'lego'}
-			@_highlightBigBrush mainVoxel if mainVoxel?
+			mat = @defaultColoring.getHighlightMaterial '3d'
+			@_highlightBigBrush mainVoxel, mat.box if mainVoxel?
 		voxels = @voxelSelector.getVoxels event, {type: 'lego', bigBrush: bigBrush}
 		return null unless voxels
 
 		for voxel in voxels
 			voxel.make3dPrinted()
-			voxel.setMaterial @defaultColoring.deselectedMaterial
+			voxel.visible = false
+			coords = voxel.voxelCoords
+			voxelBelow = @grid.getVoxel(coords.x, coords.y, coords.z - 1)
+			if voxelBelow?.enabled
+				voxelBelow.visibleVoxel.setStudVisibility true
 		return voxels
+
+	###
+	# @return {Boolean} true if anything changed, false otherwise
+	###
+	makeAllVoxels3dPrinted: (selectedNode) =>
+		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		anythingChanged = false
+		for voxel in voxels
+			anythingChanged = anythingChanged || voxel.isLego()
+			voxel.make3dPrinted()
+			@voxelSelector.touch voxel
+		return anythingChanged
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
@@ -200,7 +229,8 @@ class BrickVisualization
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: '3d'}
-			@_highlightBigBrush mainVoxel if mainVoxel?
+			mat = @defaultColoring.getHighlightMaterial 'lego'
+			@_highlightBigBrush mainVoxel, mat.box if mainVoxel?
 		voxels = @voxelSelector.getVoxels event, {type: '3d', bigBrush: bigBrush}
 		return null unless voxels
 
@@ -209,6 +239,18 @@ class BrickVisualization
 			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
 		return voxels
+
+	###
+	# @return {Boolean} true if anything changed, false otherwise
+	###
+	makeAllVoxelsLego: (selectedNode) =>
+		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		everythingLego = true
+		for voxel in voxels
+			everythingLego = everythingLego && voxel.isLego()
+			voxel.makeLego()
+			voxel.visible = true
+		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>
 		voxel.make3dPrinted() for voxel in @voxelSelector.touchedVoxels

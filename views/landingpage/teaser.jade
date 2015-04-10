@@ -1,6 +1,4 @@
 header
-	a(href='/educators')
-		#educators-bar  Are you an educator? Click here!
 	.container
 		.col-lg-8.pitch
 			h1 Brickolage
@@ -10,4 +8,11 @@ header
 					img(src='./img/spinner.gif' id="spinner")
 				input(type='file' accept=".stl"
 				style='display: none')#fileInput
+			a(href='/educators').btn#educators
+				#preview
+					img(src='/img/sample_ballista.png')
+					img(src='/img/sample_CitrusJuicer.png')
+					img(src='/img/sample_goggles.png')
+					img(src='/img/sample_printableWrench.png')
+				p Are you an educator? Check out our example models!
 		#makey.col-lg-4

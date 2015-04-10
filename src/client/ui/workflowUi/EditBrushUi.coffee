@@ -2,25 +2,25 @@
 # @class EditBrushUi
 ###
 class EditBrushUi
-	constructor: (@bundle) ->
+	constructor: (@workflowUi) ->
 		@selectedNode = null
 
 		@_brushList = []
 
-		for array in @bundle.pluginHooks.getBrushes()
+		for array in @workflowUi.bundle.pluginHooks.getBrushes()
 			for brush in array
 				@_brushList.push brush
 
-	init: (jQueryBrushContainerSelector) =>
+	init: (jQueryBrushContainerSelector, jQueryBigBrushContainerSelector) =>
 		@_selectedBrush = null
 		@_bigBrushSelected = false
 
 		@brushContainer = $(jQueryBrushContainerSelector)
+		@bigBrushContainer = $(jQueryBigBrushContainerSelector)
 
 		for brush in @_brushList
-			htmlContainer = @brushContainer.find brush.containerId
-			brush.brushButton = htmlContainer
-			brush.bigBrushButton = brush.brushButton.find '.bigBrush'
+			brush.brushButton = @brushContainer.find brush.containerId
+			brush.bigBrushButton = @bigBrushContainer.find brush.containerId
 			@_bindBrushEvent brush
 
 	onNodeSelect: (node) =>
@@ -36,8 +36,9 @@ class EditBrushUi
 
 	_bindBrushEvent: (brush) ->
 		brush.brushButton.on 'click', (event) =>
-			@_bigBrushSelected = event.shiftKey
+			@_bigBrushSelected = false
 			@_brushSelect brush
+			@workflowUi.hideMenuIfPossible()
 		brush.bigBrushButton.on 'click', (event) =>
 			if brush is @_selectedBrush
 				@_bigBrushSelected = !@_bigBrushSelected
@@ -45,6 +46,7 @@ class EditBrushUi
 				@_bigBrushSelected = true
 			@_brushSelect brush
 			event.stopImmediatePropagation()
+			@workflowUi.hideMenuIfPossible()
 
 	_brushSelect: (brush) =>
 		# deselect currently selected brush
@@ -52,7 +54,7 @@ class EditBrushUi
 
 		#select new brush
 		@_selectedBrush = brush
-		brush.brushButton.addClass 'active'
+		brush.brushButton.addClass 'active' if not @_bigBrushSelected
 		brush.bigBrushButton.addClass 'active' if @_bigBrushSelected
 		brush.selectCallback? @selectedNode, @_bigBrushSelected
 

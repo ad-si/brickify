@@ -155,6 +155,19 @@ class DummyPlugin
 		}]
 
 	###
+	# Plugins may offer downloads
+	# @param {Node} selectedNode the selected node that should be processed
+	# @param {Object} downloadOptions Additional download options
+	# @param {Float} downloadOptions.studRadius Desired radius of the Lego studs
+	# @param {String} downloadOptions.fileType desired file type, 'stl' or 'pdf'
+	###
+	getDownload: (downloadOptions, selectedNode) ->
+		return {
+			filename: ''
+			data: ''
+		}
+
+	###
 	# When the framerate is very low, plugins may be asked to reduce their visual
 	# complexity, e.g. replacing geometry with simple textures.
 	# Plugins should return true, if they reduced quality, or false,

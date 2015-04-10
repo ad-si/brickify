@@ -16,6 +16,14 @@ class Brick
 		[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
 	]
 
+	# returns true if the given size is a valid size
+	@isValidSize: (x, y, z) =>
+		for testSize in Brick.validBrickSizes
+			if testSize[0] == x and testSize[1] == y and
+			testSize[2] == z
+				return true
+		return false
+
 	# Creates a brick out of the given set of voxels
 	# Takes ownership of voxels without further processing
 	constructor: (arrayOfVoxels) ->
@@ -142,12 +150,7 @@ class Brick
 	# @validBrickSizes
 	hasValidSize: =>
 		size = @getSize()
-		for testSize in Brick.validBrickSizes
-			if testSize[0] == size.x and testSize[1] == size.y and
-			testSize[2] == size.z
-				return true
-
-		return false
+		return Brick.isValidSize(size.x, size.y, size.z)
 
 	# retruns true if the brick has no holes in it,
 	# in other words: is a cuboid

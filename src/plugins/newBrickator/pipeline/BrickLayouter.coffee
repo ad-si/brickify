@@ -122,14 +122,14 @@ class BrickLayouter
 
 	# choses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) =>
-		rnd = @_random(set.size)
+		rnd = @_random(setOfBricks.size)
 
 		iterator = setOfBricks.entries()
 		brick = iterator.next().value[0]
 		while rnd > 0
 			brick = iterator.next().value[0]
 
-		return v
+		return brick
 
 	_random: (max) ->
 		Math.floor Math.random() * max

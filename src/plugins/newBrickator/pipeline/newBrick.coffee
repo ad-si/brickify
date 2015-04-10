@@ -44,6 +44,17 @@ class Brick
 		iterator = @voxels.entries()
 		return iterator.next().value[0]
 
+	# Returns true if a voxel with this coordinates
+	# belongs to this brick
+	isVoxelInBrick: (x, y, z) ->
+		inBrick = false
+		@forEachVoxel (vox) =>
+			if vox.position.x == x and
+			vox.position.y == y and
+			vox.position.z == z
+				inBrick = true
+		return inBrick
+
 	# returns the {x, y, z} values of the voxel with
 	# the smallest x, y and z.
 	# To work properly, this function assumes that there
@@ -204,5 +215,31 @@ class Brick
 		@hasValidSize() and @isHoleFree()
 
 		return false
+
+	getStability: =>
+		s = @getSize()
+		p = @getPosition()
+		cons = @connectedBricks()
+
+		# possible slots top & bottom
+		possibleSlots = s.x * s.y * 2
+
+		# how many slots are actually connected?
+		usedSlots = 0
+
+		lowerZ = p.z - 1
+		upperZ = p.z + s.z
+
+		# test for each possible slot if neighbour bricks have
+		# voxels that belog to this slot
+		for x in [p.x...(p.x + s.x)]
+			for y in [p.y...(p.y + s.y)]
+				cons.forEach (brick) =>
+					if brick.isVoxelInBrick(x, y, upperZ)
+						usedSlots++
+					if brick.isVoxelInBrick(x, y, lowerZ)
+						usedSlots++
+
+		return usedSlots / possibleSlots
 
 module.exports = Brick

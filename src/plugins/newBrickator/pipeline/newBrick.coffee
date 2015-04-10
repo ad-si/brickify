@@ -101,6 +101,19 @@ class Brick
 
 		return neighbors
 
+	# Connected Bricks are neighbors in Zp and Zm direction
+	# because they are connected with studs to each other
+	connectedBricks: =>
+		connectedBricks = new Set()
+
+		@getNeighbors(Brick.direction.Zp).forEach (brick) ->
+			connectedBricks.add brick
+
+		@getNeighbors(Brick.direction.Zm).forEach (brick) ->
+			connectedBricks.add brick
+
+		return connectedBricks
+
 	# Splits up this brick in 1x1x1 bricks and returns them as a set
 	# This brick has no voxels after this operation
 	splitUp: =>

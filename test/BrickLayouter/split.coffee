@@ -28,3 +28,7 @@ describe 'brickLayouter split', ->
 		#split it up and relayout
 		brickLayouter.splitBricksAndRelayoutLocally [v0.brick], grid, brickGraph
 
+		#expect to be more than 1 brick
+		bricks = brickGraph.getAllBricks()
+		expect(bricks.size > 1).to.equal(true)
+

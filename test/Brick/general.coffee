@@ -46,12 +46,9 @@ describe 'Brick', ->
 		vZm = grid.setVoxel {x: 1, y: 1, z: 0}
 
 		grid.forEachVoxel (voxel) ->
-			console.log voxel
 			new NewBrick([voxel])
 
 		b = vC.brick
-
-		console.log b
 
 		nXp = b.getNeighbors(NewBrick.direction.Xp)
 		expect(nXp.size).to.equal(1)

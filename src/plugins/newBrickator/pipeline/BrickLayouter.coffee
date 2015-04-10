@@ -197,8 +197,10 @@ class BrickLayouter
 			# if they have the same width, check ...?
 			if width == widthFn(brick.getSize())
 				minWidth = widthFn brick.getPosition()
-				maxWidth = widthFn(brick.getPosition()) + widthFn(brick.getSize()) - 1
-				
+
+				maxWidth = widthFn(brick.getPosition())
+				maxWidth += widthFn(brick.getSize()) - 1
+
 				length = null
 
 				neighborsInDirection.forEach (neighbor) ->
@@ -206,8 +208,11 @@ class BrickLayouter
 
 					if widthFn(neighbor.getPosition()) < minWidth
 						return null
-					else if widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1 > maxWidth
+
+					nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
+					if nw > maxWidth
 						return null
+
 					if lengthFn(neighbor.getSize()) != length
 						return null
 

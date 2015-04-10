@@ -47,15 +47,6 @@ module.exports = class LegoPipeline
 				return lastResult
 		}
 
-		@pipelineSteps.push {
-			name: 'Update Lego references in Grid'
-			decision: (options) -> return options.reLayout or options.layouting or
-					options.initLayout
-			worker: (lastResult, options) ->
-				lastResult.brickGraph.updateReferencesInGrid()
-				return lastResult
-		}
-
 	run: (data, options = null, profiling = false) =>
 		if profiling
 			console.log "Starting Lego Pipeline

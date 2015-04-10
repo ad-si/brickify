@@ -107,7 +107,7 @@ class BrickVisualization
 
 	# updates the brick reference datastructure and updates
 	# visible brick visualization
-	updateBricks: (@bricks) =>
+	updateBrickGraph: (@brickGraph) =>
 			@updateBrickVisualization()
 
 	setStabilityView: (enabled) =>
@@ -126,13 +126,25 @@ class BrickVisualization
 	updateBrickVisualization: (coloring = @defaultColoring) =>
 		@bricksSubnode.children = []
 
-		for brickLayer in @bricks
+		# sort by layer
+		brickLayers = []
+		maxlayer = 0
+		@brickGraph.getAllBricks().forEach (brick) ->
+			z = brick.getPosition().z
+			brickLayers[z] ?= []
+			brickLayers[z].push brick
+			maxlayer = Math.max maxlayer, z
+
+		# Add bricks layerwise (because build view)
+		for i in [0..maxlayer]
+			brickLayer = brickLayers[i]
+
 			layerObject = new THREE.Object3D()
 			@bricksSubnode.add layerObject
 
 			for brick in brickLayer
 				material = coloring.getMaterialForBrick brick
-				threeBrick = @geometryCreator.getBrick brick.position, brick.size, material
+				threeBrick = @geometryCreator.getBrick brick.getPosition(), brick.getSize(), material
 				layerObject.add threeBrick
 
 	showBrickLayer: (layer) =>

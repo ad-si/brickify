@@ -1,9 +1,9 @@
 expect = require('chai').expect
-NewBrick = require '../../src/plugins/newBrickator/pipeline/newBrick'
+NewBrick = require '../../src/plugins/newBrickator/pipeline/Brick'
 BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
-describe 'newBrick', ->
+describe 'Brick', ->
 	it 'should take ownership of voxels', ->
 		grid = new Grid()
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}

@@ -1,4 +1,4 @@
-Brick = require './newBrick'
+Brick = require './Brick'
 BrickGraph = require './BrickGraph'
 arrayHelper = require './arrayHelper'
 

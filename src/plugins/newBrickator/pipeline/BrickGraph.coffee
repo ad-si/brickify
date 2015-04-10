@@ -1,4 +1,4 @@
-Brick = require './newBrick'
+Brick = require './Brick'
 arrayHelper = require './arrayHelper'
 
 module.exports = class BrickGraph

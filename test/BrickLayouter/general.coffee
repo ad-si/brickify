@@ -15,7 +15,10 @@ describe 'brickLayouter', ->
 
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 1, y: 0, z: 0}
-		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.getAllBricks()
+
+		brickLayouter.initializeBrickGraph(grid)
+		bricks = grid.getAllBricks()
+
 		expect(bricks.size).to.equal(2)
 
 	it 'should choose random brick', ->
@@ -26,9 +29,9 @@ describe 'brickLayouter', ->
 		grid.setVoxel {x: 0, y: 0, z: 0}
 
 		brickLayouter = new BrickLayouter()
-		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
+		brickLayouter.initializeBrickGraph(grid)
 
-		brick = brickLayouter._chooseRandomBrick(brickGraph.getAllBricks())
+		brick = brickLayouter._chooseRandomBrick(grid.getAllBricks())
 		position = brick.getPosition()
 		expect(position.x).to.equal(0)
 		expect(position.y).to.equal(0)

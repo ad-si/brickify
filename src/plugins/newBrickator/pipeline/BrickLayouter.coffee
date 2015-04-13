@@ -71,7 +71,7 @@ class BrickLayouter
 		bricksToSplit = new Set()
 
 		for brick in bricks
-			# add this brick to be splitted
+			# add this brick to be split
 			bricksToSplit.add brick
 
 			# get neighbours in same z layer
@@ -80,7 +80,7 @@ class BrickLayouter
 			yp = brick.getNeighbors(Brick.direction.Yp)
 			ym = brick.getNeighbors(Brick.direction.Ym)
 
-			# add them all to be splitted as well
+			# add them all to be split as well
 			xp.forEach (brick) -> bricksToSplit.add brick
 			xm.forEach (brick) -> bricksToSplit.add brick
 			yp.forEach (brick) -> bricksToSplit.add brick
@@ -124,7 +124,7 @@ class BrickLayouter
 	_anyDefinedInArray: (mergeableNeighbors) ->
 		return mergeableNeighbors.some (entry) -> entry?
 
-	# choses a random brick out of the set
+	# chooses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) =>
 		if setOfBricks.size == 0
 			return null
@@ -192,7 +192,7 @@ class BrickLayouter
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		neighborsInDirection = brick.getNeighbors(dir)
 		if neighborsInDirection.size > 0
-			# check that the neighbors together dont exceed this bricks width
+			# check that the neighbors together don't exceed this brick's width
 			width = 0
 			neighborsInDirection.forEach (neighbor) ->
 				width += widthFn neighbor.getSize()
@@ -225,7 +225,7 @@ class BrickLayouter
 
 	# Returns the index of the mergeableNeighbors sub-set-in-this-array,
 	# where the bricks have the most connected neighbors.
-	# If multiple sub-arrays have the same number of connected neigbours,
+	# If multiple sub-arrays have the same number of connected neighbors,
 	# one is randomly chosen
 	_chooseNeighborsToMergeWith: (mergeableNeighbors) =>
 		numConnections = []

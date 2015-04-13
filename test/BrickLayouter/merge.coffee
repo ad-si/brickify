@@ -12,7 +12,9 @@ describe 'brickLayouter merge', ->
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 		v1 = grid.setVoxel {x: 1, y: 0, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.getAllBricks()
+
+		brickLayouter.initializeBrickGraph(grid)
+		bricks = grid.getAllBricks()
 
 		mergeableNeighbors = brickLayouter._findMergeableNeighbors v0.brick
 		mergeableNeighborsXp = mergeableNeighbors[1]
@@ -30,7 +32,8 @@ describe 'brickLayouter merge', ->
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 		v1 = grid.setVoxel {x: 0, y: 1, z: 0}
 		brickLayouter = new BrickLayouter()
-		bricks = brickLayouter.initializeBrickGraph(grid).brickGraph.getAllBricks()
+
+		brickLayouter.initializeBrickGraph(grid)
 
 		mergeableNeighbors = brickLayouter._findMergeableNeighbors v0.brick
 		mergeableNeighborsYp = mergeableNeighbors[3]
@@ -69,8 +72,8 @@ describe 'brickLayouter merge', ->
 		v0 = grid.setVoxel {x: 5, y: 5, z: 0}
 		brickLayouter = new BrickLayouter()
 
-		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
-		brickLayouter.layoutByGreedyMerge(brickGraph)
+		brickLayouter.initializeBrickGraph(grid)
+		brickLayouter.layoutByGreedyMerge(grid)
 
 		expect(v0.brick.getPosition()).to.eql({x: 5, y: 5, z: 0})
 		expect(v0.brick.getSize()).to.eql({x: 1, y: 1, z: 1})
@@ -84,10 +87,10 @@ describe 'brickLayouter merge', ->
 		v1 = grid.setVoxel {x: 5, y: 6, z: 0}
 		brickLayouter = new BrickLayouter()
 
-		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
-		brickLayouter.layoutByGreedyMerge(brickGraph)
+		brickLayouter.initializeBrickGraph(grid)
+		brickLayouter.layoutByGreedyMerge(grid)
 
-		expect(brickGraph.getAllBricks().size).to.equal(1)
+		expect(grid.getAllBricks().size).to.equal(1)
 		expect(v0.brick).to.equal(v1.brick)
 		expect(v0.brick.getPosition()).to.eql({x: 5, y: 5, z: 0})
 		expect(v0.brick.getSize()).to.eql({x: 1, y: 2, z: 1})
@@ -103,9 +106,9 @@ describe 'brickLayouter merge', ->
 		v3 = grid.setVoxel {x: 6, y: 6, z: 0}
 
 		brickLayouter = new BrickLayouter()
-		brickGraph = brickLayouter.initializeBrickGraph(grid).brickGraph
-		brickLayouter.layoutByGreedyMerge(brickGraph)
+		brickLayouter.initializeBrickGraph(grid)
+		brickLayouter.layoutByGreedyMerge(grid)
 
-		expect(brickGraph.getAllBricks().size).to.equals(1)
+		expect(grid.getAllBricks().size).to.equals(1)
 		expect(v0.brick.getPosition()).to.eql({x: 5, y: 5, z: 0})
 		expect(v0.brick.getSize()).to.eql({x: 2, y: 2, z: 1})

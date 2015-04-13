@@ -1,7 +1,6 @@
 expect = require('chai').expect
 BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
 Brick = require '../../src/plugins/newBrickator/pipeline/Brick'
-BrickGraph = require '../../src/plugins/newBrickator/pipeline/BrickGraph'
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'brickLayouter split', ->
@@ -17,7 +16,8 @@ describe 'brickLayouter split', ->
 		v2 = grid.setVoxel { x: 0, y: 1, z: 0 }
 		v3 = grid.setVoxel { x: 1, y: 1, z: 0 }
 		v4 = grid.setVoxel { x: 1, y: 2, z: 0 }
-		brickGraph = new BrickGraph(grid)
+
+		grid.initializeBricks()
 
 		# merge bricks to one single (invalid) brick
 		v0.brick.mergeWith v1.brick
@@ -26,9 +26,9 @@ describe 'brickLayouter split', ->
 		v0.brick.mergeWith v4.brick
 
 		#split it up and relayout
-		brickLayouter.splitBricksAndRelayoutLocally [v0.brick], grid, brickGraph
+		brickLayouter.splitBricksAndRelayoutLocally [v0.brick], grid
 
 		#expect to be more than 1 brick
-		bricks = brickGraph.getAllBricks()
+		bricks = grid.getAllBricks()
 		expect(bricks.size > 1).to.equal(true)
 

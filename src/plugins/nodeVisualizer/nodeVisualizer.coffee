@@ -193,11 +193,18 @@ class NodeVisualizer
 
 
 	# check whether the pointer is over a model/brick visualization
-	pointerOverModel: (event) =>
+	pointerOverModel: (event, ignoreInvisible = true) =>
 		intersections = interactionHelper.getIntersections(
 			event, @bundle.renderer, @threejsRootNode.children
 		)
+		return intersections.length > 0 unless ignoreInvisible
+		visibleIntersections = intersections.filter (intersection) ->
+			object = intersection.object
+			while object?
+				return false unless object.visible
+				object = object.parent
+			return true
 
-		return true if intersections.length > 0
+		return visibleIntersections.length > 0
 
 module.exports = NodeVisualizer

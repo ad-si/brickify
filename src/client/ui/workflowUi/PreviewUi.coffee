@@ -5,6 +5,7 @@ class PreviewUi
 		@$panel = $('#previewGroup')
 		bundle = @workflowUi.bundle
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
+		@editControl = bundle.getPlugin 'editControl'
 		@sceneManager = bundle.sceneManager
 		@_initStabilityView()
 		@_initAssemblyView()
@@ -40,9 +41,11 @@ class PreviewUi
 		@$stabilityViewButton.toggleClass 'active', @stabilityViewEnabled
 		@$assemblyViewButton.toggleClass 'disabled', @stabilityViewEnabled
 
-		@nodeVisualizer.setStabilityView(
-			@sceneManager.selectedNode, @stabilityViewEnabled
-		)
+		if @stabilityViewEnabled
+			@editControl.disableInteraction()
+			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
+		else
+			@editControl.enableInteraction()
 
 	_initAssemblyView: =>
 		@assemblyViewEnabled = no
@@ -67,5 +70,10 @@ class PreviewUi
 		@$stabilityViewButton.toggleClass 'disabled', @assemblyViewEnabled
 
 		@previewAssemblyUi.setEnabled @assemblyViewEnabled
+
+		if @assemblyViewEnabled
+			@editControl.disableInteraction()
+		else
+			@editControl.enableInteraction()
 
 module.exports = PreviewUi

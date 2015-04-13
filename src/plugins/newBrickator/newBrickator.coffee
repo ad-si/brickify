@@ -36,8 +36,8 @@ class NewBrickator
 				optimizedModel: cachedData.optimizedModel
 				grid: cachedData.grid
 			}
-			results = @pipeline.run data, settings, true
-			cachedData.brickGraph = results.accumulatedResults.brickGraph
+
+			@pipeline.run data, settings, true
 			cachedData.csgNeedsRecalculation = true
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData
@@ -57,24 +57,23 @@ class NewBrickator
 		.then (cachedData) =>
 			modifiedBricks = []
 			for v in modifiedVoxels
-				if v.gridEntry.brick?
+				if v.gridEntry.brick
 					if v.gridEntry.brick not in modifiedBricks
 						modifiedBricks.push v.gridEntry.brick
 				else if createBricks
 					pos = v.voxelCoords
-					modifiedBricks.push cachedData.brickGraph.createBrick pos.x, pos.y, pos.z
+					modifiedBricks.push new Brick([v.gridEntry])
 
 			settings = new PipelineSettings()
 			settings.onlyRelayout()
+
 			data = {
 				optimizedModel: cachedData.optimizedModel
 				grid: cachedData.grid
-				brickGraph: cachedData.brickGraph
 				modifiedBricks: modifiedBricks
 			}
 
-			results = @pipeline.run data, settings, true
-			cachedData.brickGraph = results.accumulatedResults.brickGraph
+			@pipeline.run data, settings, true
 			cachedData.csgNeedsRecalculation = true
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData
@@ -88,7 +87,6 @@ class NewBrickator
 			data = grid: cachedData.grid
 
 			results = @pipeline.run data, settings, true
-			cachedData.brickGraph = results.accumulatedResults.brickGraph
 			cachedData.csgNeedsRecalculation = true
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData

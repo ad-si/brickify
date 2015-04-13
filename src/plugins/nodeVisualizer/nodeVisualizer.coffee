@@ -36,8 +36,8 @@ class NodeVisualizer
 			if not cachedData.initialized
 				@_initializeData node, cachedData, newBrickatorData
 
-			# update brick references and visualization
-			cachedData.brickVisualization.updateBrickGraph newBrickatorData.brickGraph
+			# update brick visualization
+			cachedData.brickVisualization.updateBrickVisualization()
 
 			# update voxel coloring and show them
 			cachedData.brickVisualization.updateVoxelVisualization()

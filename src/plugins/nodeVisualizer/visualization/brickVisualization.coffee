@@ -105,11 +105,6 @@ class BrickVisualization
 		else
 			threeBrick.setStudVisibility true
 
-	# updates the brick reference datastructure and updates
-	# visible brick visualization
-	updateBrickGraph: (@brickGraph) =>
-			@updateBrickVisualization()
-
 	setStabilityView: (enabled) =>
 		@isStabilityView = enabled
 		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
@@ -129,7 +124,7 @@ class BrickVisualization
 		# sort by layer
 		brickLayers = []
 		maxlayer = 0
-		@brickGraph.getAllBricks().forEach (brick) ->
+		@grid.getAllBricks().forEach (brick) ->
 			z = brick.getPosition().z
 			brickLayers[z] ?= []
 			brickLayers[z].push brick

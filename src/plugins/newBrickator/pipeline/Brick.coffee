@@ -31,6 +31,7 @@ class Brick
 		for voxel in arrayOfVoxels
 			voxel.brick = @
 			@voxels.add voxel
+		@_neighbors = {}
 
 	# enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>
@@ -112,6 +113,7 @@ class Brick
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
+		return @_neighbors[direction] if @_neighbors?[direction]?
 		neighbors = new Set()
 
 		@forEachVoxel (voxel) =>
@@ -119,7 +121,7 @@ class Brick
 				neighborBrick = voxel.neighbors[direction].brick
 				neighbors.add neighborBrick if neighborBrick and neighborBrick != @
 
-		return neighbors
+		return @_neighbors[direction] = neighbors
 
 	# Connected Bricks are neighbors in Zp and Zm direction
 	# because they are connected with studs to each other
@@ -158,6 +160,7 @@ class Brick
 		#clear stored data
 		@_size = null
 		@_position = null
+		@_neighbors = {}
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,

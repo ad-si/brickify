@@ -1,16 +1,14 @@
 Brick = require './Brick'
 arrayHelper = require './arrayHelper'
+Random = require './Random'
 
 ###
 # @class BrickLayouter
 ###
 
 class BrickLayouter
-	constructor: (pseudoRandom = false) ->
-		if pseudoRandom
-			@seed = 42
-			@_random = @_pseudoRandom
-		return
+	constructor: (@pseudoRandom = false) ->
+		Random.usePseudoRandom @pseudoRandom
 
 	initializeBrickGraph: (grid) ->
 		grid.initializeBricks()
@@ -61,6 +59,8 @@ class BrickLayouter
 
 				if not brick.isValid()
 					console.warn 'Invalid brick: ', brick
+					console.warn '> Using pseudoRandom:', @pseudoRandom
+					console.warn '> current seed:', @pseudoRandom
 
 				mergeableNeighbors = @_findMergeableNeighbors brick
 
@@ -135,9 +135,9 @@ class BrickLayouter
 			return null
 
 		if setOfBricks.chooseRandomBrick?
-			return setOfBricks.chooseRandomBrick(@_random)
+			return setOfBricks.chooseRandomBrick()
 
-		rnd = @_random(setOfBricks.size)
+		rnd = Random.next(setOfBricks.size)
 
 		iterator = setOfBricks.entries()
 		brick = iterator.next().value[0]
@@ -146,13 +146,6 @@ class BrickLayouter
 			rnd--
 
 		return brick
-
-	_random: (max) ->
-		Math.floor Math.random() * max
-
-	_pseudoRandom: (max) =>
-		@seed = (1103515245 * @seed + 12345) % 2 ^ 31
-		@seed % max
 
 	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
@@ -265,7 +258,7 @@ class BrickLayouter
 		largestConnections = numConnections.filter (element) ->
 			return element.num == maxConnections
 
-		randomOfLargest = largestConnections[@_random(largestConnections.length)]
+		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index
 
 	_mergeBricksAndUpdateGraphConnections: (

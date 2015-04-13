@@ -1,6 +1,7 @@
 THREE = require 'three'
 Voxel = require './Voxel'
 Brick = require './Brick'
+Random = require './Random'
 
 module.exports = class Grid
 	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
@@ -223,11 +224,11 @@ module.exports = class Grid
 		return bricks
 
 	# chooses a random brick
-	chooseRandomBrick: (randomFunction) =>
+	chooseRandomBrick: =>
 		while true
-			x = randomFunction(@numVoxelsX)
-			y = randomFunction(@numVoxelsY)
-			z = randomFunction(@numVoxelsZ)
+			x = Random.next(@numVoxelsX)
+			y = Random.next(@numVoxelsY)
+			z = Random.next(@numVoxelsZ)
 
 			vox = @getVoxel x, y, z
 

@@ -1,6 +1,7 @@
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
+Random = require './Random'
 
 module.exports = class LegoPipeline
 	constructor: ->
@@ -51,6 +52,10 @@ module.exports = class LegoPipeline
 			console.log "Starting Lego Pipeline
 			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
 			 onlyReLayout: #{options.reLayout})"
+
+			randomSeed = Math.floor Math.random() * 1000000
+			Random.setSeed randomSeed
+			console.log 'Using random seed', randomSeed
 
 			profilingResults = []
 

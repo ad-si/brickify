@@ -60,6 +60,8 @@ class Brick
 	# To work properly, this function assumes that there
 	# are no holes in the brick and the brick is a proper cuboid
 	getPosition: =>
+		return @_position if @_position?
+
 		# to bring variables to correct scope
 		x = undefined
 		y = undefined
@@ -82,6 +84,7 @@ class Brick
 
 	# returns the size of the brick
 	getSize: =>
+		return @_size if @_size?
 		@_size = {}
 
 		@forEachVoxel (voxel) =>

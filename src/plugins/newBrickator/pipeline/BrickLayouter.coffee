@@ -1,5 +1,4 @@
 Brick = require './Brick'
-BrickGraph = require './BrickGraph'
 arrayHelper = require './arrayHelper'
 
 ###
@@ -14,20 +13,21 @@ class BrickLayouter
 		return
 
 	initializeBrickGraph: (grid) ->
-		return brickGraph: new BrickGraph(grid)
+		grid.initializeBricks()
+		return grid
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
 	# !! Expects bricks to layout to be a Set !!
-	layoutByGreedyMerge: (brickGraph, bricksToLayout) =>
+	layoutByGreedyMerge: (grid, bricksToLayout) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
 
 		if not bricksToLayout?
-			bricksToLayout = brickGraph.getAllBricks()
+			bricksToLayout = grid.getAllBricks()
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
@@ -37,7 +37,7 @@ class BrickLayouter
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
-				return {brickGraph: brickGraph}
+				return {grid: grid}
 
 			numRandomChoices++
 			mergeableNeighbors = @_findMergeableNeighbors brick
@@ -59,7 +59,7 @@ class BrickLayouter
 					neighborsToMergeWith, bricksToLayout
 				mergeableNeighbors = @_findMergeableNeighbors brick
 
-		return {brickGraph: brickGraph}
+		return {grid: grid}
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This
@@ -67,7 +67,7 @@ class BrickLayouter
 	#
 	# @param {Array<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid, brickGraph) =>
+	splitBricksAndRelayoutLocally: (bricks, grid) =>
 		bricksToSplit = new Set()
 
 		for brick in bricks
@@ -94,12 +94,15 @@ class BrickLayouter
 
 			# delete bricks where voxels are disabled (3d printed)
 			if not voxel.enabled
+				# remove from relayout list
 				bricksToBeDeleted.push voxel
+				# delete brick from structure
+				voxel.brick = false
 
 		for brick in bricksToBeDeleted
 			newBricks.delete brick
 
-		@layoutByGreedyMerge brickGraph, newBricks
+		@layoutByGreedyMerge grid, newBricks
 
 		return {
 			removedBricks: bricksToSplit

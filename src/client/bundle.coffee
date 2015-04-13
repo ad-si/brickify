@@ -26,6 +26,7 @@ module.exports = class Bundle
 
 	init: =>
 		@ui?.init()
+		@pluginLoader.initPlugins()
 		@renderer.setupControls @globalConfig, @controls
 		return @sceneManager.init()
 		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId

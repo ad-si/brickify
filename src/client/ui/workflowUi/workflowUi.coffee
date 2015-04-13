@@ -6,14 +6,7 @@ PreviewUi = require './PreviewUi'
 ExportUi = require './ExportUi'
 
 class WorkflowUi
-	constructor: (@bundle) ->
-		@workflow =
-			load: new LoadUi @
-			edit: new EditUi @
-			preview: new PreviewUi @
-			export: new ExportUi @
-
-		@enableOnly @workflow.load
+	constructor: (@bundle) -> return
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -43,6 +36,14 @@ class WorkflowUi
 			ui.setEnabled step in groupsList
 
 	init: =>
+		@workflow =
+			load: new LoadUi @
+			edit: new EditUi @
+			preview: new PreviewUi @
+			export: new ExportUi @
+
+		@enableOnly @workflow.load
+
 		@_initNotImplementedMessages()
 		@_initScrollbar()
 		@_initToggleButton()

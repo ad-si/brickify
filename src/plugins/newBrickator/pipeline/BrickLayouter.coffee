@@ -58,6 +58,10 @@ class BrickLayouter
 
 				@_mergeBricksAndUpdateGraphConnections brick,
 					neighborsToMergeWith, bricksToLayout
+
+				if not brick.isValid()
+					console.warn 'Invalid brick: ', brick
+
 				mergeableNeighbors = @_findMergeableNeighbors brick
 
 		return {grid: grid}
@@ -146,7 +150,7 @@ class BrickLayouter
 	_random: (max) ->
 		Math.floor Math.random() * max
 
-	_pseudoRandom: (max) ->
+	_pseudoRandom: (max) =>
 		@seed = (1103515245 * @seed + 12345) % 2 ^ 31
 		@seed % max
 

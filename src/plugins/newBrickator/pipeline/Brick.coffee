@@ -60,8 +60,6 @@ class Brick
 	# To work properly, this function assumes that there
 	# are no holes in the brick and the brick is a proper cuboid
 	getPosition: =>
-		#return @_position if @_position?
-
 		# to bring variables to correct scope
 		x = undefined
 		y = undefined
@@ -84,7 +82,6 @@ class Brick
 
 	# returns the size of the brick
 	getSize: =>
-		#return @_size if @_size?
 		@_size = {}
 
 		@forEachVoxel (voxel) =>
@@ -185,7 +182,9 @@ class Brick
 	# returns true if the size of the brick matches one of @validBrickSizes
 	hasValidSize: =>
 		size = @getSize()
-		return Brick.isValidSize(size.x, size.y, size.z)
+		variation1 = Brick.isValidSize(size.x, size.y, size.z)
+		variation2 = Brick.isValidSize(size.y, size.x, size.z)
+		return variation1 || variation2
 
 	# returns true if the brick has no holes in it, i.e. is a cuboid
 	isHoleFree: =>
@@ -203,18 +202,32 @@ class Brick
 			vp = voxel.position
 			voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
 
+		hasHoles = false
 		for val of voxelCheck
-			return false if voxelCheck[val] == false
+			if voxelCheck[val] == false
+				console.warn 'Hole at', val
+				hasHoles = true
 
-		return true
+		return !hasHoles
 
 	# returns true if the brick is valid
 	# a brick is valid when it has voxels, is hole free and
 	# has a valid size
 	isValid: =>
-		return true if @voxels.size > 0 and
-		@hasValidSize() and @isHoleFree()
+		hasVoxels = false
+		hasVoxels = true if @voxels.size > 0
+		if not hasVoxels
+			console.warn 'Invalid: brick has no voxels'
 
+		validSize  = @hasValidSize()
+		if not validSize
+			console.warn 'Invalid: brick has invalid size',@getSize()
+
+		noHoles = @isHoleFree()
+		if not noHoles
+			console.warn 'Invalid: brick has holes'
+
+		return true if hasVoxels and validSize and noHoles
 		return false
 
 	getStability: =>

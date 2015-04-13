@@ -179,14 +179,12 @@ class Brick
 			voxel.brick = @
 			@voxels.add voxel
 
-	# returns true if the size of the brick matches one of
-	# @validBrickSizes
+	# returns true if the size of the brick matches one of @validBrickSizes
 	hasValidSize: =>
 		size = @getSize()
 		return Brick.isValidSize(size.x, size.y, size.z)
 
-	# retruns true if the brick has no holes in it,
-	# in other words: is a cuboid
+	# returns true if the brick has no holes in it, i.e. is a cuboid
 	isHoleFree: =>
 		voxelCheck  = {}
 
@@ -231,7 +229,7 @@ class Brick
 		upperZ = p.z + s.z
 
 		# test for each possible slot if neighbour bricks have
-		# voxels that belog to this slot
+		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]
 				cons.forEach (brick) =>

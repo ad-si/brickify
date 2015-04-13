@@ -11,7 +11,7 @@ module.exports = class BrickGraph
 		@grid.forEachVoxel (voxel) ->
 			new Brick([voxel])
 
-	# returns all bricks as an set
+	# returns all bricks as a set
 	getAllBricks: =>
 		bricks = new Set()
 

@@ -28,6 +28,7 @@ class BrickLayouter
 
 		if not bricksToLayout?
 			bricksToLayout = grid.getAllBricks()
+			bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
@@ -128,6 +129,9 @@ class BrickLayouter
 	_chooseRandomBrick: (setOfBricks) =>
 		if setOfBricks.size == 0
 			return null
+
+		if setOfBricks.chooseRandomBrick?
+			return setOfBricks.chooseRandomBrick(@_random)
 
 		rnd = @_random(setOfBricks.size)
 

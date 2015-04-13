@@ -222,3 +222,15 @@ module.exports = class Grid
 
 		return bricks
 
+	# chooses a random brick
+	chooseRandomBrick: (randomFunction) =>
+		while true
+			x = randomFunction(@numVoxelsX)
+			y = randomFunction(@numVoxelsY)
+			z = randomFunction(@numVoxelsZ)
+
+			vox = @getVoxel x, y, z
+
+			if vox? and vox.brick
+				return vox.brick
+

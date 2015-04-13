@@ -19,16 +19,16 @@ module.exports = class CsgExtractor
 		console.log 'Creating CSG...'
 
 		d = new Date()
-		printVoxels = @_analyzeGrid(grid)
+		legoVoxels = @_analyzeGrid(grid)
 		if options.profile
 			console.log "Grid analysis took #{new Date() - d}ms"
 
-		if printVoxels.length == 0
+		if legoVoxels.length == 0
 			return null
 
 		d = new Date()
 		voxunion = new VoxelUnion(grid)
-		voxelHull = voxunion.run printVoxels, options
+		voxelHull = voxunion.run legoVoxels, options
 		if options.profile
 			console.log "Voxel Geometrizer took #{new Date() - d}ms"
 
@@ -40,29 +40,29 @@ module.exports = class CsgExtractor
 		return printGeometry
 
 	_analyzeGrid: (grid) ->
-		# creates a list of voxels to be printed
-		printVoxels = []
+		# creates a list of voxels to be legotized
+		legoVoxels = []
 
 		grid.forEachVoxel (voxel) ->
-			return if voxel.enabled # ignore lego voxels
+			return if not voxel.enabled # ignore 3d printed voxels
 
 			x = voxel.position.x
 			y = voxel.position.y
 			z = voxel.position.z
 
-			#check if the voxel above is legofied. if yes, add a stud to current voxel
+			# check if the voxel above is 3d printed.
+			# if yes, add a stud to current voxel
 			studOnTop = false
-			if grid.hasVoxelAt(x, y, z + 1) and grid.getVoxel(x, y, z + 1).enabled
+			if grid.hasVoxelAt(x, y, z + 1) and not grid.getVoxel(x, y, z + 1).enabled
 				studOnTop = true
 
-			# check if the voxel is the lowest voxel or has a lego brick below it
+			# check if the voxel has a 3d printed voxel below it
 			# if yes, create space for stud below
 			studFromBelow = false
-			if z == 0 or
-			(grid.hasVoxelAt(x, y, z - 1) and grid.getVoxel(x, y, z - 1).enabled)
+			if (grid.hasVoxelAt(x, y, z - 1) and not grid.getVoxel(x, y, z - 1).enabled)
 				studFromBelow = true
 
-			printVoxels.push {
+			legoVoxels.push {
 				x: x
 				y: y
 				z: z
@@ -70,11 +70,11 @@ module.exports = class CsgExtractor
 				studFromBelow: studFromBelow
 			}
 
-		return printVoxels
+		return legoVoxels
 
 	_extractPrintGeometry: (originalModel, voxelHull) ->
-		# returns the volumetric intersection of the selected voxels and
-		# the original model as a THREE.Mesh
+		# returns volumetric subtraction (3d Geometry - LegoVoxels)
 		modelBsp = new ThreeBSP(originalModel)
-		printBsp = modelBsp.intersect(voxelHull)
+
+		printBsp = modelBsp.subtract(voxelHull)
 		return printBsp.toMesh(null)

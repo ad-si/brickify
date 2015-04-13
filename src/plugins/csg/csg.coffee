@@ -1,4 +1,4 @@
 class CSG
-	concstructor: -> return
+	constructor: -> return
 
 module.exports = CSG

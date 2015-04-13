@@ -41,7 +41,8 @@ class EditControl
 	onPointerEvent: (event, eventType) =>
 		return false if not @nodeVisualizer? or not @pointEventHandler?
 
-		if not @nodeVisualizer.pointerOverModel event
+		ignoreInvisible = event.buttons isnt pointerEnums.buttonStates.right
+		if not @nodeVisualizer.pointerOverModel event, ignoreInvisible
 			# when we are not above model, call only move and up events
 			switch eventType
 				when pointerEnums.events.PointerMove

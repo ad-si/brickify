@@ -31,7 +31,6 @@ class Brick
 		for voxel in arrayOfVoxels
 			voxel.brick = @
 			@voxels.add voxel
-		@_neighbors = {}
 
 	# enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>
@@ -61,7 +60,7 @@ class Brick
 	# To work properly, this function assumes that there
 	# are no holes in the brick and the brick is a proper cuboid
 	getPosition: =>
-		return @_position if @_position?
+		#return @_position if @_position?
 
 		# to bring variables to correct scope
 		x = undefined
@@ -85,7 +84,7 @@ class Brick
 
 	# returns the size of the brick
 	getSize: =>
-		return @_size if @_size?
+		#return @_size if @_size?
 		@_size = {}
 
 		@forEachVoxel (voxel) =>
@@ -113,7 +112,6 @@ class Brick
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
-		return @_neighbors[direction] if @_neighbors?[direction]?
 		neighbors = new Set()
 
 		@forEachVoxel (voxel) =>
@@ -121,7 +119,7 @@ class Brick
 				neighborBrick = voxel.neighbors[direction].brick
 				neighbors.add neighborBrick if neighborBrick and neighborBrick != @
 
-		return @_neighbors[direction] = neighbors
+		return neighbors
 
 	# Connected Bricks are neighbors in Zp and Zm direction
 	# because they are connected with studs to each other
@@ -139,10 +137,12 @@ class Brick
 	# Splits up this brick in 1x1x1 bricks and returns them as a set
 	# This brick has no voxels after this operation
 	splitUp: =>
+		# create new bricks
 		newBricks = new Set()
 
 		@forEachVoxel (voxel) ->
-			newBricks.add new Brick([voxel])
+			brick = new Brick([voxel])
+			newBricks.add brick
 
 		@_clearData()
 		return newBricks
@@ -166,7 +166,7 @@ class Brick
 	# merges this brick with the other brick specified,
 	# the other brick gets deleted in the process
 	mergeWith: (otherBrick) =>
-		#clear size and position (to be recomputed)
+		#clear size, position and neighbors (to be recomputed)
 		@_size = null
 		@_position = null
 

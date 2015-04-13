@@ -94,7 +94,10 @@ class BrickLayouter
 
 			# delete bricks where voxels are disabled (3d printed)
 			if not voxel.enabled
+				# remove from relayout list
 				bricksToBeDeleted.push voxel
+				# delete brick from structure
+				voxel.brick = false
 
 		for brick in bricksToBeDeleted
 			newBricks.delete brick

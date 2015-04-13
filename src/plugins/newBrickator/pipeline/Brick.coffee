@@ -117,7 +117,7 @@ class Brick
 		@forEachVoxel (voxel) =>
 			if voxel.neighbors[direction]?
 				neighborBrick = voxel.neighbors[direction].brick
-				neighbors.add neighborBrick if neighborBrick? and neighborBrick != @
+				neighbors.add neighborBrick if neighborBrick and neighborBrick != @
 
 		return neighbors
 

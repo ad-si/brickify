@@ -112,6 +112,8 @@ class Brick
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
+		return @_neighbors[direction] if @_neighbors?[direction]?
+
 		neighbors = new Set()
 
 		@forEachVoxel (voxel) =>
@@ -119,7 +121,14 @@ class Brick
 				neighborBrick = voxel.neighbors[direction].brick
 				neighbors.add neighborBrick if neighborBrick and neighborBrick != @
 
-		return neighbors
+		@_neighbors ?= {}
+		@_neighbors[direction] = neighbors
+
+		return @_neighbors[direction]
+
+	# tells this brick to update cached neighbors indices
+	recacheNeighbors: =>
+		@_neighbors = null
 
 	# Connected Bricks are neighbors in Zp and Zm direction
 	# because they are connected with studs to each other
@@ -137,6 +146,12 @@ class Brick
 	# Splits up this brick in 1x1x1 bricks and returns them as a set
 	# This brick has no voxels after this operation
 	splitUp: =>
+		# tell neighbors to update their cache
+		for direction in Brick.direction
+			neighbors = @getNeighbors direction
+			for neighbor in neighbors
+				neighbor.recacheNeighbors()
+
 		# create new bricks
 		newBricks = new Set()
 
@@ -160,7 +175,7 @@ class Brick
 		#clear stored data
 		@_size = null
 		@_position = null
-		@_neighbors = {}
+		@_neighbors = null
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,
@@ -169,6 +184,15 @@ class Brick
 		#clear size, position and neighbors (to be recomputed)
 		@_size = null
 		@_position = null
+		@_neighbors = null
+
+		# tell neighbors to update their cache
+		for direction in Brick.direction
+			otherNeighbors = @getNeighbors direction
+			neighbors = @getNeighbors direction
+			for neighbor in neighbors
+				otherNeighbors.recacheNeighbors()
+				neighbor.recacheNeighbors()
 
 		#take voxels from other brick
 		newVoxels = new Set()

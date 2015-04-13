@@ -93,18 +93,18 @@ class BrickLayouter
 
 		newBricks = @_splitBricks bricksToSplit
 
-		bricksToBeDeleted = []
+		bricksToBeDeleted = new Set()
+
 		newBricks.forEach (brick) ->
-			voxel = brick.getVoxel()
+			brick.forEachVoxel (voxel) ->
+				# delete bricks where voxels are disabled (3d printed)
+				if not voxel.enabled
+					# remove from relayout list
+					bricksToBeDeleted.add brick
+					# delete brick from structure
+					brick.clear()
 
-			# delete bricks where voxels are disabled (3d printed)
-			if not voxel.enabled
-				# remove from relayout list
-				bricksToBeDeleted.push voxel
-				# delete brick from structure
-				voxel.brick = false
-
-		for brick in bricksToBeDeleted
+		bricksToBeDeleted.forEach (brick) ->
 			newBricks.delete brick
 
 		@layoutByGreedyMerge grid, newBricks
@@ -214,22 +214,28 @@ class BrickLayouter
 
 				length = null
 
+				invalidSize = false
 				neighborsInDirection.forEach (neighbor) ->
 					length ?= lengthFn neighbor.getSize()
 
 					if widthFn(neighbor.getPosition()) < minWidth
-						return null
+						invalidSize = true
 
 					nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
 					if nw > maxWidth
-						return null
+						invalidSize = true
 
 					if lengthFn(neighbor.getSize()) != length
-						return null
+						invalidSize = true
+
+				if invalidSize
+					return null
 
 				if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
 				length, brick.getSize().z)
 					return neighborsInDirection
+				else
+					return null
 
 	# Returns the index of the mergeableNeighbors sub-set-in-this-array,
 	# where the bricks have the most connected neighbors.

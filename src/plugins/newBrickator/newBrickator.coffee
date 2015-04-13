@@ -53,6 +53,7 @@ class NewBrickator
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
+		console.log 'relayouting modified parts, creating bricks:',createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
 			modifiedBricks = []

@@ -47,7 +47,7 @@ class NodeVisualizer
 		.then (cachedData) =>
 			cachedData.modelVisualization.createVisualization()
 			cachedData.modelVisualization.afterCreation().then =>
-				@zoomToNode cachedData.modelVisualization.getSolid()
+				@_zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
 		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
@@ -56,7 +56,7 @@ class NodeVisualizer
 
 	onNodeDeselect: => @selectedNode = null
 
-	zoomToNode: (threeNode) =>
+	_zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphere threeNode
 		@bundle.renderer.zoomToBoundingSphere boundingSphere
 

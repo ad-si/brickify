@@ -2,8 +2,18 @@ CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
 
 class CSG
-	constructor: -> return
-
+	###
+	# Returns a promise which will, when resolved, provide
+	# the volumetric subtraction of ModelGeometry - LegoBricks
+	# as a THREE.Mesh
+	#
+	# @return {THREE.Mesh} the volumetric subtraction
+	# @param {Object} options the options which may consist out of:
+	# @param {Object} options.studSize radius and height of LEGO studs
+	# @param {Object} options.holeSize radius and height of holes for
+	# LEGO studs
+	# @param {Boolean} options.addStuds whether studs are added at all
+	###
 	getCSG: (selectedNode, options = {}) =>
 		@_applyDefaultValues options
 		@_getCachedData(selectedNode)
@@ -27,6 +37,7 @@ class CSG
 		if not options.addStuds?
 			options.addStuds = false
 
+	# returns own cached data and links grid from newBrickator data
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'csg'
 		.then (data) =>
@@ -43,6 +54,7 @@ class CSG
 				# finally return own data + newBrickator grid
 				return data
 
+	# Creates a CSG subtraction between the node - lego voxels from grid
 	_createCSG: (cachedData, selectedNode, options) =>
 		if not @_csgNeedsRecalculation cachedData, options
 			return Promise.resolve cachedData.csg
@@ -59,6 +71,8 @@ class CSG
 
 			return cachedData.csg
 
+	# Converts the optimized model from the selected node to a three model
+	# that is transformed to match the grid
 	_prepareModel: (cachedData, selectedNode) =>
 		return new Promise (resolve, reject) =>
 			if cachedData.transformedThreeModel?
@@ -73,6 +87,7 @@ class CSG
 			.catch (error) =>
 				reject(error)
 
+	# determines whether the CSG operation needs recalculation
 	_csgNeedsRecalculation: (cachedData, options) ->
 		if not cachedData.oldOptions?
 			return true

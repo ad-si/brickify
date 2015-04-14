@@ -64,4 +64,7 @@ class EditControl
 				@pointEventHandler.PointerCancel event
 				return true
 
+	relayoutModifiedParts: (selectedNode, touchedVoxels, createBricks) =>
+		@newBrickator.relayoutModifiedParts selectedNode, touchedVoxels, createBricks
+
 module.exports = EditControl

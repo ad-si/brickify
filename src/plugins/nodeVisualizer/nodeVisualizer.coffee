@@ -71,11 +71,6 @@ class NodeVisualizer
 		# instead of creating csg live, show original model semitransparent
 		visualizationData.modelVisualization.setSolidMaterial @printMaterial
 
-	# called by mouse handler
-	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>
-		@newBrickator.relayoutModifiedParts cachedData.node,
-			touchedVoxels, createBricks
-
 	rerunLegoPipeline: (selectedNode) =>
 		@newBrickator.runLegoPipeline selectedNode
 
@@ -208,5 +203,8 @@ class NodeVisualizer
 			return true
 
 		return visibleIntersections.length > 0
+
+	# get the (grid) voxel that is below the mouse
+	getVoxel: (event, selectedNode) =>
 
 module.exports = NodeVisualizer

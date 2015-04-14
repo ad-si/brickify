@@ -7,7 +7,7 @@ Random = require './Random'
 ###
 
 class BrickLayouter
-	constructor: (@pseudoRandom = false) ->
+	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
 	initializeBrickGraph: (grid) ->
@@ -57,7 +57,7 @@ class BrickLayouter
 				@_mergeBricksAndUpdateGraphConnections brick,
 					neighborsToMergeWith, bricksToLayout
 
-				if not brick.isValid()
+				if @debugMode and not brick.isValid()
 					console.warn 'Invalid brick: ', brick
 					console.warn '> Using pseudoRandom:', @pseudoRandom
 					console.warn '> current seed:', Random.getSeed()

@@ -133,4 +133,8 @@
 
 - getDownload
 
+# ## setFidelity
+# Plugins should adapt their visual fidelity to match the device's rendering power.
+# When the framerate is above / below a certain threshold, setFidelity is called
+
 - setFidelity

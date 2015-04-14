@@ -79,13 +79,15 @@ class FidelityControl
 
 	_increaseFidelity: =>
 		@currentFidelityLevel++
-		@pluginHooks.setFidelity(@currentFidelityLevel, FidelityControl.fidelityLevels)
-		console.log "_increaseFidelity",@currentFidelityLevel
+		@pluginHooks.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
 
 	_decreaseFidelity: =>
 		@currentFidelityLevel--
-		@pluginHooks.setFidelity(@currentFidelityLevel, FidelityControl.fidelityLevels)
-		console.log "_decreaseFidelity",@currentFidelityLevel
+		@pluginHooks.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
 
 	getHotkeys: =>
 		return {
@@ -106,11 +108,12 @@ class FidelityControl
 
 	_manualIncrease: =>
 		@autoAdjust = false
-		@_increaseFidelity()
+		if @currentFidelityLevel < FidelityControl.fidelityLevels.length - 1
+			@_increaseFidelity()
 
 	_manualDecrease: =>
 		@autoAdjust = false
-		@_decreaseFidelity()
+		@_decreaseFidelity() if @currentFidelityLevel > 0
 
 	_setupFpsDisplay: =>
 		@lastDisplayUpdate = 0

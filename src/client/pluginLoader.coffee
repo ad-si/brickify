@@ -85,5 +85,10 @@ module.exports = class PluginLoader
 				require '../plugins/editControl'
 				require '../plugins/editControl/package.json'
 			)
+		if @globalConfig.plugins.csg
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/csg'
+				require '../plugins/csg/package.json'
+			)
 
 		return @pluginInstances

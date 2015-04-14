@@ -1,0 +1,9 @@
+{
+  "name": "csg",
+  "version": "0.1.0",
+  "description": "Creates Constructive Solid Geometry",
+  "lowfab": {
+    "type": "?"
+  },
+  "browser": "./csg.coffee"
+}

@@ -4,7 +4,6 @@ PipelineSettings = require './pipeline/PipelineSettings'
 THREE = require 'three'
 Brick = require './pipeline/Brick'
 meshlib = require 'meshlib'
-CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
 Spinner = require '../../client/Spinner'
 
@@ -133,15 +132,18 @@ class NewBrickator
 					return data
 
 	getDownload: (selectedNode, downloadOptions) =>
-		csgOptions = {
-			studRadius: downloadOptions.studRadius
-			holeRadius: downloadOptions.holeRadius
-			addStuds: true
-		}
+		options = @_prepareCSGOptions(
+			downloadOptions.studRadius, downloadOptions.holeRadius
+		)
+
+		@csg ?= @bundle.getPlugin 'csg'
+		if not @csg?
+			console.warn 'Unable to create download due to CSG Plugin missing'
+			return Promise.resolve { data: '', fileName: '' }
 
 		dlPromise = new Promise (resolve, reject) =>
-			@_getCachedData(selectedNode).then (cachedData) =>
-				detailedCsg = @_createCSG selectedNode, cachedData, csgOptions
+			@csg.getCSG selectedNode, options
+			.then (detailedCsg) ->
 				if not detailedCsg?
 					resolve { data: '', fileName: '' }
 					return
@@ -159,72 +161,35 @@ class NewBrickator
 
 		return dlPromise
 
-	getCSG: (node, addStuds) =>
-		return @_getCachedData(node)
-		.then (cachedData) =>
-			csg = @_createCSG node, cachedData, {addStuds: addStuds}
-			return csg
+	_prepareCSGOptions: (studRadius, holeRadius) =>
+		options = {}
 
-	_createCSG: (selectedNode, cachedData, options) =>
 		# set stud and hole size
-		if options.studRadius?
+		if studRadius?
 			studSize = {
-				radius: options.studRadius
+				radius: studRadius
 				height: PipelineSettings.legoStudSize.height
 			}
 		else
 			studSize = PipelineSettings.legoStudSize
+		options.studSize = studSize
 
-		if options.holeRadius?
+		if holeRadius?
 			holeSize = {
-				radius: options.holeRadius
+				radius: holeRadius
 				height: PipelineSettings.legoHoleSize.height
 			}
 		else
 			holeSize = PipelineSettings.legoHoleSize
+		options.holeSize = holeSize
 
-		# return cached version if grid was not modified
-		if not @_csgNeedsRecalculation studSize.radius, holeSize.radius, cachedData
-			return cachedData.cachedCsg
-		cachedData.csgNeedsRecalculation = false
+		# add studs
+		options.addStuds = true
 
-		# get optimized model and transform to actual position
-		if not cachedData.optimizedThreeModel?
-			cachedData.optimizedThreeModel=
-				cachedData.optimizedModel.convertToThreeGeometry()
-			threeModel = cachedData.optimizedThreeModel
-			threeModel.applyMatrix threeHelper.getTransformMatrix selectedNode
-		else
-			threeModel = cachedData.optimizedThreeModel
+		return options
 
-		# create the intersection of selected voxels and the model mesh
-		@csgExtractor ?= new CsgExtractor()
 
-		cachedData.csgStudRadius = studSize.radius
-		cachedData.csgHoleRadius = holeSize.radius
 
-		options = {
-			profile: true
-			grid: cachedData.grid
-			studSize: studSize
-			holeSize: holeSize
-			addStuds: options.addStuds
-			transformedModel: threeModel
-		}
-
-		printThreeMesh = @csgExtractor.extractGeometry(cachedData.grid, options)
-
-		cachedData.cachedCsg = printThreeMesh
-		return printThreeMesh
-
-	_csgNeedsRecalculation: (studRadius, holeRadius, cachedData) ->
-		studSizeEqual = true if cachedData.csgStudRadius is studRadius
-		holeSizeEqual = true if cachedData.csgHoleRadius is holeRadius
-
-		return false if not cachedData.csgNeedsRecalculation and
-		studSizeEqual and holeSizeEqual
-
-		return true
 
 
 

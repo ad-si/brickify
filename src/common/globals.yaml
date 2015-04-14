@@ -69,6 +69,7 @@ plugins:
   nodeVisualizer: true
   fidelityControl: true
   editControl: true
+  csg: true
 
 # shall solid renderer display shadows and wireframe?
 createVisibleWireframe: true

@@ -188,9 +188,11 @@ class NodeVisualizer
 			cachedData.brickVisualization.showBrickLayer layer - 1
 
 	_showCsg: (cachedData) =>
-		return @newBrickator.getCSG(cachedData.node, true)
-				.then (csg) -> cachedData.brickVisualization.showCsg csg
+		@csg ?= @bundle.getPlugin 'csg'
+		return Promise.resolve() if not @csg?
 
+		return @csg.getCSG(cachedData.node, {addStuds: true})
+				.then (csg) -> cachedData.brickVisualization.showCsg csg
 
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>

@@ -1,6 +1,7 @@
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
+Random = require './Random'
 
 module.exports = class LegoPipeline
 	constructor: ->
@@ -25,7 +26,7 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Layout graph initialization'
-			decision: (options) => return options.initLayout
+			decision: (options) -> return options.initLayout
 			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 		}
@@ -34,8 +35,7 @@ module.exports = class LegoPipeline
 			name: 'Layout greedy merge'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.layoutByGreedyMerge lastResult.brickGraph,
-				lastResult.brickGraph.bricks
+				return @brickLayouter.layoutByGreedyMerge lastResult.grid
 		}
 
 		@pipelineSteps.push {
@@ -43,16 +43,7 @@ module.exports = class LegoPipeline
 			decision: (options) -> return options.reLayout
 			worker: (lastResult, options) =>
 				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
-				lastResult.brickGraph, lastResult.grid
-				return lastResult
-		}
-
-		@pipelineSteps.push {
-			name: 'Update Lego references in Grid'
-			decision: (options) -> return options.reLayout or options.layouting or
-					options.initLayout
-			worker: (lastResult, options) ->
-				lastResult.brickGraph.updateReferencesInGrid()
+				lastResult.grid
 				return lastResult
 		}
 
@@ -61,6 +52,10 @@ module.exports = class LegoPipeline
 			console.log "Starting Lego Pipeline
 			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
 			 onlyReLayout: #{options.reLayout})"
+
+			randomSeed = Math.floor Math.random() * 1000000
+			Random.setSeed randomSeed
+			console.log 'Using random seed', randomSeed
 
 			profilingResults = []
 

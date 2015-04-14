@@ -76,9 +76,10 @@ module.exports = class Coloring
 			return brick.visualizationMaterial
 
 		# collect materials of neighbors
-		neighbors = brick.uniqueNeighbors()
-		neighborColors = neighbors.map (brick) ->
-			brick.visualizationMaterial
+		neighbors = brick.getNeighbors()
+		neighborColors = []
+		neighbors.forEach (neighbor) ->
+			neighborColors.push neighbor.visualizationMaterial
 
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used

@@ -1,5 +1,6 @@
 expect = require('chai').expect
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
+BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
 
 describe 'Grid', ->
 	it 'should set a voxel', ->
@@ -84,3 +85,33 @@ describe 'Grid', ->
 		expect(ym.neighbors.Yp).to.equal(c)
 		expect(zp.neighbors.Zm).to.equal(c)
 		expect(zm.neighbors.Zp).to.equal(c)
+
+	it 'should initialize correct number of bricks', ->
+		grid = new Grid()
+		grid.numVoxelsX = 5
+		grid.numVoxelsY = 4
+		grid.numVoxelsZ = 6
+
+		for x in [0...grid.numVoxelsX]
+			for y in [0...grid.numVoxelsY]
+				for z in [0...grid.numVoxelsZ]
+					grid.setVoxel { x: x, y: y, z: z }
+
+		brickLayouter = new BrickLayouter()
+		brickLayouter.initializeBrickGraph(grid)
+
+		bricks = grid.getAllBricks()
+		numVoxels = grid.numVoxelsX * grid.numVoxelsY * grid.numVoxelsZ
+		expect(bricks.size).to.equal(numVoxels)
+
+	it 'should return correct number of bricks for a 1x1x1 configuration', ->
+		testGrid = new Grid()
+		testGrid.numVoxelsX = 1
+		testGrid.numVoxelsY = 1
+		testGrid.numVoxelsZ = 1
+		testGrid.setVoxel {x: 0, y: 0, z: 0}
+
+		brickLayouter = new BrickLayouter()
+		brickLayouter.initializeBrickGraph(testGrid)
+
+		expect(testGrid.getAllBricks().size).to.equal(1)

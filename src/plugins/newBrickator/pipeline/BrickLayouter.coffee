@@ -1,35 +1,34 @@
 Brick = require './Brick'
-BrickGraph = require './BrickGraph'
 arrayHelper = require './arrayHelper'
+Random = require './Random'
 
 ###
 # @class BrickLayouter
 ###
 
 class BrickLayouter
-	constructor: (pseudoRandom = false) ->
-		if pseudoRandom
-			@seed = 42
-			@_random = @_pseudoRandom
-		return
+	constructor: (@pseudoRandom = false, @debugMode = false) ->
+		Random.usePseudoRandom @pseudoRandom
 
 	initializeBrickGraph: (grid) ->
-		return brickGraph: new BrickGraph(grid)
+		grid.initializeBricks()
+		return grid
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
-	layoutByGreedyMerge: (brickGraph, bricksToLayout) =>
+	# !! Expects bricks to layout to be a Set !!
+	layoutByGreedyMerge: (grid, bricksToLayout) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
 
 		if not bricksToLayout?
-			bricksToLayout = brickGraph.bricks
+			bricksToLayout = grid.getAllBricks()
+			bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
 
-		for layer in bricksToLayout
-			numTotalInitialBricks += layer.length
+		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 
 		return unless numTotalInitialBricks > 0
@@ -37,135 +36,116 @@ class BrickLayouter
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
-				return {brickGraph: brickGraph}
+				return {grid: grid}
 
 			numRandomChoices++
 			mergeableNeighbors = @_findMergeableNeighbors brick
 
-			if !@_anyDefined(mergeableNeighbors)
+			if !@_anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					console.log " - randomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
-					# done with initial layout
-					break
+					break # done with initial layout
 				else
-					# randomly choose a new brick
-					continue
+					continue # randomly choose a new brick
 
-			while(@_anyDefined(mergeableNeighbors))
+			while(@_anyDefinedInArray(mergeableNeighbors))
 				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
-				brick = @_mergeBricksAndUpdateGraphConnections brick,
-					mergeableNeighbors, mergeIndex, brickGraph, bricksToLayout
+				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+
+				@_mergeBricksAndUpdateGraphConnections brick,
+					neighborsToMergeWith, bricksToLayout
+
+				if @debugMode and not brick.isValid()
+					console.warn 'Invalid brick: ', brick
+					console.warn '> Using pseudoRandom:', @pseudoRandom
+					console.warn '> current seed:', Random.getSeed()
+
 				mergeableNeighbors = @_findMergeableNeighbors brick
 
-		return {brickGraph: brickGraph}
-
-	optimizeForStability: (bricks) =>
-		for layer in bricks # access removed element?
-			for brick in layer
-				if brick? and brick.uniqueConnectedBricks().length is 0
-					console.log brick
-					if brick.uniqueNeighbors().length is 0
-						0
-						#arrayHelper.removeFirstOccurenceFromArray brick, bricks[brick.position.z]
-					else
-						console.log 'splitting brick and relayouting'
-						console.log brick
-						neighbors = brick.uniqueNeighbors()
-						oldBricks = neighbors.concat(brick)
-						@_splitBricksAndRelayout oldBricks, bricks
-
-		#console.log @_findWeakArticulationPoints bricks
-
-	###
-	# Split up all supplied bricks into single bricks and relayout. This means
-	# that all bricks will be relayouted.
-	#
-	# @param {Array<Brick>} oldBricks
-	# @param {Array<Array<Brick>>} bricks
-	###
-	_splitBricksAndRelayout: (oldBricks, bricks) =>
-		newBricks = @_splitBricks oldBricks, bricks
-		@layoutByGreedyMerge bricks
-		return
+		return {grid: grid}
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This
 	# means that all supplied bricks and their neighbors will be relayouted.
 	#
-	# @param {Array<Brick>} oldBricks
-	# @param {BrickGraph} brickGraph
+	# @param {Array<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (oldBricks, brickGraph, grid) =>
-		bricksToSplit = []
+	splitBricksAndRelayoutLocally: (bricks, grid) =>
+		bricksToSplit = new Set()
 
-		for brick in oldBricks
-			bricksToSplit = bricksToSplit.concat brick.uniqueNeighbors()
-			bricksToSplit.push brick
+		for brick in bricks
+			# add this brick to be split
+			bricksToSplit.add brick
 
-		bricksToSplit = arrayHelper.removeDuplicates bricksToSplit
+			# get neighbours in same z layer
+			xp = brick.getNeighbors(Brick.direction.Xp)
+			xm = brick.getNeighbors(Brick.direction.Xm)
+			yp = brick.getNeighbors(Brick.direction.Yp)
+			ym = brick.getNeighbors(Brick.direction.Ym)
 
-		newBricks = @_splitBricks bricksToSplit, brickGraph
+			# add them all to be split as well
+			xp.forEach (brick) -> bricksToSplit.add brick
+			xm.forEach (brick) -> bricksToSplit.add brick
+			yp.forEach (brick) -> bricksToSplit.add brick
+			ym.forEach (brick) -> bricksToSplit.add brick
 
-		legoBricks = []
-		for brick in newBricks
-			p = brick.position
-			if grid? and not grid.hasVoxelAt p.x, p.y, p.z
-				# This brick does not belong to any voxel --> delete brick
-				brickGraph.deleteBrick brick
-			else if grid? and not grid.getVoxel(p.x, p.y, p.z).enabled
-				# This voxel is going to be 3d printed --> delete brick
-				brickGraph.deleteBrick brick
-			else
-				legoBricks.push brick
+		newBricks = @_splitBricks bricksToSplit
 
-		# reset visible material
-		for brick in legoBricks
-			brick.visualizationMaterial = null
+		bricksToBeDeleted = new Set()
 
-		@layoutByGreedyMerge brickGraph, [legoBricks]
+		newBricks.forEach (brick) ->
+			brick.forEachVoxel (voxel) ->
+				# delete bricks where voxels are disabled (3d printed)
+				if not voxel.enabled
+					# remove from relayout list
+					bricksToBeDeleted.add brick
+					# delete brick from structure
+					brick.clear()
+
+		bricksToBeDeleted.forEach (brick) ->
+			newBricks.delete brick
+
+		@layoutByGreedyMerge grid, newBricks
 
 		return {
 			removedBricks: bricksToSplit
-			newBricks: legoBricks
+			newBricks: newBricks
 		}
 
-	# splits each brick in bricks to split, updates reference in brickGraph
-	_splitBricks: (bricksToSplit, brickGraph) ->
-		newBricks = []
+	# splits each brick in bricks to split, returns all newly generated
+	# bricks as a set
+	_splitBricks: (bricksToSplit) ->
+		newBricks = new Set()
 
-		for brick in bricksToSplit
-			newBricks = newBricks.concat brick.split()
-			brickGraph.deleteBrick brick
-
-		for newBrick in newBricks
-			brickGraph.bricks[newBrick.position.z].push newBrick
+		bricksToSplit.forEach (brick) ->
+			splitGenerated = brick.splitUp()
+			splitGenerated.forEach (brick) ->
+				newBricks.add brick
 
 		return newBricks
 
-	_anyDefined: (mergeableNeighbors) ->
+	_anyDefinedInArray: (mergeableNeighbors) ->
 		return mergeableNeighbors.some (entry) -> entry?
 
-	# choses a random brick out of brickLayers
-	_chooseRandomBrick: (brickLayers) =>
-		i = 0
-		brickList = brickLayers[@_random(brickLayers.length)]
+	# chooses a random brick out of the set
+	_chooseRandomBrick: (setOfBricks) ->
+		if setOfBricks.size == 0
+			return null
 
-		while brickList.length is 0 # if a layer has no bricks, retry
-			if ++i >= brickLayers.length
-				return null
-			brickList = brickLayers[@_random(brickLayers.length)]
+		if setOfBricks.chooseRandomBrick?
+			return setOfBricks.chooseRandomBrick()
 
-		brick = brickList[@_random(brickList.length)]
+		rnd = Random.next(setOfBricks.size)
+
+		iterator = setOfBricks.entries()
+		brick = iterator.next().value[0]
+		while rnd > 0
+			brick = iterator.next().value[0]
+			rnd--
+
 		return brick
-
-	_random: (max) ->
-		Math.floor Math.random() * max
-
-	_pseudoRandom: (max) ->
-		@seed = (1103515245 * @seed + 12345) % 2 ^ 31
-		@seed % max
 
 	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
@@ -211,192 +191,83 @@ class BrickLayouter
 	# @see Brick
 	###
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
-		if brick.neighbors[dir].length > 0
+		neighborsInDirection = brick.getNeighbors(dir)
+		if neighborsInDirection.size > 0
+			# check that the neighbors together don't exceed this brick's width
 			width = 0
-			ids = []
-			for neighbor in brick.neighbors[dir]
-				width += widthFn neighbor.size
-				if neighbor.id in ids
-					console.warn 'detected duplicate neighbour'
-					console.warn neighbor.id
-					console.warn brick
-					return
-				else
-					ids.push neighbor.id
-			if width == widthFn(brick.size)
-				minWidth = widthFn brick.position
-				maxWidth = widthFn(brick.position) + widthFn(brick.size) - 1
-				length = lengthFn(brick.neighbors[dir][0].size)
-				for neighbor in brick.neighbors[dir]
-					if widthFn(neighbor.position) < minWidth
-						return
-					else if widthFn(neighbor.position) +
-					widthFn(neighbor.size) - 1 > maxWidth
-						return
-					if lengthFn(neighbor.size) != length
-						return
-				if Brick.isValidSize(widthFn(brick.size), lengthFn(brick.size) +
-				length, brick.size.z)
-					return brick.neighbors[dir]
+			neighborsInDirection.forEach (neighbor) ->
+				width += widthFn neighbor.getSize()
 
-	# Returns the index of the mergeableNeighbors sub-array,
+			# if they have the same width, check ...?
+			if width == widthFn(brick.getSize())
+				minWidth = widthFn brick.getPosition()
+
+				maxWidth = widthFn(brick.getPosition())
+				maxWidth += widthFn(brick.getSize()) - 1
+
+				length = null
+
+				invalidSize = false
+				neighborsInDirection.forEach (neighbor) ->
+					length ?= lengthFn neighbor.getSize()
+
+					if widthFn(neighbor.getPosition()) < minWidth
+						invalidSize = true
+
+					nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
+					if nw > maxWidth
+						invalidSize = true
+
+					if lengthFn(neighbor.getSize()) != length
+						invalidSize = true
+
+				if invalidSize
+					return null
+
+				if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
+				length, brick.getSize().z)
+					return neighborsInDirection
+				else
+					return null
+
+	# Returns the index of the mergeableNeighbors sub-set-in-this-array,
 	# where the bricks have the most connected neighbors.
-	# If multiple sub-arrays have the same number of connected neigbours,
+	# If multiple sub-arrays have the same number of connected neighbors,
 	# one is randomly chosen
-	_chooseNeighborsToMergeWith: (mergeableNeighbors) =>
+	_chooseNeighborsToMergeWith: (mergeableNeighbors) ->
 		numConnections = []
 		maxConnections = 0
 
-		for neighbors, i in mergeableNeighbors
-			connectedBricks = []
-			continue if not neighbors
+		for neighborSet, i in mergeableNeighbors
+			continue if not neighborSet?
 
-			for neighbor in neighbors
-				connectedBricks = connectedBricks.concat neighbor.uniqueConnectedBricks()
-			connectedBricks = arrayHelper.removeDuplicates connectedBricks
+			connectedBricks = new Set()
+
+			neighborSet.forEach (neighbor) ->
+				neighborConnections = neighbor.connectedBricks()
+				neighborConnections.forEach (brick) ->
+					connectedBricks.add brick
 
 			numConnections.push {
-				num: connectedBricks.length
+				num: connectedBricks.size
 				index: i
 			}
-			maxConnections = Math.max maxConnections, connectedBricks.length
+
+			maxConnections = Math.max maxConnections, connectedBricks.size
 
 		largestConnections = numConnections.filter (element) ->
 			return element.num == maxConnections
 
-		randomOfLargest = largestConnections[@_random(largestConnections.length)]
+		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index
 
 	_mergeBricksAndUpdateGraphConnections: (
-		brick, mergeableNeighbors, mergeIndex, brickGraph, bricksToLayout ) ->
+		brick, mergeNeighbors, bricksToLayout ) ->
 
-		mergeNeighbors = mergeableNeighbors[mergeIndex]
+		mergeNeighbors.forEach (neighborToMergeWith) ->
+			bricksToLayout.delete neighborToMergeWith
+			brick.mergeWith neighborToMergeWith
 
-		ps = brick.getPositionAndSizeForNewBrick mergeIndex, mergeNeighbors
-		newBrick = new Brick(ps.position, ps.size)
-
-		#save oldBricks in newBrick for debugging
-		newBrick.mergedNeighbors = mergeNeighbors
-		newBrick.mergedBrick = brick
-
-		# set new brick connections & neighbors
-		for neighbor in mergeNeighbors
-			newBrick.getConnectionsFromMergingBrick neighbor
-			newBrick.getNeighborsFromMergingBrick neighbor
-		newBrick.getConnectionsFromMergingBrick brick
-		newBrick.getNeighborsFromMergingBrick brick
-
-		# delete outdated bricks from bricks array
-		z = brick.position.z
-		arrayHelper.removeFirstOccurenceFromArray brick, brickGraph.bricks[z]
-		if bricksToLayout
-			arrayHelper.removeFirstOccurenceFromArray brick, bricksToLayout[0]
-		for neighbor in mergeNeighbors
-			arrayHelper.removeFirstOccurenceFromArray neighbor, brickGraph.bricks[z]
-			if bricksToLayout
-				arrayHelper.removeFirstOccurenceFromArray neighbor, bricksToLayout[0]
-
-		# add newBrick to bricks array
-		brickGraph.bricks[z].push newBrick
-		return newBrick
-
-	_getBiconnectedComponents: (bricks) =>
-		@index = 0
-		biconnectedComponents = []
-		stack = []
-		for zLayer in bricks
-			for brick in zLayer
-				if brick.biconnectedComponentId == undefined
-					@_findBiconnectedComponents brick, biconnectedComponents, stack
-		return biconnectedComponents
-
-	###
-	# This algorithm searches for biconnected components in the subgraph that is
-	# reachable from the supplied brick.
-	# see http://en.algoritmy.net/article/44220/Tarjans-algorithm
-	#
-	# @param {Brick} brick
-	# @param {Array<Array<Brick>>} biconnectedComponents
-	# @param {Array<Brick>} stack
-	# @param {Brick} brick
-	###
-	_findBiconnectedComponents: (brick, biconnectedComponents, stack) =>
-		brick.biconnectedComponentId = @index
-		brick.lowlink = @index
-		@index++
-		stack.push(brick)
-		for connectedBrick in brick.uniqueConnectedBricks()
-			if connectedBrick.biconnectedComponentId == undefined
-				@_findBiconnectedComponents(connectedBrick, biconnectedComponents, stack)
-				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
-				then brick.lowlink else connectedBrick.lowlink
-			else if stack.indexOf(connectedBrick) > -1
-				brick.lowlink = if brick.lowlink < connectedBrick.lowlink
-				then brick.lowlink else connectedBrick.lowlink
-
-		if brick.lowlink == brick.biconnectedComponentId
-			otherBrick = null
-			component = []
-			while true
-				otherBrick = stack.pop()
-				component.push otherBrick
-				break if otherBrick == brick
-			biconnectedComponents.push component
-
-	###
-	# Find weak articulation points in the graph.
-	#
-	# @param {Array<Brick>} bricks All bricks in the graph
-	# @return {Array<Brick>} Bricks that are weak articulation points
-	###
-	_findWeakArticulationPoints: (bricks) =>
-		# TODO filter out trivial articulation points
-		return @_getArticulationPoints bricks
-
-	###
-	# Find potentially weak points (articulation points) in the graph.
-	#
-	# @param {Array<Brick>} bricks All bricks in the graph
-	# @return {Array<Brick>} Bricks that are articulation points
-	###
-	_getArticulationPoints: (bricks) =>
-		@time = 0
-		articulationPoints = []
-		for zLayer in bricks
-			for brick in zLayer
-				brick.discovered = false
-				brick.parent = null
-				brick.discoveryTime = -1
-		for zLayer in bricks
-			for brick in zLayer
-				if brick.discovered == undefined or !brick.discovered
-					@_findArticulationPoints brick, articulationPoints
-		articulationPoints
-
-	###
-	# Find potentially weak points in the subgraph that is reachable from the
-	# supplied brick.
-	#
-	# @param {Brick} brick the start brick
-	# @param {Array} articulationPoints An Array of previously found articulation
-	# points. The results are appended to this array.
-	###
-	_findArticulationPoints: (brick, articulationPoints) =>
-		brick.discoveryTime = brick.lowlink = ++@time
-		brick.discovered = true
-		children = 0
-		for otherBrick in brick.uniqueConnectedBricks()
-			if otherBrick.discovered is undefined or !otherBrick.discovered
-				otherBrick.parent = brick
-				children++
-				@_findArticulationPoints otherBrick, articulationPoints
-				brick.lowlink = Math.min brick.lowlink, otherBrick.lowlink
-				if !brick.parent? and children > 1
-					articulationPoints.push brick
-				if brick.parent?
-					if otherBrick.lowlink >= brick.discoveryTime
-						articulationPoints.push brick
-			else if otherBrick.parent != brick
-				brick.lowlink = Math.min brick.lowlink, otherBrick.discoveryTime
+		return brick
 
 module.exports = BrickLayouter

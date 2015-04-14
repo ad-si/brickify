@@ -71,17 +71,6 @@ class NodeVisualizer
 		# instead of creating csg live, show original model semitransparent
 		visualizationData.modelVisualization.setSolidMaterial @printMaterial
 
-	# called by mouse handler
-	_relayoutModifiedParts: (cachedData, touchedVoxels, createBricks) =>
-		@newBrickator.relayoutModifiedParts cachedData.node,
-			touchedVoxels, createBricks
-
-	rerunLegoPipeline: (selectedNode) =>
-		@newBrickator.runLegoPipeline selectedNode
-
-	_everythingPrint: (selectedNode) =>
-		@newBrickator.everythingPrint selectedNode
-
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'brickVisualizer'

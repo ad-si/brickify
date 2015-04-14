@@ -2,7 +2,7 @@ BrushHandler = require './BrushHandler'
 PointEventHandler = require './pointEventHandler'
 pointerEnums = require '../../client/ui/pointerEnums'
 
-class EditControl
+class EditController
 	constructor: ->
 		@interactionDisabled = false
 
@@ -64,4 +64,14 @@ class EditControl
 				@pointEventHandler.PointerCancel event
 				return true
 
-module.exports = EditControl
+	# Methods called by brush handler
+	relayoutModifiedParts: (selectedNode, touchedVoxels, createBricks) =>
+		@newBrickator.relayoutModifiedParts selectedNode, touchedVoxels, createBricks
+
+	rerunLegoPipeline: (selectedNode) =>
+		@newBrickator.runLegoPipeline selectedNode
+
+	everythingPrint: (selectedNode) =>
+		@newBrickator.everythingPrint selectedNode
+
+module.exports = EditController

@@ -38,19 +38,21 @@ class CSG
 			options.addStuds = false
 
 	# returns own cached data and links grid from newBrickator data
+	# resets newBrickators csgNeedsRecalculation flag
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'csg'
 		.then (data) =>
-			return data if data?
+			if not data?
+				# create empty dataset for own data
+				data = {}
+				selectedNode.storePluginData 'csg', data, true
 
-			# create empty dataset for own data
-			data = {}
-			selectedNode.storePluginData 'csg', data, true
-
-			#link grid from newBrickator
+			#link grid and dirty flag from newBrickator
 			return selectedNode.getPluginData 'newBrickator'
 			.then (newBrickatorData) =>
 				data.grid = newBrickatorData.grid
+				data.csgNeedsRecalculation = newBrickatorData.csgNeedsRecalculation
+				newBrickatorData.csgNeedsRecalculation = false
 				# finally return own data + newBrickator grid
 				return data
 
@@ -89,15 +91,21 @@ class CSG
 
 	# determines whether the CSG operation needs recalculation
 	_csgNeedsRecalculation: (cachedData, options) ->
+		newOptions = JSON.stringify options
+
+		# check if options changed
 		if not cachedData.oldOptions?
+			cachedData.oldOptions = newOptions
 			return true
 
-		newOptions = JSON.stringify options
-		return false if cachedData.oldOptions == newOptions
+		if cachedData.oldOptions != newOptions
+			cachedData.oldOptions = newOptions
+			return true
 
 		cachedData.oldOptions = newOptions
-		return true
 
-
+		# check if threre was a brush action that forces us
+		# to recreate CSG
+		return cachedData.csgNeedsRecalculation
 
 module.exports = CSG

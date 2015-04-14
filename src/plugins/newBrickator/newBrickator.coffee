@@ -173,6 +173,7 @@ class NewBrickator
 			}
 		else
 			studSize = PipelineSettings.legoStudSize
+		options.studSize = studSize
 
 		if holeRadius?
 			holeSize = {
@@ -181,6 +182,7 @@ class NewBrickator
 			}
 		else
 			holeSize = PipelineSettings.legoHoleSize
+		options.holeSize = holeSize
 
 		# add studs
 		options.addStuds = true

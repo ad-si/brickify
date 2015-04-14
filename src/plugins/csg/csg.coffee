@@ -52,7 +52,6 @@ class CSG
 			cachedData.transformedThreeModel = threeModel
 			@csgExtractor ?= new CsgExtractor()
 
-			console.log "Csg options: " + JSON.stringify options
 			options.profile = true
 			options.transformedModel = cachedData.transformedThreeModel
 

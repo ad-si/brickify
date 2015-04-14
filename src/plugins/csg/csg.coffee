@@ -38,7 +38,7 @@ class CSG
 			options.addStuds = false
 
 	# returns own cached data and links grid from newBrickator data
-	# resets newBrickators csgNeedsRecalculation flag
+	# resets newBrickator's csgNeedsRecalculation flag
 	_getCachedData: (selectedNode) ->
 		return selectedNode.getPluginData 'csg'
 		.then (data) ->
@@ -104,7 +104,7 @@ class CSG
 
 		cachedData.oldOptions = newOptions
 
-		# check if threre was a brush action that forces us
+		# check if there was a brush action that forces us
 		# to recreate CSG
 		return cachedData.csgNeedsRecalculation
 

@@ -124,7 +124,7 @@ class VoxelUnion
 					upperIndices[0], upperIndices[3], upperIndices[1])
 
 	###
-	# creates a datastructure consisting of a
+	# creates a data structure consisting of a
 	# [z][x][y] nested array out of the voxel list
 	# @param {Array<Object>} voxels Array of voxels
 	###

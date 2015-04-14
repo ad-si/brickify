@@ -189,7 +189,7 @@ class NodeVisualizer
 
 	_showCsg: (cachedData) =>
 		@csg ?= @bundle.getPlugin 'csg'
-		return if not @csg?
+		return Promise.resolve() if not @csg?
 
 		return @csg.getCSG(cachedData.node, {addStuds: true})
 				.then (csg) -> cachedData.brickVisualization.showCsg csg

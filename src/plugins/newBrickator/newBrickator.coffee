@@ -139,8 +139,7 @@ class NewBrickator
 		@csg ?= @bundle.getPlugin 'csg'
 		if not @csg?
 			console.warn 'Unable to create download due to CSG Plugin missing'
-			resolve { data: '', fileName: '' }
-			return
+			return Promise.resolve { data: '', fileName: '' }
 
 		dlPromise = new Promise (resolve, reject) =>
 			@csg.getCSG selectedNode, options

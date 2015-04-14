@@ -127,7 +127,7 @@ class Brick
 		return @_neighbors[direction]
 
 	# tells this brick to update cached neighbors indices
-	recacheNeighbors: =>
+	clearNeighborsCache: =>
 		@_neighbors = null
 
 	# Connected Bricks are neighbors in Zp and Zm direction
@@ -147,10 +147,9 @@ class Brick
 	# This brick has no voxels after this operation
 	splitUp: =>
 		# tell neighbors to update their cache
-		for direction in Brick.direction
+		for direction of Brick.direction
 			neighbors = @getNeighbors direction
-			for neighbor in neighbors
-				neighbor.recacheNeighbors()
+			neighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
 
 		# create new bricks
 		newBricks = new Set()
@@ -187,12 +186,12 @@ class Brick
 		@_neighbors = null
 
 		# tell neighbors to update their cache
-		for direction in Brick.direction
-			otherNeighbors = @getNeighbors direction
+		for direction of Brick.direction
 			neighbors = @getNeighbors direction
-			for neighbor in neighbors
-				otherNeighbors.recacheNeighbors()
-				neighbor.recacheNeighbors()
+			neighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
+
+			otherNeighbors = otherBrick.getNeighbors direction
+			otherNeighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
 
 		#take voxels from other brick
 		newVoxels = new Set()

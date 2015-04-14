@@ -17,11 +17,19 @@ fpsDisplayUpdateTime = 1000
 # @class FidelityControl
 ###
 class FidelityControl
+	@fidelityLevels = [
+		'DefaultLow',
+		'DefaultMedium',
+		'DefaultHigh',
+		'PipelineLow',
+		'PipelineMedium',
+		'PipelineHigh',
+	]
+
 	init: (bundle) =>
 		@pluginHooks = bundle.pluginHooks
 
-		@canIncreaseVisualQuality = true
-		@canDecreaseVisualQuality = true
+		@currentFidelityLevel = 0
 
 		@autoAdjust = true
 
@@ -53,7 +61,7 @@ class FidelityControl
 	_adjustFidelity: (fps) =>
 		return unless @autoAdjust
 
-		if fps < minimalAcceptableFps and @canDecreaseVisualQuality
+		if fps < minimalAcceptableFps and @currentFidelityLevel > 0
 			# count how often we dropped below the desired fps
 			# it has to occur at least @timesBelowThreshold times to cause a change
 			@timesBelowMinimumFps++
@@ -62,31 +70,22 @@ class FidelityControl
 			@timesBelowMinimumFps = 0
 			@_decreaseFidelity()
 
-		else if fps > upgradeThresholdFps and @canIncreaseVisualQuality
+		else if fps > upgradeThresholdFps and
+		@currentFidelityLevel < FidelityControl.fidelityLevels.length - 1
 			# upgrade instantly, but reset downgrade counter
 			@timesBelowMinimumFps = 0
 
 			@_increaseFidelity()
 
 	_increaseFidelity: =>
-		results = @pluginHooks.beautify()
-
-		# assume that there is a way back if we can increase quality
-		@canDecreaseVisualQuality = true
-
-		# if there is no plugin that increased quality (and returned true), then
-		# we don't need to try it again
-		@canIncreaseVisualQuality = true in results
+		@currentFidelityLevel++
+		@pluginHooks.setFidelity(@currentFidelityLevel, FidelityControl.fidelityLevels)
+		console.log "_increaseFidelity",@currentFidelityLevel
 
 	_decreaseFidelity: =>
-		results = @pluginHooks.uglify()
-
-		# assume that there is a way back if we decreased quality
-		@canIncreaseVisualQuality = true
-
-		# if there is no plugin that decreased quality (and returned true), then
-		# we don't need to try it again
-		@canDecreaseVisualQuality = true in results
+		@currentFidelityLevel--
+		@pluginHooks.setFidelity(@currentFidelityLevel, FidelityControl.fidelityLevels)
+		console.log "_decreaseFidelity",@currentFidelityLevel
 
 	getHotkeys: =>
 		return {
@@ -107,11 +106,11 @@ class FidelityControl
 
 	_manualIncrease: =>
 		@autoAdjust = false
-		@pluginHooks.beautify()
+		@_increaseFidelity()
 
 	_manualDecrease: =>
 		@autoAdjust = false
-		@pluginHooks.uglify()
+		@_decreaseFidelity()
 
 	_setupFpsDisplay: =>
 		@lastDisplayUpdate = 0

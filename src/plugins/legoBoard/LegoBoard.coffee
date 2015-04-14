@@ -83,21 +83,8 @@ module.exports = class LegoBoard
 	toggleVisibility: =>
 		@threejsNode.visible = !@threejsNode.visible
 
-	uglify: =>
-		if @highQualMode
-			@highQualMode = false
-
-			#hide studs
-			@threejsNode.children[1].visible = false
-			#change baseplate material to stud texture
-			@threejsNode.children[0].material = @baseplateTexturedMaterial
-			@currentBaseplateMaterial = @baseplateTexturedMaterial
-			return true
-
-		return false
-
-	beautify: =>
-		if not @highQualMode
+	setFidelity: (fidelityLevel, availableLevels) =>
+		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
 			@highQualMode = true
 
 			#show studs
@@ -105,6 +92,11 @@ module.exports = class LegoBoard
 			#remove texture because we have physical studs
 			@threejsNode.children[0].material = @baseplateMaterial
 			@currentBaseplateMaterial = @baseplateMaterial
-			return true
+		else
+			@highQualMode = false
 
-		return false
+			#hide studs
+			@threejsNode.children[1].visible = false
+			#change baseplate material to stud texture
+			@threejsNode.children[0].material = @baseplateTexturedMaterial
+			@currentBaseplateMaterial = @baseplateTexturedMaterial

@@ -60,7 +60,7 @@ class BrickLayouter
 				if not brick.isValid()
 					console.warn 'Invalid brick: ', brick
 					console.warn '> Using pseudoRandom:', @pseudoRandom
-					console.warn '> current seed:', @pseudoRandom
+					console.warn '> current seed:', Random.getSeed()
 
 				mergeableNeighbors = @_findMergeableNeighbors brick
 

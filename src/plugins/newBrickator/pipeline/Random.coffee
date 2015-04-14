@@ -1,7 +1,11 @@
 seed = 42
 usePseudoRandom = false
+
 module.exports.setSeed = (number) ->
 	seed = number
+
+module.exports.getSeed = ->
+	return seed
 
 module.exports.usePseudoRandom = (boolean) ->
 	usePseudoRandom = boolean

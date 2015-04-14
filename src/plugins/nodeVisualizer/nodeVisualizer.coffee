@@ -71,9 +71,6 @@ class NodeVisualizer
 		# instead of creating csg live, show original model semitransparent
 		visualizationData.modelVisualization.setSolidMaterial @printMaterial
 
-	rerunLegoPipeline: (selectedNode) =>
-		@newBrickator.runLegoPipeline selectedNode
-
 	_everythingPrint: (selectedNode) =>
 		@newBrickator.everythingPrint selectedNode
 

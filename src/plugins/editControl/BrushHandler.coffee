@@ -91,7 +91,7 @@ class BrushHandler
 		.then (cachedData) =>
 			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
 			cachedData.brickVisualization.updateModifiedVoxels()
-			@nodeVisualizer.rerunLegoPipeline selectedNode
+			@editControl.rerunLegoPipeline selectedNode
 
 
 	_printMouseDown: (event, selectedNode) =>

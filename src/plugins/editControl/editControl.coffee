@@ -64,7 +64,11 @@ class EditControl
 				@pointEventHandler.PointerCancel event
 				return true
 
+	# Methods called by brush handler
 	relayoutModifiedParts: (selectedNode, touchedVoxels, createBricks) =>
 		@newBrickator.relayoutModifiedParts selectedNode, touchedVoxels, createBricks
+
+	rerunLegoPipeline: (selectedNode) =>
+		@newBrickator.runLegoPipeline selectedNode
 
 module.exports = EditControl

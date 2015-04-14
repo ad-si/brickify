@@ -2,7 +2,7 @@ BrushHandler = require './BrushHandler'
 PointEventHandler = require './pointEventHandler'
 pointerEnums = require '../../client/ui/pointerEnums'
 
-class EditControl
+class EditController
 	constructor: ->
 		@interactionDisabled = false
 
@@ -74,4 +74,4 @@ class EditControl
 	everythingPrint: (selectedNode) =>
 		@newBrickator.everythingPrint selectedNode
 
-module.exports = EditControl
+module.exports = EditController

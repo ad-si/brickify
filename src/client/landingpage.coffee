@@ -18,7 +18,7 @@ globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
-globalConfig.plugins.editControl = false
+globalConfig.plugins.editController = false
 
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false

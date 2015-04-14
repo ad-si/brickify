@@ -253,8 +253,7 @@ class Brick
 		if not noHoles
 			console.warn 'Invalid: brick has holes'
 
-		return true if hasVoxels and validSize and noHoles
-		return false
+		return hasVoxels and validSize and noHoles
 
 	getStability: =>
 		s = @getSize()

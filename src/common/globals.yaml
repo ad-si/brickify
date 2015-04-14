@@ -68,7 +68,7 @@ plugins:
   newBrickator: true
   nodeVisualizer: true
   fidelityControl: true
-  editControl: true
+  editController: true
   csg: true
 
 # shall solid renderer display shadows and wireframe?

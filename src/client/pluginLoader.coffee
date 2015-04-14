@@ -80,10 +80,10 @@ module.exports = class PluginLoader
 				require '../plugins/fidelityControl'
 				require '../plugins/fidelityControl/package.json'
 			)
-		if @globalConfig.plugins.editControl
+		if @globalConfig.plugins.editController
 			@pluginInstances.push @_loadPlugin(
-				require '../plugins/editControl'
-				require '../plugins/editControl/package.json'
+				require '../plugins/editController'
+				require '../plugins/editController/package.json'
 			)
 		if @globalConfig.plugins.csg
 			@pluginInstances.push @_loadPlugin(

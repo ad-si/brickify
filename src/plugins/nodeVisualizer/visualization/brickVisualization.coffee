@@ -123,17 +123,13 @@ class BrickVisualization
 
 		# sort by layer
 		brickLayers = []
-		maxlayer = 0
 		@grid.getAllBricks().forEach (brick) ->
 			z = brick.getPosition().z
 			brickLayers[z] ?= []
 			brickLayers[z].push brick
-			maxlayer = Math.max maxlayer, z
 
-		# Add bricks layerwise (because build view)
-		for i in [0..maxlayer]
-			brickLayer = brickLayers[i]
-
+		# Add bricks layerwise (because of build view)
+		for z, brickLayer of brickLayers
 			layerObject = new THREE.Object3D()
 			@bricksSubnode.add layerObject
 

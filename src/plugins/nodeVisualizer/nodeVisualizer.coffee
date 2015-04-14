@@ -198,7 +198,4 @@ class NodeVisualizer
 
 		return visibleIntersections.length > 0
 
-	# get the (grid) voxel that is below the mouse
-	getVoxel: (event, selectedNode) =>
-
 module.exports = NodeVisualizer

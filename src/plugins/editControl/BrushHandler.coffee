@@ -144,6 +144,6 @@ class BrushHandler
 			return unless cachedData.
 			brickVisualization.makeAllVoxels3dPrinted selectedNode
 			cachedData.brickVisualization.updateModifiedVoxels()
-			@nodeVisualizer._everythingPrint selectedNode
+			@editControl.everythingPrint selectedNode
 
 module.exports = BrushHandler

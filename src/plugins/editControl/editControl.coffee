@@ -71,4 +71,7 @@ class EditControl
 	rerunLegoPipeline: (selectedNode) =>
 		@newBrickator.runLegoPipeline selectedNode
 
+	everythingPrint: (selectedNode) =>
+		@newBrickator.everythingPrint selectedNode
+
 module.exports = EditControl

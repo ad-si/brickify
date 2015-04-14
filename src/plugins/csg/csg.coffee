@@ -21,7 +21,7 @@ class CSG
 			@_createCSG cachedData, selectedNode, options
 
 	# applies default values if they don't exist yet
-	_applyDefaultValues: (options) =>
+	_applyDefaultValues: (options) ->
 		if not options.studSize?
 			options.studSize = {
 				radius: 2.4
@@ -39,9 +39,9 @@ class CSG
 
 	# returns own cached data and links grid from newBrickator data
 	# resets newBrickators csgNeedsRecalculation flag
-	_getCachedData: (selectedNode) =>
+	_getCachedData: (selectedNode) ->
 		return selectedNode.getPluginData 'csg'
-		.then (data) =>
+		.then (data) ->
 			if not data?
 				# create empty dataset for own data
 				data = {}
@@ -49,7 +49,7 @@ class CSG
 
 			#link grid and dirty flag from newBrickator
 			return selectedNode.getPluginData 'newBrickator'
-			.then (newBrickatorData) =>
+			.then (newBrickatorData) ->
 				data.grid = newBrickatorData.grid
 				data.csgNeedsRecalculation = newBrickatorData.csgNeedsRecalculation
 				newBrickatorData.csgNeedsRecalculation = false
@@ -75,18 +75,18 @@ class CSG
 
 	# Converts the optimized model from the selected node to a three model
 	# that is transformed to match the grid
-	_prepareModel: (cachedData, selectedNode) =>
-		return new Promise (resolve, reject) =>
+	_prepareModel: (cachedData, selectedNode) ->
+		return new Promise (resolve, reject) ->
 			if cachedData.transformedThreeModel?
 				resolve(cachedData.transformedThreeModel)
 				return
 
 			selectedNode.getModel()
-			.then (model) =>
+			.then (model) ->
 				threeModel = model.convertToThreeGeometry()
 				threeModel.applyMatrix threeHelper.getTransformMatrix selectedNode
 				resolve(threeModel)
-			.catch (error) =>
+			.catch (error) ->
 				reject(error)
 
 	# determines whether the CSG operation needs recalculation

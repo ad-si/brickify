@@ -17,7 +17,7 @@ class Brick
 	]
 
 	# returns true if the given size is a valid size
-	@isValidSize: (x, y, z) =>
+	@isValidSize: (x, y, z) ->
 		for testSize in Brick.validBrickSizes
 			if testSize[0] == x and testSize[1] == y and
 			testSize[2] == z
@@ -48,7 +48,7 @@ class Brick
 	# belongs to this brick
 	isVoxelInBrick: (x, y, z) ->
 		inBrick = false
-		@forEachVoxel (vox) =>
+		@forEachVoxel (vox) ->
 			if vox.position.x == x and
 			vox.position.y == y and
 			vox.position.z == z
@@ -67,7 +67,7 @@ class Brick
 		y = undefined
 		z = undefined
 
-		@forEachVoxel (voxel) =>
+		@forEachVoxel (voxel) ->
 			x = voxel.position.x if not x?
 			x = Math.min voxel.position.x, x
 			y = voxel.position.y if not y?
@@ -196,7 +196,7 @@ class Brick
 		#take voxels from other brick
 		newVoxels = new Set()
 
-		otherBrick.forEachVoxel (voxel) =>
+		otherBrick.forEachVoxel (voxel) ->
 			newVoxels.add voxel
 
 		otherBrick.clear()
@@ -224,7 +224,7 @@ class Brick
 				for z in [p.z...(p.z + s.z)]
 					voxelCheck[x + '-' + y + '-' + z] = false
 
-		@forEachVoxel (voxel) =>
+		@forEachVoxel (voxel) ->
 			vp = voxel.position
 			voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
 
@@ -274,7 +274,7 @@ class Brick
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]
-				cons.forEach (brick) =>
+				cons.forEach (brick) ->
 					if brick.isVoxelInBrick(x, y, upperZ)
 						usedSlots++
 					if brick.isVoxelInBrick(x, y, lowerZ)

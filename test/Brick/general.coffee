@@ -26,7 +26,7 @@ describe 'Brick', ->
 		v1c = false
 		numIter = 0
 
-		nb.forEachVoxel (voxel)	=>
+		nb.forEachVoxel (voxel)	->
 			numIter++
 			v0c = true if voxel == v0
 			v1c = true if voxel == v1

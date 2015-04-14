@@ -130,7 +130,7 @@ class BrickLayouter
 		return mergeableNeighbors.some (entry) -> entry?
 
 	# chooses a random brick out of the set
-	_chooseRandomBrick: (setOfBricks) =>
+	_chooseRandomBrick: (setOfBricks) ->
 		if setOfBricks.size == 0
 			return null
 
@@ -234,7 +234,7 @@ class BrickLayouter
 	# where the bricks have the most connected neighbors.
 	# If multiple sub-arrays have the same number of connected neighbors,
 	# one is randomly chosen
-	_chooseNeighborsToMergeWith: (mergeableNeighbors) =>
+	_chooseNeighborsToMergeWith: (mergeableNeighbors) ->
 		numConnections = []
 		maxConnections = 0
 

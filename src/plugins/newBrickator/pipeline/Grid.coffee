@@ -47,6 +47,11 @@ module.exports = class Grid
 	getNumVoxelsZ: =>
 		return @_maxVoxelZ - @_minVoxelZ + 1
 
+	# use this if you are not interested in the actual number of layers
+	# e.g. if you want to use them zero-indexed
+	getMaxZ: =>
+		return @_maxVoxelZ
+
 	_updateMinMax: ({x: x, y: y, z: z}) =>
 		@_maxVoxelX ?= 0
 		@_maxVoxelY ?= 0

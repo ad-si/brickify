@@ -30,8 +30,11 @@ module.exports = class Bundle
 		@ui?.init()
 		@pluginLoader.initPlugins()
 		@renderer.setupControls @globalConfig, @controls
-		return @sceneManager.init()
-		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId
+		return @sceneManager
+		.init()
+		.then =>
+			Spinner.stop document.getElementById @globalConfig.renderAreaId
+			return @
 
 	getPlugin: (name) =>
 		for p in @pluginInstances

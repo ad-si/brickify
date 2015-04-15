@@ -47,13 +47,14 @@ class ModelLoader
 
 	# Adds a new model to the state
 	addModelToScene: (model, hash) ->
-		return Promise
-		.resolve new Node {
-			name: model.model.fileName # Todo: Use promises to get fileName
-			modelHash: hash
-			transform:
-				position: @_calculateModelPosition model
-		}
+		return @_calculateModelPosition model
+		.then (modelPosition) ->
+			return new Node {
+				name: model.model.fileName # Todo: Use promises to get fileName
+				modelHash: hash
+				transform:
+					position: modelPosition
+			}
 		.then (node) =>
 			return @bundle.sceneManager.add node
 
@@ -70,24 +71,37 @@ class ModelLoader
 
 		polygonArea = (xArray, yArray) ->
 			# http://stackoverflow.com/questions/16285134/
-			Area = 0
+			area = 0
 			j = xArray.length - 1
 
 			for i in [0..yArray.length - 1] by 1
-				Area += (xArray[j] + xArray[i]) * (yArray[j] - yArray[i])
+				area += (xArray[j] + xArray[i]) * (yArray[j] - yArray[i])
 				j = i
-			Area = Math.abs(Area / 2)
-			return Area
+			area = Math.abs(area / 2)
+			return area
 
-		model.forEachFace (face) ->
-			#find lowest z value (for whole model)
-			minZ  = Math.min face.vertices[0].z, face.vertices[1].z, face.vertices[2].z
+		model
+		.forEachFace (face) ->
+			# Find lowest z value (for whole model)
+			minZ  = Math.min(
+				face.vertices[0].z
+				face.vertices[1].z
+				face.vertices[2].z
+			)
 
 			result.z ?= minZ
 			result.z = Math.min result.z, minZ
 
-			xValues = [face.vertices[0].x, face.vertices[1].x, face.vertices[2].x]
-			yValues = [face.vertices[0].y, face.vertices[1].y, face.vertices[2].y]
+			xValues = [
+				face.vertices[0].x
+				face.vertices[1].x
+				face.vertices[2].x
+			]
+			yValues = [
+				face.vertices[0].y
+				face.vertices[1].y
+				face.vertices[2].y
+			]
 
 			area = polygonArea(xValues, yValues)
 
@@ -101,10 +115,13 @@ class ModelLoader
 				result.x = minX + (maxX - minX) / 2
 				result.y = minY + (maxY - minY) / 2
 
-		return {
+		.done (modelPromise) ->
+			return modelPromise
+		.then ->
+			return {
 			x: -result.x
 			y: -result.y
 			z: -result.z
-		}
+			}
 
 module.exports = ModelLoader

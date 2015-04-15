@@ -16,12 +16,14 @@ Node.modelProvider = require './modelLoading/modelCache'
 module.exports = class Bundle
 	constructor: (@globalConfig, @controls) ->
 		Spinner.startOverlay document.getElementById @globalConfig.renderAreaId
+
 		@pluginLoader = new PluginLoader(@)
+		@pluginInstances = @pluginLoader.loadPlugins()
 		@pluginHooks = @pluginLoader.pluginHooks
+
 		@modelLoader = new ModelLoader(@)
 		@sceneManager = new SceneManager(@)
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
-		@pluginInstances = @pluginLoader.loadPlugins()
 		@ui = new Ui(@) if @globalConfig.buildUi
 
 	init: =>

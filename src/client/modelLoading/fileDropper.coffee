@@ -25,10 +25,12 @@ bindDropHandler = (target, overlay, callback) ->
 		stopEvent event
 	target.addEventListener 'dragover', (event) ->
 		stopEvent event
+
 	target.addEventListener 'dragenter', (event) ->
 		stopEvent event
 		showOverlay overlay
 		lastTarget = event.target
+
 	target.addEventListener 'dragleave', (event) ->
 		return unless event.target is lastTarget
 		stopEvent event

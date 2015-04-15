@@ -36,26 +36,27 @@ class ModelLoader
 				else
 					callback null, model
 
-	load: (model) =>
-		modelData = model.toBase64()
-		hash = md5 modelData
-		fileName = model.originalFileName
-		modelCache.store model
-		@addModelToScene fileName, hash, model
-
 	loadByHash: (hash) =>
 		modelCache
 		.request hash
-		.then @load
 		.catch (error) ->
 			console.error "Could not load model from hash #{hash}"
 			console.error error
+		.then (model) =>
+			return @addModelToScene model, hash
 
-	# adds a new model to the state
-	addModelToScene: (fileName, hash, model) ->
-		transform = position: @_calculateModelPosition model
-		node = new Node name: fileName, modelHash: hash, transform: transform
-		@bundle.sceneManager.add node
+	# Adds a new model to the state
+	addModelToScene: (model, hash) ->
+		return Promise
+		.resolve new Node {
+			name: model.model.fileName # Todo: Use promises to get fileName
+			modelHash: hash
+			transform:
+				position: @_calculateModelPosition model
+		}
+		.then (node) =>
+			return @bundle.sceneManager.add node
+
 
 	_calculateModelPosition: (model) ->
 		# get biggest polygon, align it to xy-center

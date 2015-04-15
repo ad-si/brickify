@@ -12,17 +12,18 @@ addOverlay = (target) ->
 	overlay.style.opacity = 0
 	overlay.style.transition = 'opacity .1s ease-in-out'
 	overlay.innerHTML =
-	'<div id="dropborder">
-		<div id="dropinfo" class="text-center">drop here</div>
-	</div>'
+		'<div id="dropborder">
+			<div id="dropinfo" class="text-center">drop here</div>
+		</div>'
 	target.appendChild overlay
 	return overlay
 
 bindDropHandler = (target, overlay, callback) ->
 	target.addEventListener 'drop', (event) ->
+		stopEvent event
 		hideOverlay overlay
 		callback event
-		stopEvent event
+
 	target.addEventListener 'dragover', (event) ->
 		stopEvent event
 

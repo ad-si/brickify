@@ -65,6 +65,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
+			return unless touchedVoxels.length > 0
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 
 			@editController.relayoutModifiedParts selectedNode, touchedVoxels, true
@@ -117,6 +118,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
+			return unless touchedVoxels.length > 0
 			console.log "Will re-layout #{touchedVoxels.length} voxel"
 
 			@editController.relayoutModifiedParts selectedNode, touchedVoxels, true

@@ -11,8 +11,9 @@ Bundle = require './bundle'
 globalConfig = require '../common/globals.yaml'
 
 
-if window.location.hostname is 'localhost'
+if process.env.NODE_ENV is 'development'
 	log.enableAll()
+
 
 commandFunctions = {
 	initialModel: (value) ->

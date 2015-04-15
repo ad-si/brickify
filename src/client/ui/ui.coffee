@@ -11,6 +11,7 @@ module.exports = class Ui
 		@renderer = @bundle.renderer
 		@pluginHooks = @bundle.pluginHooks
 		@workflowUi = new WorkflowUi(@bundle)
+		@workflowUi.init()
 		@pointerDispatcher = new PointerDispatcher(@bundle)
 
 	# Bound to updates to the window size:
@@ -19,7 +20,6 @@ module.exports = class Ui
 		@renderer.windowResizeHandler()
 
 	init: =>
-		@workflowUi.init()
 		@_initListeners()
 		@_initHotkeys()
 

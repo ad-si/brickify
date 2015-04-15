@@ -45,9 +45,11 @@ class NodeVisualizer
 		# create visible node and zoom on to it
 		@_getCachedData(node)
 		.then (cachedData) =>
-			cachedData.modelVisualization.createVisualization()
-			cachedData.modelVisualization.afterCreation().then =>
-				@_zoomToNode cachedData.modelVisualization.getSolid()
+			cachedData.modelVisualization
+				.createVisualization()
+				.then (solid) =>
+					console.log solid
+					@_zoomToNode solid
 
 	onNodeRemove: (node) =>
 		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
@@ -73,7 +75,8 @@ class NodeVisualizer
 
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
-		return selectedNode.getPluginData 'brickVisualizer'
+		return selectedNode
+		.getPluginData 'brickVisualizer'
 		.then (data) =>
 			if data?
 				return data

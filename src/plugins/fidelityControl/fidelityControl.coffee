@@ -10,7 +10,7 @@ $ = require 'jquery'
 minimalAcceptableFps = 20
 upgradeThresholdFps = 40
 accumulationTime = 200
-timesBelowThreshold = 5
+timesBelowThreshold = 10
 fpsDisplayUpdateTime = 1000
 
 ###

@@ -1,3 +1,6 @@
+log = require 'loglevel'
+
+
 class BrushHandler
 	constructor: ( @bundle, @nodeVisualizer, @editController ) ->
 		@highlightMaterial = new THREE.MeshLambertMaterial({
@@ -66,7 +69,7 @@ class BrushHandler
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 			return unless touchedVoxels.length > 0
-			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			log.debug "Will re-layout #{touchedVoxels.length} voxel"
 
 			@editController.relayoutModifiedParts selectedNode, touchedVoxels, true
 			cachedData.brickVisualization.unhighlightBigBrush()
@@ -119,7 +122,7 @@ class BrushHandler
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 			return unless touchedVoxels.length > 0
-			console.log "Will re-layout #{touchedVoxels.length} voxel"
+			log.debug "Will re-layout #{touchedVoxels.length} voxel"
 
 			@editController.relayoutModifiedParts selectedNode, touchedVoxels, true
 			cachedData.brickVisualization.unhighlightBigBrush()

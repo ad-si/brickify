@@ -2,24 +2,28 @@ require './polyfills'
 
 path = require 'path'
 $ = require 'jquery'
-globalConfig = require '../common/globals.yaml'
-Bundle = require './bundle'
-
 window.jQuery = window.$ = require 'jquery'
 bootstrap = require 'bootstrap'
 ZeroClipboard = require 'zeroclipboard'
+log = require 'loglevel'
 
+Bundle = require './bundle'
+globalConfig = require '../common/globals.yaml'
+
+
+if window.location.hostname is 'localhost'
+	log.enableAll()
 
 commandFunctions = {
 	initialModel: (value) ->
 		# load selected model
-		console.log 'loading initial model'
+		log.debug 'loading initial model'
 		p = /^[0-9a-z]{32}/
 		if p.test value
 			bundle.sceneManager.clearScene()
 			bundle.modelLoader.loadByHash value
 		else
-			console.warn 'Invalid value for initialModel'
+			log.warn 'Invalid value for initialModel'
 }
 
 postInitCallback = ->

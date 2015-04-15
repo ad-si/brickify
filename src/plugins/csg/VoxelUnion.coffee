@@ -1,4 +1,6 @@
+log = require 'loglevel'
 THREE = require 'three'
+
 ThreeCSG = require './threeCsg/ThreeCSG'
 
 ###
@@ -27,14 +29,14 @@ class VoxelUnion
 
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
 		if options.profile
-			console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
+			log.debug "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
 		if options.addStuds
 			d = new Date()
 			bspWithStuds = @_addStuds(
 				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
 			if options.profile
-				console.log "Geometrizer: stud geometry took #{new Date() - d}ms"
+				log.debug "Geometrizer: stud geometry took #{new Date() - d}ms"
 			return bspWithStuds
 
 		return boxGeometryBsp

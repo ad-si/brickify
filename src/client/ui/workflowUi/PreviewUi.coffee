@@ -28,7 +28,7 @@ class PreviewUi
 	_quitStabilityView: =>
 		@$stabilityViewButton.removeClass 'active disabled'
 		@stabilityViewEnabled = no
-		@nodeVisualizer.setStabilityView @sceneManager.selectedNode, false
+		@editController.enableInteraction()
 
 	toggleStabilityView: =>
 		@stabilityViewEnabled = !@stabilityViewEnabled
@@ -57,6 +57,7 @@ class PreviewUi
 		@$assemblyViewButton.removeClass 'active disabled'
 		@assemblyViewEnabled = no
 		@previewAssemblyUi.setEnabled no
+		@editController.enableInteraction()
 
 	_toggleAssemblyView: =>
 		@assemblyViewEnabled = !@assemblyViewEnabled

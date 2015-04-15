@@ -4,8 +4,8 @@ module.exports = class VolumeFiller
 		# voxels facing downwards (start filling), stops when it sees voxels
 		# facing upwards
 
-		for x in [0..grid.numVoxelsX - 1] by 1
-			for y in [0..grid.numVoxelsY - 1] by 1
+		for x in [0..grid.getNumVoxelsX() - 1] by 1
+			for y in [0..grid.getNumVoxelsY() - 1] by 1
 				@fillUp grid, x, y
 
 		return {grid: grid}
@@ -17,7 +17,7 @@ module.exports = class VolumeFiller
 		z = 0
 		currentFillVoxelQueue = []
 
-		while z < grid.numVoxelsZ
+		while z < grid.getNumVoxelsZ()
 			if grid.hasVoxelAt x, y, z
 				# current voxel already exists (shell voxel)
 				dir = @calculateVoxelDirection grid, x, y, z

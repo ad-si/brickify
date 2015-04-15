@@ -9,9 +9,6 @@ describe 'brickLayouter', ->
 		expect(brickLayouter).not.to.be.null
 
 		grid = new Grid()
-		grid.numVoxelsX = 2
-		grid.numVoxelsY = 2
-		grid.numVoxelsZ = 1
 
 		grid.setVoxel {x: 0, y: 0, z: 0}
 		grid.setVoxel {x: 1, y: 0, z: 0}
@@ -23,9 +20,6 @@ describe 'brickLayouter', ->
 
 	it 'should choose random brick', ->
 		grid = new Grid()
-		grid.numVoxelsX = 1
-		grid.numVoxelsY = 1
-		grid.numVoxelsZ = 1
 		grid.setVoxel {x: 0, y: 0, z: 0}
 
 		brickLayouter = new BrickLayouter()

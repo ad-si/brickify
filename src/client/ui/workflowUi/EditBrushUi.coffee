@@ -37,12 +37,8 @@ class EditBrushUi
 			@_brushSelect brush
 			@workflowUi.hideMenuIfPossible()
 		brush.bigBrushButton.on 'click', (event) =>
-			if brush is @_selectedBrush
-				@_bigBrushSelected = !@_bigBrushSelected
-			else
-				@_bigBrushSelected = true
+			@_bigBrushSelected = true
 			@_brushSelect brush
-			event.stopImmediatePropagation()
 			@workflowUi.hideMenuIfPossible()
 
 	_brushSelect: (brush) =>

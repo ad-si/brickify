@@ -78,15 +78,15 @@ class ModelLoader
 			Area = Math.abs(Area / 2)
 			return Area
 
-		model.forEachPolygon (p0, p1, p2, n) ->
+		model.forEachFace (face) ->
 			#find lowest z value (for whole model)
-			minZ  = Math.min p0.z, p1.z, p2.z
+			minZ  = Math.min face.vertices[0].z, face.vertices[1].z, face.vertices[2].z
 
 			result.z ?= minZ
 			result.z = Math.min result.z, minZ
 
-			xValues = [p0.x, p1.x, p2.x]
-			yValues = [p0.y, p1.y, p2.y]
+			xValues = [face.vertices[0].x, face.vertices[1].x, face.vertices[2].x]
+			yValues = [face.vertices[0].y, face.vertices[1].y, face.vertices[2].y]
 
 			area = polygonArea(xValues, yValues)
 

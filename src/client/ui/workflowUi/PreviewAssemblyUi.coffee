@@ -33,7 +33,7 @@ class PreviewAssemblyUi
 		@buildContainer.slideDown()
 		@previewUi.nodeVisualizer.setDisplayMode selectedNode, 'build'
 		.then (numZLayers) =>
-			@buildLayerUi.slider.attr 'min', 0
+			@buildLayerUi.slider.attr 'min', 1
 			@buildLayerUi.slider.attr 'max', numZLayers
 			@buildLayerUi.maxLayer.text numZLayers
 

@@ -147,7 +147,8 @@ class VoxelSelector
 	###
 	getBrushSize: (bigBrush) =>
 		return x: 1, y: 1, z: 1 unless bigBrush
-		length = Math.max @grid.numVoxelsX, @grid.numVoxelsY, @grid.numVoxelsZ
+		length = Math.max(
+			@grid.getNumVoxelsX(), @grid.getNumVoxelsY(), @grid.getNumVoxelsZ())
 		size = Math.sqrt length
 		height = Math.round size * @grid.heightRatio
 		return x: size, y: size, z: height

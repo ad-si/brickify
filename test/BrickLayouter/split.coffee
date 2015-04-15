@@ -7,9 +7,6 @@ describe 'brickLayouter split', ->
 	it 'should split one brick and relayout locally', ->
 		brickLayouter = new BrickLayouter(true)
 		grid = new Grid()
-		grid.numVoxelsX = 3
-		grid.numVoxelsY = 3
-		grid.numVoxelsZ = 1
 
 		v0 = grid.setVoxel { x: 0, y: 0, z: 0 }
 		v1 = grid.setVoxel { x: 1, y: 0, z: 0 }

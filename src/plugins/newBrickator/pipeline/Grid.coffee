@@ -38,13 +38,13 @@ module.exports = class Grid
 			z: Math.max(calculatedZ, minimumZ)
 		}
 
-	getNumVoxelsX: () =>
+	getNumVoxelsX: =>
 		return @_maxVoxelX - @_minVoxelX + 1
 
-	getNumVoxelsY: () =>
+	getNumVoxelsY: =>
 		return @_maxVoxelY - @_minVoxelY + 1
 
-	getNumVoxelsZ: () =>
+	getNumVoxelsZ: =>
 		return @_maxVoxelZ - @_minVoxelZ + 1
 
 	_updateMinMax: ({x: x, y: y, z: z}) =>

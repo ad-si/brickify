@@ -88,27 +88,24 @@ describe 'Grid', ->
 
 	it 'should initialize correct number of bricks', ->
 		grid = new Grid()
-		grid.numVoxelsX = 5
-		grid.numVoxelsY = 4
-		grid.numVoxelsZ = 6
+		numVoxelsX = 5
+		numVoxelsY = 4
+		numVoxelsZ = 6
 
-		for x in [0...grid.numVoxelsX]
-			for y in [0...grid.numVoxelsY]
-				for z in [0...grid.numVoxelsZ]
+		for x in [0...numVoxelsX]
+			for y in [0...numVoxelsY]
+				for z in [0...numVoxelsZ]
 					grid.setVoxel { x: x, y: y, z: z }
 
 		brickLayouter = new BrickLayouter()
 		brickLayouter.initializeBrickGraph(grid)
 
 		bricks = grid.getAllBricks()
-		numVoxels = grid.numVoxelsX * grid.numVoxelsY * grid.numVoxelsZ
+		numVoxels = numVoxelsX * numVoxelsY * numVoxelsZ
 		expect(bricks.size).to.equal(numVoxels)
 
 	it 'should return correct number of bricks for a 1x1x1 configuration', ->
 		testGrid = new Grid()
-		testGrid.numVoxelsX = 1
-		testGrid.numVoxelsY = 1
-		testGrid.numVoxelsZ = 1
 		testGrid.setVoxel {x: 0, y: 0, z: 0}
 
 		brickLayouter = new BrickLayouter()

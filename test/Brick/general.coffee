@@ -76,9 +76,6 @@ describe 'Brick', ->
 
 	it 'should return the right connectedBricks', ->
 		grid = new Grid()
-		grid.numVoxelsX = 1
-		grid.numVoxelsY = 1
-		grid.numVoxelsZ = 1
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 
 		brickLayouter = new BrickLayouter()
@@ -88,9 +85,6 @@ describe 'Brick', ->
 		expect(connectedBricks.size).to.equal(0)
 
 		grid = new Grid()
-		grid.numVoxelsX = 1
-		grid.numVoxelsY = 1
-		grid.numVoxelsZ = 2
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 		v1 = grid.setVoxel {x: 0, y: 0, z: 1}
 
@@ -101,9 +95,6 @@ describe 'Brick', ->
 		expect(connectedBricks.size).to.equal(1)
 
 		grid = new Grid()
-		grid.numVoxelsX = 1
-		grid.numVoxelsY = 1
-		grid.numVoxelsZ = 3
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 		v1 = grid.setVoxel {x: 0, y: 0, z: 1}
 		v2 = grid.setVoxel {x: 0, y: 0, z: 2}

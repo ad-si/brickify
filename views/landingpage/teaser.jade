@@ -5,10 +5,16 @@ header
 			h2 Extend your LEGO#[sup &reg;] with 3D-printed parts!
 
 			.drop
-				label(for='fileInput').btn.btn-primary.dropper#loadButton
+				label#loadButton.btn.btn-primary.dropper(for='fileInput')
 					img(src='./img/spinner.gif' id="spinner")
-				input(type='file' accept=".stl"
-				style='display: none')#fileInput
+
+				input#fileInput(
+				type='file'
+				accept=".stl"
+				style='display: none'
+				)
+				progress(value=0)
+
 			a(href='/educators').btn#educators
 				#preview
 					img(src='/img/sample_ballista.png')

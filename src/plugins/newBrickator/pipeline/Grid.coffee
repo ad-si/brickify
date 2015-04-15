@@ -13,45 +13,55 @@ module.exports = class Grid
 
 		@voxels = {}
 
-	setUpForModel: (optimizedModel, options) =>
+	setUpForModel: (model, options) =>
 		@modelTransform = options.modelTransform
 
-		bb = optimizedModel.boundingBox()
+		model
+			.getBoundingBox()
+			.then (boundingBox) =>
 
-		# if the object is moved in the scene (not in the origin),
-		# think about that while building the grid
-		if @modelTransform
-			bbMinWorld = new THREE.Vector3()
-			bbMinWorld.set bb.min.x, bb.min.y, bb.min.z
-			bbMinWorld.applyProjection(@modelTransform)
+				# if the object is moved in the scene (not in the origin),
+				# think about that while building the grid
+				if @modelTransform
+					bbMinWorld = new THREE.Vector3()
+					bbMinWorld.set(
+						boundingBox.min.x
+						boundingBox.min.y
+						boundingBox.min.z
+					)
+					bbMinWorld.applyProjection(@modelTransform)
 
-			bbMaxWorld = new THREE.Vector3()
-			bbMaxWorld.set bb.max.x, bb.max.y, bb.max.z
-			bbMaxWorld.applyProjection(@modelTransform)
-		else
-			bbMinWorld = bb.min
-			bbMaxWorld = bb.max
+					bbMaxWorld = new THREE.Vector3()
+					bbMaxWorld.set(
+						boundingBox.max.x
+						boundingBox.max.y
+						boundingBox.max.z
+					)
+					bbMaxWorld.applyProjection(@modelTransform)
+				else
+					bbMinWorld = boundingBox.min
+					bbMaxWorld = boundingBox.max
 
-		# 1.) Align bb minimum to next voxel position
-		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
-		# voxel center
-		# 3.) minimum z is to assure that grid is never below z=0
-		calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
-		calculatedZ -= @spacing.z / 2
-		minimumZ = @spacing.z / 2
+				# 1.) Align bb minimum to next voxel position
+				# 2.) spacing / 2 is subtracted to make the grid be aligned to the
+				# voxel center
+				# 3.) minimum z is to assure that grid is never below z=0
+				calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
+				calculatedZ -= @spacing.z / 2
+				minimumZ = @spacing.z / 2
 
-		@origin = {
-			x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
-			y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
-			z: Math.max(calculatedZ, minimumZ)
-		}
+				@origin = {
+					x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
+					y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
+					z: Math.max(calculatedZ, minimumZ)
+				}
 
-		maxVoxel = @mapWorldToGrid bbMaxWorld
-		minVoxel = @mapWorldToGrid bbMinWorld
+				maxVoxel = @mapWorldToGrid bbMaxWorld
+				minVoxel = @mapWorldToGrid bbMinWorld
 
-		@numVoxelsX = Math.ceil (maxVoxel.x - minVoxel.x) / @spacing.x + 2
-		@numVoxelsY = Math.ceil (maxVoxel.y - minVoxel.y) / @spacing.y + 2
-		@numVoxelsZ = Math.ceil (maxVoxel.z - minVoxel.z) / @spacing.z + 1
+				@numVoxelsX = Math.ceil (maxVoxel.x - minVoxel.x) / @spacing.x + 2
+				@numVoxelsY = Math.ceil (maxVoxel.y - minVoxel.y) / @spacing.y + 2
+				@numVoxelsZ = Math.ceil (maxVoxel.z - minVoxel.z) / @spacing.z + 1
 
 	mapWorldToGrid: (point) =>
 		# maps world coordinates to aligned grid coordinates

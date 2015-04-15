@@ -15,8 +15,13 @@ module.exports = class Voxelizer
 
 		@setupGrid optimizedModel, options
 
-		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
-			@voxelizePolygon p0, p1, p2, n
+		optimizedModel.forEachFace (face) =>
+			@voxelizePolygon(
+				face.vertices[0]
+				face.vertices[1]
+				face.vertices[2]
+				face.normal
+			)
 
 		return {grid: @voxelGrid}
 

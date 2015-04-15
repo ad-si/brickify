@@ -40,7 +40,7 @@ class ModelVisualization
 			color: 0x000000
 			transparent: true
 			opacity: 0.4
-			depthFunc: 'GREATER'
+			depthFunc: THREE.GreaterDepth
 		)
 		@shadowMat.polygonOffset = true
 		@shadowMat.polygonOffsetFactor = 5
@@ -51,7 +51,7 @@ class ModelVisualization
 		@lineMat.linewidth = 2
 		@lineMat.transparent = true
 		@lineMat.opacity = 0.1
-		@lineMat.depthFunc = 'GREATER'
+		@lineMat.depthFunc = THREE.GreaterDepth
 		@lineMat.depthWrite = false
 
 	_createVisualization: (node, threejsNode) =>

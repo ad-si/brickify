@@ -8,6 +8,7 @@
 THREE = require 'three'
 modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
+threeConverter = require '../../client/threeConverter'
 
 
 module.exports = class LegoBoard
@@ -56,10 +57,12 @@ module.exports = class LegoBoard
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
 		.then (model) ->
-			geo = model.convertToThreeGeometry()
+			return model.getObject()
+		.then (modelObject) ->
+			geometry = threeConverter.toStandardGeometry modelObject
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, studMaterial)
+					object = new THREE.Mesh(geometry, studMaterial)
 					object.translateX x
 					object.translateY y
 					studsContainer.add object

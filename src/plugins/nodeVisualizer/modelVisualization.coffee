@@ -1,6 +1,8 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
 LineMatGenerator = require './visualization/LineMatGenerator'
+threeConverter = require '../../client/threeConverter'
+
 
 class ModelVisualization
 	constructor: (@globalConfig, @node, threeNode) ->
@@ -78,15 +80,22 @@ class ModelVisualization
 			parent.wireframe = wireframe
 
 		_addModel = (model) =>
-			geometry = model.convertToThreeGeometry()
+			return model
+				.getObject()
+				.then (modelObject) =>
+					geometry = threeConverter.toStandardGeometry modelObject
 
-			_addSolid geometry, @threeNode
-			_addWireframe geometry, @threeNode if @globalConfig.createVisibleWireframe
+					_addSolid geometry, @threeNode
 
-			threeHelper.applyNodeTransforms node, @threeNode
+					if @globalConfig.createVisibleWireframe
+						_addWireframe geometry, @threeNode
 
-		@afterCreationPromise = node.getModel().then _addModel
-		return @afterCreationPromise
+					threeHelper.applyNodeTransforms node, @threeNode
+
+					return @threeNode.solid
+
+		return @afterCreationPromise = node
+			.getModel()
+			.then _addModel
 
 module.exports = ModelVisualization
-

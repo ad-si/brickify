@@ -22,8 +22,7 @@ class NodeVisualizer
 
 	init: (@bundle) => return
 
-	init3d: (@threejsRootNode) =>
-		return
+	init3d: (@threejsRootNode) => return
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -85,17 +84,29 @@ class NodeVisualizer
 
 	# creates visualization datastructures
 	_createNodeDatastructure: (node) =>
-		threeNode = new THREE.Object3D()
-		@threejsRootNode.add threeNode
-		threeHelper.link node, threeNode
+		brickThreeNode = new THREE.Object3D()
+		brickShadowThreeNode = new THREE.Object3D()
+		modelThreeNode = new THREE.Object3D()
+
+		@threejsRootNode.add brickThreeNode
+		@threejsRootNode.add brickShadowThreeNode
+		@threejsRootNode.add modelThreeNode
+
+		threeHelper.link node, brickThreeNode
+		threeHelper.link node, brickShadowThreeNode
+		threeHelper.link node, modelThreeNode
 
 		data = {
 			initialized: false
 			node: node
-			threeNode: threeNode
-			brickVisualization: new BrickVisualization @bundle, threeNode
+			brickThreeNode: brickThreeNode
+			brickShadowThreeNode: brickShadowThreeNode
+			modelThreeNode: modelThreeNode
+			brickVisualization: new BrickVisualization(
+				@bundle, brickThreeNode, brickShadowThreeNode
+			)
 			modelVisualization: new ModelVisualization(
-				@bundle.globalConfig, node, threeNode
+				@bundle.globalConfig, node, modelThreeNode
 			)
 		}
 

@@ -11,17 +11,7 @@ Coloring = require './visualization/Coloring'
 # @class NodeVisualizer
 ###
 class NodeVisualizer
-	constructor: ->
-		@printMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
-			opacity: 0.8
-			transparent: true
-		})
-
-		# remove z-Fighting on baseplate
-		@printMaterial.polygonOffset = true
-		@printMaterial.polygonOffsetFactor = 5
-		@printMaterial.polygonoffsetUnits = 5
+	constructor: -> return
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
@@ -217,7 +207,9 @@ class NodeVisualizer
 		visualizationData.initialized = true
 
 		# instead of creating csg live, show original model semitransparent
-		visualizationData.modelVisualization.setSolidMaterial @printMaterial
+		visualizationData.modelVisualization.setSolidMaterial(
+			@coloring.objectPrintMaterial
+		)
 
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>

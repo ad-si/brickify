@@ -43,10 +43,23 @@ module.exports = class Coloring
 		})
 
 		# object visualization
+		# default object material
 		@objectMaterial = new THREE.MeshLambertMaterial(
 			color: @globalConfig.colors.object
 			ambient: @globalConfig.colors.object
 		)
+
+		# printed object material
+		@objectPrintMaterial = new THREE.MeshLambertMaterial({
+			color: 0xeeeeee
+			opacity: 0.8
+			transparent: true
+		})
+
+		# remove z-Fighting on baseplate
+		@objectPrintMaterial.polygonOffset = true
+		@objectPrintMaterial.polygonOffsetFactor = 5
+		@objectPrintMaterial.polygonoffsetUnits = 5
 
 		@objectShadowMat = new THREE.MeshBasicMaterial(
 			color: 0x000000

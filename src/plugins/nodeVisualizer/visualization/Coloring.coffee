@@ -42,6 +42,12 @@ module.exports = class Coloring
 			color: 0xb5ffb8 #greenish gray
 		})
 
+		@legoShadowMat = new THREE.MeshBasicMaterial({
+			color: 0x303030
+			transparent: true
+			opacity: 0.3
+		})
+
 		# object visualization
 		# default object material
 		@objectMaterial = new THREE.MeshLambertMaterial(
@@ -84,21 +90,28 @@ module.exports = class Coloring
 	setPipelineMode: (enabled) =>
 		if enabled
 			@objectPrintMaterial.transparent = false
-			@objectPrintMaterial.opacity = 1
 
 			@objectShadowMat.visible = false
 			@objectLineMat.transparent = false
 			@objectLineMat.depthWrite = true
 			@objectLineMat.depthFunc = THREE.LessEqualDepth
 
+			@legoBoxHighlightMaterial.transparent = false
+			@printBoxHighlightMaterial.transparent = false
+			@objectPrintMaterial.transparent = false
+			@legoShadowMat.transparent = false
 		else
 			@objectPrintMaterial.transparent = true
-			@objectPrintMaterial.opacity = 0.8
 
 			@objectShadowMat.visible = true
 			@objectLineMat.transparent = true
 			@objectLineMat.depthWrite = false
 			@objectLineMat.depthFunc = THREE.GreaterDepth
+
+			@legoBoxHighlightMaterial.transparent = true
+			@printBoxHighlightMaterial.transparent = true
+			@objectPrintMaterial.transparent = false
+			@legoShadowMat.transparent = true
 
 	###
     # Returns the highlight material collection for the supplied type of voxel

@@ -31,7 +31,9 @@ class BrickVisualization
 		@isStabilityView = false
 
 	initialize: (@grid) =>
-		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @brickShadowThreeNode)
+		@voxelWireframe = new VoxelWireframe(
+			@bundle, @grid, @brickShadowThreeNode, @defaultColoring
+		)
 		@geometryCreator = new GeometryCreator(@grid)
 		@voxelSelector = new VoxelSelector @
 

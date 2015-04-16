@@ -35,7 +35,7 @@ fragExpandBlack = ->
 
 fragBlackAlwaysOpaque = ->
 	return '
-		if (col.r < 0.01 && col.g < 0.01 && col.b < 0.01){
+		if (col.r < 0.003 && col.g < 0.003 && col.b < 0.003){
 			currentOpacity = 1.0;
 		}
 	'

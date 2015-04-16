@@ -99,7 +99,7 @@ class NodeVisualizer
 
 		# bricks
 		threeRenderer.render @brickSceneTarget.quadScene, camera
-		
+
 		# everything that is 3d model and hidden gets the third bit set
 		# every visible part of the 3d model gets the second bit set
 		# (via increase and not being allowed to remove the first bit)

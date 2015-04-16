@@ -1,3 +1,5 @@
+log = require 'loglevel'
+
 Brick = require './Brick'
 arrayHelper = require './arrayHelper'
 Random = require './Random'
@@ -44,7 +46,7 @@ class BrickLayouter
 			if !@_anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
-					console.log " - randomChoices #{numRandomChoices}
+					log.debug " - randomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
 					break # done with initial layout
 				else
@@ -58,9 +60,9 @@ class BrickLayouter
 					neighborsToMergeWith, bricksToLayout
 
 				if @debugMode and not brick.isValid()
-					console.warn 'Invalid brick: ', brick
-					console.warn '> Using pseudoRandom:', @pseudoRandom
-					console.warn '> current seed:', Random.getSeed()
+					log.warn 'Invalid brick: ', brick
+					log.warn '> Using pseudoRandom:', @pseudoRandom
+					log.warn '> current seed:', Random.getSeed()
 
 				mergeableNeighbors = @_findMergeableNeighbors brick
 

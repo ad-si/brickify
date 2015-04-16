@@ -1,6 +1,7 @@
 $ = require 'jquery'
 md5 = require('blueimp-md5').md5
 meshlib = require 'meshlib'
+log = require 'loglevel'
 
 ##
 #  ModelCache
@@ -26,8 +27,8 @@ submitDataToServer = (hash, data) ->
 				contentType: 'application/octet-stream'
 		).catch (jqXHR) -> throw new Error jqXHR.statusText
 		prom.then(
-			-> console.log 'sent model to the server'
-			-> console.error 'unable to send model to the server'
+			-> log.debug 'Sent model to the server'
+			-> log.error 'Unable to send model to the server'
 		)
 		return prom
 	return exists(hash).catch(send)

@@ -1,9 +1,11 @@
+THREE = require 'three'
+meshlib = require 'meshlib'
+log = require 'loglevel'
+
 modelCache = require '../../client/modelLoading/modelCache'
 LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
-THREE = require 'three'
 Brick = require './pipeline/Brick'
-meshlib = require 'meshlib'
 threeHelper = require '../../client/threeHelper'
 Spinner = require '../../client/Spinner'
 
@@ -52,7 +54,7 @@ class NewBrickator
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
-		console.log 'relayouting modified parts, creating bricks:',createBricks
+		log.debug 'relayouting modified parts, creating bricks:',createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
 			modifiedBricks = []
@@ -137,7 +139,7 @@ class NewBrickator
 
 		@csg ?= @bundle.getPlugin 'csg'
 		if not @csg?
-			console.warn 'Unable to create download due to CSG Plugin missing'
+			log.warn 'Unable to create download due to CSG Plugin missing'
 			return Promise.resolve { data: '', fileName: '' }
 
 		dlPromise = new Promise (resolve, reject) =>

@@ -27,8 +27,11 @@ globalConfig.createVisibleWireframe = false
 config1 = clone globalConfig
 config2 = clone globalConfig
 
-# configure left bundle one to only show model
+# configure left bundle to only show model
 config1.plugins.newBrickator = false
+
+# configure right bundle to not show the model
+config2.showModel = false
 
 # instantiate 2 lowfab bundles
 config1.renderAreaId = 'renderArea1'

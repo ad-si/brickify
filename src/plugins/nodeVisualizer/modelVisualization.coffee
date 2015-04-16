@@ -55,6 +55,9 @@ class ModelVisualization
 		@lineMat.depthWrite = false
 
 	_createVisualization: (node, threejsNode) =>
+		unless @globalConfig.showModel
+			@afterCreationPromise = node.getModel()
+			return @afterCreationPromise
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @objectMaterial
 			parent.add solid

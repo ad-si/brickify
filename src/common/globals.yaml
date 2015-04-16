@@ -55,6 +55,7 @@ syncWithServer: true
 
 #ui and interaction
 buildUi: true
+showModel: true
 
 #newBrickator
 autoLegofy: true

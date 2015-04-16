@@ -13,12 +13,12 @@ fragExpandBlack = ->
 	return'
 		const int kernel = 2;
 		bool isLine = false;
-			
+
 		for (int x = -1 * (kernel - 1); x < kernel; x++){
 			for (int y = -1 * (kernel - 1); y < kernel; y++){
 				float tx = vUv.s + float(x) * texelXDelta;
 				float ty = vUv.t + float(y) * texelYDelta;
-				
+
 				vec3 c = texture2D( tColor, vec2(tx,ty)).rgb;
 
 				if (c.r < 0.1 && c.g < 0.1 && c.b < 0.1){

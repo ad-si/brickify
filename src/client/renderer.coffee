@@ -90,6 +90,7 @@ class Renderer
 			preserveDrawingBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
 		)
+		@threeRenderer.sortObjects = false
 
 		@threeRenderer.setSize @size().width, @size().height
 

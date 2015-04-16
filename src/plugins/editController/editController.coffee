@@ -39,6 +39,7 @@ class EditController
 			)
 
 	onPointerEvent: (event, eventType) =>
+		return false if @interactionDisabled
 		return false if not @nodeVisualizer? or not @pointEventHandler?
 
 		ignoreInvisible = event.buttons isnt pointerEnums.buttonStates.right

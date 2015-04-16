@@ -22,7 +22,52 @@ class NodeVisualizer
 
 	init: (@bundle) => return
 
-	init3d: (@threejsRootNode) => return
+	init3d: (@threejsRootNode) =>
+		@usePipeline = false
+
+		# Voxels / Bricks are rendered as a first render pass
+		@brickScene = @bundle.renderer.getDefaultScene()
+		@brickRootNode = new THREE.Object3D()
+		@threejsRootNode.add @brickRootNode
+
+		# Objects are rendered in the 2nd / 3rd render pass
+		@objectsScene = @bundle.renderer.getDefaultScene()
+		@objectsRootNode = new THREE.Object3D()
+		@threejsRootNode.add @objectsRootNode
+
+		# LegoShadow is rendered as a 3rd rendering pass
+		@brickShadowScene = @bundle.renderer.getDefaultScene()
+		@brickShadowRootNode = new THREE.Object3D()
+		@threejsRootNode.add @brickShadowRootNode
+
+		return
+
+	setFidelity: (fidelityLevel, availableLevels) =>
+		# Determine whether to use the pipeline or not
+		if fidelityLevel >= availableLevels.indexOf 'PipelineLow'
+			if not @usePipeline
+				@usePipeline = true
+
+				# move all subnodes to the pipeline scenes
+				@threejsRootNode.remove @brickRootNode
+				@threejsRootNode.remove @brickShadowRootNode
+				@threejsRootNode.remove @objectsRootNode
+
+				@brickScene.add @brickRootNode
+				@objectsScene.add @objectsRootNode
+				@brickShadowScene.add @brickShadowRootNode
+		else
+			if @usePipeline
+				@usePipeline = false
+
+				# move all subnodes to conventional rendering
+				@brickScene.remove @brickRootNode
+				@brickShadowScene.remove @brickShadowRootNode
+				@objectsScene.remove @objectsRootNode
+
+				@threejsRootNode.add @brickRootNode
+				@threejsRootNode.add @objectsRootNode
+				@threejsRootNode.add @brickShadowRootNode
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -88,9 +133,9 @@ class NodeVisualizer
 		brickShadowThreeNode = new THREE.Object3D()
 		modelThreeNode = new THREE.Object3D()
 
-		@threejsRootNode.add brickThreeNode
-		@threejsRootNode.add brickShadowThreeNode
-		@threejsRootNode.add modelThreeNode
+		@brickRootNode.add brickThreeNode
+		@brickShadowRootNode.add brickShadowThreeNode
+		@objectsRootNode.add modelThreeNode
 
 		threeHelper.link node, brickThreeNode
 		threeHelper.link node, brickShadowThreeNode

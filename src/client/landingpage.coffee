@@ -11,7 +11,6 @@ fileLoader = require './modelLoading/fileLoader'
 globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
-globalConfig.syncWithServer = false
 globalConfig.buildUi = false
 globalConfig.autoRotate = true
 globalConfig.plugins.dummy = false

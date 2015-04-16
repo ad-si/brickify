@@ -192,15 +192,16 @@ class NodeVisualizer
 		# link other plugins
 		@newBrickator ?= @bundle.getPlugin 'newBrickator'
 
-		# create visible node and zoom on to it
+		# create visible node and zoom to it
 		@_getCachedData(node)
 		.then (cachedData) =>
 			cachedData.modelVisualization.createVisualization()
 			cachedData.modelVisualization.afterCreation().then =>
-				@_zoomToNode cachedData.modelVisualization.getSolid()
+				solid = cachedData.modelVisualization.getSolid()
+				@_zoomToNode solid if solid?
 
 	onNodeRemove: (node) =>
-		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
+		@threeJsRootNode.remove threeHelper.find node, @threeJsRootNode
 
 	onNodeSelect: (@selectedNode) => return
 
@@ -230,12 +231,12 @@ class NodeVisualizer
 			if data?
 				return data
 			else
-				data = @_createNodeDatastructure selectedNode
+				data = @createNodeDataStructure selectedNode
 				selectedNode.storePluginData 'brickVisualizer', data, true
 				return data
 
-	# creates visualization datastructures
-	_createNodeDatastructure: (node) =>
+	# creates visualization data structures
+	createNodeDataStructure: (node) =>
 		brickThreeNode = new THREE.Object3D()
 		brickShadowThreeNode = new THREE.Object3D()
 		modelThreeNode = new THREE.Object3D()

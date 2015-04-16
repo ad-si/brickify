@@ -64,8 +64,8 @@ module.exports = class Coloring
 
 		# remove z-Fighting on baseplate
 		@objectPrintMaterial.polygonOffset = true
-		@objectPrintMaterial.polygonOffsetFactor = 5
-		@objectPrintMaterial.polygonoffsetUnits = 5
+		@objectPrintMaterial.polygonOffsetFactor = 3
+		@objectPrintMaterial.polygonOffsetUnits = 3
 
 		@objectShadowMat = new THREE.MeshBasicMaterial(
 			color: 0x000000
@@ -74,8 +74,8 @@ module.exports = class Coloring
 			depthFunc: THREE.GreaterDepth
 		)
 		@objectShadowMat.polygonOffset = true
-		@objectShadowMat.polygonOffsetFactor = 5
-		@objectShadowMat.polygonoffsetUnits = -5
+		@objectShadowMat.polygonOffsetFactor = 3
+		@objectShadowMat.polygonOffsetUnits = 3
 
 		lineMaterialGenerator = new LineMatGenerator()
 		@objectLineMat = lineMaterialGenerator.generate 0x000000
@@ -110,7 +110,7 @@ module.exports = class Coloring
 
 			@legoBoxHighlightMaterial.transparent = true
 			@printBoxHighlightMaterial.transparent = true
-			@objectPrintMaterial.transparent = false
+			@objectPrintMaterial.transparent = true
 			@legoShadowMat.transparent = true
 
 	###

@@ -11,7 +11,7 @@ class ModelVisualization
 
 	setSolidMaterial: (material) =>
 		@afterCreationPromise.then =>
-			@threeNode.solid.material = material
+			@threeNode.solid?.material = material
 
 	setNodeVisibility: (visible) =>
 		@afterCreationPromise.then =>
@@ -19,7 +19,7 @@ class ModelVisualization
 
 	setShadowVisibility: (visible) =>
 		@afterCreationPromise.then =>
-			@threeNode.wireframe.visible = visible
+			@threeNode.wireframe?.visible = visible
 
 	afterCreation: =>
 		return @afterCreationPromise
@@ -28,6 +28,9 @@ class ModelVisualization
 		@threeNode.solid
 
 	_createVisualization: (node, threejsNode) =>
+		unless @globalConfig.showModel
+			@afterCreationPromise = node.getModel()
+			return @afterCreationPromise
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @coloring.objectMaterial
 			parent.add solid
@@ -62,4 +65,3 @@ class ModelVisualization
 		return @afterCreationPromise
 
 module.exports = ModelVisualization
-

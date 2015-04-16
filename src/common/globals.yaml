@@ -13,11 +13,15 @@ colors:
   grid5: 0x999999
   grid10: 0xdddddd
 
-  object: 0xccaa33
-
   basePlate: 0x555555
   basePlateStud: 0x5a5a5a
 
+  modelColor: 0xeeeeee
+  modelOpacity: 0.8
+  modelOpacityLandingPage: 1.0
+
+  modelShadowColor: 0x000000
+  modelShadowOpacity: 0.4
 
 # camera adjustments
 fov: 40
@@ -25,17 +29,12 @@ cameraNearPlane: 0.1
 cameraFarPlane: 2500
 
 # animations
-animationStepSize: 0.02
-animations: []
 autoRotate: false
 autoRotateSpeed: 1.0
 
 # coordinate system
 axisLength: 100
 axisLineWidth: 2
-
-# objects
-meshes: []
 
 # grid
 gridLineWidthNormal: 1
@@ -50,14 +49,8 @@ staticRendererSize: false
 staticRendererWidth: 100
 staticRendererHeight: 100
 
-# sync
-syncWithServer: true
-
 #ui and interaction
 buildUi: true
-
-#newBrickator
-autoLegofy: true
 
 #load these plugins
 plugins:
@@ -71,5 +64,8 @@ plugins:
   editController: true
   csg: true
 
-# shall solid renderer display shadows and wireframe?
+# shall modelVisualization display shadows and wireframe?
 createVisibleWireframe: true
+
+# shall modelVisualization display the solid model?
+showModel: true

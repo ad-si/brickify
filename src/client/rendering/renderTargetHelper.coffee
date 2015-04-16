@@ -74,6 +74,8 @@ generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 			colorMult: { type: 'v3', value: shaderOptions.colorMult }
 			texelXDelta: { type: 'f', value: 1.0 / rttTexture.width }
 			texelYDelta: { type: 'f', value: 1.0 / rttTexture.height }
+			texWidth: { type: 'f', value: rttTexture.width }
+			texHeight: { type: 'f', value: rttTexture.height }
 		}
 		vertexShader: vertexShader()
 		fragmentShader: fragmentShader(shaderOptions)
@@ -94,8 +96,34 @@ vertexShader = (options) ->
 
 		varying vec2 vUv;
 
+		varying vec2 v_rgbNW;
+		varying vec2 v_rgbNE;
+		varying vec2 v_rgbSW;
+		varying vec2 v_rgbSE;
+		varying vec2 v_rgbM;
+		uniform float texWidth;
+		uniform float texHeight;
+
+
+		void texcoords(vec2 fragCoord, vec2 resolution,
+		out vec2 v_rgbNW, out vec2 v_rgbNE,
+		out vec2 v_rgbSW, out vec2 v_rgbSE,
+		out vec2 v_rgbM) {
+		vec2 inverseVP = 1.0 / resolution.xy;
+		v_rgbNW = (fragCoord + vec2(-1.0, -1.0)) * inverseVP;
+		v_rgbNE = (fragCoord + vec2(1.0, -1.0)) * inverseVP;
+		v_rgbSW = (fragCoord + vec2(-1.0, 1.0)) * inverseVP;
+		v_rgbSE = (fragCoord + vec2(1.0, 1.0)) * inverseVP;
+		v_rgbM = vec2(fragCoord * inverseVP);
+		}
+
 		void main() {
 			vUv = uv;
+
+			/*FXAA*/
+			vec2 texSize = vec2( texWidth, texHeight );\n
+			vec2 fragCoord = vUv * texSize;\n
+			texcoords(fragCoord, texSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
 
 			/* Dont transform coordinates, make this a screen aligned quad */
 			gl_Position = vec4( position, 1.0 );
@@ -114,6 +142,17 @@ fragmentShader = (options) ->
 		uniform float texelYDelta;
 		uniform float opacity;
 		uniform vec3 colorMult;
+		uniform float texWidth;
+		uniform float texHeight;
+		varying vec2 v_rgbNW;
+		varying vec2 v_rgbNE;
+		varying vec2 v_rgbSW;
+		varying vec2 v_rgbSE;
+		varying vec2 v_rgbM;
+
+		\n
+		' + options.fragmentPreMain + '
+		\n
 
 		void main() {
 			float currentOpacity = opacity;
@@ -141,6 +180,7 @@ setDefaultOptions = (shaderOptions) ->
 	shaderOptions.opacity ?= 1.0
 	shaderOptions.colorMult ?= new THREE.Vector3(1,1,1)
 	shaderOptions.fragmentInMain ?= ''
+	shaderOptions.fragmentPreMain ?= ''
 
 	return shaderOptions
 

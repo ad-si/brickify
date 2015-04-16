@@ -52,10 +52,16 @@ class NodeVisualizer
 			@brickSceneTarget.renderTarget, threeRenderer
 		))
 			# bricks
-			@brickSceneTarget = RenderTargetHelper.createRenderTarget(threeRenderer)
+			preMain = shaderGenerator.buildFragmentPreMainAdditions( { fxaa: true } )
+			inMain = shaderGenerator.buildFragmentInMainAdditions ( { fxaa: true } )
+
+			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
+				threeRenderer,
+				{ fragmentPreMain: preMain, fragmentInMain: inMain }
+			)
 
 			# object
-			customFrag = shaderGenerator.buildFragmentMainAdditions(
+			customFrag = shaderGenerator.buildFragmentInMainAdditions(
 				{ expandBlack: true }
 			)
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
@@ -65,7 +71,7 @@ class NodeVisualizer
 			)
 
 			# brick shadow
-			customFrag = shaderGenerator.buildFragmentMainAdditions(
+			customFrag = shaderGenerator.buildFragmentInMainAdditions(
 				{ expandBlack: true, blackAlwaysOpaque: true }
 			)
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(

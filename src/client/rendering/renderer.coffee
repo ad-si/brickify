@@ -104,6 +104,9 @@ class Renderer
 			canvas: document.getElementById globalConfig.renderAreaId
 		)
 
+		# needed for rendering pipeline
+		@threeRenderer.extensions.get 'EXT_frag_depth'
+
 		@threeRenderer.setSize @size().width, @size().height
 
 

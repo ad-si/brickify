@@ -20,6 +20,31 @@ module.exports = class LegoBoard
 	init3d: (@threejsNode) =>
 		@highQualMode = false
 
+		@_initMaterials()
+
+		#create baseplate
+		box = new THREE.BoxGeometry(400, 400, 8)
+		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
+		@baseplateBox.translateZ -4
+		@threejsNode.add @baseplateBox
+
+		#create studs
+		@studsContainer = new THREE.Object3D()
+		@threejsNode.add @studsContainer
+		@studsContainer.visible = false
+
+		modelCache
+		.request('1336affaf837a831f6b580ec75c3b73a')
+		.then (model) =>
+			geo = model.convertToThreeGeometry()
+			for x in [-160..160] by 80
+				for y in [-160..160] by 80
+					object = new THREE.Mesh(geo, @studMaterial)
+					object.translateX x
+					object.translateY y
+					@studsContainer.add object
+
+	_initMaterials: =>
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		studTexture.wrapS = THREE.RepeatWrapping
 		studTexture.wrapT = THREE.RepeatWrapping
@@ -38,31 +63,10 @@ module.exports = class LegoBoard
 				opacity: 0.4
 				transparent: true
 		)
-		studMaterial = new THREE.MeshLambertMaterial(
+
+		@studMaterial = new THREE.MeshLambertMaterial(
 				color: globalConfig.colors.basePlateStud
 		)
-
-		#create baseplate
-		box = new THREE.BoxGeometry(400, 400, 8)
-		boxobj = new THREE.Mesh(box, @baseplateMaterial)
-		boxobj.translateZ -4
-		@threejsNode.add boxobj
-
-		#create studs
-		studsContainer = new THREE.Object3D()
-		@threejsNode.add studsContainer
-		studsContainer.visible = false
-
-		modelCache
-		.request('1336affaf837a831f6b580ec75c3b73a')
-		.then (model) ->
-			geo = model.convertToThreeGeometry()
-			for x in [-160..160] by 80
-				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, studMaterial)
-					object.translateX x
-					object.translateY y
-					studsContainer.add object
 
 	on3dUpdate: =>
 		# check if the camera is below z=0. if yes, make the plate transparent
@@ -88,15 +92,17 @@ module.exports = class LegoBoard
 			@highQualMode = true
 
 			#show studs
-			@threejsNode.children[1].visible = true
+			@studsContainer.visible = true
 			#remove texture because we have physical studs
-			@threejsNode.children[0].material = @baseplateMaterial
+			@baseplateBox.material = @baseplateMaterial
+
 			@currentBaseplateMaterial = @baseplateMaterial
 		else
 			@highQualMode = false
 
 			#hide studs
-			@threejsNode.children[1].visible = false
+			@studsContainer.visible = false
 			#change baseplate material to stud texture
-			@threejsNode.children[0].material = @baseplateTexturedMaterial
+			@baseplateBox.material = @baseplateTexturedMaterial
+
 			@currentBaseplateMaterial = @baseplateTexturedMaterial

@@ -25,6 +25,7 @@ class BrickLayouter
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
+		useThreeLayers = true
 
 		if not bricksToLayout?
 			bricksToLayout = grid.getAllBricks()
@@ -41,7 +42,7 @@ class BrickLayouter
 				return {grid: grid}
 
 			numRandomChoices++
-			mergeableNeighbors = @_findMergeableNeighbors brick
+			mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
 
 			if !@_anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
@@ -83,7 +84,7 @@ class BrickLayouter
 					log.warn '> Using pseudoRandom:', @pseudoRandom
 					log.warn '> current seed:', Random.getSeed()
 
-				mergeableNeighbors = @_findMergeableNeighbors brick
+				mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
 
 		return {grid: grid}
 
@@ -170,7 +171,7 @@ class BrickLayouter
 
 	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
-	_findMergeableNeighbors: (brick) =>
+	_findMergeableNeighbors: (brick, useThreeLayers) =>
 		mergeableNeighbors = []
 
 		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
@@ -197,14 +198,15 @@ class BrickLayouter
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
-		mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
-			brick
-			Brick.direction.Zp
-		)
-		mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
-			brick
-			Brick.direction.Zm
-		)
+		if useThreeLayers
+			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
+				brick
+				Brick.direction.Zp
+			)
+			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
+				brick
+				Brick.direction.Zm
+			)
 
 		return mergeableNeighbors
 

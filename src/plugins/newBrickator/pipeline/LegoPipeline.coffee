@@ -1,6 +1,10 @@
+log = require 'loglevel'
+
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
+Random = require './Random'
+
 
 module.exports = class LegoPipeline
 	constructor: ->
@@ -25,7 +29,7 @@ module.exports = class LegoPipeline
 
 		@pipelineSteps.push {
 			name: 'Layout graph initialization'
-			decision: (options) => return options.initLayout
+			decision: (options) -> return options.initLayout
 			worker: (lastResult, options) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 		}
@@ -34,8 +38,7 @@ module.exports = class LegoPipeline
 			name: 'Layout greedy merge'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.layoutByGreedyMerge lastResult.brickGraph,
-				lastResult.brickGraph.bricks
+				return @brickLayouter.layoutByGreedyMerge lastResult.grid
 		}
 
 		@pipelineSteps.push {
@@ -43,24 +46,19 @@ module.exports = class LegoPipeline
 			decision: (options) -> return options.reLayout
 			worker: (lastResult, options) =>
 				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
-				lastResult.brickGraph, lastResult.grid
-				return lastResult
-		}
-
-		@pipelineSteps.push {
-			name: 'Update Lego references in Grid'
-			decision: (options) -> return options.reLayout or options.layouting or
-					options.initLayout
-			worker: (lastResult, options) ->
-				lastResult.brickGraph.updateReferencesInGrid()
+				lastResult.grid
 				return lastResult
 		}
 
 	run: (data, options = null, profiling = false) =>
 		if profiling
-			console.log "Starting Lego Pipeline
+			log.debug "Starting Lego Pipeline
 			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
 			 onlyReLayout: #{options.reLayout})"
+
+			randomSeed = Math.floor Math.random() * 1000000
+			Random.setSeed randomSeed
+			log.debug 'Using random seed', randomSeed
 
 			profilingResults = []
 
@@ -81,7 +79,7 @@ module.exports = class LegoPipeline
 			sum = 0
 			for s in profilingResults
 				sum += s
-			console.log "Finished Lego Pipeline in #{sum}ms"
+			log.debug "Finished Lego Pipeline in #{sum}ms"
 
 		return {
 			profilingResults: profilingResults
@@ -99,13 +97,13 @@ module.exports = class LegoPipeline
 		step = @pipelineSteps[i]
 
 		if step.decision options
-			console.log "Running step #{step.name}"
+			log.debug "Running step #{step.name}"
 			start = new Date()
 			result = @runStep i, lastResult, options
 			stop = new Date() - start
-			console.log "Step #{step.name} finished in #{stop}ms"
+			log.debug "Step #{step.name} finished in #{stop}ms"
 		else
-			console.log "(Skipping step #{step.name})"
+			log.debug "(Skipping step #{step.name})"
 			result = lastResult
 			stop = 0
 

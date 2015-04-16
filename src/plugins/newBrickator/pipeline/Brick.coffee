@@ -1,325 +1,286 @@
-module.exports = class Brick
-	@_nextBrickIndex = 0
+log = require 'loglevel'
 
-	# to replace magic numbers when using the @neighbors[] array
+class Brick
 	@direction = {
-		Xm: 0
-		Xp: 1
-		Ym: 2
-		Yp: 3
+		Xp: 'Xp'
+		Xm: 'Xm'
+		Yp: 'Yp'
+		Ym: 'Ym'
+		Zp: 'Zp'
+		Zm: 'Zm'
 	}
 
-	@getNextBrickIndex: =>
-		return @_nextBrickIndex++
+	@validBrickSizes = [
+		[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
+		[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
+		[1, 1, 3], [1, 2, 3], [1, 3, 3], [1, 4, 3],
+		[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
+		[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
+	]
 
-	@availableBrickSizes: ->
-		return [
-			[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
-			[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
-			[1, 1, 3], [1, 2, 3], [1, 3, 3], [1, 4, 3],
-			[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
-			[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
-		]
-
-	@isValidSize: (width, length, height) ->
-		for validSize in Brick.availableBrickSizes()
-			if validSize[0] == width and validSize[1] == length and
-			validSize[2] == height
-				return true
-			if validSize[0] == length and validSize[1] == width and
-			validSize[2] == height
+	# returns true if the given size is a valid size
+	@isValidSize: (x, y, z) ->
+		for testSize in Brick.validBrickSizes
+			if testSize[0] == x and testSize[1] == y and
+			testSize[2] == z
 				return true
 		return false
 
-	@uniqueBricksInSlots: (upperOrLowerSlots) ->
-		bricks = []
-		for slotsX in upperOrLowerSlots
-			for slotXY in slotsX
-				if slotXY != false
-					bricks.push slotXY
-		return removeDuplicates bricks
+	# Creates a brick out of the given set of voxels
+	# Takes ownership of voxels without further processing
+	constructor: (arrayOfVoxels) ->
+		@voxels = new Set()
+		for voxel in arrayOfVoxels
+			voxel.brick = @
+			@voxels.add voxel
 
-	constructor: (@position, @size) ->
-		# position always contains smallest x & smallest y
+	# enumerates over each voxel that belongs to this brick
+	forEachVoxel: (callback) =>
+		@voxels.forEach callback
 
-		#initialize slots
-		@upperSlots = []
-		@lowerSlots = []
-		@id = Brick.getNextBrickIndex()
+	# returns the voxel the brick consists of, if it consists out
+	# of one voxel. else returns null
+	getVoxel: =>
+		if @voxels.size > 1
+			return null
+		iterator = @voxels.entries()
+		return iterator.next().value[0]
 
-		#save old bricks for debugging, false = none, otherwise [] with bricks
-		@mergedNeighbors = false
-		@mergedBrick = false
+	# Returns true if a voxel with this coordinates
+	# belongs to this brick
+	isVoxelInBrick: (x, y, z) ->
+		inBrick = false
+		@forEachVoxel (vox) ->
+			if vox.position.x == x and
+			vox.position.y == y and
+			vox.position.z == z
+				inBrick = true
+		return inBrick
 
-		for xx in [0..@size.x - 1] by 1
-			@upperSlots[xx] = []
-			@lowerSlots[xx] = []
-			for yy in [0..@size.y - 1] by 1
-				@upperSlots[xx][yy] = false
-				@lowerSlots[xx][yy] = false
+	# returns the {x, y, z} values of the voxel with
+	# the smallest x, y and z.
+	# To work properly, this function assumes that there
+	# are no holes in the brick and the brick is a proper cuboid
+	getPosition: =>
+		return @_position if @_position?
 
-		# x-, x+, y-, y+
-		@neighbors = [[], [], [], []]
-		return
+		# to bring variables to correct scope
+		x = undefined
+		y = undefined
+		z = undefined
 
-	# Removes references to this brick from this brick's neighbors/connections
-	removeSelfFromSurrounding: =>
-		# delete from connected and neighbor bricks
-		connectedBricks = @uniqueNeighbors()
-		connectedBricks = connectedBricks.concat @uniqueConnectedBricks()
+		@forEachVoxel (voxel) ->
+			x = voxel.position.x if not x?
+			x = Math.min voxel.position.x, x
+			y = voxel.position.y if not y?
+			y = Math.min voxel.position.y, y
+			z = voxel.position.z if not z?
+			z = Math.min voxel.position.z, z
 
-		for connectedBrick in connectedBricks
-			connectedBrick.clearReferenceTo @
+		@_position = {
+			x: x
+			y: y
+			z: z
+		}
+		return @_position
 
-	# Removes all references to the brickToBeRemoved from this brick
-	clearReferenceTo: (brickToBeRemoved) =>
-		for xi in [0...@size.x]
-			for yi in [0...@size.y]
-				if @upperSlots[xi][yi] == brickToBeRemoved
-					@upperSlots[xi][yi] = false
-				if @lowerSlots[xi][yi] == brickToBeRemoved
-					@lowerSlots[xi][yi] = false
+	# returns the size of the brick
+	getSize: =>
+		return @_size if @_size?
+		@_size = {}
 
-		for i in [0...@neighbors.length]
-			brickIndex = @neighbors[i].indexOf(brickToBeRemoved)
-			if brickIndex >= 0
-				@neighbors[i].splice(brickIndex,1)
+		@forEachVoxel (voxel) =>
+			#init values
+			@_size.maxX ?= @_size.minX ?= voxel.position.x
+			@_size.maxY ?= @_size.minY ?= voxel.position.y
+			@_size.maxZ ?= @_size.minZ ?= voxel.position.z
 
-	uniqueConnectedBricks: =>
-		upperBricks = Brick.uniqueBricksInSlots @upperSlots
-		lowerBricks = Brick.uniqueBricksInSlots @lowerSlots
-		return upperBricks.concat lowerBricks
+			@_size.minX = voxel.position.x if @_size.minX > voxel.position.x
+			@_size.minY = voxel.position.y if @_size.minY > voxel.position.y
+			@_size.minZ = voxel.position.z if @_size.minZ > voxel.position.z
 
-	uniqueNeighbors: =>
-		neighborsList = [].concat.apply([],@neighbors)
-		return neighborsList
+			@_size.maxX = voxel.position.x if @_size.maxX < voxel.position.x
+			@_size.maxY = voxel.position.y if @_size.maxY < voxel.position.y
+			@_size.maxZ = voxel.position.z if @_size.maxZ < voxel.position.z
 
-	# helper method, to be moved somewhere more appropriate
-	removeDuplicates = (array) ->
-		a = array.concat()
-		i = 0
-
-		while i < a.length
-			j = i + 1
-			while j < a.length
-				a.splice j--, 1	if a[i] is a[j]
-				++j
-			++i
-		return a
-
-	getConnectionsFromMergingBrick: (mBrick) =>
-		self = @
-		offsetXY = {
-			x: mBrick.position.x - @position.x
-			y: mBrick.position.y - @position.y
+		@_size = {
+			x: (@_size.maxX - @_size.minX) + 1
+			y: (@_size.maxY - @_size.minY) + 1
+			z: (@_size.maxZ - @_size.minZ) + 1
 		}
 
-		for slots, x in mBrick.upperSlots
-			for slot, y in slots
-				if slot != false
-					self.upperSlots[offsetXY.x + x][offsetXY.y + y] = slot
-					offsetInConBrick = {
-						x: (self.position.x + offsetXY.x + x) - slot.position.x
-						y: (self.position.y + offsetXY.y + y) - slot.position.y
-					}
-					slot.lowerSlots[offsetInConBrick.x][offsetInConBrick.y] = self
+		return @_size
 
-		for slots, x in mBrick.lowerSlots
-			for slot, y in slots
-				if slot != false
-					self.lowerSlots[offsetXY.x + x][offsetXY.y + y] = slot
-					offsetInConBrick = {
-						x: (self.position.x + offsetXY.x + x) - slot.position.x
-						y: (self.position.y + offsetXY.y + y) - slot.position.y
-					}
-					slot.upperSlots[offsetInConBrick.x][offsetInConBrick.y] = self
+	# returns a set of all bricks that are next to this brick
+	# in the given direction
+	getNeighbors: (direction) =>
+		return @_neighbors[direction] if @_neighbors?[direction]?
 
-		return
+		neighbors = new Set()
 
-	getNeighborsFromMergingBrick: (mBrick) =>
-		#check all four directions
-		if @position.x == mBrick.position.x
-			#take neighbor in direction 0 xm
-			@_replaceOldNeighbors mBrick, Brick.direction.Xm, Brick.direction.Xp
-		if @position.y == mBrick.position.y
-			#take neighbor in direction 2 ym
-			@_replaceOldNeighbors mBrick, Brick.direction.Ym, Brick.direction.Yp
-		if (@position.x + @size.x) == (mBrick.position.x + mBrick.size.x)
-			#take neighbor in direction 1 xp
-			@_replaceOldNeighbors mBrick, Brick.direction.Xp, Brick.direction.Xm
-		if (@position.y + @size.y) == (mBrick.position.y + mBrick.size.y)
-			#take neighbor in direction 3 yp
-			@_replaceOldNeighbors mBrick, Brick.direction.Yp, Brick.direction.Ym
+		@forEachVoxel (voxel) =>
+			if voxel.neighbors[direction]?
+				neighborBrick = voxel.neighbors[direction].brick
+				neighbors.add neighborBrick if neighborBrick and neighborBrick != @
 
-	_replaceOldNeighbors: (mBrick, dir, opp) =>
-		for neighbor in mBrick.neighbors[dir]
-			@addNeighbor dir, neighbor
-			@_removeFirstOccurenceFromArray mBrick, neighbor.neighbors[opp]
-			neighbor.addNeighbor opp, @
-		return
+		@_neighbors ?= {}
+		@_neighbors[direction] = neighbors
 
-	getPositionAndSizeForNewBrick: (mergeIndex, mergeNeighbors) =>
-		if mergeIndex == 1
-			position = @position
-			size = {
-				x: @size.x + mergeNeighbors[0].size.x
-				y: @size.y
-				z: @size.z
-			}
-		else if mergeIndex == 0
-			position = {
-				x: mergeNeighbors[0].position.x
-				y: @position.y
-				z: @position.z
-			}
-			size = {
-				x: @size.x + mergeNeighbors[0].size.x
-				y: @size.y
-				z: @size.z
-			}
-		else if mergeIndex == 3
-			position = @position
-			size = {
-				x: @size.x
-				y: @size.y + mergeNeighbors[0].size.y
-				z: @size.z
-			}
-		else if mergeIndex == 2
-			position = {
-				x: @position.x
-				y: mergeNeighbors[0].position.y
-				z: @position.z
-			}
-			size = {
-				x: @size.x
-				y: @size.y + mergeNeighbors[0].size.y
-				z: @size.z
-			}
+		return @_neighbors[direction]
 
-		return {position: position, size: size}
+	# tells this brick to update cached neighbors indices
+	clearNeighborsCache: =>
+		@_neighbors = null
 
-	_removeFirstOccurenceFromArray: (object, array) ->
-		i = array.indexOf object
-		if i != -1
-			array.splice i, 1
-		return
+	# Connected Bricks are neighbors in Zp and Zm direction
+	# because they are connected with studs to each other
+	connectedBricks: =>
+		connectedBricks = new Set()
 
-	split: =>
-		newBricks = []
-		for x in [0..@size.x - 1] by 1
-			newBricks[x] = []
-			for y in [0..@size.y - 1] by 1
-				newBricks[x][y] = false
+		@getNeighbors(Brick.direction.Zp).forEach (brick) ->
+			connectedBricks.add brick
 
-		for x in [0..@size.x - 1]
-			for y in [0..@size.y - 1]
-				newPosition = {
-					x: @position.x + x
-					y: @position.y + y
-					z: @position.z
-				}
-				newBricks[x][y] = new Brick(newPosition,{x: 1, y: 1, z: 1})
+		@getNeighbors(Brick.direction.Zm).forEach (brick) ->
+			connectedBricks.add brick
 
-				# update connections
-				if @upperSlots[x][y] != false
-					connectedBrick = @upperSlots[x][y]
-					newBricks[x][y].upperSlots[0][0] = connectedBrick
-					offsetInConBrick = {
-						x: (newBricks[x][y].position.x) - connectedBrick.position.x
-						y: (newBricks[x][y].position.y) - connectedBrick.position.y
-					}
-					connectedBrick.lowerSlots[offsetInConBrick.x][offsetInConBrick.y] =
-						newBricks[x][y]
+		return connectedBricks
 
-				if @lowerSlots[x][y] != false
-					connectedBrick = @lowerSlots[x][y]
-					newBricks[x][y].lowerSlots[0][0] = connectedBrick
-					offsetInConBrick = {
-						x: (newBricks[x][y].position.x) - connectedBrick.position.x
-						y: (newBricks[x][y].position.y) - connectedBrick.position.y
-					}
-					connectedBrick.upperSlots[offsetInConBrick.x][offsetInConBrick.y] =
-						newBricks[x][y]
+	# Splits up this brick in 1x1x1 bricks and returns them as a set
+	# This brick has no voxels after this operation
+	splitUp: =>
+		# tell neighbors to update their cache
+		for direction of Brick.direction
+			neighbors = @getNeighbors direction
+			neighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
 
-				# update neighbors outside of splitting brick
-				if newBricks[x][y].position.x == @position.x
-					#take neighbor in direction 0 xm
-					@addNeighborsToNewBrick newBricks[x][y], Brick.direction.Xm
-				if newBricks[x][y].position.y == @position.y
-					#take neighbor in direction 2 ym
-					@addNeighborsToNewBrick newBricks[x][y], Brick.direction.Ym
-				if (newBricks[x][y].position.x + newBricks[x][y].size.x) ==
-				(@position.x + @size.x)
-					#take neighbor in direction 1 xp
-					@addNeighborsToNewBrick newBricks[x][y], Brick.direction.Xp
-				if (newBricks[x][y].position.y + newBricks[x][y].size.y) ==
-				(@position.y + @size.y)
-					#take neighbor in direction 3 yp
-					@addNeighborsToNewBrick newBricks[x][y], Brick.direction.Yp
+		# create new bricks
+		newBricks = new Set()
 
-				# update neighbors inside the splitting brick
-				if x > 0
-					newBricks[x][y].addNeighbor Brick.direction.Xm, newBricks[x - 1][y]
-					newBricks[x - 1][y].addNeighbor Brick.direction.Xp, newBricks[x][y]
-				if y > 0
-					newBricks[x][y].addNeighbor Brick.direction.Ym, newBricks[x][y - 1]
-					newBricks[x][y - 1].addNeighbor Brick.direction.Yp, newBricks[x][y]
+		@forEachVoxel (voxel) ->
+			brick = new Brick([voxel])
+			newBricks.add brick
 
-		#remove this (old) brick from all neighbors
-		for neighbors in @neighbors
-			for neighbor in neighbors
-				for i in [0..3] by 1
-					@_removeFirstOccurenceFromArray @, neighbor.neighbors[i]
+		@_clearData()
+		return newBricks
 
-		return [].concat.apply([], newBricks)
+	# removes all references to this brick from voxels
+	# this brick has to be deleted after that
+	clear: =>
+		# clear references
+		@forEachVoxel (voxel) ->
+			voxel.brick = false
+		# and stored data
+		@_clearData()
 
-	addNeighborsToNewBrick: (newBrick, direction) =>
-		switch direction
-			when Brick.direction.Xm
-				opposite = Brick.direction.Xp
-			when Brick.direction.Xp
-				opposite = Brick.direction.Xm
-			when Brick.direction.Ym
-				opposite = Brick.direction.Yp
-			when Brick.direction.Yp
-				opposite = Brick.direction.Ym
+	_clearData: =>
+		#clear stored data
+		@_size = null
+		@_position = null
+		@_neighbors = null
+		@voxels.clear()
 
-		if direction in [Brick.direction.Xm,Brick.direction.Xp]
-			minY = newBrick.position.y
-			maxY = newBrick.position.y + newBrick.size.y
-			for neighbor in @neighbors[direction]
-				if neighbor.position.y <= minY and
-				neighbor.position.y + neighbor.size.y >= maxY
-					newBrick.addNeighbor direction, neighbor
-					neighbor.addNeighbor opposite, newBrick
+	# merges this brick with the other brick specified,
+	# the other brick gets deleted in the process
+	mergeWith: (otherBrick) =>
+		#clear size, position and neighbors (to be recomputed)
+		@_size = null
+		@_position = null
+		@_neighbors = null
 
-		if direction in [Brick.direction.Ym, Brick.direction.Yp]
-			minX = newBrick.position.x
-			maxX = newBrick.position.x + newBrick.size.x
-			for neighbor in @neighbors[direction]
-				if neighbor.position.x <= minX and
-				neighbor.position.x + neighbor.size.x >= maxX
-					newBrick.addNeighbor direction, neighbor
-					neighbor.addNeighbor opposite, newBrick
+		# tell neighbors to update their cache
+		for direction of Brick.direction
+			neighbors = @getNeighbors direction
+			neighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
 
-		return
+			otherNeighbors = otherBrick.getNeighbors direction
+			otherNeighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
+
+		#take voxels from other brick
+		newVoxels = new Set()
+
+		otherBrick.forEachVoxel (voxel) ->
+			newVoxels.add voxel
+
+		otherBrick.clear()
+
+		newVoxels.forEach (voxel) =>
+			voxel.brick = @
+			@voxels.add voxel
+
+	# returns true if the size of the brick matches one of @validBrickSizes
+	hasValidSize: =>
+		size = @getSize()
+		variation1 = Brick.isValidSize(size.x, size.y, size.z)
+		variation2 = Brick.isValidSize(size.y, size.x, size.z)
+		return variation1 || variation2
+
+	# returns true if the brick has no holes in it, i.e. is a cuboid
+	isHoleFree: =>
+		voxelCheck  = {}
+
+		p = @getPosition()
+		s = @getSize()
+
+		for x in [p.x...(p.x + s.x)]
+			for y in [p.y...(p.y + s.y)]
+				for z in [p.z...(p.z + s.z)]
+					voxelCheck[x + '-' + y + '-' + z] = false
+
+		@forEachVoxel (voxel) ->
+			vp = voxel.position
+			voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
+
+		hasHoles = false
+		for val of voxelCheck
+			if voxelCheck[val] == false
+				log.warn 'Hole at', val
+				hasHoles = true
+
+		return !hasHoles
+
+	# returns true if the brick is valid
+	# a brick is valid when it has voxels, is hole free and
+	# has a valid size
+	isValid: =>
+		hasVoxels = false
+		hasVoxels = true if @voxels.size > 0
+		if not hasVoxels
+			log.warn 'Invalid: brick has no voxels'
+
+		validSize  = @hasValidSize()
+		if not validSize
+			log.warn 'Invalid: brick has invalid size',@getSize()
+
+		noHoles = @isHoleFree()
+		if not noHoles
+			log.warn 'Invalid: brick has holes'
+
+		return hasVoxels and validSize and noHoles
 
 	getStability: =>
-		# possible links at top and bottom
-		possibleLinks = 2 * @size.x * @size.y
-		links = 0
-		for x in [0..@size.x - 1]
-			for y in [0..@size.y - 1]
-				if @upperSlots[x][y] != false
-					links++
-				if @lowerSlots[x][y] != false
-					links++
-		return links / possibleLinks
+		s = @getSize()
+		p = @getPosition()
+		cons = @connectedBricks()
 
-	addNeighbor: (direction, brick) =>
-		if (@neighbors[direction].indexOf brick) != -1
-			#prevent addition of duplicate neighbor
-			#console.warn 'trying to add duplicate neighbor'
-			return
-		@neighbors[direction].push brick
+		# possible slots top & bottom
+		possibleSlots = s.x * s.y * 2
 
+		# how many slots are actually connected?
+		usedSlots = 0
+
+		lowerZ = p.z - 1
+		upperZ = p.z + s.z
+
+		# test for each possible slot if neighbour bricks have
+		# voxels that belong to this slot
+		for x in [p.x...(p.x + s.x)]
+			for y in [p.y...(p.y + s.y)]
+				cons.forEach (brick) ->
+					if brick.isVoxelInBrick(x, y, upperZ)
+						usedSlots++
+					if brick.isVoxelInBrick(x, y, lowerZ)
+						usedSlots++
+
+		return usedSlots / possibleSlots
+
+module.exports = Brick

@@ -1,12 +1,11 @@
 THREE = require 'three'
 Voxel = require './Voxel'
+Brick = require './Brick'
+Random = require './Random'
 
 module.exports = class Grid
 	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
 		@origin = {x: 0, y: 0, z: 0}
-		@numVoxelsX = 0
-		@numVoxelsY = 0
-		@numVoxelsZ = 0
 		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
 
 		@voxels = {}
@@ -22,13 +21,8 @@ module.exports = class Grid
 			bbMinWorld = new THREE.Vector3()
 			bbMinWorld.set bb.min.x, bb.min.y, bb.min.z
 			bbMinWorld.applyProjection(@modelTransform)
-
-			bbMaxWorld = new THREE.Vector3()
-			bbMaxWorld.set bb.max.x, bb.max.y, bb.max.z
-			bbMaxWorld.applyProjection(@modelTransform)
 		else
 			bbMinWorld = bb.min
-			bbMaxWorld = bb.max
 
 		# 1.) Align bb minimum to next voxel position
 		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
@@ -44,12 +38,36 @@ module.exports = class Grid
 			z: Math.max(calculatedZ, minimumZ)
 		}
 
-		maxVoxel = @mapWorldToGrid bbMaxWorld
-		minVoxel = @mapWorldToGrid bbMinWorld
+	getNumVoxelsX: =>
+		return @_maxVoxelX - @_minVoxelX + 1
 
-		@numVoxelsX = Math.ceil (maxVoxel.x - minVoxel.x) / @spacing.x + 2
-		@numVoxelsY = Math.ceil (maxVoxel.y - minVoxel.y) / @spacing.y + 2
-		@numVoxelsZ = Math.ceil (maxVoxel.z - minVoxel.z) / @spacing.z + 1
+	getNumVoxelsY: =>
+		return @_maxVoxelY - @_minVoxelY + 1
+
+	getNumVoxelsZ: =>
+		return @_maxVoxelZ - @_minVoxelZ + 1
+
+	# use this if you are not interested in the actual number of layers
+	# e.g. if you want to use them zero-indexed
+	getMaxZ: =>
+		return @_maxVoxelZ
+
+	_updateMinMax: ({x: x, y: y, z: z}) =>
+		@_maxVoxelX ?= 0
+		@_maxVoxelY ?= 0
+		@_maxVoxelZ ?= 0
+
+		@_maxVoxelX = Math.max @_maxVoxelX, x
+		@_maxVoxelY = Math.max @_maxVoxelY, y
+		@_maxVoxelZ = Math.max @_maxVoxelZ, z
+
+		@_minVoxelX ?= @_maxVoxelX
+		@_minVoxelY ?= @_maxVoxelY
+		@_minVoxelZ ?= @_maxVoxelZ
+
+		@_minVoxelX = Math.min @_minVoxelX, x
+		@_minVoxelY = Math.min @_minVoxelY, y
+		@_minVoxelZ = Math.min @_minVoxelZ, z
 
 	mapWorldToGrid: (point) =>
 		# maps world coordinates to aligned grid coordinates
@@ -115,6 +133,7 @@ module.exports = class Grid
 			v = new Voxel(position, [data])
 			@_linkNeighbors v
 			@voxels[key] = v
+			@_updateMinMax position
 		else
 			v.dataEntrys.push data
 
@@ -204,3 +223,32 @@ module.exports = class Grid
 					_collect vx, vy, vz
 
 		return list
+
+	# Initializes the grid with a 1x1x1 brick for each voxel
+	# Overrides existing bricks
+	initializeBricks: =>
+		@forEachVoxel (voxel) ->
+			new Brick([voxel])
+
+	# returns all bricks as a set
+	getAllBricks: =>
+		bricks = new Set()
+
+		@forEachVoxel (voxel) ->
+			if voxel.brick
+				bricks.add voxel.brick
+
+		return bricks
+
+	# chooses a random brick
+	chooseRandomBrick: =>
+		while true
+			x = @_minVoxelX + Random.next @getNumVoxelsX()
+			y = @_minVoxelY + Random.next @getNumVoxelsY()
+			z = @_minVoxelZ + Random.next @getNumVoxelsZ()
+
+			vox = @getVoxel x, y, z
+
+			if vox? and vox.brick
+				return vox.brick
+

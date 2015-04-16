@@ -4,6 +4,11 @@ module.exports  = class PipelineSettings
 		height: 1.8
 	}
 
+	@legoHoleSize = {
+		radius: 2.6
+		height: 2.3
+	}
+
 	constructor: ->
 		@gridSpacing = {
 			x: 8

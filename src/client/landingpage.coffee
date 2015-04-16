@@ -11,13 +11,14 @@ fileLoader = require './modelLoading/fileLoader'
 globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
-globalConfig.syncWithServer = false
 globalConfig.buildUi = false
 globalConfig.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
+globalConfig.plugins.editController = false
+globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false
@@ -26,8 +27,11 @@ globalConfig.createVisibleWireframe = false
 config1 = clone globalConfig
 config2 = clone globalConfig
 
-# configure left bundle one to only show model
+# configure left bundle to only show model
 config1.plugins.newBrickator = false
+
+# configure right bundle to not show the model
+config2.showModel = false
 
 # instantiate 2 lowfab bundles
 config1.renderAreaId = 'renderArea1'

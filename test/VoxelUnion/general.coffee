@@ -1,6 +1,6 @@
 expect = require('chai').expect
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
-VoxelUnion = require '../../src/plugins/newBrickator/VoxelUnion'
+VoxelUnion = require '../../src/plugins/csg/VoxelUnion'
 THREE = require 'three'
 
 describe 'VoxelUnion', ->

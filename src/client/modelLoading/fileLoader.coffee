@@ -1,4 +1,6 @@
+log = require 'loglevel'
 meshlib = require 'meshlib'
+
 modelCache = require './modelCache'
 Spinner = require '../Spinner'
 
@@ -35,7 +37,7 @@ loadFile = (feedbackTarget, file, spinnerOptions) ->
 		setTimeout -> reader.readAsArrayBuffer file
 
 handleLoadedFile = (feedbackTarget, filename, spinnerOptions) -> (event) ->
-	console.log "File #{filename} loaded"
+	log.debug "File #{filename} loaded"
 	fileContent = event.target.result
 
 	return new Promise (resolve, reject) ->

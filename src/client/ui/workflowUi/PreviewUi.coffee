@@ -5,6 +5,7 @@ class PreviewUi
 		@$panel = $('#previewGroup')
 		bundle = @workflowUi.bundle
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
+		@editController = bundle.getPlugin 'editController'
 		@sceneManager = bundle.sceneManager
 		@_initStabilityView()
 		@_initAssemblyView()
@@ -27,7 +28,7 @@ class PreviewUi
 	_quitStabilityView: =>
 		@$stabilityViewButton.removeClass 'active disabled'
 		@stabilityViewEnabled = no
-		@nodeVisualizer.setStabilityView @sceneManager.selectedNode, false
+		@editController.enableInteraction()
 
 	toggleStabilityView: =>
 		@stabilityViewEnabled = !@stabilityViewEnabled
@@ -40,9 +41,11 @@ class PreviewUi
 		@$stabilityViewButton.toggleClass 'active', @stabilityViewEnabled
 		@$assemblyViewButton.toggleClass 'disabled', @stabilityViewEnabled
 
-		@nodeVisualizer.setStabilityView(
-			@sceneManager.selectedNode, @stabilityViewEnabled
-		)
+		if @stabilityViewEnabled
+			@editController.disableInteraction()
+			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
+		else
+			@editController.enableInteraction()
 
 	_initAssemblyView: =>
 		@assemblyViewEnabled = no
@@ -54,6 +57,7 @@ class PreviewUi
 		@$assemblyViewButton.removeClass 'active disabled'
 		@assemblyViewEnabled = no
 		@previewAssemblyUi.setEnabled no
+		@editController.enableInteraction()
 
 	_toggleAssemblyView: =>
 		@assemblyViewEnabled = !@assemblyViewEnabled
@@ -67,5 +71,10 @@ class PreviewUi
 		@$stabilityViewButton.toggleClass 'disabled', @assemblyViewEnabled
 
 		@previewAssemblyUi.setEnabled @assemblyViewEnabled
+
+		if @assemblyViewEnabled
+			@editController.disableInteraction()
+		else
+			@editController.enableInteraction()
 
 module.exports = PreviewUi

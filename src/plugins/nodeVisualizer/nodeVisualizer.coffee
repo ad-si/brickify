@@ -35,9 +35,9 @@ class NodeVisualizer
 		@_getCachedData(node)
 		.then (cachedData) =>
 			cachedData.modelVisualization.createVisualization()
-			if @bundle.globalConfig.showModel
-				cachedData.modelVisualization.afterCreation().then =>
-					@_zoomToNode cachedData.modelVisualization.getSolid()
+			cachedData.modelVisualization.afterCreation().then =>
+				solid = cachedData.modelVisualization.getSolid()
+				@_zoomToNode solid if solid?
 
 	onNodeRemove: (node) =>
 		@threeJsRootNode.remove threeHelper.find node, @threeJsRootNode

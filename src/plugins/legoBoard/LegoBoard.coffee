@@ -21,6 +21,7 @@ module.exports = class LegoBoard
 	init3d: (@threejsNode) =>
 		@highQualMode = false
 		@usePipeline = false
+		@isVisible = true
 
 		@_initMaterials()
 
@@ -93,6 +94,8 @@ module.exports = class LegoBoard
 			@studsContainer.visible = true if @highQualMode
 
 	onPaint: (threeRenderer, camera) =>
+		return if not @isVisible
+
 		# recreate textures if either they havent been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized? and
@@ -134,6 +137,7 @@ module.exports = class LegoBoard
 
 	toggleVisibility: =>
 		@threejsNode.visible = !@threejsNode.visible
+		@isVisible = !@isVisible
 
 	setFidelity: (fidelityLevel, availableLevels) =>
 		# Determine whether to show or hide studs

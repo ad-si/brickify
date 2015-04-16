@@ -2,6 +2,7 @@ threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 interactionHelper = require '../../client/interactionHelper'
+shaderGenerator = require './shaderGenerator'
 
 ###
 # @class NodeVisualizer

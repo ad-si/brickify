@@ -343,9 +343,8 @@ class NodeVisualizer
 
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>
-		intersections = interactionHelper.getIntersections(
-			event, @bundle.renderer, @threejsRootNode.children
-		)
+		intersections = @_getPointerIntersections event
+
 		return intersections.length > 0 unless ignoreInvisible
 		visibleIntersections = intersections.filter (intersection) ->
 			object = intersection.object
@@ -355,5 +354,23 @@ class NodeVisualizer
 			return true
 
 		return visibleIntersections.length > 0
+
+	_getPointerIntersections: (event) =>
+		if @usePipeline
+			modelIntersections = interactionHelper.getIntersections(
+				event, @bundle.renderer, @objectsRootNode.children
+			)
+			if modelIntersections.length > 0
+				return modelIntersections
+
+			brickIntersections = interactionHelper.getIntersections(
+				event, @bundle.renderer, @brickRootNode.children
+			)
+			return brickIntersections
+		else
+			mixedIntersections = interactionHelper.getIntersections(
+				event, @bundle.renderer, @threejsRootNode.children
+			)
+			return mixedIntersections
 
 module.exports = NodeVisualizer

@@ -3,7 +3,7 @@ threeHelper = require '../../client/threeHelper'
 LineMatGenerator = require './visualization/LineMatGenerator'
 
 class ModelVisualization
-	constructor: (@globalConfig, @node, threeNode) ->
+	constructor: (@globalConfig, @node, threeNode, @coloring) ->
 		@_initializeMaterials()
 
 		@threeNode = new THREE.Object3D()

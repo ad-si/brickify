@@ -11,7 +11,9 @@ VoxelSelector = require '../VoxelSelector'
 # @class BrickVisualization
 ###
 class BrickVisualization
-	constructor: (@bundle,  @brickThreeNode, @brickShadowThreeNode) ->
+	constructor: (
+		@bundle,  @brickThreeNode, @brickShadowThreeNode, @defaultColoring) ->
+
 		@csgSubnode = new THREE.Object3D()
 		@brickThreeNode.add @csgSubnode
 
@@ -22,7 +24,6 @@ class BrickVisualization
 		@voxelBrickSubnode.add @bricksSubnode
 		@brickThreeNode.add @voxelBrickSubnode
 
-		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
 
 		@printVoxels = []

@@ -5,6 +5,7 @@ interactionHelper = require '../../client/interactionHelper'
 shaderGenerator = require './shaderGenerator'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
+Coloring = require './visualization/Coloring'
 
 ###
 # @class NodeVisualizer
@@ -21,6 +22,8 @@ class NodeVisualizer
 		@printMaterial.polygonOffset = true
 		@printMaterial.polygonOffsetFactor = 5
 		@printMaterial.polygonoffsetUnits = 5
+
+		@coloring = new Coloring()
 
 	init: (@bundle) => return
 
@@ -249,10 +252,10 @@ class NodeVisualizer
 			brickShadowThreeNode: brickShadowThreeNode
 			modelThreeNode: modelThreeNode
 			brickVisualization: new BrickVisualization(
-				@bundle, brickThreeNode, brickShadowThreeNode
+				@bundle, brickThreeNode, brickShadowThreeNode, @coloring
 			)
 			modelVisualization: new ModelVisualization(
-				@bundle.globalConfig, node, modelThreeNode
+				@bundle.globalConfig, node, modelThreeNode, @coloring
 			)
 		}
 

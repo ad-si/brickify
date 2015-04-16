@@ -18,6 +18,13 @@ colors:
   basePlate: 0x555555
   basePlateStud: 0x5a5a5a
 
+  modelColor: 0xeeeeee
+  modelOpacity: 0.8
+  modelOpacityLandingPage: 1.0
+
+  modelShadowColor: 0x000000
+  modelShadowOpacity: 0.4
+
 
 # camera adjustments
 fov: 40

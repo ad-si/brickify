@@ -7,17 +7,7 @@ interactionHelper = require '../../client/interactionHelper'
 # @class NodeVisualizer
 ###
 class NodeVisualizer
-	constructor: ->
-		@printMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
-			opacity: 0.8
-			transparent: true
-		})
-
-		# remove z-Fighting on baseplate
-		@printMaterial.polygonOffset = true
-		@printMaterial.polygonOffsetFactor = 5
-		@printMaterial.polygonoffsetUnits = 5
+	constructor: -> return
 
 	init: (@bundle) => return
 
@@ -68,9 +58,6 @@ class NodeVisualizer
 		visualizationData.brickVisualization.initialize newBrickatorData.grid
 		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
-
-		# instead of creating csg live, show original model semitransparent
-		visualizationData.modelVisualization.setSolidMaterial @printMaterial
 
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>

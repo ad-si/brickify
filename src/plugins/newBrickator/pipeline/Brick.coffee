@@ -281,7 +281,7 @@ class Brick
 
 		return usedSlots / possibleSlots
 
-	getStabilityInDir: (directionZmOrZp)=>
+	getStabilityInDir: (directionZmOrZp) =>
 		s = @getSize()
 		p = @getPosition()
 		conBricks = @connectedBricks()

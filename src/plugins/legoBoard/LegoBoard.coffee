@@ -106,7 +106,9 @@ module.exports = class LegoBoard
 			@renderTargetsInitialized = true
 
 		#render board
-		threeRenderer.render @pipelineScene, camera, @pipelineSceneTarget.renderTarget, true
+		threeRenderer.render(
+			@pipelineScene, camera, @pipelineSceneTarget.renderTarget, true
+		)
 
 		gl = threeRenderer.context
 

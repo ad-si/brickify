@@ -25,9 +25,10 @@ class FidelityControl
 		'PipelineMedium',
 		'PipelineHigh',
 	]
+	@minimalPipelineLevel = 3
 
-	init: (bundle) =>
-		@pluginHooks = bundle.pluginHooks
+	init: (@bundle) =>
+		@pluginHooks = @bundle.pluginHooks
 
 		@currentFidelityLevel = 0
 
@@ -78,16 +79,26 @@ class FidelityControl
 			@_increaseFidelity()
 
 	_increaseFidelity: =>
+		# Increase fidelity
 		@currentFidelityLevel++
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)
 
+		# Enable pipeline
+		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
+			@bundle.renderer.pipelineEnabled = true
+
 	_decreaseFidelity: =>
+		# Decrease fidelity
 		@currentFidelityLevel--
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)
+
+		# Disable pipeline
+		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
+			@bundle.renderer.pipelineEnabled = false
 
 	getHotkeys: =>
 		return {

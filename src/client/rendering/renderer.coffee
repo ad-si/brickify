@@ -10,6 +10,7 @@ class Renderer
 		@camera = null
 		@threeRenderer = null
 		@init globalConfig
+		@pipelineEnabled = false
 
 	localRenderer: (timestamp) =>
 		# clear screen
@@ -21,7 +22,8 @@ class Renderer
 		@threeRenderer.render @scene, @camera
 
 		# allow for custom render passes
-		@pluginHooks.onPaint @threeRenderer, @camera
+		if @pipelineEnabled
+			@pluginHooks.onPaint @threeRenderer, @camera
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp

@@ -3,6 +3,8 @@
 ###
 
 md5 = require('blueimp-md5').md5
+log = require 'loglevel'
+
 modelCache = require './modelCache'
 Node = require '../../common/project/node'
 
@@ -48,8 +50,8 @@ class ModelLoader
 		.request hash
 		.then @load
 		.catch (error) ->
-			console.error "Could not load model from hash #{hash}"
-			console.error error
+			log.error "Could not load model from hash #{hash}"
+			log.error error
 
 	# adds a new model to the state
 	addModelToScene: (fileName, hash, model) ->

@@ -1,7 +1,10 @@
+log = require 'loglevel'
+
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
 Random = require './Random'
+
 
 module.exports = class LegoPipeline
 	constructor: ->
@@ -49,13 +52,13 @@ module.exports = class LegoPipeline
 
 	run: (data, options = null, profiling = false) =>
 		if profiling
-			console.log "Starting Lego Pipeline
+			log.debug "Starting Lego Pipeline
 			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
 			 onlyReLayout: #{options.reLayout})"
 
 			randomSeed = Math.floor Math.random() * 1000000
 			Random.setSeed randomSeed
-			console.log 'Using random seed', randomSeed
+			log.debug 'Using random seed', randomSeed
 
 			profilingResults = []
 
@@ -76,7 +79,7 @@ module.exports = class LegoPipeline
 			sum = 0
 			for s in profilingResults
 				sum += s
-			console.log "Finished Lego Pipeline in #{sum}ms"
+			log.debug "Finished Lego Pipeline in #{sum}ms"
 
 		return {
 			profilingResults: profilingResults
@@ -94,13 +97,13 @@ module.exports = class LegoPipeline
 		step = @pipelineSteps[i]
 
 		if step.decision options
-			console.log "Running step #{step.name}"
+			log.debug "Running step #{step.name}"
 			start = new Date()
 			result = @runStep i, lastResult, options
 			stop = new Date() - start
-			console.log "Step #{step.name} finished in #{stop}ms"
+			log.debug "Step #{step.name} finished in #{stop}ms"
 		else
-			console.log "(Skipping step #{step.name})"
+			log.debug "(Skipping step #{step.name})"
 			result = lastResult
 			stop = 0
 

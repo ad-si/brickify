@@ -1,5 +1,8 @@
+log = require 'loglevel'
+
 ThreeCSG = require './threeCsg/ThreeCSG'
 VoxelUnion = require './VoxelUnion'
+
 
 module.exports = class CsgExtractor
 	extractGeometry: (grid, options = {}) ->
@@ -16,12 +19,12 @@ module.exports = class CsgExtractor
 		# 	holeSize: {radius, height} of holes (to fit lego studs into)
 		# }
 
-		console.log 'Creating CSG...'
+		log.debug 'Creating CSG...'
 
 		d = new Date()
 		legoVoxels = @_analyzeGrid(grid)
 		if options.profile
-			console.log "Grid analysis took #{new Date() - d}ms"
+			log.debug "Grid analysis took #{new Date() - d}ms"
 
 		if legoVoxels.length == 0
 			return null
@@ -30,12 +33,12 @@ module.exports = class CsgExtractor
 		voxunion = new VoxelUnion(grid)
 		voxelHull = voxunion.run legoVoxels, options
 		if options.profile
-			console.log "Voxel Geometrizer took #{new Date() - d}ms"
+			log.debug "Voxel Geometrizer took #{new Date() - d}ms"
 
 		d = new Date()
 		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
 		if options.profile
-			console.log "Print geometry took #{new Date() - d}ms"
+			log.debug "Print geometry took #{new Date() - d}ms"
 
 		return printGeometry
 

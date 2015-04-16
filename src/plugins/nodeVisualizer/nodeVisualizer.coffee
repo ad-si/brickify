@@ -23,9 +23,8 @@ class NodeVisualizer
 		@printMaterial.polygonOffsetFactor = 5
 		@printMaterial.polygonoffsetUnits = 5
 
-		@coloring = new Coloring()
-
-	init: (@bundle) => return
+	init: (@bundle) =>
+		@coloring = new Coloring(@bundle.globalConfig)
 
 	init3d: (@threejsRootNode) =>
 		@usePipeline = false

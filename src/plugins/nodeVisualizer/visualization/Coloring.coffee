@@ -1,8 +1,9 @@
 THREE = require 'three'
+LineMatGenerator = require './LineMatGenerator'
 
 # Provides a simple implementation on how to color voxels and bricks
 module.exports = class Coloring
-	constructor: ->
+	constructor: (@globalConfig) ->
 		@brickMaterial = new THREE.MeshLambertMaterial({
 			color: 0xfff000 #orange
 		})
@@ -40,6 +41,30 @@ module.exports = class Coloring
 		@csgMaterial = new THREE.MeshLambertMaterial({
 			color: 0xb5ffb8 #greenish gray
 		})
+
+		# object visualization
+		@objectMaterial = new THREE.MeshLambertMaterial(
+			color: @globalConfig.colors.object
+			ambient: @globalConfig.colors.object
+		)
+
+		@objectShadowMat = new THREE.MeshBasicMaterial(
+			color: 0x000000
+			transparent: true
+			opacity: 0.4
+			depthFunc: THREE.GreaterDepth
+		)
+		@objectShadowMat.polygonOffset = true
+		@objectShadowMat.polygonOffsetFactor = 5
+		@objectShadowMat.polygonoffsetUnits = -5
+
+		lineMaterialGenerator = new LineMatGenerator()
+		@objectLineMat = lineMaterialGenerator.generate 0x000000
+		@objectLineMat.linewidth = 2
+		@objectLineMat.transparent = true
+		@objectLineMat.opacity = 0.1
+		@objectLineMat.depthFunc = THREE.GreaterDepth
+		@objectLineMat.depthWrite = false
 
 		@_createBrickMaterials()
 

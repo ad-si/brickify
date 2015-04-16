@@ -13,8 +13,6 @@ colors:
   grid5: 0x999999
   grid10: 0xdddddd
 
-  object: 0xccaa33
-
   basePlate: 0x555555
   basePlateStud: 0x5a5a5a
 
@@ -24,7 +22,6 @@ colors:
 
   modelShadowColor: 0x000000
   modelShadowOpacity: 0.4
-
 
 # camera adjustments
 fov: 40

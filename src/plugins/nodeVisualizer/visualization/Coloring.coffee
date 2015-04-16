@@ -47,6 +47,9 @@ module.exports = class Coloring
 			transparent: true
 			opacity: 0.3
 		})
+		@legoShadowMat.polygonOffset = true
+		@legoShadowMat.polygonOffsetFactor = -2
+		@legoShadowMat.polygonOffsetUnits = -2
 
 		# object visualization
 		# default object material

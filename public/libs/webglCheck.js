@@ -4,7 +4,7 @@
 		canvas
 
 	try {
-		canvas = document.getElementById('canvas')
+		canvas = document.createElement('canvas')
 		gl = canvas.getContext('webgl')
 	}
 	catch (error) {
@@ -24,4 +24,7 @@
 			.getElementById('webGlWarning')
 			.style
 			.display = 'inherit'
+
+	gl = null
+	canvas = null
 }()

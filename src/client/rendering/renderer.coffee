@@ -103,6 +103,7 @@ class Renderer
 			preserveDrawingBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
 		)
+		@threeRenderer.sortObjects = false
 
 		# needed for rendering pipeline
 		@threeRenderer.extensions.get 'EXT_frag_depth'

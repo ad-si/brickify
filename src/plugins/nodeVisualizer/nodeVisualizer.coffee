@@ -11,10 +11,9 @@ class NodeVisualizer
 
 	init: (@bundle) => return
 
-	init3d: (@threejsRootNode) =>
-		return
+	init3d: (@threeJsRootNode) => return
 
-	# called by newBrickator when an object's datastructure is modified
+	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
 		.then (cachedData) =>
@@ -41,7 +40,7 @@ class NodeVisualizer
 					@_zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
-		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
+		@threeJsRootNode.remove threeHelper.find node, @threeJsRootNode
 
 	onNodeSelect: (@selectedNode) => return
 
@@ -66,14 +65,14 @@ class NodeVisualizer
 			if data?
 				return data
 			else
-				data = @_createNodeDatastructure selectedNode
+				data = @createNodeDataStructure selectedNode
 				selectedNode.storePluginData 'brickVisualizer', data, true
 				return data
 
-	# creates visualization datastructures
-	_createNodeDatastructure: (node) =>
+	# creates visualization data structures
+	createNodeDataStructure: (node) =>
 		threeNode = new THREE.Object3D()
-		@threejsRootNode.add threeNode
+		@threeJsRootNode.add threeNode
 		threeHelper.link node, threeNode
 
 		data = {
@@ -174,7 +173,7 @@ class NodeVisualizer
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>
 		intersections = interactionHelper.getIntersections(
-			event, @bundle.renderer, @threejsRootNode.children
+			event, @bundle.renderer, @threeJsRootNode.children
 		)
 		return intersections.length > 0 unless ignoreInvisible
 		visibleIntersections = intersections.filter (intersection) ->

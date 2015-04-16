@@ -11,7 +11,13 @@ Coloring = require './visualization/Coloring'
 # @class NodeVisualizer
 ###
 class NodeVisualizer
-	constructor: -> return
+	constructor: ->
+		# rendering properties
+		@brickShadowOpacity = 0.5
+		@objectOpacity = 0.8
+		@objectShadowOpacity = 0.5
+		@objectColorMult = new THREE.Vector3(1, 1, 1)
+		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
@@ -105,9 +111,9 @@ class NodeVisualizer
 		threeRenderer.render @objectsSceneTarget.quadScene, camera
 
 		# render invisble parts (object behind lego bricks)
-		if @brushHandler? and not @brushHandler.legoBrushSelected
+		if @visualizationMode? and @visualizationMode == 'printBrush'
 			# Adjust object material to be dark and more transparent
-			blendMat = @objectSceneTarget.blendingMaterial
+			blendMat = @objectsSceneTarget.blendingMaterial
 			blendMat.uniforms.colorMult.value = @objectShadowColorMult
 			blendMat.uniforms.opacity.value = @objectShadowOpacity
 
@@ -118,7 +124,7 @@ class NodeVisualizer
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 
 			gl.disable(gl.DEPTH_TEST)
-			threeRenderer.render @objectSceneTarget.quadScene, camera
+			threeRenderer.render @objectsSceneTarget.quadScene, camera
 			gl.enable(gl.DEPTH_TEST)
 
 			# Reset material to non-shadow properties
@@ -149,6 +155,9 @@ class NodeVisualizer
 				@brickScene.add @brickRootNode
 				@objectsScene.add @objectsRootNode
 				@brickShadowScene.add @brickShadowRootNode
+
+				# change material properties
+				@coloring.setPipelineMode true
 		else
 			if @usePipeline
 				@usePipeline = false
@@ -161,6 +170,9 @@ class NodeVisualizer
 				@threejsRootNode.add @brickRootNode
 				@threejsRootNode.add @objectsRootNode
 				@threejsRootNode.add @brickShadowRootNode
+
+				# change material properties
+				@coloring.setPipelineMode false
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -257,12 +269,12 @@ class NodeVisualizer
 	# @param {Node} selectedNode the currently selected node
 	# @param {String} mode the mode: 'legoBrush'/'printBrush'/'stability'/'build'
 	###
-	setDisplayMode: (selectedNode, mode) =>
+	setDisplayMode: (selectedNode, @visualizationMode) =>
 		return unless selectedNode?
 
 		return @_getCachedData selectedNode
 		.then (cachedData) =>
-			switch mode
+			switch @visualizationMode
 				when 'legoBrush'
 					@_resetStabilityView cachedData
 					@_resetBuildMode cachedData

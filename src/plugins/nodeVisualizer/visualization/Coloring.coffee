@@ -81,6 +81,25 @@ module.exports = class Coloring
 
 		@_createBrickMaterials()
 
+	setPipelineMode: (enabled) =>
+		if enabled
+			@objectPrintMaterial.transparent = false
+			@objectPrintMaterial.opacity = 1
+
+			@objectShadowMat.visible = false
+			@objectLineMat.transparent = false
+			@objectLineMat.depthWrite = true
+			@objectLineMat.depthFunc = THREE.LessEqualDepth
+
+		else
+			@objectPrintMaterial.transparent = true
+			@objectPrintMaterial.opacity = 0.8
+
+			@objectShadowMat.visible = true
+			@objectLineMat.transparent = true
+			@objectLineMat.depthWrite = false
+			@objectLineMat.depthFunc = THREE.GreaterDepth
+
 	###
     # Returns the highlight material collection for the supplied type of voxel
     # @param {String} type either 'lego' or '3d' to get the respective material

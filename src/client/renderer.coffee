@@ -12,10 +12,21 @@ class Renderer
 		@init globalConfig
 
 	localRenderer: (timestamp) =>
-			@threeRenderer.render @scene, @camera
-			@pluginHooks.on3dUpdate timestamp
-			@controls?.update()
-			requestAnimationFrame @localRenderer
+		# clear screen
+		@threeRenderer.context.stencilMask(0xFF)
+		@threeRenderer.context.clearStencil(0x00)
+		@threeRenderer.clear()
+
+		# render the default scene (plugins add objects in the init3d hook)
+		@threeRenderer.render @scene, @camera
+
+		# allow for custom render passes
+		@pluginHooks.onPaint @threeRenderer, @camera
+
+		# call update hook
+		@pluginHooks.on3dUpdate timestamp
+		@controls?.update()
+		requestAnimationFrame @localRenderer
 
 	addToScene: (node) ->
 		@scene.add node

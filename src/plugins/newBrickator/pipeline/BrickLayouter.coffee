@@ -54,8 +54,20 @@ class BrickLayouter
 				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
+				console.log 'TO BE MERGED'
+				if mergeIndex >= 4
+					console.log 'into size', brick.getSize().x, brick.getSize().y, 3
+				console.log '(size, pos)',brick.getSize().x, brick.getSize().y, brick.getSize().z, '-' , brick.getPosition().x, brick.getPosition().y, brick.getPosition().z
+				neighborsToMergeWith.forEach (fBrick) ->
+					console.log '(size, pos)', fBrick.getSize().x, fBrick.getSize().y, fBrick.getSize().z, '-', fBrick.getPosition().x, fBrick.getPosition().y, fBrick.getPosition().z
+
 				@_mergeBricksAndUpdateGraphConnections brick,
 					neighborsToMergeWith, bricksToLayout
+
+				console.log 'NEW BRICK', mergeIndex
+				console.log '(size, pos)', brick.getSize().x, brick.getSize().y, brick.getSize().z, '-', brick.getPosition().x, brick.getPosition().y, brick.getPosition().z
+				console.log brick.isValid()
+				console.log '  '
 
 				if @debugMode and not brick.isValid()
 					console.warn 'Invalid brick: ', brick
@@ -176,6 +188,14 @@ class BrickLayouter
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
+		mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
+			brick
+			Brick.direction.Zp
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
+			brick
+			Brick.direction.Zm
+		)
 
 		return mergeableNeighbors
 
@@ -195,10 +215,20 @@ class BrickLayouter
 		if neighborsInDirection.size > 0
 			# check that the neighbors together don't exceed this brick's width
 			width = 0
-			neighborsInDirection.forEach (neighbor) ->
-				width += widthFn neighbor.getSize()
+			noMerge = false
 
-			# if they have the same width, check ...?
+			neighborsInDirection.forEach (neighbor) ->
+				neighborSize = neighbor.getSize()
+				if neighborSize.z != brick.getSize().z
+					noMerge = true
+				width += widthFn neighborSize
+
+			if noMerge
+				return null
+
+			# if they have the same accumulative width
+			# check if they are in the correct positions,
+			# i.e. no spacing between neighbors
 			if width == widthFn(brick.getSize())
 				minWidth = widthFn brick.getPosition()
 
@@ -229,6 +259,78 @@ class BrickLayouter
 					return neighborsInDirection
 				else
 					return null
+
+	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
+		noMerge = false
+
+		if brick.getSize().z == 3
+			return null
+
+		# check if 3layer Brick possible according to xy dimensions
+		if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
+			return null
+
+		# check if any slot is empty
+		if brick.getStabilityInDir(direction) != 1
+			return null
+
+		# then check if size of second layer fits
+		# if size fits and no slot empty -> position fits
+		secondLayerBricks = brick.getNeighbors(direction)
+		secondLayerBricks.forEach (slBrick) ->
+			if slBrick.getSize().z != 1
+				noMerge = true
+		if noMerge
+			return null
+
+		if @_layerHasSameSizeAsBrick brick, secondLayerBricks
+			# check next layer
+			thirdLayerBricks = new Set()
+			secondLayerBricks.forEach (sLBrick) ->
+				if sLBrick.getStabilityInDir(direction) != 1
+					noMerge = true
+				sLBrick.getNeighbors(direction).forEach (nBrick) ->
+					if nBrick.getSize().z != 1
+						noMerge = true
+					thirdLayerBricks.add nBrick
+
+			if noMerge
+				return null
+
+			if @_layerHasSameSizeAsBrick brick, thirdLayerBricks
+				thirdLayerBricks.forEach (tlBrick) ->
+					secondLayerBricks.add tlBrick
+				return secondLayerBricks
+
+		# no mergeable neighbors
+		return null
+
+
+	_layerHasSameSizeAsBrick: (brick, layerBricks) =>
+		sameSize = true
+		p = brick.getPosition()
+		s = brick.getSize()
+
+		if layerBricks.size == 0
+			return false
+
+		layerBricks.forEach (lBrick) ->
+			if lBrick.getSize().z != 1
+				sameSize = false
+				return
+			lp = lBrick.getPosition()
+			ls = lBrick.getSize()
+
+			xMinInBrick = lp.x >= p.x
+			xMaxInBrick = lp.x + ls.x <= p.x + s.x
+			yMinInBrick = lp.y >= p.y
+			yMaxInBrick = lp.y + ls.y <= p.y + s.y
+
+			if not (xMinInBrick and xMaxInBrick and yMinInBrick and yMaxInBrick)
+				sameSize = false
+
+		return sameSize
+
 
 	# Returns the index of the mergeableNeighbors sub-set-in-this-array,
 	# where the bricks have the most connected neighbors.

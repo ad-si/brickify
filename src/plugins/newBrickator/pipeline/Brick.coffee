@@ -258,7 +258,7 @@ class Brick
 	getStability: =>
 		s = @getSize()
 		p = @getPosition()
-		cons = @connectedBricks()
+		conBricks = @connectedBricks()
 
 		# possible slots top & bottom
 		possibleSlots = s.x * s.y * 2
@@ -273,10 +273,36 @@ class Brick
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]
-				cons.forEach (brick) ->
+				conBricks.forEach (brick) ->
 					if brick.isVoxelInBrick(x, y, upperZ)
 						usedSlots++
 					if brick.isVoxelInBrick(x, y, lowerZ)
+						usedSlots++
+
+		return usedSlots / possibleSlots
+
+	getStabilityInDir: (directionZmOrZp)=>
+		s = @getSize()
+		p = @getPosition()
+		conBricks = @connectedBricks()
+
+		# possible slots top or bottom
+		possibleSlots = s.x * s.y
+
+		# how many slots are actually connected?
+		usedSlots = 0
+
+		if directionZmOrZp == Brick.direction.Zm
+			testZ = p.z - 1
+		else if directionZmOrZp == Brick.direction.Zp
+			testZ = p.z + s.z
+
+		# test for each possible slot if neighbour bricks have
+		# voxels that belong to this slot
+		for x in [p.x...(p.x + s.x)]
+			for y in [p.y...(p.y + s.y)]
+				conBricks.forEach (brick) ->
+					if brick.isVoxelInBrick(x, y, testZ)
 						usedSlots++
 
 		return usedSlots / possibleSlots

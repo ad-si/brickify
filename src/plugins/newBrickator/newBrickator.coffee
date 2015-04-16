@@ -21,8 +21,7 @@ class NewBrickator
 	onNodeAdd: (node) =>
 		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
-		if @bundle.globalConfig.autoLegofy
-			@runLegoPipeline node
+		@runLegoPipeline node
 
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()

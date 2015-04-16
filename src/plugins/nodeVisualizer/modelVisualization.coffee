@@ -14,7 +14,7 @@ class ModelVisualization
 
 	setSolidMaterial: (material) =>
 		@afterCreationPromise.then =>
-			@threeNode.solid.material = material
+			@threeNode.solid?.material = material
 
 	setNodeVisibility: (visible) =>
 		@afterCreationPromise.then =>
@@ -22,7 +22,7 @@ class ModelVisualization
 
 	setShadowVisibility: (visible) =>
 		@afterCreationPromise.then =>
-			@threeNode.wireframe.visible = visible
+			@threeNode.wireframe?.visible = visible
 
 	afterCreation: =>
 		return @afterCreationPromise
@@ -92,4 +92,3 @@ class ModelVisualization
 		return @afterCreationPromise
 
 module.exports = ModelVisualization
-

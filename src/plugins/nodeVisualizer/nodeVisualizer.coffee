@@ -42,12 +42,13 @@ class NodeVisualizer
 		# link other plugins
 		@newBrickator ?= @bundle.getPlugin 'newBrickator'
 
-		# create visible node and zoom on to it
+		# create visible node and zoom to it
 		@_getCachedData(node)
 		.then (cachedData) =>
 			cachedData.modelVisualization.createVisualization()
-			cachedData.modelVisualization.afterCreation().then =>
-				@_zoomToNode cachedData.modelVisualization.getSolid()
+			if @bundle.globalConfig.showModel
+				cachedData.modelVisualization.afterCreation().then =>
+					@_zoomToNode cachedData.modelVisualization.getSolid()
 
 	onNodeRemove: (node) =>
 		@threejsRootNode.remove threeHelper.find node, @threejsRootNode

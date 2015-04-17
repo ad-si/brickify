@@ -232,6 +232,8 @@ class BrickLayouter
 				neighborSize = neighbor.getSize()
 				if neighborSize.z != brick.getSize().z
 					noMerge = true
+				if neighbor.getPosition().z != brick.getPosition().z
+					noMerge = true
 				width += widthFn neighborSize
 
 			if noMerge
@@ -360,6 +362,12 @@ class BrickLayouter
 				neighborConnections = neighbor.connectedBricks()
 				neighborConnections.forEach (brick) ->
 					connectedBricks.add brick
+
+			###
+			if i == 4 or i == 5
+				connectedBricks = new Set()
+				connectedBricks.add 1
+			###
 
 			numConnections.push {
 				num: connectedBricks.size

@@ -42,6 +42,7 @@ module.exports = class Coloring
 		})
 
 		@_createBrickMaterials()
+		@_createThreeLayerBrickMaterials()
 
 	###
     # Returns the highlight material collection for the supplied type of voxel
@@ -84,8 +85,15 @@ module.exports = class Coloring
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used
 		# by neighbors to visually distinguish bricks
+
 		for i in [0...@_brickMaterials.length]
-			material = @_getRandomBrickMaterial()
+			if brick.getSize().z == 1
+				material = @_getRandomBrickMaterial()
+			else if brick.getSize().z == 3
+				material = @_getRandomThreeLayerBrickMaterial()
+			else
+				material = @_createMaterial 0xffffff
+				console.log brick
 			continue if neighborColors.indexOf(material) >= 0
 			break
 
@@ -109,6 +117,19 @@ module.exports = class Coloring
 		@_brickMaterials.push @_createMaterial 0x6b0000
 		@_brickMaterials.push @_createMaterial 0xfe3939
 		@_brickMaterials.push @_createMaterial 0xfe4d4d
+
+	_getRandomThreeLayerBrickMaterial: =>
+		i = Math.floor(Math.random() * @_tlBrickMaterials.length)
+		return @_tlBrickMaterials[i]
+
+	_createThreeLayerBrickMaterials: =>
+		@_tlBrickMaterials = []
+		@_tlBrickMaterials.push @_createMaterial 0x0000ff
+		@_tlBrickMaterials.push @_createMaterial 0x000066
+		@_tlBrickMaterials.push @_createMaterial 0x00ffff
+		@_tlBrickMaterials.push @_createMaterial 0x0099ff
+		@_tlBrickMaterials.push @_createMaterial 0x333399
+		@_tlBrickMaterials.push @_createMaterial 0x663366
 
 	_createMaterial: (color, opacity = 1) ->
 		return new THREE.MeshLambertMaterial(

@@ -207,7 +207,8 @@ module.exports.getNextValidTextureDimension = getNextValidTextureDimension
 # Returns true, if the render target has the right
 # (in terms of 2^n, see getNextValidTextureDimension)
 # size for the domElement of the threeRenderer
-renderTargetHasRightSize = (renderTarget, threeRenderer, chooseBiggerValue = false) ->
+renderTargetHasRightSize = (
+	renderTarget, threeRenderer,chooseBiggerValue = false) ->
 	screenW = threeRenderer.domElement.clientWidth
 	screenH = threeRenderer.domElement.clientHeight
 

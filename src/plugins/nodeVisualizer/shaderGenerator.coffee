@@ -55,7 +55,8 @@ fragFXAA = ->
 	return '
 		vec2 texSize = vec2( texWidth, texHeight );\n
 		vec2 fragCoord = vUv * texSize;
-		vec4 colFxaa = fxaa(tColor, fragCoord, texSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);\n
+		vec4 colFxaa = fxaa(
+			tColor, fragCoord, texSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);\n
 		col = colFxaa.rgb;\n
 	'
 

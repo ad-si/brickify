@@ -175,14 +175,14 @@ class NodeVisualizer
 			cachedData.brickVisualization.showBrickLayer layer - 1
 
 	_updateBrickCount: (bricks) =>
-		@brickCounter.text bricks.size
+		@brickCounter?.text bricks.size
 
 	_updatePrintTime: (csg) =>
 		if csg?.geometry?
 			volume = threeHelper.getVolume csg.geometry
-			@timeEstimate.text volume.toFixed 2
+			@timeEstimate?.text volume.toFixed 2
 		else
-			@timeEstimate.text 0
+			@timeEstimate?.text 0
 
 	_showCsg: (cachedData) =>
 		@csg ?= @bundle.getPlugin 'csg'

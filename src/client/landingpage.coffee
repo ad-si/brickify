@@ -2,14 +2,11 @@ require './polyfills'
 
 $ = require 'jquery'
 clone = require 'clone'
-stlParser = require 'stl-parser'
-ReadableFileStream = require('filestream').read
-meshlib = require 'meshlib'
-modelCache = require './modelLoading/modelCache'
 
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
 fileDropper = require './modelLoading/fileDropper'
+readFile = require './modelLoading/readFile'
 
 
 # Set renderer size to fit to 3 bootstrap columns
@@ -36,51 +33,6 @@ config0.plugins.newBrickator = false
 config1 = clone globalConfig
 config1.renderAreaId = 'renderArea2'
 
-
-readFile = (event, bundles) ->
-	event.preventDefault()
-	event.stopPropagation()
-
-	if event instanceof MouseEvent
-		files = event.dataTransfer.files
-	else
-		files = event.target.files
-
-	progress = document.querySelector 'progress'
-	progress.setAttribute 'value', 0
-
-	fileStream = new ReadableFileStream files[0]
-
-	fileStream.reader.addEventListener 'progress', (event) ->
-		percentageLoaded = 0
-		if event.lengthComputable
-			percentageLoaded = (event.loaded / event.total).toFixed(2)
-			progress.setAttribute 'value', percentageLoaded
-
-	fileStream.on 'error', (error) ->
-		console.error error
-		bootbox.alert(
-			title: 'Import failed'
-			message: 'Your file contains errors that we could not fix.'
-		)
-
-	modelBuilder = new meshlib.ModelBuilder()
-
-	modelBuilder.on 'model', (model) ->
-		model
-		.setFileName files[0].name
-		.calculateNormals()
-		.buildFaceVertexMesh()
-		.done (modelPromise) -> modelPromise
-		.then ->
-			return modelCache
-			.store model
-		.then (hash) ->
-			loadAndConvert hash, bundles
-
-	fileStream
-	.pipe stlParser()
-	.pipe modelBuilder
 
 loadAndConvert = (hash, bundles) ->
 	bundles[0].modelLoader

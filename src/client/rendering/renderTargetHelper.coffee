@@ -18,15 +18,16 @@ THREE = require 'three'
 # @memberOf renderTargetHelper
 ###
 module.exports.createRenderTarget = (
-	threeRenderer, shaderOptions, textureMagFilter = THREE.LinearFilter,
+	threeRenderer, shaderOptions, chooseBiggerSize = false,
+	textureMagFilter = THREE.LinearFilter,
 	textureMinFilter = THREE.LinearFilter) ->
 
 	# Create rendertarget
 	renderWidth = threeRenderer.domElement.width
 	renderHeight = threeRenderer.domElement.height
 
-	texWidth = getNextValidTextureDimension renderWidth
-	texHeight = getNextValidTextureDimension renderHeight
+	texWidth = getNextValidTextureDimension renderWidth, chooseBiggerSize
+	texHeight = getNextValidTextureDimension renderHeight, chooseBiggerSize
 
 	depthTexture = new THREE.DepthTexture texWidth, texHeight
 	renderTargetTexture = new THREE.WebGLRenderTarget(
@@ -186,7 +187,7 @@ setDefaultOptions = (shaderOptions) ->
 	return shaderOptions
 
 # Choses the next 2^n size that matches the screen resolution best
-getNextValidTextureDimension = (size) ->
+getNextValidTextureDimension = (size, chooseBiggerValue) ->
 	dims = [64, 128, 256, 512, 1024, 2048, 4096]
 
 	difference = 9999
@@ -197,18 +198,21 @@ getNextValidTextureDimension = (size) ->
 			difference = d
 			selectedDim = dim
 
+		if chooseBiggerValue and dim > size
+			return dim
+
 	return selectedDim
 module.exports.getNextValidTextureDimension = getNextValidTextureDimension
 
 # Returns true, if the render target has the right
 # (in terms of 2^n, see getNextValidTextureDimension)
 # size for the domElement of the threeRenderer
-renderTargetHasRightSize = (renderTarget, threeRenderer) ->
+renderTargetHasRightSize = (renderTarget, threeRenderer, chooseBiggerValue = false) ->
 	screenW = threeRenderer.domElement.clientWidth
 	screenH = threeRenderer.domElement.clientHeight
 
-	targetTexWidth = getNextValidTextureDimension screenW
-	targetTexHeight = getNextValidTextureDimension screenH
+	targetTexWidth = getNextValidTextureDimension screenW, chooseBiggerValue
+	targetTexHeight = getNextValidTextureDimension screenH, chooseBiggerValue
 
 	return (renderTarget.width == targetTexWidth) and
 	(renderTarget.height == targetTexHeight)

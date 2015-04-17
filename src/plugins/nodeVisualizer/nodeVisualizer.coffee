@@ -25,6 +25,7 @@ class NodeVisualizer
 	init3d: (@threejsRootNode) =>
 		@usePipeline = false
 		@usePipelineFxaa = false
+		@usePipelineBigTargets = false
 
 		# Voxels / Bricks are rendered as a first render pass
 		@brickScene = @bundle.renderer.getDefaultScene()
@@ -50,7 +51,7 @@ class NodeVisualizer
 		# the screen size has changed
 		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
-			@brickSceneTarget.renderTarget, threeRenderer
+			@brickSceneTarget.renderTarget, threeRenderer, @usePipelineBigTargets
 		))
 			# bricks
 			preMain = shaderGenerator.buildFragmentPreMainAdditions(
@@ -62,7 +63,8 @@ class NodeVisualizer
 
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ fragmentPreMain: preMain, fragmentInMain: inMain }
+				{ fragmentPreMain: preMain, fragmentInMain: inMain },
+				@usePipelineBigTargets
 			)
 
 			# object and brick shadow shader
@@ -81,7 +83,8 @@ class NodeVisualizer
 					opacity: @objectOpacity,
 					fragmentInMain: inMain,
 					fragmentPreMain: preMain
-	  			}
+	  			},
+	  			@usePipelineBigTargets
 			)
 
 			# brick shadow target
@@ -91,7 +94,8 @@ class NodeVisualizer
 					opacity: @brickShadowOpacity,
 					fragmentInMain: inMain,
 					fragmentPreMain: preMain
-				}
+				},
+				@usePipelineBigTargets
 			)
 
 			@renderTargetsInitialized = true
@@ -201,12 +205,21 @@ class NodeVisualizer
 				if not @usePipelineFxaa
 					@usePipelineFxaa = true
 					@renderTargetsInitialized = false
-					console.log 'Enabling FXAA'
 			else
 				if @usePipelineFxaa
 					@usePipelineFxaa = false
 					@renderTargetsInitialized = false
-					console.log 'Disabling FXAA'
+
+		# determine whether to use bigger render targets for improved visual quality
+		if @usePipeline
+			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+				if not @usePipelineBigTargets
+					@usePipelineBigTargets = true
+					@renderTargetsInitialized = false
+			else
+				if @usePipelineBigTargets
+					@usePipelineBigTargets = false
+					@renderTargetsInitialized = false
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

@@ -69,7 +69,7 @@ class CSG
 			options.profile = true
 			options.transformedModel = cachedData.transformedThreeModel
 
-			cachedData.csg = @csgExtractor.extractGeometry cachedData.grid, options
+			cachedData.csg = @csgExtractor.extractMesh cachedData.grid, options
 
 			return cachedData.csg
 

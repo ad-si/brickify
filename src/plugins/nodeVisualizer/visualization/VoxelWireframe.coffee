@@ -36,8 +36,9 @@ module.exports = class VoxelOutline
 		@threeNode.shadowBox = shadowBox
 
 		# add black lines to create a visible outline
+		# material is not used, but needs to be provided
 		material = new THREE.MeshLambertMaterial({
-			color: 0xff0000
+			color: 0x000000
 		})
 		mesh = new THREE.Mesh(boxGeometry, material)
 

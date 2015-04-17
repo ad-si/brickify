@@ -24,6 +24,7 @@ class NodeVisualizer
 
 	init3d: (@threejsRootNode) =>
 		@usePipeline = false
+		@usePipelineFxaa = false
 
 		# Voxels / Bricks are rendered as a first render pass
 		@brickScene = @bundle.renderer.getDefaultScene()
@@ -47,36 +48,50 @@ class NodeVisualizer
 
 		# recreate textures if either they havent been generated yet or
 		# the screen size has changed
-		if not (@renderTargetsInitialized? and
+		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
 			@brickSceneTarget.renderTarget, threeRenderer
 		))
 			# bricks
-			preMain = shaderGenerator.buildFragmentPreMainAdditions( { fxaa: true } )
-			inMain = shaderGenerator.buildFragmentInMainAdditions ( { fxaa: true } )
+			preMain = shaderGenerator.buildFragmentPreMainAdditions(
+				{ fxaa: @usePipelineFxaa }
+			)
+			inMain = shaderGenerator.buildFragmentInMainAdditions (
+				{ fxaa: @usePipelineFxaa }
+			)
 
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				{ fragmentPreMain: preMain, fragmentInMain: inMain }
 			)
 
-			# object
-			customFrag = shaderGenerator.buildFragmentInMainAdditions(
-				{ expandBlack: true }
+			# object and brick shadow shader
+			preMain = shaderGenerator.buildFragmentPreMainAdditions(
+				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: @usePipelineFxaa }
 			)
+			inMain = shaderGenerator.buildFragmentInMainAdditions(
+				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: @usePipelineFxaa }
+			)
+
+			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ opacity: @objectOpacity, fragmentInMain: customFrag },
+				{
+					opacity: @objectOpacity
+			  		fragmentInMain: inMain
+		  			fragmentPreMain: preMain
+	  			},
 				THREE.NearestFilter
 			)
 
-			# brick shadow
-			customFrag = shaderGenerator.buildFragmentInMainAdditions(
-				{ expandBlack: true, blackAlwaysOpaque: true }
-			)
+			# brick shadow target
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ opacity: @brickShadowOpacity, fragmentInMain: customFrag }
+				{
+					opacity: @brickShadowOpacity
+					fragmentInMain: inMain
+					fragmentPreMain: preMain
+				}
 			)
 
 			@renderTargetsInitialized = true
@@ -179,6 +194,19 @@ class NodeVisualizer
 
 				# change material properties
 				@coloring.setPipelineMode false
+
+		# determine whether to use FXAA
+		if @usePipeline
+			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
+				if not @usePipelineFxaa
+					@usePipelineFxaa = true
+					@renderTargetsInitialized = false
+					console.log 'Enabling FXAA'
+			else
+				if @usePipelineFxaa
+					@usePipelineFxaa = false
+					@renderTargetsInitialized = false
+					console.log 'Disabling FXAA'
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

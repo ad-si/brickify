@@ -66,30 +66,30 @@ class NodeVisualizer
 			)
 
 			# object and brick shadow shader
+			# no fxaa because lines look better without
 			preMain = shaderGenerator.buildFragmentPreMainAdditions(
-				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: @usePipelineFxaa }
+				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: false }
 			)
 			inMain = shaderGenerator.buildFragmentInMainAdditions(
-				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: @usePipelineFxaa }
+				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: false }
 			)
 
 			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				{
-					opacity: @objectOpacity
-			  		fragmentInMain: inMain
-		  			fragmentPreMain: preMain
-	  			},
-				THREE.NearestFilter
+					opacity: @objectOpacity,
+					fragmentInMain: inMain,
+					fragmentPreMain: preMain
+	  			}
 			)
 
 			# brick shadow target
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				{
-					opacity: @brickShadowOpacity
-					fragmentInMain: inMain
+					opacity: @brickShadowOpacity,
+					fragmentInMain: inMain,
 					fragmentPreMain: preMain
 				}
 			)

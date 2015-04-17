@@ -18,7 +18,8 @@ THREE = require 'three'
 # @memberOf renderTargetHelper
 ###
 module.exports.createRenderTarget = (
-	threeRenderer, shaderOptions, textureFilter = THREE.LinearFilter) ->
+	threeRenderer, shaderOptions, textureMagFilter = THREE.LinearFilter,
+	textureMinFilter = THREE.LinearFilter) ->
 
 	# Create rendertarget
 	renderWidth = threeRenderer.domElement.width
@@ -32,8 +33,8 @@ module.exports.createRenderTarget = (
 		texWidth
 		texHeight
 		{
-			minFilter: textureFilter
-			magFilter: textureFilter
+			minFilter: textureMinFilter
+			magFilter: textureMagFilter
 			format: THREE.RGBAFormat
 			depthTexture: depthTexture
 			stencilBuffer: false

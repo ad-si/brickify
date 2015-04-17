@@ -55,10 +55,10 @@ class NodeVisualizer
 		))
 			# bricks
 			preMain = shaderGenerator.buildFragmentPreMainAdditions(
-				{ fxaa: @usePipelineFxaa }
+				{ fxaa: @usePipelineFxaa && not @usePipelineBigTargets }
 			)
 			inMain = shaderGenerator.buildFragmentInMainAdditions (
-				{ fxaa: @usePipelineFxaa }
+				{ fxaa: @usePipelineFxaa && not @usePipelineBigTargets }
 			)
 
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(

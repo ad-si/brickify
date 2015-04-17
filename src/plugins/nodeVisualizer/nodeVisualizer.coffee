@@ -248,7 +248,9 @@ class NodeVisualizer
 				@_zoomToNode solid if solid?
 
 	onNodeRemove: (node) =>
-		@threeJsRootNode.remove threeHelper.find node, @threeJsRootNode
+		@brickRootNode.remove threeHelper.find node, @brickRootNode
+		@brickShadowRootNode.remove threeHelper.find node, @brickShadowRootNode
+		@objectsRootNode.remove threeHelper.find node, @objectsRootNode
 
 	onNodeSelect: (@selectedNode) => return
 

@@ -16,7 +16,6 @@ fileDropper = require './modelLoading/fileDropper'
 globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
-globalConfig.syncWithServer = false
 globalConfig.buildUi = false
 globalConfig.autoRotate = true
 globalConfig.plugins.dummy = false
@@ -24,6 +23,7 @@ globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false
+globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
 # disable wireframe on landinpage
 globalConfig.createVisibleWireframe = false

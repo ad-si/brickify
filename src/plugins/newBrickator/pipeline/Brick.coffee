@@ -1,3 +1,5 @@
+log = require 'loglevel'
+
 class Brick
 	@direction = {
 		Xp: 'Xp'
@@ -231,7 +233,7 @@ class Brick
 		hasHoles = false
 		for val of voxelCheck
 			if voxelCheck[val] == false
-				console.warn 'Hole at', val
+				log.warn 'Hole at', val
 				hasHoles = true
 
 		return !hasHoles
@@ -243,15 +245,15 @@ class Brick
 		hasVoxels = false
 		hasVoxels = true if @voxels.size > 0
 		if not hasVoxels
-			console.warn 'Invalid: brick has no voxels'
+			log.warn 'Invalid: brick has no voxels'
 
 		validSize  = @hasValidSize()
 		if not validSize
-			console.warn 'Invalid: brick has invalid size',@getSize()
+			log.warn 'Invalid: brick has invalid size',@getSize()
 
 		noHoles = @isHoleFree()
 		if not noHoles
-			console.warn 'Invalid: brick has holes'
+			log.warn 'Invalid: brick has holes'
 
 		return hasVoxels and validSize and noHoles
 

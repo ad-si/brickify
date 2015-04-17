@@ -16,7 +16,7 @@ class ModelVisualization
 
 	setSolidMaterial: (material) =>
 		@afterCreationPromise.then =>
-			@threeNode.solid.material = material
+			@threeNode.solid?.material = material
 
 	setNodeVisibility: (visible) =>
 		@afterCreationPromise.then =>
@@ -24,7 +24,7 @@ class ModelVisualization
 
 	setShadowVisibility: (visible) =>
 		@afterCreationPromise.then =>
-			@threeNode.wireframe.visible = visible
+			@threeNode.wireframe?.visible = visible
 
 	afterCreation: =>
 		return @afterCreationPromise
@@ -33,20 +33,26 @@ class ModelVisualization
 		@threeNode.solid
 
 	_initializeMaterials: =>
-		@objectMaterial = new THREE.MeshLambertMaterial(
-			color: @globalConfig.colors.object
-			ambient: @globalConfig.colors.object
-		)
+		@objectMaterial = new THREE.MeshLambertMaterial({
+			color: @globalConfig.colors.modelColor
+			opacity: @globalConfig.colors.modelOpacity
+			transparent: @globalConfig.colors.modelOpacity < 1.0
+		})
 
 		@shadowMat = new THREE.MeshBasicMaterial(
-			color: 0x000000
-			transparent: true
-			opacity: 0.4
+			color: @globalConfig.colors.modelShadowColor
+			opacity: @globalConfig.colors.modelShadowOpacity
+			transparent: @globalConfig.colors.modelShadowOpacity < 1.0
 			depthFunc: THREE.GreaterDepth
 		)
+
+		# remove z-Fighting on baseplate
+		@objectMaterial.polygonOffset = true
+		@objectMaterial.polygonOffsetFactor = 3
+		@objectMaterial.polygonOffsetUnits = 3
 		@shadowMat.polygonOffset = true
-		@shadowMat.polygonOffsetFactor = 5
-		@shadowMat.polygonoffsetUnits = -5
+		@shadowMat.polygonOffsetFactor = 3
+		@shadowMat.polygonOffsetUnits = 3
 
 		lineMaterialGenerator = new LineMatGenerator()
 		@lineMat = lineMaterialGenerator.generate 0x000000
@@ -57,6 +63,9 @@ class ModelVisualization
 		@lineMat.depthWrite = false
 
 	_createVisualization: (node, threejsNode) =>
+		unless @globalConfig.showModel
+			@afterCreationPromise = node.getModel()
+			return @afterCreationPromise
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @objectMaterial
 			parent.add solid

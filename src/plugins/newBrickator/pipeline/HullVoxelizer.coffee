@@ -1,4 +1,6 @@
+log = require 'loglevel'
 Grid = require './Grid'
+
 
 module.exports = class Voxelizer
 	constructor: ->
@@ -155,7 +157,7 @@ module.exports = class Voxelizer
 				if @debugVoxel.x == gvox.x and
 			  @debugVoxel.y == gvox.y and
 				@debugVoxel.z == gvox.z
-					console.log 'Voxelizing debug voxel, put your breakpoint *here*'
+					log.debug 'Voxelizing debug voxel, put your breakpoint *here*'
 
 			# if we move in this particular direction, check that we did not exeed our
 			# destination bounds: check if we reached the destination voxel

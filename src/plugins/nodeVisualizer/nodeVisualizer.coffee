@@ -7,24 +7,13 @@ interactionHelper = require '../../client/interactionHelper'
 # @class NodeVisualizer
 ###
 class NodeVisualizer
-	constructor: ->
-		@printMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
-			opacity: 0.8
-			transparent: true
-		})
-
-		# remove z-Fighting on baseplate
-		@printMaterial.polygonOffset = true
-		@printMaterial.polygonOffsetFactor = 5
-		@printMaterial.polygonoffsetUnits = 5
+	constructor: -> return
 
 	init: (@bundle) => return
 
-	init3d: (@threejsRootNode) =>
-		return
+	init3d: (@threeJsRootNode) => return
 
-	# called by newBrickator when an object's datastructure is modified
+	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
 		.then (cachedData) =>
@@ -42,17 +31,16 @@ class NodeVisualizer
 		# link other plugins
 		@newBrickator ?= @bundle.getPlugin 'newBrickator'
 
-		# create visible node and zoom on to it
+		# create visible node and zoom to it
 		@_getCachedData(node)
 		.then (cachedData) =>
 			cachedData.modelVisualization
 				.createVisualization()
 				.then (solid) =>
-					console.log solid
-					@_zoomToNode solid
+					@_zoomToNode solid if solid?
 
 	onNodeRemove: (node) =>
-		@threejsRootNode.remove threeHelper.find node, @threejsRootNode
+		@threeJsRootNode.remove threeHelper.find node, @threeJsRootNode
 
 	onNodeSelect: (@selectedNode) => return
 
@@ -70,9 +58,6 @@ class NodeVisualizer
 		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
 
-		# instead of creating csg live, show original model semitransparent
-		visualizationData.modelVisualization.setSolidMaterial @printMaterial
-
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
 		return selectedNode
@@ -81,14 +66,14 @@ class NodeVisualizer
 			if data?
 				return data
 			else
-				data = @_createNodeDatastructure selectedNode
+				data = @createNodeDataStructure selectedNode
 				selectedNode.storePluginData 'brickVisualizer', data, true
 				return data
 
-	# creates visualization datastructures
-	_createNodeDatastructure: (node) =>
+	# creates visualization data structures
+	createNodeDataStructure: (node) =>
 		threeNode = new THREE.Object3D()
-		@threejsRootNode.add threeNode
+		@threeJsRootNode.add threeNode
 		threeHelper.link node, threeNode
 
 		data = {
@@ -189,7 +174,7 @@ class NodeVisualizer
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>
 		intersections = interactionHelper.getIntersections(
-			event, @bundle.renderer, @threejsRootNode.children
+			event, @bundle.renderer, @threeJsRootNode.children
 		)
 		return intersections.length > 0 unless ignoreInvisible
 		visibleIntersections = intersections.filter (intersection) ->

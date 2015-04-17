@@ -54,8 +54,8 @@ module.exports = class Coloring
 		# object visualization
 		# default object material
 		@objectMaterial = new THREE.MeshLambertMaterial(
-			color: @globalConfig.colors.object
-			ambient: @globalConfig.colors.object
+			color: @globalConfig.colors.modelColor
+			ambient: @globalConfig.colors.modelColor
 		)
 
 		# printed object material

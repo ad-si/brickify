@@ -69,6 +69,7 @@ readFile = (event, bundles) ->
 	modelBuilder.on 'model', (model) ->
 		model
 		.setFileName files[0].name
+		.calculateNormals()
 		.buildFaceVertexMesh()
 		.done (modelPromise) -> modelPromise
 		.then ->

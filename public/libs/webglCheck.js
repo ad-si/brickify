@@ -29,10 +29,11 @@
 			webglWarning()
 		}
 
-	if (!gl)
+	if (!gl){
 		document
 			.getElementById('webGlWarning')
 			.style
 			.display = 'inherit'
 		webglWarning()
+	}
 }()

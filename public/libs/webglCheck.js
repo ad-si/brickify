@@ -3,21 +3,12 @@
 	var gl,
 		canvas
 
-	var webglWarned = false
-	var webglWarning = function () {
-		if (!webglWarned) {
-			alert("Your browser does not support WebGL. Please use a modern browser like Google Chrome to use this website.")
-		}
-		webglWarned = true
-	}
-
 	try {
 		canvas = document.createElement('canvas')
 		gl = canvas.getContext('webgl')
 	}
 	catch (error) {
 		console.error(error)
-		webglWarning()
 	}
 
 	if (!gl)
@@ -26,7 +17,6 @@
 		}
 		catch (error) {
 			console.error(error)
-			webglWarning()
 		}
 
 	if (!gl){
@@ -34,7 +24,8 @@
 		if (warning != null){
 			warning.style.display = 'inherit'
 		}
-		webglWarning()
+
+		alert("Your browser does not support WebGL. Please use a modern browser like Google Chrome to use this website.")
 	}
 
 	gl = null

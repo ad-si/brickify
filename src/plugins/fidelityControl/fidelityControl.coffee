@@ -41,6 +41,12 @@ class FidelityControl
 
 		@_setupFpsDisplay() if process.env.NODE_ENV is 'development'
 
+		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
+		if fragDepth?
+			@allowPipeline = true
+		else
+			@allowPipeline = false
+
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
 			@_lastTimestamp = timestamp
@@ -79,6 +85,12 @@ class FidelityControl
 			@_increaseFidelity()
 
 	_increaseFidelity: =>
+		# only allow pipeline when we have the
+		# exentsions needed for it
+		if @currentFidelityLevel == 2 and
+		not @allowPipeline
+			return
+
 		# Increase fidelity
 		@currentFidelityLevel++
 		@pluginHooks.setFidelity(

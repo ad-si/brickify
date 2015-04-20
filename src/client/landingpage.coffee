@@ -1,5 +1,7 @@
 require './polyfills'
 $ = require 'jquery'
+window.jQuery = window.$ = $
+bootstrap = require 'bootstrap'
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'

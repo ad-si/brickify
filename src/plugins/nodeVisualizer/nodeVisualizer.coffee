@@ -179,7 +179,7 @@ class NodeVisualizer
 
 	_updatePrintTime: (csg) =>
 		if csg?.geometry?
-			time = threeHelper.getPrintingTimeEstimate csg.geometry
+			time = @csg.getPrintingTimeEstimate csg.geometry
 			@timeEstimate?.text Math.round(time)
 		else
 			@timeEstimate?.text 0

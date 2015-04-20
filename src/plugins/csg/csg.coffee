@@ -1,5 +1,6 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
+printingTimeEstimator = require './printingTimeEstimator'
 
 class CSG
 	###
@@ -107,5 +108,8 @@ class CSG
 		# check if there was a brush action that forces us
 		# to recreate CSG
 		return cachedData.csgNeedsRecalculation
+
+	getPrintingTimeEstimate: (geometry) ->
+		printingTimeEstimator.getPrintingTimeEstimate geometry
 
 module.exports = CSG

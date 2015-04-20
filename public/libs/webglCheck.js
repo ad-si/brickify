@@ -3,21 +3,12 @@
 	var gl,
 		canvas
 
-	var webglWarned = false
-	var webglWarning = function () {
-		if (!webglWarned) {
-			alert("Your browser does not support WebGL. Please use a modern browser like Google Chrome to use this website.")
-		}
-		webglWarned = true
-	}
-
 	try {
-		canvas = document.getElementById('canvas')
+		canvas = document.createElement('canvas')
 		gl = canvas.getContext('webgl')
 	}
 	catch (error) {
 		console.error(error)
-		webglWarning()
 	}
 
 	if (!gl)
@@ -26,14 +17,17 @@
 		}
 		catch (error) {
 			console.error(error)
-			webglWarning()
 		}
 
 	if (!gl){
-		document
-			.getElementById('webGlWarning')
-			.style
-			.display = 'inherit'
-		webglWarning()
+		warning = document.getElementById('webGlWarning')
+		if (warning != null){
+			warning.style.display = 'inherit'
+		}
+
+		alert("Your browser does not support WebGL. Please use a modern browser like Google Chrome to use this website.")
 	}
+
+	gl = null
+	canvas = null
 }()

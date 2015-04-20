@@ -13,8 +13,9 @@ class LoadUi
 		fileDropper.init @fileLoadHandler
 
 		$('#fileInput').on 'change', (event) =>
-			@fileLoadHandler event
-			.then -> $('#fileInput').val('')
+			@fileLoadHandler(event).then =>
+				$('#fileInput').val('')
+				@workflowUi.hideMenuIfPossible()
 
 	fileLoadHandler: (event) =>
 		files = event.target.files ? event.dataTransfer.files

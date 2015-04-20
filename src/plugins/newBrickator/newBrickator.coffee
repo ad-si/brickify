@@ -1,10 +1,11 @@
+THREE = require 'three'
+meshlib = require 'meshlib'
+log = require 'loglevel'
+
 modelCache = require '../../client/modelLoading/modelCache'
 LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
-THREE = require 'three'
 Brick = require './pipeline/Brick'
-meshlib = require 'meshlib'
-CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
 Spinner = require '../../client/Spinner'
 
@@ -20,8 +21,7 @@ class NewBrickator
 	onNodeAdd: (node) =>
 		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
-		if @bundle.globalConfig.autoLegofy
-			@runLegoPipeline node
+		@runLegoPipeline node
 
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()
@@ -36,8 +36,9 @@ class NewBrickator
 				optimizedModel: cachedData.optimizedModel
 				grid: cachedData.grid
 			}
-			results = @pipeline.run data, settings, true
-			cachedData.brickGraph = results.accumulatedResults.brickGraph
+
+			@pipeline.run data, settings, true
+			cachedData.csgNeedsRecalculation = true
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData
 			Spinner.stop @bundle.renderer.getDomElement()
@@ -52,28 +53,41 @@ class NewBrickator
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
+		log.debug 'relayouting modified parts, creating bricks:',createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
 			modifiedBricks = []
 			for v in modifiedVoxels
-				if v.gridEntry.brick?
+				if v.gridEntry.brick
 					if v.gridEntry.brick not in modifiedBricks
 						modifiedBricks.push v.gridEntry.brick
 				else if createBricks
 					pos = v.voxelCoords
-					modifiedBricks.push cachedData.brickGraph.createBrick pos.x, pos.y, pos.z
+					modifiedBricks.push new Brick([v.gridEntry])
 
 			settings = new PipelineSettings()
 			settings.onlyRelayout()
+
 			data = {
 				optimizedModel: cachedData.optimizedModel
 				grid: cachedData.grid
-				brickGraph: cachedData.brickGraph
 				modifiedBricks: modifiedBricks
 			}
 
+			@pipeline.run data, settings, true
+			cachedData.csgNeedsRecalculation = true
+
+			@nodeVisualizer?.objectModified selectedNode, cachedData
+
+	everythingPrint: (selectedNode) =>
+		@_getCachedData selectedNode
+		.then (cachedData) =>
+			settings = new PipelineSettings()
+			settings.onlyInitLayout()
+
+			data = grid: cachedData.grid
+
 			results = @pipeline.run data, settings, true
-			cachedData.brickGraph = results.accumulatedResults.brickGraph
 			cachedData.csgNeedsRecalculation = true
 
 			@nodeVisualizer?.objectModified selectedNode, cachedData
@@ -117,10 +131,22 @@ class NewBrickator
 					selectedNode.storePluginData 'newBrickator', data, true
 					return data
 
-	getDownload: (selectedNode) =>
-		dlPromise = new Promise (resolve) =>
-			@_getCachedData(selectedNode).then (cachedData) =>
-				detailedCsg = @_createCSG selectedNode, cachedData, true
+	getDownload: (selectedNode, downloadOptions) =>
+		options = @_prepareCSGOptions(
+			downloadOptions.studRadius, downloadOptions.holeRadius
+		)
+
+		@csg ?= @bundle.getPlugin 'csg'
+		if not @csg?
+			log.warn 'Unable to create download due to CSG Plugin missing'
+			return Promise.resolve { data: '', fileName: '' }
+
+		dlPromise = new Promise (resolve, reject) =>
+			@csg.getCSG selectedNode, options
+			.then (detailedCsg) ->
+				if not detailedCsg?
+					resolve { data: '', fileName: '' }
+					return
 
 				optimizedModel = new meshlib.OptimizedModel()
 				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
@@ -135,41 +161,36 @@ class NewBrickator
 
 		return dlPromise
 
-	getCSG: (node, addStuds) =>
-		return @_getCachedData(node)
-		.then (cachedData) =>
-			csg = @_createCSG node, cachedData, addStuds
-			return csg
+	_prepareCSGOptions: (studRadius, holeRadius) =>
+		options = {}
 
-	_createCSG: (selectedNode, cachedData, addStuds = true) =>
-		# return cached version if grid was not modified
-		if not cachedData.csgNeedsRecalculation
-			return cachedData.cachedCsg
-		cachedData.csgNeedsRecalculation = false
-
-		# get optimized model and transform to actual position
-		if not cachedData.optimizedThreeModel?
-			cachedData.optimizedThreeModel=
-				cachedData.optimizedModel.convertToThreeGeometry()
-			threeModel = cachedData.optimizedThreeModel
-			threeModel.applyMatrix threeHelper.getTransformMatrix selectedNode
+		# set stud and hole size
+		if studRadius?
+			studSize = {
+				radius: studRadius
+				height: PipelineSettings.legoStudSize.height
+			}
 		else
-			threeModel = cachedData.optimizedThreeModel
+			studSize = PipelineSettings.legoStudSize
+		options.studSize = studSize
 
-		# create the intersection of selected voxels and the model mesh
-		@csgExtractor ?= new CsgExtractor()
+		if holeRadius?
+			holeSize = {
+				radius: holeRadius
+				height: PipelineSettings.legoHoleSize.height
+			}
+		else
+			holeSize = PipelineSettings.legoHoleSize
+		options.holeSize = holeSize
 
-		options = {
-			profile: true
-			grid: cachedData.grid
-			studSize: PipelineSettings.legoStudSize
-			addStuds: addStuds
-			transformedModel: threeModel
-		}
+		# add studs
+		options.addStuds = true
 
-		printThreeMesh = @csgExtractor.extractGeometry(cachedData.grid, options)
+		return options
 
-		cachedData.cachedCsg = printThreeMesh
-		return printThreeMesh
+
+
+
+
 
 module.exports = NewBrickator

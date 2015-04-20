@@ -1,4 +1,6 @@
+log = require 'loglevel'
 Grid = require './Grid'
+
 
 module.exports = class Voxelizer
 	constructor: ->
@@ -28,13 +30,8 @@ module.exports = class Voxelizer
 		p2 = @voxelGrid.mapModelToGrid p2
 
 		#store information for filling solids
-		if n.z >= 0
-			upwards = true
-		else
-			upwards = false
-
 		voxelData = {
-			up: upwards
+			dZ: n.z
 		}
 
 		#voxelize outer lines
@@ -155,7 +152,7 @@ module.exports = class Voxelizer
 				if @debugVoxel.x == gvox.x and
 			  @debugVoxel.y == gvox.y and
 				@debugVoxel.z == gvox.z
-					console.log 'Voxelizing debug voxel, put your breakpoint *here*'
+					log.debug 'Voxelizing debug voxel, put your breakpoint *here*'
 
 			# if we move in this particular direction, check that we did not exeed our
 			# destination bounds: check if we reached the destination voxel

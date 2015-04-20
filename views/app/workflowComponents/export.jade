@@ -3,10 +3,53 @@
 	.btn.btn-success.btn-block#shareButton
 		span.fa.fa-share
 		| &nbsp;&nbsp;Share your work
-	br
 	.btn.btn-success.btn-block#downloadButton
 		span.fa.fa-download
-		| &nbsp;&nbsp;Download stl for 3D printer
-	.btn.btn-success.btn-block#downloadPdfButton
-		span.fa.fa-download
-		| &nbsp;&nbsp;Download pdf LEGO instructions
+		| &nbsp;&nbsp;Download
+
+.modal.fade#downloadModal
+	.modal-dialog
+		.modal-content
+			.modal-header
+				button.bootbox-close-button.close(data-dismiss="modal") ×
+				h4.modal-title Download
+			.modal-body
+				h4 Download stl for 3d printer
+				p
+					| Select the stud size that works best for your 3d printer.
+					| If you don't know the size, download and print the &nbsp;
+					a(href="/download/testStrip.zip") test strip
+					| .
+				center
+					img(src="/img/testStrip.png" width=300)
+				p
+					| To connect LEGO studs into the test strip, this size works best:
+					select.form-control#studSizeSelect
+						option -3
+						option -2
+						option -1
+						option(selected="selected") 0
+						option +1
+						option +2
+						option +3
+				p
+					| To connect test strip studs into LEGO bricks, this size works best:
+					select.form-control#holeSizeSelect
+						option -3
+						option -2
+						option -1
+						option(selected="selected") 0
+						option +1
+						option +2
+						option +3
+				br
+				.btn.btn-success.btn-block#stlDownloadButton
+					span.fa.fa-download
+					| &nbsp;&nbsp;Download stl for 3D printer
+
+				h4 Download Instructions
+				.btn.btn-success.btn-block#downloadPdfButton
+					span.fa.fa-download
+					| &nbsp;&nbsp;Download pdf LEGO instructions
+			.modal-footer
+				button.btn.btn-primary#downloadCloseButton Close

@@ -25,6 +25,7 @@ module.exports = class Bundle
 		@ui = new Ui(@) if @globalConfig.buildUi
 
 	init: =>
+		@pluginLoader.initPlugins()
 		@ui?.init()
 		@renderer.setupControls @globalConfig, @controls
 		return @sceneManager.init()

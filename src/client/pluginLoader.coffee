@@ -14,12 +14,15 @@ module.exports = class PluginLoader
 		@pluginHooks.initHooks(hooks)
 		@globalConfig = @bundle.globalConfig
 
-	initPlugin: (PluginClass, packageData) ->
+	_loadPlugin: (PluginClass, packageData) ->
 		instance = new PluginClass()
 
 		for own key,value of packageData
 			instance[key] = value
 
+		return instance
+
+	_initPlugin: (instance) ->
 		if @pluginHooks.hasHook(instance, 'init')
 			instance.init @bundle
 
@@ -33,47 +36,59 @@ module.exports = class PluginLoader
 		if threeNode?
 			@bundle.renderer.addToScene threeNode
 
-		return instance
+	initPlugins: =>
+		for plugin in @pluginInstances
+			@_initPlugin plugin
 
 	# Since browserify.js does not support dynamic require
 	# all plugins must be explicitly written down
 	loadPlugins: ->
-		pluginInstances = []
+		@pluginInstances = []
 
 		if @globalConfig.plugins.dummy
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/dummy'
 				require '../plugins/dummy/package.json'
 			)
 		if @globalConfig.plugins.stlImport
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/stlImport'
 				require '../plugins/stlImport/package.json'
 			)
 		if @globalConfig.plugins.coordinateSystem
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/coordinateSystem'
 				require '../plugins/coordinateSystem/package.json'
 			)
 		if @globalConfig.plugins.legoBoard
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/legoBoard'
 				require '../plugins/legoBoard/package.json'
 			)
 		if @globalConfig.plugins.newBrickator
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/newBrickator'
 				require '../plugins/newBrickator/package.json'
 			)
 		if @globalConfig.plugins.nodeVisualizer
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/nodeVisualizer'
 				require '../plugins/nodeVisualizer/package.json'
 			)
 		if @globalConfig.plugins.fidelityControl
-			pluginInstances.push @initPlugin(
+			@pluginInstances.push @_loadPlugin(
 				require '../plugins/fidelityControl'
 				require '../plugins/fidelityControl/package.json'
 			)
+		if @globalConfig.plugins.editController
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/editController'
+				require '../plugins/editController/package.json'
+			)
+		if @globalConfig.plugins.csg
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/csg'
+				require '../plugins/csg/package.json'
+			)
 
-		return pluginInstances
+		return @pluginInstances

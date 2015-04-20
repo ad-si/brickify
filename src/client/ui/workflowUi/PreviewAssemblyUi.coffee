@@ -31,9 +31,9 @@ class PreviewAssemblyUi
 
 	_enableBuildMode: (selectedNode) =>
 		@buildContainer.slideDown()
-		@previewUi.nodeVisualizer.enableBuildMode selectedNode
+		@previewUi.nodeVisualizer.setDisplayMode selectedNode, 'build'
 		.then (numZLayers) =>
-			@buildLayerUi.slider.attr 'min', 0
+			@buildLayerUi.slider.attr 'min', 1
 			@buildLayerUi.slider.attr 'max', numZLayers
 			@buildLayerUi.maxLayer.text numZLayers
 
@@ -47,6 +47,5 @@ class PreviewAssemblyUi
 
 	_disableBuildMode: (selectedNode) =>
 		@buildContainer.slideUp()
-		@previewUi.nodeVisualizer.disableBuildMode selectedNode
 
 module.exports = PreviewAssemblyUi

@@ -155,23 +155,25 @@ class DummyPlugin
 		}]
 
 	###
-	# When the framerate is very low, plugins may be asked to reduce their visual
-	# complexity, e.g. replacing geometry with simple textures.
-	# Plugins should return true, if they reduced quality, or false,
-	# if they were unable to reduce quality even further.
-	# @see FidelityControl
+	# Plugins may offer downloads
+	# @param {Node} selectedNode the selected node that should be processed
+	# @param {Object} downloadOptions Additional download options
+	# @param {Float} downloadOptions.studRadius Desired radius of the Lego studs
+	# @param {String} downloadOptions.fileType desired file type, 'stl' or 'pdf'
 	###
-	uglify: ->
-		return false
+	getDownload: (downloadOptions, selectedNode) ->
+		return {
+			filename: ''
+			data: ''
+		}
 
 	###
-	# When the framerate is very high, plugins are encouraged
-	# to add more visual details and/or eye candy. Plugins should return true,
-	# if they were able to increase quality / add eye candy even further,
-	# or false otherwise.
-	# @see FidelityControl
+	# Plugins should adjust visual fidelity
+	# @param {Number} fidelityLevel the new level of fidelity, which is an index
+	# of
+	# @param {Array<String>} availableFidelityLevels all available fidelity levels
 	###
-	beautify: ->
-		return false
+	setFidelity: (fidelityLevel, availableFidelityLevels) ->
+		return
 
 module.exports = DummyPlugin

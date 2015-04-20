@@ -11,19 +11,25 @@
 				| Make everything
 				br
 				| 3D-print
-
-	.btn-group.btn-group-justified(role='group')#brushContainer
-		.btn.btn-primary#legoBrush
-			.smallBrush
+	.row.twoButtonRow#bigBrushContainer
+		.col-xs-6
+			.btn.btn-primary.btn-block#legoBrush
+				| Make LEGO
+				br
+				img(src='img/bigLegoBrush.png' width=64 height=64)
+		.col-xs-6
+			.btn.btn-primary.btn-block#printBrush
+				| Make 3D-print
+				br
+				img(src='img/bigPrintBrush.png' width=64 height=64)
+	.row.twoButtonRow#brushContainer
+		.col-xs-6
+			.btn.btn-primary.btn-block#legoBrush
 				| Make LEGO
 				br
 				img(src='img/legoBrush.png' width=64 height=64)
-			.bigBrush
-				| Big Brush
-		.btn.btn-primary#printBrush
-			.smallBrush
+		.col-xs-6
+			.btn.btn-primary.btn-block#printBrush
 				| Make 3D-print
 				br
 				img(src='img/printBrush.png' width=64 height=64)
-			.bigBrush
-				| Big Brush

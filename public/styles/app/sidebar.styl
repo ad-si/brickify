@@ -5,6 +5,23 @@
 	position absolute
 	top 0
 	left 0
+
+	.navbar-toggle
+		margin-top 5px
+		.icon-bar
+			background-color white
+
+	&.collapsed-sidebar
+		height auto
+
+	@media(min-width $screen-xs-max)
+		height 100% !important
+		#sidebar-content
+			display block !important
+
+	#sidebar-content
+		margin-top $padding-base-vertical
+
 	.btn
 		white-space normal
 
@@ -40,7 +57,19 @@
 
 	#buildContainer
 		display block
-		text-align center
+
+		#buildSlider
+			margin-top 25px
+
+		#buildDecrement
+			float left
+
+		#buildIncrement
+			float right
+
+		#textWrapper
+			text-align center
+			margin-top 7px
 
 	#exportGroup
 		margin-bottom 2em

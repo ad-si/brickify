@@ -6,14 +6,7 @@ PreviewUi = require './PreviewUi'
 ExportUi = require './ExportUi'
 
 class WorkflowUi
-	constructor: (@bundle) ->
-		@workflow =
-			load: new LoadUi @
-			edit: new EditUi @
-			preview: new PreviewUi @
-			export: new ExportUi @
-
-		@enableOnly @workflow.load
+	constructor: (@bundle) -> return
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
@@ -43,8 +36,17 @@ class WorkflowUi
 			ui.setEnabled step in groupsList
 
 	init: =>
+		@workflow =
+			load: new LoadUi @
+			edit: new EditUi @
+			preview: new PreviewUi @
+			export: new ExportUi @
+
+		@enableOnly @workflow.load
+
 		@_initNotImplementedMessages()
 		@_initScrollbar()
+		@_initToggleButton()
 
 	_initNotImplementedMessages: ->
 		alertCallback = ->
@@ -54,8 +56,6 @@ class WorkflowUi
 					 Please check back later.'
 			})
 
-		$('#everythingPrinted').click alertCallback
-		$('#everythingLego').click alertCallback
 		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback
 
@@ -63,6 +63,22 @@ class WorkflowUi
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar
 		window.addEventListener 'resize', -> perfectScrollbar.update sidebar
+
+	_initToggleButton: ->
+		$('#toggleMenu').click => @toggleMenu()
+
+	toggleMenu: ->
+		$('#leftSidebar').css('height': 'auto')
+		$('#sidebar-content').slideToggle null, ->
+			$('#leftSidebar').toggleClass 'collapsed-sidebar'
+			$('#leftSidebar').css('height': '')
+
+	hideMenuIfPossible: ->
+		return unless $('#toggleMenu:visible').length > 0
+		$('#leftSidebar').css('height': 'auto')
+		$('#sidebar-content').slideUp null, ->
+			$('#leftSidebar').addClass 'collapsed-sidebar'
+			$('#leftSidebar').css('height': '')
 
 	toggleStabilityView: =>
 		@workflow.preview.toggleStabilityView()

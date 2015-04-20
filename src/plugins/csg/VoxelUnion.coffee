@@ -1,4 +1,6 @@
+log = require 'loglevel'
 THREE = require 'three'
+
 ThreeCSG = require './threeCsg/ThreeCSG'
 
 ###
@@ -27,14 +29,14 @@ class VoxelUnion
 
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
 		if options.profile
-			console.log "Geometrizer: voxel geometry took #{new Date() - d}ms"
+			log.debug "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
 		if options.addStuds
 			d = new Date()
 			bspWithStuds = @_addStuds(
 				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
 			if options.profile
-				console.log "Geometrizer: stud geometry took #{new Date() - d}ms"
+				log.debug "Geometrizer: stud geometry took #{new Date() - d}ms"
 			return bspWithStuds
 
 		return boxGeometryBsp
@@ -124,7 +126,7 @@ class VoxelUnion
 					upperIndices[0], upperIndices[3], upperIndices[1])
 
 	###
-	# creates a datastructure consisting of a
+	# creates a data structure consisting of a
 	# [z][x][y] nested array out of the voxel list
 	# @param {Array<Object>} voxels Array of voxels
 	###
@@ -281,7 +283,9 @@ class VoxelUnion
 	# adds studs on top, subtracts studs from below
 	###
 	_addStuds: (boxGeometry, options, voxelsToBeGeometrized, grid) ->
-		studGeometry = @_createStudGeometry @grid.spacing, options.studSize
+		studGeometry = @_createStudGeometry(
+			@grid.spacing, options.studSize, options.holeSize
+		)
 		unionBsp = boxGeometry
 
 		for voxel in voxelsToBeGeometrized
@@ -312,15 +316,15 @@ class VoxelUnion
 	###
 	# creates Geometry needed for CSG operations
 	###
-	_createStudGeometry: (gridSpacing, studSize) ->
+	_createStudGeometry: (gridSpacing, studSize, holeSize) ->
 		studRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
-		dzBottom = -(gridSpacing.z / 2) + (studSize.height / 2)
+		dzBottom = -(gridSpacing.z / 2) + (holeSize.height / 2)
 		studTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
 		dzTop = (gridSpacing.z / 2) + (studSize.height / 2)
 		studTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
 
 		studGeometryBottom = new THREE.CylinderGeometry(
-			studSize.radius, studSize.radius, studSize.height, 20
+			holeSize.radius, holeSize.radius, holeSize.height, 20
 		)
 		studGeometryTop = new THREE.CylinderGeometry(
 			studSize.radius, studSize.radius, studSize.height, 20

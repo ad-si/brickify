@@ -7,10 +7,10 @@
 	#buildContainer.hidden
 		br
 		button.btn.btn-primary.fa.fa-chevron-left#buildDecrement
-		| &nbsp;Showing Layer&nbsp;
-		span#currentBuildLayer 1
-		| &nbsp;of&nbsp;
-		span#maxBuildLayer 0
-		| &nbsp;
 		button.btn.btn-primary.fa.fa-chevron-right#buildIncrement
+		#textWrapper
+			| Showing Layer&nbsp;
+			span#currentBuildLayer 1
+			| &nbsp;of&nbsp;
+			span#maxBuildLayer 0
 		input(type='range')#buildSlider

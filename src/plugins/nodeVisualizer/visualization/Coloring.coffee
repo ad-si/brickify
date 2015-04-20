@@ -11,25 +11,29 @@ module.exports = class Coloring
 			color: 0xff0000
 		})
 
-		@deselectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xb5ffb8 #greenish gray
-			opacity: 0.4
-			transparent: true
-		})
-
 		@hiddenMaterial = new THREE.MeshLambertMaterial({
 			color: 0xffaaaa #gray
 			opacity: 0.0
 			transparent: true
 		})
 
-		@highlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0x00ff00
+		@legoHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xff7755
 		})
 
-		@boxHighlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0x00ff00
-			opacity: 0.3
+		@printHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xeeeeee
+		})
+
+		@legoBoxHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xff7755
+			opacity: 0.5
+			transparent: true
+		})
+
+		@printBoxHighlightMaterial = new THREE.MeshLambertMaterial({
+			color: 0xeeeeee
+			opacity: 0.4
 			transparent: true
 		})
 
@@ -38,6 +42,23 @@ module.exports = class Coloring
 		})
 
 		@_createBrickMaterials()
+
+	###
+    # Returns the highlight material collection for the supplied type of voxel
+    # @param {String} type either 'lego' or '3d' to get the respective material
+    ###
+	getHighlightMaterial: (type) =>
+		if type == 'lego'
+			return {
+				voxel: @legoHighlightMaterial
+				box: @legoBoxHighlightMaterial
+			}
+		else if type == '3d'
+			return {
+				voxel: @printHighlightMaterial
+				box: @printBoxHighlightMaterial
+			}
+		return null
 
 	getMaterialForVoxel: (gridEntry) =>
 		if gridEntry.enabled
@@ -55,9 +76,10 @@ module.exports = class Coloring
 			return brick.visualizationMaterial
 
 		# collect materials of neighbors
-		neighbors = brick.uniqueNeighbors()
-		neighborColors = neighbors.map (brick) ->
-			brick.visualizationMaterial
+		neighbors = brick.getNeighbors()
+		neighborColors = []
+		neighbors.forEach (neighbor) ->
+			neighborColors.push neighbor.visualizationMaterial
 
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used

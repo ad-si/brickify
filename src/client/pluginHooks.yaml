@@ -118,24 +118,23 @@
 
 - getBrushes
 
-# ## Subtractive CSG
-# When clicking on the download button, the user expects to download eyerything
-# he needs to 3d print. therefore, getSubtractiveCSG should return a solid geometry
-# that replaces the original 3d model (partly). everything that is not replaced gets
-# 3d printed
+# ## onPointerEvent
+# When the user interacts with the application, plugins may react to pointerEvents.
+# They should return true, if they handled this event, and false, if they did not.
+# If no plugin handled the event, orbit controls will handle it.
+
+- onPointerEvent
+
+# ## getDownload
+# (parameters: see example plugin)
+# If plugins can provide something downloadable to the user, they should return
+# an object consisting out of a filename and data property, which is then offered
+# to the user to download.
 
 - getDownload
 
-# ## uglify
-# When the framerate is very low, plugins may be asked to reduce their visual complexity,
-# e.g. replacing geometry with simple textures. Plugins should return true, if
-# they reduced quality, or false, if they were unable to reduce quality even further.
+# ## setFidelity
+# Plugins should adapt their visual fidelity to match the device's rendering power.
+# When the framerate is above / below a certain threshold, setFidelity is called
 
-- uglify
-
-# ## beautify
-# When the framerate is very high, plugins are encouraged to add more visual details
-# and/or eye candy. Plugins should return true, if they were able to increase quality / add
-# eye candy even further, or false otherwise.
-
-- beautify
+- setFidelity

@@ -15,7 +15,7 @@ class NodeVisualizer
 												<span class="estimate" id="brickCount">0</span>
 												<span>bricks</span>
 												<span class="estimate" id="timeEstimate">0</span>
-												<span>cm<sup>3</sup></span>
+												<span>min</span>
 											</div>')
 			$('body').append estimates
 			@brickCounter = estimates.find '#brickCount'
@@ -179,8 +179,8 @@ class NodeVisualizer
 
 	_updatePrintTime: (csg) =>
 		if csg?.geometry?
-			volume = threeHelper.getVolume csg.geometry
-			@timeEstimate?.text volume.toFixed 2
+			time = threeHelper.getPrintingTimeEstimate csg.geometry
+			@timeEstimate?.text Math.round(time)
 		else
 			@timeEstimate?.text 0
 

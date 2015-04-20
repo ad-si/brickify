@@ -1,5 +1,7 @@
 require './polyfills'
 $ = require 'jquery'
+window.jQuery = window.$ = $
+bootstrap = require 'bootstrap'
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
@@ -69,3 +71,12 @@ b1 = bundle1.init().then ->
 		@value = ''
 
 	$('.dropper').html 'Drop an stl file'
+
+# set not available message
+$('#downloadButton').click ->
+	bootbox.alert({
+		title: 'Not available'
+		message: 'This feature is not available yet - please check back later.<br>' +
+		'<br>However, you can edit and download the model with our editor '+
+		'by clicking the <strong>Customize</strong> Button'
+	})

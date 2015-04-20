@@ -114,6 +114,9 @@ class Renderer
 		if not contextAttributes.stencil
 			console.warn 'The current WebGL context does not have a stencil buffer.
 			 Rendering will be (partly) broken'
+			@threeRenderer.hasStencilBuffer = false
+		else
+			@threeRenderer.hasStencilBuffer = true
 
 		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.autoClear = false

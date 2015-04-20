@@ -41,11 +41,10 @@ class FidelityControl
 
 		@_setupFpsDisplay() if process.env.NODE_ENV is 'development'
 
+		# allow pipeline only if we have the needed extension and a stencil buffer
 		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
-		if fragDepth?
-			@allowPipeline = true
-		else
-			@allowPipeline = false
+		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
+		@allowPipeline = fragDepth? and stencilBuffer
 
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?

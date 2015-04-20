@@ -5,7 +5,7 @@ meshlib = require 'meshlib'
 modelCache = require './modelCache'
 
 
-module.exports = (event, bundles, callback) =>
+module.exports = (event, bundles, callback) ->
 	event.preventDefault()
 	event.stopPropagation()
 

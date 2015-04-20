@@ -93,7 +93,7 @@ module.exports = class LegoBoard
 			@baseplateBox.material = @currentBaseplateMaterial
 			@studsContainer.visible = true if @highQualMode
 
-	onPaint: (threeRenderer, camera) =>
+	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible
 
 		# recreate textures if either they havent been generated yet or
@@ -116,7 +116,7 @@ module.exports = class LegoBoard
 		if camera.position.y < 0
 			# one fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
-			threeRenderer.render @pipelineSceneTarget.quadScene, camera
+			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 		else
 			# one default opaque pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 1
@@ -132,7 +132,7 @@ module.exports = class LegoBoard
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 
 			gl.disable(gl.DEPTH_TEST)
-			threeRenderer.render @pipelineSceneTarget.quadScene, camera
+			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 			gl.enable(gl.DEPTH_TEST)
 
 			gl.disable(gl.STENCIL_TEST)

@@ -29,7 +29,7 @@ module.exports.createRenderTarget = (
 	texWidth = getNextValidTextureDimension renderWidth, chooseBiggerSize
 	texHeight = getNextValidTextureDimension renderHeight, chooseBiggerSize
 
-	depthTexture = new THREE.DepthTexture texWidth, texHeight
+	depthTexture = new THREE.DepthTexture texWidth, texHeight, true
 	renderTargetTexture = new THREE.WebGLRenderTarget(
 		texWidth
 		texHeight
@@ -38,7 +38,7 @@ module.exports.createRenderTarget = (
 			magFilter: textureMagFilter
 			format: THREE.RGBAFormat
 			depthTexture: depthTexture
-			stencilBuffer: false
+			stencilBuffer: true
 		}
 	)
 

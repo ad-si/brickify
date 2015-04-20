@@ -1,5 +1,6 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
+renderTargetHelper = require './renderTargetHelper'
 
 ###
 # @class Renderer
@@ -23,12 +24,39 @@ class Renderer
 
 		# allow for custom render passes
 		if @pipelineEnabled
-			@pluginHooks.onPaint @threeRenderer, @camera
+			# init render target
+			@_initializePipelineTarget()
+
+			# clear render target
+			@threeRenderer.setRenderTarget(@pipelineRenderTarget.renderTarget)
+			@threeRenderer.context.stencilMask(0xFF)
+			@threeRenderer.context.clearStencil(0x00)
+			@threeRenderer.clear()
+			@threeRenderer.setRenderTarget(null)
+
+			# let plugins render in our target			
+			@pluginHooks.onPaint @threeRenderer, @camera, @pipelineRenderTarget.renderTarget
+
+			#render our target to the screen
+			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
+
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
 		@controls?.update()
 		requestAnimationFrame @localRenderer
+
+	# create / update target for all pipeline passes
+	_initializePipelineTarget: =>
+		if not @pipelineRenderTarget? or
+		not renderTargetHelper.renderTargetHasRightSize(
+			@pipelineRenderTarget.renderTarget, @threeRenderer, true
+		)
+			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
+				@threeRenderer,
+				null,
+				true
+			)
 
 	addToScene: (node) ->
 		@scene.add node

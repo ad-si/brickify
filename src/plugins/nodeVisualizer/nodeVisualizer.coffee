@@ -44,7 +44,7 @@ class NodeVisualizer
 
 		return
 
-	onPaint: (@threeRenderer, camera) =>
+	onPaint: (@threeRenderer, camera, target) =>
 		threeRenderer = @threeRenderer
 
 		# recreate textures if either they havent been generated yet or
@@ -70,10 +70,10 @@ class NodeVisualizer
 			# object and brick shadow shader
 			# no fxaa because lines look better without
 			preMain = shaderGenerator.buildFragmentPreMainAdditions(
-				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: false }
+				{ expandBlack: false, blackAlwaysOpaque: false, fxaa: false }
 			)
 			inMain = shaderGenerator.buildFragmentInMainAdditions(
-				{ expandBlack: false, blackAlwaysOpaque: true, fxaa: false }
+				{ expandBlack: false, blackAlwaysOpaque: false, fxaa: false }
 			)
 
 			# object target
@@ -123,7 +123,7 @@ class NodeVisualizer
 		gl.stencilMask(0xFF)
 
 		# bricks
-		threeRenderer.render @brickSceneTarget.quadScene, camera
+		threeRenderer.render @brickSceneTarget.quadScene, camera, target, false
 
 		# everything that is 3d model and hidden gets the third bit set
 		# every visible part of the 3d model gets the second bit set
@@ -133,7 +133,7 @@ class NodeVisualizer
 		gl.stencilMask(stencilBits.visibleObjectMask | stencilBits.hiddenObjectMask)
 
 		# render visible parts
-		threeRenderer.render @objectsSceneTarget.quadScene, camera
+		threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
 
 		# render invisble parts (object behind lego bricks)
 		if @visualizationMode? and @visualizationMode == 'printBrush'
@@ -149,7 +149,7 @@ class NodeVisualizer
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 
 			gl.disable(gl.DEPTH_TEST)
-			threeRenderer.render @objectsSceneTarget.quadScene, camera
+			threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
 			gl.enable(gl.DEPTH_TEST)
 
 			# Reset material to non-shadow properties
@@ -162,7 +162,7 @@ class NodeVisualizer
 		gl.stencilMask(stencilBits.visibleShadowMask)
 
 		# render this-could-be-lego-shadows and brush highlight
-		threeRenderer.render @brickShadowSceneTarget.quadScene, camera
+		threeRenderer.render @brickShadowSceneTarget.quadScene, camera, target, false
 
 		gl.disable(gl.STENCIL_TEST)
 

@@ -85,7 +85,11 @@ generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 	})
 
 	planeGeometry = new THREE.PlaneBufferGeometry(2,2)
-	return new THREE.Mesh( planeGeometry, mat )
+	mesh = new THREE.Mesh( planeGeometry, mat )
+	# disable frustum culling since the plane is always visible
+	mesh.frustumCulled = false
+	return mesh
+
 module.exports.generateQuad = generateQuad
 
 vertexShader = (options) ->
@@ -128,7 +132,7 @@ vertexShader = (options) ->
 			texcoords(fragCoord, texSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
 
 			/* Dont transform coordinates, make this a screen aligned quad */
-			gl_Position = vec4( position, 1.0 );
+			gl_Position = vec4( position.x, position.y, 0.5, 1.0 );
 		}
 	'
 fragmentShader = (options) ->

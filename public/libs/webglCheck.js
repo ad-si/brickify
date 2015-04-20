@@ -12,7 +12,7 @@
 	}
 
 	try {
-		canvas = document.getElementById('canvas')
+		canvas = document.createElement('canvas')
 		gl = canvas.getContext('webgl')
 	}
 	catch (error) {
@@ -30,10 +30,13 @@
 		}
 
 	if (!gl){
-		document
-			.getElementById('webGlWarning')
-			.style
-			.display = 'inherit'
+		warning = document.getElementById('webGlWarning')
+		if (warning != null){
+			warning.style.display = 'inherit'
+		}
 		webglWarning()
 	}
+
+	gl = null
+	canvas = null
 }()

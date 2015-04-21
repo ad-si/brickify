@@ -26,7 +26,7 @@ class FxaaPart extends ShaderPart
 		'
 
 	getVertexInMain: ->
-		return'
+		return '
 			vec2 texSize = vec2( texWidth, texHeight );\n
 			vec2 fragCoord = vUv * texSize;\n
 			texcoords(fragCoord, texSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
@@ -144,4 +144,5 @@ class FxaaPart extends ShaderPart
 			col.g = colFxaa.g;
 			col.b = colFxaa.b;
 		'
+
 module.exports = FxaaPart

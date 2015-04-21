@@ -14,6 +14,7 @@ class Renderer
 		@init globalConfig
 		@pipelineEnabled = false
 		@useBigPipelineTargets = false
+		@usePipelineSsao = false
 
 	localRenderer: (timestamp) =>
 		# clear screen
@@ -68,10 +69,22 @@ class Renderer
 			if @usePipelineFxaa
 				shaderParts.push new FxaaShaderPart()
 
+			additionalUniforms = {}
+			if @usePipelineSsao
+				# get a random texture for SSAO
+				randomTex = new THREE.Texture('img/randomTexture.png')
+				randomTex.wrapS = THREE.RepeatWrapping
+				randomTex.wrapT = THREE.RepeatWrapping
+
+				additionalUniforms.tRandom = {
+					type: 't'
+					value: randomTex
+				}
+
 			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
 				@threeRenderer,
 				shaderParts,
-				null,
+				additionalUniforms,
 				1.0,
 				@useBigPipelineTargets
 			)
@@ -92,6 +105,16 @@ class Renderer
 			else
 				if @usePipelineFxaa
 					@usePipelineFxaa = false
+					@pipelineRenderTarget = null
+
+			# determine wether to use SSAO
+			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'
+				if not @usePipelineSsao
+					@usePipelineSsao = true
+					@pipelineRenderTarget = null
+			else
+				if @usePipelineSsao
+					@usePipelineSsao = false
 					@pipelineRenderTarget = null
 
 	addToScene: (node) ->

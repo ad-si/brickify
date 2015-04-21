@@ -8,7 +8,7 @@ class ColorMultPart extends ShaderPart
 		return ''
 
 	getVertexInMain: ->
-		return''
+		return ''
 
 	getFragmentVariables: ->
 		return '
@@ -24,4 +24,5 @@ class ColorMultPart extends ShaderPart
 			col.g = col.g * colorMult.g;
 			col.b = col.b * colorMult.b;
 		'
+
 module.exports = ColorMultPart

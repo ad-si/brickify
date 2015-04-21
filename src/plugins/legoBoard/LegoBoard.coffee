@@ -26,7 +26,7 @@ module.exports = class LegoBoard
 		@_initMaterials()
 
 		#create baseplate
-		box = new THREE.BoxGeometry(400, 400, 8)
+		box = new THREE.BoxGeometry(400, 400, 8, 5, 5)
 		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox

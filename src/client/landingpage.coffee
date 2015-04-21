@@ -1,7 +1,9 @@
 require './polyfills'
 
-$ = require 'jquery'
 clone = require 'clone'
+$ = require 'jquery'
+window.jQuery = window.$ = $
+bootstrap = require 'bootstrap'
 
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
@@ -72,3 +74,12 @@ Promise
 		readFile event, bundles
 
 	$('.dropper').html 'Drop an stl file'
+
+# set not available message
+$('#downloadButton').click ->
+	bootbox.alert({
+		title: 'Not available'
+		message: 'This feature is not available yet - please check back later.<br>' +
+		'<br>However, you can edit and download the model with our editor '+
+		'by clicking the <strong>Customize</strong> Button'
+	})

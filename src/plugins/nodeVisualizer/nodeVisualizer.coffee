@@ -61,8 +61,6 @@ class NodeVisualizer
 				config.useBigTargets
 			)
 
-			# object and brick shadow shader
-
 			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,

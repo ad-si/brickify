@@ -151,6 +151,9 @@ class FidelityControl
 	_showFps: (timestamp, fps) =>
 		if timestamp - @lastDisplayUpdate > fpsDisplayUpdateTime
 			@lastDisplayUpdate = timestamp
-			@$fpsDisplay.text Math.round(fps) if @$fpsDisplay?
+			levelAbbreviation = FidelityControl.fidelityLevels[@currentFidelityLevel]
+				.match(/[A-Z]/g).join('')
+			fpsText = Math.round(fps) + '/' + levelAbbreviation
+			@$fpsDisplay.text fpsText if @$fpsDisplay?
 
 module.exports = FidelityControl

@@ -1,4 +1,4 @@
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class ColorMultPart extends ShaderPart
 	getVertexVariables: ->

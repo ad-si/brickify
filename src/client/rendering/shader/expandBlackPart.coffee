@@ -1,4 +1,4 @@
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class ExpandBlackPart extends ShaderPart
 	constructor: (@kernelSize) -> return

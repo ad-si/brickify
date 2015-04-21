@@ -1,4 +1,4 @@
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class FxaaPart extends ShaderPart
 	getVertexVariables: ->

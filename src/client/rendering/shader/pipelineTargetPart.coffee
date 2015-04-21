@@ -1,4 +1,4 @@
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class PipelineTargetPart extends ShaderPart
 	getVertexVariables: ->

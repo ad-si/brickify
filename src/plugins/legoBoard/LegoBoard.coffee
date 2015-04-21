@@ -122,7 +122,7 @@ module.exports = class LegoBoard
 		else
 			# one default opaque pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 1
-			threeRenderer.render @pipelineSceneTarget.quadScene, camera
+			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 
 			#render one pass transparent, where visible object or shadow is
 			# (= no lego)

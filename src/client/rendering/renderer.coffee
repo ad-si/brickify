@@ -1,6 +1,7 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
+FxaaShaderPart = require './shader/fxaaPart'
 
 ###
 # @class Renderer
@@ -63,21 +64,35 @@ class Renderer
 		not renderTargetHelper.renderTargetHasRightSize(
 			@pipelineRenderTarget.renderTarget, @threeRenderer, @useBigPipelineTargets
 		)
+			shaderParts = []
+			if @usePipelineFxaa
+				shaderParts.push new FxaaShaderPart()
+
 			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
 				@threeRenderer,
-				null,
+				shaderParts,
 				null,
 				1.0,
 				@useBigPipelineTargets
 			)
 
 	setFidelity: (fidelityLevel, availableLevels) =>
-		# Determine wheter to use bigger rendertargets (supersampling)
 		if @pipelineEnabled
+			# Determine wheter to use bigger rendertargets (supersampling)
 			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
 				@useBigPipelineTargets = true
 			else
 				@useBigPipelineTargets = false
+
+			# determine whether to use FXAA
+			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
+				if not @usePipelineFxaa
+					@usePipelineFxaa = true
+					@pipelineRenderTarget = null
+			else
+				if @usePipelineFxaa
+					@usePipelineFxaa = false
+					@pipelineRenderTarget = null
 
 	addToScene: (node) ->
 		@scene.add node

@@ -80,6 +80,10 @@ class ShaderGenerator
 			#extension GL_EXT_frag_depth : enable\n
 			precision highp float;
 			precision highp int;
+
+			uniform float texWidth;
+			uniform float texHeight;
+
 			varying vec2 vUv;
 			uniform float opacity;
 		'

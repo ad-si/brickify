@@ -34,7 +34,11 @@ class FxaaPart extends ShaderPart
 
 	getFragmentVariables: ->
 		return '
-			uniform vec3 colorMult;
+			varying vec2 v_rgbNW;
+			varying vec2 v_rgbNE;
+			varying vec2 v_rgbSW;
+			varying vec2 v_rgbSE;
+			varying vec2 v_rgbM;
 		'
 
 	getFragmentPreMain: ->

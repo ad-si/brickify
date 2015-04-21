@@ -25,8 +25,6 @@ class NodeVisualizer
 
 	init3d: (@threejsRootNode) =>
 		@usePipeline = false
-		@usePipelineFxaa = false
-		@usePipelineBigTargets = false
 
 		# Voxels / Bricks are rendered as a first render pass
 		@brickScene = @bundle.renderer.getDefaultScene()
@@ -68,7 +66,7 @@ class NodeVisualizer
 			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				[new ExpandBlackPart(2), new ColorMultPart()],
+				[new ExpandBlackPart(1), new ColorMultPart()],
 				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
 				@objectOpacity
 	  			config.useBigTargets
@@ -183,17 +181,6 @@ class NodeVisualizer
 
 				# change material properties
 				@coloring.setPipelineMode false
-
-		# determine whether to use FXAA
-		if @usePipeline
-			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
-				if not @usePipelineFxaa
-					@usePipelineFxaa = true
-					@renderTargetsInitialized = false
-			else
-				if @usePipelineFxaa
-					@usePipelineFxaa = false
-					@renderTargetsInitialized = false
 
 	# called by newBrickator when an object's datastructure is modified
 	objectModified: (node, newBrickatorData) =>

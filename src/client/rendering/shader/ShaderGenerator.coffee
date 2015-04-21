@@ -101,4 +101,5 @@ class ShaderGenerator
 			}
 		'
 		return shaderCode
+
 module.exports = ShaderGenerator

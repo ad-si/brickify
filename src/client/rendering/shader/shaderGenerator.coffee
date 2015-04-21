@@ -53,6 +53,9 @@ class ShaderGenerator
 			precision highp float;
 			precision highp int;
 
+			uniform float texWidth;
+			uniform float texHeight;
+
 			attribute vec3 position;
 			attribute vec2 uv;
 

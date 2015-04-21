@@ -8,8 +8,6 @@ class FxaaPart extends ShaderPart
 			varying vec2 v_rgbSW;
 			varying vec2 v_rgbSE;
 			varying vec2 v_rgbM;
-			uniform float texWidth;
-			uniform float texHeight;
 		'
 
 	getVertexPreMain: ->

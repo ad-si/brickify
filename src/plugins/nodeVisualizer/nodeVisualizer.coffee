@@ -2,11 +2,11 @@ threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 interactionHelper = require '../../client/interactionHelper'
-shaderGenerator = require './shaderGenerator'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
 Coloring = require './visualization/Coloring'
 ColorMultPart = require '../../client/rendering/shader/colorMultPart'
+ExpandBlackPart = require '../../client/rendering/shader/expandBlackPart'
 
 ###
 # @class NodeVisualizer
@@ -68,7 +68,7 @@ class NodeVisualizer
 			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				[new ColorMultPart()],
+				[new ExpandBlackPart(2), new ColorMultPart()],
 				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
 				@objectOpacity
 	  			@usePipelineBigTargets

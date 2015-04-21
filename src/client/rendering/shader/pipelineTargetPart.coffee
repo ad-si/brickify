@@ -35,7 +35,5 @@ class PipelineTargetPart extends ShaderPart
 				discard;
 			}
 			gl_FragDepthEXT = depth;
-
-			sampler2D colorTexture = tColor;
 		'
 module.exports = PipelineTargetPart

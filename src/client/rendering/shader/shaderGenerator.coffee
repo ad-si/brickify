@@ -63,7 +63,7 @@ class ShaderGenerator
 		shaderCode += '
 			void main() {
 				vUv = uv;
-				vec4 pos = position;
+				vec4 pos = vec4(position.xyz, 1.0);
 
 				' + inMain + '
 
@@ -87,7 +87,7 @@ class ShaderGenerator
 				vec4 col = vec4(0.0, 0.0, 0.0, 0.0);\n
 				float currentOpacity = opacity;
 				\n
-				+ ' + inMain + ' +
+				' + inMain + '
 				\n
 				col.a = currentOpacity;
 				gl_FragColor = col;

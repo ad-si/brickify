@@ -1,4 +1,7 @@
 THREE = require 'three'
+PipelineTargetPart = require './shader/pipelineTargetPart'
+ShaderGenerator = require './shader/ShaderGenerator'
+
 ###
 # @module renderTargetHelper
 ###
@@ -18,7 +21,9 @@ THREE = require 'three'
 # @memberOf renderTargetHelper
 ###
 module.exports.createRenderTarget = (
-	threeRenderer, shaderOptions, chooseBiggerSize = false,
+	threeRenderer,
+	shaderParts = [], additionalUniforms = {}, opacity = 1.0,
+	chooseBiggerSize = false,
 	textureMagFilter = THREE.LinearFilter,
 	textureMinFilter = THREE.LinearFilter) ->
 
@@ -51,7 +56,7 @@ module.exports.createRenderTarget = (
 	#create scene to render texture
 	quadScene = new THREE.Scene()
 	screenAlignedQuad = generateQuad(
-		renderTargetTexture, depthTexture, shaderOptions
+		renderTargetTexture, depthTexture, shaderParts, additionalUniforms, opacity
 	)
 	quadScene.add screenAlignedQuad
 
@@ -65,22 +70,30 @@ module.exports.createRenderTarget = (
 # Generates an THREE.Mesh that will be displayed as a screen aligned quad
 # and will draw the supplied rttTexture while setting the depth value to
 # the values specified in rttDepthTexture
-generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
-	shaderOptions = setDefaultOptions shaderOptions
+generateQuad =  (
+	rttTexture, rttDepthTexture, shaderParts, additionalUniforms, opacity) ->
+
+	usedShaderParts = []
+	usedShaderParts.push new PipelineTargetPart()
+	usedShaderParts = usedShaderParts.concat shaderParts
+
+	shaderCode = ShaderGenerator.generateShader usedShaderParts
+
+	baseUniforms = {
+		tDepth: { type: 't', value: rttDepthTexture }
+		tColor: { type: 't', value: rttTexture }
+		opacity: { type: 'f', value: opacity }
+		texWidth: { type: 'f', value: rttTexture.width }
+		texHeight: { type: 'f', value: rttTexture.height }
+	}
+
+	for attribute of additionalUniforms
+		baseUniforms[attribute] = additionalUniforms[attribute]
 
 	mat = new THREE.RawShaderMaterial({
-		uniforms: {
-			tDepth: { type: 't', value: rttDepthTexture }
-			tColor: { type: 't', value: rttTexture }
-			opacity: { type: 'f', value: shaderOptions.opacity }
-			colorMult: { type: 'v3', value: shaderOptions.colorMult }
-			texelXDelta: { type: 'f', value: 1.0 / rttTexture.width }
-			texelYDelta: { type: 'f', value: 1.0 / rttTexture.height }
-			texWidth: { type: 'f', value: rttTexture.width }
-			texHeight: { type: 'f', value: rttTexture.height }
-		}
-		vertexShader: vertexShader()
-		fragmentShader: fragmentShader(shaderOptions)
+		uniforms: baseUniforms
+		vertexShader: shaderCode.vertex
+		fragmentShader: shaderCode.fragment
 		transparent: true
 	})
 
@@ -89,106 +102,7 @@ generateQuad =  (rttTexture, rttDepthTexture, shaderOptions) ->
 	# disable frustum culling since the plane is always visible
 	mesh.frustumCulled = false
 	return mesh
-
 module.exports.generateQuad = generateQuad
-
-vertexShader = (options) ->
-	return '
-		precision highp float;
-		precision highp int;
-
-		attribute vec3 position;
-		attribute vec2 uv;
-
-		varying vec2 vUv;
-
-		varying vec2 v_rgbNW;
-		varying vec2 v_rgbNE;
-		varying vec2 v_rgbSW;
-		varying vec2 v_rgbSE;
-		varying vec2 v_rgbM;
-		uniform float texWidth;
-		uniform float texHeight;
-
-
-		void texcoords(vec2 fragCoord, vec2 resolution,
-		out vec2 v_rgbNW, out vec2 v_rgbNE,
-		out vec2 v_rgbSW, out vec2 v_rgbSE,
-		out vec2 v_rgbM) {
-		vec2 inverseVP = 1.0 / resolution.xy;
-		v_rgbNW = (fragCoord + vec2(-1.0, -1.0)) * inverseVP;
-		v_rgbNE = (fragCoord + vec2(1.0, -1.0)) * inverseVP;
-		v_rgbSW = (fragCoord + vec2(-1.0, 1.0)) * inverseVP;
-		v_rgbSE = (fragCoord + vec2(1.0, 1.0)) * inverseVP;
-		v_rgbM = vec2(fragCoord * inverseVP);
-		}
-
-		void main() {
-			vUv = uv;
-
-			/*FXAA*/
-			vec2 texSize = vec2( texWidth, texHeight );\n
-			vec2 fragCoord = vUv * texSize;\n
-			texcoords(fragCoord, texSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
-
-			/* Dont transform coordinates, make this a screen aligned quad */
-			gl_Position = vec4( position.x, position.y, 0.5, 1.0 );
-		}
-	'
-fragmentShader = (options) ->
-	return '
-		#extension GL_EXT_frag_depth : enable\n
-		precision highp float;
-		precision highp int;
-
-		varying vec2 vUv;
-		uniform sampler2D tDepth;
-		uniform sampler2D tColor;
-		uniform float texelXDelta;
-		uniform float texelYDelta;
-		uniform float opacity;
-		uniform vec3 colorMult;
-		uniform float texWidth;
-		uniform float texHeight;
-		varying vec2 v_rgbNW;
-		varying vec2 v_rgbNE;
-		varying vec2 v_rgbSW;
-		varying vec2 v_rgbSE;
-		varying vec2 v_rgbM;
-
-		\n
-		' + options.fragmentPreMain + '
-		\n
-
-		void main() {
-			float currentOpacity = opacity;
-			float depth = texture2D( tDepth, vUv ).r;
-			if (abs(1.0 - depth) < 0.00001){
-				discard;
-			}
-			vec3 col = texture2D( tColor, vUv ).rgb;
-
-			\n
-			' + options.fragmentInMain + '
-			\n
-
-			col.r = col.r * colorMult.r;
-			col.g = col.g * colorMult.g;
-			col.b = col.b * colorMult.b;
-
-			gl_FragColor = vec4( col.r, col.g, col.b, currentOpacity);
-			gl_FragDepthEXT = depth;
-		}'
-
-setDefaultOptions = (shaderOptions) ->
-	shaderOptions = {} if not shaderOptions?
-
-	shaderOptions.opacity ?= 1.0
-	shaderOptions.colorMult ?= new THREE.Vector3(1,1,1)
-	shaderOptions.fragmentInMain ?= ''
-	shaderOptions.fragmentPreMain ?= ''
-
-	return shaderOptions
 
 # Choses the next 2^n size that matches the screen resolution best
 getNextValidTextureDimension = (size, chooseBiggerValue) ->

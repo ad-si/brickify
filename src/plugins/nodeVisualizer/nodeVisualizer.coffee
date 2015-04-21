@@ -6,6 +6,7 @@ shaderGenerator = require './shaderGenerator'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
 Coloring = require './visualization/Coloring'
+ColorMultPart = require '../../client/rendering/shader/colorMultPart'
 
 ###
 # @class NodeVisualizer
@@ -54,47 +55,31 @@ class NodeVisualizer
 			@brickSceneTarget.renderTarget, threeRenderer, @usePipelineBigTargets
 		))
 			# bricks
-			preMain = shaderGenerator.buildFragmentPreMainAdditions(
-				{ fxaa: @usePipelineFxaa }
-			)
-			inMain = shaderGenerator.buildFragmentInMainAdditions (
-				{ fxaa: @usePipelineFxaa }
-			)
-
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{ fragmentPreMain: preMain, fragmentInMain: inMain },
+				null,
+				null,
+				1.0,
 				@usePipelineBigTargets
 			)
 
 			# object and brick shadow shader
-			# no fxaa because lines look better without
-			preMain = shaderGenerator.buildFragmentPreMainAdditions(
-				{ expandBlack: false, blackAlwaysOpaque: false, fxaa: false }
-			)
-			inMain = shaderGenerator.buildFragmentInMainAdditions(
-				{ expandBlack: false, blackAlwaysOpaque: false, fxaa: false }
-			)
 
 			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{
-					opacity: @objectOpacity,
-					fragmentInMain: inMain,
-					fragmentPreMain: preMain
-	  			},
+				[new ColorMultPart()],
+				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
+				@objectOpacity
 	  			@usePipelineBigTargets
 			)
 
 			# brick shadow target
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				{
-					opacity: @brickShadowOpacity,
-					fragmentInMain: inMain,
-					fragmentPreMain: preMain
-				},
+				null,
+				null,
+				@brickShadowOpacity,
 				@usePipelineBigTargets
 			)
 

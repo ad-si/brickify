@@ -55,6 +55,8 @@ class Renderer
 			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
 				@threeRenderer,
 				null,
+				null,
+				1.0,
 				true
 			)
 

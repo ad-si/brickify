@@ -191,6 +191,7 @@ class Renderer
 			antialias: true
 			stencil: true
 			preserveDrawingBuffer: true
+			logarithmicDepthBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
 		)
 		@threeRenderer.sortObjects = false

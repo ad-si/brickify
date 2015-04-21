@@ -24,6 +24,7 @@ class FidelityControl
 		'PipelineLow',
 		'PipelineMedium',
 		'PipelineHigh',
+		'PipelineUltra'
 	]
 	@minimalPipelineLevel = 3
 

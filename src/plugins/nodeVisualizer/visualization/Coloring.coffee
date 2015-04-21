@@ -43,7 +43,7 @@ module.exports = class Coloring
 		})
 
 		@legoShadowMat = new THREE.MeshBasicMaterial({
-			color: 0x303030
+			color: 0x707070
 			transparent: true
 			opacity: 0.3
 		})

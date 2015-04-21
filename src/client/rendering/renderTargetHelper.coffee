@@ -1,5 +1,5 @@
 THREE = require 'three'
-PipelineTargetPart = require './shader/pipelineTargetPart'
+PipelineTargetPart = require './shader/PipelineTargetPart'
 ShaderGenerator = require './shader/ShaderGenerator'
 
 ###

@@ -78,18 +78,20 @@ class ShaderGenerator
 			precision highp float;
 			precision highp int;
 			varying vec2 vUv;
+			uniform float opacity;
 		'
 		shaderCode += variables
 		shaderCode += preMain
 		shaderCode += '
 			void main(){
 				vec4 col = vec4(0.0, 0.0, 0.0, 0.0);\n
+				float currentOpacity = opacity;
 				\n
 				+ ' + inMain + ' +
 				\n
+				col.a = currentOpacity;
 				gl_FragColor = col;
 			}
 		'
 		return shaderCode
-
-
+module.exports = ShaderGenerator

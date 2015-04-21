@@ -2,6 +2,7 @@ THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/fxaaPart'
+SsaoShaderPart = require './shader/ssaoPart'
 
 ###
 # @class Renderer
@@ -68,11 +69,13 @@ class Renderer
 			shaderParts = []
 			if @usePipelineFxaa
 				shaderParts.push new FxaaShaderPart()
+			if @usePipelineSsao
+				shaderParts.push new SsaoShaderPart()
 
 			additionalUniforms = {}
 			if @usePipelineSsao
 				# get a random texture for SSAO
-				randomTex = new THREE.Texture('img/randomTexture.png')
+				randomTex =THREE.ImageUtils.loadTexture('img/randomTexture.png')
 				randomTex.wrapS = THREE.RepeatWrapping
 				randomTex.wrapT = THREE.RepeatWrapping
 

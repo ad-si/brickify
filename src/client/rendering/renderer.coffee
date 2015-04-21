@@ -12,6 +12,7 @@ class Renderer
 		@threeRenderer = null
 		@init globalConfig
 		@pipelineEnabled = false
+		@useBigPipelineTargets = false
 
 	localRenderer: (timestamp) =>
 		# clear screen
@@ -34,8 +35,18 @@ class Renderer
 			@threeRenderer.clear()
 			@threeRenderer.setRenderTarget(null)
 
-			# let plugins render in our target			
-			@pluginHooks.onPaint @threeRenderer, @camera, @pipelineRenderTarget.renderTarget
+			# set clobal config
+			pipelineConfig = {
+				useBigTargets: @useBigPipelineTargets
+			}
+
+			# let plugins render in our target
+			@pluginHooks.onPaint(
+				@threeRenderer,
+				@camera,
+				@pipelineRenderTarget.renderTarget,
+				pipelineConfig
+			)
 
 			#render our target to the screen
 			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
@@ -50,15 +61,23 @@ class Renderer
 	_initializePipelineTarget: =>
 		if not @pipelineRenderTarget? or
 		not renderTargetHelper.renderTargetHasRightSize(
-			@pipelineRenderTarget.renderTarget, @threeRenderer, true
+			@pipelineRenderTarget.renderTarget, @threeRenderer, @useBigPipelineTargets
 		)
 			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
 				@threeRenderer,
 				null,
 				null,
 				1.0,
-				true
+				@useBigPipelineTargets
 			)
+
+	setFidelity: (fidelityLevel, availableLevels) =>
+		# Determine wheter to use bigger rendertargets (supersampling)
+		if @pipelineEnabled
+			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+				@useBigPipelineTargets = true
+			else
+				@useBigPipelineTargets = false
 
 	addToScene: (node) ->
 		@scene.add node

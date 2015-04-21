@@ -95,6 +95,9 @@ class FidelityControl
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)
+		@bundle.renderer.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
 
 		# Enable pipeline
 		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
@@ -104,6 +107,9 @@ class FidelityControl
 		# Decrease fidelity
 		@currentFidelityLevel--
 		@pluginHooks.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
+		@bundle.renderer.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)
 

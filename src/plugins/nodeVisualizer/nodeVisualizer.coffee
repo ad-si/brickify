@@ -45,14 +45,14 @@ class NodeVisualizer
 
 		return
 
-	onPaint: (@threeRenderer, camera, target) =>
+	onPaint: (@threeRenderer, camera, target, config) =>
 		threeRenderer = @threeRenderer
 
 		# recreate textures if either they havent been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
-			@brickSceneTarget.renderTarget, threeRenderer, @usePipelineBigTargets
+			@brickSceneTarget.renderTarget, threeRenderer, config.useBigTargets
 		))
 			# bricks
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
@@ -60,7 +60,7 @@ class NodeVisualizer
 				null,
 				null,
 				1.0,
-				@usePipelineBigTargets
+				config.useBigTargets
 			)
 
 			# object and brick shadow shader
@@ -71,7 +71,7 @@ class NodeVisualizer
 				[new ExpandBlackPart(2), new ColorMultPart()],
 				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
 				@objectOpacity
-	  			@usePipelineBigTargets
+	  			config.useBigTargets
 			)
 
 			# brick shadow target
@@ -80,7 +80,7 @@ class NodeVisualizer
 				null,
 				null,
 				@brickShadowOpacity,
-				@usePipelineBigTargets
+				config.useBigTargets
 			)
 
 			@renderTargetsInitialized = true
@@ -193,17 +193,6 @@ class NodeVisualizer
 			else
 				if @usePipelineFxaa
 					@usePipelineFxaa = false
-					@renderTargetsInitialized = false
-
-		# determine whether to use bigger render targets for improved visual quality
-		if @usePipeline
-			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-				if not @usePipelineBigTargets
-					@usePipelineBigTargets = true
-					@renderTargetsInitialized = false
-			else
-				if @usePipelineBigTargets
-					@usePipelineBigTargets = false
 					@renderTargetsInitialized = false
 
 	# called by newBrickator when an object's datastructure is modified

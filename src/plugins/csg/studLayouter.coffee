@@ -105,27 +105,27 @@ _addStudsOnTop = (boxGeometry, options, voxelsToBeGeometrized, grid) ->
 			_translateToPosition studMesh, grid.origin, grid.spacing, voxel
 			studBsp = new ThreeBSP studMesh
 			for direction, type of voxel.topStudType
-				if type is topStudTypes.smallCircle
+				if type is topStudTypes.smallCircle or type is topStudTypes.largeCircle
 					cutoutMesh = new THREE.Mesh studGeometry.rectangular, null
 					_translateToPosition(
-						cutoutMesh, grid.origin, grid.spacing, voxel, direction
-					)
+						cutoutMesh, grid.origin, grid.spacing, voxel, direction)
 					cutoutBsp = new ThreeBSP cutoutMesh
 					studBsp = studBsp.union cutoutBsp
+				if type is topStudTypes.smallCircle
 					smallCircleMesh = new THREE.Mesh studGeometry.smallCircle, null
 					_translateToPosition(
-						smallCircleMesh, grid.origin, grid.spacing, voxel, direction
-					)
+						smallCircleMesh, grid.origin, grid.spacing, voxel, direction)
 					smallCircleBsp = new ThreeBSP smallCircleMesh
 					studBsp = studBsp.subtract smallCircleBsp
 
 				else if type is topStudTypes.largeCircle
-					studMesh = new THREE.Mesh studGeometry.largeCircle, null
+					largeCircleGeometry = _duplicateLargeCircle(
+						studGeometry.largeCircle, grid.spacing, direction)
+					largeCircleMesh = new THREE.Mesh largeCircleGeometry, null
 					_translateToPosition(
-						studMesh, grid.origin, grid.spacing, voxel, direction
-					)
-					largeCircleBsp = new ThreeBSP studMesh
-					studBsp = studBsp.union largeCircleBsp
+						largeCircleMesh, grid.origin, grid.spacing, voxel, direction)
+					largeCircleBsp = new ThreeBSP largeCircleMesh
+					studBsp = studBsp.subtract largeCircleBsp
 
 			unionBsp = unionBsp.union studBsp
 
@@ -144,6 +144,49 @@ _translateToPosition = (mesh, gridOrigin, gridSpacing, voxel, direction) ->
 	mesh.translateX gridOrigin.x + gridSpacing.x * voxel.x + gridSpacing.x * modX
 	mesh.translateY gridOrigin.y + gridSpacing.y * voxel.y + gridSpacing.y * modY
 	mesh.translateZ gridOrigin.z + gridSpacing.z * voxel.z
+
+_duplicateLargeCircle = (geometry, gridSpacing, direction) ->
+	geo1 = geometry.clone()
+	geo2 = geometry.clone()
+
+	translationX1 = 0
+	translationY1 = 0
+
+	translationX2 = 0
+	translationY2 = 0
+
+	if direction is 'xp'
+		translationX1 = 0
+		translationY1 = 0.5
+		translationX2 = 0
+		translationY2 = -0.5
+	else if direction is 'xm'
+		translationX1 = 0
+		translationY1 = 0.5
+		translationX2 = 0
+		translationY2 = -0.5
+	else if direction is 'yp'
+		translationX1 = 0.5
+		translationY1 = 0
+		translationX2 = -0.5
+		translationY2 = 0
+	else if direction is 'ym'
+		translationX1 = 0.5
+		translationY1 = 0
+		translationX2 = -0.5
+		translationY2 = 0
+
+	translation1 = new THREE.Matrix4().makeTranslation(
+		gridSpacing.x * translationX1, gridSpacing.y * translationY1, 0)
+	translation2 = new THREE.Matrix4().makeTranslation(
+		gridSpacing.x * translationX2, gridSpacing.y * translationY2, 0)
+
+	geo1.applyMatrix translation1
+	geo2.applyMatrix translation2
+
+	geo1.merge geo2
+
+	return geo1
 
 ###
 # creates Geometry needed for CSG operations
@@ -169,16 +212,22 @@ _createTopStudGeometry = (gridSpacing, holeSize) ->
 	rectGeometry = _getRectangularStudGeometry holeSize.radius, holeSize.height
 	rectGeometry.applyMatrix studTranslationTop
 
+	rotation = new THREE.Matrix4().makeRotationX Math.PI / 2
+
 	smallCircleGeometry = _getSmallCircleStudGeometry(
 		(gridSpacing.x - 2 * holeSize.radius) / 2, holeSize.height)
-	rotation = new THREE.Matrix4().makeRotationX Math.PI / 2
 	smallCircleGeometry.applyMatrix rotation
 	smallCircleGeometry.applyMatrix studTranslationTop
+
+	largeCircleGeometry = _getLargeCircleStudGeometry(
+		holeSize.radius, holeSize.height)
+	largeCircleGeometry.applyMatrix rotation
+	largeCircleGeometry.applyMatrix studTranslationTop
 
 	return {
 		rectangular: rectGeometry
 		smallCircle: smallCircleGeometry
-		largeCircle: rectGeometry # TODO
+		largeCircle: largeCircleGeometry
 	}
 
 _getCylinderStudGeometry = (radius, height) ->
@@ -189,3 +238,6 @@ _getRectangularStudGeometry = (radius, height) ->
 
 _getSmallCircleStudGeometry = (circleRadius, height) ->
 	new THREE.CylinderGeometry circleRadius, circleRadius, height, 16
+
+_getLargeCircleStudGeometry = (circleRadius, height) ->
+	new THREE.CylinderGeometry circleRadius, circleRadius, height, 20

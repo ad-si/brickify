@@ -1,4 +1,4 @@
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class PipelineTargetPart extends ShaderPart
 	getVertexVariables: ->
@@ -9,7 +9,7 @@ class PipelineTargetPart extends ShaderPart
 
 	getVertexInMain: ->
 		# make this a screen aligned quad with z=0.5
-		return'
+		return '
 			pos.x = pos.x;
 			pos.y = pos.y;
 			pos.z = 0.5;
@@ -36,4 +36,5 @@ class PipelineTargetPart extends ShaderPart
 			}
 			gl_FragDepthEXT = depth;
 		'
+
 module.exports = PipelineTargetPart

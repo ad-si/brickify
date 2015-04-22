@@ -1,7 +1,7 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
-FxaaShaderPart = require './shader/fxaaPart'
+FxaaShaderPart = require './shader/FxaaPart'
 SsaoShaderPart = require './shader/ssaoPart'
 SsaoBlurPart = require './shader/ssaoBlurPart'
 ###

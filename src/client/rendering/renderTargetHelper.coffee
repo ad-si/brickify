@@ -1,6 +1,6 @@
 THREE = require 'three'
-PipelineTargetPart = require './shader/pipelineTargetPart'
-ShaderGenerator = require './shader/shaderGenerator'
+PipelineTargetPart = require './shader/PipelineTargetPart'
+ShaderGenerator = require './shader/ShaderGenerator'
 
 ###
 # @module renderTargetHelper

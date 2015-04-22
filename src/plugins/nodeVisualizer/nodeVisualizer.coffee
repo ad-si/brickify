@@ -5,8 +5,8 @@ interactionHelper = require '../../client/interactionHelper'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
 Coloring = require './visualization/Coloring'
-ColorMultPart = require '../../client/rendering/shader/colorMultPart'
-ExpandBlackPart = require '../../client/rendering/shader/expandBlackPart'
+ColorMultPart = require '../../client/rendering/shader/ColorMultPart'
+ExpandBlackPart = require '../../client/rendering/shader/ExpandBlackPart'
 
 ###
 # @class NodeVisualizer

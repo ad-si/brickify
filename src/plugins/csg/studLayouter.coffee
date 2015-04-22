@@ -231,13 +231,13 @@ _createTopStudGeometry = (gridSpacing, holeSize) ->
 	}
 
 _getCylinderStudGeometry = (radius, height) ->
-	new THREE.CylinderGeometry radius, radius, height, 16
+	new THREE.CylinderGeometry radius, radius, height, 14
 
 _getRectangularStudGeometry = (radius, height) ->
 	new THREE.BoxGeometry 2 * radius, 2 * radius, height
 
 _getSmallCircleStudGeometry = (circleRadius, height) ->
-	new THREE.CylinderGeometry circleRadius, circleRadius, height, 16
+	new THREE.CylinderGeometry circleRadius, circleRadius, height, 8
 
 _getLargeCircleStudGeometry = (circleRadius, height) ->
-	new THREE.CylinderGeometry circleRadius, circleRadius, height, 20
+	new THREE.CylinderGeometry circleRadius, circleRadius, height, 14

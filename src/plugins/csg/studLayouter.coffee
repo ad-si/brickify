@@ -56,20 +56,24 @@ _getTopStudTypeForVoxel = (voxel, layer) ->
 
 	if layer[x + 1]?[y]
 		studType.xp = topStudTypes.smallCircle
-		#if layer[x + 1][y + 1] or layer[x + 1]?[y - 1]
-		#	studType.xp = topStudTypes.largeCircle
+		if (layer[x + 1][y + 1] and layer[x][y + 1]) or
+		(layer[x + 1][y - 1] and layer[x][y - 1])
+			studType.xp = topStudTypes.largeCircle
 	if layer[x - 1]?[y]
 		studType.xm = topStudTypes.smallCircle
-		#if layer[x - 1]?[y + 1] or layer[x + 1]?[y - 1]
-		#	studType.xm = topStudTypes.largeCircle
+		if (layer[x - 1][y + 1] and layer[x][y + 1]) or
+		(layer[x - 1][y - 1] and layer[x][y - 1])
+			studType.xm = topStudTypes.largeCircle
 	if layer[x][y + 1]
 		studType.yp = topStudTypes.smallCircle
-		#if layer[x + 1]?[y + 1] or layer[x - 1]?[y + 1]
-		#	studType.yp = topStudTypes.largeCircle
+		if (layer[x + 1]?[y + 1] and layer[x + 1]?[y]) or
+		(layer[x - 1]?[y] and layer[x - 1]?[y + 1])
+			studType.yp = topStudTypes.largeCircle
 	if layer[x][y - 1]
 		studType.ym = topStudTypes.smallCircle
-		#if layer[x + 1]?[y - 1] or layer[x - 1]?[y - 1]
-		#	studType.ym = topStudTypes.largeCircle
+		if (layer[x + 1]?[y - 1] and layer[x + 1]?[y]) or
+		(layer[x - 1]?[y] and layer[x - 1]?[y - 1])
+			studType.ym = topStudTypes.largeCircle
 
 	return studType
 

@@ -3,7 +3,7 @@ OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/fxaaPart'
 SsaoShaderPart = require './shader/ssaoPart'
-
+SsaoBlurPart = require './shader/ssaoBlurPart'
 ###
 # @class Renderer
 ###
@@ -54,6 +54,19 @@ class Renderer
 			#render our target to the screen
 			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
 
+			if @usePipelineSsao
+				# take data from our target and render SSAO
+				# data into gauss target
+				@threeRenderer.render(
+					@ssaoTarget.quadScene, @camera, @ssaoBlurTarget.renderTarget, true
+				)
+
+				# take the ssao values and render a gaussed version on the screen
+				@threeRenderer.render(
+					@ssaoBlurTarget.quadScene, @camera
+				)
+
+
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
@@ -66,31 +79,42 @@ class Renderer
 		not renderTargetHelper.renderTargetHasRightSize(
 			@pipelineRenderTarget.renderTarget, @threeRenderer, @useBigPipelineTargets
 		)
+			# Create the render target that renders everything antialiased to the screen
 			shaderParts = []
 			if @usePipelineFxaa
 				shaderParts.push new FxaaShaderPart()
-			if @usePipelineSsao
-				shaderParts.push new SsaoShaderPart()
 
-			additionalUniforms = {}
+			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
+				@threeRenderer,
+				shaderParts,
+				{},
+				1.0,
+				@useBigPipelineTargets
+			)
+
 			if @usePipelineSsao
 				# get a random texture for SSAO
 				randomTex = THREE.ImageUtils.loadTexture('img/randomTexture.png')
 				randomTex.wrapS = THREE.RepeatWrapping
 				randomTex.wrapT = THREE.RepeatWrapping
 
-				additionalUniforms.tRandom = {
-					type: 't'
-					value: randomTex
-				}
+				# clone the pipeline Rendertarget:
+				# use this render target to create SSAO values out of scene
+				@ssaoTarget = renderTargetHelper.cloneRenderTarget(
+					@pipelineRenderTarget,
+					[new SsaoShaderPart()],
+					{tRandom: {	type: 't', value: randomTex}},
+					1.0
+				)
 
-			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
-				@threeRenderer,
-				shaderParts,
-				additionalUniforms,
-				1.0,
-				@useBigPipelineTargets
-			)
+				# create a rendertarget that applies a gauss filter on everything
+				@ssaoBlurTarget = renderTargetHelper.createRenderTarget(
+					@threeRenderer,
+					[new SsaoBlurPart()],
+					{},
+					1.0,
+					@useBigPipelineTargets
+				)
 
 	setFidelity: (fidelityLevel, availableLevels) =>
 		if @pipelineEnabled

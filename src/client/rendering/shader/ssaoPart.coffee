@@ -95,8 +95,8 @@ class SsaoPart extends ShaderPart
 			vec3 normal = ssaoNormalFromDepth(ssaoDepth, vUv);
 			normal = normal * 0.5 + 0.5;
 			/*col = vec4(normal.rgb, 1.0);*/
-			/*col = vec4( ssao, ssao, ssao, 1.0 );*/
-			col = col * 0.3 + (col * ssao * 0.7);
+			col = vec4( ssao, ssao, ssao, 1.0 );
+			/*col = col * 0.3 + (col * ssao * 0.7);*/
 		'
 
 module.exports = SsaoPart

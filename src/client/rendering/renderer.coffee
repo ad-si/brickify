@@ -75,7 +75,7 @@ class Renderer
 			additionalUniforms = {}
 			if @usePipelineSsao
 				# get a random texture for SSAO
-				randomTex =THREE.ImageUtils.loadTexture('img/randomTexture.png')
+				randomTex = THREE.ImageUtils.loadTexture('img/randomTexture.png')
 				randomTex.wrapS = THREE.RepeatWrapping
 				randomTex.wrapT = THREE.RepeatWrapping
 

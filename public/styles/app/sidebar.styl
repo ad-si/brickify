@@ -32,7 +32,7 @@
 		:first-child
 			padding-right 2px
 
-	div.disabled, h4.disabled
+	div.disabled, h4.disabled, span.disabled
 		opacity 0.5
 
 	#loadGroup
@@ -41,35 +41,41 @@
 			margin-left 20px
 			top -5px
 
-	#brushContainer
-		div
-			font-size 0.90em
-		.bigBrush
-			border-top-width 1px
-			border-top-style solid
-			$spacing = 10px
-			margin $spacing $padding-base-horizontal*-1 $padding-base-vertical*-1
-			padding $spacing $padding-base-horizontal $padding-base-vertical
-		:first-child .bigBrush
-			border-bottom-left-radius $border-radius-base
-		:last-child .bigBrush
-			border-bottom-right-radius $border-radius-base
+	#editGroup
+		#brushContainer
+			div
+				font-size 0.90em
+			.bigBrush
+				border-top-width 1px
+				border-top-style solid
+				$spacing = 10px
+				margin $spacing $padding-base-horizontal*-1 $padding-base-vertical*-1
+				padding $spacing $padding-base-horizontal $padding-base-vertical
+			:first-child .bigBrush
+				border-bottom-left-radius $border-radius-base
+			:last-child .bigBrush
+				border-bottom-right-radius $border-radius-base
 
-	#buildContainer
-		display block
-
-		#buildSlider
-			margin-top 25px
-
-		#buildDecrement
-			float left
-
-		#buildIncrement
-			float right
-
-		#textWrapper
+		.estimate
+			font-size 1.5em
 			text-align center
-			margin-top 7px
+
+	#previewGroup
+		#buildContainer
+			display block
+
+			#buildSlider
+				margin-top 25px
+
+			#buildDecrement
+				float left
+
+			#buildIncrement
+				float right
+
+			#textWrapper
+				text-align center
+				margin-top 7px
 
 	#exportGroup
 		margin-bottom 2em

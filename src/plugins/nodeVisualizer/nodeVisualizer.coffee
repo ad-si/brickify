@@ -11,15 +11,8 @@ class NodeVisualizer
 
 	init: (@bundle) =>
 		if @bundle.globalConfig.buildUi
-			estimates = $('<div id="estimates" class="hidden-xs">
-												<span class="estimate" id="brickCount">0</span>
-												<span>bricks</span>
-												<span class="estimate" id="timeEstimate">0</span>
-												<span>min</span>
-											</div>')
-			$('body').append estimates
-			@brickCounter = estimates.find '#brickCount'
-			@timeEstimate = estimates.find '#timeEstimate'
+			@brickCounter = $ '#brickCount'
+			@timeEstimate = $ '#timeEstimate'
 
 	init3d: (@threeJsRootNode) => return
 

@@ -67,6 +67,27 @@ module.exports.createRenderTarget = (
 		blendingMaterial: screenAlignedQuad.material
 	}
 
+# Clones the originalTarget but creates a new custom blendingMat shader
+module.exports.cloneRenderTarget = (
+	originalTarget,
+	shaderParts = [], additionalUniforms = {}, opacity = 1.0,
+	) ->
+
+	#create scene to render texture
+	quadScene = new THREE.Scene()
+	screenAlignedQuad = generateQuad(
+		originalTarget.renderTarget, originalTarget.depthTexture,
+		shaderParts, additionalUniforms, opacity
+	)
+	quadScene.add screenAlignedQuad
+
+	return {
+		depthTexture: originalTarget.depthTexture
+		renderTarget: originalTarget.renderTarget
+		quadScene: quadScene
+		blendingMaterial: screenAlignedQuad.material
+	}
+
 # Generates an THREE.Mesh that will be displayed as a screen aligned quad
 # and will draw the supplied rttTexture while setting the depth value to
 # the values specified in rttDepthTexture

@@ -132,17 +132,17 @@ _addStudsOnTop = (boxGeometry, options, voxelsToBeGeometrized, grid) ->
 	return unionBsp
 
 _translateToPosition = (mesh, gridOrigin, gridSpacing, voxel, direction) ->
-	modifierX = 0
-	modifierY = 0
+	modX = 0
+	modY = 0
 
 	switch direction
-		when 'xp' then modifierX = 0.5
-		when 'xm' then modifierX = -0.5
-		when 'yp' then modifierY = 0.5
-		when 'ym' then modifierY = -0.5
+		when 'xp' then modX = 0.5
+		when 'xm' then modX = -0.5
+		when 'yp' then modY = 0.5
+		when 'ym' then modY = -0.5
 
-	mesh.translateX gridOrigin.x + gridSpacing.x * voxel.x + gridSpacing.x * modifierX
-	mesh.translateY gridOrigin.y + gridSpacing.y * voxel.y + gridSpacing.y * modifierY
+	mesh.translateX gridOrigin.x + gridSpacing.x * voxel.x + gridSpacing.x * modX
+	mesh.translateY gridOrigin.y + gridSpacing.y * voxel.y + gridSpacing.y * modY
 	mesh.translateZ gridOrigin.z + gridSpacing.z * voxel.z
 
 ###
@@ -153,7 +153,7 @@ _createBottomStudGeometry = (gridSpacing, studSize) ->
 	dzBottom =  -(gridSpacing.z / 2) + (studSize.height / 2)
 	studTranslationBottom = new THREE.Matrix4().makeTranslation 0, 0, dzBottom
 
-	studGeometryBottom = _getCylinderStudGeometry studSize.radius, studSize.height, 20
+	studGeometryBottom = _getCylinderStudGeometry studSize.radius, studSize.height
 
 	studGeometryBottom.applyMatrix studRotation
 	studGeometryBottom.applyMatrix studTranslationBottom

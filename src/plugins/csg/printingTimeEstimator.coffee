@@ -47,7 +47,7 @@ getSurface = (threeGeometry) ->
 ###
 getHeight = (threeGeometry) ->
 	vertices = threeGeometry.vertices
-	return if vertices.length is 0
+	return 0 if vertices.length is 0
 
 	minZ = vertices[0].z
 	maxZ = vertices[0].z
@@ -69,4 +69,6 @@ module.exports.getPrintingTimeEstimate = (geometry) ->
 	height = getHeight geometry
 	surface = getSurface geometry
 	volume = getVolume geometry
+
+	return 0 if volume is 0
 	return 2 + 2 * height + 0.3 * surface + 2.5 * volume

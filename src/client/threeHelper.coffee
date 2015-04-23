@@ -21,7 +21,9 @@ getBoundingSphereWorld = (threeNode) ->
 		radius: geometry.boundingSphere.radius
 		center: geometry.boundingSphere.center
 
+	threeNode.parent.updateMatrixWorld()
 	result.center.applyProjection threeNode.matrixWorld
+	threeNode.updateMatrix()
 
 	return result
 

@@ -53,15 +53,6 @@ class NodeVisualizer
 
 	_zoomToNode: (threeNode) =>
 		boundingSphere = threeHelper.getBoundingSphereWorld threeNode
-
-		#console.warn JSON.stringify threeNode.matrixWorld
-
-		#threeNode.updateMatrix()
-		threeNode.parent.updateMatrixWorld()
-
-		#console.warn JSON.stringify threeNode.matrixWorld
-
-		#console.log(boundingSphere)
 		@bundle.renderer.zoomToBoundingSphere boundingSphere
 
 

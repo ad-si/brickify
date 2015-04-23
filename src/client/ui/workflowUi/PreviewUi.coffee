@@ -32,6 +32,7 @@ class PreviewUi
 
 	toggleStabilityView: =>
 		@stabilityViewEnabled = !@stabilityViewEnabled
+		@_quitAssemblyView()
 
 		if @stabilityViewEnabled
 			@workflowUi.enableOnly @
@@ -61,6 +62,7 @@ class PreviewUi
 
 	_toggleAssemblyView: =>
 		@assemblyViewEnabled = !@assemblyViewEnabled
+		@_quitStabilityView()
 
 		if @assemblyViewEnabled
 			@workflowUi.enableOnly @

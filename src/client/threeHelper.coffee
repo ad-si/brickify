@@ -7,21 +7,20 @@ applyNodeTransforms = (node, threeNode) ->
 	_set threeNode.rotation, node.transform.rotation
 	_set threeNode.scale, node.transform.scale
 
+	threeNode.updateMatrix()
+
 getTransformMatrix = (node) ->
 	threeNode = new THREE.Object3D()
 	applyNodeTransforms node, threeNode
-	threeNode.updateMatrix()
 	return threeNode.matrix
 
-getBoundingSphere = (threeNode) ->
+getBoundingSphereWorld = (threeNode) ->
 	geometry = threeNode.geometry
 	geometry.computeBoundingSphere()
 	result =
 		radius: geometry.boundingSphere.radius
 		center: geometry.boundingSphere.center
 
-	threeNode.updateMatrix()
-	threeNode.parent?.updateMatrixWorld()
 	result.center.applyProjection threeNode.matrixWorld
 
 	return result
@@ -34,5 +33,5 @@ module.exports = {
 		threeParentNode.getObjectByProperty 'brickolageNode', node.id, true
 	applyNodeTransforms: applyNodeTransforms
 	getTransformMatrix: getTransformMatrix
-	getBoundingSphere: getBoundingSphere
+	getBoundingSphereWorld: getBoundingSphereWorld
 }

@@ -34,10 +34,8 @@ class Renderer
 
 		@threeRenderer.render @scene, @camera
 
-	zoomToBoundingSphere: (radiusAndPosition) ->
+	zoomToBoundingSphere: ({radius, center}) ->
 		# zooms out/in the camera so that the object is fully visible
-		radius = radiusAndPosition.radius
-		center = radiusAndPosition.center
 		center = new THREE.Vector3(center.x, center.y, center.z)
 
 		alpha = @camera.fov

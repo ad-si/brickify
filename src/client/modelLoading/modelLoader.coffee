@@ -45,19 +45,19 @@ class ModelLoader
 			log.error "Could not load model from hash #{hash}"
 			log.error error
 		.then (model) =>
-			return @addModelToScene model, hash
-
-	addModelToScene: (model, hash) ->
-		return model
-		.getModificationInvariantTranslation()
-		.then (translationMatrix) ->
-			return new Node {
-				name: model.model.fileName # Todo: Use promises to get fileName
-				modelHash: hash
-				transform:
-					position: translationMatrix
-			}
+			model
+			.buildFacesFromFaceVertexMesh()
+			.getModificationInvariantTranslation()
+			.then (translationMatrix) =>
+				return new Node {
+					name: model.model.fileName # Todo: Use promises to get fileName
+					modelHash: hash
+					transform:
+						position: translationMatrix
+				}
 		.then (node) =>
 			return @bundle.sceneManager.add node
+		.catch (error) =>
+			log.error error
 
 module.exports = ModelLoader

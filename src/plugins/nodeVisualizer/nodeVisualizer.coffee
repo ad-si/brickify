@@ -2,6 +2,8 @@ threeHelper = require '../../client/threeHelper'
 BrickVisualization = require './visualization/brickVisualization'
 ModelVisualization = require './modelVisualization'
 interactionHelper = require '../../client/interactionHelper'
+log = require 'loglevel'
+
 
 ###
 # @class NodeVisualizer
@@ -34,10 +36,13 @@ class NodeVisualizer
 		# create visible node and zoom to it
 		@_getCachedData(node)
 		.then (cachedData) =>
-			cachedData.modelVisualization
+			return cachedData.modelVisualization
 				.createVisualization()
-				.then (solid) =>
-					@_zoomToNode solid if solid?
+				.getSolid()
+		.then (solid) =>
+			@_zoomToNode solid if solid?
+		.catch (error) =>
+			log.error error
 
 	onNodeRemove: (node) =>
 		@threeJsRootNode.remove threeHelper.find node, @threeJsRootNode
@@ -47,8 +52,18 @@ class NodeVisualizer
 	onNodeDeselect: => @selectedNode = null
 
 	_zoomToNode: (threeNode) =>
-		boundingSphere = threeHelper.getBoundingSphere threeNode
+		boundingSphere = threeHelper.getBoundingSphereWorld threeNode
+
+		#console.warn JSON.stringify threeNode.matrixWorld
+
+		#threeNode.updateMatrix()
+		threeNode.parent.updateMatrixWorld()
+
+		#console.warn JSON.stringify threeNode.matrixWorld
+
+		#console.log(boundingSphere)
 		@bundle.renderer.zoomToBoundingSphere boundingSphere
+
 
 	# initialize visualization with data from newBrickator
 	# change solid renderer appearance
@@ -57,6 +72,7 @@ class NodeVisualizer
 		visualizationData.brickVisualization.initialize newBrickatorData.grid
 		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
+
 
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
@@ -70,6 +86,7 @@ class NodeVisualizer
 				selectedNode.storePluginData 'brickVisualizer', data, true
 				return data
 
+
 	# creates visualization data structures
 	createNodeDataStructure: (node) =>
 		threeNode = new THREE.Object3D()
@@ -82,7 +99,9 @@ class NodeVisualizer
 			threeNode: threeNode
 			brickVisualization: new BrickVisualization @bundle, threeNode
 			modelVisualization: new ModelVisualization(
-				@bundle.globalConfig, node, threeNode
+				@bundle.globalConfig,
+				node,
+				threeNode
 			)
 		}
 
@@ -118,13 +137,17 @@ class NodeVisualizer
 		cachedData.brickVisualization.showVoxels()
 		cachedData.brickVisualization.updateVoxelVisualization()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
+
 		cachedData.modelVisualization.setShadowVisibility false
+
 
 	_applyPrintBrushMode: (cachedData) =>
 		cachedData.brickVisualization.showVoxels()
 		cachedData.brickVisualization.updateVoxelVisualization()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
+
 		cachedData.modelVisualization.setShadowVisibility true
+
 
 	_applyStabilityView: (cachedData) =>
 		cachedData.stabilityViewEnabled  = true
@@ -144,6 +167,7 @@ class NodeVisualizer
 			cachedData.modelVisualization.setNodeVisibility true
 			cachedData.stabilityViewEnabled = false
 
+
 	_applyBuildMode: (cachedData) =>
 		# show bricks and csg
 		cachedData.brickVisualization.showBricks()
@@ -152,11 +176,15 @@ class NodeVisualizer
 		@_showCsg cachedData
 
 		cachedData.modelVisualization.setNodeVisibility false
+
 		return cachedData.numZLayers
+
 
 	_resetBuildMode: (cachedData) =>
 		cachedData.brickVisualization.hideCsg()
+
 		cachedData.modelVisualization.setNodeVisibility true
+
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
@@ -168,8 +196,10 @@ class NodeVisualizer
 		@csg ?= @bundle.getPlugin 'csg'
 		return Promise.resolve() if not @csg?
 
-		return @csg.getCSG(cachedData.node, {addStuds: true})
-				.then (csg) -> cachedData.brickVisualization.showCsg csg
+		return @csg
+				.getCSG(cachedData.node, {addStuds: true})
+				.then (csg) ->
+					cachedData.brickVisualization.showCsg csg
 
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>

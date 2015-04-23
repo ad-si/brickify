@@ -4,6 +4,7 @@ clone = require 'clone'
 $ = require 'jquery'
 window.jQuery = window.$ = $
 bootstrap = require 'bootstrap'
+log = require 'loglevel'
 
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
@@ -29,25 +30,13 @@ globalConfig.createVisibleWireframe = false
 
 config0 = clone globalConfig
 config0.renderAreaId = 'renderArea1'
-# configure left bundle one to only show model
-config0.plugins.newBrickator = false
+config0.plugins.newBrickator = false # Don't show bricks in left canvas
 
 config1 = clone globalConfig
 config1.renderAreaId = 'renderArea2'
+config1.showModel = false # Don't show 3d-model in right canvas
 
-
-loadAndConvert = (hash, bundles) ->
-	bundles[0].modelLoader
-	.loadByHash hash
-	.then ->
-		$('#' + config0.renderAreaId).css 'backgroundImage', 'none'
-
-	bundles[1].modelLoader
-	.loadByHash hash
-	.then ->
-		$('#' + config1.renderAreaId).css 'backgroundImage', 'none'
-
-	$('.applink').prop 'href', "app#initialModel=#{hash}"
+defaultModelHash = '1c2395a3145ad77aee7479020b461ddf'
 
 
 Promise
@@ -56,14 +45,35 @@ Promise
 	new Bundle(config1).init()
 ]
 .then (bundles) ->
+
+	Promise
+	.all [
+		bundles[0]
+		.modelLoader
+		.loadByHash(defaultModelHash)
+		.then(->
+			$('#' + config0.renderAreaId).css 'backgroundImage', 'none'
+			return bundles[0]
+		)
+		,
+		bundles[1]
+		.modelLoader
+		.loadByHash(defaultModelHash)
+		.then(->
+			$('#' + config1.renderAreaId).css 'backgroundImage', 'none'
+			return bundles[1]
+		)
+	]
+.then (bundles) ->
+
+	#console.log(bundlePromises)
+
+	$('.applink').prop 'href', "app#initialModel=#{defaultModelHash}"
+
 	bundles[1].renderer.setupControls(
-	 	config1,
-	 	bundles[0].renderer.getControls()
+	    config1,
+	    bundles[0].renderer.getControls()
 	)
-
-	defaultModelHash = '1c2395a3145ad77aee7479020b461ddf'
-
-	loadAndConvert defaultModelHash, bundles
 
 	fileDropper.init (event) ->
 		readFile event, bundles
@@ -74,6 +84,10 @@ Promise
 		readFile event, bundles
 
 	$('.dropper').html 'Drop an stl file'
+
+.catch (error) ->
+	console.error error
+
 
 # set not available message
 $('#downloadButton').click ->

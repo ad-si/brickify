@@ -35,9 +35,7 @@ class VoxelUnion
 		if options.addStuds
 			d = new Date()
 			bspWithStuds = studLayouter.addStuds(
-				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
-			if options.profile
-				log.debug "Geometrizer: stud geometry took #{new Date() - d}ms"
+				boxGeometryBsp, options, voxelsToBeGeometrized, @grid, options.profile)
 			return bspWithStuds
 
 		return boxGeometryBsp

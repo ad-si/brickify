@@ -1,3 +1,5 @@
+log = require 'loglevel'
+
 ###
 # @module studLayouter
 ###
@@ -13,12 +15,17 @@ bottomStudTypes = {
 }
 
 module.exports.addStuds = (
-	boxGeometryBsp, options, voxelsToBeGeometrized, grid) ->
+	boxGeometryBsp, options, voxelsToBeGeometrized, grid, profile) ->
 	_layoutStuds voxelsToBeGeometrized
+	d = new Date()
 	unionBsp = _subtractStudsFromBelow(
 		boxGeometryBsp, options, voxelsToBeGeometrized, grid)
+	log.debug "Stud layouter: studs from below took #{new Date() - d}ms" if profile
+	d2 = new Date()
 	unionBsp = _addStudsOnTop(
 		unionBsp, options, voxelsToBeGeometrized, grid)
+	log.debug "Stud layouter: studs on top took #{new Date() - d2}ms" if profile
+	log.debug "Stud layouter: stud geometry took #{new Date() - d}ms" if profile
 
 	return unionBsp
 

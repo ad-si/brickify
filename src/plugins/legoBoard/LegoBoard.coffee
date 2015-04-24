@@ -76,7 +76,7 @@ module.exports = class LegoBoard
 		cam = @bundle.renderer.camera
 
 		# it should be z, but due to orbitcontrols the scene is rotated
-		if cam.position.y < 0
+		if cam.position.z < 0
 			@threejsNode.children[0].material = @baseplateTransparentMaterial
 			@threejsNode.children[1].visible = false
 		else

@@ -76,12 +76,16 @@ Promise
 	)
 
 	fileDropper.init (event) ->
-		readFiles event, bundles
+		event.preventDefault()
+		event.stopPropagation()
+		readFiles event.dataTransfer.files, bundles
 
 	document
 	.getElementById 'fileInput'
 	.addEventListener 'change', (event) ->
-		readFiles event, bundles
+		event.preventDefault()
+		event.stopPropagation()
+		readFiles event.target.files, bundles
 
 	$('.dropper').html 'Drop an stl file'
 

@@ -48,6 +48,11 @@ module.exports = class Ui
 					hotkey: 's'
 					callback: @_toggleStabilityView
 				}
+				{
+					description: 'Toggle LEGO assembly view'
+					hotkey: 'l'
+					callback: @_toggleAssemblyView
+				}
 			]
 		}
 		@hotkeys.addEvents gridHotkeys
@@ -58,3 +63,6 @@ module.exports = class Ui
 
 	_toggleStabilityView: =>
 		@workflowUi.toggleStabilityView()
+
+	_toggleAssemblyView: =>
+		@workflowUi.toggleAssemblyView()

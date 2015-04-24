@@ -9,7 +9,7 @@ log = require 'loglevel'
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
 fileDropper = require './modelLoading/fileDropper'
-readFile = require './modelLoading/readFile'
+readFiles = require './modelLoading/readFiles'
 
 
 # Set renderer size to fit to 3 bootstrap columns
@@ -76,12 +76,12 @@ Promise
 	)
 
 	fileDropper.init (event) ->
-		readFile event, bundles
+		readFiles event, bundles
 
 	document
 	.getElementById 'fileInput'
 	.addEventListener 'change', (event) ->
-		readFile event, bundles
+		readFiles event, bundles
 
 	$('.dropper').html 'Drop an stl file'
 

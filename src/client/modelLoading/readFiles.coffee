@@ -5,14 +5,10 @@ meshlib = require 'meshlib'
 modelCache = require './modelCache'
 
 
-module.exports = (event, bundles, callback) ->
-	event.preventDefault()
-	event.stopPropagation()
+module.exports = (files, bundles, callback) ->
 
-	if event instanceof MouseEvent
-		files = event.dataTransfer.files
-	else
-		files = event.target.files
+	if not Array.isArray bundles
+		bundles = [bundles]
 
 	progress = document.querySelector 'progress'
 	progress.setAttribute 'value', 0
@@ -44,10 +40,10 @@ module.exports = (event, bundles, callback) ->
 			return modelCache
 			.store model
 		.then (hash) ->
-			Promise.all [
-				bundles[0].modelLoader.loadByHash hash
-				bundles[1].modelLoader.loadByHash hash
-			]
+			Promise.all(
+				bundles.map (bundle) ->
+					return bundle.modelLoader.loadByHash hash
+			)
 		.then callback
 
 	fileStream

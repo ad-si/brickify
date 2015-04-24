@@ -4,7 +4,7 @@ stlParser = require 'stl-parser'
 
 fileDropper = require '../../modelLoading/fileDropper'
 modelCache = require '../../modelLoading/modelCache'
-readFile = require '../../modelLoading/readFile'
+readFiles = require '../../modelLoading/readFiles'
 
 
 class LoadUi
@@ -17,19 +17,31 @@ class LoadUi
 
 	_initFileLoadHandler: =>
 		fileDropper.init (event) =>
+
+			event.preventDefault()
+			event.stopPropagation()
+
+			files = event.dataTransfer.files
+
 			@_checkReplaceModel()
 			.then (loadConfirmed) =>
 				return unless loadConfirmed
-				readFile event, [@workflowUi.bundle],
+				readFiles files, @workflowUi.bundle,
 					@workflowUi.hideMenuIfPossible
 
 		document
 		.getElementById 'fileInput'
 		.addEventListener 'change', (event) =>
+
+			event.preventDefault()
+			event.stopPropagation()
+
+			files = event.target.files
+
 			@_checkReplaceModel()
 			.then (loadConfirmed) =>
 				return unless loadConfirmed
-				readFile event, [@workflowUi.bundle],
+				readFiles files, @workflowUi.bundle,
 					@workflowUi.hideMenuIfPossible
 
 
@@ -37,8 +49,15 @@ class LoadUi
 		question = 'You already have a model in your scene.
 				 Loading the new model will replace the existing model!'
 
-		@workflowUi.bundle.sceneManager.scene.then (scene) ->
-			return true if scene.nodes.length is 0
-			return new Promise (resolve) -> bootbox.confirm question, resolve
+		return @workflowUi
+		.bundle
+		.sceneManager
+		.scene
+		.then (scene) ->
+			if scene.nodes.length is 0
+				return Promise.resolve true
+			else
+				return new Promise (resolve) ->
+					bootbox.confirm question, resolve
 
 module.exports = LoadUi

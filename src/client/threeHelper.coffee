@@ -23,7 +23,6 @@ getBoundingSphereWorld = (threeNode) ->
 
 	threeNode.parent.updateMatrixWorld()
 	result.center.applyProjection threeNode.matrixWorld
-	threeNode.updateMatrix()
 
 	return result
 

@@ -1,5 +1,6 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
+printingTimeEstimator = require './printingTimeEstimator'
 
 class CSG
 	###
@@ -51,7 +52,7 @@ class CSG
 			return selectedNode.getPluginData 'newBrickator'
 			.then (newBrickatorData) ->
 				data.grid = newBrickatorData.grid
-				data.csgNeedsRecalculation = newBrickatorData.csgNeedsRecalculation
+				data.csgNeedsRecalculation = true if newBrickatorData.csgNeedsRecalculation
 				newBrickatorData.csgNeedsRecalculation = false
 				# finally return own data + newBrickator grid
 				return data
@@ -69,7 +70,7 @@ class CSG
 			options.profile = true
 			options.transformedModel = cachedData.transformedThreeModel
 
-			cachedData.csg = @csgExtractor.extractGeometry cachedData.grid, options
+			cachedData.csg = @csgExtractor.extractMesh cachedData.grid, options
 
 			return cachedData.csg
 
@@ -106,6 +107,12 @@ class CSG
 
 		# check if there was a brush action that forces us
 		# to recreate CSG
-		return cachedData.csgNeedsRecalculation
+		if cachedData.csgNeedsRecalculation
+			cachedData.csgNeedsRecalculation = false
+			return true
+		return false
+
+	getPrintingTimeEstimate: (geometry) ->
+		printingTimeEstimator.getPrintingTimeEstimate geometry
 
 module.exports = CSG

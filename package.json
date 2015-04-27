@@ -50,7 +50,7 @@
     "serve-favicon": "^2.1.6",
     "spin": "0.0.1",
     "stl-exporter": "^0.3.0",
-    "stl-parser": "^0.5.0",
+    "stl-parser": "^0.6.0",
     "string.prototype.endswith": "^0.2.0",
     "stylus": "^0.50.0",
     "three": "Lowfab/three.js#dev-20150415",

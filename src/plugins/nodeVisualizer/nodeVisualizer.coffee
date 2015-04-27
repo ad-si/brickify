@@ -26,30 +26,28 @@ class NodeVisualizer
 			@brickCounter = $ '#brickCount'
 			@timeEstimate = $ '#timeEstimate'
 
-	init3d: (@threejsRootNode) =>
+	init3d: (@threeJsRootNode) =>
 		@usePipeline = false
 
 		# Voxels / Bricks are rendered as a first render pass
 		@brickScene = @bundle.renderer.getDefaultScene()
 		@brickRootNode = new THREE.Object3D()
-		@threejsRootNode.add @brickRootNode
+		@threeJsRootNode.add @brickRootNode
 
 		# Objects are rendered in the 2nd / 3rd render pass
 		@objectsScene = @bundle.renderer.getDefaultScene()
 		@objectsRootNode = new THREE.Object3D()
-		@threejsRootNode.add @objectsRootNode
+		@threeJsRootNode.add @objectsRootNode
 
 		# LegoShadow is rendered as a 3rd rendering pass
 		@brickShadowScene = @bundle.renderer.getDefaultScene()
 		@brickShadowRootNode = new THREE.Object3D()
-		@threejsRootNode.add @brickShadowRootNode
-
-		return
+		@threeJsRootNode.add @brickShadowRootNode
 
 	onPaint: (@threeRenderer, camera, target, config) =>
 		threeRenderer = @threeRenderer
 
-		# recreate textures if either they havent been generated yet or
+		# recreate textures if either they haven't been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
@@ -68,7 +66,7 @@ class NodeVisualizer
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				[new ExpandBlackPart(2), new ColorMultPart()],
-				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
+				{colorMult: {type: 'v3', value: new THREE.Vector3(1, 1, 1)}},
 				@objectOpacity
 	  			config.useBigTargets
 			)
@@ -119,14 +117,14 @@ class NodeVisualizer
 		# render visible parts
 		threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
 
-		# render invisble parts (object behind lego bricks)
+		# render invisible parts (object behind lego bricks)
 		if @visualizationMode? and @visualizationMode == 'printBrush'
 			# Adjust object material to be dark and more transparent
 			blendMat = @objectsSceneTarget.blendingMaterial
 			blendMat.uniforms.colorMult.value = @objectShadowColorMult
 			blendMat.uniforms.opacity.value = @objectShadowOpacity
 
-			# Only render where hidden 3d model is
+			# Only render where there is hidden 3d model
 			gl.stencilFunc(
 				gl.EQUAL, stencilBits.hiddenObjectMask, stencilBits.hiddenObjectMask
 			)
@@ -157,9 +155,9 @@ class NodeVisualizer
 				@usePipeline = true
 
 				# move all subnodes to the pipeline scenes
-				@threejsRootNode.remove @brickRootNode
-				@threejsRootNode.remove @brickShadowRootNode
-				@threejsRootNode.remove @objectsRootNode
+				@threeJsRootNode.remove @brickRootNode
+				@threeJsRootNode.remove @brickShadowRootNode
+				@threeJsRootNode.remove @objectsRootNode
 
 				@brickScene.add @brickRootNode
 				@objectsScene.add @objectsRootNode
@@ -176,14 +174,14 @@ class NodeVisualizer
 				@brickShadowScene.remove @brickShadowRootNode
 				@objectsScene.remove @objectsRootNode
 
-				@threejsRootNode.add @brickRootNode
-				@threejsRootNode.add @objectsRootNode
-				@threejsRootNode.add @brickShadowRootNode
+				@threeJsRootNode.add @brickRootNode
+				@threeJsRootNode.add @objectsRootNode
+				@threeJsRootNode.add @brickShadowRootNode
 
 				# change material properties
 				@coloring.setPipelineMode false
 
-	# called by newBrickator when an object's datastructure is modified
+	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
 		.then (cachedData) =>
@@ -231,7 +229,7 @@ class NodeVisualizer
 		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
 
-		# instead of creating csg live, show original model semitransparent
+		# instead of creating csg live, show original semitransparent model
 		visualizationData.modelVisualization.setSolidMaterial(
 			@coloring.objectPrintMaterial
 		)
@@ -400,7 +398,7 @@ class NodeVisualizer
 			return brickIntersections
 		else
 			mixedIntersections = interactionHelper.getIntersections(
-				event, @bundle.renderer, @threejsRootNode.children
+				event, @bundle.renderer, @threeJsRootNode.children
 			)
 			return mixedIntersections
 

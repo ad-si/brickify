@@ -119,7 +119,6 @@ class BrickVisualization
 			@voxelWireframe.setVisibility false
 		else
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
-		return
 
 	updateBrickVisualization: (coloring = @defaultColoring) =>
 		@bricksSubnode.children = []
@@ -131,7 +130,7 @@ class BrickVisualization
 			brickLayers[z] ?= []
 			brickLayers[z].push brick
 
-		# Add bricks layerwise (because of build view)
+		# Add bricks layer-wise (because of build view)
 		for z, brickLayer of brickLayers
 			layerObject = new THREE.Object3D()
 			@bricksSubnode.add layerObject

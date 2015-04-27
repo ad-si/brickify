@@ -44,7 +44,7 @@ class CSG
 		return selectedNode.getPluginData 'csg'
 		.then (data) ->
 			if not data?
-				# create empty dataset for own data
+				# create empty data set for own data
 				data = {}
 				selectedNode.storePluginData 'csg', data, true
 

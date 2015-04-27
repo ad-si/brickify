@@ -36,7 +36,7 @@ class Renderer
 			@threeRenderer.clear()
 			@threeRenderer.setRenderTarget(null)
 
-			# set clobal config
+			# set global config
 			pipelineConfig = {
 				useBigTargets: @useBigPipelineTargets
 			}
@@ -49,7 +49,7 @@ class Renderer
 				pipelineConfig
 			)
 
-			#render our target to the screen
+			# render our target to the screen
 			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
 
 
@@ -78,7 +78,7 @@ class Renderer
 
 	setFidelity: (fidelityLevel, availableLevels) =>
 		if @pipelineEnabled
-			# Determine wheter to use bigger rendertargets (supersampling)
+			# Determine whether to use bigger render targets (super sampling)
 			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
 				@useBigPipelineTargets = true
 			else

@@ -22,6 +22,9 @@ class NodeVisualizer
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
+		if @bundle.globalConfig.buildUi
+			@brickCounter = $ '#brickCount'
+			@timeEstimate = $ '#timeEstimate'
 
 	init3d: (@threejsRootNode) =>
 		@usePipeline = false
@@ -193,6 +196,7 @@ class NodeVisualizer
 			# update voxel coloring and show them
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.showVoxels()
+			@_updateBrickCount cachedData.brickVisualization.grid.getAllBricks()
 
 	onNodeAdd: (node) =>
 		# link other plugins
@@ -349,12 +353,24 @@ class NodeVisualizer
 		return @_getCachedData(selectedNode).then (cachedData) ->
 			cachedData.brickVisualization.showBrickLayer layer - 1
 
+	_updateBrickCount: (bricks) =>
+		@brickCounter?.text bricks.size
+
+	_updatePrintTime: (csg) =>
+		if csg?.geometry?
+			time = @csg.getPrintingTimeEstimate csg.geometry
+			@timeEstimate?.text Math.round(time)
+		else
+			@timeEstimate?.text 0
+
 	_showCsg: (cachedData) =>
 		@csg ?= @bundle.getPlugin 'csg'
 		return Promise.resolve() if not @csg?
 
 		return @csg.getCSG(cachedData.node, {addStuds: true})
-				.then (csg) -> cachedData.brickVisualization.showCsg csg
+				.then (csg) =>
+					cachedData.brickVisualization.showCsg csg
+					@_updatePrintTime csg
 
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>

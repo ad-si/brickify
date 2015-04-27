@@ -10,9 +10,11 @@ block body
 
 	include footer
 
+	include feedback
 
-block scripts	
+
+block scripts
+	script(src='/libs/webglCheck.js')
 	script(src='shared.js')
 	script(src='landingpage.js')
-	script(src='/node_modules/bootbox/bootbox.min.js')
-	script(src='/libs/webglCheck.js')
+	script(src = '/node_modules/bootbox/bootbox.min.js')

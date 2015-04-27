@@ -75,4 +75,5 @@ class EditController
 	everythingPrint: (selectedNode) =>
 		@newBrickator.everythingPrint selectedNode
 
+
 module.exports = EditController

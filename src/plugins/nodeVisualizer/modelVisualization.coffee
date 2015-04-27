@@ -32,7 +32,7 @@ class ModelVisualization
 			@afterCreationPromise = node.getModel()
 			return @afterCreationPromise
 		_addSolid = (geometry, parent) =>
-			solid = new THREE.Mesh geometry, @coloring.objectMaterial
+			solid = new THREE.Mesh geometry, @coloring.objectPrintMaterial
 			parent.add solid
 			parent.solid = solid
 

@@ -231,11 +231,6 @@ class NodeVisualizer
 		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
 
-		# instead of creating csg live, show original model semitransparent
-		visualizationData.modelVisualization.setSolidMaterial(
-			@coloring.objectPrintMaterial
-		)
-
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'brickVisualizer'

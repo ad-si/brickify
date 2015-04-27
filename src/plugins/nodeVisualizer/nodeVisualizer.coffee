@@ -67,7 +67,7 @@ class NodeVisualizer
 			# object target
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				[new ExpandBlackPart(1), new ColorMultPart()],
+				[new ExpandBlackPart(2), new ColorMultPart()],
 				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
 				@objectOpacity
 	  			config.useBigTargets

@@ -11,17 +11,19 @@ VoxelSelector = require '../VoxelSelector'
 # @class BrickVisualization
 ###
 class BrickVisualization
-	constructor: (@bundle, @threeNode) ->
+	constructor: (
+		@bundle,  @brickThreeNode, @brickShadowThreeNode, @defaultColoring) ->
+
 		@csgSubnode = new THREE.Object3D()
-		@threeNode.add @csgSubnode
+		@brickThreeNode.add @csgSubnode
 
 		@voxelBrickSubnode = new THREE.Object3D()
 		@voxelsSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @voxelsSubnode
 		@bricksSubnode = new THREE.Object3D()
 		@voxelBrickSubnode.add @bricksSubnode
+		@brickThreeNode.add @voxelBrickSubnode
 
-		@defaultColoring = new Coloring()
 		@stabilityColoring = new StabilityColoring()
 
 		@printVoxels = []
@@ -29,8 +31,9 @@ class BrickVisualization
 		@isStabilityView = false
 
 	initialize: (@grid) =>
-		@voxelWireframe = new VoxelWireframe(@bundle, @grid, @voxelBrickSubnode)
-		@threeNode.add @voxelBrickSubnode
+		@voxelWireframe = new VoxelWireframe(
+			@bundle, @grid, @brickShadowThreeNode, @defaultColoring
+		)
 		@geometryCreator = new GeometryCreator(@grid)
 		@voxelSelector = new VoxelSelector @
 
@@ -116,7 +119,6 @@ class BrickVisualization
 			@voxelWireframe.setVisibility false
 		else
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
-		return
 
 	updateBrickVisualization: (coloring = @defaultColoring) =>
 		@bricksSubnode.children = []
@@ -128,7 +130,7 @@ class BrickVisualization
 			brickLayers[z] ?= []
 			brickLayers[z].push brick
 
-		# Add bricks layerwise (because of build view)
+		# Add bricks layer-wise (because of build view)
 		for z, brickLayer of brickLayers
 			layerObject = new THREE.Object3D()
 			@bricksSubnode.add layerObject
@@ -182,12 +184,12 @@ class BrickVisualization
 		dimensions = new THREE.Vector3 size.x, size.y, size.z
 		unless @bigBrushHighlight? and
 		@bigBrushHighlight.dimensions.equals dimensions
-			@voxelBrickSubnode.remove @bigBrushHighlight if @bigBrushHighlight
+			@brickShadowThreeNode.remove @bigBrushHighlight if @bigBrushHighlight
 			@bigBrushHighlight = @geometryCreator.getBrickBox(
 				dimensions
 				material
 			)
-			@voxelBrickSubnode.add @bigBrushHighlight
+			@brickShadowThreeNode.add @bigBrushHighlight
 
 		@bigBrushHighlight.position.copy voxel.position
 		@bigBrushHighlight.material = material

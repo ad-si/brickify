@@ -1,6 +1,6 @@
 PluginLoader = require '../client/pluginLoader'
 Ui = require './ui/ui'
-Renderer = require './renderer'
+Renderer = require './rendering/Renderer'
 ModelLoader = require './modelLoading/modelLoader'
 SceneManager = require './sceneManager'
 Spinner = require './Spinner'

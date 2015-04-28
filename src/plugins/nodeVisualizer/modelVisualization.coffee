@@ -1,8 +1,9 @@
 THREE = require 'three'
+log = require 'loglevel'
+
 threeHelper = require '../../client/threeHelper'
 LineMatGenerator = require './visualization/LineMatGenerator'
 threeConverter = require '../../client/threeConverter'
-log = require 'loglevel'
 
 
 class ModelVisualization

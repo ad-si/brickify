@@ -83,4 +83,7 @@ class WorkflowUi
 	toggleStabilityView: =>
 		@workflow.preview.toggleStabilityView()
 
+	toggleAssemblyView: =>
+		@workflow.preview.toggleAssemblyView()
+
 module.exports = WorkflowUi

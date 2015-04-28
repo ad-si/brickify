@@ -55,7 +55,7 @@ module.exports = (files, bundles, callback) ->
 		$loadingTextElement.text 'Processing…'
 
 		# Give time to render text
-		setTimeout () ->
+		setTimeout ->
 			model
 			.setFileName files[0].name
 			.calculateNormals()

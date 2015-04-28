@@ -244,7 +244,7 @@ module.exports = class Grid
 		bricks = new Set()
 
 		@forEachVoxel (voxel) ->
-			if voxel.brick
+			if voxel.enabled and voxel.brick
 				bricks.add voxel.brick
 
 		return bricks

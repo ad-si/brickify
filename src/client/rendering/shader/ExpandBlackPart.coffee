@@ -8,9 +8,6 @@ class ExpandBlackPart extends ShaderPart
 			varying vec2 texelDelta;
 		'
 
-	getVertexPreMain: ->
-		return ''
-
 	getVertexInMain: ->
 		return '
 			texelDelta.x = 1.0 / texWidth;
@@ -21,9 +18,6 @@ class ExpandBlackPart extends ShaderPart
 		return '
 			varying vec2 texelDelta;
 		'
-
-	getFragmentPreMain: ->
-		return ''
 
 	getFragmentInMain: =>
 		k = @kernelSize

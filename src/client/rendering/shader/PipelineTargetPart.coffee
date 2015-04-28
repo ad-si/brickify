@@ -1,12 +1,6 @@
 ShaderPart = require './ShaderPart'
 
 class PipelineTargetPart extends ShaderPart
-	getVertexVariables: ->
-		return ''
-
-	getVertexPreMain: ->
-		return ''
-
 	getVertexInMain: ->
 		# make this a screen aligned quad with z=0.5
 		return '
@@ -21,9 +15,6 @@ class PipelineTargetPart extends ShaderPart
 			uniform sampler2D tDepth;
 			uniform sampler2D tColor;
 		'
-
-	getFragmentPreMain: ->
-		return ''
 
 	getFragmentInMain: ->
 		return '

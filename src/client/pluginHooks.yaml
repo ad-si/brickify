@@ -47,6 +47,13 @@
 
 - on3dUpdate
 
+# ## onPaint
+# 
+# Plugins that need visuals beyond a node in a default scene (-> init3d) may
+# perform their custom render pass in this call. 
+
+- onPaint
+
 #  ## scene interaction and administration
 
 #  ### New nodes

@@ -1,11 +1,17 @@
 ReadableFileStream = require('filestream').read
 stlParser = require 'stl-parser'
 meshlib = require 'meshlib'
+Nanobar = require 'nanobar'
 
 modelCache = require './modelCache'
 
 averageFaceSize = 240 # Bytes
-
+nanobar = new Nanobar {
+	bg: '#acf'
+	target: document.getElementById('loadButton')
+	id: 'mynano'
+}
+$loadingTextElement = $('#loadButton span')
 
 module.exports = (files, bundles, callback) ->
 
@@ -22,8 +28,8 @@ module.exports = (files, bundles, callback) ->
 
 	faceCounter = 0
 
-	progressBar = document.querySelector 'progress'
-	progressBar.setAttribute 'value', 0
+	nanobar.go 0
+	$loadingTextElement.text 'Loading…'
 
 	fileStream = new ReadableFileStream files[0]
 	fileStream.on 'error', (error) ->
@@ -41,27 +47,33 @@ module.exports = (files, bundles, callback) ->
 			then data.faceCount
 			else files[0].size / averageFaceSize
 		else
-			progressBar.setAttribute 'value', String data.number / faceCounter
-
-	streamingStlParser.on 'end', ->
-		progressBar.setAttribute 'value', '1'
+			nanobar.go	(data.number / faceCounter) * 100
 
 	modelBuilder = new meshlib.ModelBuilder()
 	modelBuilder.on 'model', (model) ->
-		model
-		.setFileName files[0].name
-		.calculateNormals()
-		.buildFaceVertexMesh()
-		.done (modelPromise) -> modelPromise
-		.then ->
-			return modelCache
-			.store model
-		.then (hash) ->
-			Promise.all(
-				bundles.map (bundle) ->
-					return bundle.modelLoader.loadByHash hash
-			)
-		.then callback
+		nanobar.go 100
+		$loadingTextElement.text 'Processing…'
+
+		# Give time to render text
+		setTimeout () ->
+			model
+			.setFileName files[0].name
+			.calculateNormals()
+			.buildFaceVertexMesh()
+			.done (modelPromise) -> modelPromise
+			.then ->
+				$loadingTextElement.text 'Opening…'
+				return modelCache
+				.store model
+			.then (hash) ->
+				Promise.all(
+					bundles.map (bundle) ->
+						return bundle.modelLoader.loadByHash hash
+				)
+			.then (bundles) ->
+				$('#loadButton span').text 'Drop an STL File'
+				callback bundles
+		, 50
 
 	fileStream
 	.pipe streamingStlParser

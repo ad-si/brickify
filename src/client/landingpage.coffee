@@ -71,8 +71,8 @@ Promise
 	$('.applink').prop 'href', "app#initialModel=#{defaultModelHash}"
 
 	bundles[1].renderer.setupControls(
-	    config1,
-	    bundles[0].renderer.getControls()
+		config1,
+		bundles[0].renderer.getControls()
 	)
 
 	fileDropper.init (event) ->
@@ -87,7 +87,8 @@ Promise
 		event.stopPropagation()
 		readFiles event.target.files, bundles
 
-	$('.dropper').html 'Drop an stl file'
+	$('.dropper img').remove()
+	$('.dropper span').text 'Drop an STL file'
 
 .catch (error) ->
 	console.error error

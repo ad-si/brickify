@@ -1,5 +1,8 @@
 THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
+renderTargetHelper = require './renderTargetHelper'
+FxaaShaderPart = require './shader/FxaaPart'
+log = require 'loglevel'
 
 ###
 # @class Renderer
@@ -10,12 +13,85 @@ class Renderer
 		@camera = null
 		@threeRenderer = null
 		@init globalConfig
+		@pipelineEnabled = false
+		@useBigPipelineTargets = false
 
 	localRenderer: (timestamp) =>
-			@threeRenderer.render @scene, @camera
-			@pluginHooks.on3dUpdate timestamp
-			@controls?.update()
-			requestAnimationFrame @localRenderer
+		# clear screen
+		@threeRenderer.context.stencilMask(0xFF)
+		@threeRenderer.clear()
+
+		# render the default scene (plugins add objects in the init3d hook)
+		@threeRenderer.render @scene, @camera
+
+		# allow for custom render passes
+		if @pipelineEnabled
+			# init render target
+			@_initializePipelineTarget()
+
+			# clear render target
+			@threeRenderer.setRenderTarget(@pipelineRenderTarget.renderTarget)
+			@threeRenderer.context.stencilMask(0xFF)
+			@threeRenderer.clear()
+			@threeRenderer.setRenderTarget(null)
+
+			# set global config
+			pipelineConfig = {
+				useBigTargets: @useBigPipelineTargets
+			}
+
+			# let plugins render in our target
+			@pluginHooks.onPaint(
+				@threeRenderer,
+				@camera,
+				@pipelineRenderTarget.renderTarget,
+				pipelineConfig
+			)
+
+			# render our target to the screen
+			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
+
+
+		# call update hook
+		@pluginHooks.on3dUpdate timestamp
+		@controls?.update()
+		requestAnimationFrame @localRenderer
+
+	# create / update target for all pipeline passes
+	_initializePipelineTarget: =>
+		if not @pipelineRenderTarget? or
+		not renderTargetHelper.renderTargetHasRightSize(
+			@pipelineRenderTarget.renderTarget, @threeRenderer, @useBigPipelineTargets
+		)
+			shaderParts = []
+			if @usePipelineFxaa
+				shaderParts.push new FxaaShaderPart()
+
+			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
+				@threeRenderer,
+				shaderParts,
+				null,
+				1.0,
+				@useBigPipelineTargets
+			)
+
+	setFidelity: (fidelityLevel, availableLevels) =>
+		if @pipelineEnabled
+			# Determine whether to use bigger render targets (super sampling)
+			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+				@useBigPipelineTargets = true
+			else
+				@useBigPipelineTargets = false
+
+			# determine whether to use FXAA
+			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
+				if not @usePipelineFxaa
+					@usePipelineFxaa = true
+					@pipelineRenderTarget = null
+			else
+				if @usePipelineFxaa
+					@usePipelineFxaa = false
+					@pipelineRenderTarget = null
 
 	addToScene: (node) ->
 		@scene.add node
@@ -61,15 +137,14 @@ class Renderer
 			new THREE.Vector3(position.x, position.y, position.z)
 		@controls.reset()
 
-	init: (globalConfig) ->
-		@setupSize globalConfig
-		@setupRenderer globalConfig
-		@setupScene globalConfig
-		@setupLighting globalConfig
-		@setupCamera globalConfig
+	init: (@globalConfig) ->
+		@_setupSize @globalConfig
+		@_setupRenderer @globalConfig
+		@scene = @getDefaultScene()
+		@_setupCamera @globalConfig
 		requestAnimationFrame @localRenderer
 
-	setupSize: (globalConfig) ->
+	_setupSize: (globalConfig) ->
 		if not globalConfig.staticRendererSize
 			@staticRendererSize = false
 		else
@@ -83,20 +158,35 @@ class Renderer
 		else
 			return {width: window.innerWidth, height: window.innerHeight}
 
-	setupRenderer: (globalConfig) ->
+	_setupRenderer: (globalConfig) ->
 		@threeRenderer = new THREE.WebGLRenderer(
 			alpha: true
 			antialias: true
+			stencil: true
 			preserveDrawingBuffer: true
 			canvas: document.getElementById globalConfig.renderAreaId
 		)
 		@threeRenderer.sortObjects = false
 
+		# needed for rendering pipeline
+		@threeRenderer.extensions.get 'EXT_frag_depth'
+
+		# Stencil test
+		gl = @threeRenderer.context
+		contextAttributes = gl.getContextAttributes()
+		if not contextAttributes.stencil
+			log.warn 'The current WebGL context does not have a stencil buffer.
+			 Rendering will be (partly) broken'
+			@threeRenderer.hasStencilBuffer = false
+		else
+			@threeRenderer.hasStencilBuffer = true
+
 		@threeRenderer.setSize @size().width, @size().height
+		@threeRenderer.autoClear = false
 
+	_setupScene: (globalConfig) ->
+		scene = new THREE.Scene()
 
-	setupScene: (globalConfig) ->
-		@scene = new THREE.Scene()
 		# Scene rotation because orbit controls only works
 		# with up vector of 0, 1, 0
 		sceneRotation = new THREE.Matrix4()
@@ -104,14 +194,16 @@ class Renderer
 			new THREE.Vector3( 1, 0, 0 ),
 			(-Math.PI / 2)
 		)
-		@scene.applyMatrix(sceneRotation)
-		@scene.fog = new THREE.Fog(
+		scene.applyMatrix(sceneRotation)
+		scene.fog = new THREE.Fog(
 			globalConfig.colors.background
 			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)
 
-	setupCamera: (globalConfig) ->
+		return scene
+
+	_setupCamera: (globalConfig) ->
 		@camera = new THREE.PerspectiveCamera(
 			globalConfig.fov,
 			(@size().width / @size().height),
@@ -138,21 +230,27 @@ class Renderer
 			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
 			@controls.target.set(0, 0, 0)
 
-	setupLighting: (globalConfig) ->
+	_setupLighting: (scene) ->
 		ambientLight = new THREE.AmbientLight(0x404040)
-		@scene.add ambientLight
+		scene.add ambientLight
 
 		directionalLight = new THREE.DirectionalLight(0xffffff)
 		directionalLight.position.set 0, 20, 30
-		@scene.add directionalLight
+		scene.add directionalLight
 
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, 0, 30
-		@scene.add directionalLight
+		scene.add directionalLight
 
 		directionalLight = new THREE.DirectionalLight(0x808080)
 		directionalLight.position.set 20, -20, -30
-		@scene.add directionalLight
+		scene.add directionalLight
+
+	# creates a scene with default light and rotation settings
+	getDefaultScene: =>
+		scene = @_setupScene(@globalConfig)
+		@_setupLighting(scene)
+		return scene
 
 	loadCamera: (state) =>
 		if state.controls?

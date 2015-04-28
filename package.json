@@ -50,7 +50,7 @@
     "spin": "0.0.1",
     "string.prototype.endswith": "^0.2.0",
     "stylus": "^0.50.0",
-    "three": "Lowfab/three.js#dev-20150415",
+    "three": "Lowfab/three.js#dev-20150416",
     "three-orbit-controls": "Lowfab/three-orbit-controls#v69.2.0-beta",
     "winston": "^0.8.1",
     "zeroclipboard": "^2.2.0"

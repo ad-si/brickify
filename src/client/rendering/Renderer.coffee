@@ -2,6 +2,7 @@ THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/FxaaPart'
+log = require 'loglevel'
 
 ###
 # @class Renderer
@@ -174,7 +175,7 @@ class Renderer
 		gl = @threeRenderer.context
 		contextAttributes = gl.getContextAttributes()
 		if not contextAttributes.stencil
-			console.warn 'The current WebGL context does not have a stencil buffer.
+			log.warn 'The current WebGL context does not have a stencil buffer.
 			 Rendering will be (partly) broken'
 			@threeRenderer.hasStencilBuffer = false
 		else

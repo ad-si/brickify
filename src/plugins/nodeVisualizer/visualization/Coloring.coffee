@@ -117,9 +117,9 @@ module.exports = class Coloring
 			@legoShadowMat.transparent = true
 
 	###
-    # Returns the highlight material collection for the supplied type of voxel
-    # @param {String} type either 'lego' or '3d' to get the respective material
-    ###
+	# Returns the highlight material collection for the supplied type of voxel
+	# @param {String} type either 'lego' or '3d' to get the respective material
+	###
 	getHighlightMaterial: (type) =>
 		if type == 'lego'
 			return {

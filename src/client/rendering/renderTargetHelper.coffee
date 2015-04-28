@@ -21,13 +21,15 @@ ShaderGenerator = require './shader/ShaderGenerator'
 # @memberOf renderTargetHelper
 ###
 module.exports.createRenderTarget = (
-	threeRenderer,
-	shaderParts = [], additionalUniforms = {}, opacity = 1.0,
-	chooseBiggerSize = false,
-	textureMagFilter = THREE.LinearFilter,
+	threeRenderer
+	shaderParts = []
+	additionalUniforms = {}
+	opacity = 1.0
+	chooseBiggerSize = false
+	textureMagFilter = THREE.LinearFilter
 	textureMinFilter = THREE.LinearFilter) ->
 
-	# Create rendertarget
+	# Create render target
 	renderWidth = threeRenderer.domElement.width
 	renderHeight = threeRenderer.domElement.height
 
@@ -47,7 +49,7 @@ module.exports.createRenderTarget = (
 		}
 	)
 
-	# apply values to parent, due to broken THREE implementation / WIP pullrequest
+	# apply values to parent, due to broken THREE implementation / WIP pull request
 	renderTargetTexture.wrapS = renderTargetTexture.texture.wrapS
 	renderTargetTexture.wrapT = renderTargetTexture.texture.wrapT
 	renderTargetTexture.magFilter = renderTargetTexture.texture.magFilter
@@ -104,7 +106,7 @@ generateQuad =  (
 	return mesh
 module.exports.generateQuad = generateQuad
 
-# Choses the next 2^n size that matches the screen resolution best
+# Chooses the next 2^n size that matches the screen resolution best
 getNextValidTextureDimension = (size, chooseBiggerValue) ->
 	dims = [64, 128, 256, 512, 1024, 2048, 4096]
 

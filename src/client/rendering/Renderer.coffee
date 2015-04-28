@@ -18,7 +18,6 @@ class Renderer
 	localRenderer: (timestamp) =>
 		# clear screen
 		@threeRenderer.context.stencilMask(0xFF)
-		@threeRenderer.context.clearStencil(0x00)
 		@threeRenderer.clear()
 
 		# render the default scene (plugins add objects in the init3d hook)
@@ -32,7 +31,6 @@ class Renderer
 			# clear render target
 			@threeRenderer.setRenderTarget(@pipelineRenderTarget.renderTarget)
 			@threeRenderer.context.stencilMask(0xFF)
-			@threeRenderer.context.clearStencil(0x00)
 			@threeRenderer.clear()
 			@threeRenderer.setRenderTarget(null)
 

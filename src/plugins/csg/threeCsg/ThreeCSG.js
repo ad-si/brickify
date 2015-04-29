@@ -226,6 +226,11 @@ ThreeBSP = (function() {
 
 		this.neighborhood = [];
 	};
+
+	ThreeBSP.Polygon.prototype.isValid = function() {
+		return this.vertices.length >= 3;
+	};
+
 	ThreeBSP.Polygon.prototype.calculateProperties = function() {
 		var a = this.vertices[0],
 			b = this.vertices[1],
@@ -321,11 +326,12 @@ ThreeBSP = (function() {
 			var vertice_count,
 				i, j, ti, tj, vi, vj,
 				t, v,
-				f = [],
-				b = [],
 				n = [],
 				fP, bP;
 			
+			fP = new ThreeBSP.Polygon();
+			bP = new ThreeBSP.Polygon();
+
 			for ( i = 0, vertice_count = polygon.vertices.length; i < vertice_count; i++ ) {
 				
 				j = (i + 1) % vertice_count;
@@ -333,14 +339,15 @@ ThreeBSP = (function() {
 				vj = polygon.vertices[j];
 				ti = this.classifyVertex( vi );
 				tj = this.classifyVertex( vj );
-				
-				if ( ti != BACK ) f.push( vi );
-				if ( ti != FRONT ) b.push( vi );
+
+				if ( ti != BACK ) fP.vertices.push( vi );
+				if ( ti != FRONT ) bP.vertices.push( vi );
 				if ( (ti | tj) === SPANNING ) {
 					t = ( this.w - this.normal.dot( vi ) ) / this.normal.dot( vj.clone().subtract( vi ) );
 					v = vi.interpolate( vj, t );
-					f.push( v );
-					b.push( v );
+
+					fP.vertices.push( v );
+					bP.vertices.push( v );
 					n.push( v );
 
 					var neighborhood = polygon.findNeighborhood(vi, vj);
@@ -350,11 +357,12 @@ ThreeBSP = (function() {
 					}
 				}
 			}
-			
-			
-			if ( f.length >= 3 ) front.push( fP = new ThreeBSP.Polygon( f ).calculateProperties() );
-			if ( b.length >= 3 ) back.push( bP = new ThreeBSP.Polygon( b ).calculateProperties() );
-			if( fP && bP ) {
+
+
+			if ( fP.isValid() ) front.push( fP.calculateProperties() );
+			if ( bP.isValid() ) back.push( bP.calculateProperties() );
+			// neighborhood between new polygons
+			if ( fP.isValid() && bP.isValid() ) {
 				var neighborhood = new ThreeBSP.Neighborhood( fP, bP, n[0], n[1] );
 				fP.neighborhood.push( neighborhood );
 				bP.neighborhood.push( neighborhood );

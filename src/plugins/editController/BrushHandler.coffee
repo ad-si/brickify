@@ -86,7 +86,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
-			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_everythingLego: (selectedNode) =>
@@ -139,7 +139,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
-			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_everythingPrint: (selectedNode) =>

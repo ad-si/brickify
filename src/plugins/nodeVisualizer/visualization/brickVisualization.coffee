@@ -16,13 +16,9 @@ class BrickVisualization
 
 		@csgSubnode = new THREE.Object3D()
 		@brickThreeNode.add @csgSubnode
-
-		@voxelBrickSubnode = new THREE.Object3D()
-		@voxelsSubnode = new THREE.Object3D()
-		@voxelBrickSubnode.add @voxelsSubnode
+	
 		@bricksSubnode = new THREE.Object3D()
-		@voxelBrickSubnode.add @bricksSubnode
-		@brickThreeNode.add @voxelBrickSubnode
+		@brickThreeNode.add @bricksSubnode
 
 		@stabilityColoring = new StabilityColoring()
 
@@ -37,14 +33,6 @@ class BrickVisualization
 		@geometryCreator = new GeometryCreator(@grid)
 		@voxelSelector = new VoxelSelector @
 
-	showVoxels: =>
-		@voxelsSubnode.visible = true
-		@bricksSubnode.visible = false
-
-	showBricks: =>
-		@bricksSubnode.visible = true
-		@voxelsSubnode.visible = false
-
 	showCsg: (newCsgMesh) =>
 		@csgSubnode.children = []
 		return if not newCsgMesh?
@@ -58,14 +46,76 @@ class BrickVisualization
 		@csgSubnode.visible = false
 
 	hideVoxelAndBricks: =>
-		@voxelBrickSubnode.visible = false
+		@bricksSubnode.visible = false
 
 	showVoxelAndBricks: =>
-		@voxelBrickSubnode.visible  = true
+		@bricksSubnode.visible  = true
+
+	# updates brick and voxel visualization
+	updateVisualization: (coloring = @defaultColoring, recreate = false) =>
+		# throw out all visual bricks that have no valid linked brick
+		for layer in @bricksSubnode.children
+			deletionList = []
+			for visualBrick in layer.children
+				if not visualBrick.brick? or not visualBrick.brick.isValid()
+					deletionList.push visualBrick
+
+			for delBrick in deletionList
+				# remove from scenegraph
+				layer.remove delBrick
+				# delete reference from datastructure brick
+				if delBrick.brick?
+					delBrick.brick.setVisualBrick null
+
+		# Recreate visible bricks for all bricks in the datastructure that 
+		# have no linked brick
+
+		# sort layerwise for build view
+		brickLayers = []
+		@grid.getAllBricks().forEach (brick) ->
+			z = brick.getPosition().z
+			brickLayers[z] ?= []
+
+			if not brick.getVisualBrick()?
+				brickLayers[z].push brick
+
+		for z, brickLayer of brickLayers
+			# create layer object if it does not exist
+			if not @bricksSubnode.children[z]?
+				layerObject = new THREE.Object3D()
+				@bricksSubnode.add layerObject
+
+			layerObject = @bricksSubnode.children[z]
+
+			for brick in brickLayer
+				# create visual brick
+				material = coloring.getMaterialForBrick brick
+				threeBrick = @geometryCreator.getBrick(
+					brick.getPosition(), brick.getSize(), material
+				)
+
+				# link data <-> visuals
+				brick.setVisualBrick threeBrick
+				threeBrick.brick = brick
+
+				# add to scene graph
+				layerObject.add threeBrick
+		
+		# if this coloring differs from the last used coloring, go through
+		# all visible bricks to update their material
+		if @_oldColoring? and @_oldColoring != coloring
+			for layer in @bricksSubnode.children
+				for visualBrick in layer.children
+					material = coloring.getMaterialForBrick visualBrick.brick
+					visualBrick.setMaterial material
+		@_oldColoring = coloring
 
 	# (re)creates voxel visualization.
 	# hides disabled voxels, updates material and stud visibility
 	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
+		# DEBUG
+		return
+
 		@unhighlightBigBrush()
 		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
 		recreate
@@ -111,7 +161,7 @@ class BrickVisualization
 	setStabilityView: (enabled) =>
 		@isStabilityView = enabled
 		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
-		@updateBrickVisualization(coloring)
+		@updateVisualization(coloring)
 
 		# Turn off possible lego box during stability view
 		if enabled
@@ -119,28 +169,6 @@ class BrickVisualization
 			@voxelWireframe.setVisibility false
 		else
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
-
-	updateBrickVisualization: (coloring = @defaultColoring) =>
-		@bricksSubnode.children = []
-
-		# sort by layer
-		brickLayers = []
-		@grid.getAllBricks().forEach (brick) ->
-			z = brick.getPosition().z
-			brickLayers[z] ?= []
-			brickLayers[z].push brick
-
-		# Add bricks layer-wise (because of build view)
-		for z, brickLayer of brickLayers
-			layerObject = new THREE.Object3D()
-			@bricksSubnode.add layerObject
-
-			for brick in brickLayer
-				material = coloring.getMaterialForBrick brick
-				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), material
-				)
-				layerObject.add threeBrick
 
 	showBrickLayer: (layer) =>
 		for i in [0..@bricksSubnode.children.length - 1] by 1

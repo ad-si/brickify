@@ -189,12 +189,11 @@ class NodeVisualizer
 			if not cachedData.initialized
 				@_initializeData node, cachedData, newBrickatorData
 
-			# update brick visualization
-			cachedData.brickVisualization.updateBrickVisualization()
+			# visualization
+			cachedData.brickVisualization.updateVisualization()
+			cachedData.brickVisualization.showVoxelAndBricks()
 
-			# update voxel coloring and show them
-			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.showVoxels()
+			# brick count / printing time
 			@_updateBrickCount cachedData.brickVisualization.grid.getAllBricks()
 			@_updateQuickPrintTime(
 				cachedData.brickVisualization.grid.getDisabledVoxels()
@@ -307,14 +306,14 @@ class NodeVisualizer
 					return @_applyBuildMode cachedData
 
 	_applyLegoBrushMode: (cachedData) =>
-		cachedData.brickVisualization.showVoxels()
-		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.updateVisualization()
+		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 		cachedData.modelVisualization.setShadowVisibility false
 
 	_applyPrintBrushMode: (cachedData) =>
-		cachedData.brickVisualization.showVoxels()
-		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.updateVisualization()
+		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 		cachedData.modelVisualization.setShadowVisibility true
 
@@ -325,7 +324,6 @@ class NodeVisualizer
 		.then ->
 			# change coloring to stability coloring
 			cachedData.brickVisualization.setStabilityView true
-			cachedData.brickVisualization.showBricks()
 
 		cachedData.modelVisualization.setNodeVisibility false
 
@@ -338,7 +336,6 @@ class NodeVisualizer
 
 	_applyBuildMode: (cachedData) =>
 		# show bricks and csg
-		cachedData.brickVisualization.showBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 
 		@_showCsg cachedData

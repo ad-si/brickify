@@ -350,10 +350,36 @@ ThreeBSP = (function() {
 					bP.vertices.push( v );
 					n.push( v );
 
+					// neighborhood between old neighbor and two new polygons
 					var neighborhood = polygon.findNeighborhood(vi, vj);
-					if(neighborhood) {
-						var p = neighborhood.other( polygon );
-						
+					if ( neighborhood ) {
+						var p, ii, ij, nPi, nPj;
+						p = neighborhood.other( polygon );
+						ii = p.vertices.indexOf( vi );
+						ij = p.vertices.indexOf( vj );
+						if( ij - ii === 1 || ii - ij > 1) {
+							p.vertices.splice( ii + 1, 0, v );
+						} else {
+							p.vertices.splice( ij + 1, 0, v );
+						}
+						neighborhood.remove();
+
+						nPi = new ThreeBSP.Neighborhood( p, null, vi, v );
+						p.neighborhood.push( nPi );
+						nPj = new ThreeBSP.Neighborhood( p, null, vj, v );
+						p.neighborhood.push( nPj );
+
+						if ( ti != BACK && tj != FRONT ) {
+							nPi.p2 = fP;
+							fP.neighborhood.push( nPi );
+							nPj.p2 = bP;
+							bP.neighborhood.push( nPj );
+						} else if ( ti != FRONT && tj != BACK ) {
+							nPj.p2 = fP;
+							fP.neighborhood.push( nPj );
+							nPi.p2 = bP;
+							bP.neighborhood.push( nPi );
+						}
 					}
 				}
 			}
@@ -390,6 +416,13 @@ ThreeBSP = (function() {
 		return ( p === this.p1 ? this.p2 : this.p1 );
 	};
 	
+	ThreeBSP.Neighborhood.prototype.remove = function() {
+		var i1 = this.p1.neighborhood.indexOf( this );
+		this.p1.neighborhood.splice(i1, 1);
+		var i2 = this.p1.neighborhood.indexOf( this );
+		this.p2.neighborhood.splice(i2, 1);
+	};
+
 	ThreeBSP.Vertex = function( x, y, z, normal, uv ) {
 		this.x = x;
 		this.y = y;

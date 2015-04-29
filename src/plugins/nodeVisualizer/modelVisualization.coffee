@@ -1,11 +1,8 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
-LineMatGenerator = require './visualization/LineMatGenerator'
 
 class ModelVisualization
-	constructor: (@globalConfig, @node, threeNode) ->
-		@_initializeMaterials()
-
+	constructor: (@globalConfig, @node, threeNode, @coloring) ->
 		@threeNode = new THREE.Object3D()
 		threeNode.add @threeNode
 
@@ -30,42 +27,12 @@ class ModelVisualization
 	getSolid: =>
 		@threeNode.solid
 
-	_initializeMaterials: =>
-		@objectMaterial = new THREE.MeshLambertMaterial({
-			color: @globalConfig.colors.modelColor
-			opacity: @globalConfig.colors.modelOpacity
-			transparent: @globalConfig.colors.modelOpacity < 1.0
-		})
-
-		@shadowMat = new THREE.MeshBasicMaterial(
-			color: @globalConfig.colors.modelShadowColor
-			opacity: @globalConfig.colors.modelShadowOpacity
-			transparent: @globalConfig.colors.modelShadowOpacity < 1.0
-			depthFunc: THREE.GreaterDepth
-		)
-
-		# remove z-Fighting on baseplate
-		@objectMaterial.polygonOffset = true
-		@objectMaterial.polygonOffsetFactor = 3
-		@objectMaterial.polygonOffsetUnits = 3
-		@shadowMat.polygonOffset = true
-		@shadowMat.polygonOffsetFactor = 3
-		@shadowMat.polygonOffsetUnits = 3
-
-		lineMaterialGenerator = new LineMatGenerator()
-		@lineMat = lineMaterialGenerator.generate 0x000000
-		@lineMat.linewidth = 2
-		@lineMat.transparent = true
-		@lineMat.opacity = 0.1
-		@lineMat.depthFunc = THREE.GreaterDepth
-		@lineMat.depthWrite = false
-
 	_createVisualization: (node, threejsNode) =>
 		unless @globalConfig.showModel
 			@afterCreationPromise = node.getModel()
 			return @afterCreationPromise
 		_addSolid = (geometry, parent) =>
-			solid = new THREE.Mesh geometry, @objectMaterial
+			solid = new THREE.Mesh geometry, @coloring.objectMaterial
 			parent.add solid
 			parent.solid = solid
 
@@ -74,13 +41,13 @@ class ModelVisualization
 			wireframe = new THREE.Object3D()
 
 			#shadow
-			shadow = new THREE.Mesh geometry, @shadowMat
+			shadow = new THREE.Mesh geometry, @coloring.objectShadowMat
 			wireframe.add shadow
 
 			# visible black lines
 			lineObject = new THREE.Mesh geometry
 			lines = new THREE.EdgesHelper lineObject, 0x000000, 30
-			lines.material = @lineMat
+			lines.material = @coloring.objectLineMat
 			wireframe.add lines
 
 			parent.add wireframe

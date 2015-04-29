@@ -163,6 +163,13 @@ class Brick
 		@_clearData()
 		return newBricks
 
+	# Returns the brick visualization that belongs to this brick
+	getVisualBrick: =>
+		return @_visualBrick
+
+	# Sets the brick visualization that belongs to this brick
+	setVisualBrick: (@_visualBrick) => return
+
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that
 	clear: =>
@@ -177,6 +184,7 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
+		@_visualBrick = null
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,

@@ -120,7 +120,7 @@ module.exports = class LegoBoard
 		gl = threeRenderer.context
 
 		# render baseplate transparent if cam looks from below
-		if camera.position.y < 0
+		if camera.position.z < 0
 			# one fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false

@@ -16,7 +16,7 @@ if process.env.NODE_ENV is 'development'
 
 
 commandFunctions = {
-	initialModel: (value) ->
+	model: (value) ->
 		# load selected model
 		log.debug 'loading initial model'
 		p = /^[0-9a-z]{32}/
@@ -32,13 +32,14 @@ postInitCallback = ->
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
 	commands = hash.split '+'
-	prom = Promise.resolve()
-	runCmd = (key, value) -> -> Promise.resolve commandFunctions[key](value)
+
 	for cmd in commands
 		key = cmd.split('=')[0]
 		value = cmd.split('=')[1]
 		if commandFunctions[key]?
-			prom = prom.then runCmd key, value
+			prom = Promise
+			.resolve()
+			.then Promise.resolve commandFunctions[key](value)
 
 	#clear url hash after executing commands
 	window.location.hash = ''

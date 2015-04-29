@@ -66,6 +66,7 @@ module.exports = (files, bundles, callback) ->
 				return modelCache
 				.store model
 			.then (hash) ->
+				$('.applink').prop 'href', "app#model=#{hash}"
 				Promise.all(
 					bundles.map (bundle) ->
 						return bundle.modelLoader.loadByHash hash

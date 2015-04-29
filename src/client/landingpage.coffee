@@ -66,9 +66,7 @@ Promise
 	]
 .then (bundles) ->
 
-	#console.log(bundlePromises)
-
-	$('.applink').prop 'href', "app#initialModel=#{defaultModelHash}"
+	$('.applink').prop 'href', "app#model=#{defaultModelHash}"
 
 	bundles[1].renderer.setupControls(
 		config1,

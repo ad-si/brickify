@@ -342,6 +342,12 @@ ThreeBSP = (function() {
 					f.push( v );
 					b.push( v );
 					n.push( v );
+
+					var neighborhood = polygon.findNeighborhood(vi, vj);
+					if(neighborhood) {
+						var p = neighborhood.other( polygon );
+						
+					}
 				}
 			}
 			
@@ -356,11 +362,24 @@ ThreeBSP = (function() {
 		}
 	};
 
+	ThreeBSP.Polygon.prototype.findNeighborhood = function( v1, v2 ) {
+		var i, len;
+		for (i = 0, len = this.neighborhood.length; i < len; i++) {
+			var n = this.neighborhood[i];
+			if(n.v1 === v1 && n.v2 === v2 || n.v1 === v2 && n.v2 === v1) return n;
+		}
+		return null;
+	};
+
 	ThreeBSP.Neighborhood = function( p1, p2, v1, v2 ) {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.v1 = v1;
 		this.v2 = v2;
+	};
+
+	ThreeBSP.Neighborhood.prototype.other = function( p ) {
+		return ( p === this.p1 ? this.p2 : this.p1 );
 	};
 	
 	ThreeBSP.Vertex = function( x, y, z, normal, uv ) {

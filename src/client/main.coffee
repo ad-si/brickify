@@ -1,9 +1,9 @@
 require './polyfills'
+$ = require 'jquery'
+window.jQuery = window.$ = $
+bootstrap = require 'bootstrap'
 
 path = require 'path'
-$ = require 'jquery'
-window.jQuery = window.$ = require 'jquery'
-bootstrap = require 'bootstrap'
 ZeroClipboard = require 'zeroclipboard'
 log = require 'loglevel'
 

@@ -223,6 +223,8 @@ ThreeBSP = (function() {
 		} else {
 			this.normal = this.w = undefined;
 		}
+
+		this.neighborhood = [];
 	};
 	ThreeBSP.Polygon.prototype.calculateProperties = function() {
 		var a = this.vertices[0],
@@ -320,7 +322,9 @@ ThreeBSP = (function() {
 				i, j, ti, tj, vi, vj,
 				t, v,
 				f = [],
-				b = [];
+				b = [],
+				n = [],
+				fP, bP;
 			
 			for ( i = 0, vertice_count = polygon.vertices.length; i < vertice_count; i++ ) {
 				
@@ -337,13 +341,26 @@ ThreeBSP = (function() {
 					v = vi.interpolate( vj, t );
 					f.push( v );
 					b.push( v );
+					n.push( v );
 				}
 			}
 			
 			
-			if ( f.length >= 3 ) front.push( new ThreeBSP.Polygon( f ).calculateProperties() );
-			if ( b.length >= 3 ) back.push( new ThreeBSP.Polygon( b ).calculateProperties() );
+			if ( f.length >= 3 ) front.push( fP = new ThreeBSP.Polygon( f ).calculateProperties() );
+			if ( b.length >= 3 ) back.push( bP = new ThreeBSP.Polygon( b ).calculateProperties() );
+			if( fP && bP ) {
+				var neighborhood = new ThreeBSP.Neighborhood( fP, bP, n[0], n[1] );
+				fP.neighborhood.push( neighborhood );
+				bP.neighborhood.push( neighborhood );
+			}
 		}
+	};
+
+	ThreeBSP.Neighborhood = function( p1, p2, v1, v2 ) {
+		this.p1 = p1;
+		this.p2 = p2;
+		this.v1 = v1;
+		this.v2 = v2;
 	};
 	
 	ThreeBSP.Vertex = function( x, y, z, normal, uv ) {

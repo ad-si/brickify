@@ -42,14 +42,14 @@ module.exports = class LegoBoard
 		.request('1336affaf837a831f6b580ec75c3b73a')
 		.then (model) ->
 			return model.getObject()
-		.then (modelObject) ->
+		.then (modelObject) =>
 			geometry = threeConverter.toStandardGeometry modelObject
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80
 					object = new THREE.Mesh(geometry, @studMaterial)
 					object.translateX x
 					object.translateY y
-					studsContainer.add object
+					@studsContainer.add object
 		.catch (error) ->
 			log.error error
 

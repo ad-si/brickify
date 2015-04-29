@@ -6,6 +6,8 @@
 ###
 
 THREE = require 'three'
+log = require 'loglevel'
+
 modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
 threeConverter = require '../../client/threeConverter'
@@ -49,6 +51,8 @@ module.exports = class LegoBoard
 					object.translateX x
 					object.translateY y
 					studsContainer.add object
+		.catch (error) ->
+			log.error error
 
 		# create scene for pipeline
 		@pipelineScene = @bundle.renderer.getDefaultScene()

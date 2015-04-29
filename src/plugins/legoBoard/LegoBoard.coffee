@@ -9,7 +9,6 @@ THREE = require 'three'
 log = require 'loglevel'
 
 modelCache = require '../../client/modelLoading/modelCache'
-globalConfig = require '../../common/globals.yaml'
 threeConverter = require '../../client/threeConverter'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
@@ -64,7 +63,7 @@ module.exports = class LegoBoard
 		studTexture.repeat.set 50,50
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
-			color: globalConfig.colors.basePlate
+			color: @globalConfig.colors.basePlate
 		)
 		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
 			map: studTexture
@@ -72,13 +71,13 @@ module.exports = class LegoBoard
 		@currentBaseplateMaterial = @baseplateTexturedMaterial
 
 		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlate
+				color: @globalConfig.colors.basePlate
 				opacity: 0.4
 				transparent: true
 		)
 
 		@studMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlateStud
+				color: @globalConfig.colors.basePlateStud
 		)
 
 	on3dUpdate: =>

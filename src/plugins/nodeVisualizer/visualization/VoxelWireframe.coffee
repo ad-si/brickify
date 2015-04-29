@@ -5,7 +5,7 @@ interactionHelper = require '../../../client/interactionHelper'
 # This class creates a wireframe representation with darkened sides
 # of a given set of voxels
 module.exports = class VoxelOutline
-	constructor: (@bundle, @grid, threeNode) ->
+	constructor: (@bundle, @grid, threeNode, @coloring) ->
 		@threeNode = new THREE.Object3D()
 		threeNode.add @threeNode
 
@@ -31,18 +31,14 @@ module.exports = class VoxelOutline
 		boxGeometry = @voxelUnion.run voxels, options
 
 		# add black sides to make volume more visible
-		shadowMat = new THREE.MeshBasicMaterial({
-			color: 0x000000
-			transparent: true
-			opacity: 0.3
-		})
-		shadowBox = new THREE.Mesh(boxGeometry, shadowMat)
+		shadowBox = new THREE.Mesh(boxGeometry, @coloring.legoShadowMat)
 		@threeNode.add shadowBox
 		@threeNode.shadowBox = shadowBox
 
 		# add black lines to create a visible outline
+		# material is not used, but needs to be provided
 		material = new THREE.MeshLambertMaterial({
-			color: 0xff0000
+			color: 0x000000
 		})
 		mesh = new THREE.Mesh(boxGeometry, material)
 

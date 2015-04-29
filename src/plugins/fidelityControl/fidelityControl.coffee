@@ -25,9 +25,10 @@ class FidelityControl
 		'PipelineMedium',
 		'PipelineHigh',
 	]
+	@minimalPipelineLevel = 3
 
-	init: (bundle) =>
-		@pluginHooks = bundle.pluginHooks
+	init: (@bundle) =>
+		@pluginHooks = @bundle.pluginHooks
 
 		@currentFidelityLevel = 0
 
@@ -38,7 +39,13 @@ class FidelityControl
 
 		@timesBelowMinimumFps = 0
 
-		@_setupFpsDisplay() if process.env.NODE_ENV is 'development'
+		@showFps = process.env.NODE_ENV is 'development'
+		@_setupFpsDisplay()
+
+		# allow pipeline only if we have the needed extension and a stencil buffer
+		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
+		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
+		@allowPipeline = fragDepth? and stencilBuffer
 
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
@@ -78,16 +85,35 @@ class FidelityControl
 			@_increaseFidelity()
 
 	_increaseFidelity: =>
+		# only allow pipeline when we have the extensions needed for it
+		return if @currentFidelityLevel == 2 and not @allowPipeline
+
+		# Increase fidelity
 		@currentFidelityLevel++
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)
+		@bundle.renderer.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
+
+		# Enable pipeline
+		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
+			@bundle.renderer.pipelineEnabled = true
 
 	_decreaseFidelity: =>
+		# Decrease fidelity
 		@currentFidelityLevel--
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)
+		@bundle.renderer.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
+
+		# Disable pipeline
+		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
+			@bundle.renderer.pipelineEnabled = false
 
 	getHotkeys: =>
 		return {
@@ -116,13 +142,18 @@ class FidelityControl
 		@_decreaseFidelity() if @currentFidelityLevel > 0
 
 	_setupFpsDisplay: =>
+		return unless @showFps
 		@lastDisplayUpdate = 0
 		@$fpsDisplay = $('<div class="fps-display"></div>')
 		$('body').append @$fpsDisplay
 
 	_showFps: (timestamp, fps) =>
+		return unless @showFps
 		if timestamp - @lastDisplayUpdate > fpsDisplayUpdateTime
 			@lastDisplayUpdate = timestamp
-			@$fpsDisplay.text Math.round(fps) if @$fpsDisplay?
+			levelAbbreviation = FidelityControl.fidelityLevels[@currentFidelityLevel]
+				.match(/[A-Z]/g).join('')
+			fpsText = Math.round(fps) + '/' + levelAbbreviation
+			@$fpsDisplay.text fpsText
 
 module.exports = FidelityControl

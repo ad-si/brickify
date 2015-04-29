@@ -1,8 +1,9 @@
 THREE = require 'three'
+LineMatGenerator = require './LineMatGenerator'
 
 # Provides a simple implementation on how to color voxels and bricks
 module.exports = class Coloring
-	constructor: ->
+	constructor: (@globalConfig) ->
 		@brickMaterial = new THREE.MeshLambertMaterial({
 			color: 0xfff000 #orange
 		})
@@ -41,12 +42,84 @@ module.exports = class Coloring
 			color: 0xb5ffb8 #greenish gray
 		})
 
+		@legoShadowMat = new THREE.MeshBasicMaterial({
+			color: 0x707070
+			transparent: true
+			opacity: 0.3
+		})
+		@legoShadowMat.polygonOffset = true
+		@legoShadowMat.polygonOffsetFactor = +2
+		@legoShadowMat.polygonOffsetUnits = +2
+
+		# object visualization
+		# default object material
+		@objectMaterial = new THREE.MeshLambertMaterial(
+			color: @globalConfig.colors.modelColor
+			ambient: @globalConfig.colors.modelColor
+		)
+
+		# printed object material
+		@objectPrintMaterial = new THREE.MeshLambertMaterial({
+			color: 0xeeeeee
+			opacity: 0.8
+			transparent: true
+		})
+
+		# remove z-Fighting on baseplate
+		@objectPrintMaterial.polygonOffset = true
+		@objectPrintMaterial.polygonOffsetFactor = 3
+		@objectPrintMaterial.polygonOffsetUnits = 3
+
+		@objectShadowMat = new THREE.MeshBasicMaterial(
+			color: 0x000000
+			transparent: true
+			opacity: 0.4
+			depthFunc: THREE.GreaterDepth
+		)
+		@objectShadowMat.polygonOffset = true
+		@objectShadowMat.polygonOffsetFactor = 3
+		@objectShadowMat.polygonOffsetUnits = 3
+
+		lineMaterialGenerator = new LineMatGenerator()
+		@objectLineMat = lineMaterialGenerator.generate 0x000000
+		@objectLineMat.linewidth = 2
+		@objectLineMat.transparent = true
+		@objectLineMat.opacity = 0.1
+		@objectLineMat.depthFunc = THREE.GreaterDepth
+		@objectLineMat.depthWrite = false
+
 		@_createBrickMaterials()
 
+	setPipelineMode: (enabled) =>
+		if enabled
+			@objectPrintMaterial.transparent = false
+
+			@objectShadowMat.visible = false
+			@objectLineMat.transparent = false
+			@objectLineMat.depthWrite = true
+			@objectLineMat.depthFunc = THREE.LessEqualDepth
+
+			@legoBoxHighlightMaterial.transparent = false
+			@printBoxHighlightMaterial.transparent = false
+			@objectPrintMaterial.transparent = false
+			@legoShadowMat.transparent = false
+		else
+			@objectPrintMaterial.transparent = true
+
+			@objectShadowMat.visible = true
+			@objectLineMat.transparent = true
+			@objectLineMat.depthWrite = false
+			@objectLineMat.depthFunc = THREE.GreaterDepth
+
+			@legoBoxHighlightMaterial.transparent = true
+			@printBoxHighlightMaterial.transparent = true
+			@objectPrintMaterial.transparent = true
+			@legoShadowMat.transparent = true
+
 	###
-    # Returns the highlight material collection for the supplied type of voxel
-    # @param {String} type either 'lego' or '3d' to get the respective material
-    ###
+	# Returns the highlight material collection for the supplied type of voxel
+	# @param {String} type either 'lego' or '3d' to get the respective material
+	###
 	getHighlightMaterial: (type) =>
 		if type == 'lego'
 			return {

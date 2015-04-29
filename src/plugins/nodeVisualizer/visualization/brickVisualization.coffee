@@ -110,53 +110,20 @@ class BrickVisualization
 					visualBrick.setMaterial material
 		@_oldColoring = coloring
 
-	# (re)creates voxel visualization.
-	# hides disabled voxels, updates material and stud visibility
-	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
-		# DEBUG
-		return
+		# code from updateVoxelVisualization
 
 		@unhighlightBigBrush()
-		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
-		recreate
-			@_createVoxelVisualization coloring
-			return
-
-		# update materials and show/hide studs
-		for v in @voxelsSubnode.children
-			# get material
-			material = coloring.getMaterialForVoxel v.gridEntry
-			v.setMaterial material
-			@_updateVoxel v
 
 		# show not filled lego shape as outline
 		outlineCoords = @printVoxels.map (voxel) -> voxel.voxelCoords
 		@voxelWireframe.createWireframe outlineCoords
 
+		# / code from updateVoxelVisualization
+
+		#ToDo: hide studs when brick is completely below other brick
+
 	setPossibleLegoBoxVisibility: (isVisible) =>
 		@voxelWireframe.setVisibility isVisible
-
-	# clear and create voxel visualization
-	_createVoxelVisualization: (coloring) =>
-		@voxelsSubnode.children = []
-
-		@grid.forEachVoxel (voxel) =>
-			material = coloring.getMaterialForVoxel voxel
-			p = voxel.position
-			threeBrick = @geometryCreator.getVoxel {x: p.x, y: p.y, z: p.z}, material
-			@_updateVoxel threeBrick
-			@voxelsSubnode.add threeBrick
-
-	# makes disabled voxels invisible, toggles stud visibility
-	_updateVoxel: (threeBrick) =>
-		if not threeBrick.isLego()
-			threeBrick.visible = false
-
-		coords = threeBrick.voxelCoords
-		if @grid.getVoxel(coords.x, coords.y, coords.z + 1)?.enabled
-			threeBrick.setStudVisibility false
-		else
-			threeBrick.setStudVisibility true
 
 	setStabilityView: (enabled) =>
 		@isStabilityView = enabled

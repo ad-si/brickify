@@ -2,7 +2,7 @@
   "name": "newBrickator",
   "version": "0.1.0",
   "description": "voxelises models and layouts legobricks for generated voxels",
-  "lowfab": {
+  "brickify": {
     "type": "converter"
   },
   "browser": "./newBrickator.coffee"

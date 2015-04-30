@@ -36,7 +36,7 @@ config1.plugins.newBrickator = false
 # configure right bundle to not show the model
 config2.showModel = false
 
-# instantiate 2 lowfab bundles
+# instantiate 2 brickify bundles
 config1.renderAreaId = 'renderArea1'
 bundle1 = new Bundle config1
 b1 = bundle1.init().then ->

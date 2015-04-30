@@ -1,6 +1,6 @@
 ###
   #Cakefile
-  Building and running of lowfab is specified through this cakefile.
+  Building and running of brickify is specified through this cakefile.
 
   **Note that you should only need to run `$ npm install` and `$ npm start`,
   all other tasks are being executed automatically.**
@@ -65,12 +65,10 @@ task 'build', 'Builds client and server js files', ->
   the server afterwards.
 ###
 task 'start', 'Links hooks and starts server', ->
-	# *Lowfab* is the main server part which is responsible for delivering the
-	# website and for server-side plugin integration and model processing
-	lowfab = require './src/server/main'
-
 	cakeUtilities.linkHooks()
 
-	lowfab
+	# the main server part which is responsible for delivering the
+	# website and for server-side plugin integration and model processing
+	require './src/server/main'
 		.setupRouting()
 		.startServer()

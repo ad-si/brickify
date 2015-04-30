@@ -65,10 +65,42 @@ getHeight = (threeGeometry) ->
 # @param {THREE.Geometry} threeGeometry an instance of three geometry
 # @return {Number} approximate printing time in minutes
 ###
+getEstimate = (height, surface, volume) ->
+	return 0 if volume is 0
+	return 2 + 2 * height + 0.3 * surface + 2.5 * volume
+
 module.exports.getPrintingTimeEstimate = (geometry) ->
 	height = getHeight geometry
 	surface = getSurface geometry
 	volume = getVolume geometry
 
-	return 0 if volume is 0
-	return 2 + 2 * height + 0.3 * surface + 2.5 * volume
+	return getEstimate height, surface, volume
+
+module.exports.getPrintingTimeEstimateForVoxels = (voxels, gridSpacing) ->
+	return 0 if voxels.length is 0
+
+	maxZ = voxels[0].position.z
+	minZ = maxZ
+	for voxel in voxels
+		z = voxel.position.z
+		maxZ = Math.max z, maxZ
+		minZ = Math.min z, minZ
+
+	height = (maxZ - minZ + 1) * gridSpacing.z / 10
+
+	voxelSurface = gridSpacing.x * gridSpacing.z
+	voxelSurface += gridSpacing.x * gridSpacing.y
+	voxelSurface += gridSpacing.y * gridSpacing.z
+	# voxelSurface *= 2
+	voxelSurface /= 100
+	surface = voxelSurface * voxels.length # / 2
+	# to account for adjacent voxels
+	surface /= 2
+
+	voxelVolume = gridSpacing.x * gridSpacing.y * gridSpacing.z
+	voxelVolume /= 1000
+	volume = voxelVolume * voxels.length
+	# not all voxels are completely filled
+	volume /= 3
+
+	return getEstimate height, surface, volume

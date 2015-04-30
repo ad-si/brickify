@@ -35,56 +35,75 @@ module.exports = class Voxelizer
 		}
 
 		#voxelize outer lines
-		l0 = @voxelizeLine p0, p1, voxelData, true
-		l0len = l0.length
-		l1 = @voxelizeLine p1, p2, voxelData, true
-		l1len = l1.length
-		l2 = @voxelizeLine p2, p0, voxelData, true
-		l2len = l2.length
+		@voxelizeLine p0, p1, voxelData
+		l0len = @_getLength p0, p1
+		@voxelizeLine p1, p2, voxelData
+		l1len = @_getLength p1, p2
+		@voxelizeLine p2, p0, voxelData
+		l2len = @_getLength p2, p0
 
 		#sort for short and long side
 		if l0len >= l1len and l0len >= l2len
-			longSide  = l0
-			shortSide1 = l1
-			shortSide2 = l2
+			longSide  = {start: p0, end: p1}
+			shortSide1 = {start: p1, end: p2}
+			shortSide2 = {start: p2, end: p0}
+
+			longSideLength = l0len
+			shortSideLength1 = l1len
+			shortSideLength2 = l2len
 		else if l1len >= l0len and l1len >= l2len
-			longSide = l1
-			shortSide1 = l0.reverse()
-			shortSide2 = l2.reverse()
+			longSide = {start: p1, end: p2}
+			shortSide1 = {start: p1, end: p0}
+			shortSide2 = {start: p0, end: p2}
+
+			longSideLength = l1len
+			shortSideLength1 = l0len
+			shortSideLength2 = l2len
 		else # if l2len >= l0len and l2len >= l1len
-			longSide = l2
-			shortSide1 = l1.reverse()
-			shortSide2 = l0.reverse()
+			longSide = {start: p2, end: p0}
+			shortSide1 = {start: p2, end: p1}
+			shortSide2 = {start: p1, end: p0}
+
+			longSideLength = l2len
+			shortSideLength1 = l1len
+			shortSideLength2 = l0len
 
 		longSideIndex = 0
-		longSideDelta =
-			(longSide.length - 1) / (shortSide1.length + shortSide2.length)
-		for i in [0..shortSide1.length - 1] by 1
-			p0 = @voxelGrid.mapVoxelToGrid shortSide1[i]
-			p1 = @voxelGrid.mapVoxelToGrid longSide[Math.round(longSideIndex)]
+		longSideDelta = (longSideLength - 1) / (shortSideLength1 + shortSideLength2)
+
+		for i in [0..shortSideLength1] by 1
+			p0 = @_interpolateLine shortSide1, i / shortSideLength1
+			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
 			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
-		for i in [0..shortSide2.length - 1] by 1
-			p0 = @voxelGrid.mapVoxelToGrid shortSide2[i]
-			p1 = @voxelGrid.mapVoxelToGrid longSide[Math.round(longSideIndex)]
+		for i in [0..shortSideLength2] by 1
+			p0 = @_interpolateLine shortSide2, i / shortSideLength2
+			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
 			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
-	voxelizeLine: (a, b, voxelData = true, returnVoxel = false) =>
+	_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
+		x = (x1 - x2) * (x1 - x2)
+		y = (y1 - y2) * (y1 - y2)
+		z = (z1 - z2) * (z1 - z2)
+		return Math.sqrt x + y + z
+
+	_interpolateLine: ({start: {x: x1, y: y1, z: z1},
+	end: {x: x2, y: y2, z: z2}}, i) ->
+		x = x1 + (x2 - x1) * i
+		y = y1 + (y2 - y1) * i
+		z = z1 + (z2 - z1) * i
+		return x: x, y: y, z: z
+
+	voxelizeLine: (a, b, voxelData = true) =>
 		# voxelizes the line from a to b
 		# voxel data = something to store in the voxel grid for each voxel.
 		# can be true for 'there is a voxel' or
 		# a complex object with more information
 
-		lineVoxels = []
-
 		@visitAllPointsBresenham a, b, (p) =>
 			@voxelGrid.setVoxel p, voxelData
-			if returnVoxel
-				lineVoxels.push p
-
-		return lineVoxels
 
 	visitAllPointsBresenham: (a, b, visitor) =>
 		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus

@@ -60,6 +60,11 @@ module.exports = class PluginLoader
 				require '../plugins/coordinateSystem'
 				require '../plugins/coordinateSystem/package.json'
 			)
+		if @globalConfig.plugins.nodeVisualizer
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/nodeVisualizer'
+				require '../plugins/nodeVisualizer/package.json'
+			)
 		if @globalConfig.plugins.legoBoard
 			@pluginInstances.push @_loadPlugin(
 				require '../plugins/legoBoard'
@@ -69,11 +74,6 @@ module.exports = class PluginLoader
 			@pluginInstances.push @_loadPlugin(
 				require '../plugins/newBrickator'
 				require '../plugins/newBrickator/package.json'
-			)
-		if @globalConfig.plugins.nodeVisualizer
-			@pluginInstances.push @_loadPlugin(
-				require '../plugins/nodeVisualizer'
-				require '../plugins/nodeVisualizer/package.json'
 			)
 		if @globalConfig.plugins.fidelityControl
 			@pluginInstances.push @_loadPlugin(

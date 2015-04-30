@@ -1,5 +1,7 @@
 require './polyfills'
 $ = require 'jquery'
+window.jQuery = window.$ = $
+bootstrap = require 'bootstrap'
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
@@ -18,6 +20,7 @@ globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false
+globalConfig.plugins.csg = false
 globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
 # disable wireframe on landinpage
@@ -33,7 +36,7 @@ config1.plugins.newBrickator = false
 # configure right bundle to not show the model
 config2.showModel = false
 
-# instantiate 2 lowfab bundles
+# instantiate 2 brickify bundles
 config1.renderAreaId = 'renderArea1'
 bundle1 = new Bundle config1
 b1 = bundle1.init().then ->
@@ -69,3 +72,12 @@ b1 = bundle1.init().then ->
 		@value = ''
 
 	$('.dropper').html 'Drop an stl file'
+
+# set not available message
+$('#downloadButton').click ->
+	bootbox.alert({
+		title: 'Not available'
+		message: 'This feature is not available yet - please check back later.<br>' +
+		'<br>However, you can edit and download the model with our editor '+
+		'by clicking the <strong>Customize</strong> Button'
+	})

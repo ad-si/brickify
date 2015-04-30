@@ -1,6 +1,6 @@
 #  #Plugin API#
 #
-#  Server-side plugins can provide the following hooks to interact with lowfab.
+#  Server-side plugins can provide the following hooks to interact with brickify.
 #
 #  The hooks must exist at load-time. Hooks that are added later during
 #  run-time will not be called.

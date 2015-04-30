@@ -2,7 +2,7 @@
   "name": "csg",
   "version": "0.1.0",
   "description": "Creates Constructive Solid Geometry",
-  "lowfab": {
+  "brickify": {
     "type": "?"
   },
   "browser": "./csg.coffee"

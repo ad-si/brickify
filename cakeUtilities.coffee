@@ -8,7 +8,7 @@ coffeeScript = require 'coffee-script'
 mkdirp = require 'mkdirp'
 # Recursively process folders and files
 readdirp = require 'readdirp'
-# Support mixing .coffee and .js files in lowfab-project
+# Support mixing .coffee and .js files in brickify-project
 coffeeify = require 'coffeeify'
 # Load yaml configuration into javascript file
 browserifyData = require('browserify-data')

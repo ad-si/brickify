@@ -43,7 +43,7 @@ class CSG
 		return selectedNode.getPluginData 'csg'
 		.then (data) ->
 			if not data?
-				# create empty dataset for own data
+				# create empty data set for own data
 				data = {}
 				selectedNode.storePluginData 'csg', data, true
 
@@ -51,7 +51,7 @@ class CSG
 			return selectedNode.getPluginData 'newBrickator'
 			.then (newBrickatorData) ->
 				data.grid = newBrickatorData.grid
-				data.csgNeedsRecalculation = newBrickatorData.csgNeedsRecalculation
+				data.csgNeedsRecalculation = true if newBrickatorData.csgNeedsRecalculation
 				newBrickatorData.csgNeedsRecalculation = false
 				# finally return own data + newBrickator grid
 				return data
@@ -69,7 +69,7 @@ class CSG
 			options.profile = true
 			options.transformedModel = cachedData.transformedThreeModel
 
-			cachedData.csg = @csgExtractor.extractGeometry cachedData.grid, options
+			cachedData.csg = @csgExtractor.extractMesh cachedData.grid, options
 
 			return cachedData.csg
 
@@ -106,6 +106,9 @@ class CSG
 
 		# check if there was a brush action that forces us
 		# to recreate CSG
-		return cachedData.csgNeedsRecalculation
+		if cachedData.csgNeedsRecalculation
+			cachedData.csgNeedsRecalculation = false
+			return true
+		return false
 
 module.exports = CSG

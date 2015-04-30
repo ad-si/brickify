@@ -32,6 +32,7 @@ class PreviewUi
 
 	toggleStabilityView: =>
 		@stabilityViewEnabled = !@stabilityViewEnabled
+		@_quitAssemblyView()
 
 		if @stabilityViewEnabled
 			@workflowUi.enableOnly @
@@ -50,7 +51,7 @@ class PreviewUi
 	_initAssemblyView: =>
 		@assemblyViewEnabled = no
 		@$assemblyViewButton = $('#buildButton')
-		@$assemblyViewButton.click @_toggleAssemblyView
+		@$assemblyViewButton.click @toggleAssemblyView
 		@previewAssemblyUi = new PreviewAssemblyUi @
 
 	_quitAssemblyView: =>
@@ -59,8 +60,9 @@ class PreviewUi
 		@previewAssemblyUi.setEnabled no
 		@editController.enableInteraction()
 
-	_toggleAssemblyView: =>
+	toggleAssemblyView: =>
 		@assemblyViewEnabled = !@assemblyViewEnabled
+		@_quitStabilityView()
 
 		if @assemblyViewEnabled
 			@workflowUi.enableOnly @

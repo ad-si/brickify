@@ -1,10 +1,10 @@
 THREE = require 'three'
 
 module.exports.link = (node, threeNode) ->
-	threeNode.brickolageNode = node.id
+	threeNode.brickifyNode = node.id
 
 module.exports.find = (node, threeParentNode) ->
-	threeParentNode.getObjectByProperty 'brickolageNode', node.id, true
+	threeParentNode.getObjectByProperty 'brickifyNode', node.id, true
 
 applyNodeTransforms = (node, threeNode) ->
 	_set = (property, vector) -> property.set vector.x, vector.y, vector.z

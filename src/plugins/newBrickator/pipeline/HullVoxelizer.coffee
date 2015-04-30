@@ -69,7 +69,7 @@ module.exports = class Voxelizer
 			shortSideLength2 = l0len
 
 		longSideIndex = 0
-		longSideDelta = (longSideLength - 1) / (shortSideLength1 + shortSideLength2)
+		longSideDelta = longSideLength / (shortSideLength1 + shortSideLength2)
 
 		for i in [0..shortSideLength1] by 1
 			p0 = @_interpolateLine shortSide1, i / shortSideLength1

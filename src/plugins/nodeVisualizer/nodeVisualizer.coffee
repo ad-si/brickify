@@ -404,6 +404,9 @@ class NodeVisualizer
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg csg
 					@_updatePrintTime csg
+				.catch (error) ->
+					log.error error
+
 
 	# check whether the pointer is over a model/brick visualization
 	pointerOverModel: (event, ignoreInvisible = true) =>

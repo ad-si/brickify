@@ -138,7 +138,9 @@ class BrickVisualization
 			for brick in brickLayer
 				material = coloring.getMaterialForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), material
+					brick.getPosition(),
+					brick.getSize(),
+					material
 				)
 				layerObject.add threeBrick
 

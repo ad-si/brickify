@@ -47,13 +47,13 @@ module.exports = (files, bundles, callback) ->
 			then data.faceCount
 			else files[0].size / averageFaceSize
 		else
-			progress = (data.number / faceCounter) * 100
-			if progress < 100
+			progress = (data.number / faceCounter) * 80
+			if progress < 80
 				nanobar.go progress
 
 	modelBuilder = new meshlib.ModelBuilder()
 	modelBuilder.on 'model', (model) ->
-		nanobar.go 100
+		nanobar.go 90
 		$loadingTextElement.text 'Processing Geometry'
 
 		# Give time to render text
@@ -74,6 +74,7 @@ module.exports = (files, bundles, callback) ->
 						return bundle.modelLoader.loadByHash hash
 				)
 			.then (bundles) ->
+				nanobar.go 100
 				$('#loadButton span').text 'Drop an STL File'
 				callback bundles
 		, 50

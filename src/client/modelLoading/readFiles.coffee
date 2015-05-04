@@ -47,7 +47,9 @@ module.exports = (files, bundles, callback) ->
 			then data.faceCount
 			else files[0].size / averageFaceSize
 		else
-			nanobar.go	(data.number / faceCounter) * 100
+			progress = (data.number / faceCounter) * 100
+			if progress < 100
+				nanobar.go progress
 
 	modelBuilder = new meshlib.ModelBuilder()
 	modelBuilder.on 'model', (model) ->

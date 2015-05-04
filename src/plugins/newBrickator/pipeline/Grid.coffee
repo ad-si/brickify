@@ -193,6 +193,11 @@ module.exports = class Grid
 		for own key of @voxels
 			callback @voxels[key]
 
+	getDisabledVoxels: =>
+		voxels = []
+		@forEachVoxel (voxel) -> voxels.push voxel unless voxel.enabled
+		return voxels
+
 	getNeighbors: (x, y, z, selectionCallback) =>
 		# returns a list of neighbors for this voxel position.
 		# the selectionCallback(neighbor) defines what to return

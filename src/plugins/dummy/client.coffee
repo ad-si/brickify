@@ -7,10 +7,10 @@
 #
 # We encourage plugin developers to split their plugins in several modules.
 # The main file referenced in the module's `package.json`
-# will be loaded by the lowfab framework.
+# will be loaded by the brickify framework.
 #
 # This file must return a class which provides **hook-methods** that specify
-# the interaction between the lowfab framework and the plugin.
+# the interaction between the brickify framework and the plugin.
 # E.g. `dummyPlugin.on3dUpdate()`.
 #
 # @class DummyPlugin
@@ -100,7 +100,7 @@ class DummyPlugin
 
 
 	###
-	# When a file is loaded into lowfab, the `fileLoader` will try to import
+	# When a file is loaded into brickify, the `fileLoader` will try to import
 	# it with every plugin that implements importFile until one succeeds.
 	# The file's name and its content are provided as arguments.
 	#

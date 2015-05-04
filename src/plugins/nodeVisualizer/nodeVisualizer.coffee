@@ -10,6 +10,7 @@ stencilBits = require '../../client/rendering/stencilBits'
 Coloring = require './visualization/Coloring'
 ColorMultPart = require '../../client/rendering/shader/ColorMultPart'
 ExpandBlackPart = require '../../client/rendering/shader/ExpandBlackPart'
+PrintingTimeEstimator = require './printingTimeEstimator'
 
 
 ###
@@ -199,6 +200,10 @@ class NodeVisualizer
 			cachedData.brickVisualization.updateVoxelVisualization()
 			cachedData.brickVisualization.showVoxels()
 			@_updateBrickCount cachedData.brickVisualization.grid.getAllBricks()
+			@_updateQuickPrintTime(
+				cachedData.brickVisualization.grid.getDisabledVoxels()
+				cachedData.brickVisualization.grid.spacing
+			)
 
 	onNodeAdd: (node) =>
 		# link other plugins
@@ -379,10 +384,16 @@ class NodeVisualizer
 
 	_updatePrintTime: (csg) =>
 		if csg?.geometry?
-			time = @csg.getPrintingTimeEstimate csg.geometry
-			@timeEstimate?.text Math.round(time)
+			time = PrintingTimeEstimator.getPrintingTimeEstimate csg.geometry
+			time = Math.round time
+			@timeEstimate?.text time
 		else
 			@timeEstimate?.text 0
+
+	_updateQuickPrintTime: (voxels, spacing) =>
+		time = PrintingTimeEstimator.getPrintingTimeEstimateForVoxels voxels, spacing
+		time = Math.round time
+		@timeEstimate?.text time
 
 	_showCsg: (cachedData) =>
 		@csg ?= @bundle.getPlugin 'csg'

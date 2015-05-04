@@ -2,7 +2,7 @@
   "name": "coordinate-system",
   "version": "0.1.0",
   "description": "Colored coordinate system for better navigation.",
-  "lowfab": {
+  "brickify": {
     "type": "renderer"
   },
   "browser": "./coordinateSystem.coffee"

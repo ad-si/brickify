@@ -1,6 +1,5 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
-printingTimeEstimator = require './printingTimeEstimator'
 
 class CSG
 	###
@@ -111,8 +110,5 @@ class CSG
 			cachedData.csgNeedsRecalculation = false
 			return true
 		return false
-
-	getPrintingTimeEstimate: (geometry) ->
-		printingTimeEstimator.getPrintingTimeEstimate geometry
 
 module.exports = CSG

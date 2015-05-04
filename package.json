@@ -1,16 +1,16 @@
 {
-  "name": "Lowfab",
-  "version": "0.7.0",
-  "description": "Combine various fabrication techniques to materialize your 3D-models",
+  "name": "Brickify",
+  "version": "0.8.0",
+  "description": "Extend your LEGO� with 3D-printed parts!",
   "keywords": [
     "fabrication",
     "3d printing",
     "lego"
   ],
-  "homepage": "http://lowfab.net",
+  "homepage": "http://brickify.it",
   "bugs": "http://github.com/stuikomma/lowfab/issues",
   "dependencies": {
-    "PEP": "Lowfab/PEP#0.3.1",
+    "PEP": "brickify/PEP#0.3.1",
     "array.prototype.find": "^1.0.0",
     "array.prototype.findindex": "^1.0.0",
     "blueimp-md5": "^1.1.0",
@@ -54,8 +54,8 @@
     "stl-parser": "^0.6.0",
     "string.prototype.endswith": "^0.2.0",
     "stylus": "^0.50.0",
-    "three": "Lowfab/three.js#dev-20150416",
-    "three-orbit-controls": "Lowfab/three-orbit-controls#v69.2.0-beta",
+    "three": "brickify/three.js#dev-20150416",
+    "three-orbit-controls": "brickify/three-orbit-controls#v69.2.0-beta",
     "winston": "^0.8.1",
     "zeroclipboard": "^2.2.0"
   },

@@ -23,6 +23,7 @@ globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false
+globalConfig.plugins.csg = false
 globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
 # disable wireframe on landinpage

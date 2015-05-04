@@ -29,9 +29,9 @@ getBoundingSphereWorld = (threeNode) ->
 
 module.exports = {
 	link: (node, threeNode) ->
-		threeNode.brickolageNode = node.id
+		threeNode.brickifyNode = node.id
 	find: (node, threeParentNode) ->
-		threeParentNode.getObjectByProperty 'brickolageNode', node.id, true
+		threeParentNode.getObjectByProperty 'brickifyNode', node.id, true
 	applyNodeTransforms: applyNodeTransforms
 	getTransformMatrix: getTransformMatrix
 	getBoundingSphereWorld: getBoundingSphereWorld

@@ -29,7 +29,7 @@ module.exports = (files, bundles, callback) ->
 	faceCounter = 0
 
 	nanobar.go 0
-	$loadingTextElement.text 'Loading…'
+	$loadingTextElement.text 'Loading File'
 
 	fileStream = new ReadableFileStream files[0]
 	fileStream.on 'error', (error) ->
@@ -54,7 +54,7 @@ module.exports = (files, bundles, callback) ->
 	modelBuilder = new meshlib.ModelBuilder()
 	modelBuilder.on 'model', (model) ->
 		nanobar.go 100
-		$loadingTextElement.text 'Processing…'
+		$loadingTextElement.text 'Processing Geometry'
 
 		# Give time to render text
 		setTimeout ->
@@ -64,7 +64,7 @@ module.exports = (files, bundles, callback) ->
 			.buildFaceVertexMesh()
 			.done (modelPromise) -> modelPromise
 			.then ->
-				$loadingTextElement.text 'Opening…'
+				$loadingTextElement.text 'Preparing View'
 				return modelCache
 				.store model
 			.then (hash) ->

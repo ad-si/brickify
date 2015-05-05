@@ -68,21 +68,19 @@ module.exports = class Voxelizer
 			shortSideLength1 = l1len
 			shortSideLength2 = l0len
 
-		longSideIndex = 0
 		longSideDelta = longSideLength / (shortSideLength1 + shortSideLength2)
-		stepSize = @voxelGrid.spacing.x + @voxelGrid.spacing.y + @voxelGrid.spacing.z
-		stepSize /= 60
+		longSideIndex = longSideDelta
 
-		for i in [0..shortSideLength1] by 1
+		for i in [1..shortSideLength1] by 1
 			p0 = @_interpolateLine shortSide1, i / shortSideLength1
 			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
-			longSideIndex += longSideDelta * stepSize
+			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
-		for i in [0..shortSideLength2] by 1
+		for i in [1..shortSideLength2] by 1
 			p0 = @_interpolateLine shortSide2, i / shortSideLength2
 			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
-			longSideIndex += longSideDelta * stepSize
+			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
 	_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->

@@ -14,9 +14,9 @@ module.exports = (chai, utils) ->
 	)
 
 compareVertex = (expect, obj, coords) ->
-	expect(obj.x).to.equal(coords[0])
-	expect(obj.y).to.equal(coords[1])
-	expect(obj.z).to.equal(coords[2])
+	{x, y, z} = obj
+	o = [x, y, z]
+	expect(o).to.deep.equal(coords)
 
 comparePolygon = (expect, obj, coordsarray) ->
 	expect(obj.vertices).to.have.length(coordsarray.length)

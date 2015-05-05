@@ -1,6 +1,7 @@
 $ = require 'jquery'
 modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
+log = require 'loglevel'
 
 
 module.exports = class DownloadProvider
@@ -17,9 +18,15 @@ module.exports = class DownloadProvider
 			holeRadius: @exportUi.holeRadius
 		}
 
-		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
+		downloadPromises = @bundle.pluginHooks.getDownload(
+			selectedNode,
+			downloadOptions
+		)
 
-		Promise.all(promisesArray).then (resultsArray) ->
+		Promise
+		.all downloadPromises
+		.then (resultsArray) ->
 			for result in resultsArray
-				if result.fileName.length > 0
-					saveAs result.data, result.fileName
+				saveAs new Blob([result.data]), result.fileName
+		.catch (error) ->
+			log.error error

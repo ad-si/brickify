@@ -1,5 +1,8 @@
+require 'string.prototype.endswith'
+
 THREE = require 'three'
 meshlib = require 'meshlib'
+stlExporter = require 'stl-exporter'
 log = require 'loglevel'
 
 modelCache = require '../../client/modelLoading/modelCache'
@@ -7,6 +10,7 @@ LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 Brick = require './pipeline/Brick'
 threeHelper = require '../../client/threeHelper'
+threeConverter = require '../../client/threeConverter'
 Spinner = require '../../client/Spinner'
 
 ###
@@ -53,7 +57,7 @@ class NewBrickator
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
-		log.debug 'relayouting modified parts, creating bricks:',createBricks
+		log.debug 'relayouting modified parts, creating bricks:', createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
 			modifiedBricks = []
@@ -133,33 +137,33 @@ class NewBrickator
 
 	getDownload: (selectedNode, downloadOptions) =>
 		options = @_prepareCSGOptions(
-			downloadOptions.studRadius, downloadOptions.holeRadius
+			downloadOptions.studRadius,
+			downloadOptions.holeRadius
 		)
+		emptyPromise = Promise.resolve {data: '', fileName: ''}
 
 		@csg ?= @bundle.getPlugin 'csg'
 		if not @csg?
 			log.warn 'Unable to create download due to CSG Plugin missing'
-			return Promise.resolve { data: '', fileName: '' }
+			return emptyPromise
 
-		dlPromise = new Promise (resolve, reject) =>
-			@csg.getCSG selectedNode, options
-			.then (detailedCsg) ->
-				if not detailedCsg?
-					resolve { data: '', fileName: '' }
-					return
+		return @csg
+		.getCSG selectedNode, options
+		.then (detailedCsg) ->
+			if not detailedCsg?
+				return emptyPromise
 
-				optimizedModel = new meshlib.OptimizedModel()
-				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
+			modelObject = threeConverter.toModelObject detailedCsg.geometry
 
-				meshlib
-				.model(optimizedModel)
-				.export null, (error, binaryStl) ->
-					fn = "brickify-#{selectedNode.name}"
-					if fn.indexOf('.stl') < 0
-						fn += '.stl'
-					resolve { data: binaryStl, fileName: fn }
+			return selectedNode
+			.getName()
+			.then (name) ->
+				name += '.stl' unless name.endsWith('.stl')
 
-		return dlPromise
+				return {
+				data: stlExporter.toBinaryStl modelObject.mesh.faceVertex
+				fileName: name.toLowerCase().replace(' ', '_')
+				}
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}
@@ -187,10 +191,6 @@ class NewBrickator
 		options.addStuds = true
 
 		return options
-
-
-
-
 
 
 module.exports = NewBrickator

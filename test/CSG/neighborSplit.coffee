@@ -153,7 +153,30 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 			expect(back.neighborhood).not.to.contain(neighbor)
 
 		it 'should connect old neighbor with new polygons on second split', ->
-			expect(false).to.be.ok
+			base = templateToPolygon baseTemplate
+			split = templateToPolygon splitTemplate
+			split2 = templateToPolygon split2Template
+			front = []
+			back = []
+			split.splitPolygon base, [], [], front, back
+			front = front[0]
+			back = back[0]
+			front2 = []
+			back2 = []
+			split2.splitPolygon front, [], [], front2, back2
+			front2 = front2[0]
+			back2 = back2[0]
+			expect(back.neighborhood).to.have.length(2)
+			neighbor1 = back.neighborhood[0]
+			expect(neighbor1.p1).to.equal(back)
+			expect(neighbor1.p2).to.equal(front2)
+			expect(neighbor1.v1).to.equal([1, 0, 0])
+			expect(neighbor1.v2).to.equal([0, 0, 0])
+			neighbor2 = back.neighborhood[1]
+			expect(neighbor2.p1).to.equal(back)
+			expect(neighbor2.p2).to.equal(back2)
+			expect(neighbor2.v1).to.equal([-1, 0, 0])
+			expect(neighbor2.v2).to.equal([0, 0, 0])
 
 	describe 'second split back tests', ->
 		it 'should correctly split back twice', ->
@@ -240,6 +263,28 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 			expect(front.neighborhood).not.to.contain(neighbor)
 			expect(back.neighborhood).not.to.contain(neighbor)
 
-
 		it 'should connect old neighbor with new polygons on second split', ->
-			expect(false).to.be.ok
+			base = templateToPolygon baseTemplate
+			split = templateToPolygon splitTemplate
+			split2 = templateToPolygon split2Template
+			front = []
+			back = []
+			split.splitPolygon base, [], [], front, back
+			front = front[0]
+			back = back[0]
+			front2 = []
+			back2 = []
+			split2.splitPolygon back, [], [], front2, back2
+			front2 = front2[0]
+			back2 = back2[0]
+			expect(front.neighborhood).to.have.length(2)
+			neighbor1 = front.neighborhood[0]
+			expect(neighbor1.p1).to.equal(front)
+			expect(neighbor1.p2).to.equal(back2)
+			expect(neighbor1.v1).to.equal([-1, 0, 0])
+			expect(neighbor1.v2).to.equal([0, 0, 0])
+			neighbor2 = front.neighborhood[1]
+			expect(neighbor2.p1).to.equal(front)
+			expect(neighbor2.p2).to.equal(front2)
+			expect(neighbor2.v1).to.equal([1, 0, 0])
+			expect(neighbor2.v2).to.equal([0, 0, 0])

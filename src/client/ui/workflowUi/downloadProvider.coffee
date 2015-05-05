@@ -2,14 +2,10 @@ $ = require 'jquery'
 modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
 
+
 module.exports = class DownloadProvider
-	constructor: (@bundle) ->
-		return
-
-	init: (jqueryString, @exportUi, @sceneManager) =>
-		@jqueryObject = $(jqueryString)
-
-		@jqueryObject.on 'click', =>
+	constructor: ({@bundle, selectorString, @exportUi, @sceneManager}) ->
+		$(selectorString).on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
 				@_createDownload 'stl', selNode

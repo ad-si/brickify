@@ -381,6 +381,8 @@ ThreeBSP = (function() {
 							bP.neighborhood.push( nPi );
 						}
 					}
+				} else if ( ti === COPLANAR ) {
+					vl.push( vi );
 				}
 			}
 

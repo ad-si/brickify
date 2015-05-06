@@ -88,6 +88,26 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 			back = back[0]
 			expect(back).to.equal([[-1, 0, 0], [0, 0, 0], [0, 1, 0]])
 
+		it 'should set correct neighborhood on first split of triangle with coplanar
+			vertex', ->
+			base = templateToPolygon baseTriangle
+			split = templateToPolygon splitYZTemplate
+
+			front = []
+			back = []
+			split.splitPolygon base, [], [], front, back
+			front = front[0]
+			back = back[0]
+			expect(front.neighborhood).to.have.length(1)
+			neighborhood = front.neighborhood[0]
+			expect(neighborhood.p1).to.equal(front)
+			expect(neighborhood.p2).to.equal(back)
+			expect(neighborhood.v1).to.equal([0, 0, 0])
+			expect(neighborhood.v2).to.equal([0, 1, 0])
+
+			expect(back.neighborhood).to.have.length(1)
+			expect(back.neighborhood[0]).to.equal(neighborhood)
+
 	describe 'second split front tests', ->
 		it 'should correctly split front twice', ->
 			base = templateToPolygon baseTemplate

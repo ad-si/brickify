@@ -421,7 +421,7 @@ ThreeBSP = (function() {
 	ThreeBSP.Neighborhood.prototype.remove = function() {
 		var i1 = this.p1.neighborhood.indexOf( this );
 		this.p1.neighborhood.splice(i1, 1);
-		var i2 = this.p1.neighborhood.indexOf( this );
+		var i2 = this.p2.neighborhood.indexOf( this );
 		this.p2.neighborhood.splice(i2, 1);
 	};
 

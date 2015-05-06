@@ -351,13 +351,13 @@ ThreeBSP = (function() {
 					vl.push( v );
 
 					// neighborhood between old neighbor and two new polygons
-					var neighborhood = polygon.findNeighborhood(vi, vj);
+					var neighborhood = polygon.findNeighborhood( vi, vj );
 					if ( neighborhood ) {
 						var n, ni, nj, nPi, nPj;
 						n = neighborhood.other( polygon );
 						ni = n.vertices.indexOf( vi );
 						nj = n.vertices.indexOf( vj );
-						if( nj - ni === 1 || ni - nj > 1) {
+						if( nj - ni === 1 || ni - nj > 1 ) {
 							n.vertices.splice( ni + 1, 0, v );
 						} else {
 							n.vertices.splice( nj + 1, 0, v );

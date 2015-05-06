@@ -386,9 +386,9 @@ ThreeBSP = (function() {
 				}
 			}
 
-
 			if ( fP.isValid() ) front.push( fP.calculateProperties() );
 			if ( bP.isValid() ) back.push( bP.calculateProperties() );
+
 			// neighborhood between new polygons
 			if ( fP.isValid() && bP.isValid() ) {
 				var neighborhood = new ThreeBSP.Neighborhood( fP, bP, vl[0], vl[1] );

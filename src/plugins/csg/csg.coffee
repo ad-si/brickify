@@ -1,5 +1,6 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
+csgCleaner = require './csgCleaner'
 
 class CSG
 	###
@@ -62,14 +63,16 @@ class CSG
 			return Promise.resolve cachedData.csg
 
 		return @_prepareModel cachedData, selectedNode
-		.then (threeModel) =>
-			cachedData.transformedThreeModel = threeModel
+		.then (threeGeometry) =>
+			cachedData.transformedthreeGeometry = threeGeometry
 			@csgExtractor ?= new CsgExtractor()
 
 			options.profile = true
-			options.transformedModel = cachedData.transformedThreeModel
+			options.transformedModel = cachedData.transformedthreeGeometry
 
-			cachedData.csg = @csgExtractor.extractMesh cachedData.grid, options
+			cachedData.csg = @csgExtractor.extractGeometry cachedData.grid, options
+
+			csgCleaner.clean cachedData.csg
 
 			return cachedData.csg
 
@@ -77,15 +80,15 @@ class CSG
 	# that is transformed to match the grid
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
-			if cachedData.transformedThreeModel?
-				resolve(cachedData.transformedThreeModel)
+			if cachedData.transformedthreeGeometry?
+				resolve(cachedData.transformedthreeGeometry)
 				return
 
 			selectedNode.getModel()
 			.then (model) ->
-				threeModel = model.convertToThreeGeometry()
-				threeModel.applyMatrix threeHelper.getTransformMatrix selectedNode
-				resolve(threeModel)
+				threeGeometry = model.convertToThreeGeometry()
+				threeGeometry.applyMatrix threeHelper.getTransformMatrix selectedNode
+				resolve(threeGeometry)
 			.catch (error) ->
 				reject(error)
 

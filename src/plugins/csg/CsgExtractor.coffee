@@ -5,11 +5,11 @@ VoxelUnion = require './VoxelUnion'
 
 
 module.exports = class CsgExtractor
-	extractMesh: (grid, options = {}) ->
+	extractGeometry: (grid, options = {}) ->
 		# extracts voxel that are not selected for
 		# legofication (where enabled = false)
-		# intersected with the original mesh
-		# as a THREE.Mesh
+		# intersected with the original geometry
+		# as a THREE.Geometry
 
 		# options may be
 		# {
@@ -27,7 +27,7 @@ module.exports = class CsgExtractor
 			log.debug "Grid analysis took #{new Date() - d}ms"
 
 		if legoVoxels.length == 0
-			return new THREE.Mesh options.transformedModel, null
+			return options.transformedModel
 
 		d = new Date()
 		voxunion = new VoxelUnion(grid)
@@ -36,11 +36,11 @@ module.exports = class CsgExtractor
 			log.debug "Voxel Geometrizer took #{new Date() - d}ms"
 
 		d = new Date()
-		printMesh = @_extractPrintGeometry options.transformedModel, voxelHull
+		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
 		if options.profile
 			log.debug "Print geometry took #{new Date() - d}ms"
 
-		return printMesh
+		return printGeometry
 
 	_analyzeGrid: (grid) ->
 		# creates a list of voxels to be legotized
@@ -80,4 +80,4 @@ module.exports = class CsgExtractor
 		modelBsp = new ThreeBSP(originalModel)
 
 		printBsp = modelBsp.subtract(voxelHull)
-		return printBsp.toMesh(null)
+		return printBsp.toGeometry()

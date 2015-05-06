@@ -75,5 +75,5 @@ module.exports = class Ui
 
 	_toggleRendering: =>
 		fidelityControl = @bundle.getPlugin 'FidelityControl'
-		fidelityControl.reset() if fidelityControl?
+		fidelityControl?.reset()
 		@renderer.toggleRendering()

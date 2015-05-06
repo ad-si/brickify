@@ -443,9 +443,7 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 			v1 = base1.vertices[2] # 1, 0, 0
 			v2 = base1.vertices[3] # 0, 1, 0
 
-			neighbor = new ThreeBSP.Neighborhood base1, base2, v1, v2
-			base1.neighborhood.push neighbor
-			base2.neighborhood.push neighbor
+			new ThreeBSP.Neighborhood base1, base2, v1, v2
 
 			front = []
 			back = []
@@ -476,9 +474,7 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 			v1 = base1.vertices[1] # 0, -1, 0
 			v2 = base1.vertices[2] # 1, 0, 0
 
-			neighbor = new ThreeBSP.Neighborhood base1, base2, v1, v2
-			base1.neighborhood.push neighbor
-			base2.neighborhood.push neighbor
+			new ThreeBSP.Neighborhood base1, base2, v1, v2
 
 			front = []
 			back = []

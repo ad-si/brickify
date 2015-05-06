@@ -342,6 +342,9 @@ ThreeBSP = (function() {
 
 				if ( ti != BACK ) fP.vertices.push( vi );
 				if ( ti != FRONT ) bP.vertices.push( vi );
+
+				var nOld = polygon.findNeighborhood( vi, vj );
+
 				if ( (ti | tj) === SPANNING ) {
 					t = ( this.w - this.normal.dot( vi ) ) / this.normal.dot( vj.clone().subtract( vi ) );
 					v = vi.interpolate( vj, t );
@@ -351,23 +354,22 @@ ThreeBSP = (function() {
 					vl.push( v );
 
 					// neighborhood between old neighbor and two new polygons
-					var neighborhood = polygon.findNeighborhood( vi, vj );
-					if ( neighborhood ) {
-						var n, ni, nj, nPi, nPj;
-						n = neighborhood.other( polygon );
-						ni = n.vertices.indexOf( vi );
-						nj = n.vertices.indexOf( vj );
+					if ( nOld ) {
+						var other, ni, nj, nPi, nPj;
+						other = nOld.other( polygon );
+						ni = other.vertices.indexOf( vi );
+						nj = other.vertices.indexOf( vj );
 						if( nj - ni === 1 || ni - nj > 1 ) {
-							n.vertices.splice( ni + 1, 0, v );
+							other.vertices.splice( ni + 1, 0, v );
 						} else {
-							n.vertices.splice( nj + 1, 0, v );
+							other.vertices.splice( nj + 1, 0, v );
 						}
-						neighborhood.remove();
+						nOld.remove();
 
-						nPi = new ThreeBSP.Neighborhood( n, null, vi, v );
-						n.neighborhood.push( nPi );
-						nPj = new ThreeBSP.Neighborhood( n, null, vj, v );
-						n.neighborhood.push( nPj );
+						nPi = new ThreeBSP.Neighborhood( other, null, vi, v );
+						other.neighborhood.push( nPi );
+						nPj = new ThreeBSP.Neighborhood( other, null, vj, v );
+						other.neighborhood.push( nPj );
 
 						if ( ti != BACK && tj != FRONT ) {
 							nPi.p2 = fP;
@@ -385,40 +387,38 @@ ThreeBSP = (function() {
 					vl.push( vi );
 
 					// neighborhood between old neighbor and two new polygons
-					var neighborhood = polygon.findNeighborhood( vi, vj );
-					if ( neighborhood ) {
-						var n, nP;
-						n = neighborhood.other( polygon );
-						neighborhood.remove();
+					if ( nOld ) {
+						var other, nNew;
+						other = nOld.other( polygon );
+						nOld.remove();
 
-						nP = new ThreeBSP.Neighborhood( n, null, vi, vj );
-						n.neighborhood.push( nP )
+						nNew = new ThreeBSP.Neighborhood( other, null, vi, vj );
+						other.neighborhood.push( nNew );
 
 						if ( tj != FRONT ) {
-							nP.p2 = bP;
-							bP.neighborhood.push( nP );
+							nNew.p2 = bP;
+							bP.neighborhood.push( nNew );
 						} else if ( tj != BACK ) {
-							nP.p2 = fP
-							fP.neighborhood.push( nP );
+							nNew.p2 = fP;
+							fP.neighborhood.push( nNew );
 						}
 					}
 				} else if ( tj === COPLANAR ) {
 					// neighborhood between old neighbor and two new polygons
-					var neighborhood = polygon.findNeighborhood( vi, vj );
-					if ( neighborhood ) {
-						var n, nP;
-						n = neighborhood.other( polygon );
-						neighborhood.remove();
+					if ( nOld ) {
+						var other, nNew;
+						other = nOld.other( polygon );
+						nOld.remove();
 
-						nP = new ThreeBSP.Neighborhood( n, null, vi, vj );
-						n.neighborhood.push( nP )
+						nNew = new ThreeBSP.Neighborhood( other, null, vi, vj );
+						other.neighborhood.push( nNew );
 
 						if ( ti != FRONT ) {
-							nP.p2 = bP;
-							bP.neighborhood.push( nP );
+							nNew.p2 = bP;
+							bP.neighborhood.push( nNew );
 						} else if ( ti != BACK ) {
-							nP.p2 = fP
-							fP.neighborhood.push( nP );
+							nNew.p2 = fP;
+							fP.neighborhood.push( nNew );
 						}
 					}
 				}
@@ -429,9 +429,9 @@ ThreeBSP = (function() {
 
 			// neighborhood between new polygons
 			if ( fP.isValid() && bP.isValid() ) {
-				var neighborhood = new ThreeBSP.Neighborhood( fP, bP, vl[0], vl[1] );
-				fP.neighborhood.push( neighborhood );
-				bP.neighborhood.push( neighborhood );
+				var nNew = new ThreeBSP.Neighborhood( fP, bP, vl[0], vl[1] );
+				fP.neighborhood.push( nNew );
+				bP.neighborhood.push( nNew );
 			}
 		}
 	};

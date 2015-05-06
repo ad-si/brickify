@@ -348,26 +348,26 @@ ThreeBSP = (function() {
 
 					fP.vertices.push( v );
 					bP.vertices.push( v );
-					n.push( v );
+					vl.push( v );
 
 					// neighborhood between old neighbor and two new polygons
 					var neighborhood = polygon.findNeighborhood(vi, vj);
 					if ( neighborhood ) {
-						var p, ii, ij, nPi, nPj;
-						p = neighborhood.other( polygon );
-						ii = p.vertices.indexOf( vi );
-						ij = p.vertices.indexOf( vj );
-						if( ij - ii === 1 || ii - ij > 1) {
-							p.vertices.splice( ii + 1, 0, v );
+						var n, ni, nj, nPi, nPj;
+						n = neighborhood.other( polygon );
+						ni = n.vertices.indexOf( vi );
+						nj = n.vertices.indexOf( vj );
+						if( nj - ni === 1 || ni - nj > 1) {
+							n.vertices.splice( ni + 1, 0, v );
 						} else {
-							p.vertices.splice( ij + 1, 0, v );
+							n.vertices.splice( nj + 1, 0, v );
 						}
 						neighborhood.remove();
 
-						nPi = new ThreeBSP.Neighborhood( p, null, vi, v );
-						p.neighborhood.push( nPi );
-						nPj = new ThreeBSP.Neighborhood( p, null, vj, v );
-						p.neighborhood.push( nPj );
+						nPi = new ThreeBSP.Neighborhood( n, null, vi, v );
+						n.neighborhood.push( nPi );
+						nPj = new ThreeBSP.Neighborhood( n, null, vj, v );
+						n.neighborhood.push( nPj );
 
 						if ( ti != BACK && tj != FRONT ) {
 							nPi.p2 = fP;
@@ -389,7 +389,7 @@ ThreeBSP = (function() {
 			if ( bP.isValid() ) back.push( bP.calculateProperties() );
 			// neighborhood between new polygons
 			if ( fP.isValid() && bP.isValid() ) {
-				var neighborhood = new ThreeBSP.Neighborhood( fP, bP, n[0], n[1] );
+				var neighborhood = new ThreeBSP.Neighborhood( fP, bP, vl[0], vl[1] );
 				fP.neighborhood.push( neighborhood );
 				bP.neighborhood.push( neighborhood );
 			}

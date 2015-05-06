@@ -74,4 +74,6 @@ module.exports = class Ui
 		@workflowUi.toggleAssemblyView()
 
 	_toggleRendering: =>
+		fidelityControl = @bundle.getPlugin 'FidelityControl'
+		fidelityControl.reset() if fidelityControl?
 		@renderer.toggleRendering()

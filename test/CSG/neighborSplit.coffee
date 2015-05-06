@@ -11,14 +11,14 @@ baseTemplate = [
 	[-1, 1, 0]
 ]
 
-splitTemplate = [
+splitXZTemplate = [
 	[-1, 0, -1]
 	[1, 0, -1]
 	[1, 0, 1]
 	[-1, 0, 1]
 ]
 
-split2Template = [
+splitYZTemplate = [
 	[0, -1, -1]
 	[0, 1, -1]
 	[0, 1, 1]
@@ -35,7 +35,7 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 	describe 'first split tests', ->
 		it 'should split correctly', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
+			split = templateToPolygon splitXZTemplate
 
 			front = []
 			back = []
@@ -50,7 +50,7 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should set correct neighborhood on first split', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
+			split = templateToPolygon splitXZTemplate
 
 			front = []
 			back = []
@@ -70,8 +70,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 	describe 'second split front tests', ->
 		it 'should correctly split front twice', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 
 			front = []
 			split.splitPolygon base, [], [], front, []
@@ -88,8 +88,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should insert vertex in back neighbor on second split', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -102,8 +102,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 		it 'should insert vertex in back neighbor on second split
  with reversed vertices', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -119,8 +119,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should set correct neighborhood on second split of front', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -140,8 +140,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should remove the old neighborhood on second split of front', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -154,8 +154,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should connect old neighbor with new polygons on second split', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -181,8 +181,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 	describe 'second split back tests', ->
 		it 'should correctly split back twice', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 
 			back = []
 			split.splitPolygon base, [], [], [], back
@@ -199,8 +199,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should insert vertex in front neighbor on second split', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -213,8 +213,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 		it 'should insert vertex in front neighbor on second split
  with reversed vertices', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -230,8 +230,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should set correct neighborhood on second split of back', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -251,8 +251,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should remove the old neighborhood on second split of back', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back
@@ -265,8 +265,8 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 		it 'should connect old neighbor with new polygons on second split', ->
 			base = templateToPolygon baseTemplate
-			split = templateToPolygon splitTemplate
-			split2 = templateToPolygon split2Template
+			split = templateToPolygon splitXZTemplate
+			split2 = templateToPolygon splitYZTemplate
 			front = []
 			back = []
 			split.splitPolygon base, [], [], front, back

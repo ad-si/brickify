@@ -48,6 +48,8 @@ module.exports.buildServer = (onlyDelete = false) ->
 		path.join __dirname, '/src/server'
 		path.join __dirname, '/routes'
 		path.join __dirname, '/src/common'
+		path.join __dirname, '/test'
+		path.join __dirname, '/testClient'
 	]
 
 	for dir in directories

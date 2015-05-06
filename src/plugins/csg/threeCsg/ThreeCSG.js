@@ -46,7 +46,7 @@ ThreeBSP = (function() {
 
 				vertex = geometry.vertices[ face.b ];
                                 uvs = faceVertexUvs ? new THREE.Vector2( faceVertexUvs[1].x, faceVertexUvs[1].y ) : null;
-                                vertex = new ThreeBSP.Vertex( vertex.x, vertex.y, vertex.z, face.vertexNormals[2], uvs );
+                                vertex = new ThreeBSP.Vertex( vertex.x, vertex.y, vertex.z, face.vertexNormals[1], uvs );
 				vertex.applyMatrix4(this.matrix);
 				polygon.vertices.push( vertex );
 

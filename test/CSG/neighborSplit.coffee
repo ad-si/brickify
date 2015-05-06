@@ -25,6 +25,12 @@ splitYZTemplate = [
 	[0, -1, 1]
 ]
 
+baseTriangle = [
+	[-1, 0, 0]
+	[1, 0, 0]
+	[0, 1, 0]
+]
+
 templateToPolygon = (template) ->
 	vertices = []
 	for v in template
@@ -66,6 +72,21 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 
 			expect(back.neighborhood).to.have.length(1)
 			expect(back.neighborhood[0]).to.equal(neighborhood)
+
+		it 'should split triangle with coplanar vertex correctly', ->
+			base = templateToPolygon baseTriangle
+			split = templateToPolygon splitYZTemplate
+
+			front = []
+			back = []
+			split.splitPolygon base, [], [], front, back
+
+			expect(front).to.have.length(1)
+			expect(back).to.have.length(1)
+			front = front[0]
+			expect(front).to.equal([[0, 0, 0], [1, 0, 0], [0, 1, 0]])
+			back = back[0]
+			expect(back).to.equal([[-1, 0, 0], [0, 0, 0], [0, 1, 0]])
 
 	describe 'second split front tests', ->
 		it 'should correctly split front twice', ->

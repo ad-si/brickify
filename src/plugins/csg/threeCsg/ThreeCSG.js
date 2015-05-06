@@ -402,6 +402,25 @@ ThreeBSP = (function() {
 							fP.neighborhood.push( nP );
 						}
 					}
+				} else if ( tj === COPLANAR ) {
+					// neighborhood between old neighbor and two new polygons
+					var neighborhood = polygon.findNeighborhood( vi, vj );
+					if ( neighborhood ) {
+						var n, nP;
+						n = neighborhood.other( polygon );
+						neighborhood.remove();
+
+						nP = new ThreeBSP.Neighborhood( n, null, vi, vj );
+						n.neighborhood.push( nP )
+
+						if ( ti != FRONT ) {
+							nP.p2 = bP;
+							bP.neighborhood.push( nP );
+						} else if ( ti != BACK ) {
+							nP.p2 = fP
+							fP.neighborhood.push( nP );
+						}
+					}
 				}
 			}
 

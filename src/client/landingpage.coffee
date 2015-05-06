@@ -14,7 +14,7 @@ globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
-globalConfig.autoRotate = true
+globalConfig.orbitControls.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
@@ -23,7 +23,7 @@ globalConfig.plugins.editController = false
 globalConfig.plugins.csg = false
 globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
-# disable wireframe on landinpage
+# disable wireframe on landingpage
 globalConfig.createVisibleWireframe = false
 
 # clone global config 2 times

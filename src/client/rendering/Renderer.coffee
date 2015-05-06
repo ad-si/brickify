@@ -226,10 +226,8 @@ class Renderer
 			@controls = controls
 		else
 			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-			@controls.autoRotate = globalConfig.autoRotate
-			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
-			@controls.maxDistance = globalConfig.maxDistance
-			@controls.minDistance = globalConfig.minDistance
+			for key, value of globalConfig.orbitControls
+				@controls[key] = value
 			@controls.target.set(0, 0, 0)
 
 	_setupLighting: (scene) ->

@@ -32,6 +32,13 @@ baseTemplate45 = [
 	[0, 1, 0]
 ]
 
+baseTemplate45NE = [
+	[0, 1, 0]
+	[1, 0, 0]
+	[2, 1, 0]
+	[1, 2, 0]
+]
+
 templateToPolygon = (template) ->
 	vertices = []
 	for v in template
@@ -421,3 +428,36 @@ describe 'CSG neighbor splitting for two-manifoldness', ->
 			expect(neighbor2.p2).to.equal(back2)
 			expect(neighbor2.v1).to.equal([-1, 0, 0])
 			expect(neighbor2.v2).to.equal([0, 0, 0])
+
+		it 'should update neighbors on coplanar vertex split NE', ->
+			base1 = templateToPolygon baseTemplate45
+			base2 = templateToPolygon baseTemplate45NE
+			split = templateToPolygon splitXZTemplate
+			v1 = base1.vertices[2] # 1, 0, 0
+			v2 = base1.vertices[3] # 0, 1, 0
+
+			neighbor = new ThreeBSP.Neighborhood base1, base2, v1, v2
+			base1.neighborhood.push neighbor
+			base2.neighborhood.push neighbor
+
+			front = []
+			back = []
+			split.splitPolygon base1, [], [], front, back
+			front = front[0]
+			back = back[0]
+			expect(base1.neighborhood).to.be.empty
+			expect(base2.neighborhood).to.have.length(1)
+			b2n = base2.neighborhood[0]
+			expect(b2n.p1).to.equal(base2)
+			expect(b2n.p2).to.equal(back)
+			expect(b2n.v1).to.equal([1, 0, 0])
+			expect(b2n.v2).to.equal([0, 1, 0])
+			expect(front.neighborhood).to.have.length(1)
+			fn = front.neighborhood[0]
+			expect(fn.p1).to.equal(front)
+			expect(fn.p2).to.equal(back)
+			expect(fn.v1).to.equal([-1, 0, 0])
+			expect(fn.v2).to.equal([1, 0, 0])
+			expect(back.neighborhood).to.have.length(2)
+			expect(back.neighborhood[0]).to.equal(b2n)
+			expect(back.neighborhood[1]).to.equal(fn)

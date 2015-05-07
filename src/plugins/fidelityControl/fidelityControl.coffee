@@ -156,4 +156,10 @@ class FidelityControl
 			fpsText = Math.round(fps) + '/' + levelAbbreviation
 			@$fpsDisplay.text fpsText
 
+	reset: =>
+		@accumulatedFrames = 0
+		@accumulatedTime = 0
+		@timesBelowMinimumFps = 0
+		@_lastTimestamp = null
+
 module.exports = FidelityControl

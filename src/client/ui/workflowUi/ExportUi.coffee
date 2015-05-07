@@ -13,13 +13,6 @@ class ExportUi
 		@downloadButton = $('#downloadButton')
 		@downloadModal = $('#downloadModal')
 
-		#init modal
-		@downloadModal.modal ({
-			backdrop: 'static'
-			keyboard: true
-			show: false
-		})
-
 		#show modal when clicking on download button
 		@downloadButton.click =>
 			@downloadModal.modal 'show'

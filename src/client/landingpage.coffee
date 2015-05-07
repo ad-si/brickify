@@ -72,6 +72,13 @@ b1 = bundle1.init().then ->
 		@value = ''
 
 	$('.dropper').text 'Drop an stl file'
+	$('#preview img').on( 'dragstart'
+		(e) ->
+			e.originalEvent.dataTransfer.setData(
+				'text/plain'
+				e.originalEvent.target.getAttribute 'data-hash'
+			)
+	)
 
 # set not available message
 $('#downloadButton').click ->

@@ -63,6 +63,9 @@ buildGeometry = (hashmap, baseGeometry) ->
 
 getConnectedComponents = (geometry) ->
 	equivalenceClasses = []
+
+	return equivalenceClasses if geometry.faces.length is 0
+
 	for i in [0..geometry.faces.length - 1]
 		face = geometry.faces[i]
 		connectedClasses = []

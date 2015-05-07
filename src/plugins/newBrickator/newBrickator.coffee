@@ -144,7 +144,7 @@ class NewBrickator
 		dlPromise = new Promise (resolve, reject) =>
 			@csg.getCSG selectedNode, options
 			.then (detailedCsgGeometries) ->
-				if not detailedCsgGeometries?
+				if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
 					resolve [{ data: '', fileName: '' }]
 					return
 

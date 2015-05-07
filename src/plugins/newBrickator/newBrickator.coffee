@@ -143,21 +143,29 @@ class NewBrickator
 
 		dlPromise = new Promise (resolve, reject) =>
 			@csg.getCSG selectedNode, options
-			.then (detailedCsg) ->
-				if not detailedCsg?
-					resolve { data: '', fileName: '' }
+			.then (detailedCsgGeometries) ->
+				if not detailedCsgGeometries?
+					resolve [{ data: '', fileName: '' }]
 					return
 
-				optimizedModel = new meshlib.OptimizedModel()
-				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
+				results = []
 
-				meshlib
-				.model(optimizedModel)
-				.export null, (error, binaryStl) ->
-					fn = "brickify-#{selectedNode.name}"
-					if fn.indexOf('.stl') < 0
+				for i in [0..detailedCsgGeometries.length - 1]
+					geometry = detailedCsgGeometries[i]
+
+					optimizedModel = new meshlib.OptimizedModel()
+					optimizedModel.fromThreeGeometry(geometry)
+
+					meshlib
+					.model(optimizedModel)
+					.export null, (error, binaryStl) ->
+						fn = "brickify-#{selectedNode.name}"
+						fn.replace /.stl$/, ''
+						fn += "-#{i}"
 						fn += '.stl'
-					resolve { data: binaryStl, fileName: fn }
+						results.push { data: binaryStl, fileName: fn }
+
+					resolve results
 
 		return dlPromise
 

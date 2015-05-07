@@ -25,5 +25,9 @@ module.exports = class DownloadProvider
 
 		Promise.all(promisesArray).then (resultsArray) ->
 			for result in resultsArray
-				if result.fileName.length > 0
+				if Array.isArray result
+					for subResult in result
+						if subResult.fileName.length > 0
+							saveAs subResult.data, subResult.fileName
+				else if result.fileName.length > 0
 					saveAs result.data, result.fileName

@@ -15,6 +15,7 @@ modelCache = {}
 exists = (hash) ->
 	return Promise.resolve $.get '/model/exists/' + hash
 		.catch (jqXHR) -> throw new Error jqXHR.statusText
+module.exports.exists = exists
 
 # sends the model to the server if the server hasn't got a file
 # with the same hash value

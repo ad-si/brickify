@@ -160,7 +160,7 @@ class NewBrickator
 					.model(optimizedModel)
 					.export null, (error, binaryStl) ->
 						fn = "brickify-#{selectedNode.name}"
-						fn.replace /.stl$/, ''
+						fn = fn.replace /.stl$/, ''
 						fn += "-#{i}"
 						fn += '.stl'
 						results.push { data: binaryStl, fileName: fn }
@@ -197,10 +197,6 @@ class NewBrickator
 		options.minimalPrintVolume = @bundle.globalConfig.minimalPrintVolume
 
 		return options
-
-
-
-
 
 
 module.exports = NewBrickator

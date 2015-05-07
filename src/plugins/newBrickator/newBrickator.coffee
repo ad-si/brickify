@@ -186,6 +186,8 @@ class NewBrickator
 		# add studs
 		options.addStuds = true
 
+		options.minimalPrintVolume = @bundle.globalConfig.minimalPrintVolume
+
 		return options
 
 

@@ -71,7 +71,7 @@ class CSG
 			options.transformedModel = cachedData.transformedthreeGeometry
 
 			csg = @csgExtractor.extractGeometry cachedData.grid, options
-			cachedData.csg = csgCleaner.clean csg
+			cachedData.csg = csgCleaner.clean csg, options
 
 			return cachedData.csg
 

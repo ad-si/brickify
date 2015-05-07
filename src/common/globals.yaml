@@ -71,3 +71,5 @@ orbitControls:
   autoRotateSpeed: 1.0
   maxDistance: 1500
   minDistance: 2
+
+minimalPrintVolume: 5 # in mm^3

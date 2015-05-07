@@ -376,7 +376,12 @@ class NodeVisualizer
 		@csg ?= @bundle.getPlugin 'csg'
 		return Promise.resolve() if not @csg?
 
-		return @csg.getCSG(cachedData.node, {addStuds: true})
+		options = {
+			addStuds: true
+			minimalPrintVolume: @bundle.globalConfig.minimalPrintVolume
+		}
+
+		return @csg.getCSG(cachedData.node, options)
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg csg
 					@_updatePrintTime csg

@@ -1,19 +1,38 @@
-clean = (geometry) ->
+clean = (geometry, options) ->
 	geometries = splitGeometry geometry
+	geometries = filterSmallGeometries geometries, options.minimalPrintVolume
 	return geometries
+
+filterSmallGeometries = (geometries, minimalPrintVolume) ->
+	filteredGeometries = []
+	for geometry in geometries
+		volume = getVolume geometry
+		if volume > minimalPrintVolume
+			filteredGeometries.push geometry
+	return filteredGeometries
 
 ###
 # calculates the volume of threeGeometry
 # see http://stackoverflow.com/questions/1410525
 # @param {THREE.Geometry} threeGeometry an instance of three geometry
-# @return {Number} volume in cm^3
+# @return {Number} volume in mm^3
 ###
 getVolume = (threeGeometry) ->
 	volume = 0
 	forAllFaces threeGeometry, (a, b, c) ->
 		volume += (a.x * b.y * c.z) + (a.y * b.z * c.x) + (a.z * b.x * c.y) - \
 				(a.x * b.z * c.y) - (a.y * b.x * c.z) - (a.z * b.y * c.x)
-	return volume / 6 / 1000
+	return volume / 6
+
+forAllFaces = (threeGeometry, visitor) ->
+	faces = threeGeometry.faces
+	vertices = threeGeometry.vertices
+
+	for face in faces
+		a = vertices[face.a]
+		b = vertices[face.b]
+		c = vertices[face.c]
+		visitor a, b, c
 
 splitGeometry = (geometry) ->
 	geometry.mergeVertices()
@@ -34,7 +53,7 @@ buildGeometry = (hashmap, baseGeometry) ->
 		bIndex = geometry.vertices.length - 1
 		geometry.vertices.push baseGeometry.vertices[face.c]
 		cIndex = geometry.vertices.length - 1
-		geometry.faces.push new THREE.Face3 aIndex, bIndex, cIndex
+		geometry.faces.push new THREE.Face3 aIndex, bIndex, cIndex, face.normal
 
 	geometry.mergeVertices()
 	geometry.verticesNeedUpdate = true
@@ -44,7 +63,8 @@ buildGeometry = (hashmap, baseGeometry) ->
 
 getConnectedComponents = (geometry) ->
 	equivalenceClasses = []
-	forEachFace geometry, (index, face) ->
+	for i in [0..geometry.faces.length - 1]
+		face = geometry.faces[i]
 		connectedClasses = []
 
 		for equivalenceClass in equivalenceClasses
@@ -54,7 +74,7 @@ getConnectedComponents = (geometry) ->
 				equivalenceClass.vertexIndices.add face.a
 				equivalenceClass.vertexIndices.add face.b
 				equivalenceClass.vertexIndices.add face.c
-				equivalenceClass.faceIndices.add index
+				equivalenceClass.faceIndices.add i
 				connectedClasses.push equivalenceClass
 
 		if connectedClasses.length is 0
@@ -65,7 +85,7 @@ getConnectedComponents = (geometry) ->
 			equivalenceClass.vertexIndices.add face.a
 			equivalenceClass.vertexIndices.add face.b
 			equivalenceClass.vertexIndices.add face.c
-			equivalenceClass.faceIndices.add index
+			equivalenceClass.faceIndices.add i
 			equivalenceClasses.push equivalenceClass
 
 		else if connectedClasses.length > 1
@@ -75,10 +95,6 @@ getConnectedComponents = (geometry) ->
 				a.faceIndices.length > 0
 
 	return equivalenceClasses
-
-forEachFace = (geometry, visitor) ->
-	for i in [0..geometry.faces.length - 1]
-		visitor i, geometry.faces[i]
 
 compactClasses = (equivalenceClasses) ->
 	newClass =  {

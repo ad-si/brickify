@@ -71,7 +71,7 @@ b1 = bundle1.init().then ->
 		callback event
 		@value = ''
 
-	$('.dropper').html 'Drop an stl file'
+	$('.dropper').text 'Drop an stl file'
 
 # set not available message
 $('#downloadButton').click ->

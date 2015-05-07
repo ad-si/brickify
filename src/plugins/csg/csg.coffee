@@ -70,9 +70,8 @@ class CSG
 			options.profile = true
 			options.transformedModel = cachedData.transformedthreeGeometry
 
-			cachedData.csg = @csgExtractor.extractGeometry cachedData.grid, options
-
-			csgCleaner.clean cachedData.csg
+			csg = @csgExtractor.extractGeometry cachedData.grid, options
+			cachedData.csg = csgCleaner.clean csg
 
 			return cachedData.csg
 
@@ -81,7 +80,7 @@ class CSG
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
 			if cachedData.transformedthreeGeometry?
-				resolve(cachedData.transformedthreeGeometry)
+				resolve(cachedData.transformedthreeGeometry, cachedData)
 				return
 
 			selectedNode.getModel()

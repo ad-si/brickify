@@ -1,7 +1,6 @@
 clean = (geometry) ->
-	geometry.mergeVertices()
-	connectedComponents = getConnectedComponents geometry
-	console.log connectedComponents
+	geometries = splitGeometry geometry
+	return geometries
 
 ###
 # calculates the volume of threeGeometry
@@ -16,51 +15,88 @@ getVolume = (threeGeometry) ->
 				(a.x * b.z * c.y) - (a.y * b.x * c.z) - (a.z * b.y * c.x)
 	return volume / 6 / 1000
 
+splitGeometry = (geometry) ->
+	geometry.mergeVertices()
+	connectedComponents = getConnectedComponents geometry
+	geometries = []
+	for component in connectedComponents
+		geometries.push buildGeometry(component, geometry)
+
+	return geometries
+
+buildGeometry = (hashmap, baseGeometry) ->
+	geometry = new THREE.Geometry()
+	hashmap.faceIndices.enumerate (faceIndex) ->
+		face = baseGeometry.faces[faceIndex]
+		geometry.vertices.push baseGeometry.vertices[face.a]
+		aIndex = geometry.vertices.length - 1
+		geometry.vertices.push baseGeometry.vertices[face.b]
+		bIndex = geometry.vertices.length - 1
+		geometry.vertices.push baseGeometry.vertices[face.c]
+		cIndex = geometry.vertices.length - 1
+		geometry.faces.push new THREE.Face3 aIndex, bIndex, cIndex
+
+	geometry.mergeVertices()
+	geometry.verticesNeedUpdate = true
+	geometry.elementsNeedUpdate = true
+
+	return geometry
 
 getConnectedComponents = (geometry) ->
 	equivalenceClasses = []
-	forEachFace geometry, (a, b, c) ->
+	forEachFace geometry, (index, face) ->
 		connectedClasses = []
-		
+
 		for equivalenceClass in equivalenceClasses
-			if equivalenceClass.has(a) or
-			equivalenceClass.has(b) or
-			equivalenceClass.has(c)
-				equivalenceClass.push a
-				equivalenceClass.push b
-				equivalenceClass.push c
+			if equivalenceClass.vertexIndices.has(face.a) or
+			equivalenceClass.vertexIndices.has(face.b) or
+			equivalenceClass.vertexIndices.has(face.c)
+				equivalenceClass.vertexIndices.add face.a
+				equivalenceClass.vertexIndices.add face.b
+				equivalenceClass.vertexIndices.add face.c
+				equivalenceClass.faceIndices.add index
 				connectedClasses.push equivalenceClass
 
 		if connectedClasses.length is 0
-			equivalenceClass = new Hashmap()
-			equivalenceClass.push a
-			equivalenceClass.push b
-			equivalenceClass.push c
+			equivalenceClass = {
+				vertexIndices: new Hashmap()
+				faceIndices: new Hashmap()
+			}
+			equivalenceClass.vertexIndices.add face.a
+			equivalenceClass.vertexIndices.add face.b
+			equivalenceClass.vertexIndices.add face.c
+			equivalenceClass.faceIndices.add index
 			equivalenceClasses.push equivalenceClass
 
 		else if connectedClasses.length > 1
 			combined = compactClasses connectedClasses
 			equivalenceClasses.push combined
 			equivalenceClasses = equivalenceClasses.filter (a) ->
-				a.length > 0
+				a.faceIndices.length > 0
 
 	return equivalenceClasses
 
 forEachFace = (geometry, visitor) ->
-	for face in geometry.faces
-		visitor face.a, face.b ,face.c
+	for i in [0..geometry.faces.length - 1]
+		visitor i, geometry.faces[i]
 
 compactClasses = (equivalenceClasses) ->
-	newClass =  new Hashmap()
+	newClass =  {
+		vertexIndices: new Hashmap()
+		faceIndices: new Hashmap()
+	}
 
 	for eq in equivalenceClasses
 		# add points and polygons to new class. The hashmap
 		# automatically prevents inserting duplicate values
-		eq.enumerate (point) ->
-			newClass.push point
+		eq.vertexIndices.enumerate (vertex) ->
+			newClass.vertexIndices.add vertex
+		eq.faceIndices.enumerate (faceIndex) ->
+			newClass.faceIndices.add faceIndex
 
 		# clear old class
-		eq.clear()
+		eq.vertexIndices.clear()
+		eq.faceIndices.clear()
 
 	return newClass
 
@@ -71,7 +107,7 @@ class Hashmap
 		@length = 0
 		@_enumarray = []
 		@_hasarray = []
-	push: (number) =>
+	add: (number) =>
 		if not @_hasarray[number]
 			@length++
 			@_hasarray[number] = true

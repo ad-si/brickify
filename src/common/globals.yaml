@@ -67,6 +67,9 @@ rendering:
   # shall modelVisualization display the solid model?
   showModel: true
 
+  # shall pipeline rendering be allowed?
+  usePipeline: true
+
 orbitControls:
   autoRotate: false
   autoRotateSpeed: 1.0

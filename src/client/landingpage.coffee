@@ -71,8 +71,8 @@ b1 = bundle1.init().then ->
 			modelCache.exists hash
 			.then -> loadFromHash hash
 			.catch -> bootbox.alert(
-				title: 'Not a valid model'
-				message: 'You can only drop stl files or our example images!'
+				title: 'This is not a valid model!'
+				message: 'You can only drop stl files or our example images.'
 			)
 
 	fileDropper = require './modelLoading/fileDropper'

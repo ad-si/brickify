@@ -45,7 +45,7 @@ splitGeometry = (geometry) ->
 
 buildGeometry = (hashmap, baseGeometry) ->
 	geometry = new THREE.Geometry()
-	hashmap.faceIndices.enumerate (faceIndex) ->
+	hashmap.faceIndices.forEach (faceIndex) ->
 		face = baseGeometry.faces[faceIndex]
 		geometry.vertices.push baseGeometry.vertices[face.a]
 		aIndex = geometry.vertices.length - 1
@@ -82,8 +82,8 @@ getConnectedComponents = (geometry) ->
 
 		if connectedClasses.length is 0
 			equivalenceClass = {
-				vertexIndices: new Hashmap()
-				faceIndices: new Hashmap()
+				vertexIndices: new Set()
+				faceIndices: new Set()
 			}
 			equivalenceClass.vertexIndices.add face.a
 			equivalenceClass.vertexIndices.add face.b
@@ -101,16 +101,16 @@ getConnectedComponents = (geometry) ->
 
 compactClasses = (equivalenceClasses) ->
 	newClass =  {
-		vertexIndices: new Hashmap()
-		faceIndices: new Hashmap()
+		vertexIndices: new Set()
+		faceIndices: new Set()
 	}
 
 	for eq in equivalenceClasses
 		# add points and polygons to new class. The hashmap
 		# automatically prevents inserting duplicate values
-		eq.vertexIndices.enumerate (vertex) ->
+		eq.vertexIndices.forEach (vertex) ->
 			newClass.vertexIndices.add vertex
-		eq.faceIndices.enumerate (faceIndex) ->
+		eq.faceIndices.forEach (faceIndex) ->
 			newClass.faceIndices.add faceIndex
 
 		# clear old class
@@ -120,25 +120,3 @@ compactClasses = (equivalenceClasses) ->
 	return newClass
 
 module.exports.clean = clean
-
-class Hashmap
-	constructor: ->
-		@length = 0
-		@_enumarray = []
-		@_hasarray = []
-	add: (number) =>
-		if not @_hasarray[number]
-			@length++
-			@_hasarray[number] = true
-			@_enumarray.push number
-	has: (number) =>
-		if @_hasarray[number]?
-			return true
-		return false
-	enumerate: (callback) =>
-		for i in [0..@_enumarray.length - 1] by 1
-			callback @_enumarray[i]
-	clear: =>
-		@length = 0
-		@_enumarray = []
-		@_hasarray = []

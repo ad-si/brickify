@@ -38,6 +38,9 @@ class CSG
 		if not options.addStuds?
 			options.addStuds = false
 
+		if not options.minimalPrintVolume?
+			options.minimalPrintVolume = 5
+
 	# returns own cached data and links grid from newBrickator data
 	# resets newBrickator's csgNeedsRecalculation flag
 	_getCachedData: (selectedNode) ->

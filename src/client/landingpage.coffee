@@ -24,7 +24,7 @@ globalConfig.plugins.csg = false
 globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
 # disable wireframe on landingpage
-globalConfig.createVisibleWireframe = false
+globalConfig.rendering.showShadowAndWireframe = false
 
 # clone global config 2 times
 config1 = clone globalConfig

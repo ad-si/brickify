@@ -60,11 +60,12 @@ plugins:
   editController: true
   csg: true
 
-# shall modelVisualization display shadows and wireframe?
-createVisibleWireframe: true
+rendering:
+  # shall modelVisualization display shadows and wireframe?
+  showShadowAndWireframe: true
 
-# shall modelVisualization display the solid model?
-showModel: true
+  # shall modelVisualization display the solid model?
+  showModel: true
 
 orbitControls:
   autoRotate: false

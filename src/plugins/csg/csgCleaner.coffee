@@ -38,6 +38,7 @@ splitGeometry = (geometry) ->
 	geometry.mergeVertices()
 	connectedComponents = getConnectedComponents geometry
 	geometries = []
+	console.log "found #{connectedComponents.length} connected Components"
 	for component in connectedComponents
 		geometries.push buildGeometry(component, geometry)
 
@@ -47,13 +48,15 @@ buildGeometry = (hashmap, baseGeometry) ->
 	geometry = new THREE.Geometry()
 	hashmap.faceIndices.forEach (faceIndex) ->
 		face = baseGeometry.faces[faceIndex]
-		geometry.vertices.push baseGeometry.vertices[face.a]
-		aIndex = geometry.vertices.length - 1
-		geometry.vertices.push baseGeometry.vertices[face.b]
-		bIndex = geometry.vertices.length - 1
-		geometry.vertices.push baseGeometry.vertices[face.c]
-		cIndex = geometry.vertices.length - 1
-		geometry.faces.push new THREE.Face3 aIndex, bIndex, cIndex, face.normal
+		length = geometry.vertices.length
+		geometry.vertices.push(
+			baseGeometry.vertices[face.a]
+			baseGeometry.vertices[face.b]
+			baseGeometry.vertices[face.c]
+		)
+		geometry.faces.push(
+			new THREE.Face3 length, length + 1, length + 2, face.normal
+		)
 
 	geometry.mergeVertices()
 	geometry.verticesNeedUpdate = true
@@ -68,15 +71,18 @@ getConnectedComponents = (geometry) ->
 
 	for i in [0..geometry.faces.length - 1]
 		face = geometry.faces[i]
+		a = face.a
+		b = face.b
+		c = face.c
 		connectedClasses = []
 
 		for equivalenceClass in equivalenceClasses
-			if equivalenceClass.vertexIndices.has(face.a) or
-			equivalenceClass.vertexIndices.has(face.b) or
-			equivalenceClass.vertexIndices.has(face.c)
-				equivalenceClass.vertexIndices.add face.a
-				equivalenceClass.vertexIndices.add face.b
-				equivalenceClass.vertexIndices.add face.c
+			if equivalenceClass.vertexIndices.has(a) or
+			equivalenceClass.vertexIndices.has(b) or
+			equivalenceClass.vertexIndices.has(c)
+				equivalenceClass.vertexIndices.add a
+				equivalenceClass.vertexIndices.add b
+				equivalenceClass.vertexIndices.add c
 				equivalenceClass.faceIndices.add i
 				connectedClasses.push equivalenceClass
 
@@ -85,9 +91,9 @@ getConnectedComponents = (geometry) ->
 				vertexIndices: new Set()
 				faceIndices: new Set()
 			}
-			equivalenceClass.vertexIndices.add face.a
-			equivalenceClass.vertexIndices.add face.b
-			equivalenceClass.vertexIndices.add face.c
+			equivalenceClass.vertexIndices.add a
+			equivalenceClass.vertexIndices.add b
+			equivalenceClass.vertexIndices.add c
 			equivalenceClass.faceIndices.add i
 			equivalenceClasses.push equivalenceClass
 
@@ -100,23 +106,22 @@ getConnectedComponents = (geometry) ->
 	return equivalenceClasses
 
 compactClasses = (equivalenceClasses) ->
-	newClass =  {
-		vertexIndices: new Set()
-		faceIndices: new Set()
-	}
+	vertexIndices = new Set()
+	faceIndices = new Set()
 
 	for eq in equivalenceClasses
-		# add points and polygons to new class. The hashmap
-		# automatically prevents inserting duplicate values
 		eq.vertexIndices.forEach (vertex) ->
-			newClass.vertexIndices.add vertex
+			vertexIndices.add vertex
 		eq.faceIndices.forEach (faceIndex) ->
-			newClass.faceIndices.add faceIndex
+			faceIndices.add faceIndex
 
 		# clear old class
 		eq.vertexIndices.clear()
 		eq.faceIndices.clear()
 
-	return newClass
+	return {
+		vertexIndices: vertexIndices
+		faceIndices: faceIndices
+	}
 
 module.exports.clean = clean

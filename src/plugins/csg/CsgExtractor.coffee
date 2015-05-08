@@ -27,7 +27,10 @@ module.exports = class CsgExtractor
 			log.debug "Grid analysis took #{new Date() - d}ms"
 
 		if legoVoxels.length == 0
-			return options.transformedModel
+			return {
+				csg: options.transformedModel
+				isOriginalModel: true
+			}
 
 		d = new Date()
 		voxunion = new VoxelUnion(grid)
@@ -40,7 +43,10 @@ module.exports = class CsgExtractor
 		if options.profile
 			log.debug "Print geometry took #{new Date() - d}ms"
 
-		return printGeometry
+		return {
+			csg: printGeometry
+			isOriginalModel: false
+		}
 
 	_analyzeGrid: (grid) ->
 		# creates a list of voxels to be legotized

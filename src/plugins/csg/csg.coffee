@@ -72,9 +72,11 @@ class CSG
 
 			options.profile = true
 			options.transformedModel = cachedData.transformedthreeGeometry
+			options.split = true
 
-			csg = @csgExtractor.extractGeometry cachedData.grid, options
-			cachedData.csg = csgCleaner.clean csg, options
+			result = @csgExtractor.extractGeometry cachedData.grid, options
+			options.filterSmallGeometries = !result.isOriginalModel
+			cachedData.csg = csgCleaner.clean result.csg, options
 
 			return cachedData.csg
 

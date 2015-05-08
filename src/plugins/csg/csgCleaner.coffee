@@ -1,6 +1,8 @@
 clean = (geometry, options) ->
-	geometries = splitGeometry geometry
-	geometries = filterSmallGeometries geometries, options.minimalPrintVolume
+	if options.split
+		geometries = splitGeometry geometry
+	if options.filterSmallGeometries
+		geometries = filterSmallGeometries geometries, options.minimalPrintVolume
 	return geometries
 
 filterSmallGeometries = (geometries, minimalPrintVolume) ->

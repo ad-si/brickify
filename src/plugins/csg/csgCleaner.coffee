@@ -102,30 +102,25 @@ getConnectedComponents = (geometry) ->
 			equivalenceClasses.push equivalenceClass
 
 		else if connectedClasses.length > 1
-			combined = compactClasses connectedClasses
-			equivalenceClasses.push combined
+			compactClasses connectedClasses
 			equivalenceClasses = equivalenceClasses.filter (a) ->
 				a.faceIndices.size > 0
 
 	return equivalenceClasses
 
 compactClasses = (equivalenceClasses) ->
-	vertexIndices = new Set()
-	faceIndices = new Set()
+	vertexIndices = equivalenceClasses[0].vertexIndices
+	faceIndices = equivalenceClasses[0].faceIndices
 
-	for eq in equivalenceClasses
-		eq.vertexIndices.forEach (vertex) ->
+	for i in [1..equivalenceClasses.length - 1] by 1
+		equivalenceClass = equivalenceClasses[i]
+		equivalenceClass.vertexIndices.forEach (vertex) ->
 			vertexIndices.add vertex
-		eq.faceIndices.forEach (faceIndex) ->
+		equivalenceClass.faceIndices.forEach (faceIndex) ->
 			faceIndices.add faceIndex
 
 		# clear old class
-		eq.vertexIndices.clear()
-		eq.faceIndices.clear()
-
-	return {
-		vertexIndices: vertexIndices
-		faceIndices: faceIndices
-	}
+		equivalenceClass.vertexIndices.clear()
+		equivalenceClass.faceIndices.clear()
 
 module.exports.clean = clean

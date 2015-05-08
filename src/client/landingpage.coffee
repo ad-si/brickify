@@ -8,13 +8,14 @@ globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
 clone = require 'clone'
 fileLoader = require './modelLoading/fileLoader'
+modelCache = require './modelLoading/modelCache'
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
-globalConfig.autoRotate = true
+globalConfig.orbitControls.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
@@ -23,8 +24,9 @@ globalConfig.plugins.editController = false
 globalConfig.plugins.csg = false
 globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 
-# disable wireframe on landinpage
-globalConfig.createVisibleWireframe = false
+# disable wireframe and pipeline on landingpage
+globalConfig.rendering.showShadowAndWireframe = false
+globalConfig.rendering.usePipeline = false
 
 # clone global config 2 times
 config1 = clone globalConfig
@@ -36,7 +38,7 @@ config1.plugins.newBrickator = false
 # configure right bundle to not show the model
 config2.showModel = false
 
-# instantiate 2 lowfab bundles
+# instantiate 2 brickify bundles
 config1.renderAreaId = 'renderArea1'
 bundle1 = new Bundle config1
 b1 = bundle1.init().then ->
@@ -55,13 +57,24 @@ b1 = bundle1.init().then ->
 	#load and process model
 	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
 
+	loadFromHash = (hash) ->
+		b1.then -> bundle1.sceneManager.clearScene()
+		b2.then -> bundle2.sceneManager.clearScene()
+		loadAndConvert hash, true
+
 	callback = (event) ->
 		files = event.target.files ? event.dataTransfer.files
-		fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
-		.then (hash) ->
-			b1.then -> bundle1.sceneManager.clearScene()
-			b2.then -> bundle2.sceneManager.clearScene()
-			loadAndConvert hash, true
+		if files.length
+			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
+			.then loadFromHash
+		else
+			hash = event.dataTransfer.getData 'text/plain'
+			modelCache.exists hash
+			.then -> loadFromHash hash
+			.catch -> bootbox.alert(
+				title: 'This is not a valid model!'
+				message: 'You can only drop stl files or our example images.'
+			)
 
 	fileDropper = require './modelLoading/fileDropper'
 	fileDropper.init callback
@@ -71,7 +84,14 @@ b1 = bundle1.init().then ->
 		callback event
 		@value = ''
 
-	$('.dropper').html 'Drop an stl file'
+	$('.dropper').text 'Drop an stl file'
+	$('#preview img').on( 'dragstart'
+		(e) ->
+			e.originalEvent.dataTransfer.setData(
+				'text/plain'
+				e.originalEvent.target.getAttribute 'data-hash'
+			)
+	)
 
 # set not available message
 $('#downloadButton').click ->

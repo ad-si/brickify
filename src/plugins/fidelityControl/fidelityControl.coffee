@@ -12,6 +12,8 @@ upgradeThresholdFps = 40
 accumulationTime = 200
 timesBelowThreshold = 10
 fpsDisplayUpdateTime = 1000
+maxNoPipelineDecisions = 3
+
 
 ###
 # @class FidelityControl
@@ -43,9 +45,12 @@ class FidelityControl
 		@_setupFpsDisplay()
 
 		# allow pipeline only if we have the needed extension and a stencil buffer
+		# and if the pipeline is enabled in the global config
+		usePipeline = @bundle.globalConfig.rendering.usePipeline
 		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
 		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
-		@allowPipeline = fragDepth? and stencilBuffer
+		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
+		@noPipelineDecisions = 0
 
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
@@ -75,18 +80,21 @@ class FidelityControl
 			return if @timesBelowMinimumFps < timesBelowThreshold
 
 			@timesBelowMinimumFps = 0
+			if @currentFidelityLevel is FidelityControl.minimalPipelineLevel
+				@noPipelineDecisions++
 			@_decreaseFidelity()
 
 		else if fps > upgradeThresholdFps and
 		@currentFidelityLevel < FidelityControl.fidelityLevels.length - 1
 			# upgrade instantly, but reset downgrade counter
 			@timesBelowMinimumFps = 0
-
+			if @currentFidelityLevel is FidelityControl.minimalPipelineLevel - 1
+				return if @noPipelineDecisions > maxNoPipelineDecisions
 			@_increaseFidelity()
 
 	_increaseFidelity: =>
 		# only allow pipeline when we have the extensions needed for it
-		return if @currentFidelityLevel == 2 and not @allowPipeline
+		return if @currentFidelityLevel == 2 and not @pipelineAvailable
 
 		# Increase fidelity
 		@currentFidelityLevel++
@@ -155,5 +163,11 @@ class FidelityControl
 				.match(/[A-Z]/g).join('')
 			fpsText = Math.round(fps) + '/' + levelAbbreviation
 			@$fpsDisplay.text fpsText
+
+	reset: =>
+		@accumulatedFrames = 0
+		@accumulatedTime = 0
+		@timesBelowMinimumFps = 0
+		@_lastTimestamp = null
 
 module.exports = FidelityControl

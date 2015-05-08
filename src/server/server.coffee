@@ -11,7 +11,7 @@
   - **Node interpreter**: IntelliJ should insert the correct path to your node
     executable itself.
   - **Working directory**:
-    insert the path to the root repository folder of lowfab
+    insert the path to the root repository folder of brickify
   - **JavaScript file**: insert `src/server/server.js`
   - Add an external tool in the **Before launch** section
       - Give it any name you want
@@ -28,10 +28,7 @@
   run to rebuild and run the server.
 ###
 
-# Require the real server application
-lowfab = require './main'
-
-# Start the server
-lowfab
+# Require the real server application and start the server
+require './main'
 .setupRouting()
 .startServer()

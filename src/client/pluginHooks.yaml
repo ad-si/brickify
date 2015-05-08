@@ -1,6 +1,6 @@
 # # Plugin API
 #
-# Client-side plugins can provide the following hooks to interact with lowfab.
+# Client-side plugins can provide the following hooks to interact with brickify.
 #
 # The hooks must exist at load-time. Hooks that are added later during
 # run-time will not be called.
@@ -48,9 +48,9 @@
 - on3dUpdate
 
 # ## onPaint
-# 
+#
 # Plugins that need visuals beyond a node in a default scene (-> init3d) may
-# perform their custom render pass in this call. 
+# perform their custom render pass in this call.
 
 - onPaint
 
@@ -87,7 +87,7 @@
 
 #  ## File import
 #
-#  When a file is loaded into lowfab, the [fileLoader](fileLoader.html) will
+#  When a file is loaded into brickify, the [fileLoader](fileLoader.html) will
 #  try to import it with every plugin that implements `importFile` until one
 #  succeeds and returns an [OptimizedModel](../common/OptimizedModel.html).
 #  The file's name and its content are provided as arguments.

@@ -2,7 +2,7 @@
   #Coordinate System Plugin#
 
   Creates a colored coordinate system and a grid base surface for better
-  navigation inside lowfab.
+  navigation inside brickify.
 ###
 
 THREE = require 'three'

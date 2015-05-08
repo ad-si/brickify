@@ -2,7 +2,7 @@
   "name": "editController",
   "version": "0.1.0",
   "description": "Controls user interaction with brushes",
-  "lowfab": {
+  "brickify": {
     "type": "ui"
   },
   "browser": "./editController.coffee"

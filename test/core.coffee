@@ -3,23 +3,23 @@ process.env.NODE_ENV = 'test'
 expect = require('chai').expect
 http = require('http')
 
-lowfab = require('../src/server/main')
+brickify = require('../src/server/main')
 
 
-describe 'Lowfab', ->
+describe 'Brickify', ->
 	server = {}
 
 	before (done) ->
 		this.timeout(5000)
 
-		server = lowfab
+		server = brickify
 			.setupRouting()
 			.startServer(3001)
 
 		done()
 
 	describe 'Server', ->
-		it 'should host the lowfab website', (done) ->
+		it 'should host the brickify website', (done) ->
 			request = http.request(
 				{method: 'HEAD', host: 'localhost', port: 3001},
 				(response) ->

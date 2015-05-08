@@ -95,7 +95,7 @@ getConnectedComponents = (geometry) ->
 			combined = compactClasses connectedClasses
 			equivalenceClasses.push combined
 			equivalenceClasses = equivalenceClasses.filter (a) ->
-				a.faceIndices.length > 0
+				a.faceIndices.size > 0
 
 	return equivalenceClasses
 

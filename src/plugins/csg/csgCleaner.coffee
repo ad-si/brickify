@@ -39,8 +39,10 @@ forAllFaces = (threeGeometry, visitor) ->
 splitGeometry = (geometry) ->
 	geometry.mergeVertices()
 	connectedComponents = getConnectedComponents geometry
+	if connectedComponents.length is 1
+		return [geometry]
+
 	geometries = []
-	console.log "found #{connectedComponents.length} connected Components"
 	for component in connectedComponents
 		geometries.push buildGeometry(component, geometry)
 

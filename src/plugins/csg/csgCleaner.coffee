@@ -1,8 +1,23 @@
-clean = (geometry, options) ->
+log = require 'loglevel'
+
+clean = (geometry, options = {}) ->
 	if options.split
+		d = new Date()
 		geometries = splitGeometry geometry
+		if options.profile
+			log.debug "Model splitting took #{new Date() - d}ms"
+	else
+		log.debug '(Skipping step model splitting)'
+		geometries = [geometry]
+
 	if options.filterSmallGeometries
+		d = new Date()
 		geometries = filterSmallGeometries geometries, options.minimalPrintVolume
+		if options.profile
+			log.debug "Filtering small geometries took #{new Date() - d}ms"
+	else
+		log.debug '(Skipping step filtering small geometries)'
+
 	return geometries
 
 filterSmallGeometries = (geometries, minimalPrintVolume) ->

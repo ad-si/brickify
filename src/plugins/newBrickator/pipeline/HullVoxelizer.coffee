@@ -25,9 +25,9 @@ module.exports = class Voxelizer
 	voxelizePolygon: (p0, p1, p2, n) =>
 		# transform model coordinates to grid coordinates
 		# (object may be moved/rotated)
-		p0 = @voxelGrid.mapModelToGrid p0
-		p1 = @voxelGrid.mapModelToGrid p1
-		p2 = @voxelGrid.mapModelToGrid p2
+		p0 = @voxelGrid.mapModelToVoxelSpace p0
+		p1 = @voxelGrid.mapModelToVoxelSpace p1
+		p2 = @voxelGrid.mapModelToVoxelSpace p2
 
 		#store information for filling solids
 		voxelData = {
@@ -69,16 +69,16 @@ module.exports = class Voxelizer
 			shortSideLength1 = l1len
 			shortSideLength2 = l0len
 
-		longSideDelta = longSideLength / (shortSideLength1 + shortSideLength2)
+		longSideDelta = longSideLength / (shortSideLength1 + shortSideLength2 + 2) / 2
 		longSideIndex = longSideDelta
 
-		for i in [1..shortSideLength1] by 1
+		for i in [0..shortSideLength1] by 0.5
 			p0 = @_interpolateLine shortSide1, i / shortSideLength1
 			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
 			longSideIndex += longSideDelta
 			@voxelizeLine p0, p1, voxelData
 
-		for i in [1..shortSideLength2] by 1
+		for i in [0..shortSideLength2] by 0.5
 			p0 = @_interpolateLine shortSide2, i / shortSideLength2
 			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
 			longSideIndex += longSideDelta
@@ -103,22 +103,16 @@ module.exports = class Voxelizer
 		# can be true for 'there is a voxel' or
 		# a complex object with more information
 		length = @_getLength a, b
-
-		if length < 1
-			@voxelGrid.setVoxel @voxelGrid.mapGridToVoxel(a), voxelData
-			return
+		dx = (b.x - a.x) / length / 5
+		dy = (b.y - a.y) / length / 5
+		dz = (b.z - a.z) / length / 5
 
 		currentVoxel = x: -1, y: -1, z: -1
-
-		dx = (b.x - a.x) / length
-		dy = (b.y - a.y) / length
-		dz = (b.z - a.z) / length
-
 		currentGridPosition = x: a.x, y: a.y, z: a.z
 
-		for i in [0..length] by 1
+		for i in [0..length] by 0.2
 			oldVoxel = currentVoxel
-			currentVoxel = @voxelGrid.mapGridToVoxel currentGridPosition
+			currentVoxel = @voxelGrid.mapVoxelSpaceToVoxel currentGridPosition
 			if (oldVoxel.x != currentVoxel.x) or
 			(oldVoxel.y != currentVoxel.y) or
 			(oldVoxel.z != currentVoxel.z)

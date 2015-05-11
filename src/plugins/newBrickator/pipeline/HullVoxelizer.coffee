@@ -107,7 +107,7 @@ module.exports = class Voxelizer
 		dy = (b.y - a.y) / length / 5
 		dz = (b.z - a.z) / length / 5
 
-		currentVoxel = x: -1, y: -1, z: -1
+		currentVoxel = x: 0, y: 0, z: -1 # not a valid voxel because of z < 0
 		currentGridPosition = x: a.x, y: a.y, z: a.z
 
 		for i in [0..length] by 0.2

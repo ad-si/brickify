@@ -34,10 +34,12 @@ module.exports = class Voxelizer
 			dZ: n.z
 		}
 
+		lineStepSize = @voxelGrid.heightRatio / 16
+
 		#voxelize outer lines
-		@voxelizeLine p0, p1, voxelData
-		@voxelizeLine p1, p2, voxelData
-		@voxelizeLine p2, p0, voxelData
+		@voxelizeLine p0, p1, voxelData, lineStepSize
+		@voxelizeLine p1, p2, voxelData, lineStepSize
+		@voxelizeLine p2, p0, voxelData, lineStepSize
 
 		l0len = @_getLength p0, p1
 		l1len = @_getLength p1, p2
@@ -69,20 +71,23 @@ module.exports = class Voxelizer
 			shortSideLength1 = l1len
 			shortSideLength2 = l0len
 
-		longSideDelta = longSideLength / (shortSideLength1 + shortSideLength2 + 2) / 2
+		stepSize = @voxelGrid.heightRatio / 5
+		longSideDelta = longSideLength / (shortSideLength1 + shortSideLength2 + 2)
+		longSideDelta *= stepSize
+
 		longSideIndex = longSideDelta
 
-		for i in [0..shortSideLength1] by 0.5
+		for i in [0..shortSideLength1] by stepSize
 			p0 = @_interpolateLine shortSide1, i / shortSideLength1
 			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
 			longSideIndex += longSideDelta
-			@voxelizeLine p0, p1, voxelData
+			@voxelizeLine p0, p1, voxelData, lineStepSize
 
-		for i in [0..shortSideLength2] by 0.5
+		for i in [0..shortSideLength2] by stepSize
 			p0 = @_interpolateLine shortSide2, i / shortSideLength2
 			p1 = @_interpolateLine longSide, longSideIndex / longSideLength
 			longSideIndex += longSideDelta
-			@voxelizeLine p0, p1, voxelData
+			@voxelizeLine p0, p1, voxelData, lineStepSize
 
 	_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
 		x = (x1 - x2) * (x1 - x2)
@@ -97,20 +102,20 @@ module.exports = class Voxelizer
 		z = z1 + (z2 - z1) * i
 		return x: x, y: y, z: z
 
-	voxelizeLine: (a, b, voxelData = true) =>
+	voxelizeLine: (a, b, voxelData = true, stepSize) =>
 		# voxelizes the line from a to b
 		# voxel data = something to store in the voxel grid for each voxel.
 		# can be true for 'there is a voxel' or
 		# a complex object with more information
 		length = @_getLength a, b
-		dx = (b.x - a.x) / length / 5
-		dy = (b.y - a.y) / length / 5
-		dz = (b.z - a.z) / length / 5
+		dx = (b.x - a.x) / length * stepSize
+		dy = (b.y - a.y) / length * stepSize
+		dz = (b.z - a.z) / length * stepSize
 
 		currentVoxel = x: 0, y: 0, z: -1 # not a valid voxel because of z < 0
 		currentGridPosition = x: a.x, y: a.y, z: a.z
 
-		for i in [0..length] by 0.2
+		for i in [0..length] by stepSize
 			oldVoxel = currentVoxel
 			currentVoxel = @voxelGrid.mapVoxelSpaceToVoxel currentGridPosition
 			if (oldVoxel.x != currentVoxel.x) or

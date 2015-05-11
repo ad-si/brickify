@@ -36,10 +36,11 @@ module.exports = class Voxelizer
 
 		#voxelize outer lines
 		@voxelizeLine p0, p1, voxelData
-		l0len = @_getLength p0, p1
 		@voxelizeLine p1, p2, voxelData
-		l1len = @_getLength p1, p2
 		@voxelizeLine p2, p0, voxelData
+
+		l0len = @_getLength p0, p1
+		l1len = @_getLength p1, p2
 		l2len = @_getLength p2, p0
 
 		#sort for short and long side
@@ -101,110 +102,32 @@ module.exports = class Voxelizer
 		# voxel data = something to store in the voxel grid for each voxel.
 		# can be true for 'there is a voxel' or
 		# a complex object with more information
+		length = @_getLength a, b
 
-		@visitAllPointsBresenham a, b, (p) =>
-			@voxelGrid.setVoxel p, voxelData
+		if length < 1
+			@voxelGrid.setVoxel @voxelGrid.mapGridToVoxel(a), voxelData
+			return
 
-	visitAllPointsBresenham: (a, b, visitor) =>
-		# http://de.wikipedia.org/wiki/Bresenham-Algorithmus
-		# https://gist.github.com/yamamushi/5823518
-		# http://stackoverflow.com/questions/16505905/
-		# walk-a-line-between-two-points-in-a-3d-voxel-space-visiting-all-cells
+		currentVoxel = x: -1, y: -1, z: -1
 
-		afl = {
-			x: Math.floor a.x
-			y: Math.floor a.y
-			z: Math.floor a.z
-		}
+		dx = (b.x - a.x) / length
+		dy = (b.y - a.y) / length
+		dz = (b.z - a.z) / length
 
-		bfl = {
-			x: Math.floor b.x
-			y: Math.floor b.y
-			z: Math.floor b.z
-		}
+		currentGridPosition = x: a.x, y: a.y, z: a.z
 
-		bvox = @voxelGrid.mapGridToVoxel bfl
-
-		#stepping
-		sx = if bfl.x > afl.x then 1 else (if bfl.x < afl.x then -1 else 0)
-		sy = if bfl.y > afl.y then 1 else (if bfl.y < afl.y then -1 else 0)
-		sz = if bfl.z > afl.z then 1 else (if bfl.z < afl.z then -1 else 0)
-
-		g = {
-			x: afl.x
-			y: afl.y
-			z: afl.z
-		}
-
-		#Planes for each axis that we will next cross
-		gxp = afl.x + (if bfl.x > afl.x then 1 else 0)
-		gyp = afl.y + (if bfl.y > afl.y then 1 else 0)
-		gzp = afl.z + (if bfl.z > afl.z then 1 else 0)
-
-		#Only used for multiplying up the error margins
-		vx = if b.x == a.x then 1 else (b.x - a.x)
-		vy = if b.y == a.y then 1 else (b.y - a.y)
-		vz = if b.z == a.z then 1 else (b.z - a.z)
-
-		#Error is normalized to vx * vy * vz so we only have to multiply up
-		vxvy = vx * vy
-		vxvz = vx * vz
-		vyvz = vy * vz
-
-		#Error from the next plane accumulators, scaled up by vx*vy*vz
-		errx = (gxp - a.x) * vyvz
-		erry = (gyp - a.y) * vxvz
-		errz = (gzp - a.z) * vxvy
-
-		derrx = sx * vyvz
-		derry = sy * vxvz
-		derrz = sz * vxvy
-
-		gvox = {x: -2, y: -2, z: -2}
-		gvox_old = {x: -1, y: -1, z: -1}
-
-		while (true)
-			gvox_old = gvox
-			gvox = @voxelGrid.mapGridToVoxel g
-
-			if @debugVoxel
-				if @debugVoxel.x == gvox.x and
-			  @debugVoxel.y == gvox.y and
-				@debugVoxel.z == gvox.z
-					log.debug 'Voxelizing debug voxel, put your breakpoint *here*'
-
-			# if we move in this particular direction, check that we did not exeed our
-			# destination bounds: check if we reached the destination voxel
-			if ((sx == 0) or
-			((sx > 0 && gvox.x >= bvox.x) or (sx < 0 && gvox.x <= bvox.x))) and
-			((sy == 0) or
-			((sy > 0 && gvox.y >= bvox.y) or (sy < 0 && gvox.y <= bvox.y))) and
-			((sz == 0) or
-			((sz > 0 && gvox.z >= bvox.z) or (sz < 0 && gvox.z <= bvox.z)))
-				break
-
-			if (gvox_old.x != gvox.x) or (gvox_old.y != gvox.y) or (gvox_old.z != gvox.z)
-				visitor gvox
-
-			#Which plane do we cross first?
-			xr = Math.abs(errx)
-			yr = Math.abs(erry)
-			zr = Math.abs(errz)
-
-			if (sx != 0 && (sy == 0 || xr < yr) && (sz == 0 || xr < zr))
-				g.x += sx
-				errx += derrx
-
-			else if (sy != 0 && (sz == 0 || yr < zr))
-				g.y += sy
-				erry += derry
-
-			else if (sz != 0)
-				g.z += sz
-				errz += derrz
+		for i in [0..length] by 1
+			oldVoxel = currentVoxel
+			currentVoxel = @voxelGrid.mapGridToVoxel currentGridPosition
+			if (oldVoxel.x != currentVoxel.x) or
+			(oldVoxel.y != currentVoxel.y) or
+			(oldVoxel.z != currentVoxel.z)
+				@voxelGrid.setVoxel currentVoxel, voxelData
+			currentGridPosition.x += dx
+			currentGridPosition.y += dy
+			currentGridPosition.z += dz
 
 	setupGrid: (optimizedModel, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)
 		@voxelGrid.setUpForModel optimizedModel, options
 		return @voxelGrid
-

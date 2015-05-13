@@ -58,12 +58,11 @@ class NewBrickator
 		.then (cachedData) =>
 			modifiedBricks = []
 			for v in modifiedVoxels
-				if v.gridEntry.brick
-					if v.gridEntry.brick not in modifiedBricks
-						modifiedBricks.push v.gridEntry.brick
+				if v.brick
+					if v.brick not in modifiedBricks
+						modifiedBricks.push v.brick
 				else if createBricks
-					pos = v.voxelCoords
-					modifiedBricks.push new Brick([v.gridEntry])
+					modifiedBricks.push new Brick([v])
 
 			settings = new PipelineSettings()
 			settings.onlyRelayout()

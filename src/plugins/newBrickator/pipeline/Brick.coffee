@@ -223,6 +223,7 @@ class Brick
 		return variation1 || variation2
 
 	# returns true if the brick has no holes in it, i.e. is a cuboid
+	# voxels marked to be 3d printed count as holes
 	isHoleFree: =>
 		voxelCheck  = {}
 
@@ -236,7 +237,8 @@ class Brick
 
 		@forEachVoxel (voxel) ->
 			vp = voxel.position
-			voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
+			if voxel.isLego()
+				voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
 
 		hasHoles = false
 		for val of voxelCheck
@@ -251,15 +253,12 @@ class Brick
 	# has a valid size
 	isValid: =>	
 		if @voxels.size == 0
-			log.warn 'Invalid: brick has no voxels'
 			return false
 
 		if not @hasValidSize()
-			log.warn 'Invalid: brick has invalid size', @getSize()
 			return false
 
 		if not @isHoleFree()
-			log.warn 'Invalid: brick has holes'
 			return false
 
 		return true

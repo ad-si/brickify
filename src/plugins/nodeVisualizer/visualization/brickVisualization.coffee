@@ -18,7 +18,9 @@ class BrickVisualization
 		@brickThreeNode.add @csgSubnode
 	
 		@bricksSubnode = new THREE.Object3D()
+		@temporaryVoxels = new THREE.Object3D()
 		@brickThreeNode.add @bricksSubnode
+		@brickThreeNode.add @temporaryVoxels
 
 		@stabilityColoring = new StabilityColoring()
 
@@ -58,6 +60,9 @@ class BrickVisualization
 
 	# updates brick and voxel visualization
 	updateVisualization: (coloring = @defaultColoring, recreate = false) =>
+		# delete temporary voxels
+		@temporaryVoxels.children = []
+
 		# throw out all visual bricks that have no valid linked brick
 		for layer in @bricksSubnode.children
 			deletionList = []
@@ -201,6 +206,9 @@ class BrickVisualization
 
 	# makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
+		# hide highlight voxel since it will be made invisible
+		@_highlightVoxel.visible = false
+		
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: 'lego'}
 			mat = @defaultColoring.getHighlightMaterial '3d'
@@ -210,7 +218,23 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.make3dPrinted()
-			# Todo: split visible brick and hide visible voxel at this position
+			# Split visual brick into voxels (only once per brick)
+			if (voxel.brick)
+				visualBrick = voxel.brick.getVisualBrick()
+				if not visualBrick.hasBeenSplit
+					voxel.brick.forEachVoxel (voxel) =>
+						temporaryVoxel = @geometryCreator.getBrick(
+							voxel.position, {x: 1, y: 1, z: 1}, visualBrick.material
+						)
+						temporaryVoxel.voxelPosition = voxel.position
+						@temporaryVoxels.add temporaryVoxel
+					visualBrick.hasBeenSplit = true
+					visualBrick.visible = false
+			# hide visual voxels for 3d printed geometry
+			for temporaryVoxel in @temporaryVoxels.children
+				if temporaryVoxel.voxelPosition == voxel.position
+					temporaryVoxel.visible = false
+					break
 
 		return voxels
 

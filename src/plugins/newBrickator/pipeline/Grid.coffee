@@ -4,11 +4,16 @@ Brick = require './Brick'
 Random = require './Random'
 
 module.exports = class Grid
-	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
+	constructor: (@spacing = {x: 8, y: 8, z: 3.2}, pojo) ->
 		@origin = {x: 0, y: 0, z: 0}
 		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
 
 		@voxels = {}
+		if pojo?
+			for x, voxelPlane of pojo
+				for y, voxelColumn of voxelPlane
+					for z, dataEntries of voxelColumn
+						@setVoxel x: x, y: y, z: z
 
 	setUpForModel: (optimizedModel, options) =>
 		@modelTransform = options.modelTransform
@@ -257,3 +262,15 @@ module.exports = class Grid
 			if vox? and vox.brick
 				return vox.brick
 
+	toPOJO: =>
+		voxels = []
+		@forEachVoxel (voxel) ->
+			x = voxel.position.x
+			y = voxel.position.y
+			z = voxel.position.z
+
+			voxels[x] ?= []
+			voxels[x][y] ?= []
+			voxels[x][y][z] = voxel.dataEntrys
+
+		return voxels

@@ -8,7 +8,7 @@ module.exports = class VolumeFiller
 			for y in [0..grid.getNumVoxelsY() - 1] by 1
 				@fillUp grid, x, y
 
-		return {grid: grid}
+		Promise.resolve {grid: grid}
 
 	fillUp: (grid, x, y) =>
 		#fill up from z=0 to z=max

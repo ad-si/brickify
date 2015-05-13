@@ -38,10 +38,11 @@ class NewBrickator
 			}
 
 			@pipeline.run data, settings, true
-			cachedData.csgNeedsRecalculation = true
+			.then =>
+				cachedData.csgNeedsRecalculation = true
 
-			@nodeVisualizer?.objectModified selectedNode, cachedData
-			Spinner.stop @bundle.renderer.getDomElement()
+				@nodeVisualizer?.objectModified selectedNode, cachedData
+				Spinner.stop @bundle.renderer.getDomElement()
 
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout
@@ -75,9 +76,10 @@ class NewBrickator
 			}
 
 			@pipeline.run data, settings, true
-			cachedData.csgNeedsRecalculation = true
+			.then =>
+				cachedData.csgNeedsRecalculation = true
 
-			@nodeVisualizer?.objectModified selectedNode, cachedData
+				@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	everythingPrint: (selectedNode) =>
 		@_getCachedData selectedNode
@@ -87,10 +89,11 @@ class NewBrickator
 
 			data = grid: cachedData.grid
 
-			results = @pipeline.run data, settings, true
-			cachedData.csgNeedsRecalculation = true
+			@pipeline.run data, settings, true
+			.then =>
+				cachedData.csgNeedsRecalculation = true
 
-			@nodeVisualizer?.objectModified selectedNode, cachedData
+				@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	_createDataStructure: (selectedNode) =>
 		selectedNode.getModel().then (model) =>
@@ -99,23 +102,19 @@ class NewBrickator
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
 			settings.deactivateLayouting()
 
-			results = @pipeline.run(
+			@pipeline.run(
 				optimizedModel: model
 				settings
 				true
 			)
-
-			# create visuals
-			grid = results.accumulatedResults.grid
-
-			# create datastructure
-			data = {
-				node: selectedNode
-				grid: grid
-				optimizedModel: model
-				csgNeedsRecalculation: true
-			}
-			return data
+			.then (results) ->
+				# create data structure
+				return {
+					node: selectedNode
+					grid: results.grid
+					optimizedModel: model
+					csgNeedsRecalculation: true
+				}
 
 	_checkDataStructure: (selectedNode, data) ->
 		return yes # Later: Check for node transforms

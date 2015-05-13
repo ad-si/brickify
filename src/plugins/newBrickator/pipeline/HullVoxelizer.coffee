@@ -20,7 +20,7 @@ module.exports = class Voxelizer
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
 			@voxelizePolygon p0, p1, p2, n
 
-		return {grid: @voxelGrid}
+		Promise.resolve {grid: @voxelGrid}
 
 	voxelizePolygon: (p0, p1, p2, n) =>
 		# transform model coordinates to grid coordinates

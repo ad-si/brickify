@@ -191,7 +191,8 @@ class BrickVisualization
 			)
 			@brickShadowThreeNode.add @bigBrushHighlight
 
-		@bigBrushHighlight.position.copy voxel.position
+		worldPosition = @grid.mapVoxelToWorld voxel.position
+		@bigBrushHighlight.position.copy worldPosition
 		@bigBrushHighlight.material = material
 		@bigBrushHighlight.visible = true
 
@@ -209,11 +210,8 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.make3dPrinted()
-			voxel.visible = false
-			coords = voxel.voxelCoords
-			voxelBelow = @grid.getVoxel(coords.x, coords.y, coords.z - 1)
-			if voxelBelow?.enabled
-				voxelBelow.visibleVoxel.setStudVisibility true
+			# Todo: split visible brick and hide visible voxel at this position
+
 		return voxels
 
 	###
@@ -243,8 +241,12 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.makeLego()
+
+			# Todo show visible voxels at this position
+			###
 			voxel.visible = true
 			voxel.setMaterial @defaultColoring.selectedMaterial
+			###
 		return voxels
 
 	###
@@ -255,8 +257,7 @@ class BrickVisualization
 		everythingLego = true
 		for voxel in voxels
 			everythingLego = everythingLego && voxel.isLego()
-			voxel.makeLego()
-			voxel.visible = true
+			voxel.makeLego() 
 		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>

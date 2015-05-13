@@ -36,7 +36,6 @@ class VoxelSelector
 		size = @getBrushSize options.bigBrush
 		gridEntries = @grid.getSurrounding mainVoxel.position, size, -> true
 		voxels = gridEntries
-			.map (voxel) -> voxel.visibleVoxel
 			.filter (voxel) => @_hasType voxel, type
 			.filter (voxel) => voxel not in @touchedVoxels
 		@touchedVoxels = @touchedVoxels.concat voxels

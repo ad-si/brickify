@@ -257,3 +257,60 @@ module.exports = class Grid
 			if vox? and vox.brick
 				return vox.brick
 
+	intersectVoxels: (rayOrigin, rayDirection) =>
+		dirfrac = {
+			x: 1.0 / rayDirection.x
+			y: 1.0 / rayDirection.y
+			z: 1.0 / rayDirection.z
+		}
+
+		intersections = []
+
+		@forEachVoxel (voxel) =>
+			distance = @_intersectVoxel voxel, dirfrac, rayOrigin
+			if (distance > 0)
+				intersections.push {
+					distance: distance
+					voxel: voxel
+				}
+
+		intersections.sort (a,b) -> return a.distance - b.distance
+		return intersections
+
+	# Intersects a ray (1/direction + origin) with a voxel. returns the distance until
+	# intersection, a value <0 means no intersection
+	_intersectVoxel: (voxel, dirfrac, rayOrigin) =>
+		# source:
+		# http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
+
+		worldPosition = @mapVoxelToWorld voxel.position
+		lower = {
+			x: worldPosition.x - (@spacing.x / 2.0)
+			y: worldPosition.y - (@spacing.y / 2.0)
+			z: worldPosition.z - (@spacing.z / 2.0)
+		}
+		upper = {
+			x: worldPosition.x + (@spacing.x / 2.0)
+			y: worldPosition.y + (@spacing.y / 2.0)
+			z: worldPosition.z + (@spacing.z / 2.0)
+		}
+
+		t1 = (lower.x - rayOrigin.x) * dirfrac.x
+		t2 = (upper.x - rayOrigin.x) * dirfrac.x
+		t3 = (lower.y - rayOrigin.y) * dirfrac.y
+		t4 = (upper.y - rayOrigin.y) * dirfrac.y
+		t5 = (lower.z - rayOrigin.z) * dirfrac.z
+		t6 = (upper.z - rayOrigin.z) * dirfrac.z
+
+		tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6))
+		tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6))
+
+		if (tmax < 0 || tmin > tmax)
+			return -1
+		else
+			return tmin
+		
+
+
+
+

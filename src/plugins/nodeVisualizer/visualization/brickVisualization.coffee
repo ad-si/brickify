@@ -33,6 +33,11 @@ class BrickVisualization
 		@geometryCreator = new GeometryCreator(@grid)
 		@voxelSelector = new VoxelSelector @
 
+		@_highlightVoxel = @geometryCreator.getBrick(
+			{x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}, @defaultColoring.printHighlightMaterial
+		)
+		@brickThreeNode.add @_highlightVoxel
+
 	showCsg: (newCsgMesh) =>
 		@csgSubnode.children = []
 		return if not newCsgMesh?
@@ -159,16 +164,16 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			if @currentlyHighlightedVoxel?
-				@currentlyHighlightedVoxel.setHighlight false
-
-			@currentlyHighlightedVoxel = voxel
-			voxel.setHighlight true, hVoxel
+			@_highlightVoxel.visible = true
+			worldPos = @grid.mapVoxelToWorld voxel.position
+			@_highlightVoxel.position.set(
+				worldPos.x, worldPos.y, worldPos.z
+			)
+			@_highlightVoxel.material = hVoxel
 			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
-			if @currentlyHighlightedVoxel?
-				@currentlyHighlightedVoxel.setHighlight false
+			@_highlightVoxel.visible = false
 			@unhighlightBigBrush()
 
 		return voxel

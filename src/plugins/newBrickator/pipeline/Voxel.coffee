@@ -14,4 +14,7 @@ class Voxel
 			Ym: null
 		}
 
+	isLego: =>
+		return @enabled
+
 module.exports = Voxel

@@ -153,7 +153,7 @@ class NewBrickator
 				meshlib
 				.model(optimizedModel)
 				.export null, (error, binaryStl) ->
-					fn = "brickolage-#{selectedNode.name}"
+					fn = "brickify-#{selectedNode.name}"
 					if fn.indexOf('.stl') < 0
 						fn += '.stl'
 					resolve { data: binaryStl, fileName: fn }

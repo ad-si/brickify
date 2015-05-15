@@ -1,4 +1,4 @@
-# Lowfab
+# Brickify
 
 ## Installation
 
@@ -60,6 +60,5 @@ Call `$ npm run documentation` and
 
 The server currently serves:
 
-- [lowfab.net](http://lowfab.net): current master-branch
-- [dev.lowfab.net](http://dev.lowfab.net): current develop-branch
-- [batchtests.lowfab.net](http://batchtests.lowfab.net): results of batchTesting (performed on develop)
+- [brickify.it](http://brickify.it): current master-branch
+- [dev.brickify.it](http://dev.brickify.it): current develop-branch

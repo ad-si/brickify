@@ -125,7 +125,7 @@ class BrickVisualization
 		@unhighlightBigBrush()
 
 		# show not filled lego shape as outline
-		outlineCoords = @printVoxels.map (voxel) -> voxel.voxelCoords
+		outlineCoords = @printVoxels.map (voxel) -> voxel.position
 		@voxelWireframe.createWireframe outlineCoords
 
 		# / code from updateVoxelVisualization
@@ -208,7 +208,7 @@ class BrickVisualization
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
 		# hide highlight voxel since it will be made invisible
 		@_highlightVoxel.visible = false
-		
+
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: 'lego'}
 			mat = @defaultColoring.getHighlightMaterial '3d'
@@ -266,11 +266,12 @@ class BrickVisualization
 		for voxel in voxels
 			voxel.makeLego()
 
-			# Todo show visible voxels at this position
-			###
-			voxel.visible = true
-			voxel.setMaterial @defaultColoring.selectedMaterial
-			###
+			# Create a visible temporary voxel at this position
+			temporaryVoxel = @geometryCreator.getBrick(
+				voxel.position, {x: 1, y: 1, z: 1}, @defaultColoring.selectedMaterial
+			)
+			temporaryVoxel.voxelPosition = voxel.position
+			@temporaryVoxels.add temporaryVoxel
 		return voxels
 
 	###

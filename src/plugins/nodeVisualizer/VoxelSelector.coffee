@@ -97,8 +97,7 @@ class VoxelSelector
 	_getBaseplateVoxel: (event, type) ->
 		baseplatePos = interactionHelper.getGridPosition event, @renderer
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePos
-		gridEntry = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
-		voxel = gridEntry?.visibleVoxel
+		voxel = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 		return null unless voxel?
 
 		if @_hasType voxel, type

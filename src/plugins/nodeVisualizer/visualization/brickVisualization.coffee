@@ -65,19 +65,22 @@ class BrickVisualization
 		# delete temporary voxels
 		@temporaryVoxels.children = []
 
-		# throw out all visual bricks that have no valid linked brick
-		for layer in @bricksSubnode.children
-			deletionList = []
-			for visualBrick in layer.children
-				if not visualBrick.brick? or not visualBrick.brick.isValid()
-					deletionList.push visualBrick
+		if recreate
+			@bricksSubnode.children = []
+		else
+			# throw out all visual bricks that have no valid linked brick
+			for layer in @bricksSubnode.children
+				deletionList = []
+				for visualBrick in layer.children
+					if not visualBrick.brick? or not visualBrick.brick.isValid()
+						deletionList.push visualBrick
 
-			for delBrick in deletionList
-				# remove from scenegraph
-				layer.remove delBrick
-				# delete reference from datastructure brick
-				if delBrick.brick?
-					delBrick.brick.setVisualBrick null
+				for delBrick in deletionList
+					# remove from scenegraph
+					layer.remove delBrick
+					# delete reference from datastructure brick
+					if delBrick.brick?
+						delBrick.brick.setVisualBrick null
 
 		# Recreate visible bricks for all bricks in the datastructure that
 		# have no linked brick
@@ -88,7 +91,7 @@ class BrickVisualization
 			z = brick.getPosition().z
 			brickLayers[z] ?= []
 
-			if not brick.getVisualBrick()?
+			if (not recreate) and (not brick.getVisualBrick()?)
 				brickLayers[z].push brick
 
 		for z, brickLayer of brickLayers

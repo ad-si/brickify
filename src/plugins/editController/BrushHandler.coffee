@@ -96,9 +96,10 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
-			cachedData.brickVisualization.updateModifiedVoxels()
 			@editController.rerunLegoPipeline selectedNode
-
+			brickVis = cachedData.brickVisualization
+			brickVis.updateModifiedVoxels()
+			brickVis.updateVisualization(null, true)
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @editController.interactionDisabled

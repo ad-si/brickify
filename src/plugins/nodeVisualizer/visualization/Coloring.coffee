@@ -25,6 +25,9 @@ module.exports = class Coloring
 		@printHighlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0xeeeeee
 		})
+		@printHighlightMaterial.polygonOffset = true
+		@printHighlightMaterial.polygonOffsetFactor = -3
+		@printHighlightMaterial.polygonOffsetUnits = -3
 
 		@legoBoxHighlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0xff7755

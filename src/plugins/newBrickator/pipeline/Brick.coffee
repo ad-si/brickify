@@ -243,7 +243,6 @@ class Brick
 		hasHoles = false
 		for val of voxelCheck
 			if voxelCheck[val] == false
-				log.warn 'Hole at', val
 				hasHoles = true
 
 		return !hasHoles

@@ -66,7 +66,8 @@ class EditController
 				return true
 
 	# Methods called by brush handler
-	relayoutModifiedParts: (selectedNode, cachedData, touchedVoxels, createBricks) =>
+	relayoutModifiedParts: (
+		selectedNode, cachedData, touchedVoxels, createBricks) =>
 		@newBrickator.relayoutModifiedParts selectedNode, touchedVoxels, createBricks
 		cachedData.brickVisualization.updateVisualization()
 

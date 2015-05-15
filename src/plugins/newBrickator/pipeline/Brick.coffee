@@ -250,7 +250,7 @@ class Brick
 	# returns true if the brick is valid
 	# a brick is valid when it has voxels, is hole free and
 	# has a valid size
-	isValid: =>	
+	isValid: =>
 		if @voxels.size == 0
 			return false
 

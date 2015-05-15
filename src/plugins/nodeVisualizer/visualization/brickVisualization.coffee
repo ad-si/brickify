@@ -16,7 +16,7 @@ class BrickVisualization
 
 		@csgSubnode = new THREE.Object3D()
 		@brickThreeNode.add @csgSubnode
-	
+
 		@bricksSubnode = new THREE.Object3D()
 		@temporaryVoxels = new THREE.Object3D()
 		@brickThreeNode.add @bricksSubnode
@@ -36,7 +36,9 @@ class BrickVisualization
 		@voxelSelector = new VoxelSelector @
 
 		@_highlightVoxel = @geometryCreator.getBrick(
-			{x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}, @defaultColoring.printHighlightMaterial
+			{x: 0, y: 0, z: 0},
+			{x: 1, y: 1, z: 1},
+			@defaultColoring.printHighlightMaterial
 		)
 		@brickThreeNode.add @_highlightVoxel
 
@@ -77,7 +79,7 @@ class BrickVisualization
 				if delBrick.brick?
 					delBrick.brick.setVisualBrick null
 
-		# Recreate visible bricks for all bricks in the datastructure that 
+		# Recreate visible bricks for all bricks in the datastructure that
 		# have no linked brick
 
 		# sort layerwise for build view
@@ -110,7 +112,7 @@ class BrickVisualization
 
 				# add to scene graph
 				layerObject.add threeBrick
-		
+
 		# if this coloring differs from the last used coloring, go through
 		# all visible bricks to update their material
 		if @_oldColoring? and @_oldColoring != coloring
@@ -282,7 +284,7 @@ class BrickVisualization
 		everythingLego = true
 		for voxel in voxels
 			everythingLego = everythingLego && voxel.isLego()
-			voxel.makeLego() 
+			voxel.makeLego()
 		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>

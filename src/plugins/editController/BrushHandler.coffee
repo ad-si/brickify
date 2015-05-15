@@ -71,7 +71,9 @@ class BrushHandler
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"
 
-			@editController.relayoutModifiedParts selectedNode, cachedData, touchedVoxels, true
+			@editController.relayoutModifiedParts(
+				selectedNode, cachedData, touchedVoxels, true
+			)
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_legoMouseHover: (event, selectedNode) =>
@@ -124,7 +126,9 @@ class BrushHandler
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"
 
-			@editController.relayoutModifiedParts selectedNode, cachedData, touchedVoxels, true
+			@editController.relayoutModifiedParts(
+				selectedNode, cachedData, touchedVoxels, true
+			)
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_printMouseHover: (event, selectedNode) =>
@@ -146,7 +150,8 @@ class BrushHandler
 		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			return unless cachedData.brickVisualization.makeAllVoxels3dPrinted selectedNode
+			return unless cachedData
+				.brickVisualization.makeAllVoxels3dPrinted selectedNode
 			cachedData.brickVisualization.updateModifiedVoxels()
 			@editController.everythingPrint selectedNode
 

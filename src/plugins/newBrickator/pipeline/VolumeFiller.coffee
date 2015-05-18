@@ -8,13 +8,18 @@ module.exports = class VolumeFiller
 
 		gridPOJO = grid.toPOJO()
 		numVoxelsZ = grid.getNumVoxelsZ()
-		worker = @getWorker()
-		worker.fillGrid gridPOJO, numVoxelsZ
-		.then (gridPOJO) ->
-			worker.terminate()
+		@worker = @getWorker()
+		return @worker.fillGrid gridPOJO, numVoxelsZ
+		.then (gridPOJO) =>
+			@worker.terminate()
+			@worker = null
 			newGrid = new Grid grid.spacing, gridPOJO
 			newGrid.origin = grid.origin
 			return {grid: grid}
+
+	terminate: =>
+		@worker?.terminate()
+		@worker = null
 
 	getWorker: ->
 		operative {

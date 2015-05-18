@@ -23,9 +23,13 @@ class NewBrickator
 
 		@runLegoPipeline node
 
+	onNodeRemove: (node) =>
+		@pipeline.terminate()
+
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData(selectedNode).then (cachedData) =>
+		@_getCachedData(selectedNode)
+		.then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
 			settings = new PipelineSettings()
 			settings.deactivateVoxelizing()
@@ -43,6 +47,12 @@ class NewBrickator
 
 				@nodeVisualizer?.objectModified selectedNode, cachedData
 				Spinner.stop @bundle.renderer.getDomElement()
+			.catch (error) =>
+				log.debug error
+				Spinner.stop @bundle.renderer.getDomElement()
+		.catch (error) =>
+			log.debug error
+			Spinner.stop @bundle.renderer.getDomElement()
 
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout
@@ -80,6 +90,8 @@ class NewBrickator
 				cachedData.csgNeedsRecalculation = true
 
 				@nodeVisualizer?.objectModified selectedNode, cachedData
+			.catch (error) ->
+				log.debug error
 
 	everythingPrint: (selectedNode) =>
 		@_getCachedData selectedNode

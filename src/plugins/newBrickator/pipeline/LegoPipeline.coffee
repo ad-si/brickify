@@ -48,6 +48,7 @@ module.exports = class LegoPipeline
 				)
 
 	run: (data, options = null, profiling = false) =>
+		@terminated = false
 		if profiling
 			log.debug "Starting Lego Pipeline
 			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
@@ -59,24 +60,31 @@ module.exports = class LegoPipeline
 
 		start = new Date()
 
-		@runWebWorker 0, data, options, profiling
+		runPromise = @runPromise 0, data, options, profiling
 		.then (result) ->
 			if profiling
 				log.debug "Finished Lego Pipeline in #{new Date() - start}ms"
 			return result
 
-	runWebWorker: (i, data, options, profiling) =>
-		if i >= @pipelineSteps.length
+		cancelPromise = new Promise (resolve, @reject) => return
+
+		return Promise.race([runPromise, cancelPromise])
+
+	runPromise: (i, data, options, profiling) =>
+		if i >= @pipelineSteps.length or @terminated
+			@currentStep = null
+			@terminated = true
 			return data
 		else
 			@runStep i, data, options, profiling
 				.then (result) =>
 					for own key of result
 						data[key] = result[key]
-					return @runWebWorker ++i, data, options, profiling
+					return @runPromise ++i, data, options, profiling
 
 	runStep: (i, lastResult, options, profiling) ->
 		step = @pipelineSteps[i]
+		@currentStep = step
 
 		if step.decision options
 			log.debug "Running step #{step.name}" if profiling
@@ -90,3 +98,11 @@ module.exports = class LegoPipeline
 			log.debug "(Skipping step #{step.name})" if profiling
 			result = lastResult
 			Promise.resolve result
+
+	terminate: =>
+		return if @terminated
+		@terminated = true
+		@currentStep?.terminate?()
+		@reject? "LegoPipeline was terminated at step #{@currentStep.name}"
+		@currentStep = null
+		@reject = null

@@ -199,7 +199,18 @@ class NewBrickator
 
 		return options
 
-
+	getHotkeys: =>
+		return unless process.env.NODE_ENV is 'development'
+		return {
+		title: 'newBrickator'
+		events: [
+			{
+				hotkey: 'c'
+				description: 'cancel current pipeline operation'
+				callback: => @pipeline.terminate()
+			}
+		]
+		}
 
 
 

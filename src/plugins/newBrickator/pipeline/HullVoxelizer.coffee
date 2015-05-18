@@ -36,11 +36,6 @@ module.exports = class Voxelizer
 
 		lineStepSize = @voxelGrid.heightRatio / 16
 
-		#voxelize outer lines
-		@voxelizeLine p0, p1, voxelData, lineStepSize
-		@voxelizeLine p1, p2, voxelData, lineStepSize
-		@voxelizeLine p2, p0, voxelData, lineStepSize
-
 		l0len = @_getLength p0, p1
 		l1len = @_getLength p1, p2
 		l2len = @_getLength p2, p0

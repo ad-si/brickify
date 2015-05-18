@@ -56,13 +56,13 @@ class NewBrickator
 		log.debug 'relayouting modified parts, creating bricks:',createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
-			modifiedBricks = []
+			modifiedBricks = new Set()
 			for v in modifiedVoxels
 				if v.brick
 					if v.brick not in modifiedBricks
-						modifiedBricks.push v.brick
+						modifiedBricks.add v.brick
 				else if createBricks
-					modifiedBricks.push new Brick([v])
+					modifiedBricks.add new Brick([v])
 
 			settings = new PipelineSettings()
 			settings.onlyRelayout()

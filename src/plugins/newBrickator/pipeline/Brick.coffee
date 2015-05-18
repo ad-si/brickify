@@ -252,16 +252,7 @@ class Brick
 	# a brick is valid when it has voxels, is hole free and
 	# has a valid size
 	isValid: =>
-		if @voxels.size == 0
-			return false
-
-		if not @hasValidSize()
-			return false
-
-		if not @isHoleFree()
-			return false
-
-		return true
+		return @voxels.size > 0 and @hasValidSize() and @isHoleFree()
 
 	getStability: =>
 		s = @getSize()

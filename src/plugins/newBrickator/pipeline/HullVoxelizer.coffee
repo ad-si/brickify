@@ -97,11 +97,15 @@ module.exports = class Voxelizer
 		z = z1 + (z2 - z1) * i
 		return x: x, y: y, z: z
 
-	voxelizeLine: (a, b, voxelData = true, stepSize) =>
-		# voxelizes the line from a to b
-		# voxel data = something to store in the voxel grid for each voxel.
-		# can be true for 'there is a voxel' or
-		# a complex object with more information
+	###
+	# Voxelizes the line from a to b. Stores data in each generated voxel.
+	#
+	# @param a point the start point of the line
+	# @param b point the end point of the line
+	# @param voxelData Object data to store in the voxel grid for each voxel
+	# @param stepSize Number the stepSize to use for sampling the line
+	###
+	voxelizeLine: (a, b, voxelData, stepSize) =>
 		length = @_getLength a, b
 		dx = (b.x - a.x) / length * stepSize
 		dy = (b.y - a.y) / length * stepSize

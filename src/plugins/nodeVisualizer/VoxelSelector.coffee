@@ -40,9 +40,7 @@ class VoxelSelector
 			.filter (voxel) => voxel not in @touchedVoxels
 		@touchedVoxels = @touchedVoxels.concat voxels
 		if options.bigBrush
-			@level =
-				voxelZ: mainVoxel.position.z
-				worldZ: mainVoxel.position.z
+			@level = mainVoxel.position.z
 		return voxels
 
 	###
@@ -68,12 +66,12 @@ class VoxelSelector
 		return voxel
 
 	_getLeveledVoxel: (event, voxels) ->
-		voxel =  voxels.find (voxel) => voxel.position.z == @level.voxelZ
+		voxel =  voxels.find (voxel) => voxel.position.z == @level
 		return voxel if voxel
 		position = interactionHelper.getPlanePosition(
 			event
 			@renderer
-			@level.worldZ
+			@level
 		)
 		voxelCoords = @grid.mapGridToVoxel @grid.mapWorldToGrid position
 		pseudoVoxel =

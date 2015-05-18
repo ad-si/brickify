@@ -76,10 +76,10 @@ module.exports = class Voxelizer
 			@voxelizeLine p0, p1, voxelData, lineStepSize
 
 	_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
-		x = (x1 - x2) * (x1 - x2)
-		y = (y1 - y2) * (y1 - y2)
-		z = (z1 - z2) * (z1 - z2)
-		return Math.sqrt x + y + z
+		dx = x2 - x1
+		dy = y2 - y1
+		dz = z2 - z1
+		return Math.sqrt dx * dx + dy * dy + dz * dz
 
 	_interpolateLine: ({start: {x: x1, y: y1, z: z1},
 	end: {x: x2, y: y2, z: z2}}, i) ->

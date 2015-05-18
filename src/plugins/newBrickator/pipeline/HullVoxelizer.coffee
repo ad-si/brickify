@@ -4,12 +4,19 @@ module.exports = class Voxelizer
 	constructor: ->
 		@voxelGrid = null
 
+	addDefaults: (options) ->
+		options.lineAccuracy ?= 16
+		options.outerAccuracy ?= 5
 
-	voxelize: (optimizedModel, options) =>
+	voxelize: (optimizedModel, options = {}) =>
+		@addDefaults options
 		@setupGrid optimizedModel, options
 
+		lineStepSize = @voxelGrid.heightRatio / options.lineAccuracy
+		outerStepSize = @voxelGrid.heightRatio / options.outerAccuracy
+
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
-			@voxelizePolygon p0, p1, p2, n
+			@voxelizePolygon p0, p1, p2, n, lineStepSize, outerStepSize
 
 		return {grid: @voxelGrid}
 

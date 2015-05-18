@@ -59,7 +59,7 @@ module.exports = class Voxelizer
 			shortSideLength1 = l1len
 			shortSideLength2 = l0len
 
-		longSideStepSize = (shortSideLength1 + shortSideLength2) * outerStepSize
+		longSideStepSize = 1 / (shortSideLength1 + shortSideLength2) * outerStepSize
 
 		longSideIndex = 0
 

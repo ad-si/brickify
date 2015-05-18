@@ -155,7 +155,9 @@ class BrickVisualization
 			else
 				@bricksSubnode.children[i].visible = false
 
-		@showBricks()
+	showAllBrickLayers: =>
+		for layer in @bricksSubnode.children
+			layer.visible = true
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>

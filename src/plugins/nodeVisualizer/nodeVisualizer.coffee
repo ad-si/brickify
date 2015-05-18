@@ -305,6 +305,9 @@ class NodeVisualizer
 					@_resetStabilityView cachedData
 					return @_applyBuildMode cachedData
 
+	getDisplayMode: =>
+		return @visualizationMode
+
 	_applyLegoBrushMode: (cachedData) =>
 		cachedData.brickVisualization.updateVisualization()
 		cachedData.brickVisualization.showVoxelAndBricks()
@@ -345,6 +348,7 @@ class NodeVisualizer
 
 	_resetBuildMode: (cachedData) =>
 		cachedData.brickVisualization.hideCsg()
+		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
 
 	# when build mode is enabled, this tells the visualization to show

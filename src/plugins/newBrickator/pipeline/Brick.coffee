@@ -244,6 +244,7 @@ class Brick
 		for val of voxelCheck
 			if voxelCheck[val] == false
 				hasHoles = true
+				break
 
 		return !hasHoles
 

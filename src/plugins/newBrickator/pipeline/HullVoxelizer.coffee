@@ -1,6 +1,4 @@
-log = require 'loglevel'
 Grid = require './Grid'
-
 
 module.exports = class Voxelizer
 	constructor: ->

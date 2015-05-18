@@ -132,7 +132,7 @@ class VoxelSelector
 
 		# rotate to match scene that is rotated 90° around x-axis
 		m = new THREE.Matrix4()
-		m.makeRotationX(3.14159 / 2.0)
+		m.makeRotationX(Math.PI / 2.0)
 		rayDirection.applyProjection(m)
 		rayOrigin.applyProjection(m)
 

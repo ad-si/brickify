@@ -6,15 +6,8 @@ module.exports = class Voxelizer
 	constructor: ->
 		@voxelGrid = null
 
-	setDebugVoxel: (@debugVoxel) =>
-		# allows for setting a breakpoint when voxelizing and inspecting
-		# a specific voxel
-		return
 
-	voxelize: (optimizedModel, options = {}) =>
-		if options.debugVoxel?
-			@debugVoxel = options.debugVoxel
-
+	voxelize: (optimizedModel, options) =>
 		@setupGrid optimizedModel, options
 
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>

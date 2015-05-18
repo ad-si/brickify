@@ -59,8 +59,7 @@ class NewBrickator
 			modifiedBricks = new Set()
 			for v in modifiedVoxels
 				if v.brick
-					if v.brick not in modifiedBricks
-						modifiedBricks.add v.brick
+					modifiedBricks.add v.brick
 				else if createBricks
 					modifiedBricks.add new Brick([v])
 

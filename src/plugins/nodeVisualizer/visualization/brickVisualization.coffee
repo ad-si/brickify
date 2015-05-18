@@ -40,6 +40,8 @@ class BrickVisualization
 			{x: 1, y: 1, z: 1},
 			@defaultColoring.printHighlightMaterial
 		)
+		@_highlightVoxel.visible = false
+
 		@brickThreeNode.add @_highlightVoxel
 
 	showCsg: (newCsgMesh) =>
@@ -141,14 +143,18 @@ class BrickVisualization
 		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
 		@updateVisualization(coloring)
 
-		# Turn off possible lego box during stability view
+		# Turn off possible lego box and highlight during stability view
 		if enabled
 			@_legoBoxVisibilityBeforeStability = @voxelWireframe.isVisible()
 			@voxelWireframe.setVisibility false
+			@_highlightVoxel.visible = false
 		else
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 
 	showBrickLayer: (layer) =>
+		# hide highlight when in build mode
+		@_highlightVoxel.visible = false
+
 		for i in [0..@bricksSubnode.children.length - 1] by 1
 			if i <= layer
 				@bricksSubnode.children[i].visible = true
@@ -259,6 +265,9 @@ class BrickVisualization
 
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
+		# hide highlight
+		@_highlightVoxel.visible = false
+
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: '3d'}
 			mat = @defaultColoring.getHighlightMaterial 'lego'

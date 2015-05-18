@@ -118,22 +118,18 @@ class BrickVisualization
 
 		# if this coloring differs from the last used coloring, go through
 		# all visible bricks to update their material
-		if @_oldColoring? and @_oldColoring != coloring
+		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
 					material = coloring.getMaterialForBrick visualBrick.brick
 					visualBrick.setMaterial material
 		@_oldColoring = coloring
 
-		# code from updateVoxelVisualization
-
 		@unhighlightBigBrush()
 
 		# show not filled lego shape as outline
 		outlineCoords = @printVoxels.map (voxel) -> voxel.position
 		@voxelWireframe.createWireframe outlineCoords
-
-		# / code from updateVoxelVisualization
 
 		#ToDo: hide studs when brick is completely below other brick
 

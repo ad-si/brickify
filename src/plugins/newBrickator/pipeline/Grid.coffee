@@ -94,15 +94,22 @@ module.exports = class Grid
 			# model and world coordinates are in the same system
 			return @mapWorldToGrid point
 
-	mapGridToVoxel: (point) =>
+	mapModelToVoxelSpace: (point) =>
+		gridPoint = @mapModelToGrid point
+		return @mapGridToVoxel gridPoint, false
+
+	mapGridToVoxel: (point, round = true) =>
 		# maps aligned grid coordinates to voxel indices
 		# cut z<0 to z=0, since the grid cannot have
 		# voxels in negative direction
-		return {
-			x: Math.round(point.x / @spacing.x)
-			y: Math.round(point.y / @spacing.y)
-			z: Math.max(Math.round(point.z / @spacing.z), 0)
-		}
+		x = point.x / @spacing.x
+		y = point.y / @spacing.y
+		z = Math.max point.z / @spacing.z, 0
+		if round
+			x = Math.round x
+			y = Math.round y
+			z = Math.round z
+		return x: x, y: y, z: z
 
 	mapVoxelToGrid: (point) =>
 		# maps voxel indices to aligned grid coordinates
@@ -119,6 +126,13 @@ module.exports = class Grid
 			x: relative.x + @origin.x
 			y: relative.y + @origin.y
 			z: relative.z + @origin.z
+		}
+
+	mapVoxelSpaceToVoxel: (point) ->
+		return {
+			x: Math.round point.x
+			y: Math.round point.y
+			z: Math.round point.z
 		}
 
 	# generates a key for a hashmap from the given coordinates

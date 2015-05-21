@@ -10,12 +10,13 @@ module.exports = class VolumeFiller
 		numVoxelsZ = grid.getNumVoxelsZ()
 		@worker = @getWorker()
 		return @worker.fillGrid gridPOJO, numVoxelsZ
-		.then (gridPOJO) =>
+		.then (newGridPOJO) =>
 			@worker.terminate()
 			@worker = null
-			newGrid = new Grid grid.spacing, gridPOJO
+			newGrid = new Grid grid.spacing
 			newGrid.origin = grid.origin
-			return {grid: grid}
+			newGrid.fromPojo newGridPOJO
+			return {grid: newGrid}
 
 	terminate: =>
 		@worker?.terminate()
@@ -36,14 +37,14 @@ module.exports = class VolumeFiller
 				currentFillVoxelQueue = []
 
 				while z < numVoxelsZ
-					if grid[x]?[y]?[z]?
+					if grid[x][y][z]?
 						# current voxel already exists (shell voxel)
 						dir = @calculateVoxelDirection grid, x, y, z
 
 						if dir.definitelyUp
 							#fill up voxels and leave model
 							for v in currentFillVoxelQueue
-								@setVoxel v, {inside: true}
+								@setVoxel grid, v, {inside: true}
 							insideModel = false
 						else if dir.definitelyDown
 							# re-entering model if inside? that seems odd. empty current fill queue
@@ -54,7 +55,7 @@ module.exports = class VolumeFiller
 						else
 							#if not sure, fill up (precautious people might leave this out?)
 							for v in currentFillVoxelQueue
-								@setVoxel v, {inside: true}
+								@setVoxel grid, v, {inside: true}
 							currentFillVoxelQueue = []
 
 							insideModel = false
@@ -93,8 +94,9 @@ module.exports = class VolumeFiller
 				definitelyDown: definitelyDown
 				}
 
-			setVoxel: (grid, x, y, z, voxelData) ->
+			setVoxel: (grid, {x: x, y: y, z: z}, voxelData) ->
 				grid[x] ?= []
 				grid[x][y] ?= []
-				grid[x][y][z] = [voxelData]
-		}
+				grid[x][y][z] ?= []
+				grid[x][y][z].push voxelData
+			}

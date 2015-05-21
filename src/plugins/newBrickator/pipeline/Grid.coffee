@@ -4,16 +4,11 @@ Brick = require './Brick'
 Random = require './Random'
 
 module.exports = class Grid
-	constructor: (@spacing = {x: 8, y: 8, z: 3.2}, pojo) ->
+	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->
 		@origin = {x: 0, y: 0, z: 0}
 		@heightRatio = ((@spacing.x + @spacing.y) / 2) / @spacing.z
 
 		@voxels = {}
-		if pojo?
-			for x, voxelPlane of pojo
-				for y, voxelColumn of voxelPlane
-					for z, dataEntries of voxelColumn
-						@setVoxel x: x, y: y, z: z
 
 	setUpForModel: (optimizedModel, options) =>
 		@modelTransform = options.modelTransform
@@ -149,12 +144,16 @@ module.exports = class Grid
 		v = @voxels[key]
 
 		if not v?
-			v = new Voxel(position, [data])
+			data = [data] unless Array.isArray data
+			v = new Voxel(position, data)
 			@_linkNeighbors v
 			@voxels[key] = v
 			@_updateMinMax position
 		else
-			v.dataEntrys.push data
+			if Array.isArray data
+				v.dataEntrys = v.dataEntrys.concat data
+			else
+				v.dataEntrys.push data
 
 		return v
 
@@ -286,8 +285,13 @@ module.exports = class Grid
 			voxels[x] ?= []
 			voxels[x][y] ?= []
 			voxels[x][y][z] = voxel.dataEntrys
-
 		return voxels
+
+	fromPojo: (pojo) ->
+		for x, voxelPlane of pojo
+			for y, voxelColumn of voxelPlane
+				for z, dataEntries of voxelColumn
+					@setVoxel x: x, y: y, z: z, dataEntries
 
 	intersectVoxels: (rayOrigin, rayDirection) =>
 		dirfrac = {

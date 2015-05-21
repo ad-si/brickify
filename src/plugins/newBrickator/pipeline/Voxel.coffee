@@ -1,6 +1,6 @@
 class Voxel
-	constructor: (@position, dataEntrys = []) ->
-		@dataEntrys = dataEntrys
+	constructor: (@position, dataEntries = []) ->
+		@dataEntries = dataEntries
 		@brick = false
 		@enabled = true
 		@definitelyUp = false

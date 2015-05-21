@@ -68,11 +68,11 @@ module.exports = class VolumeFiller
 			calculateVoxelDirection: (grid, x, y, z, tolerance = 0.1) ->
 				# determines whether all polygons related to this voxel are either
 				# all aligned upwards or all aligned downwards
-				dataEntrys = grid[x][y][z]
+				dataEntries = grid[x][y][z]
 				numUp = 0
 				numDown = 0
 
-				for e in dataEntrys
+				for e in dataEntries
 					# everything smaller than tolerance is considered level
 					if e.dZ > tolerance then numUp++ else if e.dZ < -tolerance then numDown++
 
@@ -86,8 +86,8 @@ module.exports = class VolumeFiller
 				else
 					definitelyDown = false
 
-				dataEntrys.definitelyUp = definitelyUp
-				dataEntrys.definitelyDown = definitelyDown
+				dataEntries.definitelyUp = definitelyUp
+				dataEntries.definitelyDown = definitelyDown
 
 				return {
 				definitelyUp: definitelyUp

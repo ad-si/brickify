@@ -151,9 +151,9 @@ module.exports = class Grid
 			@_updateMinMax position
 		else
 			if Array.isArray data
-				v.dataEntrys = v.dataEntrys.concat data
+				v.dataEntries = v.dataEntries.concat data
 			else
-				v.dataEntrys.push data
+				v.dataEntries.push data
 
 		return v
 
@@ -284,7 +284,7 @@ module.exports = class Grid
 
 			voxels[x] ?= []
 			voxels[x][y] ?= []
-			voxels[x][y][z] = voxel.dataEntrys
+			voxels[x][y][z] = voxel.dataEntries
 		return voxels
 
 	fromPojo: (pojo) ->

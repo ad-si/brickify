@@ -59,7 +59,7 @@ describe 'Grid', ->
 		expect(v).to.equal(undefined)
 
 		v = grid.getVoxel 1, 2, 3
-		expect(v.dataEntrys[0]).to.equal('v1')
+		expect(v.dataEntries[0]).to.equal('v1')
 
 	it 'should link voxels correctly', ->
 		grid = new Grid()

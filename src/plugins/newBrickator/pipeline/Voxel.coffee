@@ -14,4 +14,13 @@ class Voxel
 			Ym: null
 		}
 
+	isLego: =>
+		return @enabled
+
+	makeLego: =>
+		@enabled = true
+
+	make3dPrinted: =>
+		@enabled = false
+
 module.exports = Voxel

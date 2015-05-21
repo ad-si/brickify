@@ -17,12 +17,10 @@ class BrickVisualization
 		@csgSubnode = new THREE.Object3D()
 		@brickThreeNode.add @csgSubnode
 
-		@voxelBrickSubnode = new THREE.Object3D()
-		@voxelsSubnode = new THREE.Object3D()
-		@voxelBrickSubnode.add @voxelsSubnode
 		@bricksSubnode = new THREE.Object3D()
-		@voxelBrickSubnode.add @bricksSubnode
-		@brickThreeNode.add @voxelBrickSubnode
+		@temporaryVoxels = new THREE.Object3D()
+		@brickThreeNode.add @bricksSubnode
+		@brickThreeNode.add @temporaryVoxels
 
 		@stabilityColoring = new StabilityColoring()
 
@@ -37,13 +35,14 @@ class BrickVisualization
 		@geometryCreator = new GeometryCreator(@grid)
 		@voxelSelector = new VoxelSelector @
 
-	showVoxels: =>
-		@voxelsSubnode.visible = true
-		@bricksSubnode.visible = false
+		@_highlightVoxel = @geometryCreator.getBrick(
+			{x: 0, y: 0, z: 0},
+			{x: 1, y: 1, z: 1},
+			@defaultColoring.printHighlightMaterial
+		)
+		@_highlightVoxel.visible = false
 
-	showBricks: =>
-		@bricksSubnode.visible = true
-		@voxelsSubnode.visible = false
+		@brickThreeNode.add @_highlightVoxel
 
 	showCsg: (newCsgMesh) =>
 		@csgSubnode.children = []
@@ -58,98 +57,113 @@ class BrickVisualization
 		@csgSubnode.visible = false
 
 	hideVoxelAndBricks: =>
-		@voxelBrickSubnode.visible = false
+		@bricksSubnode.visible = false
 
 	showVoxelAndBricks: =>
-		@voxelBrickSubnode.visible  = true
+		@bricksSubnode.visible  = true
 
-	# (re)creates voxel visualization.
-	# hides disabled voxels, updates material and stud visibility
-	updateVoxelVisualization: (coloring = @defaultColoring, recreate = false) =>
-		@unhighlightBigBrush()
-		if not @voxelsSubnode.children or @voxelsSubnode.children.length == 0 or
-		recreate
-			@_createVoxelVisualization coloring
-			return
+	# updates brick and voxel visualization
+	updateVisualization: (coloring = @defaultColoring, recreate = false) =>
+		# delete temporary voxels
+		@temporaryVoxels.children = []
 
-		# update materials and show/hide studs
-		for v in @voxelsSubnode.children
-			# get material
-			material = coloring.getMaterialForVoxel v.gridEntry
-			v.setMaterial material
-			@_updateVoxel v
-
-		# show not filled lego shape as outline
-		outlineCoords = @printVoxels.map (voxel) -> voxel.voxelCoords
-		@voxelWireframe.createWireframe outlineCoords
-
-	setPossibleLegoBoxVisibility: (isVisible) =>
-		@voxelWireframe.setVisibility isVisible
-
-	# clear and create voxel visualization
-	_createVoxelVisualization: (coloring) =>
-		@voxelsSubnode.children = []
-
-		@grid.forEachVoxel (voxel) =>
-			material = coloring.getMaterialForVoxel voxel
-			p = voxel.position
-			threeBrick = @geometryCreator.getVoxel {x: p.x, y: p.y, z: p.z}, material
-			@_updateVoxel threeBrick
-			@voxelsSubnode.add threeBrick
-
-	# makes disabled voxels invisible, toggles stud visibility
-	_updateVoxel: (threeBrick) =>
-		if not threeBrick.isLego()
-			threeBrick.visible = false
-
-		coords = threeBrick.voxelCoords
-		if @grid.getVoxel(coords.x, coords.y, coords.z + 1)?.enabled
-			threeBrick.setStudVisibility false
+		if recreate
+			@bricksSubnode.children = []
 		else
-			threeBrick.setStudVisibility true
+			# throw out all visual bricks that have no valid linked brick
+			for layer in @bricksSubnode.children
+				deletionList = []
+				for visualBrick in layer.children
+					if not visualBrick.brick? or not visualBrick.brick.isValid()
+						deletionList.push visualBrick
 
-	setStabilityView: (enabled) =>
-		@isStabilityView = enabled
-		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
-		@updateBrickVisualization(coloring)
+				for delBrick in deletionList
+					# remove from scenegraph
+					layer.remove delBrick
+					# delete reference from datastructure brick
+					if delBrick.brick?
+						delBrick.brick.setVisualBrick null
 
-		# Turn off possible lego box during stability view
-		if enabled
-			@_legoBoxVisibilityBeforeStability = @voxelWireframe.isVisible()
-			@voxelWireframe.setVisibility false
-		else
-			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
+		# Recreate visible bricks for all bricks in the datastructure that
+		# have no linked brick
 
-	updateBrickVisualization: (coloring = @defaultColoring) =>
-		@bricksSubnode.children = []
-
-		# sort by layer
+		# sort layerwise for build view
 		brickLayers = []
 		@grid.getAllBricks().forEach (brick) ->
 			z = brick.getPosition().z
 			brickLayers[z] ?= []
-			brickLayers[z].push brick
 
-		# Add bricks layer-wise (because of build view)
+			if (not recreate) and (not brick.getVisualBrick()?)
+				brickLayers[z].push brick
+
 		for z, brickLayer of brickLayers
-			layerObject = new THREE.Object3D()
-			@bricksSubnode.add layerObject
+			# create layer object if it does not exist
+			if not @bricksSubnode.children[z]?
+				layerObject = new THREE.Object3D()
+				@bricksSubnode.add layerObject
+
+			layerObject = @bricksSubnode.children[z]
 
 			for brick in brickLayer
+				# create visual brick
 				material = coloring.getMaterialForBrick brick
 				threeBrick = @geometryCreator.getBrick(
 					brick.getPosition(), brick.getSize(), material
 				)
+
+				# link data <-> visuals
+				brick.setVisualBrick threeBrick
+				threeBrick.brick = brick
+
+				# add to scene graph
 				layerObject.add threeBrick
 
+		# if this coloring differs from the last used coloring, go through
+		# all visible bricks to update their material
+		if @_oldColoring != coloring
+			for layer in @bricksSubnode.children
+				for visualBrick in layer.children
+					material = coloring.getMaterialForBrick visualBrick.brick
+					visualBrick.setMaterial material
+		@_oldColoring = coloring
+
+		@unhighlightBigBrush()
+
+		# show not filled lego shape as outline
+		outlineCoords = @printVoxels.map (voxel) -> voxel.position
+		@voxelWireframe.createWireframe outlineCoords
+
+		#ToDo: hide studs when brick is completely below other brick
+
+	setPossibleLegoBoxVisibility: (isVisible) =>
+		@voxelWireframe.setVisibility isVisible
+
+	setStabilityView: (enabled) =>
+		@isStabilityView = enabled
+		coloring = if @isStabilityView then @stabilityColoring else @defaultColoring
+		@updateVisualization(coloring)
+
+		# Turn off possible lego box and highlight during stability view
+		if enabled
+			@_legoBoxVisibilityBeforeStability = @voxelWireframe.isVisible()
+			@voxelWireframe.setVisibility false
+			@_highlightVoxel.visible = false
+		else
+			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
+
 	showBrickLayer: (layer) =>
+		# hide highlight when in build mode
+		@_highlightVoxel.visible = false
+
 		for i in [0..@bricksSubnode.children.length - 1] by 1
 			if i <= layer
 				@bricksSubnode.children[i].visible = true
 			else
 				@bricksSubnode.children[i].visible = false
 
-		@showBricks()
+	showAllBrickLayers: =>
+		for layer in @bricksSubnode.children
+			layer.visible = true
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
@@ -164,16 +178,16 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			if @currentlyHighlightedVoxel?
-				@currentlyHighlightedVoxel.setHighlight false
-
-			@currentlyHighlightedVoxel = voxel
-			voxel.setHighlight true, hVoxel
+			@_highlightVoxel.visible = true
+			worldPos = @grid.mapVoxelToWorld voxel.position
+			@_highlightVoxel.position.set(
+				worldPos.x, worldPos.y, worldPos.z
+			)
+			@_highlightVoxel.material = hVoxel
 			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
-			if @currentlyHighlightedVoxel?
-				@currentlyHighlightedVoxel.setHighlight false
+			@_highlightVoxel.visible = false
 			@unhighlightBigBrush()
 
 		return voxel
@@ -191,7 +205,8 @@ class BrickVisualization
 			)
 			@brickShadowThreeNode.add @bigBrushHighlight
 
-		@bigBrushHighlight.position.copy voxel.position
+		worldPosition = @grid.mapVoxelToWorld voxel.position
+		@bigBrushHighlight.position.copy worldPosition
 		@bigBrushHighlight.material = material
 		@bigBrushHighlight.visible = true
 
@@ -200,6 +215,9 @@ class BrickVisualization
 
 	# makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
+		# hide highlight voxel since it will be made invisible
+		@_highlightVoxel.visible = false
+
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: 'lego'}
 			mat = @defaultColoring.getHighlightMaterial '3d'
@@ -209,11 +227,24 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.make3dPrinted()
-			voxel.visible = false
-			coords = voxel.voxelCoords
-			voxelBelow = @grid.getVoxel(coords.x, coords.y, coords.z - 1)
-			if voxelBelow?.enabled
-				voxelBelow.visibleVoxel.setStudVisibility true
+			# Split visual brick into voxels (only once per brick)
+			if (voxel.brick)
+				visualBrick = voxel.brick.getVisualBrick()
+				if not visualBrick.hasBeenSplit
+					voxel.brick.forEachVoxel (voxel) =>
+						temporaryVoxel = @geometryCreator.getBrick(
+							voxel.position, {x: 1, y: 1, z: 1}, visualBrick.material
+						)
+						temporaryVoxel.voxelPosition = voxel.position
+						@temporaryVoxels.add temporaryVoxel
+					visualBrick.hasBeenSplit = true
+					visualBrick.visible = false
+			# hide visual voxels for 3d printed geometry
+			for temporaryVoxel in @temporaryVoxels.children
+				if temporaryVoxel.voxelPosition == voxel.position
+					temporaryVoxel.visible = false
+					break
+
 		return voxels
 
 	###
@@ -234,6 +265,9 @@ class BrickVisualization
 
 	# makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
+		# hide highlight
+		@_highlightVoxel.visible = false
+
 		if bigBrush
 			mainVoxel = @voxelSelector.getVoxel event, {type: '3d'}
 			mat = @defaultColoring.getHighlightMaterial 'lego'
@@ -243,8 +277,13 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.makeLego()
-			voxel.visible = true
-			voxel.setMaterial @defaultColoring.selectedMaterial
+
+			# Create a visible temporary voxel at this position
+			temporaryVoxel = @geometryCreator.getBrick(
+				voxel.position, {x: 1, y: 1, z: 1}, @defaultColoring.selectedMaterial
+			)
+			temporaryVoxel.voxelPosition = voxel.position
+			@temporaryVoxels.add temporaryVoxel
 		return voxels
 
 	###
@@ -256,7 +295,6 @@ class BrickVisualization
 		for voxel in voxels
 			everythingLego = everythingLego && voxel.isLego()
 			voxel.makeLego()
-			voxel.visible = true
 		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>

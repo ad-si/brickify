@@ -3,6 +3,10 @@ threeHelper = require '../../client/threeHelper'
 csgCleaner = require './csgCleaner'
 
 class CSG
+
+	init: (bundle) =>
+		@minimalPrintVolume = bundle.globalConfig.minimalPrintVolume
+
 	###
 	# Returns a promise which will, when resolved, provide
 	# the volumetric subtraction of ModelGeometry - LegoBricks
@@ -39,7 +43,7 @@ class CSG
 			options.addStuds = false
 
 		if not options.minimalPrintVolume?
-			options.minimalPrintVolume = 5
+			options.minimalPrintVolume = @minimalPrintVolume
 
 	# returns own cached data and links grid from newBrickator data
 	# resets newBrickator's csgNeedsRecalculation flag

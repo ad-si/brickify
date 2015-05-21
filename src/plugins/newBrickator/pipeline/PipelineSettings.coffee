@@ -15,7 +15,6 @@ module.exports  = class PipelineSettings
 			y: 8
 			z: 3.2
 		}
-		@debugVoxel = null
 		@modelTransform = null
 		@voxelizing = true
 		@initLayout = true
@@ -44,13 +43,6 @@ module.exports  = class PipelineSettings
 		@gridSpacing.x = x
 		@gridSpacing.y = y
 		@gridSpacing.z = z
-
-	setDebugVoxel: (x, y, z) =>
-		@debugVoxel = {
-			x: x
-			y: y
-			z: z
-		}
 
 	setModelTransform: (transformMatrix) =>
 		@modelTransform = transformMatrix

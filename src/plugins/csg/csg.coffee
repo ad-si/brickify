@@ -5,7 +5,12 @@ csgCleaner = require './csgCleaner'
 class CSG
 
 	init: (bundle) =>
-		@minimalPrintVolume = bundle.globalConfig.minimalPrintVolume
+		globalConfig = bundle.globalConfig
+		@defaults =
+			minimalPrintVolume: globalConfig.minimalPrintVolume
+			holeSize: globalConfig.holeSize
+			studSize: globalConfig.studSize
+			addStuds: globalConfig.addStuds
 
 	###
 	# Returns a promise which will, when resolved, provide
@@ -27,23 +32,8 @@ class CSG
 
 	# applies default values if they don't exist yet
 	_applyDefaultValues: (options) ->
-		if not options.studSize?
-			options.studSize = {
-				radius: 2.4
-				height: 1.8
-			}
-
-		if not options.holeSize?
-			options.holeSize = {
-				radius: 2.4
-				height: 1.8
-			}
-
-		if not options.addStuds?
-			options.addStuds = false
-
-		if not options.minimalPrintVolume?
-			options.minimalPrintVolume = @minimalPrintVolume
+		for key, value of @defaults
+			options[key] = value unless options[key]?
 
 	# returns own cached data and links grid from newBrickator data
 	# resets newBrickator's csgNeedsRecalculation flag

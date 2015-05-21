@@ -77,3 +77,20 @@ orbitControls:
   minDistance: 2
 
 minimalPrintVolume: 5 # in mm^3
+
+studSize:
+  radius: 2.4
+  height: 1.8
+
+holeSize:
+  radius: 2.633
+  height: 2.3
+
+gridSpacing:
+  x: 8
+  y: 8
+  z: 3.2
+
+addStuds: false
+
+exportStepSize: 0.033

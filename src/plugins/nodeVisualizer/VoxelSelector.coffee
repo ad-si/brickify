@@ -68,11 +68,14 @@ class VoxelSelector
 	_getLeveledVoxel: (event, voxels) ->
 		voxel =  voxels.find (voxel) => voxel.position.z == @level
 		return voxel if voxel
+
+		levelWorldPosition = @grid.mapVoxelToWorld({x: 0, y: 0, z: @level}).z
 		position = interactionHelper.getPlanePosition(
 			event
 			@renderer
-			@level
+			levelWorldPosition
 		)
+
 		voxelCoords = @grid.mapGridToVoxel @grid.mapWorldToGrid position
 		pseudoVoxel =
 			position: voxelCoords

@@ -1,6 +1,4 @@
-# unit - all units are in mm (do not change...)
-mm: 1
-
+# all units are in mm
 
 colors:
   background: 0x222222

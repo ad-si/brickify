@@ -96,24 +96,20 @@ module.exports = class Grid
 
 	mapModelToVoxelSpace: (point) =>
 		gridPoint = @mapModelToGrid point
-		return @mapGridToVoxelSpace gridPoint
+		return @mapGridToVoxel gridPoint, false
 
-	mapGridToVoxelSpace: (point) =>
-		return {
-			x: point.x / @spacing.x
-			y: point.y / @spacing.y
-			z: point.z / @spacing.z
-		}
-
-	mapGridToVoxel: (point) =>
+	mapGridToVoxel: (point, round = true) =>
 		# maps aligned grid coordinates to voxel indices
 		# cut z<0 to z=0, since the grid cannot have
 		# voxels in negative direction
-		return {
-			x: Math.round(point.x / @spacing.x)
-			y: Math.round(point.y / @spacing.y)
-			z: Math.max(Math.round(point.z / @spacing.z), 0)
-		}
+		x = point.x / @spacing.x
+		y = point.y / @spacing.y
+		z = Math.max point.z / @spacing.z, 0
+		if round
+			x = Math.round x
+			y = Math.round y
+			z = Math.round z
+		return x: x, y: y, z: z
 
 	mapVoxelToGrid: (point) =>
 		# maps voxel indices to aligned grid coordinates
@@ -133,11 +129,10 @@ module.exports = class Grid
 		}
 
 	mapVoxelSpaceToVoxel: (point) ->
-		z = if point.z <= 0 then 0 else Math.round point.z
 		return {
 			x: Math.round point.x
 			y: Math.round point.y
-			z: z
+			z: Math.round point.z
 		}
 
 	# generates a key for a hashmap from the given coordinates

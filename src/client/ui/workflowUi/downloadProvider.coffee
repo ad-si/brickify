@@ -29,8 +29,10 @@ module.exports = class DownloadProvider
 
 			if files.length is 0
 				bootbox.alert(
-					title: 'No downloads'
-					message: 'There is nothing to download at the moment'
+					title: 'There is nothing to download at the moment'
+					message: 'This happens when your whole model is made out of LEGO
+										and you have not selected anything	to be 3D-printed. Use
+										the Make 3D-print brush for that'
 				)
 			if files.length is 1
 				data = files[0].data

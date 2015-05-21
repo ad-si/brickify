@@ -34,12 +34,18 @@ module.exports = class Coloring
 			opacity: 0.5
 			transparent: true
 		})
+		@legoBoxHighlightMaterial.polygonOffset = true
+		@legoBoxHighlightMaterial.polygonOffsetFactor = -1
+		@legoBoxHighlightMaterial.polygonOffsetUnits = -1
 
 		@printBoxHighlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0xeeeeee
 			opacity: 0.4
 			transparent: true
 		})
+		@printBoxHighlightMaterial.polygonOffset = true
+		@printBoxHighlightMaterial.polygonOffsetFactor = -1
+		@printBoxHighlightMaterial.polygonOffsetUnits = -1
 
 		@csgMaterial = new THREE.MeshLambertMaterial({
 			color: 0xb5ffb8 #greenish gray

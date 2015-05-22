@@ -28,13 +28,13 @@ class ModelVisualization
 		@threeNode.solid
 
 	_createVisualization: (node) =>
+
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @coloring.objectMaterial
 			parent.add solid
 			parent.solid = solid
 
 		_addWireframe = (geometry, parent) =>
-			# ToDo: create fancy shader material / correct rendering pipeline
 			wireframe = new THREE.Object3D()
 
 			#shadow

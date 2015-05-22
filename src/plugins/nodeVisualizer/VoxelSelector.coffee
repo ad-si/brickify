@@ -7,16 +7,17 @@ interactionHelper = require '../../client/interactionHelper'
 class VoxelSelector
 	constructor: (brickVisualization) ->
 		@renderer = brickVisualization.bundle.renderer
-		@node = brickVisualization.voxelsSubnode
 		@grid = brickVisualization.grid
 		@voxelWireframe = brickVisualization.voxelWireframe
 		@level = undefined
 
 		@touchedVoxels = []
 
+		@geometryCreator = brickVisualization.geometryCreator
+
 	getAllVoxels: =>
 		voxels = []
-		@grid.forEachVoxel (voxel) => voxels.push voxel.visibleVoxel
+		@grid.forEachVoxel (voxel) => voxels.push voxel
 		return voxels
 
 	###
@@ -30,19 +31,16 @@ class VoxelSelector
 		type = options.type || 'lego'
 
 		mainVoxel = @getVoxel event, options
-		return null unless mainVoxel?.voxelCoords?
+		return null unless mainVoxel?.position?
 
 		size = @getBrushSize options.bigBrush
-		gridEntries = @grid.getSurrounding mainVoxel.voxelCoords, size, -> true
+		gridEntries = @grid.getSurrounding mainVoxel.position, size, -> true
 		voxels = gridEntries
-			.map (voxel) -> voxel.visibleVoxel
 			.filter (voxel) => @_hasType voxel, type
 			.filter (voxel) => voxel not in @touchedVoxels
 		@touchedVoxels = @touchedVoxels.concat voxels
 		if options.bigBrush
-			@level =
-				voxelZ: mainVoxel.voxelCoords.z
-				worldZ: mainVoxel.position.z
+			@level = mainVoxel.position.z
 		return voxels
 
 	###
@@ -56,7 +54,8 @@ class VoxelSelector
 		type = options.type || 'lego'
 
 		intersections = @_getIntersections event
-		voxels = intersections.map (intersection) -> intersection.object.parent
+		voxels = intersections.map (obj) ->
+			return obj.voxel
 
 		return @_getLeveledVoxel event, voxels if @level
 
@@ -67,18 +66,19 @@ class VoxelSelector
 		return voxel
 
 	_getLeveledVoxel: (event, voxels) ->
-		voxel =  voxels.find (voxel) => voxel.voxelCoords.z == @level.voxelZ
+		voxel =  voxels.find (voxel) => voxel.position.z == @level
 		return voxel if voxel
+
+		levelWorldPosition = @grid.mapVoxelToWorld({x: 0, y: 0, z: @level}).z
 		position = interactionHelper.getPlanePosition(
 			event
 			@renderer
-			@level.worldZ
+			levelWorldPosition
 		)
+
 		voxelCoords = @grid.mapGridToVoxel @grid.mapWorldToGrid position
-		position = @grid.mapVoxelToWorld voxelCoords
 		pseudoVoxel =
-			position: position
-			voxelCoords: voxelCoords
+			position: voxelCoords
 		return pseudoVoxel
 
 	_getFrontierVoxel: (voxels, type) ->
@@ -98,8 +98,7 @@ class VoxelSelector
 	_getBaseplateVoxel: (event, type) ->
 		baseplatePos = interactionHelper.getGridPosition event, @renderer
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePos
-		gridEntry = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
-		voxel = gridEntry?.visibleVoxel
+		voxel = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 		return null unless voxel?
 
 		if @_hasType voxel, type
@@ -125,17 +124,22 @@ class VoxelSelector
 		middle.applyMatrix4 revTransform
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
 		gridEntry = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
-		unless gridEntry?.visibleVoxel?.isLego()
-			return gridEntry.visibleVoxel
+		unless gridEntry?.isLego()
+			return gridEntry
 		else
 			return null
 
 	_getIntersections: (event) ->
-		return interactionHelper.getIntersections(
-			event
-			@renderer
-			@node.children
-		)
+		rayDirection = interactionHelper.calculateRay event, @renderer
+		rayOrigin = @renderer.getCamera().position.clone()
+
+		# rotate to match scene that is rotated 90° around x-axis
+		m = new THREE.Matrix4()
+		m.makeRotationX(Math.PI / 2.0)
+		rayDirection.applyProjection(m)
+		rayOrigin.applyProjection(m)
+
+		return @grid.intersectVoxels rayOrigin, rayDirection
 
 	_hasType: (voxel, type) ->
 		return voxel.isLego() and type is 'lego' or

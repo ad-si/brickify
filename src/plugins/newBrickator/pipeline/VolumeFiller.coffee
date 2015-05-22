@@ -12,7 +12,7 @@ module.exports = class VolumeFiller
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				#@terminate()
+				@terminate()
 				newGrid = new Grid grid.spacing
 				newGrid.origin = grid.origin
 				newGrid.fromPojo message.data
@@ -37,7 +37,6 @@ module.exports = class VolumeFiller
 		@worker = null
 
 	getWorker: ->
-		return @worker if @worker
 		return operative {
 			fillGrid: (grid, numVoxelsX, numVoxelsY, numVoxelsZ, callback) ->
 				for x, voxelPlane of grid

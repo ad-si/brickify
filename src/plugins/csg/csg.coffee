@@ -61,11 +61,11 @@ class CSG
 
 		return @_prepareModel cachedData, selectedNode
 		.then (threeGeometry) =>
-			cachedData.transformedthreeGeometry = threeGeometry
+			cachedData.transformedThreeGeometry = threeGeometry
 			@csgExtractor ?= new CsgExtractor()
 
 			options.profile = true
-			options.transformedModel = cachedData.transformedthreeGeometry
+			options.transformedModel = cachedData.transformedThreeGeometry
 
 			result = @csgExtractor.extractGeometry cachedData.grid, options
 
@@ -79,8 +79,8 @@ class CSG
 	# that is transformed to match the grid
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
-			if cachedData.transformedthreeGeometry?
-				resolve(cachedData.transformedthreeGeometry, cachedData)
+			if cachedData.transformedThreeGeometry?
+				resolve(cachedData.transformedThreeGeometry, cachedData)
 				return
 
 			selectedNode.getModel()

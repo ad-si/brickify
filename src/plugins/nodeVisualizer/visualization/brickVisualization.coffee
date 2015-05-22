@@ -95,6 +95,9 @@ class BrickVisualization
 
 			if (not recreate) and (not brick.getVisualBrick()?)
 				brickLayers[z].push brick
+			if brick.getVisualBrick()?
+				brick.getVisualBrick().visible = yes
+				brick.getVisualBrick().hasBeenSplit = no
 
 		for z, brickLayer of brickLayers
 			# create layer object if it does not exist

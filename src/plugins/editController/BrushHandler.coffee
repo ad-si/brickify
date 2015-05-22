@@ -151,8 +151,8 @@ class BrushHandler
 		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
-			return unless cachedData
-				.brickVisualization.makeAllVoxels3dPrinted selectedNode
+			return unless cachedData.
+				brickVisualization.makeAllVoxels3dPrinted selectedNode
 			cachedData.brickVisualization.updateModifiedVoxels()
 			@editController.everythingPrint selectedNode
 

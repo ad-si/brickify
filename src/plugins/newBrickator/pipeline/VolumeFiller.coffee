@@ -39,14 +39,14 @@ module.exports = class VolumeFiller
 				while z < numVoxelsZ
 					if grid[x][y][z]?
 						# current voxel already exists (shell voxel)
-						dir = @calculateVoxelDirection grid, x, y, z
+						dir = grid[x][y][z]
 
-						if dir.definitelyUp
+						if dir > 0
 							#fill up voxels and leave model
 							for v in currentFillVoxelQueue
 								@setVoxel grid, v, {inside: true}
 							insideModel = false
-						else if dir.definitelyDown
+						else if dir < 0
 							# re-entering model if inside? that seems odd. empty current fill queue
 							if insideModel
 								currentFillVoxelQueue = []
@@ -64,35 +64,6 @@ module.exports = class VolumeFiller
 						if insideModel
 							currentFillVoxelQueue.push {x: x, y: y, z: z}
 					z++
-
-			calculateVoxelDirection: (grid, x, y, z, tolerance = 0.1) ->
-				# determines whether all polygons related to this voxel are either
-				# all aligned upwards or all aligned downwards
-				dataEntries = grid[x][y][z]
-				numUp = 0
-				numDown = 0
-
-				for e in dataEntries
-					# everything smaller than tolerance is considered level
-					if e.dZ > tolerance then numUp++ else if e.dZ < -tolerance then numDown++
-
-				if numUp > 0 and numDown == 0
-					definitelyUp = true
-				else
-					definitelyUp = false
-
-				if numDown > 0 and numUp == 0
-					definitelyDown = true
-				else
-					definitelyDown = false
-
-				dataEntries.definitelyUp = definitelyUp
-				dataEntries.definitelyDown = definitelyDown
-
-				return {
-				definitelyUp: definitelyUp
-				definitelyDown: definitelyDown
-				}
 
 			setVoxel: (grid, {x: x, y: y, z: z}, voxelData) ->
 				grid[x] ?= []

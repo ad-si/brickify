@@ -28,9 +28,7 @@ module.exports = class Voxelizer
 		p2 = @voxelGrid.mapModelToVoxelSpace p2
 
 		#store information for filling solids
-		voxelData = {
-			dZ: n.z
-		}
+		direction = @_getTolerantDirection n.z
 
 		l0len = @_getLength p0, p1
 		l1len = @_getLength p1, p2
@@ -67,13 +65,13 @@ module.exports = class Voxelizer
 			p0 = @_interpolateLine shortSide1, i
 			p1 = @_interpolateLine longSide, longSideIndex
 			longSideIndex += longSideStepSize
-			@voxelizeLine p0, p1, voxelData, lineStepSize
+			@voxelizeLine p0, p1, direction, lineStepSize
 
 		for i in [0..1] by outerStepSize / shortSideLength2
 			p0 = @_interpolateLine shortSide2, i
 			p1 = @_interpolateLine longSide, longSideIndex
 			longSideIndex += longSideStepSize
-			@voxelizeLine p0, p1, voxelData, lineStepSize
+			@voxelizeLine p0, p1, direction, lineStepSize
 
 	_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
 		dx = x2 - x1
@@ -89,6 +87,9 @@ module.exports = class Voxelizer
 		z = z1 + (z2 - z1) * i
 		return x: x, y: y, z: z
 
+	_getTolerantDirection: (dZ, tolerance = 0.1) ->
+		return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
+
 	###
 	# Voxelizes the line from a to b. Stores data in each generated voxel.
 	#
@@ -97,7 +98,7 @@ module.exports = class Voxelizer
 	# @param voxelData Object data to store in the voxel grid for each voxel
 	# @param stepSize Number the stepSize to use for sampling the line
 	###
-	voxelizeLine: (a, b, voxelData, stepSize) =>
+	voxelizeLine: (a, b, direction, stepSize) =>
 		length = @_getLength a, b
 		dx = (b.x - a.x) / length * stepSize
 		dy = (b.y - a.y) / length * stepSize
@@ -112,7 +113,7 @@ module.exports = class Voxelizer
 			if (oldVoxel.x != currentVoxel.x) or
 			(oldVoxel.y != currentVoxel.y) or
 			(oldVoxel.z != currentVoxel.z)
-				@voxelGrid.setVoxel currentVoxel, voxelData
+				@voxelGrid.setVoxel currentVoxel, direction
 			currentGridPosition.x += dx
 			currentGridPosition.y += dy
 			currentGridPosition.z += dz

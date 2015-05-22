@@ -139,22 +139,17 @@ module.exports = class Grid
 	_generateKey: (x, y, z) ->
 		return x + '-' + y + '-' + z
 
-	setVoxel: (position, data = true) ->
+	setVoxel: (position, direction = 0) ->
 		key = @_generateKey position.x, position.y, position.z
 		v = @voxels[key]
 
 		if not v?
-			data = [data] unless Array.isArray data
-			v = new Voxel(position, data)
+			v = new Voxel(position, direction)
 			@_linkNeighbors v
 			@voxels[key] = v
 			@_updateMinMax position
 		else
-			if Array.isArray data
-				v.dataEntries = v.dataEntries.concat data
-			else
-				v.dataEntries.push data
-
+			v.setDirection direction
 		return v
 
 	# links neighbours of this voxel with this voxel
@@ -284,17 +279,17 @@ module.exports = class Grid
 
 			voxels[x] ?= []
 			voxels[x][y] ?= []
-			voxels[x][y][z] = voxel.dataEntries
+			voxels[x][y][z] = voxel.direction
 		return voxels
 
 	fromPojo: (pojo) ->
 		for x, voxelPlane of pojo
 			for y, voxelColumn of voxelPlane
-				for z, dataEntries of voxelColumn
+				for z, direction of voxelColumn
 					x = parseInt x
 					y = parseInt y
 					z = parseInt z
-					@setVoxel x: x, y: y, z: z, dataEntries
+					@setVoxel x: x, y: y, z: z, direction
 
 	intersectVoxels: (rayOrigin, rayDirection) =>
 		dirfrac = {

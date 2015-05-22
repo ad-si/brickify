@@ -39,6 +39,8 @@ class ExportUi
 		holeSelection = @holeSizeSelect.val()
 
 		switch studSelection
+			when '-4'
+				@studRadius = 2.268
 			when '-3'
 				@studRadius = 2.301
 			when '-2'
@@ -53,8 +55,12 @@ class ExportUi
 				@studRadius = 2.466
 			when '+3'
 				@studRadius = 2.499
+			when '+4'
+				@studRadius = 2.532
 
 		switch holeSelection
+			when '-4'
+				@holeRadius = 2.501
 			when '-3'
 				@holeRadius = 2.534
 			when '-2'
@@ -69,6 +75,8 @@ class ExportUi
 				@holeRadius = 2.699
 			when '+3'
 				@holeRadius = 2.732
+			when '+4'
+				@holeRadius = 2.765
 
 
 module.exports = ExportUi

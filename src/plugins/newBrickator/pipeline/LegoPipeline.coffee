@@ -17,31 +17,31 @@ module.exports = class LegoPipeline
 		@pipelineSteps.push
 			name: 'Hull voxelizing'
 			decision: (options) -> return options.voxelizing
-			worker: (lastResult, options) =>
+			worker: (lastResult, options, progressCallback) =>
 				return @voxelizer.voxelize lastResult.optimizedModel, options
 
 		@pipelineSteps.push
 			name: 'Volume filling'
 			decision: (options) -> return options.voxelizing
-			worker: (lastResult, options) =>
-				return @volumeFiller.fillGrid lastResult.grid, options
+			worker: (lastResult, options, progressCallback) =>
+				return @volumeFiller.fillGrid lastResult.grid, options, progressCallback
 
 		@pipelineSteps.push
 			name: 'Layout graph initialization'
 			decision: (options) -> return options.initLayout
-			worker: (lastResult, options) =>
+			worker: (lastResult, options, progressCallback) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
 
 		@pipelineSteps.push
 			name: 'Layout greedy merge'
 			decision: (options) -> return options.layouting
-			worker: (lastResult, options) =>
+			worker: (lastResult, options, progressCallback) =>
 				return @brickLayouter.layoutByGreedyMerge lastResult.grid
 
 		@pipelineSteps.push
 			name: 'Local reLayout'
 			decision: (options) -> return options.reLayout
-			worker: (lastResult, options) =>
+			worker: (lastResult, options, progressCallback) =>
 				return @brickLayouter.splitBricksAndRelayoutLocally(
 					lastResult.modifiedBricks
 					lastResult.grid
@@ -60,7 +60,10 @@ module.exports = class LegoPipeline
 
 		start = new Date()
 
-		runPromise = @runPromise 0, data, options, profiling
+		progressCallback = (progress) ->
+			log.debug progress
+
+		runPromise = @runPromise 0, data, options, profiling, progressCallback
 		.then (result) ->
 			if profiling
 				log.debug "Finished Lego Pipeline in #{new Date() - start}ms"
@@ -70,26 +73,26 @@ module.exports = class LegoPipeline
 
 		return Promise.race([runPromise, cancelPromise])
 
-	runPromise: (i, data, options, profiling) =>
+	runPromise: (i, data, options, profiling, progressCallback) =>
 		if i >= @pipelineSteps.length or @terminated
 			@currentStep = null
 			@terminated = true
 			return data
 		else
-			@runStep i, data, options, profiling
+			@runStep i, data, options, profiling, progressCallback
 				.then (result) =>
 					for own key of result
 						data[key] = result[key]
-					return @runPromise ++i, data, options, profiling
+					return @runPromise ++i, data, options, profiling, progressCallback
 
-	runStep: (i, lastResult, options, profiling) ->
+	runStep: (i, lastResult, options, profiling, progressCallback) ->
 		step = @pipelineSteps[i]
 		@currentStep = step
 
 		if step.decision options
 			log.debug "Running step #{step.name}" if profiling
 			start = new Date()
-			step.worker lastResult, options
+			step.worker lastResult, options, progressCallback
 			.then (result) ->
 				stop = new Date() - start
 				log.debug "Step #{step.name} finished in #{stop}ms" if profiling

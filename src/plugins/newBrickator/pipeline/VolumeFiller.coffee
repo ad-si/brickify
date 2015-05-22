@@ -1,34 +1,52 @@
 Grid = require './Grid'
 
 module.exports = class VolumeFiller
-	fillGrid: (grid, options) ->
+	fillGrid: (grid, options, progressCallback) ->
 		# fills spaces in the grid. Goes up from z=0 to z=max and looks for
 		# voxels facing downwards (start filling), stops when it sees voxels
 		# facing upwards
 
 		gridPOJO = grid.toPOJO()
+
+		callback = (message) =>
+			if message.state is 'progress'
+				progressCallback message.progress
+			else # if state is 'finished'
+				#@terminate()
+				newGrid = new Grid grid.spacing
+				newGrid.origin = grid.origin
+				newGrid.fromPojo message.data
+				@resolve newGrid
+
+		numVoxelsX = grid.getNumVoxelsX()
+		numVoxelsY = grid.getNumVoxelsY()
 		numVoxelsZ = grid.getNumVoxelsZ()
 		@worker = @getWorker()
-		return @worker.fillGrid gridPOJO, numVoxelsZ
-		.then (newGridPOJO) =>
-			@worker.terminate()
-			@worker = null
-			newGrid = new Grid grid.spacing
-			newGrid.origin = grid.origin
-			newGrid.fromPojo newGridPOJO
-			return {grid: newGrid}
+		@worker.fillGrid(
+			gridPOJO
+			numVoxelsX
+			numVoxelsY
+			numVoxelsZ
+			callback
+		)
+
+		return new Promise (@resolve, reject) => return
 
 	terminate: =>
 		@worker?.terminate()
 		@worker = null
 
 	getWorker: ->
-		operative {
-			fillGrid: (grid, numVoxelsZ) ->
+		return @worker if @worker
+		return operative {
+			fillGrid: (grid, numVoxelsX, numVoxelsY, numVoxelsZ, callback) ->
 				for x, voxelPlane of grid
 					for y, voxelColumn of voxelPlane
+						x = parseInt x
+						y = parseInt y
 						@fillUp grid, x, y, numVoxelsZ
-				@deferred().fulfill grid
+						@updateProgress callback, x, y, numVoxelsX, numVoxelsY
+				callback state: 'finished', data: grid
 
 			fillUp: (grid, x, y, numVoxelsZ) ->
 				#fill up from z=0 to z=max
@@ -70,4 +88,9 @@ module.exports = class VolumeFiller
 				grid[x][y] ?= []
 				grid[x][y][z] ?= []
 				grid[x][y][z].push voxelData
-			}
+
+			updateProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
+				progress = ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY
+				callback state: 'progress', progress: progress
+
+		}

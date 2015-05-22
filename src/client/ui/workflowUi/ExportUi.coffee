@@ -2,9 +2,7 @@ DownloadProvider = require './downloadProvider'
 
 class ExportUi
 	constructor: (@workflowUi) ->
-		@studSize = @workflowUi.bundle.globalConfig.studSize
-		@holeSize = @workflowUi.bundle.globalConfig.holeSize
-		@stepSize = @workflowUi.bundle.globalConfig.exportStepSize
+		{@studSize, @holeSize, @stepSize} = @workflowUi.bundle.globalConfig
 
 		@$panel = $('#exportGroup')
 		@_initDownloadModal()

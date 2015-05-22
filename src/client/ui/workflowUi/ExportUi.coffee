@@ -2,7 +2,7 @@ DownloadProvider = require './downloadProvider'
 
 class ExportUi
 	constructor: (@workflowUi) ->
-		{@studSize, @holeSize, @stepSize} = @workflowUi.bundle.globalConfig
+		{@studSize, @holeSize, @exportStepSize} = @workflowUi.bundle.globalConfig
 
 		@$panel = $('#exportGroup')
 		@_initDownloadModal()
@@ -39,11 +39,11 @@ class ExportUi
 
 	_updateStudRadius: =>
 		studSelection = parseInt @studSizeSelect.val()
-		@studRadius = @studSize.radius + studSelection * @stepSize
+		@studRadius = @studSize.radius + studSelection * @exportStepSize
 
 	_updateHoleRadius: =>
 		holeSelection = parseInt @holeSizeSelect.val()
-		@holeRadius = @holeSize.radius + holeSelection * @stepSize
+		@holeRadius = @holeSize.radius + holeSelection * @exportStepSize
 
 
 module.exports = ExportUi

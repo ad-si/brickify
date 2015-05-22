@@ -60,9 +60,6 @@ class VoxelSelector
 		return @_getLeveledVoxel event, voxels if @level
 
 		voxel = @_getFrontierVoxel voxels, type
-		# We found a frontier voxel but there is no valid previous voxel:
-		return voxel if voxel or voxel is null
-		# We have not even found a frontier voxel: (voxel is undefined)
 		if type is '3d'
 			voxel ?= @_getBaseplateVoxel event, type
 			voxel ?= @_getMiddleVoxel event
@@ -87,16 +84,10 @@ class VoxelSelector
 	_getFrontierVoxel: (voxels, type) ->
 		lastTouched = @touchedVoxels[-2...]
 		frontier = voxels.findIndex (voxel) -> voxel.isLego()
-		return undefined unless frontier > -1
+		return null unless frontier > -1
 
 		prevVoxel = voxels[frontier - 1]
 		frontierVoxel = voxels[frontier]
-
-		# The frontier lego voxel is the first voxel in the intersection
-		# If we want lego, use it, if we want 3d, there is nothing to be found
-		if prevVoxel is undefined
-			return frontierVoxel if type is 'lego'
-			return null if type is '3d'
 
 		if type is 'lego' and prevVoxel not in lastTouched or
 		type is '3d' and frontierVoxel in lastTouched
@@ -108,7 +99,7 @@ class VoxelSelector
 		baseplatePos = interactionHelper.getGridPosition event, @renderer
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid baseplatePos
 		voxel = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
-		return undefined unless voxel?
+		return null unless voxel?
 
 		if @_hasType voxel, type
 			return voxel
@@ -117,7 +108,7 @@ class VoxelSelector
 
 	_getMiddleVoxel: (event) ->
 		modelIntersects = @voxelWireframe.intersectRay event
-		return undefined unless modelIntersects.length >= 2
+		return null unless modelIntersects.length >= 2
 
 		start = modelIntersects[0].point
 		end = modelIntersects[1].point

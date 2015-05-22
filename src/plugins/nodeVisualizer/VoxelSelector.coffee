@@ -123,7 +123,11 @@ class VoxelSelector
 		)
 		middle.applyMatrix4 revTransform
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
-		return @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
+		gridEntry = @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
+		unless gridEntry?.isLego()
+			return gridEntry
+		else
+			return null
 
 	_getIntersections: (event) ->
 		rayDirection = interactionHelper.calculateRay event, @renderer

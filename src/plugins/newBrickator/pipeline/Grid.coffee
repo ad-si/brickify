@@ -291,6 +291,9 @@ module.exports = class Grid
 		for x, voxelPlane of pojo
 			for y, voxelColumn of voxelPlane
 				for z, dataEntries of voxelColumn
+					x = parseInt x
+					y = parseInt y
+					z = parseInt z
 					@setVoxel x: x, y: y, z: z, dataEntries
 
 	intersectVoxels: (rayOrigin, rayDirection) =>

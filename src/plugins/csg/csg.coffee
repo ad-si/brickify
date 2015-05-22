@@ -1,6 +1,5 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
-printingTimeEstimator = require './printingTimeEstimator'
 
 class CSG
 	###
@@ -44,7 +43,7 @@ class CSG
 		return selectedNode.getPluginData 'csg'
 		.then (data) ->
 			if not data?
-				# create empty dataset for own data
+				# create empty data set for own data
 				data = {}
 				selectedNode.storePluginData 'csg', data, true
 
@@ -111,8 +110,5 @@ class CSG
 			cachedData.csgNeedsRecalculation = false
 			return true
 		return false
-
-	getPrintingTimeEstimate: (geometry) ->
-		printingTimeEstimator.getPrintingTimeEstimate geometry
 
 module.exports = CSG

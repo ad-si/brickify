@@ -56,14 +56,12 @@ class NewBrickator
 		log.debug 'relayouting modified parts, creating bricks:',createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
-			modifiedBricks = []
+			modifiedBricks = new Set()
 			for v in modifiedVoxels
-				if v.gridEntry.brick
-					if v.gridEntry.brick not in modifiedBricks
-						modifiedBricks.push v.gridEntry.brick
+				if v.brick
+					modifiedBricks.add v.brick
 				else if createBricks
-					pos = v.voxelCoords
-					modifiedBricks.push new Brick([v.gridEntry])
+					modifiedBricks.add new Brick([v])
 
 			settings = new PipelineSettings()
 			settings.onlyRelayout()
@@ -154,7 +152,7 @@ class NewBrickator
 				meshlib
 				.model(optimizedModel)
 				.export null, (error, binaryStl) ->
-					fn = "brickolage-#{selectedNode.name}"
+					fn = "brickify-#{selectedNode.name}"
 					if fn.indexOf('.stl') < 0
 						fn += '.stl'
 					resolve { data: binaryStl, fileName: fn }

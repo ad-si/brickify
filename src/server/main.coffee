@@ -20,7 +20,7 @@ exec = require('child_process').exec
 http = require 'http'
 
 yaml = require 'js-yaml'
-# Support mixing .coffee and .js files in lowfab-project
+# Support mixing .coffee and .js files in brickify-project
 coffeeify = require 'coffeeify'
 # Load yaml configuration into javascript file
 browserifyData = require 'browserify-data'
@@ -70,11 +70,11 @@ browserify.settings({
 server = http.createServer(webapp)
 port = process.env.NODEJS_PORT or process.env.PORT or 3000
 ip = process.env.NODEJS_IP or '127.0.0.1'
-sessionSecret = process.env.LOWFAB_SESSION_SECRET or 'lowfabSessionSecret!'
+sessionSecret = process.env.BRICKIFY_SESSION_SECRET or 'brickifySessionSecret!'
 
 module.exports.setupRouting = ->
 	webapp.set 'hostname', if developmentMode then "localhost:#{port}" else
-		process.env.HOSTNAME or 'lowfab.net'
+		process.env.HOSTNAME or 'brickify.it'
 
 	webapp.set 'views', path.normalize 'views'
 	webapp.set 'view engine', 'jade'

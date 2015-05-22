@@ -2,7 +2,7 @@
   "name": "nodeVisualizer",
   "version": "0.1.0",
   "description": "visualizes model, voxels and bricks and makes them user selectable",
-  "lowfab": {
+  "brickify": {
     "type": "renderer"
   },
   "browser": "./nodeVisualizer.coffee"

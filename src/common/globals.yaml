@@ -28,10 +28,6 @@ fov: 40
 cameraNearPlane: 0.1
 cameraFarPlane: 2500
 
-# animations
-autoRotate: false
-autoRotateSpeed: 1.0
-
 # coordinate system
 axisLength: 100
 axisLineWidth: 2
@@ -64,8 +60,18 @@ plugins:
   editController: true
   csg: true
 
-# shall modelVisualization display shadows and wireframe?
-createVisibleWireframe: true
+rendering:
+  # shall modelVisualization display shadows and wireframe?
+  showShadowAndWireframe: true
 
-# shall modelVisualization display the solid model?
-showModel: true
+  # shall modelVisualization display the solid model?
+  showModel: true
+
+  # shall pipeline rendering be allowed?
+  usePipeline: true
+
+orbitControls:
+  autoRotate: false
+  autoRotateSpeed: 1.0
+  maxDistance: 1500
+  minDistance: 2

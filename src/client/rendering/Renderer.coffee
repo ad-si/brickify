@@ -4,6 +4,8 @@ renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/FxaaPart'
 SsaoShaderPart = require './shader/ssaoPart'
 SsaoBlurPart = require './shader/ssaoBlurPart'
+log = require 'loglevel'
+
 ###
 # @class Renderer
 ###
@@ -20,7 +22,6 @@ class Renderer
 	localRenderer: (timestamp) =>
 		# clear screen
 		@threeRenderer.context.stencilMask(0xFF)
-		@threeRenderer.context.clearStencil(0x00)
 		@threeRenderer.clear()
 
 		# render the default scene (plugins add objects in the init3d hook)
@@ -34,11 +35,10 @@ class Renderer
 			# clear render target
 			@threeRenderer.setRenderTarget(@pipelineRenderTarget.renderTarget)
 			@threeRenderer.context.stencilMask(0xFF)
-			@threeRenderer.context.clearStencil(0x00)
 			@threeRenderer.clear()
 			@threeRenderer.setRenderTarget(null)
 
-			# set clobal config
+			# set global config
 			pipelineConfig = {
 				useBigTargets: @useBigPipelineTargets
 			}
@@ -51,7 +51,7 @@ class Renderer
 				pipelineConfig
 			)
 
-			#render our target to the screen
+			# render our target to the screen
 			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
 
 			if @usePipelineSsao
@@ -71,7 +71,7 @@ class Renderer
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
 		@controls?.update()
-		requestAnimationFrame @localRenderer
+		@animationRequestID = requestAnimationFrame @localRenderer
 
 	# create / update target for all pipeline passes
 	_initializePipelineTarget: =>
@@ -118,7 +118,7 @@ class Renderer
 
 	setFidelity: (fidelityLevel, availableLevels) =>
 		if @pipelineEnabled
-			# Determine wheter to use bigger rendertargets (supersampling)
+			# Determine whether to use bigger render targets (super sampling)
 			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
 				@useBigPipelineTargets = true
 			else
@@ -193,7 +193,7 @@ class Renderer
 		@_setupRenderer @globalConfig
 		@scene = @getDefaultScene()
 		@_setupCamera @globalConfig
-		requestAnimationFrame @localRenderer
+		@animationRequestID = requestAnimationFrame @localRenderer
 
 	_setupSize: (globalConfig) ->
 		if not globalConfig.staticRendererSize
@@ -227,7 +227,7 @@ class Renderer
 		gl = @threeRenderer.context
 		contextAttributes = gl.getContextAttributes()
 		if not contextAttributes.stencil
-			console.warn 'The current WebGL context does not have a stencil buffer.
+			log.warn 'The current WebGL context does not have a stencil buffer.
 			 Rendering will be (partly) broken'
 			@threeRenderer.hasStencilBuffer = false
 		else
@@ -278,8 +278,8 @@ class Renderer
 			@controls = controls
 		else
 			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-			@controls.autoRotate = globalConfig.autoRotate
-			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
+			for key, value of globalConfig.orbitControls
+				@controls[key] = value
 			@controls.target.set(0, 0, 0)
 
 	_setupLighting: (scene) ->
@@ -318,5 +318,15 @@ class Renderer
 
 	getControls: =>
 		@controls
+
+	toggleRendering: =>
+		if @animationRequestID?
+			cancelAnimationFrame @animationRequestID
+			@animationRequestID = null
+			@controls.enabled = false
+		else
+			@animationRequestID = requestAnimationFrame @localRenderer
+			@controls.enabled = true
+
 
 module.exports = Renderer

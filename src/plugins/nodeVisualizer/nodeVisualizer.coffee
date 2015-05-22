@@ -7,6 +7,7 @@ stencilBits = require '../../client/rendering/stencilBits'
 Coloring = require './visualization/Coloring'
 ColorMultPart = require '../../client/rendering/shader/ColorMultPart'
 ExpandBlackPart = require '../../client/rendering/shader/ExpandBlackPart'
+PrintingTimeEstimator = require './printingTimeEstimator'
 
 ###
 # @class NodeVisualizer
@@ -26,30 +27,28 @@ class NodeVisualizer
 			@brickCounter = $ '#brickCount'
 			@timeEstimate = $ '#timeEstimate'
 
-	init3d: (@threejsRootNode) =>
+	init3d: (@threeJsRootNode) =>
 		@usePipeline = false
 
 		# Voxels / Bricks are rendered as a first render pass
 		@brickScene = @bundle.renderer.getDefaultScene()
 		@brickRootNode = new THREE.Object3D()
-		@threejsRootNode.add @brickRootNode
+		@threeJsRootNode.add @brickRootNode
 
 		# Objects are rendered in the 2nd / 3rd render pass
 		@objectsScene = @bundle.renderer.getDefaultScene()
 		@objectsRootNode = new THREE.Object3D()
-		@threejsRootNode.add @objectsRootNode
+		@threeJsRootNode.add @objectsRootNode
 
 		# LegoShadow is rendered as a 3rd rendering pass
 		@brickShadowScene = @bundle.renderer.getDefaultScene()
 		@brickShadowRootNode = new THREE.Object3D()
-		@threejsRootNode.add @brickShadowRootNode
-
-		return
+		@threeJsRootNode.add @brickShadowRootNode
 
 	onPaint: (@threeRenderer, camera, target, config) =>
 		threeRenderer = @threeRenderer
 
-		# recreate textures if either they havent been generated yet or
+		# recreate textures if either they haven't been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
@@ -68,7 +67,7 @@ class NodeVisualizer
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				[new ExpandBlackPart(2), new ColorMultPart()],
-				{colorMult: {type: 'v3', value: new THREE.Vector3(1,1,1)}},
+				{colorMult: {type: 'v3', value: new THREE.Vector3(1, 1, 1)}},
 				@objectOpacity
 	  			config.useBigTargets
 			)
@@ -119,14 +118,14 @@ class NodeVisualizer
 		# render visible parts
 		threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
 
-		# render invisble parts (object behind lego bricks)
+		# render invisible parts (object behind lego bricks)
 		if @visualizationMode? and @visualizationMode == 'printBrush'
 			# Adjust object material to be dark and more transparent
 			blendMat = @objectsSceneTarget.blendingMaterial
 			blendMat.uniforms.colorMult.value = @objectShadowColorMult
 			blendMat.uniforms.opacity.value = @objectShadowOpacity
 
-			# Only render where hidden 3d model is
+			# Only render where there is hidden 3d model
 			gl.stencilFunc(
 				gl.EQUAL, stencilBits.hiddenObjectMask, stencilBits.hiddenObjectMask
 			)
@@ -157,9 +156,9 @@ class NodeVisualizer
 				@usePipeline = true
 
 				# move all subnodes to the pipeline scenes
-				@threejsRootNode.remove @brickRootNode
-				@threejsRootNode.remove @brickShadowRootNode
-				@threejsRootNode.remove @objectsRootNode
+				@threeJsRootNode.remove @brickRootNode
+				@threeJsRootNode.remove @brickShadowRootNode
+				@threeJsRootNode.remove @objectsRootNode
 
 				@brickScene.add @brickRootNode
 				@objectsScene.add @objectsRootNode
@@ -176,27 +175,30 @@ class NodeVisualizer
 				@brickShadowScene.remove @brickShadowRootNode
 				@objectsScene.remove @objectsRootNode
 
-				@threejsRootNode.add @brickRootNode
-				@threejsRootNode.add @objectsRootNode
-				@threejsRootNode.add @brickShadowRootNode
+				@threeJsRootNode.add @brickRootNode
+				@threeJsRootNode.add @objectsRootNode
+				@threeJsRootNode.add @brickShadowRootNode
 
 				# change material properties
 				@coloring.setPipelineMode false
 
-	# called by newBrickator when an object's datastructure is modified
+	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
 		.then (cachedData) =>
 			if not cachedData.initialized
 				@_initializeData node, cachedData, newBrickatorData
 
-			# update brick visualization
-			cachedData.brickVisualization.updateBrickVisualization()
+			# visualization
+			cachedData.brickVisualization.updateVisualization()
+			cachedData.brickVisualization.showVoxelAndBricks()
 
-			# update voxel coloring and show them
-			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.showVoxels()
+			# brick count / printing time
 			@_updateBrickCount cachedData.brickVisualization.grid.getAllBricks()
+			@_updateQuickPrintTime(
+				cachedData.brickVisualization.grid.getDisabledVoxels()
+				cachedData.brickVisualization.grid.spacing
+			)
 
 	onNodeAdd: (node) =>
 		# link other plugins
@@ -298,15 +300,18 @@ class NodeVisualizer
 					@_resetStabilityView cachedData
 					return @_applyBuildMode cachedData
 
+	getDisplayMode: =>
+		return @visualizationMode
+
 	_applyLegoBrushMode: (cachedData) =>
-		cachedData.brickVisualization.showVoxels()
-		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.updateVisualization()
+		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 		cachedData.modelVisualization.setShadowVisibility false
 
 	_applyPrintBrushMode: (cachedData) =>
-		cachedData.brickVisualization.showVoxels()
-		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.updateVisualization()
+		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 		cachedData.modelVisualization.setShadowVisibility true
 
@@ -317,7 +322,6 @@ class NodeVisualizer
 		.then ->
 			# change coloring to stability coloring
 			cachedData.brickVisualization.setStabilityView true
-			cachedData.brickVisualization.showBricks()
 
 		cachedData.modelVisualization.setNodeVisibility false
 
@@ -330,7 +334,6 @@ class NodeVisualizer
 
 	_applyBuildMode: (cachedData) =>
 		# show bricks and csg
-		cachedData.brickVisualization.showBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 
 		@_showCsg cachedData
@@ -340,6 +343,7 @@ class NodeVisualizer
 
 	_resetBuildMode: (cachedData) =>
 		cachedData.brickVisualization.hideCsg()
+		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
 
 	# when build mode is enabled, this tells the visualization to show
@@ -353,10 +357,16 @@ class NodeVisualizer
 
 	_updatePrintTime: (csg) =>
 		if csg?.geometry?
-			time = @csg.getPrintingTimeEstimate csg.geometry
-			@timeEstimate?.text Math.round(time)
+			time = PrintingTimeEstimator.getPrintingTimeEstimate csg.geometry
+			time = Math.round time
+			@timeEstimate?.text time
 		else
 			@timeEstimate?.text 0
+
+	_updateQuickPrintTime: (voxels, spacing) =>
+		time = PrintingTimeEstimator.getPrintingTimeEstimateForVoxels voxels, spacing
+		time = Math.round time
+		@timeEstimate?.text time
 
 	_showCsg: (cachedData) =>
 		@csg ?= @bundle.getPlugin 'csg'
@@ -395,7 +405,7 @@ class NodeVisualizer
 			return brickIntersections
 		else
 			mixedIntersections = interactionHelper.getIntersections(
-				event, @bundle.renderer, @threejsRootNode.children
+				event, @bundle.renderer, @threeJsRootNode.children
 			)
 			return mixedIntersections
 

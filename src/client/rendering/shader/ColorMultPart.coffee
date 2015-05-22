@@ -1,22 +1,10 @@
 ShaderPart = require './ShaderPart'
 
 class ColorMultPart extends ShaderPart
-	getVertexVariables: ->
-		return ''
-
-	getVertexPreMain: ->
-		return ''
-
-	getVertexInMain: ->
-		return ''
-
 	getFragmentVariables: ->
 		return '
 			uniform vec3 colorMult;
 		'
-
-	getFragmentPreMain: ->
-		return ''
 
 	getFragmentInMain: ->
 		return '

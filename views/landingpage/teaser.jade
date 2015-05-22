@@ -1,7 +1,7 @@
 header
 	.container
 		.col-lg-8.pitch
-			h1 Brickolage
+			h1 brickify
 			h2 Extend your LEGO#[sup &reg;] with 3D-printed parts!
 			.drop
 				label(for='fileInput').btn.btn-primary.dropper#loadButton
@@ -10,9 +10,13 @@ header
 				style='display: none')#fileInput
 			a(href='/educators').btn#educators
 				#preview
-					img(src='/img/sample_ballista.png')
-					img(src='/img/sample_CitrusJuicer.png')
-					img(src='/img/sample_goggles.png')
-					img(src='/img/sample_printableWrench.png')
+					img(src='/img/sample_ballista.png', draggable="true",
+					data-hash='708d0b0b44f491523de951afa44b3e06')
+					img(src='/img/sample_CitrusJuicer.png', draggable="true",
+					data-hash='cd8a7a94eac03bf07f32048269e5cc1f')
+					img(src='/img/sample_goggles.png', draggable="true",
+					data-hash='1c2395a3145ad77aee7479020b461ddf')
+					img(src='/img/sample_printableWrench.png', draggable="true",
+					data-hash='1b2512f0804dfd68b2783108d840ab6f')
 				p Are you an educator? Check out our example models!
 		#makey.col-lg-4

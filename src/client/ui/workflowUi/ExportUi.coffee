@@ -12,22 +12,10 @@ class ExportUi
 	_initDownloadModal: =>
 		@downloadButton = $('#downloadButton')
 		@downloadModal = $('#downloadModal')
-		@downloadCloseButton = $('#downloadCloseButton')
-
-		#init modal
-		@downloadModal.modal ({
-			backdrop: 'static'
-			keyboard: true
-			show: false
-		})
 
 		#show modal when clicking on download button
 		@downloadButton.click =>
 			@downloadModal.modal 'show'
-
-		# dismiss modal when clicking on Close
-		@downloadCloseButton.click =>
-			@downloadModal.modal 'hide'
 
 	_initDownloadModalContent: =>
 		# stl download

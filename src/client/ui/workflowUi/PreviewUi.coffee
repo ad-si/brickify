@@ -15,8 +15,8 @@ class PreviewUi
 		@quit() unless enabled
 
 	quit: =>
-		@_quitStabilityView() if @stabilityViewEnabled
-		@_quitAssemblyView() if @assemblyViewEnabled
+		@_quitStabilityView()
+		@_quitAssemblyView()
 
 	_initStabilityView: =>
 		@stabilityViewEnabled = no
@@ -26,6 +26,7 @@ class PreviewUi
 			@workflowUi.hideMenuIfPossible()
 
 	_quitStabilityView: =>
+		return unless @stabilityViewEnabled
 		@$stabilityViewButton.removeClass 'active disabled'
 		@stabilityViewEnabled = no
 		@editController.enableInteraction()
@@ -55,6 +56,7 @@ class PreviewUi
 		@previewAssemblyUi = new PreviewAssemblyUi @
 
 	_quitAssemblyView: =>
+		return unless @assemblyViewEnabled
 		@$assemblyViewButton.removeClass 'active disabled'
 		@assemblyViewEnabled = no
 		@previewAssemblyUi.setEnabled no

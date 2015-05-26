@@ -44,12 +44,13 @@ class BrickVisualization
 
 		@brickThreeNode.add @_highlightVoxel
 
-	showCsg: (newCsgMesh) =>
+	showCsg: (newCsgGeometry) =>
 		@csgSubnode.children = []
-		return if not newCsgMesh?
+		return if not newCsgGeometry?
 
-		@csgSubnode.add newCsgMesh
-		newCsgMesh.material = @defaultColoring.csgMaterial
+		for geometry in newCsgGeometry
+			csgMesh = new THREE.Mesh geometry, @defaultColoring.csgMaterial
+			@csgSubnode.add csgMesh
 
 		@csgSubnode.visible = true
 

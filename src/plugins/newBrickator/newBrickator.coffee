@@ -27,7 +27,7 @@ class NewBrickator
 		Spinner.startOverlay @bundle.renderer.getDomElement()
 		@_getCachedData(selectedNode).then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.deactivateVoxelizing()
 
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
@@ -63,7 +63,7 @@ class NewBrickator
 				else if createBricks
 					modifiedBricks.add new Brick([v])
 
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyRelayout()
 
 			data = {
@@ -80,7 +80,7 @@ class NewBrickator
 	everythingPrint: (selectedNode) =>
 		@_getCachedData selectedNode
 		.then (cachedData) =>
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyInitLayout()
 
 			data = grid: cachedData.grid
@@ -93,7 +93,7 @@ class NewBrickator
 	_createDataStructure: (selectedNode) =>
 		selectedNode.getModel().then (model) =>
 			# create grid
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
 			settings.deactivateLayouting()
 
@@ -141,21 +141,29 @@ class NewBrickator
 
 		dlPromise = new Promise (resolve, reject) =>
 			@csg.getCSG selectedNode, options
-			.then (detailedCsg) ->
-				if not detailedCsg?
-					resolve { data: '', fileName: '' }
+			.then (detailedCsgGeometries) ->
+				if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
+					resolve [{ data: '', fileName: '' }]
 					return
 
-				optimizedModel = new meshlib.OptimizedModel()
-				optimizedModel.fromThreeGeometry(detailedCsg.geometry)
+				results = []
 
-				meshlib
-				.model(optimizedModel)
-				.export null, (error, binaryStl) ->
-					fn = "brickify-#{selectedNode.name}"
-					if fn.indexOf('.stl') < 0
+				for i in [0..detailedCsgGeometries.length - 1]
+					geometry = detailedCsgGeometries[i]
+
+					optimizedModel = new meshlib.OptimizedModel()
+					optimizedModel.fromThreeGeometry(geometry)
+
+					meshlib
+					.model(optimizedModel)
+					.export null, (error, binaryStl) ->
+						fn = "brickify-#{selectedNode.name}"
+						fn = fn.replace /.stl$/, ''
+						fn += "-#{i}"
 						fn += '.stl'
-					resolve { data: binaryStl, fileName: fn }
+						results.push { data: binaryStl, fileName: fn }
+
+					resolve results
 
 		return dlPromise
 
@@ -164,31 +172,21 @@ class NewBrickator
 
 		# set stud and hole size
 		if studRadius?
-			studSize = {
+			options.studSize = {
 				radius: studRadius
-				height: PipelineSettings.legoStudSize.height
+				height: @bundle.globalConfig.studSize.height
 			}
-		else
-			studSize = PipelineSettings.legoStudSize
-		options.studSize = studSize
 
 		if holeRadius?
-			holeSize = {
+			options.holeSize = {
 				radius: holeRadius
-				height: PipelineSettings.legoHoleSize.height
+				height: @bundle.globalConfig.holeSize.height
 			}
-		else
-			holeSize = PipelineSettings.legoHoleSize
-		options.holeSize = holeSize
 
 		# add studs
 		options.addStuds = true
 
 		return options
-
-
-
-
 
 
 module.exports = NewBrickator

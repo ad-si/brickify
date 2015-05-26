@@ -46,7 +46,6 @@ class BrushHandler
 		@nodeVisualizer.setDisplayMode selectedNode, 'printBrush'
 
 	_legoMouseDown: (event, selectedNode) =>
-		return if @interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -55,7 +54,6 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseMove: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -64,7 +62,6 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_legoMouseUp: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
@@ -77,14 +74,12 @@ class BrushHandler
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_legoMouseHover: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.
 				highlightVoxel event, selectedNode, '3d', @bigBrushSelected
 
 	_legoCancel: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
@@ -92,7 +87,6 @@ class BrushHandler
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_everythingLego: (selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
@@ -102,7 +96,6 @@ class BrushHandler
 			brickVis.updateVisualization(null, true)
 
 	_printMouseDown: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -111,7 +104,6 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseMove: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -120,7 +112,6 @@ class BrushHandler
 				cachedData.csgNeedsRecalculation = true
 
 	_printMouseUp: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
@@ -133,14 +124,12 @@ class BrushHandler
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_printMouseHover: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.
 				highlightVoxel event, selectedNode, 'lego', @bigBrushSelected
 
 	_printCancel: (event, selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
@@ -148,7 +137,6 @@ class BrushHandler
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_everythingPrint: (selectedNode) =>
-		return if @editController.interactionDisabled
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.

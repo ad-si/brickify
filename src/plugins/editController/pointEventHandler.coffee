@@ -14,9 +14,7 @@ class PointEventHandler
 
 		# perform brush action
 		@isBrushing = true
-		brush = @brushUi.getSelectedBrush()
-		if brush? and brush.mouseDownCallback?
-			brush.mouseDownCallback event, @sceneManager.selectedNode
+		@brushUi.getSelectedBrush()?.onBrushDown? event, @sceneManager.selectedNode
 
 	pointerMove: (event) =>
 		if not @_validBrushButton event
@@ -27,30 +25,27 @@ class PointEventHandler
 		brush = @brushUi.getSelectedBrush()
 		return false unless brush?
 
-		if @isBrushing and brush.mouseMoveCallback?
-			brush.mouseMoveCallback event, @sceneManager.selectedNode
+		if @isBrushing
+			brush.onBrushMove? event, @sceneManager.selectedNode
 			return true
-		else if event.buttons is pointerEnums.buttonStates.none and
-		brush.mouseHoverCallback?
-			brush.mouseHoverCallback event, @sceneManager.selectedNode
+		else if event.buttons is pointerEnums.buttonStates.none
+			brush.onBrushOver? event, @sceneManager.selectedNode
 			return true
 
 	pointerUp: (event) =>
 		# end brush action
 		if @isBrushing
 			@isBrushing = false
-			brush = @brushUi.getSelectedBrush()
-			if brush? and brush.mouseUpCallback?
-				brush.mouseUpCallback event, @sceneManager.selectedNode
+			@brushUi.getSelectedBrush()?.onBrushUp? event, @sceneManager.selectedNode
 
 			@_untoggleBrush()
 
 	pointerCancel: (event) =>
 		if @isBrushing
 			@isBrushing = false
-			brush = @brushUi.getSelectedBrush()
-			if brush? and brush.cancelCallback?
-				brush.cancelCallback event, @sceneManager.selectedNode
+			@brushUi.getSelectedBrush()?.onBrushCancel?(
+				event, @sceneManager.selectedNode
+			)
 
 			@_untoggleBrush()
 

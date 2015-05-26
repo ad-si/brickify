@@ -19,20 +19,20 @@ class BrushHandler
 	getBrushes: =>
 		return [{
 			containerId: '#legoBrush'
-			selectCallback: @_legoSelect
-			mouseDownCallback: @_legoMouseDown
-			mouseMoveCallback: @_legoMouseMove
-			mouseHoverCallback: @_legoMouseHover
-			mouseUpCallback: @_legoMouseUp
-			cancelCallback: @_legoCancel
+			onBrushSelect: @_legoSelect
+			onBrushDown: @_legoDown
+			onBrushMove: @_legoMove
+			onBrushOver: @_legoHover
+			onBrushUp: @_legoUp
+			onBrushCancel: @_legoCancel
 		},{
 			containerId: '#printBrush'
-			selectCallback: @_printSelect
-			mouseDownCallback: @_printMouseDown
-			mouseMoveCallback: @_printMouseMove
-			mouseHoverCallback: @_printMouseHover
-			mouseUpCallback: @_printMouseUp
-			cancelCallback: @_printCancel
+			onBrushSelect: @_printSelect
+			onBrushDown: @_printDown
+			onBrushMove: @_printMove
+			onBrushOver: @_printHover
+			onBrushUp: @_printUp
+			onBrushCancel: @_printCancel
 		}]
 
 	_legoSelect: (selectedNode, @bigBrushSelected) =>
@@ -45,7 +45,7 @@ class BrushHandler
 		return if @editController.interactionDisabled
 		@nodeVisualizer.setDisplayMode selectedNode, 'printBrush'
 
-	_legoMouseDown: (event, selectedNode) =>
+	_legoDown: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -53,7 +53,7 @@ class BrushHandler
 			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
-	_legoMouseMove: (event, selectedNode) =>
+	_legoMove: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -61,7 +61,7 @@ class BrushHandler
 			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
-	_legoMouseUp: (event, selectedNode) =>
+	_legoUp: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
@@ -73,7 +73,7 @@ class BrushHandler
 			)
 			cachedData.brickVisualization.unhighlightBigBrush()
 
-	_legoMouseHover: (event, selectedNode) =>
+	_legoHover: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.
@@ -95,7 +95,7 @@ class BrushHandler
 			brickVis.updateModifiedVoxels()
 			brickVis.updateVisualization(null, true)
 
-	_printMouseDown: (event, selectedNode) =>
+	_printDown: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -103,7 +103,7 @@ class BrushHandler
 			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
-	_printMouseMove: (event, selectedNode) =>
+	_printMove: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			voxels = cachedData.brickVisualization.
@@ -111,7 +111,7 @@ class BrushHandler
 			if voxels?
 				cachedData.csgNeedsRecalculation = true
 
-	_printMouseUp: (event, selectedNode) =>
+	_printUp: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
@@ -123,7 +123,7 @@ class BrushHandler
 			)
 			cachedData.brickVisualization.unhighlightBigBrush()
 
-	_printMouseHover: (event, selectedNode) =>
+	_printHover: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			cachedData.brickVisualization.

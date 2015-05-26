@@ -17,12 +17,21 @@ class Renderer
 		@useBigPipelineTargets = false
 
 	localRenderer: (timestamp) =>
+		@_renderFrame timestamp, @camera, null
+
+		# call update hook
+		@pluginHooks.on3dUpdate timestamp
+		@controls?.update()
+		@animationRequestID = requestAnimationFrame @localRenderer
+
+	# Renders all plugins
+	_renderFrame: (timestamp, camera, renderTarget = null) =>
 		# clear screen
 		@threeRenderer.context.stencilMask(0xFF)
 		@threeRenderer.clear()
 
 		# render the default scene (plugins add objects in the init3d hook)
-		@threeRenderer.render @scene, @camera
+		@threeRenderer.render @scene, camera
 
 		# allow for custom render passes
 		if @pipelineEnabled
@@ -43,19 +52,13 @@ class Renderer
 			# let plugins render in our target
 			@pluginHooks.onPaint(
 				@threeRenderer,
-				@camera,
+				camera,
 				@pipelineRenderTarget.renderTarget,
 				pipelineConfig
 			)
 
 			# render our target to the screen
-			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
-
-
-		# call update hook
-		@pluginHooks.on3dUpdate timestamp
-		@controls?.update()
-		@animationRequestID = requestAnimationFrame @localRenderer
+			@threeRenderer.render @pipelineRenderTarget.quadScene, camera
 
 	# create / update target for all pipeline passes
 	_initializePipelineTarget: =>

@@ -163,7 +163,7 @@ class DummyPlugin
 	###
 	getDownload: (downloadOptions, selectedNode) ->
 		return {
-			filename: ''
+			fileName: ''
 			data: ''
 		}
 

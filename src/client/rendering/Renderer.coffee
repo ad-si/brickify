@@ -19,7 +19,7 @@ class Renderer
 
 	# renders the current scene to an image, uses the camera if provided
 	# returns a promise which will resolve with the image
-	renderToImage: (camera = null) =>
+	renderToImage: (camera = @camera) =>
 		return new Promise (resolve, reject) =>
 			@imageRenderQueries.push {
 				resolve: resolve
@@ -41,7 +41,7 @@ class Renderer
 			)
 				@imageRenderTarget = renderTargetHelper.createRenderTarget(
 					@threeRenderer,
-					shaderParts,
+					[],
 					null,
 					1.0,
 					@useBigPipelineTargets
@@ -55,13 +55,23 @@ class Renderer
 			height = @imageRenderTarget.renderTarget.height
 
 			pixels = new Uint8Array(width * height * 4);
+
+			# fix three inconsistency on current depthTarget dev branch
+			@imageRenderTarget.renderTarget.format = @imageRenderTarget.renderTarget.texture.format
+
 			@threeRenderer.readRenderTargetPixels(
 				@imageRenderTarget.renderTarget, 0, 0,
 				width, height, pixels
 			)
 
 			# resolve promise
-			imageQuery.resolve pixels
+			imageQuery.resolve {
+				viewWidth: @size().width
+				viewHeight: @size().height
+				imageWidth: width
+				imageHeight: height
+				pixels: pixels
+			}
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp

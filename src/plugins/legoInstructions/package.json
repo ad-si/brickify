@@ -1,0 +1,9 @@
+{
+  "name": "lego-instructions",
+  "version": "0.1.0",
+  "description": "Lego assembly instructions for download as pdf",
+  "brickify": {
+    "type": "download"
+  },
+  "browser": "./LegoInstructions.coffee"
+}

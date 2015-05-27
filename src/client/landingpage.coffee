@@ -32,8 +32,9 @@ globalConfig.rendering.usePipeline = false
 config1 = clone globalConfig
 config2 = clone globalConfig
 
-# configure left bundle to only show model
+# configure left bundle to only show model, disable lego instructions
 config1.plugins.newBrickator = false
+config1.plugins.legoInstructions = false
 
 # configure right bundle to not show the model
 config2.showModel = false

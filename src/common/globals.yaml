@@ -57,6 +57,7 @@ plugins:
   fidelityControl: true
   editController: true
   csg: true
+  legoInstructions: true
 
 rendering:
   # shall modelVisualization display shadows and wireframe?

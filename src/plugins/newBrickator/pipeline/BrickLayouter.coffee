@@ -72,12 +72,12 @@ class BrickLayouter
 	# Split up all supplied bricks into single bricks and relayout locally. This
 	# means that all supplied bricks and their neighbors will be relayouted.
 	#
-	# @param {Array<Brick>} bricks bricks that should be split
+	# @param {Set<Brick>} bricks bricks that should be split
 	###
 	splitBricksAndRelayoutLocally: (bricks, grid) =>
 		bricksToSplit = new Set()
 
-		for brick in bricks
+		bricks.forEach (brick) ->
 			# add this brick to be split
 			bricksToSplit.add brick
 

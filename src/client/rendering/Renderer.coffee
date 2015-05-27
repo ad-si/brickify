@@ -55,7 +55,7 @@ class Renderer
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
 		@controls?.update()
-		requestAnimationFrame @localRenderer
+		@animationRequestID = requestAnimationFrame @localRenderer
 
 	# create / update target for all pipeline passes
 	_initializePipelineTarget: =>
@@ -142,7 +142,7 @@ class Renderer
 		@_setupRenderer @globalConfig
 		@scene = @getDefaultScene()
 		@_setupCamera @globalConfig
-		requestAnimationFrame @localRenderer
+		@animationRequestID = requestAnimationFrame @localRenderer
 
 	_setupSize: (globalConfig) ->
 		if not globalConfig.staticRendererSize
@@ -226,8 +226,8 @@ class Renderer
 			@controls = controls
 		else
 			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-			@controls.autoRotate = globalConfig.autoRotate
-			@controls.autoRotateSpeed = globalConfig.autoRotateSpeed
+			for key, value of globalConfig.orbitControls
+				@controls[key] = value
 			@controls.target.set(0, 0, 0)
 
 	_setupLighting: (scene) ->
@@ -266,5 +266,15 @@ class Renderer
 
 	getControls: =>
 		@controls
+
+	toggleRendering: =>
+		if @animationRequestID?
+			cancelAnimationFrame @animationRequestID
+			@animationRequestID = null
+			@controls.enabled = false
+		else
+			@animationRequestID = requestAnimationFrame @localRenderer
+			@controls.enabled = true
+
 
 module.exports = Renderer

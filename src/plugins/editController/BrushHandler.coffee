@@ -71,7 +71,9 @@ class BrushHandler
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"
 
-			@editController.relayoutModifiedParts selectedNode, touchedVoxels, true
+			@editController.relayoutModifiedParts(
+				selectedNode, cachedData, touchedVoxels, true
+			)
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_legoMouseHover: (event, selectedNode) =>
@@ -86,7 +88,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
-			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_everythingLego: (selectedNode) =>
@@ -94,9 +96,10 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
-			cachedData.brickVisualization.updateModifiedVoxels()
 			@editController.rerunLegoPipeline selectedNode
-
+			brickVis = cachedData.brickVisualization
+			brickVis.updateModifiedVoxels()
+			brickVis.updateVisualization(null, true)
 
 	_printMouseDown: (event, selectedNode) =>
 		return if @editController.interactionDisabled
@@ -124,7 +127,9 @@ class BrushHandler
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"
 
-			@editController.relayoutModifiedParts selectedNode, touchedVoxels, true
+			@editController.relayoutModifiedParts(
+				selectedNode, cachedData, touchedVoxels, true
+			)
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_printMouseHover: (event, selectedNode) =>
@@ -139,7 +144,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) ->
 			cachedData.brickVisualization.resetTouchedVoxelsToLego()
-			cachedData.brickVisualization.updateVoxelVisualization()
+			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
 	_everythingPrint: (selectedNode) =>
@@ -147,7 +152,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.
-			brickVisualization.makeAllVoxels3dPrinted selectedNode
+				brickVisualization.makeAllVoxels3dPrinted selectedNode
 			cachedData.brickVisualization.updateModifiedVoxels()
 			@editController.everythingPrint selectedNode
 

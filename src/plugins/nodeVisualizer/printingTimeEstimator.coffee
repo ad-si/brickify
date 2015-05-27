@@ -69,12 +69,16 @@ getEstimate = (height, surface, volume) ->
 	return 0 if volume is 0
 	return 2 + 2 * height + 0.3 * surface + 2.5 * volume
 
-module.exports.getPrintingTimeEstimate = (geometry) ->
-	height = getHeight geometry
-	surface = getSurface geometry
-	volume = getVolume geometry
+module.exports.getPrintingTimeEstimate = (geometries) ->
+	time = 0
+	for geometry in geometries
+		height = getHeight geometry
+		surface = getSurface geometry
+		volume = getVolume geometry
 
-	return getEstimate height, surface, volume
+		time += getEstimate height, surface, volume
+
+	return time
 
 module.exports.getPrintingTimeEstimateForVoxels = (voxels, gridSpacing) ->
 	return 0 if voxels.length is 0

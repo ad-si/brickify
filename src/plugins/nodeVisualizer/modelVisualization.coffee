@@ -7,7 +7,7 @@ class ModelVisualization
 		threeNode.add @threeNode
 
 	createVisualization: ->
-		@_createVisualization(@node, @threeNode)
+		@_createVisualization @node
 
 	setSolidMaterial: (material) =>
 		@afterCreationPromise.then =>
@@ -27,17 +27,14 @@ class ModelVisualization
 	getSolid: =>
 		@threeNode.solid
 
-	_createVisualization: (node, threejsNode) =>
-		unless @globalConfig.showModel
-			@afterCreationPromise = node.getModel()
-			return @afterCreationPromise
+	_createVisualization: (node) =>
+
 		_addSolid = (geometry, parent) =>
 			solid = new THREE.Mesh geometry, @coloring.objectMaterial
 			parent.add solid
 			parent.solid = solid
 
 		_addWireframe = (geometry, parent) =>
-			# ToDo: create fancy shader material / correct rendering pipeline
 			wireframe = new THREE.Object3D()
 
 			#shadow
@@ -56,8 +53,10 @@ class ModelVisualization
 		_addModel = (model) =>
 			geometry = model.convertToThreeGeometry()
 
-			_addSolid geometry, @threeNode
-			_addWireframe geometry, @threeNode if @globalConfig.createVisibleWireframe
+			if @globalConfig.rendering.showModel
+				_addSolid geometry, @threeNode
+			if @globalConfig.rendering.showShadowAndWireframe
+				_addWireframe geometry, @threeNode
 
 			threeHelper.applyNodeTransforms node, @threeNode
 

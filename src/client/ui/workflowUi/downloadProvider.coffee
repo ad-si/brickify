@@ -2,6 +2,8 @@ $ = require 'jquery'
 modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
 JSZip = require 'jszip'
+log = require 'loglevel'
+
 
 module.exports = class DownloadProvider
 	constructor: (@bundle) ->
@@ -41,9 +43,8 @@ module.exports = class DownloadProvider
 			if files.length > 1
 				promisesArray = []
 				for file in files
-					promisesArray.push(
-						@_arrayBufferFromBlob file.data, file.fileName
-					)
+					fileConversion = @_convertToArrayBuffer file.data, file.fileName
+					promisesArray.push fileConversion if fileConversion?
 
 				Promise.all(promisesArray).then (resultsArray) ->
 					zip = new JSZip()
@@ -64,6 +65,18 @@ module.exports = class DownloadProvider
 				files.push data: entry.data, fileName: entry.fileName
 		return files
 
+	_convertToArrayBuffer: (data, fileName) =>
+		if data instanceof Blob
+			return @_arrayBufferFromBlob data, fileName
+		if data instanceof ArrayBuffer
+			return Promise.resolve {data: data, fileName: fileName}
+		if (data instanceof String) or (typeof(data) == 'string')
+			return @_arrayBufferFromString data, fileName
+
+		log.warn 'No conversion method found for file',fileName
+		return null
+
+
 	_arrayBufferFromBlob: (blob, fileName) ->
 		reader = new FileReader()
 		return new Promise (resolve, reject) ->
@@ -72,3 +85,13 @@ module.exports = class DownloadProvider
 			reader.onerror = reject
 			reader.onabort = reject
 			reader.readAsArrayBuffer blob
+
+	_arrayBufferFromString: (string, fileName) ->
+		return new Promise (resolve, reject) ->
+			buffer = new ArrayBuffer(string.length * 2)
+			bufferView = new Uint16Array(buffer)
+			for i in [0...string.length] by 1
+				bufferView[i] = string.charCodeAt i
+
+			resolve {data: buffer, fileName: fileName}
+

@@ -1,5 +1,4 @@
 PNG = require('node-png').PNG
-streamToArray = require 'stream-to-array'
 THREE = require 'three'
 log = require 'loglevel'
 

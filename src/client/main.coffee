@@ -13,7 +13,8 @@ globalConfig = require '../common/globals.yaml'
 
 if process.env.NODE_ENV is 'development'
 	log.enableAll()
-
+else
+	log.setLevel 'warn'
 
 commandFunctions = {
 	initialModel: (value) ->

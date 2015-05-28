@@ -130,6 +130,8 @@ class NewBrickator
 					return data
 
 	getDownload: (selectedNode, downloadOptions) =>
+		return null if downloadOptions.fileType != 'stl'
+
 		options = @_prepareCSGOptions(
 			downloadOptions.studRadius, downloadOptions.holeRadius
 		)

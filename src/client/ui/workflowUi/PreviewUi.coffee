@@ -15,8 +15,8 @@ class PreviewUi
 		@quit() unless enabled
 
 	quit: =>
-		@_quitStabilityView() if @stabilityViewEnabled
-		@_quitAssemblyView() if @assemblyViewEnabled
+		@_quitStabilityView()
+		@_quitAssemblyView()
 
 	_initStabilityView: =>
 		@stabilityViewEnabled = no
@@ -26,6 +26,7 @@ class PreviewUi
 			@workflowUi.hideMenuIfPossible()
 
 	_quitStabilityView: =>
+		return unless @stabilityViewEnabled
 		@$stabilityViewButton.removeClass 'active disabled'
 		@stabilityViewEnabled = no
 		@editController.enableInteraction()
@@ -46,6 +47,7 @@ class PreviewUi
 			@editController.disableInteraction()
 			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
 		else
+			_paq.push ['trackEvent', 'Editor', 'PreviewAction', 'StabilityView']
 			@editController.enableInteraction()
 
 	_initAssemblyView: =>
@@ -55,6 +57,7 @@ class PreviewUi
 		@previewAssemblyUi = new PreviewAssemblyUi @
 
 	_quitAssemblyView: =>
+		return unless @assemblyViewEnabled
 		@$assemblyViewButton.removeClass 'active disabled'
 		@assemblyViewEnabled = no
 		@previewAssemblyUi.setEnabled no
@@ -65,6 +68,7 @@ class PreviewUi
 		@_quitStabilityView()
 
 		if @assemblyViewEnabled
+			_paq.push ['trackEvent', 'Editor', 'PreviewAction', 'AssemblyView']
 			@workflowUi.enableOnly @
 		else
 			@workflowUi.enableAll()

@@ -56,8 +56,12 @@ class WorkflowUi
 					 Please check back later.'
 			})
 
-		$('#downloadPdfButton').click alertCallback
-		$('#shareButton').click alertCallback
+		$('#downloadPdfButton').click ->
+			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadPdfClick']
+			alertCallback()
+		$('#shareButton').click ->
+			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
+			alertCallback()
 
 	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'

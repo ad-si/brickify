@@ -44,12 +44,13 @@ class BrickVisualization
 
 		@brickThreeNode.add @_highlightVoxel
 
-	showCsg: (newCsgMesh) =>
+	showCsg: (newCsgGeometry) =>
 		@csgSubnode.children = []
-		return if not newCsgMesh?
+		return if not newCsgGeometry?
 
-		@csgSubnode.add newCsgMesh
-		newCsgMesh.material = @defaultColoring.csgMaterial
+		for geometry in newCsgGeometry
+			csgMesh = new THREE.Mesh geometry, @defaultColoring.csgMaterial
+			@csgSubnode.add csgMesh
 
 		@csgSubnode.visible = true
 
@@ -95,6 +96,9 @@ class BrickVisualization
 
 			if (not recreate) and (not brick.getVisualBrick()?)
 				brickLayers[z].push brick
+			if brick.getVisualBrick()?
+				brick.getVisualBrick().visible = yes
+				brick.getVisualBrick().hasBeenSplit = no
 
 		for z, brickLayer of brickLayers
 			# create layer object if it does not exist
@@ -252,12 +256,11 @@ class BrickVisualization
 	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
-		anythingChanged = false
+		everything3D = true
 		for voxel in voxels
-			anythingChanged = anythingChanged || voxel.isLego()
+			everything3D = everything3D && !voxel.isLego()
 			voxel.make3dPrinted()
-			@voxelSelector.touch voxel
-		return anythingChanged
+		return !everything3D
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels

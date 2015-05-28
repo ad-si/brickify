@@ -113,13 +113,13 @@
 #
 # {
 #	text: 'Make Lego'
-#	selectCallback: # when the brush is selected, selectedNode as argument
-#	deselectCallback: # when the brush is deselected
-#	mouseDownCallback: # when a node is selected and mouse is pressed
-#	mouseMoveCallback: # after being pressed, when mouse is moved
-#	mouseHoverCallback: # when the mouse is moved, but not pressed
-#	mouseUpCallback: # when mouse is released
-#	cancelCallback: # when interaction is canceled (ESC, two buttons pressed)
+#	onBrushSelect: # when the brush is selected, selectedNode as argument
+#	onBrushDeselect: # when the brush is deselected
+#	onBrushDown: # when a node is selected and mouse is pressed
+#	onBrushMove: # after being pressed, when mouse is moved
+#	onBrushOver: # when the mouse is moved, but not pressed
+#	onBrushUp: # when mouse is released
+#	onBrushCancel: # when interaction is canceled (ESC, two buttons pressed)
 # }
 #
 
@@ -135,8 +135,9 @@
 # ## getDownload
 # (parameters: see example plugin)
 # If plugins can provide something downloadable to the user, they should return
-# an object consisting out of a filename and data property, which is then offered
-# to the user to download.
+# either a single object {filename: String (not null) data: Blob} or an array of such objects.
+# It may also return a promise that resolves to one of the above.
+# Download objects with an empty filename are ignored.
 
 - getDownload
 

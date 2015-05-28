@@ -45,15 +45,20 @@ class EditBrushUi
 		# deselect currently selected brush
 		@_deselectBrush @selectedNode
 
+		# piwik select event
+		big = ''
+		big = 'Big' if @_bigBrushSelected
+		_paq.push ['trackEvent', 'Editor', 'BrushSelect', brush.containerId + big]
+
 		#select new brush
 		@_selectedBrush = brush
 		brush.brushButton.addClass 'active' if not @_bigBrushSelected
 		brush.bigBrushButton.addClass 'active' if @_bigBrushSelected
-		brush.selectCallback? @selectedNode, @_bigBrushSelected
+		brush.onBrushSelect? @selectedNode, @_bigBrushSelected
 
 	_deselectBrush: (node) =>
 		if @_selectedBrush?
-			@_selectedBrush.deselectCallback? node
+			@_selectedBrush.onBrushDeselect? node
 			@_selectedBrush.brushButton.removeClass 'active'
 			@_selectedBrush.bigBrushButton.removeClass 'active'
 			@_selectedBrush = null

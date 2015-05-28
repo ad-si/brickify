@@ -361,8 +361,8 @@ class NodeVisualizer
 		@brickCounter?.text bricks.size
 
 	_updatePrintTime: (csg) =>
-		if csg?.geometry?
-			time = PrintingTimeEstimator.getPrintingTimeEstimate csg.geometry
+		if csg?
+			time = PrintingTimeEstimator.getPrintingTimeEstimate csg
 			time = Math.round time
 			@timeEstimate?.text time
 		else
@@ -377,7 +377,12 @@ class NodeVisualizer
 		@csg ?= @bundle.getPlugin 'csg'
 		return Promise.resolve() if not @csg?
 
-		return @csg.getCSG(cachedData.node, {addStuds: true})
+		options = {
+			addStuds: true
+			minimalPrintVolume: @bundle.globalConfig.minimalPrintVolume
+		}
+
+		return @csg.getCSG(cachedData.node, options)
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg csg
 					@_updatePrintTime csg

@@ -17,14 +17,11 @@ module.exports = class Voxelizer
 
 		@worker = @getWorker()
 
-		voxelSpacePolygons = []
-		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
-			p0 = @voxelGrid.mapModelToVoxelSpace p0
-			p1 = @voxelGrid.mapModelToVoxelSpace p1
-			p2 = @voxelGrid.mapModelToVoxelSpace p2
-			voxelSpacePolygons.push p0: p0, p1: p1, p2: p2, dZ: n.z
+		voxelSpaceModel = @_getVoxelSpaceModel optimizedModel
 
-		@worker.voxelize voxelSpacePolygons, lineStepSize, outerStepSize, (message) =>
+		console.log JSON.stringify(voxelSpaceModel).length
+
+		@worker.voxelize voxelSpaceModel, lineStepSize, outerStepSize, (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
@@ -33,28 +30,51 @@ module.exports = class Voxelizer
 
 		return new Promise (@resolve, reject) => return
 
+	_getVoxelSpaceModel: (optimizedModel) =>
+		positions = optimizedModel.positions
+		voxelSpacePositions = []
+		for i in [0...positions.length] by 3
+			position =
+				x: positions[i]
+				y: positions[i + 1]
+				z: positions[i + 2]
+			position = @voxelGrid.mapModelToVoxelSpace position
+			voxelSpacePositions.push position.x
+			voxelSpacePositions.push position.y
+			voxelSpacePositions.push position.z
+
+		normals = optimizedModel.faceNormals
+		directions = []
+		for i in [2...normals.length] by 3
+			z = normals[i]
+			directions.push @_getTolerantDirection z
+
+		return {
+			positions: voxelSpacePositions
+			indices: optimizedModel.indices
+			directions: directions
+		}
+
 	terminate: =>
 		@worker?.terminate()
 		@worker = null
 
 	getWorker: ->
 		return operative {
-			voxelize: (polygons, lineStepSize, outerStepSize, progressCallback) ->
+			voxelize: (model, lineStepSize, outerStepSize, progressCallback) ->
 				grid = []
 				@resetProgress()
-				length = polygons.length
-				for i in [0...length] by 1
-					polygon = polygons[i]
+				@forEachPolygon model, (p0, p1, p2, direction) ->
 					@voxelizePolygon(
-						polygon.p0
-						polygon.p1
-						polygon.p2
-						polygon.dZ
+						p0
+						p1
+						p2
+						direction
 						lineStepSize
 						outerStepSize
 						grid
 					)
-					@postProgress(i, length, progressCallback)
+					#@postProgress(i, length, progressCallback)
 				progressCallback state: 'finished', data: grid
 
 			voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->
@@ -62,7 +82,7 @@ module.exports = class Voxelizer
 				# (object may be moved/rotated)
 
 				#store information for filling solids
-				direction = @_getTolerantDirection dZ
+				direction = dZ
 
 				l0len = @_getLength p0, p1
 				l1len = @_getLength p1, p2
@@ -121,9 +141,6 @@ module.exports = class Voxelizer
 				z = z1 + (z2 - z1) * i
 				return x: x, y: y, z: z
 
-			_getTolerantDirection: (dZ, tolerance = 0.1) ->
-				return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
-
 			###
 			# Voxelizes the line from a to b. Stores data in each generated voxel.
 			#
@@ -177,7 +194,35 @@ module.exports = class Voxelizer
 				return unless currentProgress > @lastProgress
 				@lastProgress = currentProgress
 				callback state: 'progress', progress: currentProgress
+
+			forEachPolygon: (model, visitor) ->
+				indices = model.indices
+				positions = model.positions
+				directions = model.directions
+				for i in [0...directions.length]
+					i3 = i * 3
+					p0 = {
+						x: positions[indices[i3] * 3]
+						y: positions[indices[i3] * 3 + 1]
+						z: positions[indices[i3] * 3 + 2]
+					}
+					p1 = {
+						x: positions[indices[i3 + 1] * 3]
+						y: positions[indices[i3 + 1] * 3 + 1]
+						z: positions[indices[i3 + 1] * 3 + 2]
+					}
+					p2 = {
+						x: positions[indices[i3 + 2] * 3]
+						y: positions[indices[i3 + 2] * 3 + 1]
+						z: positions[indices[i3 + 2] * 3 + 2]
+					}
+					direction = directions[i]
+
+					visitor p0, p1, p2, direction
 		}
+
+	_getTolerantDirection: (dZ, tolerance = 0.1) ->
+		return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
 
 	setupGrid: (optimizedModel, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)

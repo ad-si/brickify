@@ -65,12 +65,12 @@ b1 = bundle1.init().then ->
 	callback = (event) ->
 		files = event.target.files ? event.dataTransfer.files
 		if files.length
-			_paq.push(['trackEvent', 'Landingpage', 'LoadModel', files[0].name]);
+			_paq.push ['trackEvent', 'Landingpage', 'LoadModel', files[0].name]
 			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
 			.then loadFromHash
 		else
 			hash = event.dataTransfer.getData 'text/plain'
-			_paq.push(['trackEvent', 'Landingpage', 'LoadModelFromImage', hash]);
+			_paq.push ['trackEvent', 'Landingpage', 'LoadModelFromImage', hash]
 			modelCache.exists hash
 			.then -> loadFromHash hash
 			.catch -> bootbox.alert(
@@ -97,7 +97,7 @@ b1 = bundle1.init().then ->
 
 # set not available message
 $('#downloadButton').click ->
-	_paq.push(['trackEvent', 'Landingpage', 'ButtonClick', 'Download']);
+	_paq.push ['trackEvent', 'Landingpage', 'ButtonClick', 'Download']
 	bootbox.alert({
 		title: 'Not available'
 		message: 'This feature is not available yet - please check back later.<br>' +

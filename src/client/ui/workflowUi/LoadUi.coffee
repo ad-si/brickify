@@ -21,7 +21,7 @@ class LoadUi
 		files = event.target.files ? event.dataTransfer.files
 		@_checkReplaceModel().then (loadConfirmed) =>
 			return unless loadConfirmed
-			_paq.push(['trackEvent', 'Editor', 'LoadModel', files[0].name]);
+			_paq.push ['trackEvent', 'Editor', 'LoadModel', files[0].name]
 			spinnerOptions =
 				length: 5
 				radius: 3

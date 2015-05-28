@@ -56,11 +56,11 @@ class WorkflowUi
 					 Please check back later.'
 			})
 
-		$('#downloadPdfButton').click () ->
-			_paq.push(['trackEvent', 'Editor', 'ExportAction', 'DownloadPdfClick'])
+		$('#downloadPdfButton').click ->
+			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadPdfClick']
 			alertCallback()
-		$('#shareButton').click () ->
-			_paq.push(['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'])
+		$('#shareButton').click ->
+			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
 			alertCallback()
 
 	_initScrollbar: ->

@@ -13,4 +13,7 @@ module.exports.getImprint = (request, response) ->
 	response.render path.join('landingpage','imprint'), pageTitle: 'imprint'
 
 module.exports.getEducators = (request, response) ->
-	response.render path.join('landingpage','educators'), {page:'landing', pageTitle: 'educators'}
+	response.render(
+		path.join('landingpage','educators')
+		{page: 'landing', pageTitle: 'educators'}
+	)

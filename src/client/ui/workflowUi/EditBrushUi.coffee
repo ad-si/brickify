@@ -48,7 +48,7 @@ class EditBrushUi
 		# piwik select event
 		big = ''
 		big = 'Big' if @_bigBrushSelected
-		_paq.push(['trackEvent', 'Editor', 'BrushSelect', brush.containerId + big]);
+		_paq.push ['trackEvent', 'Editor', 'BrushSelect', brush.containerId + big]
 
 		#select new brush
 		@_selectedBrush = brush

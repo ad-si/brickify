@@ -71,7 +71,10 @@ class BrushHandler
 
 			brush = 'LegoBrush'
 			brush += 'Big' if @bigBrushSelected
-			_paq.push(['trackEvent', 'Editor', 'BrushAction',  brush, touchedVoxels.length])
+			_paq.push(
+				['trackEvent', 'Editor', 'BrushAction', brush,
+				touchedVoxels.length]
+			)
 
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"
@@ -130,10 +133,13 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
-		
+
 			brush = 'PrintBrush'
 			brush += 'Big' if @bigBrushSelected
-			_paq.push(['trackEvent', 'Editor', 'BrushAction',  brush, touchedVoxels.length])
+			_paq.push(
+				['trackEvent', 'Editor', 'BrushAction',  brush,
+				touchedVoxels.length]
+			)
 
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"

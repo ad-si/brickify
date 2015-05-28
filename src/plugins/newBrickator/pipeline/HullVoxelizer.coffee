@@ -4,23 +4,20 @@ module.exports = class Voxelizer
 	constructor: ->
 		@voxelGrid = null
 
-	addDefaults: (options) ->
+	_addDefaults: (options) ->
 		options.lineAccuracy ?= 16
 		options.outerAccuracy ?= 5
 
 	voxelize: (optimizedModel, options = {}, progressCallback) =>
-		@addDefaults options
+		@_addDefaults options
 		@setupGrid optimizedModel, options
 
 		lineStepSize = @voxelGrid.heightRatio / options.lineAccuracy
 		outerStepSize = @voxelGrid.heightRatio / options.outerAccuracy
 
-		@worker = @getWorker()
-
 		voxelSpaceModel = @_getVoxelSpaceModel optimizedModel
 
-		console.log JSON.stringify(voxelSpaceModel).length
-
+		@worker = @_getWorker()
 		@worker.voxelize voxelSpaceModel, lineStepSize, outerStepSize, (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
@@ -59,13 +56,13 @@ module.exports = class Voxelizer
 		@worker?.terminate()
 		@worker = null
 
-	getWorker: ->
+	_getWorker: ->
 		return operative {
 			voxelize: (model, lineStepSize, outerStepSize, progressCallback) ->
 				grid = []
-				@resetProgress()
-				@forEachPolygon model, (p0, p1, p2, direction) ->
-					@voxelizePolygon(
+				@_resetProgress()
+				@_forEachPolygon model, (p0, p1, p2, direction) ->
+					@_voxelizePolygon(
 						p0
 						p1
 						p2
@@ -77,7 +74,7 @@ module.exports = class Voxelizer
 					#@postProgress(i, length, progressCallback)
 				progressCallback state: 'finished', data: grid
 
-			voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->
+			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->
 				# transform model coordinates to voxel coordinates
 				# (object may be moved/rotated)
 
@@ -119,13 +116,13 @@ module.exports = class Voxelizer
 					p0 = @_interpolateLine shortSide1, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@voxelizeLine p0, p1, direction, lineStepSize, grid
+					@_voxelizeLine p0, p1, direction, lineStepSize, grid
 
 				for i in [0..1] by outerStepSize / shortSideLength2
 					p0 = @_interpolateLine shortSide2, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@voxelizeLine p0, p1, direction, lineStepSize, grid
+					@_voxelizeLine p0, p1, direction, lineStepSize, grid
 
 			_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
 				dx = x2 - x1
@@ -149,7 +146,7 @@ module.exports = class Voxelizer
 			# @param voxelData Object data to store in the voxel grid for each voxel
 			# @param stepSize Number the stepSize to use for sampling the line
 			###
-			voxelizeLine: (a, b, direction, stepSize, grid) ->
+			_voxelizeLine: (a, b, direction, stepSize, grid) ->
 				length = @_getLength a, b
 				dx = (b.x - a.x) / length * stepSize
 				dy = (b.y - a.y) / length * stepSize
@@ -160,23 +157,23 @@ module.exports = class Voxelizer
 
 				for i in [0..length] by stepSize
 					oldVoxel = currentVoxel
-					currentVoxel = @roundVoxelSpaceToVoxel currentGridPosition
+					currentVoxel = @_roundVoxelSpaceToVoxel currentGridPosition
 					if (oldVoxel.x != currentVoxel.x) or
 					(oldVoxel.y != currentVoxel.y) or
 					(oldVoxel.z != currentVoxel.z)
-						@setVoxel currentVoxel, direction, grid
+						@_setVoxel currentVoxel, direction, grid
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
 
-			roundVoxelSpaceToVoxel: ({x: x, y: y, z: z}) ->
+			_roundVoxelSpaceToVoxel: ({x: x, y: y, z: z}) ->
 				return {
 					x: Math.round x
 					y: Math.round y
 					z: Math.round z
 				}
 
-			setVoxel: ({x: x, y: y, z: z}, direction, grid) ->
+			_setVoxel: ({x: x, y: y, z: z}, direction, grid) ->
 				grid[x] ?= []
 				grid[x][y] ?= []
 				oldDirection = grid[x][y][z]
@@ -185,17 +182,17 @@ module.exports = class Voxelizer
 				else
 					grid[x][y][z] = direction
 
-			resetProgress: ->
+			_resetProgress: ->
 				@lastProgress = 0
 
-			postProgress: (current, max, callback) ->
+			_postProgress: (current, max, callback) ->
 				currentProgress = Math.round 100 * current / max
 				# only send progress updates in 1% steps
 				return unless currentProgress > @lastProgress
 				@lastProgress = currentProgress
 				callback state: 'progress', progress: currentProgress
 
-			forEachPolygon: (model, visitor) ->
+			_forEachPolygon: (model, visitor) ->
 				indices = model.indices
 				positions = model.positions
 				directions = model.directions

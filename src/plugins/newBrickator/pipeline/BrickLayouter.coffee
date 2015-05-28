@@ -14,7 +14,7 @@ class BrickLayouter
 
 	initializeBrickGraph: (grid) ->
 		grid.initializeBricks()
-		Promise.resolve grid
+		return Promise.resolve grid
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -33,12 +33,12 @@ class BrickLayouter
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 
-		Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
+		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
-				return {grid: grid}
+				return Promise.resolve {grid: grid}
 
 			numRandomChoices++
 			mergeableNeighbors = @_findMergeableNeighbors brick
@@ -66,7 +66,7 @@ class BrickLayouter
 
 				mergeableNeighbors = @_findMergeableNeighbors brick
 
-		Promise.resolve {grid: grid}
+		return Promise.resolve {grid: grid}
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This

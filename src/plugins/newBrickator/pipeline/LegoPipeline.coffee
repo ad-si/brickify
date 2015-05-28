@@ -109,7 +109,7 @@ module.exports = class LegoPipeline
 		else
 			log.debug "(Skipping step #{step.name})" if profiling
 			result = lastResult
-			Promise.resolve result
+			return Promise.resolve result
 
 	terminate: =>
 		return if @terminated

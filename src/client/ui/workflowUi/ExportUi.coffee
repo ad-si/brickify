@@ -40,10 +40,12 @@ class ExportUi
 
 	_updateStudRadius: =>
 		studSelection = parseInt @studSizeSelect.val()
+		@studRadiusSelection = @studSizeSelect.val()
 		@studRadius = @studSize.radius + studSelection * @exportStepSize
 
 	_updateHoleRadius: =>
 		holeSelection = parseInt @holeSizeSelect.val()
+		@holeRadiusSelection = @holeSizeSelect.val()
 		@holeRadius = @holeSize.radius + holeSelection * @exportStepSize
 
 

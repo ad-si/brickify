@@ -12,7 +12,7 @@ module.exports = class VolumeFiller
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				#@terminate()
+				@terminate()
 				newGrid = new Grid grid.spacing
 				newGrid.origin = grid.origin
 				newGrid.fromPojo message.data
@@ -37,15 +37,15 @@ module.exports = class VolumeFiller
 		@worker = null
 
 	getWorker: ->
-		return @worker if @worker?
 		return operative {
 			fillGrid: (grid, numVoxelsX, numVoxelsY, numVoxelsZ, callback) ->
+				@resetProgress()
 				for x, voxelPlane of grid
 					for y, voxelColumn of voxelPlane
 						x = parseInt x
 						y = parseInt y
 						@fillUp grid, x, y, numVoxelsZ
-						@updateProgress callback, x, y, numVoxelsX, numVoxelsY
+						@postProgress callback, x, y, numVoxelsX, numVoxelsY
 				callback state: 'finished', data: grid
 
 			fillUp: (grid, x, y, numVoxelsZ) ->
@@ -89,8 +89,14 @@ module.exports = class VolumeFiller
 				grid[x][y][z] ?= []
 				grid[x][y][z] = voxelData
 
-			updateProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
-				progress = ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY
+			resetProgress: ->
+				@lastProgress = 0
+
+			postProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
+				progress = Math.round(
+					100 * ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY)
+				return unless progress > @lastProgress
+				@lastProgress = progress
 				callback state: 'progress', progress: progress
 
 		}

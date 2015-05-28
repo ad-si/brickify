@@ -27,7 +27,7 @@ module.exports = class Voxelizer
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				#@terminate()
+				@terminate()
 				@voxelGrid.fromPojo message.data
 				@resolve grid: @voxelGrid
 
@@ -38,7 +38,6 @@ module.exports = class Voxelizer
 		@worker = null
 
 	getWorker: ->
-		return @worker if @worker?
 		return operative {
 			addPolygon: (p0, p1, p2, dZ) ->
 				@polygons ?= []
@@ -48,7 +47,7 @@ module.exports = class Voxelizer
 				grid = []
 				@resetProgress()
 				initialLength = @polygons.length
-				while @polygons.length > 1
+				while @polygons.length > 0
 					polygon = @polygons.pop()
 					@voxelizePolygon(
 						polygon.p0
@@ -59,7 +58,8 @@ module.exports = class Voxelizer
 						outerStepSize
 						grid
 					)
-					@postProgress initialLength - @polygons.length, initialLength, progressCallback
+					@postProgress(
+						initialLength - @polygons.length, initialLength, progressCallback)
 				progressCallback state: 'finished', data: grid
 
 			voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->
@@ -177,9 +177,9 @@ module.exports = class Voxelizer
 				@lastProgress = 0
 
 			postProgress: (current, max, callback) ->
-				currentProgress = current / max
-				# only send progress updates in ~1% steps
-				return unless currentProgress > @lastProgress + 0.01
+				currentProgress = Math.round 100 * current / max
+				# only send progress updates in 1% steps
+				return unless currentProgress > @lastProgress
 				@lastProgress = currentProgress
 				callback state: 'progress', progress: currentProgress
 		}

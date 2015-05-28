@@ -29,21 +29,21 @@ module.exports = class VolumeFiller
 		return @worker if @worker?
 		return operative {
 			fillGrid: (grid, callback) ->
-				numVoxelsX = grid.length
+				numVoxelsX = grid.length - 1
 				numVoxelsY = 0
 				numVoxelsZ = 0
 				for x, voxelPlane of grid
-					numVoxelsY = Math.max numVoxelsY, voxelPlane.length
+					numVoxelsY = Math.max numVoxelsY, voxelPlane.length - 1
 					for y, voxelColumn of voxelPlane
-						numVoxelsZ = Math.max numVoxelsZ, voxelColumn.length
+						numVoxelsZ = Math.max numVoxelsZ, voxelColumn.length - 1
 
 				@resetProgress()
 				for x, voxelPlane of grid
 					x = parseInt x
 					for y, voxelColumn of voxelPlane
 						y = parseInt y
-						@fillUp grid, x, y, numVoxelsZ
 						@postProgress callback, x, y, numVoxelsX, numVoxelsY
+						@fillUp grid, x, y, numVoxelsZ
 				callback state: 'finished', data: grid
 
 			fillUp: (grid, x, y, numVoxelsZ) ->
@@ -88,11 +88,11 @@ module.exports = class VolumeFiller
 				grid[x][y][z] = voxelData
 
 			resetProgress: ->
-				@lastProgress = 0
+				@lastProgress = -1
 
 			postProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
 				progress = Math.round(
-					100 * ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY)
+					100 * ((x - 1) * numVoxelsY + (y - 1)) / (numVoxelsX) / (numVoxelsY))
 				return unless progress > @lastProgress
 				@lastProgress = progress
 				callback state: 'progress', progress: progress

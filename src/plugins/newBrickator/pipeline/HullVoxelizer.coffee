@@ -183,7 +183,7 @@ module.exports = class Voxelizer
 					grid[x][y][z] = direction
 
 			_resetProgress: ->
-				@lastProgress = 0
+				@lastProgress = -1
 
 			_postProgress: (progressFloat, callback) ->
 				currentProgress = Math.round 100 * progressFloat

@@ -128,6 +128,19 @@ class Brick
 
 		return @_neighbors[direction]
 
+	getNeighborsXY: ->
+		neighbors = new Set()
+		@getNeighbors(Brick.direction.Xp).forEach (brick) ->
+			neighbors.add brick
+		@getNeighbors(Brick.direction.Xm).forEach (brick) ->
+			neighbors.add brick
+		@getNeighbors(Brick.direction.Yp).forEach (brick) ->
+			neighbors.add brick
+		@getNeighbors(Brick.direction.Ym).forEach (brick) ->
+			neighbors.add brick
+
+		return neighbors
+
 	# tells this brick to update cached neighbors indices
 	clearNeighborsCache: =>
 		@_neighbors = null

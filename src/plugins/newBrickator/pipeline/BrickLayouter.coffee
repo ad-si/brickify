@@ -21,11 +21,10 @@ class BrickLayouter
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
 	# !! Expects bricks to layout to be a Set !!
-	layoutByGreedyMerge: (grid, bricksToLayout) =>
+	layoutByGreedyMerge: (grid, bricksToLayout, useThreeLayers = true) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
-		useThreeLayers = true
 
 		if not bricksToLayout?
 			bricksToLayout = grid.getAllBricks()
@@ -87,7 +86,7 @@ class BrickLayouter
 	#
 	# @param {Set<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid) =>
+	splitBricksAndRelayoutLocally: (bricks, grid, useThreeLayers = true) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->
@@ -122,7 +121,7 @@ class BrickLayouter
 		bricksToBeDeleted.forEach (brick) ->
 			newBricks.delete brick
 
-		@layoutByGreedyMerge grid, newBricks
+		@layoutByGreedyMerge grid, newBricks, useThreeLayers
 
 		return {
 			removedBricks: bricksToSplit

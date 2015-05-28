@@ -23,6 +23,7 @@ class LegoInstructions
 			cam.up = new THREE.Vector3(0,0,1)
 
 			# enter build mode
+			oldVisualizationMode = @nodeVisualizer.getDisplayMode()
 			@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
 			.then (numLayers) =>
 				resultingFiles = []
@@ -34,9 +35,14 @@ class LegoInstructions
 					promiseChain = promiseChain.then (fileData) =>
 						resultingFiles.push fileData
 				
-				promiseChain.then =>
+				# save download
+				promiseChain = promiseChain.then =>
 					console.log 'Finished pdf instructions screenshots'
 					resolve resultingFiles
+
+				# reset display mode
+				promiseChain.then =>
+					@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
 
 	_createScreenshotOfLayer: (promiseChain, layer, cam) =>
 		return promiseChain.then () =>

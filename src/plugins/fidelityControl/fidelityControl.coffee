@@ -51,6 +51,15 @@ class FidelityControl
 		usePipeline = @bundle.globalConfig.rendering.usePipeline
 		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
 		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
+
+		capabilites = ''
+		capabilites += 'ExtFragDepth' if fragDepth?
+		capabilites += ' stencilBuffer' if stencilBuffer
+
+		_paq.push(
+			['setCustomVariable', 0, 'GpuCapabilities', capabilites, 'visit']
+		)
+
 		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 

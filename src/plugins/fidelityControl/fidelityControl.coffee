@@ -13,7 +13,7 @@ accumulationTime = 200
 timesBelowThreshold = 10
 fpsDisplayUpdateTime = 1000
 maxNoPipelineDecisions = 3
-
+piwikStatInterval = 20
 
 ###
 # @class FidelityControl
@@ -38,6 +38,8 @@ class FidelityControl
 
 		@accumulatedFrames = 0
 		@accumulatedTime = 0
+
+		@currentPiwikStat = 0
 
 		@timesBelowMinimumFps = 0
 
@@ -69,6 +71,18 @@ class FidelityControl
 			@accumulatedTime %= accumulationTime
 			@_adjustFidelity fps
 			@_showFps timestamp, fps
+
+			@currentPiwikStat++
+			if @currentPiwikStat > piwikStatInterval
+				@_sendFpsStats(fps)
+				@currentPiwikStat = 0
+
+	_sendFpsStats: (fps) =>
+		_paq.push(
+				['trackEvent', 'FidelityControl', 'FpsAverage', 
+				FidelityControl.fidelityLevels[@currentFidelityLevel],
+				fps]
+		)
 
 	_adjustFidelity: (fps) =>
 		return unless @autoAdjust

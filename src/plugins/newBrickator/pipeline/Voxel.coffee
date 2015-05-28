@@ -25,7 +25,7 @@ class Voxel
 
 	setDirection: (direction) ->
 		if @direction
-			@direction = 0 unless @direction = direction
+			@direction = 0 unless @direction is direction
 		else
 			@direction = direction
 

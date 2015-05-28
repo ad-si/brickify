@@ -18,7 +18,11 @@ module.exports = class LegoPipeline
 			name: 'Hull voxelizing'
 			decision: (options) -> return options.voxelizing
 			worker: (lastResult, options, progressCallback) =>
-				return @voxelizer.voxelize lastResult.optimizedModel, options
+				return @voxelizer.voxelize(
+					lastResult.optimizedModel
+					options
+					progressCallback
+				)
 
 		@pipelineSteps.push
 			name: 'Volume filling'

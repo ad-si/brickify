@@ -284,10 +284,10 @@ module.exports = class Grid
 
 	fromPojo: (pojo) ->
 		for x, voxelPlane of pojo
+			x = parseInt x
 			for y, voxelColumn of voxelPlane
+				y = parseInt y
 				for z, direction of voxelColumn
-					x = parseInt x
-					y = parseInt y
 					z = parseInt z
 					@setVoxel x: x, y: y, z: z, direction
 

@@ -12,11 +12,11 @@ module.exports = class VolumeFiller
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				@terminate()
+				#@terminate()
 				newGrid = new Grid grid.spacing
 				newGrid.origin = grid.origin
 				newGrid.fromPojo message.data
-				@resolve newGrid
+				@resolve grid: newGrid
 
 		numVoxelsX = grid.getNumVoxelsX()
 		numVoxelsY = grid.getNumVoxelsY()
@@ -37,6 +37,7 @@ module.exports = class VolumeFiller
 		@worker = null
 
 	getWorker: ->
+		return @worker if @worker?
 		return operative {
 			fillGrid: (grid, numVoxelsX, numVoxelsY, numVoxelsZ, callback) ->
 				for x, voxelPlane of grid
@@ -61,7 +62,7 @@ module.exports = class VolumeFiller
 						if dir > 0
 							#fill up voxels and leave model
 							for v in currentFillVoxelQueue
-								@setVoxel grid, v, {inside: true}
+								@setVoxel grid, v, 0
 							insideModel = false
 						else if dir < 0
 							# re-entering model if inside? that seems odd. empty current fill queue
@@ -72,7 +73,7 @@ module.exports = class VolumeFiller
 						else
 							#if not sure, fill up (precautious people might leave this out?)
 							for v in currentFillVoxelQueue
-								@setVoxel grid, v, {inside: true}
+								@setVoxel grid, v, 0
 							currentFillVoxelQueue = []
 
 							insideModel = false
@@ -86,7 +87,7 @@ module.exports = class VolumeFiller
 				grid[x] ?= []
 				grid[x][y] ?= []
 				grid[x][y][z] ?= []
-				grid[x][y][z].push voxelData
+				grid[x][y][z] = voxelData
 
 			updateProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
 				progress = ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY

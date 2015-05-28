@@ -22,10 +22,13 @@ module.exports = class Voxelizer
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				@terminate()
 				@resolve grid: @voxelGrid, gridPOJO: message.data
 
 		return new Promise (@resolve, reject) => return
+
+	terminate: =>
+		@worker?.terminate()
+		@worker = null
 
 	_getVoxelSpaceModel: (optimizedModel) =>
 		positions = optimizedModel.positions
@@ -52,11 +55,8 @@ module.exports = class Voxelizer
 			directions: directions
 		}
 
-	terminate: =>
-		@worker?.terminate()
-		@worker = null
-
 	_getWorker: ->
+		return @worker if @worker?
 		return operative {
 			voxelize: (model, lineStepSize, outerStepSize, progressCallback) ->
 				grid = []

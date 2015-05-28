@@ -10,7 +10,6 @@ module.exports = class VolumeFiller
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				@terminate()
 				grid.fromPojo message.data
 				@resolve grid: grid
 

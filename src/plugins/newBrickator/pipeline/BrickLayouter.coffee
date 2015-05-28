@@ -60,22 +60,15 @@ class BrickLayouter
 				console.log 'TO BE MERGED'
 				if mergeIndex >= 4
 					console.log 'into size', brick.getSize().x, brick.getSize().y, 3
-				console.log '(size, pos)',
-					brick.getSize().x, brick.getSize().y, brick.getSize().z, '-',
-					brick.getPosition().x, brick.getPosition().y, brick.getPosition().z
+				brick.debugLog()
 				neighborsToMergeWith.forEach (fBrick) ->
-					console.log '(size, pos)',
-						fBrick.getSize().x, fBrick.getSize().y, fBrick.getSize().z, '-',
-						fBrick.getPosition().x, fBrick.getPosition().y,
-						fBrick.getPosition().z
+					fBrick.debugLog()
 
 				@_mergeBricksAndUpdateGraphConnections brick,
 					neighborsToMergeWith, bricksToLayout
 
 				console.log 'NEW BRICK', mergeIndex
-				console.log '(size, pos)',
-					brick.getSize().x, brick.getSize().y, brick.getSize().z, '-',
-					brick.getPosition().x, brick.getPosition().y, brick.getPosition().z
+				brick.debugLog()
 				console.log brick.isValid()
 				console.log '  '
 

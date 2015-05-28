@@ -22,6 +22,17 @@ module.exports = class DownloadProvider
 			holeRadius: @exportUi.holeRadius
 		}
 
+		if (fileType == 'stl')
+			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadStlClick']
+			_paq.push(
+				['trackEvent', 'Editor', 'ExportAction', 'StudRadius',
+				downloadOptions.studRadius]
+			)
+			_paq.push(
+				['trackEvent', 'Editor', 'ExportAction', 'HoleRadius',
+				downloadOptions.holeRadius]
+			)
+
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
 
 		Promise.all(promisesArray).then (resultsArray) =>

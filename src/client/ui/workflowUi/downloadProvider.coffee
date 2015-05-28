@@ -3,7 +3,7 @@ modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
 JSZip = require 'jszip'
 log = require 'loglevel'
-
+Spinner = require '../../Spinner'
 
 module.exports = class DownloadProvider
 	constructor: (@bundle) ->
@@ -14,13 +14,23 @@ module.exports = class DownloadProvider
 		@stljQueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
-				@_createDownload 'stl', selNode
+				Spinner.startOverlay @stljQueryObject[0]
+				@stljQueryObject.addClass 'disabled'
+				window.setTimeout(
+					=> @_createDownload 'stl', selNode
+					20
+				)
 
 		@pdfjQueryObject = $(pdfButtonId)
 		@pdfjQueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
-				@_createDownload 'pdf', selNode
+				Spinner.startOverlay @pdfjQueryObject[0]
+				@pdfjQueryObject.addClass 'disabled'
+				window.setTimeout(
+					=> @_createDownload 'pdf', selNode
+					20
+				)
 
 	_createDownload: (fileType, selectedNode) =>
 		downloadOptions = {
@@ -33,6 +43,14 @@ module.exports = class DownloadProvider
 
 		Promise.all(promisesArray).then (resultsArray) =>
 			files = @_collectFiles resultsArray
+
+			# Stop showing spinner
+			if (fileType == 'pdf')
+				Spinner.stop @pdfjQueryObject[0]
+				@pdfjQueryObject.removeClass 'disabled'
+			else
+				Spinner.stop @stljQueryObject[0]
+				@stljQueryObject.removeClass 'disabled'
 
 			if files.length is 0
 				bootbox.alert(

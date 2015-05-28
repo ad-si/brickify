@@ -45,7 +45,8 @@ module.exports = class Voxelizer
 				@polygons.push p0: p0, p1: p1, p2: p2, dZ: dZ
 
 			voxelize: (lineStepSize, outerStepSize, progressCallback) ->
-				@grid = []
+				grid = []
+				@resetProgress()
 				initialLength = @polygons.length
 				while @polygons.length > 1
 					polygon = @polygons.pop()
@@ -56,12 +57,12 @@ module.exports = class Voxelizer
 						polygon.dZ
 						lineStepSize
 						outerStepSize
+						grid
 					)
-					progress = 1 - @polygons.length / initialLength
-					progressCallback state: 'progress', progress: progress
-				progressCallback state: 'finished', data: @grid
+					@postProgress initialLength - @polygons.length, initialLength, progressCallback
+				progressCallback state: 'finished', data: grid
 
-			voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize) ->
+			voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->
 				# transform model coordinates to voxel coordinates
 				# (object may be moved/rotated)
 
@@ -103,13 +104,13 @@ module.exports = class Voxelizer
 					p0 = @_interpolateLine shortSide1, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@voxelizeLine p0, p1, direction, lineStepSize
+					@voxelizeLine p0, p1, direction, lineStepSize, grid
 
 				for i in [0..1] by outerStepSize / shortSideLength2
 					p0 = @_interpolateLine shortSide2, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@voxelizeLine p0, p1, direction, lineStepSize
+					@voxelizeLine p0, p1, direction, lineStepSize, grid
 
 			_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
 				dx = x2 - x1
@@ -136,7 +137,7 @@ module.exports = class Voxelizer
 			# @param voxelData Object data to store in the voxel grid for each voxel
 			# @param stepSize Number the stepSize to use for sampling the line
 			###
-			voxelizeLine: (a, b, direction, stepSize) ->
+			voxelizeLine: (a, b, direction, stepSize, grid) ->
 				length = @_getLength a, b
 				dx = (b.x - a.x) / length * stepSize
 				dy = (b.y - a.y) / length * stepSize
@@ -151,7 +152,7 @@ module.exports = class Voxelizer
 					if (oldVoxel.x != currentVoxel.x) or
 					(oldVoxel.y != currentVoxel.y) or
 					(oldVoxel.z != currentVoxel.z)
-						@setVoxel currentVoxel, direction
+						@setVoxel currentVoxel, direction, grid
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
@@ -163,14 +164,24 @@ module.exports = class Voxelizer
 					z: Math.round z
 				}
 
-			setVoxel: ({x: x, y: y, z: z}, direction) ->
-				@grid[x] ?= []
-				@grid[x][y] ?= []
-				oldDirection = @grid[x][y][z]
+			setVoxel: ({x: x, y: y, z: z}, direction, grid) ->
+				grid[x] ?= []
+				grid[x][y] ?= []
+				oldDirection = grid[x][y][z]
 				if oldDirection?
-					@grid[x][y][z] = 0 unless oldDirection is direction
+					grid[x][y][z] = 0 unless oldDirection is direction
 				else
-					@grid[x][y][z] = direction
+					grid[x][y][z] = direction
+
+			resetProgress: ->
+				@lastProgress = 0
+
+			postProgress: (current, max, callback) ->
+				currentProgress = current / max
+				# only send progress updates in ~1% steps
+				return unless currentProgress > @lastProgress + 0.01
+				@lastProgress = currentProgress
+				callback state: 'progress', progress: currentProgress
 		}
 
 	setupGrid: (optimizedModel, options) ->

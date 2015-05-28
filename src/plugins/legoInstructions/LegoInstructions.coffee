@@ -39,6 +39,12 @@ class LegoInstructions
 				# save download
 				promiseChain = promiseChain.then =>
 					log.debug 'Finished pdf instructions screenshots'
+
+					resultingFiles.push({
+						fileName: "LEGO Assembly instructions.html"
+						data: @_createHtml(numLayers)
+					})
+
 					resolve resultingFiles
 
 				# reset display mode
@@ -114,4 +120,20 @@ class LegoInstructions
 				newImage[newCoords + 3] = renderedImage.pixels[oldCoords + 3]
 
 		return newImage
+
+	_createHtml: (numLayers) ->
+		style = '<style>img{width: 100%}h1,h3{font-family:Helvetica, Arial, sans-serif;}</style>'
+
+		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
+		html += '<html><head><title>LEGO assembly instructions</title></head><body><h1>Build instructions</h1>'
+		html += style
+
+		for i in [1..numLayers]
+			html += '<br>'
+			html += '<h3> Layer ' + i + '</h3>'
+			html += '<p><img src="LEGO%20assembly%20instructions%20' + i + '.png"></p>'
+
+		html += '</body></html>'
+		return html
+
 module.exports = LegoInstructions

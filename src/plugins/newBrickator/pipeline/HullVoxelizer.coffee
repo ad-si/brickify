@@ -61,7 +61,7 @@ module.exports = class Voxelizer
 			voxelize: (model, lineStepSize, outerStepSize, progressCallback) ->
 				grid = []
 				@_resetProgress()
-				@_forEachPolygon model, (p0, p1, p2, direction) ->
+				@_forEachPolygon model, (p0, p1, p2, direction, progress) ->
 					@_voxelizePolygon(
 						p0
 						p1
@@ -71,7 +71,7 @@ module.exports = class Voxelizer
 						outerStepSize
 						grid
 					)
-					#@postProgress(i, length, progressCallback)
+					@_postProgress(progress, progressCallback)
 				progressCallback state: 'finished', data: grid
 
 			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->
@@ -185,8 +185,8 @@ module.exports = class Voxelizer
 			_resetProgress: ->
 				@lastProgress = 0
 
-			_postProgress: (current, max, callback) ->
-				currentProgress = Math.round 100 * current / max
+			_postProgress: (progressFloat, callback) ->
+				currentProgress = Math.round 100 * progressFloat
 				# only send progress updates in 1% steps
 				return unless currentProgress > @lastProgress
 				@lastProgress = currentProgress
@@ -196,7 +196,8 @@ module.exports = class Voxelizer
 				indices = model.indices
 				positions = model.positions
 				directions = model.directions
-				for i in [0...directions.length]
+				length = directions.length
+				for i in [0...length]
 					i3 = i * 3
 					p0 = {
 						x: positions[indices[i3] * 3]
@@ -215,7 +216,7 @@ module.exports = class Voxelizer
 					}
 					direction = directions[i]
 
-					visitor p0, p1, p2, direction
+					visitor p0, p1, p2, direction, i / length
 		}
 
 	_getTolerantDirection: (dZ, tolerance = 0.1) ->

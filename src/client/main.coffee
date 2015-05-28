@@ -13,10 +13,12 @@ globalConfig = require '../common/globals.yaml'
 
 if process.env.NODE_ENV is 'development'
 	log.enableAll()
-
+else
+	log.setLevel 'warn'
 
 commandFunctions = {
 	initialModel: (value) ->
+		_paq.push ['trackEvent', 'Editor', 'Start', 'WithInitialModel']
 		# load selected model
 		log.debug 'loading initial model'
 		p = /^[0-9a-z]{32}/
@@ -39,6 +41,9 @@ postInitCallback = ->
 		value = cmd.split('=')[1]
 		if commandFunctions[key]?
 			prom = prom.then runCmd key, value
+
+	if commands.length == 0
+		_paq.push ['trackEvent', 'Editor', 'Start', 'WithoutInitialModel']
 
 	#clear url hash after executing commands
 	window.location.hash = ''

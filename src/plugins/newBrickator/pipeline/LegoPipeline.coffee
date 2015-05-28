@@ -28,7 +28,12 @@ module.exports = class LegoPipeline
 			name: 'Volume filling'
 			decision: (options) -> return options.voxelizing
 			worker: (lastResult, options, progressCallback) =>
-				return @volumeFiller.fillGrid lastResult.grid, options, progressCallback
+				return @volumeFiller.fillGrid(
+					lastResult.grid
+					lastResult.gridPOJO
+					options
+					progressCallback
+				)
 
 		@pipelineSteps.push
 			name: 'Layout graph initialization'

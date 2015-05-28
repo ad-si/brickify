@@ -1,32 +1,22 @@
 Grid = require './Grid'
 
 module.exports = class VolumeFiller
-	fillGrid: (grid, options, progressCallback) ->
+	fillGrid: (grid, gridPOJO, options, progressCallback) ->
 		# fills spaces in the grid. Goes up from z=0 to z=max and looks for
 		# voxels facing downwards (start filling), stops when it sees voxels
 		# facing upwards
-
-		gridPOJO = grid.toPOJO()
 
 		callback = (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
-				@terminate()
-				newGrid = new Grid grid.spacing
-				newGrid.origin = grid.origin
-				newGrid.fromPojo message.data
-				@resolve grid: newGrid
+				#@terminate()
+				grid.fromPojo message.data
+				@resolve grid: grid
 
-		numVoxelsX = grid.getNumVoxelsX()
-		numVoxelsY = grid.getNumVoxelsY()
-		numVoxelsZ = grid.getNumVoxelsZ()
 		@worker = @getWorker()
 		@worker.fillGrid(
 			gridPOJO
-			numVoxelsX
-			numVoxelsY
-			numVoxelsZ
 			callback
 		)
 
@@ -37,12 +27,21 @@ module.exports = class VolumeFiller
 		@worker = null
 
 	getWorker: ->
+		return @worker if @worker?
 		return operative {
-			fillGrid: (grid, numVoxelsX, numVoxelsY, numVoxelsZ, callback) ->
+			fillGrid: (grid, callback) ->
+				numVoxelsX = grid.length
+				numVoxelsY = 0
+				numVoxelsZ = 0
+				for x, voxelPlane of grid
+					numVoxelsY = Math.max numVoxelsY, voxelPlane.length
+					for y, voxelColumn of voxelPlane
+						numVoxelsZ = Math.max numVoxelsZ, voxelColumn.length
+
 				@resetProgress()
 				for x, voxelPlane of grid
+					x = parseInt x
 					for y, voxelColumn of voxelPlane
-						x = parseInt x
 						y = parseInt y
 						@fillUp grid, x, y, numVoxelsZ
 						@postProgress callback, x, y, numVoxelsX, numVoxelsY
@@ -54,7 +53,7 @@ module.exports = class VolumeFiller
 				z = 0
 				currentFillVoxelQueue = []
 
-				while z < numVoxelsZ
+				while z <= numVoxelsZ
 					if grid[x][y][z]?
 						# current voxel already exists (shell voxel)
 						dir = grid[x][y][z]

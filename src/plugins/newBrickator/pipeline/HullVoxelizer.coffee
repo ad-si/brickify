@@ -29,8 +29,7 @@ module.exports = class Voxelizer
 				progressCallback message.progress
 			else # if state is 'finished'
 				@terminate()
-				@voxelGrid.fromPojo message.data
-				@resolve grid: @voxelGrid
+				@resolve grid: @voxelGrid, gridPOJO: message.data
 
 		return new Promise (@resolve, reject) => return
 

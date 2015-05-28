@@ -17,13 +17,14 @@ module.exports = class Voxelizer
 
 		@worker = @getWorker()
 
+		voxelSpacePolygons = []
 		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
 			p0 = @voxelGrid.mapModelToVoxelSpace p0
 			p1 = @voxelGrid.mapModelToVoxelSpace p1
 			p2 = @voxelGrid.mapModelToVoxelSpace p2
-			@worker.addPolygon p0, p1, p2, n.z
+			voxelSpacePolygons.push p0: p0, p1: p1, p2: p2, dZ: n.z
 
-		@worker.voxelize lineStepSize, outerStepSize, (message) =>
+		@worker.voxelize voxelSpacePolygons, lineStepSize, outerStepSize, (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
@@ -39,16 +40,12 @@ module.exports = class Voxelizer
 
 	getWorker: ->
 		return operative {
-			addPolygon: (p0, p1, p2, dZ) ->
-				@polygons ?= []
-				@polygons.push p0: p0, p1: p1, p2: p2, dZ: dZ
-
-			voxelize: (lineStepSize, outerStepSize, progressCallback) ->
+			voxelize: (polygons, lineStepSize, outerStepSize, progressCallback) ->
 				grid = []
 				@resetProgress()
-				initialLength = @polygons.length
-				while @polygons.length > 0
-					polygon = @polygons.pop()
+				length = polygons.length
+				for i in [0...length] by 1
+					polygon = polygons[i]
 					@voxelizePolygon(
 						polygon.p0
 						polygon.p1
@@ -58,8 +55,7 @@ module.exports = class Voxelizer
 						outerStepSize
 						grid
 					)
-					@postProgress(
-						initialLength - @polygons.length, initialLength, progressCallback)
+					@postProgress(i, length, progressCallback)
 				progressCallback state: 'finished', data: grid
 
 			voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, outerStepSize, grid) ->

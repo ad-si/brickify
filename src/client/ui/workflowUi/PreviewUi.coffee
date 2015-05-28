@@ -47,6 +47,7 @@ class PreviewUi
 			@editController.disableInteraction()
 			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
 		else
+			_paq.push(['trackEvent', 'Editor', 'PreviewAction', 'StabilityView'])
 			@editController.enableInteraction()
 
 	_initAssemblyView: =>
@@ -67,6 +68,7 @@ class PreviewUi
 		@_quitStabilityView()
 
 		if @assemblyViewEnabled
+			_paq.push(['trackEvent', 'Editor', 'PreviewAction', 'AssemblyView'])
 			@workflowUi.enableOnly @
 		else
 			@workflowUi.enableAll()

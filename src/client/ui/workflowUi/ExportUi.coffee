@@ -17,6 +17,7 @@ class ExportUi
 
 		#show modal when clicking on download button
 		@downloadButton.click =>
+			_paq.push(['trackEvent', 'Editor', 'ExportAction', 'DownloadButtonClick'])
 			@downloadModal.modal 'show'
 
 	_initDownloadModalContent: =>

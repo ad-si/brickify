@@ -12,7 +12,9 @@ class LegoInstructions
 
 	onNodeDeselect: => @selectedNode = null
 
-	getDownload: (downloadOptions, selectedNode) =>
+	getDownload: (selectedNode, downloadOptions) =>
+		return null if downloadOptions.fileType != 'pdf'
+
 		return new Promise (resolve, reject) =>
 			log.debug 'Creating pdf instructions...'
 
@@ -37,7 +39,7 @@ class LegoInstructions
 				
 				# save download
 				promiseChain = promiseChain.then =>
-					console.log 'Finished pdf instructions screenshots'
+					log.debug 'Finished pdf instructions screenshots'
 					resolve resultingFiles
 
 				# reset display mode
@@ -48,7 +50,7 @@ class LegoInstructions
 		return promiseChain.then () =>
 			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
 			.then =>
-				console.log 'create screenshot of layer',layer
+				log.debug 'create screenshot of layer',layer
 				@renderer.renderToImage(cam)
 				.then (pixelData) =>
 					pixelData.pixels = @_flipAndFitImage pixelData

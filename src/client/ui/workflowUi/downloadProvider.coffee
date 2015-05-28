@@ -9,13 +9,18 @@ module.exports = class DownloadProvider
 	constructor: (@bundle) ->
 		return
 
-	init: (jqueryString, @exportUi, @sceneManager) =>
-		@jqueryObject = $(jqueryString)
-
-		@jqueryObject.on 'click', =>
+	init: (stlButtonId, pdfButtonId, @exportUi, @sceneManager) =>
+		@stljQueryObject = $(stlButtonId)
+		@stljQueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
 				@_createDownload 'stl', selNode
+
+		@pdfjQueryObject = $(pdfButtonId)
+		@pdfjQueryObject.on 'click', =>
+			selNode = @sceneManager.selectedNode
+			if selNode?
+				@_createDownload 'pdf', selNode
 
 	_createDownload: (fileType, selectedNode) =>
 		downloadOptions = {
@@ -52,11 +57,12 @@ module.exports = class DownloadProvider
 					for result in resultsArray
 						zip.file result.fileName, result.data, options
 					zipFile = zip.generate type: 'blob'
-					saveAs zipFile, "brickify-#{selectedNode.name}.zip"
+					saveAs zipFile, "brickify-#{selectedNode.name}-#{fileType}.zip"
 
 	_collectFiles: (array) ->
 		files = []
 		for entry in array
+			continue if not entry?
 			if Array.isArray entry
 				for subEntry in entry
 					if subEntry.fileName.length > 0

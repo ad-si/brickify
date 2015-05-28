@@ -56,7 +56,6 @@ class WorkflowUi
 					 Please check back later.'
 			})
 
-		$('#downloadPdfButton').click alertCallback
 		$('#shareButton').click alertCallback
 
 	_initScrollbar: ->

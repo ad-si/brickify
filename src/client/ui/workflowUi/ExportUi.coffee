@@ -23,7 +23,7 @@ class ExportUi
 		# stl download
 		@downloadProvider = new DownloadProvider @workflowUi.bundle
 		@downloadProvider.init(
-			'#stlDownloadButton', @, @workflowUi.bundle.sceneManager
+			'#stlDownloadButton', '#downloadPdfButton', @, @workflowUi.bundle.sceneManager
 		)
 
 		@studSizeSelect = $('#studSizeSelect')

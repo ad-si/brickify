@@ -54,10 +54,11 @@ class Renderer
 			width = @imageRenderTarget.renderTarget.width
 			height = @imageRenderTarget.renderTarget.height
 
-			pixels = new Uint8Array(width * height * 4);
+			pixels = new Uint8Array(width * height * 4)
 
 			# fix three inconsistency on current depthTarget dev branch
-			@imageRenderTarget.renderTarget.format = @imageRenderTarget.renderTarget.texture.format
+			rt = @imageRenderTarget.renderTarget
+			rt.format = rt.texture.format
 
 			@threeRenderer.readRenderTargetPixels(
 				@imageRenderTarget.renderTarget, 0, 0,

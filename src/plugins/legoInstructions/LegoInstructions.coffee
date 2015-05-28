@@ -18,7 +18,9 @@ class LegoInstructions
 			log.debug 'Creating pdf instructions...'
 
 			# pseudoisometric
-			cam = new THREE.PerspectiveCamera(@renderer.camera.fov, @renderer.camera.aspect, 1, 1000)
+			cam = new THREE.PerspectiveCamera(
+				@renderer.camera.fov, @renderer.camera.aspect, 1, 1000
+			)
 			cam.position.set(100,100,100)
 			cam.lookAt(new THREE.Vector3(0,0,0))
 			cam.up = new THREE.Vector3(0,0,1)
@@ -35,13 +37,13 @@ class LegoInstructions
 					promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
 					promiseChain = promiseChain.then (fileData) =>
 						resultingFiles.push fileData
-				
+
 				# save download
 				promiseChain = promiseChain.then =>
 					log.debug 'Finished pdf instructions screenshots'
 
 					resultingFiles.push({
-						fileName: "LEGO Assembly instructions.html"
+						fileName: 'LEGO Assembly instructions.html'
 						data: @_createHtml(numLayers)
 					})
 
@@ -52,7 +54,7 @@ class LegoInstructions
 					@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
 
 	_createScreenshotOfLayer: (promiseChain, layer, cam) =>
-		return promiseChain.then () =>
+		return promiseChain.then =>
 			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
 			.then =>
 				log.debug 'create screenshot of layer',layer
@@ -68,7 +70,9 @@ class LegoInstructions
 
 	_convertToPng: (renderedImage) ->
 		return new Promise (resolve, reject) ->
-			png = new PNG({width: renderedImage.viewWidth, height: renderedImage.viewHeight})
+			png = new PNG({
+				width: renderedImage.viewWidth, height: renderedImage.viewHeight
+			})
 			for i in [0...renderedImage.pixels.length]
 				png.data[i] = renderedImage.pixels[i]
 			png.pack()
@@ -113,7 +117,7 @@ class LegoInstructions
 				newCoords *= 4
 				oldCoords =  (oldY * iw) + Math.round(x * scaleX)
 				oldCoords *= 4
-				
+
 				newImage[newCoords] = renderedImage.pixels[oldCoords]
 				newImage[newCoords + 1] = renderedImage.pixels[oldCoords + 1]
 				newImage[newCoords + 2] = renderedImage.pixels[oldCoords + 2]
@@ -122,10 +126,15 @@ class LegoInstructions
 		return newImage
 
 	_createHtml: (numLayers) ->
-		style = '<style>img{width: 100%}h1,h3{font-family:Helvetica, Arial, sans-serif;}</style>'
+		style = '<style>
+		img{width: 100%}h1,h3{font-family:Helvetica, Arial, sans-serif;}
+		</style>'
 
-		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
-		html += '<html><head><title>LEGO assembly instructions</title></head><body><h1>Build instructions</h1>'
+		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+		"http://www.w3.org/TR/html4/strict.dtd">'
+		html += '<html><head>
+		<title>LEGO assembly instructions</title>
+		</head><body><h1>Build instructions</h1>'
 		html += style
 
 		for i in [1..numLayers]

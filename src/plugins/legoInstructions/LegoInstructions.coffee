@@ -1,21 +1,57 @@
 PNG = require('node-png').PNG
 streamToArray = require 'stream-to-array'
+THREE = require 'three'
+log = require 'loglevel'
 
 class LegoInstructions
 	init: (bundle) ->
 		@renderer = bundle.renderer
+		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
+
+	onNodeSelect: (@selectedNode) => return
+
+	onNodeDeselect: => @selectedNode = null
 
 	getDownload: (downloadOptions, selectedNode) =>
 		return new Promise (resolve, reject) =>
-			@renderer.renderToImage()
-			.then (pixelData) =>
-				pixelData.pixels = @_flipAndFitImage pixelData
-				@_convertToPng(pixelData)
-				.then (pngData) =>
-					resolve({
-						fileName: 'LEGO assembly instructions.png'
-						data: pngData.buffer
-					})
+			log.debug 'Creating pdf instructions...'
+
+			# pseudoisometric
+			cam = new THREE.PerspectiveCamera(@renderer.camera.fov, @renderer.camera.aspect, 1, 1000)
+			cam.position.set(100,100,100)
+			cam.lookAt(new THREE.Vector3(0,0,0))
+			cam.up = new THREE.Vector3(0,0,1)
+
+			# enter build mode
+			@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
+			.then (numLayers) =>
+				resultingFiles = []
+
+				# screenshot of each layer
+				promiseChain = Promise.resolve()
+				for layer in [1..numLayers]
+					promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
+					promiseChain = promiseChain.then (fileData) =>
+						resultingFiles.push fileData
+				
+				promiseChain.then =>
+					console.log 'Finished pdf instructions screenshots'
+					resolve resultingFiles
+
+	_createScreenshotOfLayer: (promiseChain, layer, cam) =>
+		return promiseChain.then () =>
+			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
+			.then =>
+				console.log 'create screenshot of layer',layer
+				@renderer.renderToImage(cam)
+				.then (pixelData) =>
+					pixelData.pixels = @_flipAndFitImage pixelData
+					@_convertToPng(pixelData)
+					.then (pngData) =>
+						return ({
+							fileName: "LEGO assembly instructions #{layer}.png"
+							data: pngData.buffer
+						})
 
 	_convertToPng: (renderedImage) ->
 		return new Promise (resolve, reject) ->

@@ -6,6 +6,7 @@
 ###
 
 $ = require 'jquery'
+piwikTracking = require '../../client/piwikTracking'
 
 minimalAcceptableFps = 20
 upgradeThresholdFps = 40
@@ -56,9 +57,7 @@ class FidelityControl
 		capabilites += 'ExtFragDepth' if fragDepth?
 		capabilites += ' stencilBuffer' if stencilBuffer
 
-		_paq.push(
-			['setCustomVariable', 0, 'GpuCapabilities', capabilites, 'visit']
-		)
+		piwikTracking.setCustomSessionVariable 0, 'GpuCapabilities', capabilites
 
 		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
@@ -87,10 +86,10 @@ class FidelityControl
 				@currentPiwikStat = 0
 
 	_sendFpsStats: (fps) =>
-		_paq.push(
-				['trackEvent', 'FidelityControl', 'FpsAverage', 
-				FidelityControl.fidelityLevels[@currentFidelityLevel],
-				fps]
+		piwikTracking.trackEvent(
+			'FidelityControl', 'FpsAverage', 
+			FidelityControl.fidelityLevels[@currentFidelityLevel],
+			fps
 		)
 
 	_adjustFidelity: (fps) =>

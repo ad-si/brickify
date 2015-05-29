@@ -1,4 +1,5 @@
 perfectScrollbar = require 'perfect-scrollbar'
+piwikTracking = require '../../piwikTracking'
 
 LoadUi = require './LoadUi'
 EditUi = require './EditUi'
@@ -57,10 +58,10 @@ class WorkflowUi
 			})
 
 		$('#downloadPdfButton').click ->
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadPdfClick']
+			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadPdfClick'
 			alertCallback()
 		$('#shareButton').click ->
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
+			piwikTracking.trackEvent 'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
 			alertCallback()
 
 	_initScrollbar: ->

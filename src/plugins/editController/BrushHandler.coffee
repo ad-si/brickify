@@ -124,7 +124,9 @@ class BrushHandler
 
 			brush = 'PrintBrush'
 			brush += 'Big' if @bigBrushSelected
-			piwikTracking.trackEvent 'Editor', 'BrushAction',  brush, touchedVoxels.length
+			piwikTracking.trackEvent(
+				'Editor', 'BrushAction',  brush, touchedVoxels.length
+			)
 
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"

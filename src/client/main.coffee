@@ -19,7 +19,9 @@ else
 
 commandFunctions = {
 	initialModel: (value) ->
-		piwikTracking.trackEvent 'trackEvent', 'Editor', 'StartWithInitialModel', value
+		piwikTracking.trackEvent(
+			'trackEvent', 'Editor', 'StartWithInitialModel', value
+		)
 		# load selected model
 		log.debug 'loading initial model'
 		p = /^[0-9a-z]{32}/

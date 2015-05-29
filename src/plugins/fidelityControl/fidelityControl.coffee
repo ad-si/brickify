@@ -87,7 +87,7 @@ class FidelityControl
 
 	_sendFpsStats: (fps) =>
 		piwikTracking.trackEvent(
-			'FidelityControl', 'FpsAverage', 
+			'FidelityControl', 'FpsAverage',
 			FidelityControl.fidelityLevels[@currentFidelityLevel],
 			fps
 		)

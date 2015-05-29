@@ -61,7 +61,9 @@ class WorkflowUi
 			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadPdfClick'
 			alertCallback()
 		$('#shareButton').click ->
-			piwikTracking.trackEvent 'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
+			piwikTracking.trackEvent(
+				'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
+			)
 			alertCallback()
 
 	_initScrollbar: ->

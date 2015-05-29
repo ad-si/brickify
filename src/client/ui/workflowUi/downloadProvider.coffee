@@ -25,8 +25,12 @@ module.exports = class DownloadProvider
 
 		if (fileType == 'stl')
 			piwikTracking.trackEvent 'EditorExport', 'DownloadStlClick'
-			piwikTracking.trackEvent 'EditorExport', 'StudRadius', @exportUi.studRadiusSelection
-			piwikTracking.trackEvent 'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
+			piwikTracking.trackEvent(
+				'EditorExport', 'StudRadius', @exportUi.studRadiusSelection
+			)
+			piwikTracking.trackEvent(
+				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
+			)
 
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
 

@@ -6,7 +6,7 @@ class LegoInstructions
 	init: (bundle) ->
 		@renderer = bundle.renderer
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
-
+		@newBrickator = bundle.getPlugin 'newBrickator'
 	onNodeSelect: (@selectedNode) => return
 
 	onNodeDeselect: => @selectedNode = null
@@ -37,6 +37,12 @@ class LegoInstructions
 					promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
 					promiseChain = promiseChain.then (fileData) =>
 						resultingFiles.push fileData
+
+				# scad generation
+				promiseChain = promiseChain.then =>
+					@newBrickator._getCachedData(selectedNode). then (data) =>
+						console.log data
+						resultingFiles.push @_createScad data.grid.getAllBricks()
 
 				# save download
 				promiseChain = promiseChain.then =>
@@ -144,5 +150,17 @@ class LegoInstructions
 
 		html += '</body></html>'
 		return html
+
+	_createScad: (bricks) ->
+		scad = 'include <BrickExport.scad>\n'
+		bricks.forEach (brick) =>
+			pos = "[#{brick.getPosition().x},#{brick.getPosition().y},#{brick.getPosition().z}]"
+			size = "[#{brick.getSize().x},#{brick.getSize().y},#{brick.getSize().z}]"
+			scad += "GridTranslate(#{pos}){ Brick(#{size}); }\n"
+
+		return {
+			fileName: 'bricks.scad'
+			data: scad
+		}
 
 module.exports = LegoInstructions

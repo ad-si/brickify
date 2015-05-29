@@ -10,14 +10,18 @@ log = require 'loglevel'
 Bundle = require './bundle'
 globalConfig = require '../common/globals.yaml'
 
+piwikTracking = require './piwikTracking'
 
 if process.env.NODE_ENV is 'development'
 	log.enableAll()
-
+else
+	log.setLevel 'warn'
 
 commandFunctions = {
 	initialModel: (value) ->
-		_paq.push ['trackEvent', 'Editor', 'Start', 'WithInitialModel']
+		piwikTracking.trackEvent(
+			'trackEvent', 'Editor', 'StartWithInitialModel', value
+		)
 		# load selected model
 		log.debug 'loading initial model'
 		p = /^[0-9a-z]{32}/
@@ -42,7 +46,7 @@ postInitCallback = ->
 			prom = prom.then runCmd key, value
 
 	if commands.length == 0
-		_paq.push ['trackEvent', 'Editor', 'Start', 'WithoutInitialModel']
+		piwikTracking.trackEvent 'Editor', 'Start', 'StartWithoutInitialModel'
 
 	#clear url hash after executing commands
 	window.location.hash = ''

@@ -1,5 +1,5 @@
 log = require 'loglevel'
-
+piwikTracking = require '../../client/piwikTracking'
 
 class BrushHandler
 	constructor: ( @bundle, @nodeVisualizer, @editController ) ->
@@ -68,10 +68,7 @@ class BrushHandler
 
 			brush = 'LegoBrush'
 			brush += 'Big' if @bigBrushSelected
-			_paq.push(
-				['trackEvent', 'Editor', 'BrushAction', brush,
-				touchedVoxels.length]
-			)
+			piwikTracking.trackEvent 'Editor', 'BrushAction', brush, touchedVoxels.length
 
 			return unless touchedVoxels.length > 0
 			log.debug "Will re-layout #{touchedVoxels.length} voxel"
@@ -98,7 +95,7 @@ class BrushHandler
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
 			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
-			_paq.push(['trackEvent', 'Editor', 'BrushAction', 'MakeEverythingLego'])
+			piwikTracking.trackEvent 'Editor', 'BrushAction', 'MakeEverythingLego'
 			@editController.rerunLegoPipeline selectedNode
 			brickVis = cachedData.brickVisualization
 			brickVis.updateModifiedVoxels()
@@ -127,9 +124,8 @@ class BrushHandler
 
 			brush = 'PrintBrush'
 			brush += 'Big' if @bigBrushSelected
-			_paq.push(
-				['trackEvent', 'Editor', 'BrushAction',  brush,
-				touchedVoxels.length]
+			piwikTracking.trackEvent(
+				'Editor', 'BrushAction',  brush, touchedVoxels.length
 			)
 
 			return unless touchedVoxels.length > 0
@@ -158,7 +154,7 @@ class BrushHandler
 		.then (cachedData) =>
 			return unless cachedData.
 				brickVisualization.makeAllVoxels3dPrinted selectedNode
-			_paq.push(['trackEvent', 'Editor', 'BrushAction', 'MakeEverythingPrint'])
+			piwikTracking.trackEvent 'Editor', 'BrushAction', 'MakeEverythingPrint'
 			cachedData.brickVisualization.updateModifiedVoxels()
 			@editController.everythingPrint selectedNode
 

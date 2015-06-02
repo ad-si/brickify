@@ -1,7 +1,7 @@
 {
   "name": "Brickify",
-  "version": "0.8.0",
-  "description": "Extend your LEGO� with 3D-printed parts!",
+  "version": "0.9.2",
+  "description": "Extend your LEGO® with 3D-printed parts!",
   "keywords": [
     "fabrication",
     "3d printing",
@@ -38,6 +38,7 @@
     "jade": "^1.7.0",
     "jquery": "^2.1.1",
     "js-yaml": "^3.2.7",
+    "jszip": "^2.5.0",
     "loglevel": "^1.2.0",
     "meshlib": "^0.6.0",
     "mkdirp": "^0.5.0",

@@ -163,6 +163,13 @@ class Brick
 		@_clearData()
 		return newBricks
 
+	# Returns the brick visualization that belongs to this brick
+	getVisualBrick: =>
+		return @_visualBrick
+
+	# Sets the brick visualization that belongs to this brick
+	setVisualBrick: (@_visualBrick) => return
+
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that
 	clear: =>
@@ -177,6 +184,7 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
+		@_visualBrick = null
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,
@@ -215,6 +223,7 @@ class Brick
 		return variation1 || variation2
 
 	# returns true if the brick has no holes in it, i.e. is a cuboid
+	# voxels marked to be 3d printed count as holes
 	isHoleFree: =>
 		voxelCheck  = {}
 
@@ -228,13 +237,14 @@ class Brick
 
 		@forEachVoxel (voxel) ->
 			vp = voxel.position
-			voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
+			if voxel.isLego()
+				voxelCheck[vp.x + '-' + vp.y + '-' + vp.z] = true
 
 		hasHoles = false
 		for val of voxelCheck
 			if voxelCheck[val] == false
-				log.warn 'Hole at', val
 				hasHoles = true
+				break
 
 		return !hasHoles
 
@@ -242,20 +252,7 @@ class Brick
 	# a brick is valid when it has voxels, is hole free and
 	# has a valid size
 	isValid: =>
-		hasVoxels = false
-		hasVoxels = true if @voxels.size > 0
-		if not hasVoxels
-			log.warn 'Invalid: brick has no voxels'
-
-		validSize  = @hasValidSize()
-		if not validSize
-			log.warn 'Invalid: brick has invalid size',@getSize()
-
-		noHoles = @isHoleFree()
-		if not noHoles
-			log.warn 'Invalid: brick has holes'
-
-		return hasVoxels and validSize and noHoles
+		return @voxels.size > 0 and @hasValidSize() and @isHoleFree()
 
 	getStability: =>
 		s = @getSize()

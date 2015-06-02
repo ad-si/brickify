@@ -1,9 +1,18 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
 threeConverter = require '../../client/threeConverter'
-
+csgCleaner = require './csgCleaner'
 
 class CSG
+
+	init: (bundle) =>
+		globalConfig = bundle.globalConfig
+		@defaults =
+			minimalPrintVolume: globalConfig.minimalPrintVolume
+			holeSize: globalConfig.holeSize
+			studSize: globalConfig.studSize
+			addStuds: globalConfig.addStuds
+
 	###
 	# Returns a promise which will, when resolved, provide
 	# the volumetric subtraction of ModelGeometry - LegoBricks
@@ -24,20 +33,8 @@ class CSG
 
 	# applies default values if they don't exist yet
 	_applyDefaultValues: (options) ->
-		if not options.studSize?
-			options.studSize = {
-				radius: 2.4
-				height: 1.8
-			}
-
-		if not options.holeSize?
-			options.holeSize = {
-				radius: 2.4
-				height: 1.8
-			}
-
-		if not options.addStuds?
-			options.addStuds = false
+		for key, value of @defaults
+			options[key] = value unless options[key]?
 
 	# returns own cached data and links grid from newBrickator data
 	# resets newBrickator's csgNeedsRecalculation flag
@@ -64,14 +61,18 @@ class CSG
 			return Promise.resolve cachedData.csg
 
 		return @_prepareModel cachedData, selectedNode
-		.then (threeModel) =>
-			cachedData.transformedThreeModel = threeModel
+		.then (threeGeometry) =>
+			cachedData.transformedThreeGeometry = threeGeometry
 			@csgExtractor ?= new CsgExtractor()
 
 			options.profile = true
-			options.transformedModel = cachedData.transformedThreeModel
+			options.transformedModel = cachedData.transformedThreeGeometry
 
-			cachedData.csg = @csgExtractor.extractMesh cachedData.grid, options
+			result = @csgExtractor.extractGeometry cachedData.grid, options
+
+			options.split = true
+			options.filterSmallGeometries = !result.isOriginalModel
+			cachedData.csg = csgCleaner.clean result.csg, options
 
 			return cachedData.csg
 
@@ -79,8 +80,8 @@ class CSG
 	# that is transformed to match the grid
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
-			if cachedData.transformedThreeModel?
-				resolve(cachedData.transformedThreeModel)
+			if cachedData.transformedThreeGeometry?
+				resolve(cachedData.transformedThreeGeometry, cachedData)
 				return
 
 			selectedNode
@@ -88,9 +89,9 @@ class CSG
 			.then (model) ->
 				return model.getObject()
 			.then (modelObject) ->
-				threeModel = threeConverter.toStandardGeometry modelObject
-				threeModel.applyMatrix threeHelper.getTransformMatrix selectedNode
-				resolve(threeModel)
+				threeGeometry = threeConverter.toStandardGeometry modelObject
+				threeGeometry.applyMatrix threeHelper.getTransformMatrix selectedNode
+				resolve(threeGeometry)
 			.catch (error) ->
 				reject(error)
 

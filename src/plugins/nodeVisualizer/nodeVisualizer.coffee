@@ -193,12 +193,11 @@ class NodeVisualizer
 			if not cachedData.initialized
 				@_initializeData node, cachedData, newBrickatorData
 
-			# update brick visualization
-			cachedData.brickVisualization.updateBrickVisualization()
+			# visualization
+			cachedData.brickVisualization.updateVisualization()
+			cachedData.brickVisualization.showVoxelAndBricks()
 
-			# update voxel coloring and show them
-			cachedData.brickVisualization.updateVoxelVisualization()
-			cachedData.brickVisualization.showVoxels()
+			# brick count / printing time
 			@_updateBrickCount cachedData.brickVisualization.grid.getAllBricks()
 			@_updateQuickPrintTime(
 				cachedData.brickVisualization.grid.getDisabledVoxels()
@@ -320,17 +319,20 @@ class NodeVisualizer
 					@_resetStabilityView cachedData
 					return @_applyBuildMode cachedData
 
+	getDisplayMode: =>
+		return @visualizationMode
+
 	_applyLegoBrushMode: (cachedData) =>
-		cachedData.brickVisualization.showVoxels()
-		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.updateVisualization()
+		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 
 		cachedData.modelVisualization.setShadowVisibility false
 
 
 	_applyPrintBrushMode: (cachedData) =>
-		cachedData.brickVisualization.showVoxels()
-		cachedData.brickVisualization.updateVoxelVisualization()
+		cachedData.brickVisualization.updateVisualization()
+		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 
 		cachedData.modelVisualization.setShadowVisibility true
@@ -343,7 +345,6 @@ class NodeVisualizer
 		.then ->
 			# change coloring to stability coloring
 			cachedData.brickVisualization.setStabilityView true
-			cachedData.brickVisualization.showBricks()
 
 		cachedData.modelVisualization.setNodeVisibility false
 
@@ -357,7 +358,6 @@ class NodeVisualizer
 
 	_applyBuildMode: (cachedData) =>
 		# show bricks and csg
-		cachedData.brickVisualization.showBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 
 		@_showCsg cachedData
@@ -369,7 +369,7 @@ class NodeVisualizer
 
 	_resetBuildMode: (cachedData) =>
 		cachedData.brickVisualization.hideCsg()
-
+		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
 
 
@@ -383,8 +383,8 @@ class NodeVisualizer
 		@brickCounter?.text bricks.size
 
 	_updatePrintTime: (csg) =>
-		if csg?.geometry?
-			time = PrintingTimeEstimator.getPrintingTimeEstimate csg.geometry
+		if csg?
+			time = PrintingTimeEstimator.getPrintingTimeEstimate csg
 			time = Math.round time
 			@timeEstimate?.text time
 		else
@@ -399,8 +399,12 @@ class NodeVisualizer
 		@csg ?= @bundle.getPlugin 'csg'
 		return Promise.resolve() if not @csg?
 
-		return @csg
-				.getCSG(cachedData.node, {addStuds: true})
+		options = {
+			addStuds: true
+			minimalPrintVolume: @bundle.globalConfig.minimalPrintVolume
+		}
+
+		return @csg.getCSG(cachedData.node, options)
 				.then (csg) =>
 					cachedData.brickVisualization.showCsg csg
 					@_updatePrintTime csg

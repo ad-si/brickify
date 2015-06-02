@@ -2,6 +2,8 @@ $ = require 'jquery'
 modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
 log = require 'loglevel'
+JSZip = require 'jszip'
+piwikTracking = require '../../piwikTracking'
 
 
 module.exports = class DownloadProvider
@@ -18,6 +20,15 @@ module.exports = class DownloadProvider
 			holeRadius: @exportUi.holeRadius
 		}
 
+		if (fileType == 'stl')
+			piwikTracking.trackEvent 'EditorExport', 'DownloadStlClick'
+			piwikTracking.trackEvent(
+				'EditorExport', 'StudRadius', @exportUi.studRadiusSelection
+			)
+			piwikTracking.trackEvent(
+				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
+			)
+
 		downloadPromises = @bundle.pluginHooks.getDownload(
 			selectedNode,
 			downloadOptions
@@ -26,7 +37,53 @@ module.exports = class DownloadProvider
 		Promise
 		.all downloadPromises
 		.then (resultsArray) ->
-			for result in resultsArray
-				saveAs new Blob([result.data]), result.fileName
+			files = @_collectFiles resultsArray
+
+			if files.length is 0
+				bootbox.alert(
+					title: 'There is nothing to download at the moment'
+					message: 'This happens when your whole model is made out of LEGO
+										and you have not selected anything	to be 3D-printed. Use
+										the Make 3D-print brush for that'
+				)
+			if files.length is 1
+				data = files[0].data
+				fileName = files[0].fileName
+				saveAs data, fileName
+			if files.length > 1
+				promisesArray = []
+				for file in files
+					promisesArray.push(
+						@_arrayBufferFromBlob file.data, file.fileName
+					)
+
+				Promise.all(promisesArray).then (resultsArray) ->
+					zip = new JSZip()
+					options = binary: true
+					for result in resultsArray
+						zip.file result.fileName, result.data, options
+					zipFile = zip.generate type: 'blob'
+					saveAs zipFile, "brickify-#{selectedNode.name}.zip"
+
 		.catch (error) ->
 			log.error error
+
+	_collectFiles: (array) ->
+		files = []
+		for entry in array
+			if Array.isArray entry
+				for subEntry in entry
+					if subEntry.fileName.length > 0
+						files.push data: subEntry.data, fileName: subEntry.fileName
+			else if entry.fileName.length > 0
+				files.push data: entry.data, fileName: entry.fileName
+		return files
+
+	_arrayBufferFromBlob: (blob, fileName) ->
+		reader = new FileReader()
+		return new Promise (resolve, reject) ->
+			reader.onload = ->
+				resolve {data: reader.result, fileName: fileName}
+			reader.onerror = reject
+			reader.onabort = reject
+			reader.readAsArrayBuffer blob

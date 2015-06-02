@@ -1,21 +1,6 @@
 module.exports  = class PipelineSettings
-	@legoStudSize = {
-		radius: 2.4
-		height: 1.8
-	}
-
-	@legoHoleSize = {
-		radius: 2.6
-		height: 2.3
-	}
-
-	constructor: ->
-		@gridSpacing = {
-			x: 8
-			y: 8
-			z: 3.2
-		}
-		@debugVoxel = null
+	constructor: (globalConfig) ->
+		@gridSpacing = globalConfig.gridSpacing
 		@modelTransform = null
 		@voxelizing = true
 		@initLayout = true
@@ -44,13 +29,6 @@ module.exports  = class PipelineSettings
 		@gridSpacing.x = x
 		@gridSpacing.y = y
 		@gridSpacing.z = z
-
-	setDebugVoxel: (x, y, z) =>
-		@debugVoxel = {
-			x: x
-			y: y
-			z: z
-		}
 
 	setModelTransform: (transformMatrix) =>
 		@modelTransform = transformMatrix

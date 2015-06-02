@@ -86,27 +86,26 @@ class ModelVisualization
 
 
 	_createVisualization: (node, threejsNode) =>
-		if not @globalConfig.showModel
-			return node.getModel()
-		else
-			return node
-			.getModel()
-			.then (model) =>
-				return model.getObject()
-			.then (modelObject) =>
-				geometry = threeConverter.toStandardGeometry modelObject
+		return node
+		.getModel()
+		.then (model) ->
+			return model.getObject()
+		.then (modelObject) =>
+			geometry = threeConverter.toStandardGeometry modelObject
+			threeHelper.applyNodeTransforms node, threejsNode
 
-				threeHelper.applyNodeTransforms node, threejsNode
+			if @globalConfig.rendering.showModel
+				@_addSolid geometry, @threeNode
 
-				@_addSolid geometry, threejsNode
+			if @globalConfig.rendering.showShadowAndWireframe
+				@_addWireframe geometry, @threeNode
 
-				if @globalConfig.createVisibleWireframe
-					@_addWireframe geometry, threejsNode
+			if @globalConfig.createVisibleWireframe
+				@_addWireframe geometry, threejsNode
 
-				return threejsNode.solid
-			.catch (error) =>
-				log.error error
-
+			return threejsNode.solid
+		.catch (error) ->
+			log.error error
 
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected

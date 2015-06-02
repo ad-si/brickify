@@ -15,6 +15,7 @@ sendRequest = (options = {}) ->
 	.resolve $.ajax options
 	.catch (result) -> throw new Error(result.responseText)
 
+
 saveModelOnServer = (base64Model, hash) ->
 	return sendRequest {
 		url: '/model/submit/' + hash,

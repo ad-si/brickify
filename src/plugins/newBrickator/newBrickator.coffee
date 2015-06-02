@@ -31,7 +31,7 @@ class NewBrickator
 		Spinner.startOverlay @bundle.renderer.getDomElement()
 		@_getCachedData(selectedNode).then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.deactivateVoxelizing()
 
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
@@ -60,16 +60,14 @@ class NewBrickator
 		log.debug 'relayouting modified parts, creating bricks:', createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
-			modifiedBricks = []
+			modifiedBricks = new Set()
 			for v in modifiedVoxels
-				if v.gridEntry.brick
-					if v.gridEntry.brick not in modifiedBricks
-						modifiedBricks.push v.gridEntry.brick
+				if v.brick
+					modifiedBricks.add v.brick
 				else if createBricks
-					pos = v.voxelCoords
-					modifiedBricks.push new Brick([v.gridEntry])
+					modifiedBricks.add new Brick([v])
 
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyRelayout()
 
 			data = {
@@ -86,7 +84,7 @@ class NewBrickator
 	everythingPrint: (selectedNode) =>
 		@_getCachedData selectedNode
 		.then (cachedData) =>
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyInitLayout()
 
 			data = grid: cachedData.grid
@@ -99,7 +97,7 @@ class NewBrickator
 	_createDataStructure: (selectedNode) =>
 		selectedNode.getModel().then (model) =>
 			# create grid
-			settings = new PipelineSettings()
+			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
 			settings.deactivateLayouting()
 
@@ -149,43 +147,48 @@ class NewBrickator
 
 		return @csg
 		.getCSG selectedNode, options
-		.then (detailedCsg) ->
-			if not detailedCsg?
-				return emptyPromise
+		.then (detailedCsgGeometries) ->
+			if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
+				resolve [{ data: '', fileName: '' }]
+				return
 
 			modelObject = threeConverter.toModelObject detailedCsg.geometry
 
 			return selectedNode
 			.getName()
 			.then (name) ->
-				name += '.stl' unless name.endsWith('.stl')
+				for i in [0..detailedCsgGeometries.length - 1]
+					geometry = detailedCsgGeometries[i]
 
-				return {
-				data: stlExporter.toBinaryStl modelObject.mesh.faceVertex
-				fileName: name.toLowerCase().replace(' ', '_')
-				}
+					optimizedModel = new meshlib.OptimizedModel()
+					optimizedModel.fromThreeGeometry(geometry)
+
+					meshlib
+					.model(optimizedModel)
+					.export null, (error, binaryStl) ->
+						fn = "brickify-#{selectedNode.name}"
+						fn = fn.replace /.stl$/, ''
+						fn += "-#{i}"
+						fn += '.stl'
+						results.push { data: binaryStl, fileName: fn }
+
+					return results
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}
 
 		# set stud and hole size
 		if studRadius?
-			studSize = {
+			options.studSize = {
 				radius: studRadius
-				height: PipelineSettings.legoStudSize.height
+				height: @bundle.globalConfig.studSize.height
 			}
-		else
-			studSize = PipelineSettings.legoStudSize
-		options.studSize = studSize
 
 		if holeRadius?
-			holeSize = {
+			options.holeSize = {
 				radius: holeRadius
-				height: PipelineSettings.legoHoleSize.height
+				height: @bundle.globalConfig.holeSize.height
 			}
-		else
-			holeSize = PipelineSettings.legoHoleSize
-		options.holeSize = holeSize
 
 		# add studs
 		options.addStuds = true

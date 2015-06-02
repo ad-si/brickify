@@ -5,6 +5,7 @@ stlParser = require 'stl-parser'
 fileDropper = require '../../modelLoading/fileDropper'
 modelCache = require '../../modelLoading/modelCache'
 readFiles = require '../../modelLoading/readFiles'
+piwikTracking = require '../../piwikTracking'
 
 
 class LoadUi
@@ -41,6 +42,9 @@ class LoadUi
 			@_checkReplaceModel()
 			.then (loadConfirmed) =>
 				return unless loadConfirmed
+
+				piwikTracking.trackEvent 'Editor', 'LoadModel', files[0].name
+
 				readFiles files, @workflowUi.bundle,
 					@workflowUi.hideMenuIfPossible
 

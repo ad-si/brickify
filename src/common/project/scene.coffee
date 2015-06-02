@@ -23,21 +23,23 @@ class Scene extends SyncObject
 		return Promise.all(@nodes.map _loadNode).then (nodes) => @nodes = nodes
 
 	addNode: (node) =>
-		_addNode = =>
-			node.getName().then (name) =>
+		return @next =>
+			node
+			.getName()
+			.then (name) =>
 				@nodes.push node
 				@_modify "Node \"#{name}\" added"
-		return @next _addNode
 
 	getNodes: =>
 		return @done => @nodes
 
 	removeNode: (node) =>
-		_removeNode = =>
-			node.getName().then (name) =>
+		return @next =>
+			node
+			.getName()
+			.then (name) =>
 				if -1 isnt index = @nodes.indexOf node
 					@nodes.splice index, 1
 					@_modify "Node \"#{name}\" removed"
-		return @next _removeNode
 
 module.exports = Scene

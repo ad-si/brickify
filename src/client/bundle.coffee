@@ -14,22 +14,27 @@ Node.modelProvider = require './modelLoading/modelCache'
 # @class Bundle
 ###
 module.exports = class Bundle
-	constructor: (@globalConfig, @controls) ->
+	constructor: (@globalConfig) ->
 		Spinner.startOverlay document.getElementById @globalConfig.renderAreaId
+
 		@pluginLoader = new PluginLoader(@)
+		@pluginInstances = @pluginLoader.loadPlugins()
 		@pluginHooks = @pluginLoader.pluginHooks
+
 		@modelLoader = new ModelLoader(@)
 		@sceneManager = new SceneManager(@)
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
-		@pluginInstances = @pluginLoader.loadPlugins()
 		@ui = new Ui(@) if @globalConfig.buildUi
 
-	init: =>
+	init: (controls) =>
 		@pluginLoader.initPlugins()
 		@ui?.init()
-		@renderer.setupControls @globalConfig, @controls
-		return @sceneManager.init()
-		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId
+		@renderer.setupControls @globalConfig, controls
+		return @sceneManager
+		.init()
+		.then =>
+			Spinner.stop document.getElementById @globalConfig.renderAreaId
+			return @
 
 	getPlugin: (name) =>
 		for p in @pluginInstances

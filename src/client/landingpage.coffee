@@ -1,15 +1,18 @@
 require './polyfills'
+
+clone = require 'clone'
 $ = require 'jquery'
 window.jQuery = window.$ = $
 bootstrap = require 'bootstrap'
+log = require 'loglevel'
 piwikTracking = require './piwikTracking'
 
-# Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
-clone = require 'clone'
-fileLoader = require './modelLoading/fileLoader'
+fileDropper = require './modelLoading/fileDropper'
+readFiles = require './modelLoading/readFiles'
 modelCache = require './modelLoading/modelCache'
+
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -29,42 +32,66 @@ globalConfig.colors.modelOpacity = globalConfig.colors.modelOpacityLandingPage
 globalConfig.rendering.showShadowAndWireframe = false
 globalConfig.rendering.usePipeline = false
 
-# clone global config 2 times
+config0 = clone globalConfig
+config0.renderAreaId = 'renderArea1'
+config0.plugins.newBrickator = false # Don't show bricks in left canvas
+
 config1 = clone globalConfig
-config2 = clone globalConfig
+config1.renderAreaId = 'renderArea2'
+config1.showModel = false # Don't show 3d-model in right canvas
 
-# configure left bundle to only show model
-config1.plugins.newBrickator = false
+defaultModelHash = '1c2395a3145ad77aee7479020b461ddf'
 
-# configure right bundle to not show the model
-config2.showModel = false
 
-# instantiate 2 brickify bundles
-config1.renderAreaId = 'renderArea1'
-bundle1 = new Bundle config1
-b1 = bundle1.init().then ->
-	controls = bundle1.getControls()
-	config2.renderAreaId = 'renderArea2'
-	bundle2 = new Bundle config2, controls
-	b2 = bundle2.init()
+Promise
+.all [
+	new Bundle(config0).init(),
+	new Bundle(config1).init()
+]
+.then (bundles) ->
 
-	loadAndConvert = (hash, animate) ->
-		b1.then -> bundle1.modelLoader.loadByHash hash
-			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
-		b2.then -> bundle2.modelLoader.loadByHash hash
-			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
-		$('.applink').prop 'href', "app#initialModel=#{hash}"
+	Promise
+	.all [
+		bundles[0]
+		.modelLoader
+		.loadByHash(defaultModelHash)
+		.then(->
+			$('#' + config0.renderAreaId).css 'backgroundImage', 'none'
+			return bundles[0]
+		)
+		,
+		bundles[1]
+		.modelLoader
+		.loadByHash(defaultModelHash)
+		.then(->
+			$('#' + config1.renderAreaId).css 'backgroundImage', 'none'
+			return bundles[1]
+		)
+	]
+.then (bundles) ->
 
-	#load and process model
-	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
+	$('.applink').prop 'href', "app#model=#{defaultModelHash}"
 
-	loadFromHash = (hash) ->
-		b1.then -> bundle1.sceneManager.clearScene()
-		b2.then -> bundle2.sceneManager.clearScene()
-		loadAndConvert hash, true
+	bundles[1].renderer.setupControls(
+		config1,
+		bundles[0].renderer.getControls()
+	)
 
-	callback = (event) ->
-		files = event.target.files ? event.dataTransfer.files
+	fileDropper.init (event) ->
+		event.preventDefault()
+		event.stopPropagation()
+		readFiles event.dataTransfer.files, bundles
+
+	document
+	.getElementById 'fileInput'
+	.addEventListener 'change', (event) ->
+
+		event.preventDefault()
+		event.stopPropagation()
+		readFiles event.target.files, bundles
+
+		files = event.target.files
+
 		if files.length
 			piwikTracking.trackEvent 'Landingpage', 'LoadModel', files[0].name
 			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
@@ -79,22 +106,18 @@ b1 = bundle1.init().then ->
 				message: 'You can only drop stl files or our example images.'
 			)
 
-	fileDropper = require './modelLoading/fileDropper'
-	fileDropper.init callback
 
-	fileInput = document.getElementById('fileInput')
-	fileInput.addEventListener 'change', (event) ->
-		callback event
-		@value = ''
-
-	$('.dropper').text 'Drop an stl file'
-	$('#preview img').on( 'dragstart'
-		(e) ->
-			e.originalEvent.dataTransfer.setData(
+	$('.dropper').text 'Drop an STL file'
+	$('#preview img').on( 'dragstart', (event) ->
+			event.originalEvent.dataTransfer.setData(
 				'text/plain'
-				e.originalEvent.target.getAttribute 'data-hash'
+				event.originalEvent.target.getAttribute 'data-hash'
 			)
 	)
+
+.catch (error) ->
+	console.error error
+
 
 # set not available message
 $('#downloadButton').click ->

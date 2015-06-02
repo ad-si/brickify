@@ -8,13 +8,19 @@ log = require 'loglevel'
 # @class Renderer
 ###
 class Renderer
-	constructor: (@pluginHooks, globalConfig) ->
-		@scene = null
+	constructor: (@pluginHooks, @globalConfig) ->
 		@camera = null
 		@threeRenderer = null
-		@init globalConfig
 		@pipelineEnabled = false
 		@useBigPipelineTargets = false
+
+		@scene = @_setupScene @globalConfig
+		@_setupLighting @scene
+		@_setupSize @globalConfig
+		@_setupRenderer @globalConfig
+		@_setupCamera @globalConfig
+
+		requestAnimationFrame @localRenderer
 
 	localRenderer: (timestamp) =>
 		# clear screen
@@ -110,12 +116,8 @@ class Renderer
 
 		@threeRenderer.render @scene, @camera
 
-	zoomToBoundingSphere: (radiusAndPosition) ->
+	zoomToBoundingSphere: ({radius, center}) ->
 		# zooms out/in the camera so that the object is fully visible
-		radius = radiusAndPosition.radius
-		center = radiusAndPosition.center
-		center = new THREE.Vector3(center.x, center.y, center.z)
-
 		alpha = @camera.fov
 		distanceToObject = radius / Math.sin(alpha)
 
@@ -125,9 +127,8 @@ class Renderer
 		rv = rv.multiplyScalar(zoomAdjustmentFactor)
 
 		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
-		target = center.clone().applyMatrix4(@scene.matrix)
-		position = target.clone().add(rv)
-		@setCamera position, target
+		position = center.clone().add(rv)
+		@setCamera position, center
 
 	setCamera: (position, target) ->
 		@controls.update()
@@ -186,21 +187,11 @@ class Renderer
 
 	_setupScene: (globalConfig) ->
 		scene = new THREE.Scene()
-
-		# Scene rotation because orbit controls only works
-		# with up vector of 0, 1, 0
-		sceneRotation = new THREE.Matrix4()
-		sceneRotation.makeRotationAxis(
-			new THREE.Vector3( 1, 0, 0 ),
-			(-Math.PI / 2)
-		)
-		scene.applyMatrix(sceneRotation)
 		scene.fog = new THREE.Fog(
 			globalConfig.colors.background
 			globalConfig.cameraNearPlane
 			globalConfig.cameraFarPlane
 		)
-
 		return scene
 
 	_setupCamera: (globalConfig) ->
@@ -215,7 +206,7 @@ class Renderer
 			globalConfig.axisLength + 10
 			globalConfig.axisLength / 2
 		)
-		@camera.up.set(0, 1, 0)
+		@camera.up.set(0, 0, 1)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 	setupControls: (globalConfig, controls) ->
@@ -248,8 +239,8 @@ class Renderer
 
 	# creates a scene with default light and rotation settings
 	getDefaultScene: =>
-		scene = @_setupScene(@globalConfig)
-		@_setupLighting(scene)
+		scene = @_setupScene @globalConfig
+		@_setupLighting scene
 		return scene
 
 	loadCamera: (state) =>

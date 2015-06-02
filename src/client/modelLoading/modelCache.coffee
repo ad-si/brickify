@@ -1,7 +1,6 @@
 $ = require 'jquery'
 md5 = require('blueimp-md5').md5
 meshlib = require 'meshlib'
-log = require 'loglevel'
 
 ##
 #  ModelCache
@@ -9,51 +8,48 @@ log = require 'loglevel'
 #  cached models from the server
 ##
 
-# The cache of optimized model promises
 modelCache = {}
 
-exists = (hash) ->
-	return Promise.resolve $.get '/model/exists/' + hash
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
-module.exports.exists = exists
+sendRequest = (options = {}) ->
+	Promise
+	.resolve $.ajax options
+	.catch (result) -> throw new Error(result.responseText)
 
-# sends the model to the server if the server hasn't got a file
-# with the same hash value
-submitDataToServer = (hash, data) ->
-	send = ->
-		prom = Promise.resolve(
-			$.ajax '/model/submit/' + hash,
-				data: data
-				type: 'POST'
-				contentType: 'application/octet-stream'
-		).catch (jqXHR) -> throw new Error jqXHR.statusText
-		prom.then(
-			-> log.debug 'Sent model to the server'
-			-> log.error 'Unable to send model to the server'
-		)
-		return prom
-	return exists(hash).catch(send)
 
-module.exports.store = (optimizedModel) ->
-	modelData = optimizedModel.toBase64()
-	hash = md5(modelData)
-	modelCache[hash] = Promise.resolve optimizedModel
-	return submitDataToServer(hash, modelData).then -> hash
+saveModelOnServer = (base64Model, hash) ->
+	return sendRequest {
+		url: '/model/submit/' + hash,
+		method: 'POST'
+		data: base64Model
+		contentType: 'application/octet-stream'
+	}
 
-# requests a mesh with the given hash from the server
-requestDataFromServer = (hash) ->
-	return Promise.resolve $.get '/model/get/' + hash
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
 
-buildModelPromise = (hash) ->
-	return requestDataFromServer(hash).then((data) ->
-		model = new meshlib.OptimizedModel()
-		model.fromBase64 data
-		return model
-	)
+module.exports.store = (model) ->
+	hash = ''
 
-# Request an optimized mesh with the given hash
-# The mesh will be provided by the cache if present or loaded from the server
-# if available.
+	return model
+	.getBase64()
+	.then (base64Model) ->
+		hash = md5 base64Model
+		return sendRequest {url: '/model/exists/' + hash}
+		.catch (error) ->
+			if error.message is 'Model does not exist'
+				return saveModelOnServer base64Model, hash
+			else
+				throw error
+	.then ->
+		return hash
+
+
+# Request a model with the given hash
+# Will be provided by the cache if present or loaded from the server otherwise
 module.exports.request = (hash) ->
-	return modelCache[hash] ?= buildModelPromise(hash)
+	if not modelCache[hash]
+		modelCache[hash] = sendRequest {url: '/model/get/' + hash}
+		.then (base64Model) ->
+			return meshlib
+			.Model
+			.fromBase64 base64Model
+
+	return modelCache[hash]

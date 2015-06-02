@@ -6,8 +6,10 @@
 ###
 
 THREE = require 'three'
+log = require 'loglevel'
+
 modelCache = require '../../client/modelLoading/modelCache'
-globalConfig = require '../../common/globals.yaml'
+threeConverter = require '../../client/threeConverter'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
 
@@ -38,14 +40,18 @@ module.exports = class LegoBoard
 
 		modelCache
 		.request('1336affaf837a831f6b580ec75c3b73a')
-		.then (model) =>
-			geo = model.convertToThreeGeometry()
+		.then (model) ->
+			return model.getObject()
+		.then (modelObject) =>
+			geometry = threeConverter.toStandardGeometry modelObject
 			for x in [-160..160] by 80
 				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, @studMaterial)
+					object = new THREE.Mesh(geometry, @studMaterial)
 					object.translateX x
 					object.translateY y
 					@studsContainer.add object
+		.catch (error) ->
+			log.error error
 
 		# create scene for pipeline
 		@pipelineScene = @bundle.renderer.getDefaultScene()
@@ -57,7 +63,7 @@ module.exports = class LegoBoard
 		studTexture.repeat.set 50,50
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
-			color: globalConfig.colors.basePlate
+			color: @globalConfig.colors.basePlate
 		)
 		@baseplateTexturedMaterial = new THREE.MeshLambertMaterial(
 			map: studTexture
@@ -65,13 +71,13 @@ module.exports = class LegoBoard
 		@currentBaseplateMaterial = @baseplateTexturedMaterial
 
 		@baseplateTransparentMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlate
+				color: @globalConfig.colors.basePlate
 				opacity: 0.4
 				transparent: true
 		)
 
 		@studMaterial = new THREE.MeshLambertMaterial(
-				color: globalConfig.colors.basePlateStud
+				color: @globalConfig.colors.basePlateStud
 		)
 
 	on3dUpdate: =>
@@ -85,8 +91,7 @@ module.exports = class LegoBoard
 
 		cam = @bundle.renderer.camera
 
-		# it should be z, but due to orbitcontrols the scene is rotated
-		if cam.position.y < 0
+		if cam.position.z < 0
 			@baseplateBox.material = @baseplateTransparentMaterial
 			@studsContainer.visible = false
 		else
@@ -115,10 +120,11 @@ module.exports = class LegoBoard
 		gl = threeRenderer.context
 
 		# render baseplate transparent if cam looks from below
-		if camera.position.y < 0
+		if camera.position.z < 0
 			# one fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
+
 		else
 			# one default opaque pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 1

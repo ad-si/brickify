@@ -18,9 +18,12 @@ else
 	log.setLevel 'warn'
 
 commandFunctions = {
-	initialModel: (value) ->
+	model: (value) ->
 		piwikTracking.trackEvent(
-			'trackEvent', 'Editor', 'StartWithInitialModel', value
+			'trackEvent',
+			'Editor',
+			'StartWithInitialModel',
+			value
 		)
 		# load selected model
 		log.debug 'loading initial model'
@@ -37,13 +40,14 @@ postInitCallback = ->
 	hash = window.location.hash
 	hash = hash.substring 1, hash.length
 	commands = hash.split '+'
-	prom = Promise.resolve()
-	runCmd = (key, value) -> -> Promise.resolve commandFunctions[key](value)
+
 	for cmd in commands
 		key = cmd.split('=')[0]
 		value = cmd.split('=')[1]
 		if commandFunctions[key]?
-			prom = prom.then runCmd key, value
+			prom = Promise
+			.resolve()
+			.then Promise.resolve commandFunctions[key](value)
 
 	if commands.length == 0
 		piwikTracking.trackEvent 'Editor', 'Start', 'StartWithoutInitialModel'

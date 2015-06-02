@@ -1,17 +1,14 @@
 $ = require 'jquery'
 modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
+log = require 'loglevel'
 JSZip = require 'jszip'
 piwikTracking = require '../../piwikTracking'
 
+
 module.exports = class DownloadProvider
-	constructor: (@bundle) ->
-		return
-
-	init: (jqueryString, @exportUi, @sceneManager) =>
-		@jqueryObject = $(jqueryString)
-
-		@jqueryObject.on 'click', =>
+	constructor: ({@bundle, selectorString, @exportUi, @sceneManager}) ->
+		$(selectorString).on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
 				@_createDownload 'stl', selNode
@@ -32,9 +29,14 @@ module.exports = class DownloadProvider
 				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
 			)
 
-		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
+		downloadPromises = @bundle.pluginHooks.getDownload(
+			selectedNode,
+			downloadOptions
+		)
 
-		Promise.all(promisesArray).then (resultsArray) =>
+		Promise
+		.all downloadPromises
+		.then (resultsArray) ->
 			files = @_collectFiles resultsArray
 
 			if files.length is 0
@@ -62,6 +64,9 @@ module.exports = class DownloadProvider
 						zip.file result.fileName, result.data, options
 					zipFile = zip.generate type: 'blob'
 					saveAs zipFile, "brickify-#{selectedNode.name}.zip"
+
+		.catch (error) ->
+			log.error error
 
 	_collectFiles: (array) ->
 		files = []

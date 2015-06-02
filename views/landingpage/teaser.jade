@@ -3,11 +3,18 @@ header
 		.col-lg-8.pitch
 			h1 brickify
 			h2 Extend your LEGO#[sup &reg;] with 3D-printed parts!
+
 			.drop
-				label(for='fileInput').btn.btn-primary.dropper#loadButton
+				label#loadButton.btn.btn-primary.dropper(for='fileInput')
 					img(src='./img/spinner.gif' id="spinner")
-				input(type='file' accept=".stl"
-				style='display: none')#fileInput
+					span
+
+				input#fileInput(
+				type='file'
+				accept=".stl"
+				style='display: none'
+				)
+
 			a(href='/educators').btn#educators
 				#preview
 					img(src='/img/sample_ballista.png', draggable="true",

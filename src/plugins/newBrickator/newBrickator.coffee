@@ -1,5 +1,8 @@
+require 'string.prototype.endswith'
+
 THREE = require 'three'
 meshlib = require 'meshlib'
+stlExporter = require 'stl-exporter'
 log = require 'loglevel'
 
 modelCache = require '../../client/modelLoading/modelCache'
@@ -7,6 +10,7 @@ LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 Brick = require './pipeline/Brick'
 threeHelper = require '../../client/threeHelper'
+threeConverter = require '../../client/threeConverter'
 Spinner = require '../../client/Spinner'
 
 ###
@@ -53,7 +57,7 @@ class NewBrickator
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
-		log.debug 'relayouting modified parts, creating bricks:',createBricks
+		log.debug 'relayouting modified parts, creating bricks:', createBricks
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
 			modifiedBricks = new Set()
@@ -131,23 +135,28 @@ class NewBrickator
 
 	getDownload: (selectedNode, downloadOptions) =>
 		options = @_prepareCSGOptions(
-			downloadOptions.studRadius, downloadOptions.holeRadius
+			downloadOptions.studRadius,
+			downloadOptions.holeRadius
 		)
+		emptyPromise = Promise.resolve {data: '', fileName: ''}
 
 		@csg ?= @bundle.getPlugin 'csg'
 		if not @csg?
 			log.warn 'Unable to create download due to CSG Plugin missing'
-			return Promise.resolve { data: '', fileName: '' }
+			return emptyPromise
 
-		dlPromise = new Promise (resolve, reject) =>
-			@csg.getCSG selectedNode, options
-			.then (detailedCsgGeometries) ->
-				if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
-					resolve [{ data: '', fileName: '' }]
-					return
+		return @csg
+		.getCSG selectedNode, options
+		.then (detailedCsgGeometries) ->
+			if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
+				resolve [{ data: '', fileName: '' }]
+				return
 
-				results = []
+			modelObject = threeConverter.toModelObject detailedCsg.geometry
 
+			return selectedNode
+			.getName()
+			.then (name) ->
 				for i in [0..detailedCsgGeometries.length - 1]
 					geometry = detailedCsgGeometries[i]
 
@@ -163,9 +172,7 @@ class NewBrickator
 						fn += '.stl'
 						results.push { data: binaryStl, fileName: fn }
 
-					resolve results
-
-		return dlPromise
+					return results
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}

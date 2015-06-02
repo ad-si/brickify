@@ -22,11 +22,13 @@ class ExportUi
 			@downloadModal.modal 'show'
 
 	_initDownloadModalContent: =>
-		# stl download
-		@downloadProvider = new DownloadProvider @workflowUi.bundle
-		@downloadProvider.init(
-			'#stlDownloadButton', @, @workflowUi.bundle.sceneManager
-		)
+		# Stl download
+		@downloadProvider = new DownloadProvider {
+			bundle: @workflowUi.bundle
+			selectorString: '#stlDownloadButton'
+			exportUi: @
+			sceneManager: @workflowUi.bundle.sceneManager
+		}
 
 		@studSizeSelect = $('#studSizeSelect')
 		@holeSizeSelect = $('#holeSizeSelect')

@@ -38,6 +38,7 @@ module.exports = class VolumeFiller
 						numVoxelsZ = Math.max numVoxelsZ, voxelColumn.length - 1
 
 				@resetProgress()
+
 				for x, voxelPlane of grid
 					x = parseInt x
 					for y, voxelColumn of voxelPlane
@@ -47,7 +48,7 @@ module.exports = class VolumeFiller
 				callback state: 'finished', data: grid
 
 			fillUp: (grid, x, y, numVoxelsZ) ->
-				#fill up from z=0 to z=max
+				# fill up from z=0 to z=max
 				insideModel = false
 				z = 0
 				currentFillVoxelQueue = []
@@ -58,7 +59,7 @@ module.exports = class VolumeFiller
 						dir = grid[x][y][z]
 
 						if dir > 0
-							#fill up voxels and leave model
+							# fill up voxels and leave model
 							for v in currentFillVoxelQueue
 								@setVoxel grid, v, 0
 							insideModel = false
@@ -66,17 +67,17 @@ module.exports = class VolumeFiller
 							# re-entering model if inside? that seems odd. empty current fill queue
 							if insideModel
 								currentFillVoxelQueue = []
-							#entering model
+							# entering model
 							insideModel = true
 						else
-							#if not sure, fill up (precautious people might leave this out?)
+							# if not sure fill up
 							for v in currentFillVoxelQueue
 								@setVoxel grid, v, 0
 							currentFillVoxelQueue = []
 
 							insideModel = false
 					else
-						#voxel does not yet exist. create if inside model
+						# voxel does not exist yet. create if inside model
 						if insideModel
 							currentFillVoxelQueue.push {x: x, y: y, z: z}
 					z++
@@ -96,5 +97,4 @@ module.exports = class VolumeFiller
 				return unless progress > @lastProgress
 				@lastProgress = progress
 				callback state: 'progress', progress: progress
-
 		}

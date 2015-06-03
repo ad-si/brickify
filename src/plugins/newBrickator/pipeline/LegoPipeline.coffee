@@ -74,8 +74,7 @@ module.exports = class LegoPipeline
 
 		runPromise = @runPromise 0, data, options, profiling, progressCallback
 		.then (result) ->
-			if profiling
-				log.debug "Finished Lego Pipeline in #{new Date() - start}ms"
+			log.debug "Finished Lego Pipeline in #{new Date() - start}ms" if profiling
 			return result
 
 		cancelPromise = new Promise (resolve, @reject) => return
@@ -83,12 +82,13 @@ module.exports = class LegoPipeline
 		return Promise.race([runPromise, cancelPromise])
 
 	runPromise: (i, data, options, profiling, progressCallback) =>
-		if i >= @pipelineSteps.length or @terminated
+		finished = i >= @pipelineSteps.length or @terminated
+		if finished
 			@currentStep = null
 			@terminated = true
 			return data
 		else
-			@runStep i, data, options, profiling, progressCallback
+			return @runStep i, data, options, profiling, progressCallback
 				.then (result) =>
 					for own key of result
 						data[key] = result[key]
@@ -101,15 +101,14 @@ module.exports = class LegoPipeline
 		if step.decision options
 			log.debug "Running step #{step.name}" if profiling
 			start = new Date()
-			step.worker lastResult, options, progressCallback
+			return step.worker lastResult, options, progressCallback
 			.then (result) ->
 				stop = new Date() - start
 				log.debug "Step #{step.name} finished in #{stop}ms" if profiling
 				return result
 		else
 			log.debug "(Skipping step #{step.name})" if profiling
-			result = lastResult
-			return Promise.resolve result
+			return Promise.resolve lastResult
 
 	terminate: =>
 		return if @terminated

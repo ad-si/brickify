@@ -15,7 +15,7 @@ module.exports = class Voxelizer
 		lineStepSize = @voxelGrid.heightRatio / options.lineAccuracy
 		outerStepSize = @voxelGrid.heightRatio / options.outerAccuracy
 
-		voxelSpaceModel = @_getVoxelSpaceModel optimizedModel
+		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel
 
 		@worker = @_getWorker()
 		@worker.voxelize voxelSpaceModel, lineStepSize, outerStepSize, (message) =>
@@ -30,7 +30,7 @@ module.exports = class Voxelizer
 		@worker?.terminate()
 		@worker = null
 
-	_getVoxelSpaceModel: (optimizedModel) =>
+	_getOptimizedVoxelSpaceModel: (optimizedModel) =>
 		positions = optimizedModel.positions
 		voxelSpacePositions = []
 		for i in [0...positions.length] by 3

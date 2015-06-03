@@ -93,7 +93,7 @@ module.exports = class VolumeFiller
 
 			_postProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
 				progress = Math.round(
-					100 * ((x - 1) * numVoxelsY + (y - 1)) / (numVoxelsX) / (numVoxelsY))
+					100 * ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY)
 				return unless progress > @lastProgress
 				@lastProgress = progress
 				callback state: 'progress', progress: progress

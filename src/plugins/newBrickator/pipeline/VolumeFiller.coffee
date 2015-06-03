@@ -13,7 +13,7 @@ module.exports = class VolumeFiller
 				grid.fromPojo message.data
 				@resolve grid: grid
 
-		@worker = @getWorker()
+		@worker = @_getWorker()
 		@worker.fillGrid(
 			gridPOJO
 			callback
@@ -25,7 +25,7 @@ module.exports = class VolumeFiller
 		@worker?.terminate()
 		@worker = null
 
-	getWorker: ->
+	_getWorker: ->
 		return @worker if @worker?
 		return operative {
 			fillGrid: (grid, callback) ->
@@ -37,17 +37,17 @@ module.exports = class VolumeFiller
 					for y, voxelColumn of voxelPlane
 						numVoxelsZ = Math.max numVoxelsZ, voxelColumn.length - 1
 
-				@resetProgress()
+				@_resetProgress()
 
 				for x, voxelPlane of grid
 					x = parseInt x
 					for y, voxelColumn of voxelPlane
 						y = parseInt y
-						@postProgress callback, x, y, numVoxelsX, numVoxelsY
-						@fillUp grid, x, y, numVoxelsZ
+						@_postProgress callback, x, y, numVoxelsX, numVoxelsY
+						@_fillUp grid, x, y, numVoxelsZ
 				callback state: 'finished', data: grid
 
-			fillUp: (grid, x, y, numVoxelsZ) ->
+			_fillUp: (grid, x, y, numVoxelsZ) ->
 				# fill up from z=0 to z=max
 				insideModel = false
 				z = 0
@@ -61,7 +61,7 @@ module.exports = class VolumeFiller
 						if dir > 0
 							# fill up voxels and leave model
 							for v in currentFillVoxelQueue
-								@setVoxel grid, v, 0
+								@_setVoxel grid, v, 0
 							insideModel = false
 						else if dir < 0
 							# re-entering model if inside? that seems odd. empty current fill queue
@@ -72,7 +72,7 @@ module.exports = class VolumeFiller
 						else
 							# if not sure fill up
 							for v in currentFillVoxelQueue
-								@setVoxel grid, v, 0
+								@_setVoxel grid, v, 0
 							currentFillVoxelQueue = []
 
 							insideModel = false
@@ -82,16 +82,16 @@ module.exports = class VolumeFiller
 							currentFillVoxelQueue.push {x: x, y: y, z: z}
 					z++
 
-			setVoxel: (grid, {x: x, y: y, z: z}, voxelData) ->
+			_setVoxel: (grid, {x: x, y: y, z: z}, voxelData) ->
 				grid[x] ?= []
 				grid[x][y] ?= []
 				grid[x][y][z] ?= []
 				grid[x][y][z] = voxelData
 
-			resetProgress: ->
+			_resetProgress: ->
 				@lastProgress = -1
 
-			postProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
+			_postProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
 				progress = Math.round(
 					100 * ((x - 1) * numVoxelsY + (y - 1)) / (numVoxelsX) / (numVoxelsY))
 				return unless progress > @lastProgress

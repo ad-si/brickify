@@ -7,7 +7,6 @@ LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 Brick = require './pipeline/Brick'
 threeHelper = require '../../client/threeHelper'
-Spinner = require '../../client/Spinner'
 
 ###
 # @class NewBrickator
@@ -27,7 +26,6 @@ class NewBrickator
 		@pipeline.terminate()
 
 	runLegoPipeline: (selectedNode) =>
-		Spinner.startOverlay @bundle.renderer.getDomElement()
 		@_getCachedData(selectedNode)
 		.then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
@@ -46,13 +44,6 @@ class NewBrickator
 				cachedData.csgNeedsRecalculation = true
 
 				@nodeVisualizer?.objectModified selectedNode, cachedData
-				Spinner.stop @bundle.renderer.getDomElement()
-			.catch (error) =>
-				log.debug error
-				Spinner.stop @bundle.renderer.getDomElement()
-		.catch (error) =>
-			log.debug error
-			Spinner.stop @bundle.renderer.getDomElement()
 
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout

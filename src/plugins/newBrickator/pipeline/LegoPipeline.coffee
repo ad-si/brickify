@@ -5,10 +5,13 @@ VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
 Random = require './Random'
 operative = require 'operative'
+Nanobar = require 'nanobar'
 
 
 module.exports = class LegoPipeline
 	constructor: ->
+		@nanobar = new Nanobar bg: '#fff'
+
 		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
 		@brickLayouter = new BrickLayouter()
@@ -69,10 +72,7 @@ module.exports = class LegoPipeline
 
 		start = new Date()
 
-		progressCallback = (progress) ->
-			log.debug progress
-
-		runPromise = @runPromise 0, data, options, profiling, progressCallback
+		runPromise = @runPromise 0, data, options, profiling
 		.then (result) ->
 			log.debug "Finished Lego Pipeline in #{new Date() - start}ms" if profiling
 			return result
@@ -81,11 +81,16 @@ module.exports = class LegoPipeline
 
 		return Promise.race([runPromise, cancelPromise])
 
-	runPromise: (i, data, options, profiling, progressCallback) =>
+	runPromise: (i, data, options, profiling) =>
+		progressCallback = (progress) =>
+			overallProgress =
+				100 * i / @pipelineSteps.length + progress / @pipelineSteps.length
+			@nanobar.go overallProgress
 		finished = i >= @pipelineSteps.length or @terminated
 		if finished
 			@currentStep = null
 			@terminated = true
+			@nanobar.go 100
 			return data
 		else
 			return @runStep i, data, options, profiling, progressCallback
@@ -117,3 +122,4 @@ module.exports = class LegoPipeline
 		@reject? "LegoPipeline was terminated at step #{@currentStep.name}"
 		@currentStep = null
 		@reject = null
+		@nanobar.go 100

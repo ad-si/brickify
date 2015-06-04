@@ -82,10 +82,8 @@ class LegoInstructions
 			# read png stream
 			png.on 'data', (data) ->
 				newData = new Uint8Array(pngData.length + data.length)
-				for i in [0...pngData.length]
-					newData[i] = pngData[i]
-				for i in [0...data.length]
-					newData[pngData.length + i] = data[i]
+				newData.set pngData
+				newData.set data, pngData.length
 				pngData = newData
 			png.on 'end', ->
 				resolve pngData

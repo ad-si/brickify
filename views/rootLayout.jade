@@ -2,10 +2,7 @@ doctype html
 html
 	head
 		meta(charset='utf-8')
-		if pageTitle != null
-			title #{pageTitle} - brickify - Extend your LEGO with 3D-printed parts!
-		else
-			title brickify - Extend your LEGO with 3D-printed parts!
+		title #{pageTitle ? pageTitle + ' - ' : ''}Brickify
 		meta(name='viewport' content='width=device-width, initial-scale=1')
 
 		block styles

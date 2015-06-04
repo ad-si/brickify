@@ -5,8 +5,15 @@ section.quickConvert
 				h3
 					center Original Model
 				canvas#renderArea1.quickConvertCanvas
-			.col-lg-2.text-center.convert-arrow
-				img.img-responsive(src='/img/convertArrow.png')
+
+			svg.col-lg-2.text-center.convert-arrow.visible-lg(
+				width='144px'
+				height='64px'
+				viewBox='0 0 7 4'
+				style='fill: rgba(255,255,255,0.6)'
+			)
+				path(d='M0,1.4 h7 v-1.4 l2,2 l-2,2 v-1.4 h-7 z')
+
 			.col-lg-5.text-center
 				h3
 					center With LEGO#[sup &reg;] bricks

@@ -138,12 +138,6 @@ class VoxelSelector
 		rayDirection = interactionHelper.calculateRay event, @renderer
 		rayOrigin = @renderer.getCamera().position.clone()
 
-		# rotate to match scene that is rotated 90° around x-axis
-		m = new THREE.Matrix4()
-		m.makeRotationX(Math.PI / 2.0)
-		rayDirection.applyProjection(m)
-		rayOrigin.applyProjection(m)
-
 		return @grid.intersectVoxels rayOrigin, rayDirection
 
 	_hasType: (voxel, type) ->

@@ -1,6 +1,7 @@
 PNG = require('node-png').PNG
 THREE = require 'three'
 log = require 'loglevel'
+threeHelper = require '../../client/threeHelper'
 
 class LegoInstructions
 	init: (bundle) ->
@@ -21,37 +22,48 @@ class LegoInstructions
 			cam = new THREE.PerspectiveCamera(
 				@renderer.camera.fov, @renderer.camera.aspect, 1, 1000
 			)
-			cam.position.set(100,100,100)
-			cam.lookAt(new THREE.Vector3(0,0,0))
-			cam.up = new THREE.Vector3(0,0,1)
 
-			# enter build mode
-			oldVisualizationMode = @nodeVisualizer.getDisplayMode()
-			@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
-			.then (numLayers) =>
-				resultingFiles = []
+			cam.position.set(1, 1, 1)
+			cam.lookAt(new THREE.Vector3(0, 0, 0))
+			cam.up = new THREE.Vector3(0, 0, 1)
 
-				# screenshot of each layer
-				promiseChain = Promise.resolve()
-				for layer in [1..numLayers]
-					promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
-					promiseChain = promiseChain.then (fileData) =>
-						resultingFiles.push fileData
+			@nodeVisualizer.getBrickThreeNode selectedNode
+			.then (brickNode) =>
+				boundingSphere = threeHelper.getBoundingSphere brickNode
+				threeHelper.zoomToBoundingSphere(
+					cam
+					@renderer.scene
+					null
+					boundingSphere
+				)
+			.then =>
+				# enter build mode
+				oldVisualizationMode = @nodeVisualizer.getDisplayMode()
+				@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
+				.then (numLayers) =>
+					resultingFiles = []
 
-				# save download
-				promiseChain = promiseChain.then =>
-					log.debug 'Finished pdf instructions screenshots'
+					# screenshot of each layer
+					promiseChain = Promise.resolve()
+					for layer in [1..numLayers]
+						promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
+						promiseChain = promiseChain.then (fileData) ->
+							resultingFiles.push fileData
 
-					resultingFiles.push({
-						fileName: 'LEGO Assembly instructions.html'
-						data: @_createHtml(numLayers)
-					})
+					# save download
+					promiseChain = promiseChain.then =>
+						log.debug 'Finished pdf instructions screenshots'
 
-					resolve resultingFiles
+						resultingFiles.push({
+							fileName: 'LEGO Assembly instructions.html'
+							data: @_createHtml(numLayers)
+						})
 
-				# reset display mode
-				promiseChain.then =>
-					@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
+						resolve resultingFiles
+
+					# reset display mode
+					promiseChain.then =>
+						@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
 
 	_createScreenshotOfLayer: (promiseChain, layer, cam) =>
 		return promiseChain.then =>

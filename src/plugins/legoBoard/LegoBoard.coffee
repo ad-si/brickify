@@ -83,10 +83,9 @@ module.exports = class LegoBoard
 		if not @bundle?
 			return
 
-		cam = @bundle.renderer.camera
+		camera = @bundle.renderer.camera
 
-		# it should be z, but due to orbitcontrols the scene is rotated
-		if cam.position.y < 0
+		if camera.position.z < 0
 			@baseplateBox.material = @baseplateTransparentMaterial
 			@studsContainer.visible = false
 		else
@@ -115,7 +114,7 @@ module.exports = class LegoBoard
 		gl = threeRenderer.context
 
 		# render baseplate transparent if cam looks from below
-		if camera.position.y < 0
+		if camera.position.z < 0
 			# one fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false

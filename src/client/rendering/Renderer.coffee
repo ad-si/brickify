@@ -3,6 +3,7 @@ OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/FxaaPart'
 log = require 'loglevel'
+threeHelper = require '../threeHelper'
 
 ###
 # @class Renderer
@@ -169,32 +170,10 @@ class Renderer
 
 		@threeRenderer.render @scene, @camera
 
-	zoomToBoundingSphere: (radiusAndPosition) ->
+	zoomToNode: (threeNode) ->
+		boundingSphere = threeHelper.getBoundingSphere threeNode
 		# zooms out/in the camera so that the object is fully visible
-		radius = radiusAndPosition.radius
-		center = radiusAndPosition.center
-		center = new THREE.Vector3(center.x, center.y, center.z)
-
-		alpha = @camera.fov
-		distanceToObject = radius / Math.sin(alpha)
-
-		rv = @camera.position.clone().sub(@controls.target)
-		rv = rv.normalize().multiplyScalar(distanceToObject)
-		zoomAdjustmentFactor = 2.5
-		rv = rv.multiplyScalar(zoomAdjustmentFactor)
-
-		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
-		target = center.clone().applyMatrix4(@scene.matrix)
-		position = target.clone().add(rv)
-		@setCamera position, target
-
-	setCamera: (position, target) ->
-		@controls.update()
-		@controls.target = @controls.target0 =
-			new THREE.Vector3(target.x, target.y, target.z)
-		@controls.position = @controls.position0 =
-			new THREE.Vector3(position.x, position.y, position.z)
-		@controls.reset()
+		threeHelper.zoomToBoundingSphere @camera, @scene, @controls, boundingSphere
 
 	init: (@globalConfig) ->
 		@_setupSize @globalConfig
@@ -245,15 +224,6 @@ class Renderer
 
 	_setupScene: (globalConfig) ->
 		scene = new THREE.Scene()
-
-		# Scene rotation because orbit controls only works
-		# with up vector of 0, 1, 0
-		sceneRotation = new THREE.Matrix4()
-		sceneRotation.makeRotationAxis(
-			new THREE.Vector3( 1, 0, 0 ),
-			(-Math.PI / 2)
-		)
-		scene.applyMatrix(sceneRotation)
 		scene.fog = new THREE.Fog(
 			globalConfig.colors.background
 			globalConfig.cameraNearPlane
@@ -271,10 +241,10 @@ class Renderer
 		)
 		@camera.position.set(
 			globalConfig.axisLength
-			globalConfig.axisLength + 10
-			globalConfig.axisLength / 2
+			globalConfig.axisLength
+			globalConfig.axisLength
 		)
-		@camera.up.set(0, 1, 0)
+		@camera.up.set(0, 0, 1)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 	setupControls: (globalConfig, controls) ->

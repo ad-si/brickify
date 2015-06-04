@@ -222,8 +222,7 @@ class NodeVisualizer
 	onNodeDeselect: => @selectedNode = null
 
 	_zoomToNode: (threeNode) =>
-		boundingSphere = threeHelper.getBoundingSphere threeNode
-		@bundle.renderer.zoomToBoundingSphere boundingSphere
+		@bundle.renderer.zoomToNode threeNode
 
 	# initialize visualization with data from newBrickator
 	# change solid renderer appearance
@@ -418,5 +417,10 @@ class NodeVisualizer
 				event, @bundle.renderer, @threeJsRootNode.children
 			)
 			return mixedIntersections
+
+	getBrickThreeNode: (node) =>
+		return @_getCachedData(node)
+		.then (cachedData) ->
+			return cachedData.brickThreeNode
 
 module.exports = NodeVisualizer

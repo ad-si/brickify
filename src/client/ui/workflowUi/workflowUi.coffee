@@ -56,9 +56,6 @@ class WorkflowUi
 					 Please check back later.'
 			})
 
-		$('#downloadPdfButton').click ->
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadPdfClick']
-			alertCallback()
 		$('#shareButton').click ->
 			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
 			alertCallback()

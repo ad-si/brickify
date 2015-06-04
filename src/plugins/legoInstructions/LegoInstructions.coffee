@@ -62,7 +62,7 @@ class LegoInstructions
 				.then (pixelData) =>
 					pixelData.pixels = @_flipAndFitImage pixelData
 					@_convertToPng(pixelData)
-					.then (pngData) =>
+					.then (pngData) ->
 						return ({
 							fileName: "LEGO assembly instructions #{layer}.png"
 							data: pngData.buffer

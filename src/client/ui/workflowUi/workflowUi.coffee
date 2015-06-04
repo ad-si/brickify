@@ -3,7 +3,8 @@ perfectScrollbar = require 'perfect-scrollbar'
 LoadUi = require './LoadUi'
 EditUi = require './EditUi'
 PreviewUi = require './PreviewUi'
-ExportUi = require './ExportUi'
+DownloadUi = require './DownloadUi'
+ShareUi =  require './ShareUi'
 
 class WorkflowUi
 	constructor: (@bundle) -> return
@@ -40,25 +41,14 @@ class WorkflowUi
 			load: new LoadUi @
 			edit: new EditUi @
 			preview: new PreviewUi @
-			export: new ExportUi @
+			export: new DownloadUi @bundle
+			share: new ShareUi @bundle
 
 		@enableOnly @workflow.load
 
-		@_initNotImplementedMessages()
 		@_initScrollbar()
 		@_initToggleButton()
 
-	_initNotImplementedMessages: ->
-		alertCallback = ->
-			bootbox.alert({
-					title: 'Not implemented yet'
-					message: 'We are sorry, but this feature is not implemented yet.
-					 Please check back later.'
-			})
-
-		$('#shareButton').click ->
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
-			alertCallback()
 
 	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'

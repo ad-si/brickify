@@ -45,6 +45,7 @@ staticRendererHeight: 100
 
 #ui and interaction
 buildUi: true
+offerDownload: false
 
 #load these plugins
 plugins:

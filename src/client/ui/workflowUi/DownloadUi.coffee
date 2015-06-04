@@ -1,31 +1,34 @@
 DownloadProvider = require './downloadProvider'
+downloadModal = require '../downloadModal'
 
-class ExportUi
-	constructor: (@workflowUi) ->
-		{@studSize, @holeSize, @exportStepSize} = @workflowUi.bundle.globalConfig
+class DownloadUi
+	constructor: (@bundle) ->
+		{@studSize, @holeSize, @exportStepSize} = @bundle.globalConfig
 
-		@$panel = $('#exportGroup')
 		@_initDownloadModal()
 		@_initDownloadModalContent()
+		@$panel = $('#downloadButton')
 
 	setEnabled: (enabled) =>
 		@$panel.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
+		@$downloadModal.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
 
 	_initDownloadModal: =>
+		@$downloadModal = downloadModal.getModal()
+		$('body').append @$downloadModal
 		@downloadButton = $('#downloadButton')
-		@downloadModal = $('#downloadModal')
 
 		#show modal when clicking on download button
 		@downloadButton.click =>
 			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadButtonClick']
-			@downloadModal.modal 'show'
+			@$downloadModal.modal 'show'
 
 	_initDownloadModalContent: =>
 		# stl download
-		@downloadProvider = new DownloadProvider @workflowUi.bundle
+		@downloadProvider = new DownloadProvider @bundle
 		@downloadProvider.init(
 			'#stlDownloadButton', '#downloadPdfButton',
-			@, @workflowUi.bundle.sceneManager
+			@, @bundle.sceneManager
 		)
 
 		@studSizeSelect = $('#studSizeSelect')
@@ -48,4 +51,4 @@ class ExportUi
 		@holeRadius = @holeSize.radius + holeSelection * @exportStepSize
 
 
-module.exports = ExportUi
+module.exports = DownloadUi

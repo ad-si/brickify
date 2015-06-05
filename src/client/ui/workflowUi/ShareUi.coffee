@@ -1,3 +1,5 @@
+piwikTracking = require '../../piwikTracking'
+
 class ShareUi
 	constructor: ->
 		@$shareButton = $('#shareButton')
@@ -13,6 +15,9 @@ class ShareUi
 
 		@$shareButton.click ->
 			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
+			piwikTracking.trackEvent(
+				'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
+			)
 			alertCallback()
 
 	setEnabled: (enabled) =>

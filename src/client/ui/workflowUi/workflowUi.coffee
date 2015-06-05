@@ -49,7 +49,6 @@ class WorkflowUi
 		@_initScrollbar()
 		@_initToggleButton()
 
-
 	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'
 		perfectScrollbar.initialize sidebar

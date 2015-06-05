@@ -4,6 +4,7 @@ saveAs = require 'filesaver.js'
 JSZip = require 'jszip'
 log = require 'loglevel'
 Spinner = require '../../Spinner'
+piwikTracking = require '../../piwikTracking'
 
 module.exports = class DownloadProvider
 	constructor: (@bundle) ->
@@ -40,14 +41,12 @@ module.exports = class DownloadProvider
 		}
 
 		if (fileType == 'stl')
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadStlClick']
-			_paq.push(
-				['trackEvent', 'Editor', 'ExportAction', 'StudRadius',
-				downloadOptions.studRadius]
+			piwikTracking.trackEvent 'EditorExport', 'DownloadStlClick'
+			piwikTracking.trackEvent(
+				'EditorExport', 'StudRadius', @exportUi.studRadiusSelection
 			)
-			_paq.push(
-				['trackEvent', 'Editor', 'ExportAction', 'HoleRadius',
-				downloadOptions.holeRadius]
+			piwikTracking.trackEvent(
+				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
 			)
 
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions

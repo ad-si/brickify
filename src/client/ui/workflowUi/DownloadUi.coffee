@@ -1,5 +1,6 @@
 DownloadProvider = require './downloadProvider'
 downloadModal = require '../downloadModal'
+piwikTracking = require '../../piwikTracking'
 
 class DownloadUi
 	constructor: (@bundle) ->
@@ -20,7 +21,7 @@ class DownloadUi
 
 		#show modal when clicking on download button
 		@downloadButton.click =>
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'DownloadButtonClick']
+			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadButtonClick'
 			@$downloadModal.modal 'show'
 
 	_initDownloadModalContent: =>
@@ -44,10 +45,12 @@ class DownloadUi
 
 	_updateStudRadius: =>
 		studSelection = parseInt @studSizeSelect.val()
+		@studRadiusSelection = @studSizeSelect.val()
 		@studRadius = @studSize.radius + studSelection * @exportStepSize
 
 	_updateHoleRadius: =>
 		holeSelection = parseInt @holeSizeSelect.val()
+		@holeRadiusSelection = @holeSizeSelect.val()
 		@holeRadius = @holeSize.radius + holeSelection * @exportStepSize
 
 

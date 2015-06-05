@@ -2,9 +2,9 @@
 
 ## Installation
 
-`$ git clone https://github.com/stuikomma/lowfab.git`
+`$ git clone https://github.com/brickify/brickify.git`
 
-`$ cd lowfab`
+`$ cd brickify`
 
 Install dependencies: `$ npm install`
 

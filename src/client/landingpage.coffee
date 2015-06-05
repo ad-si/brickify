@@ -2,6 +2,7 @@ require './polyfills'
 $ = require 'jquery'
 window.jQuery = window.$ = $
 bootstrap = require 'bootstrap'
+piwikTracking = require './piwikTracking'
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
@@ -75,12 +76,12 @@ b1 = bundle1.init().then ->
 	callback = (event) ->
 		files = event.target.files ? event.dataTransfer.files
 		if files.length
-			_paq.push ['trackEvent', 'Landingpage', 'LoadModel', files[0].name]
+			piwikTracking.trackEvent 'Landingpage', 'LoadModel', files[0].name
 			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
 			.then loadFromHash
 		else
 			hash = event.dataTransfer.getData 'text/plain'
-			_paq.push ['trackEvent', 'Landingpage', 'LoadModelFromImage', hash]
+			piwikTracking.trackEvent 'Landingpage', 'LoadModelFromImage', hash
 			modelCache.exists hash
 			.then -> loadFromHash hash
 			.catch -> bootbox.alert(
@@ -104,3 +105,16 @@ b1 = bundle1.init().then ->
 				e.originalEvent.target.getAttribute 'data-hash'
 			)
 	)
+<<<<<<< HEAD
+=======
+
+# set not available message
+$('#downloadButton').click ->
+	piwikTracking.trackEvent 'Landingpage', 'ButtonClick', 'Download'
+	bootbox.alert({
+		title: 'Not available'
+		message: 'This feature is not available yet - please check back later.<br>' +
+		'<br>However, you can edit and download the model with our editor '+
+		'by clicking the <strong>Customize</strong> Button'
+	})
+>>>>>>> 191e03250a58f27ec03febe134fef9ee4e93162b

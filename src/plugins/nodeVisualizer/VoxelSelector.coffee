@@ -122,15 +122,16 @@ class VoxelSelector
 		start = modelIntersects[0].point
 		end = modelIntersects[1].point
 
-		revTransform = new THREE.Matrix4()
-		revTransform.getInverse @renderer.scene.matrix
-
 		middle = new THREE.Vector3(
 			(start.x + end.x) / 2
 			(start.y + end.y) / 2
 			(start.z + end.z) / 2
 		)
+
+		revTransform = new THREE.Matrix4()
+		revTransform.getInverse @renderer.scene.matrix
 		middle.applyMatrix4 revTransform
+
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
 		return @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 

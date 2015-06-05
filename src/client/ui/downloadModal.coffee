@@ -15,7 +15,7 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
         </div>
         <div class=\"modal-body\">'
 	if testStrip
-    html += '
+		html += '
     <h4 class=\"disabled\">Download stl for 3d printer</h4>
     <p>Select the stud size that works best for your 3d printer. If you don\'t
 know the size, download and print the&nbsp;
@@ -32,12 +32,12 @@ know the size, download and print the&nbsp;
 <br />'
 
 	if  stl
-    html += '
+		html += '
 <div id=\"stlDownloadButton\" class=\"btn btn-success btn-block disabled\">
     &nbsp;&nbsp;Download stl for 3D printer
 </div>'
 	if lego
-	  html += '
+		html += '
 <h4 class=\"disabled\">Download Instructions</h4>
 <div id=\"downloadPdfButton\" class=\"btn btn-success btn-block disabled\">
     &nbsp;&nbsp;Download pdf LEGO instructions

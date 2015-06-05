@@ -11,7 +11,7 @@ class WorkflowUi
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		@_enable ['load', 'edit', 'preview', 'export']
+		@_enable ['load', 'edit', 'preview', 'export', 'share']
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>

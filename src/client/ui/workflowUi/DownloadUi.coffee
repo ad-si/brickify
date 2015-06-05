@@ -10,11 +10,11 @@ class DownloadUi
 		@$panel = $('#downloadButton')
 
 	setEnabled: (enabled) =>
-		@$panel.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
+		@$panel.toggleClass 'disabled', !enabled
 		@$downloadModal.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
 
 	_initDownloadModal: =>
-		@$downloadModal = downloadModal.getModal()
+		@$downloadModal = downloadModal @bundle.globalConfig.downloadSettings
 		$('body').append @$downloadModal
 		@downloadButton = $('#downloadButton')
 

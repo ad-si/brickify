@@ -16,6 +16,6 @@ class ShareUi
 			alertCallback()
 
 	setEnabled: (enabled) =>
-		@$shareButton.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
+		@$shareButton.toggleClass 'disabled', !enabled
 
 module.exports = ShareUi

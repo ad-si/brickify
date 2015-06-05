@@ -41,6 +41,12 @@ config2.showModel = false
 
 # configure right bundle to offer downloading lego instructions
 config2.offerDownload = true
+config2.downloadSettings = {
+	testStrip: false
+	stl: false
+	lego: true
+	steps: 0
+}
 
 # instantiate 2 brickify bundles
 config1.renderAreaId = 'renderArea1'

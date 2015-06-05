@@ -94,3 +94,9 @@ gridSpacing:
 addStuds: false
 
 exportStepSize: 0.033
+
+downloadSettings:
+  testStrip: true
+  stl: true
+  lego: true
+  steps: 4

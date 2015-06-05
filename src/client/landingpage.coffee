@@ -105,16 +105,3 @@ b1 = bundle1.init().then ->
 				e.originalEvent.target.getAttribute 'data-hash'
 			)
 	)
-<<<<<<< HEAD
-=======
-
-# set not available message
-$('#downloadButton').click ->
-	piwikTracking.trackEvent 'Landingpage', 'ButtonClick', 'Download'
-	bootbox.alert({
-		title: 'Not available'
-		message: 'This feature is not available yet - please check back later.<br>' +
-		'<br>However, you can edit and download the model with our editor '+
-		'by clicking the <strong>Customize</strong> Button'
-	})
->>>>>>> 191e03250a58f27ec03febe134fef9ee4e93162b

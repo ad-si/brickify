@@ -45,10 +45,15 @@ class LegoInstructions
 
 					# screenshot of each layer
 					promiseChain = Promise.resolve()
+					imageWidth = 0
 					for layer in [1..numLayers]
 						promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
 						promiseChain = promiseChain.then (fileData) ->
-							resultingFiles.push fileData
+							resultingFiles.push {
+								fileName: fileData.fileName
+								data: fileData.data
+							}
+							imageWidth = fileData.imageWidth
 
 					# save download
 					promiseChain = promiseChain.then =>
@@ -56,7 +61,7 @@ class LegoInstructions
 
 						resultingFiles.push({
 							fileName: 'LEGO Assembly instructions.html'
-							data: @_createHtml(numLayers)
+							data: @_createHtml numLayers, imageWidth
 						})
 
 						resolve resultingFiles
@@ -78,6 +83,7 @@ class LegoInstructions
 						return ({
 							fileName: "LEGO assembly instructions #{layer}.png"
 							data: pngData.buffer
+							imageWidth: pixelData.viewWidth
 						})
 
 	_convertToPng: (renderedImage) ->
@@ -135,10 +141,11 @@ class LegoInstructions
 
 		return newImage
 
-	_createHtml: (numLayers) ->
-		style = '<style>
-		img{width: 100%}h1,h3{font-family:Helvetica, Arial, sans-serif;}
-		</style>'
+	_createHtml: (numLayers, imgWidth) ->
+		style = "<style>
+		img{width: #{imgWidth}px; max-width: 100%;}
+		h1,h3{font-family:Helvetica, Arial, sans-serif;}
+		</style>"
 
 		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		"http://www.w3.org/TR/html4/strict.dtd">'

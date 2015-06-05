@@ -36,7 +36,8 @@ module.exports.getBoundingSphere = (threeNode) ->
 		center = boundingBox.center()
 		return radius: radius, center: center
 
-module.exports.zoomToBoundingSphere = (camera, scene, controls, boundingSphere) ->
+module.exports.zoomToBoundingSphere = (
+	camera, scene, controls, boundingSphere) ->
 	radius = boundingSphere.radius
 	center = boundingSphere.center
 

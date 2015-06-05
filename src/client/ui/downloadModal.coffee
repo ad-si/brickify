@@ -5,7 +5,7 @@ addOptions = ($select, range, defaultValue) ->
 
 
 getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
-	html = "
+	html = '
 <div id=\"downloadModal\" tabindex=\"-1\" class=\"modal fade\">
     <div class=\"modal-dialog\">
       <div class=\"modal-content\">
@@ -13,11 +13,11 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
           <button data-dismiss=\"modal\" class=\"close\">&#215;</button>
           <h4 class=\"modal-title disabled\">Download</h4>
         </div>
-        <div class=\"modal-body\">"
+        <div class=\"modal-body\">'
 	if testStrip
-    html += "
+    html += '
     <h4 class=\"disabled\">Download stl for 3d printer</h4>
-    <p>Select the stud size that works best for your 3d printer. If you don't
+    <p>Select the stud size that works best for your 3d printer. If you don\'t
 know the size, download and print the&nbsp;
 <a  href=\"/download/testStrip.zip\">test strip</a>.</p>
     <center>
@@ -29,27 +29,27 @@ know the size, download and print the&nbsp;
 <p>To connect test strip studs into LEGO bricks, this size works best:
     <select id=\"studSizeSelect\" class=\"form-control\"/>
 </p>
-<br />"
+<br />'
 
 	if  stl
-    html += "
+    html += '
 <div id=\"stlDownloadButton\" class=\"btn btn-success btn-block disabled\">
     &nbsp;&nbsp;Download stl for 3D printer
-</div>"
+</div>'
 	if lego
-	  html += "
+	  html += '
 <h4 class=\"disabled\">Download Instructions</h4>
 <div id=\"downloadPdfButton\" class=\"btn btn-success btn-block disabled\">
     &nbsp;&nbsp;Download pdf LEGO instructions
-</div>"
-	html += "
+</div>'
+	html += '
 </div>
 <div class=\"modal-footer\">
     <button data-dismiss=\"modal\" class=\"btn btn-primary disabled\">
         Close
     </button>
 </div>
-</div></div></div>"
+</div></div></div>'
 
 	$modal = $($.parseHTML html)
 	if testStrip

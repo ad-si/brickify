@@ -207,8 +207,9 @@ module.exports.setupRouting = ->
 
 	webapp.use (req, res) ->
 		res
-		.status(404)
+		.status 404
 		.render '404'
+
 	return module.exports
 
 module.exports.startServer = (_port, _ip) ->

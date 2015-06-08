@@ -186,6 +186,26 @@ class FidelityControl
 			fpsText = Math.round(fps) + '/' + levelAbbreviation
 			@$fpsDisplay.text fpsText
 
+	# disables pipeline for screenshots
+	enableScreenshotMode: =>
+		level = FidelityControl.fidelityLevels.indexOf 'DefaultHigh'
+
+		@pluginHooks.setFidelity(
+			level, FidelityControl.fidelityLevels
+		)
+		@bundle.renderer.setFidelity(
+			level, FidelityControl.fidelityLevels
+		)
+
+	# resets screenshot mode, restores old fidelity level
+	disableScreenshotMode: =>
+		@pluginHooks.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
+		@bundle.renderer.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+		)
+
 	reset: =>
 		@accumulatedFrames = 0
 		@accumulatedTime = 0

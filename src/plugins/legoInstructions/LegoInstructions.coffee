@@ -3,13 +3,15 @@ THREE = require 'three'
 log = require 'loglevel'
 threeHelper = require '../../client/threeHelper'
 
-instructionsResolution = 1024
+instructionsResolution = 512
 
 class LegoInstructions
 	init: (bundle) ->
 		@renderer = bundle.renderer
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
 		@newBrickator = bundle.getPlugin 'newBrickator'
+		@fidelityControl = bundle.getPlugin 'fidelity-control'
+
 	onNodeSelect: (@selectedNode) => return
 
 	onNodeDeselect: => @selectedNode = null
@@ -39,6 +41,9 @@ class LegoInstructions
 					boundingSphere
 				)
 			.then =>
+				# disable pipeline
+				@fidelityControl.enableScreenshotMode()
+
 				# enter build mode
 				oldVisualizationMode = @nodeVisualizer.getDisplayMode()
 				@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
@@ -77,6 +82,7 @@ class LegoInstructions
 					# reset display mode
 					promiseChain.then =>
 						@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
+						@fidelityControl.disableScreenshotMode()
 
 	_createScreenshotOfLayer: (promiseChain, layer, cam) =>
 		return promiseChain.then =>

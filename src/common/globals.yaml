@@ -1,6 +1,4 @@
-# unit - all units are in mm (do not change...)
-mm: 1
-
+# all units are in mm
 
 colors:
   background: 0x222222
@@ -75,3 +73,22 @@ orbitControls:
   autoRotateSpeed: 1.0
   maxDistance: 1500
   minDistance: 2
+
+minimalPrintVolume: 100 # in mm^3 (roughly half the volume of a 1x1 brick)
+
+studSize:
+  radius: 2.4
+  height: 1.8
+
+holeSize:
+  radius: 2.633
+  height: 2.3
+
+gridSpacing:
+  x: 8
+  y: 8
+  z: 3.2
+
+addStuds: false
+
+exportStepSize: 0.033

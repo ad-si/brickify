@@ -1,14 +1,14 @@
 {
   "name": "Brickify",
-  "version": "0.8.0",
-  "description": "Extend your LEGO® with 3D-printed parts!",
+  "version": "0.9.3",
+  "description": "Faster 3D-printing with LEGO bricks",
   "keywords": [
     "fabrication",
     "3d printing",
     "lego"
   ],
   "homepage": "http://brickify.it",
-  "bugs": "http://github.com/stuikomma/lowfab/issues",
+  "bugs": "http://github.com/brickify/brickify/issues",
   "dependencies": {
     "PEP": "brickify/PEP#0.3.1",
     "array.prototype.find": "^1.0.0",
@@ -37,6 +37,7 @@
     "jade": "^1.7.0",
     "jquery": "^2.1.1",
     "js-yaml": "^3.2.7",
+    "jszip": "^2.5.0",
     "loglevel": "^1.2.0",
     "meshlib": "brickify/meshlib#0.2.3",
     "mkdirp": "^0.5.0",
@@ -86,7 +87,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/stuikomma/lowfab.git"
+    "url": "http://github.com/brickify/brickify.git"
   },
   "author": "HPI HCI-Bachelorprojekt 2014",
   "contributors": [

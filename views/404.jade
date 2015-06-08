@@ -1,11 +1,19 @@
-extends rootLayout
+extends ./rootLayout
+
+block styles
+	link(rel='stylesheet', href='/styles/screen.css')
 
 block body
-	p The requested URL
-		= ' '
-		del could not get fabricated
-		= ' '
-		ins was not found on this server!
-	p Go back to
-		= ' '
-		a(href="/") brickify
+	.container
+
+		h1: a(href='/') brickify
+
+		p The requested URL
+			= ' '
+			del could not get fabricated
+			= ' '
+			ins was not found on this server!
+
+		p Go back to
+			= ' '
+			a(href="/") brickify

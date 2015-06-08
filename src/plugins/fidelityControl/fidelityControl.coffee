@@ -6,6 +6,7 @@
 ###
 
 $ = require 'jquery'
+piwikTracking = require '../../client/piwikTracking'
 
 minimalAcceptableFps = 20
 upgradeThresholdFps = 40
@@ -13,7 +14,7 @@ accumulationTime = 200
 timesBelowThreshold = 10
 fpsDisplayUpdateTime = 1000
 maxNoPipelineDecisions = 3
-
+piwikStatInterval = 20
 
 ###
 # @class FidelityControl
@@ -40,6 +41,8 @@ class FidelityControl
 		@accumulatedFrames = 0
 		@accumulatedTime = 0
 
+		@currentPiwikStat = 0
+
 		@timesBelowMinimumFps = 0
 
 		@showFps = process.env.NODE_ENV is 'development'
@@ -50,6 +53,13 @@ class FidelityControl
 		usePipeline = @bundle.globalConfig.rendering.usePipeline
 		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
 		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
+
+		capabilites = ''
+		capabilites += 'ExtFragDepth' if fragDepth?
+		capabilites += ' stencilBuffer' if stencilBuffer
+
+		piwikTracking.setCustomSessionVariable 0, 'GpuCapabilities', capabilites
+
 		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
@@ -70,6 +80,18 @@ class FidelityControl
 			@accumulatedTime %= accumulationTime
 			@_adjustFidelity fps
 			@_showFps timestamp, fps
+
+			@currentPiwikStat++
+			if @currentPiwikStat > piwikStatInterval
+				@_sendFpsStats(fps)
+				@currentPiwikStat = 0
+
+	_sendFpsStats: (fps) =>
+		piwikTracking.trackEvent(
+			'FidelityControl', 'FpsAverage',
+			FidelityControl.fidelityLevels[@currentFidelityLevel],
+			fps
+		)
 
 	_adjustFidelity: (fps) =>
 		return unless @autoAdjust

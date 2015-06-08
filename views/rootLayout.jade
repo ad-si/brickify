@@ -2,15 +2,15 @@ doctype html
 html
 	head
 		meta(charset='utf-8')
-		if pageTitle != null
-			title #{pageTitle} - brickify - Extend your LEGO with 3D-printed parts!
-		else
-			title brickify - Extend your LEGO with 3D-printed parts!
-		meta(name='viewport' content='width=device-width, initial-scale=1')
+		title 
+			if pageTitle
+				| #{pageTitle} | Brickify
+			else
+				| Brickify - Faster 3D-printing with LEGO bricks
 
-		script(src='/js/piwik.js')
-		noscript
-			img(src='//piwik.brickify.it/piwik.php?idsite=1' style='border:0;' alt='')
+		meta(name='viewport' content='width=device-width, initial-scale=1')
+		meta(name="description" content='Faster 3D-printing with LEGO bricks')
+		meta(name="keywords" content='Brickify, 3D-printing, LEGO')
 
 		block styles
 
@@ -18,4 +18,7 @@ html
 
 		block body
 
+		script(src='/js/piwik.js')
+		noscript
+			img(src='//piwik.brickify.it/piwik.php?idsite=1' style='border:0;' alt='')
 		block scripts

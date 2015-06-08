@@ -100,3 +100,6 @@ downloadSettings:
   stl: true
   lego: true
   steps: 4
+
+# resolution of the images in the build instructions
+legoInstructionResolution: 1024

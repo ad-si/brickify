@@ -4,14 +4,13 @@ log = require 'loglevel'
 threeHelper = require '../../client/threeHelper'
 partListGenerator = require './PartListGenerator'
 
-instructionsResolution = 1024
-
 class LegoInstructions
 	init: (bundle) ->
 		@renderer = bundle.renderer
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
 		@newBrickator = bundle.getPlugin 'newBrickator'
 		@fidelityControl = bundle.getPlugin 'fidelity-control'
+		@imageResolution = bundle.globalConfig.legoInstructionResolution
 
 	onNodeSelect: (@selectedNode) => return
 
@@ -94,7 +93,7 @@ class LegoInstructions
 			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
 			.then =>
 				log.debug 'create screenshot of layer',layer
-				@renderer.renderToImage(cam, instructionsResolution)
+				@renderer.renderToImage(cam, @imageResolution)
 				.then (pixelData) =>
 					flippedImage = @_flipAndFitImage pixelData
 					@_convertToPng(flippedImage)

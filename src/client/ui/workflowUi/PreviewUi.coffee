@@ -1,4 +1,5 @@
 PreviewAssemblyUi = require './PreviewAssemblyUi'
+piwikTracking = require '../../piwikTracking'
 
 class PreviewUi
 	constructor: (@workflowUi) ->
@@ -47,6 +48,7 @@ class PreviewUi
 			@editController.disableInteraction()
 			@nodeVisualizer.setDisplayMode @sceneManager.selectedNode, 'stability'
 		else
+			piwikTracking.trackEvent 'Editor', 'PreviewAction', 'StabilityView'
 			@editController.enableInteraction()
 
 	_initAssemblyView: =>
@@ -67,6 +69,7 @@ class PreviewUi
 		@_quitStabilityView()
 
 		if @assemblyViewEnabled
+			piwikTracking.trackEvent  'Editor', 'PreviewAction', 'AssemblyView'
 			@workflowUi.enableOnly @
 		else
 			@workflowUi.enableAll()

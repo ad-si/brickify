@@ -2,6 +2,7 @@ $ = require 'jquery'
 modelCache = require '../../modelLoading/modelCache'
 saveAs = require 'filesaver.js'
 JSZip = require 'jszip'
+piwikTracking = require '../../piwikTracking'
 
 module.exports = class DownloadProvider
 	constructor: (@bundle) ->
@@ -21,6 +22,15 @@ module.exports = class DownloadProvider
 			studRadius: @exportUi.studRadius
 			holeRadius: @exportUi.holeRadius
 		}
+
+		if (fileType == 'stl')
+			piwikTracking.trackEvent 'EditorExport', 'DownloadStlClick'
+			piwikTracking.trackEvent(
+				'EditorExport', 'StudRadius', @exportUi.studRadiusSelection
+			)
+			piwikTracking.trackEvent(
+				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
+			)
 
 		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
 

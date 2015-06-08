@@ -1,4 +1,5 @@
 DownloadProvider = require './downloadProvider'
+piwikTracking = require '../../piwikTracking'
 
 class ExportUi
 	constructor: (@workflowUi) ->
@@ -17,6 +18,7 @@ class ExportUi
 
 		#show modal when clicking on download button
 		@downloadButton.click =>
+			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadButtonClick'
 			@downloadModal.modal 'show'
 
 	_initDownloadModalContent: =>
@@ -39,10 +41,12 @@ class ExportUi
 
 	_updateStudRadius: =>
 		studSelection = parseInt @studSizeSelect.val()
+		@studRadiusSelection = @studSizeSelect.val()
 		@studRadius = @studSize.radius + studSelection * @exportStepSize
 
 	_updateHoleRadius: =>
 		holeSelection = parseInt @holeSizeSelect.val()
+		@holeRadiusSelection = @holeSizeSelect.val()
 		@holeRadius = @holeSize.radius + holeSelection * @exportStepSize
 
 

@@ -1,5 +1,6 @@
 fileDropper = require '../../modelLoading/fileDropper'
 fileLoader = require '../../modelLoading/fileLoader'
+piwikTracking = require '../../piwikTracking'
 
 class LoadUi
 	constructor: (@workflowUi) ->
@@ -21,6 +22,7 @@ class LoadUi
 		files = event.target.files ? event.dataTransfer.files
 		@_checkReplaceModel().then (loadConfirmed) =>
 			return unless loadConfirmed
+			piwikTracking.trackEvent 'Editor', 'LoadModel', files[0].name
 			spinnerOptions =
 				length: 5
 				radius: 3

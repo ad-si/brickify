@@ -2,6 +2,7 @@ PNG = require('node-png').PNG
 THREE = require 'three'
 log = require 'loglevel'
 threeHelper = require '../../client/threeHelper'
+partListGenerator = require './PartListGenerator'
 
 instructionsResolution = 1024
 
@@ -62,19 +63,23 @@ class LegoInstructions
 							}
 							imageWidth = fileData.imageWidth
 
-					# scad generation
+					# scad and part list generation
+					partListHtml = ''
 					promiseChain = promiseChain.then =>
 						@newBrickator._getCachedData(selectedNode). then (data) =>
-							console.log data
+							partList = partListGenerator.generatePartList data.grid.getAllBricks()
+							partListHtml = partListGenerator.getHtml partList
+
 							resultingFiles.push @_createScad data.grid.getAllBricks()
 
 					# save download
 					promiseChain = promiseChain.then =>
 						log.debug 'Finished pdf instructions screenshots'
 
+						# add instructions html to download
 						resultingFiles.push({
 							fileName: 'LEGO Assembly instructions.html'
-							data: @_createHtml numLayers, imageWidth
+							data: @_createHtml numLayers, imageWidth, partListHtml
 						})
 
 						resolve resultingFiles
@@ -182,10 +187,10 @@ class LegoInstructions
 		imageData[index + 2] = rgbaArray[2]
 		imageData[index + 3] = rgbaArray[3]
 
-	_createHtml: (numLayers, imgWidth) ->
+	_createHtml: (numLayers, imgWidth, partListHtml = null) ->
 		style = "<style>
 		img{width: #{imgWidth}px; max-width: 100%;}
-		h1,h3{font-family:Helvetica, Arial, sans-serif;}
+		h1,h3,p,li{font-family:Helvetica, Arial, sans-serif;}
 		</style>"
 
 		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -194,6 +199,8 @@ class LegoInstructions
 		<title>LEGO assembly instructions</title>
 		</head><body><h1>Build instructions</h1>'
 		html += style
+
+		html += partListHtml if partListHtml?
 
 		for i in [1..numLayers]
 			html += '<br>'

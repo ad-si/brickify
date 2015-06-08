@@ -11,8 +11,13 @@ module.exports.generatePartList = (bricks) ->
 				brickType.count++
 				return
 
+		size = brick.getSize()
 		partList.push {
-			size: brick.getSize()
+			size: {
+				x: size.x
+				y: size.y
+				z: size.z
+			}
 			count: 1
 		}
 

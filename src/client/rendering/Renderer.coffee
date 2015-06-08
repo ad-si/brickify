@@ -15,7 +15,7 @@ class Renderer
 		@threeRenderer = null
 		@init globalConfig
 		@pipelineEnabled = false
-		@useBigPipelineTargets = false
+		@renderResolution = 0
 		@imageRenderQueries = []
 
 	# renders the current scene to an image, uses the camera if provided
@@ -101,17 +101,11 @@ class Renderer
 			@threeRenderer.clear()
 			@threeRenderer.setRenderTarget(null)
 
-			# set global config
-			pipelineConfig = {
-				useBigTargets: @useBigPipelineTargets
-			}
-
 			# let plugins render in our target
 			@pluginHooks.onPaint(
 				@threeRenderer,
 				camera,
-				@pipelineRenderTarget.renderTarget,
-				pipelineConfig
+				@pipelineRenderTarget.renderTarget
 			)
 
 			# render our target to the screen
@@ -121,7 +115,7 @@ class Renderer
 	_initializePipelineTarget: =>
 		if not @pipelineRenderTarget? or
 		not renderTargetHelper.renderTargetHasRightSize(
-			@pipelineRenderTarget.renderTarget, @threeRenderer, @useBigPipelineTargets
+			@pipelineRenderTarget.renderTarget, @threeRenderer
 		)
 			shaderParts = []
 			if @usePipelineFxaa
@@ -131,17 +125,16 @@ class Renderer
 				@threeRenderer,
 				shaderParts,
 				null,
-				1.0,
-				@useBigPipelineTargets
+				1.0
 			)
 
 	setFidelity: (fidelityLevel, availableLevels) =>
 		if @pipelineEnabled
 			# Determine whether to use bigger render targets (super sampling)
 			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-				@useBigPipelineTargets = true
+				renderTargetHelper.configureSize true
 			else
-				@useBigPipelineTargets = false
+				renderTargetHelper.configureSize false
 
 			# determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'

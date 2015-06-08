@@ -92,17 +92,17 @@ module.exports = class LegoBoard
 			@baseplateBox.material = @currentBaseplateMaterial
 			@studsContainer.visible = true if @highQualMode
 
-	onPaint: (threeRenderer, camera, target, config) =>
+	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible
 
 		# recreate textures if either they havent been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized? and
 		RenderTargetHelper.renderTargetHasRightSize(
-			@pipelineSceneTarget.renderTarget, threeRenderer, config.useBigTargets
+			@pipelineSceneTarget.renderTarget, threeRenderer
 		))
 			@pipelineSceneTarget = RenderTargetHelper.createRenderTarget(
-				threeRenderer, null, null, 1.0, config.useBigTargets
+				threeRenderer, null, null, 1.0
 			)
 			@renderTargetsInitialized = true
 

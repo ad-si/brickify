@@ -45,22 +45,21 @@ class NodeVisualizer
 		@brickShadowRootNode = new THREE.Object3D()
 		@threeJsRootNode.add @brickShadowRootNode
 
-	onPaint: (@threeRenderer, camera, target, config) =>
+	onPaint: (@threeRenderer, camera, target) =>
 		threeRenderer = @threeRenderer
 
 		# recreate textures if either they haven't been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
-			@brickSceneTarget.renderTarget, threeRenderer, config.useBigTargets
+			@brickSceneTarget.renderTarget, threeRenderer
 		))
 			# bricks
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				null,
 				null,
-				1.0,
-				config.useBigTargets
+				1.0
 			)
 
 			# object target
@@ -69,7 +68,6 @@ class NodeVisualizer
 				[new ExpandBlackPart(2), new ColorMultPart()],
 				{colorMult: {type: 'v3', value: new THREE.Vector3(1, 1, 1)}},
 				@objectOpacity
-	  			config.useBigTargets
 			)
 
 			# brick shadow target
@@ -77,8 +75,7 @@ class NodeVisualizer
 				threeRenderer,
 				null,
 				null,
-				@brickShadowOpacity,
-				config.useBigTargets
+				@brickShadowOpacity
 			)
 
 			@renderTargetsInitialized = true

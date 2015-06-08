@@ -3,7 +3,7 @@ THREE = require 'three'
 log = require 'loglevel'
 threeHelper = require '../../client/threeHelper'
 
-instructionsResolution = 512
+instructionsResolution = 1024
 
 class LegoInstructions
 	init: (bundle) ->
@@ -91,8 +91,8 @@ class LegoInstructions
 				log.debug 'create screenshot of layer',layer
 				@renderer.renderToImage(cam, instructionsResolution)
 				.then (pixelData) =>
-					pixelData.pixels = @_flipAndFitImage pixelData
-					@_convertToPng(pixelData)
+					flippedImage = @_flipAndFitImage pixelData
+					@_convertToPng(flippedImage)
 					.then (pngData) ->
 						return ({
 							fileName: "LEGO assembly instructions #{layer}.png"
@@ -100,13 +100,14 @@ class LegoInstructions
 							imageWidth: pixelData.viewWidth
 						})
 
-	_convertToPng: (renderedImage) ->
+	_convertToPng: (image) ->
 		return new Promise (resolve, reject) ->
 			png = new PNG({
-				width: renderedImage.viewWidth, height: renderedImage.viewHeight
+				width: image.width
+				height: image.height
 			})
-			for i in [0...renderedImage.pixels.length]
-				png.data[i] = renderedImage.pixels[i]
+			for i in [0...image.data.length]
+				png.data[i] = image.data[i]
 			png.pack()
 
 			pngData = new Uint8Array(0)
@@ -123,37 +124,63 @@ class LegoInstructions
 	# flips the image horizontally (because renderer delivers it upside down)
 	# and scales it to actual recorded screen measurements (because it is always
 	# in size 2^n)
-	_flipAndFitImage: (renderedImage) ->
+	_flipAndFitImage: (renderedImage) =>
 		sw = renderedImage.viewWidth
 		sh = renderedImage.viewHeight
 		iw = renderedImage.imageWidth
 		ih = renderedImage.imageHeight
 
+		# scale screen to match image dimensions,
+		# but retain aspect ratio
+		biggerView = Math.max sw, sh
+		biggerImage = Math.max iw, ih
+
+		scaleFactor = biggerImage / biggerView
+
+		sw = Math.round sw * scaleFactor
+		sh = Math.round sh * scaleFactor
+
+		# create new image
 		newImage = new Uint8Array(sw * sh * 4)
 
 		scaleX = iw / sw
 		scaleY = ih / sh
 
-		maxX = sw - 1
-		maxY = sh - 1
-
-		for y in [0..maxY]
+		for y in [0...sh]
 			# flip new y coordinates
-			newY = maxY - y
-			oldY = Math.round(y * scaleY)
+			newY = (sh - 1) - y
+			oldY = Math.round y * scaleY
 
-			for x in [0..maxX]
-				newCoords =  (newY * sw) + x
-				newCoords *= 4
-				oldCoords =  (oldY * iw) + Math.round(x * scaleX)
-				oldCoords *= 4
+			for x in [0...sw]
+				newX = x
+				oldX = Math.round x * scaleX
 
-				newImage[newCoords] = renderedImage.pixels[oldCoords]
-				newImage[newCoords + 1] = renderedImage.pixels[oldCoords + 1]
-				newImage[newCoords + 2] = renderedImage.pixels[oldCoords + 2]
-				newImage[newCoords + 3] = renderedImage.pixels[oldCoords + 3]
+				pixelData = @_getPixel renderedImage.pixels, iw, oldX, oldY
+				@_setPixel newImage, sw, newX, newY, pixelData
 
-		return newImage
+		return {
+			data: newImage
+			width: sw
+			height: sh
+		}
+
+	_getPixel: (imageData, imageWidth, x, y) ->
+		index = (imageWidth * y) + x
+		index *= 4
+		return [
+			imageData[index]
+			imageData[index + 1]
+			imageData[index + 2]
+			imageData[index + 3]
+		]
+
+	_setPixel: (imageData, imageWidth, x, y, rgbaArray) ->
+		index = (imageWidth * y) + x
+		index *= 4
+		imageData[index] = rgbaArray[0]
+		imageData[index + 1] = rgbaArray[1]
+		imageData[index + 2] = rgbaArray[2]
+		imageData[index + 3] = rgbaArray[3]
 
 	_createHtml: (numLayers, imgWidth) ->
 		style = "<style>

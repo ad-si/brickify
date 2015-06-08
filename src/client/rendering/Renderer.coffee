@@ -143,7 +143,7 @@ class Renderer
 				@useBigRendertargets = true
 			else
 				@useBigRendertargets = false
-			
+
 			renderTargetHelper.configureSize @useBigRendertargets
 
 			# determine whether to use FXAA

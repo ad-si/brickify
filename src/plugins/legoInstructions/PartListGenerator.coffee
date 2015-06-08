@@ -5,7 +5,7 @@ log = require 'loglevel'
 module.exports.generatePartList = (bricks) ->
 	partList = []
 
-	bricks.forEach (brick) =>
+	bricks.forEach (brick) ->
 		for brickType in partList
 			if equalSize brickType.size, brick.getSize()
 				brickType.count++
@@ -30,8 +30,9 @@ module.exports.generatePartList = (bricks) ->
 
 	return partList
 
-equalSize = (a,b) =>
-	return ((a.x == b.x and a.y == b.y) or (a.x == b.y and a.y == b.x)) and a.z == b.z
+equalSize = (a,b) ->
+	return ((a.x == b.x and a.y == b.y) or
+		(a.x == b.y and a.y == b.x)) and a.z == b.z
 
 module.exports.getHtml = (list) ->
 	html = '<h3>Bricks needed</h3>'

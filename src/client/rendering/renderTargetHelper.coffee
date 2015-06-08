@@ -8,7 +8,7 @@ ShaderGenerator = require './shader/ShaderGenerator'
 
 _chooseBiggerSize = false
 _overrideSizeValue = null
-module.exports.configureSize = (chooseBiggerSize = false, overrideSizeValue = null) ->
+module.exports.configureSize = (chooseBiggerSize, overrideSizeValue = null) ->
 	_chooseBiggerSize = chooseBiggerSize
 	_overrideSizeValue = overrideSizeValue
 

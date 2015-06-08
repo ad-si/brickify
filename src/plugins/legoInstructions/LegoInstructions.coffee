@@ -212,8 +212,9 @@ class LegoInstructions
 	_createScad: (bricks) =>
 		scad = @_scadDisclaimer()
 
-		bricks.forEach (brick) =>
-			pos = "[#{brick.getPosition().x},#{brick.getPosition().y},#{brick.getPosition().z}]"
+		bricks.forEach (brick) ->
+			pos = "[#{brick.getPosition().x},
+			#{brick.getPosition().y},#{brick.getPosition().z}]"
 			size = "[#{brick.getSize().x},#{brick.getSize().y},#{brick.getSize().z}]"
 			scad += "GridTranslate(#{pos}){ Brick(#{size}); }\n"
 
@@ -225,7 +226,7 @@ class LegoInstructions
 			data: scad
 		}
 
-	_scadDisclaimer: () ->
+	_scadDisclaimer: ->
 		return '
 			/*\n
 			 * \n
@@ -234,7 +235,7 @@ class LegoInstructions
 			 *\n
 			 */\n\n
 		'
-	_scadBase: () ->
+	_scadBase: ->
 		return '
 			gridSpacing = [8, 8, 3.2];
 			brickSpacing = [0.2, 0.2, 0.2];
@@ -259,11 +260,13 @@ class LegoInstructions
 			            size[0] * gridSpacing[0] - brickSpacing[0],
 			            size[1] * gridSpacing[1] - brickSpacing[1],
 			            size[2] * gridSpacing[2] - brickSpacing[2]], false);
-			            
+
 			            for ( sx = [1 : size[0]]){
 			                for ( sy = [1 : size[1]]){
-			                    tx = sx * gridSpacing[0] - gridSpacing[0]/2 - brickSpacing[0]/2;
-			                    ty = sy * gridSpacing[1] - gridSpacing[1]/2 - brickSpacing[1]/2;
+			                    tx = sx * gridSpacing[0] - gridSpacing[0]/2
+			                    - brickSpacing[0]/2;
+			                    ty = sy * gridSpacing[1] - gridSpacing[1]/2
+			                    - brickSpacing[1]/2;
 			                    tz = size[2] * gridSpacing[2] - brickSpacing[2];
 			                    translate([tx, ty, tz]){
 			                        cylinder(r = studRadius, h = studHeight, $fs = 0.5);
@@ -274,11 +277,17 @@ class LegoInstructions
 			        union(){
 			            for ( sx = [1 : size[0]]){
 			                for ( sy = [1 : size[1]]){
-			                    tx = sx * gridSpacing[0] - gridSpacing[0]/2 - brickSpacing[0]/2;
-			                    ty = sy * gridSpacing[1] - gridSpacing[1]/2 - brickSpacing[1]/2;
+			                    tx = sx * gridSpacing[0] - gridSpacing[0]/2
+			                    - brickSpacing[0]/2;
+			                    ty = sy * gridSpacing[1] - gridSpacing[1]/2
+			                    - brickSpacing[1]/2;
 			                    tz = 0;
 			                    translate([tx, ty, tz - brickSpacing.z]){
-			                        cylinder(r = holeRadius, h = 2 + brickSpacing.z, $fs = 0.5);
+			                        cylinder(
+			                        	r = holeRadius,
+			                        	h = 2 + brickSpacing.z,
+			                        	$fs = 0.5
+			                        );
 			                    }
 			                }
 			            }

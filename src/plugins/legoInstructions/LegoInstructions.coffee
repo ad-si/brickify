@@ -102,7 +102,7 @@ class LegoInstructions
 						return ({
 							fileName: "LEGO assembly instructions #{layer}.png"
 							data: pngData.buffer
-							imageWidth: pixelData.viewWidth
+							imageWidth: flippedImage.width
 						})
 
 	_convertToPng: (image) ->

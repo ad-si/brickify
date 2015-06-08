@@ -40,7 +40,7 @@ know the size, download and print the&nbsp;
 		html += '
 <h4 class=\"disabled\">Download Instructions</h4>
 <div id=\"downloadPdfButton\" class=\"btn btn-success btn-block disabled\">
-    &nbsp;&nbsp;Download pdf LEGO instructions
+    &nbsp;&nbsp;Download LEGO instructions and scad file
 </div>'
 	html += '
 </div>

@@ -3,6 +3,8 @@ THREE = require 'three'
 log = require 'loglevel'
 threeHelper = require '../../client/threeHelper'
 
+instructionsResolution = 1024
+
 class LegoInstructions
 	init: (bundle) ->
 		@renderer = bundle.renderer
@@ -81,7 +83,7 @@ class LegoInstructions
 			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
 			.then =>
 				log.debug 'create screenshot of layer',layer
-				@renderer.renderToImage(cam)
+				@renderer.renderToImage(cam, instructionsResolution)
 				.then (pixelData) =>
 					pixelData.pixels = @_flipAndFitImage pixelData
 					@_convertToPng(pixelData)

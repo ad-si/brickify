@@ -117,6 +117,9 @@ module.exports.generateQuad = generateQuad
 
 # Chooses the next 2^n size that matches the screen resolution best
 getNextValidTextureDimension = (size) ->
+	if not size?
+		return null
+
 	dims = [64, 128, 256, 512, 1024, 2048, 4096]
 
 	difference = 9999

@@ -15,17 +15,18 @@ class Renderer
 		@threeRenderer = null
 		@init globalConfig
 		@pipelineEnabled = false
-		@renderResolution = 0
+		@useBigRendertargets = false
 		@imageRenderQueries = []
 
 	# renders the current scene to an image, uses the camera if provided
 	# returns a promise which will resolve with the image
-	renderToImage: (camera = @camera) =>
+	renderToImage: (camera = @camera, resolution = null) =>
 		return new Promise (resolve, reject) =>
 			@imageRenderQueries.push {
 				resolve: resolve
 				reject: reject
 				camera: camera
+				resolution: renderTargetHelper.getNextValidTextureDimension resolution
 			}
 
 	localRenderer: (timestamp) =>
@@ -35,17 +36,20 @@ class Renderer
 			# render first query to image
 			imageQuery = @imageRenderQueries.shift()
 
+			# override render size if requested
+			if imageQuery.resolution?
+				renderTargetHelper.configureSize true, imageQuery.resolution
+
 			# create rendertarget
 			if not @imageRenderTarget? or
 			not renderTargetHelper.renderTargetHasRightSize(
-				@imageRenderTarget.renderTarget, @threeRenderer, @useBigPipelineTargets
+				@imageRenderTarget.renderTarget, @threeRenderer
 			)
 				@imageRenderTarget = renderTargetHelper.createRenderTarget(
 					@threeRenderer,
 					[],
 					null,
-					1.0,
-					@useBigPipelineTargets
+					1.0
 				)
 
 			# render to target
@@ -65,6 +69,10 @@ class Renderer
 				@imageRenderTarget.renderTarget, 0, 0,
 				width, height, pixels
 			)
+
+			# restore original renderTarget size if it was altered
+			if imageQuery.resolution?
+				renderTargetHelper.configureSize @useBigRendertargets
 
 			# resolve promise
 			imageQuery.resolve {
@@ -132,9 +140,11 @@ class Renderer
 		if @pipelineEnabled
 			# Determine whether to use bigger render targets (super sampling)
 			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-				renderTargetHelper.configureSize true
+				@useBigRendertargets = true
 			else
-				renderTargetHelper.configureSize false
+				@useBigRendertargets = false
+			
+			renderTargetHelper.configureSize @useBigRendertargets
 
 			# determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'

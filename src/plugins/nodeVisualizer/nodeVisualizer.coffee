@@ -55,6 +55,9 @@ class NodeVisualizer
 			@brickSceneTarget.renderTarget, threeRenderer
 		))
 			# bricks
+			if @brickSceneTarget?
+				RenderTargetHelper.deleteRenderTarget @brickSceneTarget, @threeRenderer
+
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				null,
@@ -63,6 +66,9 @@ class NodeVisualizer
 			)
 
 			# object target
+			if @objectsSceneTarget?
+				RenderTargetHelper.deleteRenderTarget @objectsSceneTarget, @threeRenderer
+
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				[new ExpandBlackPart(2), new ColorMultPart()],
@@ -71,6 +77,11 @@ class NodeVisualizer
 			)
 
 			# brick shadow target
+			if @brickShadowSceneTarget?
+				RenderTargetHelper.deleteRenderTarget(
+					@brickShadowSceneTarget, @threeRenderer
+				)
+
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				null,

@@ -101,6 +101,9 @@ module.exports = class LegoBoard
 		RenderTargetHelper.renderTargetHasRightSize(
 			@pipelineSceneTarget.renderTarget, threeRenderer
 		))
+			if @pipelineSceneTarget?
+				RenderTargetHelper.deleteRenderTarget @pipelineSceneTarget, threeRenderer
+
 			@pipelineSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer, null, null, 1.0
 			)

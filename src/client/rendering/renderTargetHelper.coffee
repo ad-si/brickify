@@ -152,4 +152,13 @@ renderTargetHasRightSize = (renderTarget, threeRenderer) ->
 
 	return (renderTarget.width == targetTexWidth) and
 	(renderTarget.height == targetTexHeight)
+
 module.exports.renderTargetHasRightSize = renderTargetHasRightSize
+
+deleteRenderTarget = (renderTarget, threeRenderer) ->
+	 renderTarget.renderTarget.dispose()
+
+	 if renderTarget.depthTexture?.__webglTexture?
+	 	threeRenderer.context.deleteTexture renderTarget.depthTexture.__webglTexture
+
+module.exports.deleteRenderTarget = deleteRenderTarget

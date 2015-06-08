@@ -45,6 +45,9 @@ class Renderer
 			not renderTargetHelper.renderTargetHasRightSize(
 				@imageRenderTarget.renderTarget, @threeRenderer
 			)
+				if @imageRenderTarget?
+					renderTargetHelper.deleteRenderTarget @imageRenderTarget, @threeRenderer
+
 				@imageRenderTarget = renderTargetHelper.createRenderTarget(
 					@threeRenderer,
 					[],
@@ -128,6 +131,9 @@ class Renderer
 			shaderParts = []
 			if @usePipelineFxaa
 				shaderParts.push new FxaaShaderPart()
+
+			if @pipelineRenderTarget?
+				renderTargetHelper.deleteRenderTarget @pipelineRenderTarget, @threeRenderer
 
 			@pipelineRenderTarget = renderTargetHelper.createRenderTarget(
 				@threeRenderer,

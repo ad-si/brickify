@@ -7,6 +7,7 @@ module.exports = class Voxelizer
 	_addDefaults: (options) ->
 		options.lineAccuracy ?= 16
 		options.outerAccuracy ?= 5
+		options.zTolerance ?= 0.1
 
 	voxelize: (optimizedModel, options = {}, progressCallback) =>
 		@_addDefaults options
@@ -15,7 +16,7 @@ module.exports = class Voxelizer
 		lineStepSize = @voxelGrid.heightRatio / options.lineAccuracy
 		outerStepSize = @voxelGrid.heightRatio / options.outerAccuracy
 
-		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel
+		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel, options
 
 		@worker = @_getWorker()
 		@worker.voxelize voxelSpaceModel, lineStepSize, outerStepSize, (message) =>
@@ -30,7 +31,7 @@ module.exports = class Voxelizer
 		@worker?.terminate()
 		@worker = null
 
-	_getOptimizedVoxelSpaceModel: (optimizedModel) =>
+	_getOptimizedVoxelSpaceModel: (optimizedModel, options) =>
 		positions = optimizedModel.positions
 		voxelSpacePositions = []
 		for i in [0...positions.length] by 3
@@ -47,7 +48,7 @@ module.exports = class Voxelizer
 		directions = []
 		for i in [2...normals.length] by 3
 			z = normals[i]
-			directions.push @_getTolerantDirection z
+			directions.push @_getTolerantDirection z, options.zTolerance
 
 		return {
 			positions: voxelSpacePositions
@@ -177,7 +178,7 @@ module.exports = class Voxelizer
 				grid[x] ?= []
 				grid[x][y] ?= []
 				oldDirection = grid[x][y][z]
-				if oldDirection?
+				if oldDirection? and direction isnt 0
 					grid[x][y][z] = 0 unless oldDirection is direction
 				else
 					grid[x][y][z] = direction
@@ -219,7 +220,7 @@ module.exports = class Voxelizer
 					visitor p0, p1, p2, direction, i / length
 		}
 
-	_getTolerantDirection: (dZ, tolerance = 0.1) ->
+	_getTolerantDirection: (dZ, tolerance) ->
 		return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
 
 	setupGrid: (optimizedModel, options) ->

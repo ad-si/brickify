@@ -68,6 +68,10 @@ class BrickLayouter
 
 		return {grid: grid}
 
+
+	finalLayoutPass: (grid) =>
+		return {grid: grid}
+
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This
 	# means that all supplied bricks and their neighbors will be relayouted.

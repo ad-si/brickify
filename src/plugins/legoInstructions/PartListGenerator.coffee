@@ -51,7 +51,7 @@ module.exports.getHtml = (list) ->
 		else if part.size.z == 3
 			html += 'Bricks with size '
 		else
-			log.warn 'Invalid LEGO heigth for part list'
+			log.warn 'Invalid LEGO height for part list'
 
 		html += "#{part.size.x} x #{part.size.y}</td></tr>"
 

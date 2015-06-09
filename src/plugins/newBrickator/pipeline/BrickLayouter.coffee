@@ -56,25 +56,43 @@ class BrickLayouter
 				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
+				###
 				console.log 'TO BE MERGED'
 				if mergeIndex >= 4
 					console.log 'into size', brick.getSize().x, brick.getSize().y, 3
 				brick.debugLog()
 				neighborsToMergeWith.forEach (fBrick) ->
 					fBrick.debugLog()
+				###
 
 				@_mergeBricksAndUpdateGraphConnections brick,
 					neighborsToMergeWith, bricksToLayout
 
+				###
 				console.log 'NEW BRICK', mergeIndex
 				brick.debugLog()
 				console.log brick.isValid()
 				console.log '  '
+				###
 
 				if @debugMode and not brick.isValid()
 					log.warn 'Invalid brick: ', brick
 					log.warn '> Using pseudoRandom:', @pseudoRandom
 					log.warn '> current seed:', Random.getSeed()
+
+				###
+				if brick.getStability() == 0
+					neighborsXy = brick.getNeighborsXY()
+					if neighborsXy.size != 0
+						# split brick & neighbors into smallest components
+						#console.log 'instability to be remedied'
+						neighborsXy.add brick
+						newBricks = @_splitBricks neighborsXy
+						bricksToLayout.delete brick
+						newBricks.forEach (newBrick) ->
+							bricksToLayout.add newBrick
+						console.log 'instability removed'
+				###
 
 				mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
 
@@ -145,6 +163,9 @@ class BrickLayouter
 
 	# chooses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) ->
+		###
+		console.log 'choosing Random Brick'
+		###
 		if setOfBricks.size == 0
 			return null
 
@@ -215,55 +236,71 @@ class BrickLayouter
 	###
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		neighborsInDirection = brick.getNeighbors(dir)
-		if neighborsInDirection.size > 0
-			# check that the neighbors together don't exceed this brick's width
-			width = 0
-			noMerge = false
+		if neighborsInDirection.size == 0
+			return null
 
+		#special case: brick is 3 layer, all neighbors 1x1x1
+		if brick.getSize().z == 3
+			num1x1x1neighbors = 3 * widthFn(brick.getPosition())
+			if neighborsInDirection.size == num1x1x1neighbors
+				merge = true
+				neighborsInDirection.forEach (neighbor) ->
+					ns = neighbor.getSize()
+					if not (ns.x == 1 and ns.y == 1 and ns.z == 1)
+						merge = false
+				if merge
+					#check for valid brick size?
+					console.warn 'special case'
+					return neighborsInDirection
+
+		# check that the neighbors together don't exceed this brick's width
+		width = 0
+		noMerge = false
+
+		neighborsInDirection.forEach (neighbor) ->
+			neighborSize = neighbor.getSize()
+			if neighborSize.z != brick.getSize().z
+				noMerge = true
+			if neighbor.getPosition().z != brick.getPosition().z
+				noMerge = true
+			width += widthFn neighborSize
+
+		if noMerge
+			return null
+
+		# if they have the same accumulative width
+		# check if they are in the correct positions,
+		# i.e. no spacing between neighbors
+		if width == widthFn(brick.getSize())
+			minWidth = widthFn brick.getPosition()
+
+			maxWidth = widthFn(brick.getPosition())
+			maxWidth += widthFn(brick.getSize()) - 1
+
+			length = null
+
+			invalidSize = false
 			neighborsInDirection.forEach (neighbor) ->
-				neighborSize = neighbor.getSize()
-				if neighborSize.z != brick.getSize().z
-					noMerge = true
-				if neighbor.getPosition().z != brick.getPosition().z
-					noMerge = true
-				width += widthFn neighborSize
+				length ?= lengthFn neighbor.getSize()
 
-			if noMerge
+				if widthFn(neighbor.getPosition()) < minWidth
+					invalidSize = true
+
+				nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
+				if nw > maxWidth
+					invalidSize = true
+
+				if lengthFn(neighbor.getSize()) != length
+					invalidSize = true
+
+			if invalidSize
 				return null
 
-			# if they have the same accumulative width
-			# check if they are in the correct positions,
-			# i.e. no spacing between neighbors
-			if width == widthFn(brick.getSize())
-				minWidth = widthFn brick.getPosition()
-
-				maxWidth = widthFn(brick.getPosition())
-				maxWidth += widthFn(brick.getSize()) - 1
-
-				length = null
-
-				invalidSize = false
-				neighborsInDirection.forEach (neighbor) ->
-					length ?= lengthFn neighbor.getSize()
-
-					if widthFn(neighbor.getPosition()) < minWidth
-						invalidSize = true
-
-					nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
-					if nw > maxWidth
-						invalidSize = true
-
-					if lengthFn(neighbor.getSize()) != length
-						invalidSize = true
-
-				if invalidSize
-					return null
-
-				if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
-				length, brick.getSize().z)
-					return neighborsInDirection
-				else
-					return null
+			if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
+			length, brick.getSize().z)
+				return neighborsInDirection
+			else
+				return null
 
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
 		noMerge = false

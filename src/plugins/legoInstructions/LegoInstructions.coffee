@@ -193,6 +193,7 @@ class LegoInstructions
 		style = "<style>
 		img{width: #{imgWidth}px; max-width: 100%;}
 		h1,h3,p,td{font-family:Helvetica, Arial, sans-serif;}
+		td{min-width: 80px;}
 		</style>"
 
 		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"

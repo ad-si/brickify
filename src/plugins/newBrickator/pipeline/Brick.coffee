@@ -128,7 +128,7 @@ class Brick
 
 		return @_neighbors[direction]
 
-	getNeighborsXY: ->
+	getNeighborsXY: =>
 		neighbors = new Set()
 		@getNeighbors(Brick.direction.Xp).forEach (brick) ->
 			neighbors.add brick

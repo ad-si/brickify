@@ -47,6 +47,8 @@ module.exports = class VolumeFiller
 						@_fillUp grid, x, y, numVoxelsZ
 				callback state: 'finished', data: grid
 
+			#_fillUp: (grid, x, y, numVoxelsZ)
+
 			_fillUp: (grid, x, y, numVoxelsZ) ->
 				# fill up from z=0 to z=max
 				insideModel = false
@@ -74,8 +76,6 @@ module.exports = class VolumeFiller
 							for v in currentFillVoxelQueue
 								@_setVoxel grid, v, 0
 							currentFillVoxelQueue = []
-
-							insideModel = false
 					else
 						# voxel does not exist yet. create if inside model
 						if insideModel

@@ -39,11 +39,13 @@ module.exports.generatePartList = (bricks) ->
 module.exports.getHtml = (list) ->
 	html = '<h3>Bricks needed</h3>'
 	html += '<p>This is a list of how many and what types of'
-	html += ' bricks you need to build this model: <ul>'
-
+	html += ' bricks you need to build this model:'
+	html += '<table>'
+	html += '<tr><td><strong>Amount</strong></td>'
+	html += '<td><strong>Part description</strong></td></tr>'
 	for part in list
-		html += '<li>'
-		html += "<strong>#{part.count}x</strong> "
+		html += '<tr><td>'
+		html += "#{part.count}x</td><td>"
 		if part.size.z == 1
 			html += 'Plates with size '
 		else if part.size.z == 3
@@ -51,7 +53,7 @@ module.exports.getHtml = (list) ->
 		else
 			log.warn 'Invalid LEGO heigth for part list'
 
-		html += "#{part.size.x} x #{part.size.y}</li>"
+		html += "#{part.size.x} x #{part.size.y}</td></tr>"
 
-	html += '</ul></p>'
+	html += '</table></p>'
 	return html

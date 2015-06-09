@@ -60,7 +60,7 @@ Call `$ npm run documentation` and
 ## Styleguide
 
 The code must be formatted as described in
-https://github.com/style-guides/CoffeeScript/tree/v0.1.0
+https://github.com/style-guides/CoffeeScript/tree/v0.1.1
 
 
 ## Server

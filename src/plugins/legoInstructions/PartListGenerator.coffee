@@ -42,18 +42,22 @@ module.exports.getHtml = (list) ->
 	html += ' bricks you need to build this model:'
 	html += '<table>'
 	html += '<tr><td><strong>Amount</strong></td>'
-	html += '<td><strong>Part description</strong></td></tr>'
+	html += '<td><strong>Type</strong></td>'
+	html += '<td><strong>Size</strong></td></tr>'
 	for part in list
-		html += '<tr><td>'
-		html += "#{part.count}x</td><td>"
 		if part.size.z == 1
-			html += 'Plates with size '
+			type = 'Plate'
 		else if part.size.z == 3
-			html += 'Bricks with size '
+			type = 'Brick'
 		else
 			log.warn 'Invalid LEGO height for part list'
+			continue
 
-		html += "#{part.size.x} x #{part.size.y}</td></tr>"
+		html += '<tr>'
+		html += "<td>#{part.count}x</td>"
+		html += "<td>#{type}</td>"
+		html += "<td>#{part.size.x} x #{part.size.y}</td>"
+		html += '</tr>'
 
 	html += '</table></p>'
 	return html

@@ -1,4 +1,5 @@
 log = require 'loglevel'
+Brick = require '../newBrickator/pipeline/Brick'
 
 # generates a list of how many bricks of which size
 # is in the given set of bricks
@@ -7,7 +8,7 @@ module.exports.generatePartList = (bricks) ->
 
 	bricks.forEach (brick) ->
 		for brickType in partList
-			if equalSize brickType.size, brick.getSize()
+			if Brick.isSizeEqual brickType.size, brick.getSize()
 				brickType.count++
 				return
 
@@ -34,10 +35,6 @@ module.exports.generatePartList = (bricks) ->
 			part.size.y = tmp
 
 	return partList
-
-equalSize = (a,b) ->
-	return ((a.x == b.x and a.y == b.y) or
-		(a.x == b.y and a.y == b.x)) and a.z == b.z
 
 module.exports.getHtml = (list) ->
 	html = '<h3>Bricks needed</h3>'

@@ -26,6 +26,13 @@ class Brick
 				return true
 		return false
 
+	# returns true if the two sizes are equal in terms of
+	# same height and same x/y dimensions which may be
+	# switched
+	@isSizeEqual: (a, b) ->
+		return ((a.x == b.x and a.y == b.y) or
+		(a.x == b.y and a.y == b.x)) and a.z == b.z
+
 	# Creates a brick out of the given set of voxels
 	# Takes ownership of voxels without further processing
 	constructor: (arrayOfVoxels) ->

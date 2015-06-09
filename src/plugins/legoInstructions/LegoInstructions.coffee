@@ -2,7 +2,7 @@ PNG = require('node-png').PNG
 THREE = require 'three'
 log = require 'loglevel'
 threeHelper = require '../../client/threeHelper'
-partListGenerator = require './PartListGenerator'
+pieceListGenerator = require './PieceListGenerator'
 openScadGenerator = require './OpenScadGenerator'
 
 class LegoInstructions
@@ -63,12 +63,12 @@ class LegoInstructions
 							}
 							imageWidth = fileData.imageWidth
 
-					# scad and part list generation
-					partListHtml = ''
+					# scad and piece list generation
+					pieceListHtml = ''
 					promiseChain = promiseChain.then =>
 						@newBrickator._getCachedData(selectedNode).then (data) ->
-							partList = partListGenerator.generatePartList data.grid.getAllBricks()
-							partListHtml = partListGenerator.getHtml partList
+							pieceList = pieceListGenerator.generatePieceList data.grid.getAllBricks()
+							pieceListHtml = pieceListGenerator.getHtml pieceList
 
 							resultingFiles.push openScadGenerator.generateScad(
 								data.grid.getAllBricks()
@@ -81,7 +81,7 @@ class LegoInstructions
 						# add instructions html to download
 						resultingFiles.push({
 							fileName: 'LEGO Assembly instructions.html'
-							data: @_createHtml numLayers, imageWidth, partListHtml
+							data: @_createHtml numLayers, imageWidth, pieceListHtml
 						})
 
 						resolve resultingFiles
@@ -189,7 +189,7 @@ class LegoInstructions
 		imageData[index + 2] = rgbaArray[2]
 		imageData[index + 3] = rgbaArray[3]
 
-	_createHtml: (numLayers, imgWidth, partListHtml = null) ->
+	_createHtml: (numLayers, imgWidth, pieceListHtml = null) ->
 		style = "<style>
 		img{width: #{imgWidth}px; max-width: 100%;}
 		h1,h3,p,td{font-family:Helvetica, Arial, sans-serif;}
@@ -203,7 +203,7 @@ class LegoInstructions
 		</head><body><h1>Build instructions</h1>'
 		html += style
 
-		html += partListHtml if partListHtml?
+		html += pieceListHtml if pieceListHtml?
 
 		for i in [1..numLayers]
 			html += '<br>'

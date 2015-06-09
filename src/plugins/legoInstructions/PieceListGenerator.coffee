@@ -3,17 +3,17 @@ Brick = require '../newBrickator/pipeline/Brick'
 
 # generates a list of how many bricks of which size
 # is in the given set of bricks
-module.exports.generatePartList = (bricks) ->
-	partList = []
+module.exports.generatePieceList = (bricks) ->
+	pieceList = []
 
 	bricks.forEach (brick) ->
-		for brickType in partList
+		for brickType in pieceList
 			if Brick.isSizeEqual brickType.size, brick.getSize()
 				brickType.count++
 				return
 
 		size = brick.getSize()
-		partList.push {
+		pieceList.push {
 			size: {
 				x: size.x
 				y: size.y
@@ -23,18 +23,18 @@ module.exports.generatePartList = (bricks) ->
 		}
 
 	# sort so that most needed bricks are on top
-	partList.sort (a,b) ->
+	pieceList.sort (a,b) ->
 		return b.count - a.count
 
 	# switch sizes so that the smallest number
 	# is always first
-	for part in partList
-		if part.size.x > part.size.y
-			tmp = part.size.x
-			part.size.x = part.size.y
-			part.size.y = tmp
+	for piece in pieceList
+		if piece.size.x > piece.size.y
+			tmp = piece.size.x
+			piece.size.x = piece.size.y
+			piece.size.y = tmp
 
-	return partList
+	return pieceList
 
 module.exports.getHtml = (list) ->
 	html = '<h3>Bricks needed</h3>'
@@ -44,19 +44,19 @@ module.exports.getHtml = (list) ->
 	html += '<tr><td><strong>Amount</strong></td>'
 	html += '<td><strong>Type</strong></td>'
 	html += '<td><strong>Size</strong></td></tr>'
-	for part in list
-		if part.size.z == 1
+	for piece in list
+		if piece.size.z == 1
 			type = 'Plate'
-		else if part.size.z == 3
+		else if piece.size.z == 3
 			type = 'Brick'
 		else
-			log.warn 'Invalid LEGO height for part list'
+			log.warn 'Invalid LEGO height for piece list'
 			continue
 
 		html += '<tr>'
-		html += "<td>#{part.count}x</td>"
+		html += "<td>#{piece.count}x</td>"
 		html += "<td>#{type}</td>"
-		html += "<td>#{part.size.x} x #{part.size.y}</td>"
+		html += "<td>#{piece.size.x} x #{piece.size.y}</td>"
 		html += '</tr>'
 
 	html += '</table></p>'

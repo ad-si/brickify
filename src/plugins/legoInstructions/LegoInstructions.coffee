@@ -66,7 +66,7 @@ class LegoInstructions
 					# scad and part list generation
 					partListHtml = ''
 					promiseChain = promiseChain.then =>
-						@newBrickator._getCachedData(selectedNode). then (data) =>
+						@newBrickator._getCachedData(selectedNode).then (data) ->
 							partList = partListGenerator.generatePartList data.grid.getAllBricks()
 							partListHtml = partListGenerator.getHtml partList
 

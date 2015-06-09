@@ -158,17 +158,21 @@ module.exports = class Coloring
 			return brick.visualizationMaterial
 
 		# collect materials of neighbors
-		neighbors = brick.getNeighbors()
-		neighborColors = []
+		neighbors = brick.getNeighborsXY()
+		connections = brick.connectedBricks()
+
+		neighborColors = new Set()
 		neighbors.forEach (neighbor) ->
-			neighborColors.push neighbor.visualizationMaterial
+			neighborColors.add neighbor.visualizationMaterial
+		connections.forEach (connection) ->
+			neighborColors.add connection.visualizationMaterial
 
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used
 		# by neighbors to visually distinguish bricks
 		for i in [0...@_brickMaterials.length]
 			material = @_getRandomBrickMaterial()
-			continue if neighborColors.indexOf(material) >= 0
+			continue if neighborColors.has(material)
 			break
 
 		brick.visualizationMaterial = material

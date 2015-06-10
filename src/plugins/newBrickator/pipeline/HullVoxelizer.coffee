@@ -15,8 +15,15 @@ module.exports = class Voxelizer
 		lineStepSize = @voxelGrid.heightRatio / options.lineAccuracy
 		outerStepSize = @voxelGrid.heightRatio / options.outerAccuracy
 
-		optimizedModel.forEachPolygon (p0, p1, p2, n) =>
-			@voxelizePolygon p0, p1, p2, n, lineStepSize, outerStepSize
+		optimizedModel.forEachFace (face) =>
+			@voxelizePolygon(
+				face.vertices[0]
+				face.vertices[1]
+				face.vertices[2]
+				face.normal
+				lineStepSize
+				outerStepSize
+			)
 
 		return {grid: @voxelGrid}
 

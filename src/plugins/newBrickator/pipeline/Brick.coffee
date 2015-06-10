@@ -131,14 +131,9 @@ class Brick
 	getNeighborsXY: =>
 		neighbors = new Set()
 
-		@getNeighbors(Brick.direction.Xp).forEach (brick) ->
-			neighbors.add brick
-		@getNeighbors(Brick.direction.Xm).forEach (brick) ->
-			neighbors.add brick
-		@getNeighbors(Brick.direction.Yp).forEach (brick) ->
-			neighbors.add brick
-		@getNeighbors(Brick.direction.Ym).forEach (brick) ->
-			neighbors.add brick
+		[Brick.direction.Xp, Brick.direction.Xm, Brick.direction.Yp,
+		Brick.direction.Ym].forEach (direction) =>
+			@getNeighbors(direction).forEach (brick) -> neighbors.add brick
 
 		return neighbors
 

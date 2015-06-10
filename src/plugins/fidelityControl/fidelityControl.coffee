@@ -122,10 +122,10 @@ class FidelityControl
 		# Increase fidelity
 		@currentFidelityLevel++
 		@pluginHooks.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 		@bundle.renderer.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 
 		# Enable pipeline
@@ -136,10 +136,10 @@ class FidelityControl
 		# Decrease fidelity
 		@currentFidelityLevel--
 		@pluginHooks.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 		@bundle.renderer.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 
 		# Disable pipeline
@@ -197,9 +197,11 @@ class FidelityControl
 
 		@pluginHooks.setFidelity(
 			level, FidelityControl.fidelityLevels
+			screenshotMode: true
 		)
 		@bundle.renderer.setFidelity(
 			level, FidelityControl.fidelityLevels
+			screenshotMode: true
 		)
 
 	# resets screenshot mode, restores old fidelity level
@@ -210,9 +212,11 @@ class FidelityControl
 
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
+			screenshotMode: false
 		)
 		@bundle.renderer.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
+			screenshotMode: false
 		)
 
 	reset: =>

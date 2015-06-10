@@ -172,8 +172,10 @@ class DummyPlugin
 	# @param {Number} fidelityLevel the new level of fidelity, which is an index
 	# of
 	# @param {Array<String>} availableFidelityLevels all available fidelity levels
+	# @param {Object} options
+	# @param {Boolean} options.screenshotMode true while instructions are rendered
 	###
-	setFidelity: (fidelityLevel, availableFidelityLevels) ->
+	setFidelity: (fidelityLevel, availableFidelityLevels, options) ->
 		return
 
 module.exports = DummyPlugin

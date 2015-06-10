@@ -21,7 +21,7 @@ class LegoInstructions
 		return null if downloadOptions.type != 'instructions'
 
 		return new Promise (resolve, reject) =>
-			log.debug 'Creating pdf instructions...'
+			log.debug 'Creating instructions...'
 
 			# pseudoisometric
 			cam = new THREE.PerspectiveCamera(
@@ -76,7 +76,7 @@ class LegoInstructions
 
 					# save download
 					promiseChain = promiseChain.then =>
-						log.debug 'Finished pdf instructions screenshots'
+						log.debug 'Finished instruction screenshots'
 
 						# add instructions html to download
 						resultingFiles.push({

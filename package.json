@@ -60,7 +60,7 @@
     "chai": "^2.0.0",
     "chai-as-promised": "^4.1.1",
     "chai-shallow-deep-equal": "^1.2.0",
-    "coffeelint": "^1.6.1",
+    "coffeelint": "^1.10.1",
     "crojsdoc": "^0.8.11",
     "groc": "^0.8.0",
     "jquery-mockjax": "^1.6.1",

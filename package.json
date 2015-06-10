@@ -19,7 +19,7 @@
     "bootstrap": "^3.3.2",
     "bootstrap-styl": "^4.0.2",
     "browserify-data": "^0.2.0",
-    "browserify-middleware": "^4.1.0",
+    "browserify-middleware": "Lowfab/browserify-middleware#7e2d93a7fbd67d589e8cbb0eba0d2094dd907eac",
     "clone": "^1.0.0",
     "coffee-script": "^1.9.1",
     "coffeeify": "^1.0.0",

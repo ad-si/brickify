@@ -1,12 +1,14 @@
 _scadBase = require './brick.scad'
 
+toScadVector = (vector) ->
+	return "[#{vector.x}, #{vector.y}, #{vector.z}]"
+
 module.exports.generateScad = (bricks) ->
 	scad = _scadDisclaimer()
 
 	bricks.forEach (brick) ->
-		pos = "[#{brick.getPosition().x},
-		#{brick.getPosition().y},#{brick.getPosition().z}]"
-		size = "[#{brick.getSize().x},#{brick.getSize().y},#{brick.getSize().z}]"
+		pos = toScadVector brick.getPosition()
+		size = toScadVector brick.getSize()
 		scad += "GridTranslate(#{pos}){ Brick(#{size}); }\n"
 
 	scad += '\n\n'

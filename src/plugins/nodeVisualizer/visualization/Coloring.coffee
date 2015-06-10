@@ -187,14 +187,14 @@ module.exports = class Coloring
 
 	_createBrickMaterials: =>
 		@_brickMaterials = []
-		@_brickMaterials.push @_createMaterial 0x530000
-		@_brickMaterials.push @_createMaterial 0xfe2020
-		@_brickMaterials.push @_createMaterial 0xba0000
-		@_brickMaterials.push @_createMaterial 0xfe5c5c
-		@_brickMaterials.push @_createMaterial 0xdb0000
-		@_brickMaterials.push @_createMaterial 0x6b0000
-		@_brickMaterials.push @_createMaterial 0xfe3939
-		@_brickMaterials.push @_createMaterial 0xfe4d4d
+		@_brickMaterials.push @_createMaterial 0x550000
+		@_brickMaterials.push @_createMaterial 0x8e0000
+		@_brickMaterials.push @_createMaterial 0xc60000
+		@_brickMaterials.push @_createMaterial 0xff0000
+		@_brickMaterials.push @_createMaterial 0xcc4444
+		@_brickMaterials.push @_createMaterial 0xdd4f4f
+		@_brickMaterials.push @_createMaterial 0xee5b5b
+		@_brickMaterials.push @_createMaterial 0xff6666
 
 	_createMaterial: (color, opacity = 1) ->
 		return new THREE.MeshLambertMaterial(

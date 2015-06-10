@@ -1,5 +1,6 @@
 log = require 'loglevel'
 meshlib = require 'meshlib'
+stlParser = require 'stl-parser'
 
 modelCache = require './modelCache'
 Spinner = require '../Spinner'
@@ -25,6 +26,14 @@ module.exports.onLoadFile = (files, feedbackTarget, spinnerOptions) ->
 
 	return loadFile feedbackTarget, file, spinnerOptions
 		.then handleLoadedFile feedbackTarget, file.name, spinnerOptions
+		.catch (error) ->
+			bootbox.alert(
+				title: 'Import failed'
+				message: 'Your file contains errors that we could not fix.'
+			)
+			feedbackTarget.innerHTML = errorString
+			log.error error.stack
+			reject error
 
 loadFile = (feedbackTarget, file, spinnerOptions) ->
 	feedbackTarget.innerHTML = readingString
@@ -41,27 +50,22 @@ handleLoadedFile = (feedbackTarget, filename, spinnerOptions) -> (event) ->
 	fileContent = event.target.result
 
 	return new Promise (resolve, reject) ->
-		meshlib.parse fileContent, null, (error, optimizedModel) ->
-			Spinner.stop feedbackTarget
+		stlParser(fileContent).on 'data', (data) ->
 
-			if error or !optimizedModel
-				bootbox.alert(
-					title: 'Import failed'
-					message: 'Your file contains errors that we could not fix.'
-				)
-				feedbackTarget.innerHTML = errorString
-				reject()
-				return
+			model = meshlib.Model.fromObject {mesh: data}
 
-			optimizedModel.originalFileName = filename
-			feedbackTarget.innerHTML = uploadString
-			Spinner.start feedbackTarget, spinnerOptions
+			model
+			.setFileName filename
+			.calculateNormals()
+			.buildFaceVertexMesh()
+			.done()
+			.then ->
+				Spinner.stop feedbackTarget
+				feedbackTarget.innerHTML = uploadString
+				Spinner.start feedbackTarget, spinnerOptions
+				return modelCache.store model
 
-			modelCache.store(optimizedModel)
 			.then (md5hash) ->
 				Spinner.stop feedbackTarget
 				feedbackTarget.innerHTML = loadedString
 				resolve md5hash
-			.catch reject
-
-		return

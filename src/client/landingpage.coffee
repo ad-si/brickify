@@ -18,7 +18,6 @@ globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
 globalConfig.orbitControls.autoRotate = true
 globalConfig.plugins.dummy = false
-globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false

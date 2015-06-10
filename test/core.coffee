@@ -20,6 +20,7 @@ describe 'Brickify', ->
 
 	describe 'Server', ->
 		it 'should host the brickify website', (done) ->
+			@timeout(5000)
 			request = http.request(
 				{method: 'HEAD', host: 'localhost', port: 3001},
 				(response) ->

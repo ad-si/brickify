@@ -80,6 +80,9 @@
     "no_tabs": {
         "level": "ignore"
     },
+    "no_this": {
+        "level": "error"
+    },
     "no_throwing_strings": {
         "level": "error"
     },

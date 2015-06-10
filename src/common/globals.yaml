@@ -49,7 +49,6 @@ buildUi: true
 #load these plugins
 plugins:
   dummy: false
-  stlImport: true
   coordinateSystem: true
   legoBoard: true
   newBrickator: true

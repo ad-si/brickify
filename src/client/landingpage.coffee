@@ -2,6 +2,7 @@ require './polyfills'
 $ = require 'jquery'
 window.jQuery = window.$ = $
 bootstrap = require 'bootstrap'
+piwikTracking = require './piwikTracking'
 
 # Init quickconvert after basic page functionality has been initialized
 globalConfig = require '../common/globals.yaml'
@@ -17,7 +18,6 @@ globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
 globalConfig.orbitControls.autoRotate = true
 globalConfig.plugins.dummy = false
-globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false
@@ -65,12 +65,12 @@ b1 = bundle1.init().then ->
 	callback = (event) ->
 		files = event.target.files ? event.dataTransfer.files
 		if files.length
-			_paq.push ['trackEvent', 'Landingpage', 'LoadModel', files[0].name]
+			piwikTracking.trackEvent 'Landingpage', 'LoadModel', files[0].name
 			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
 			.then loadFromHash
 		else
 			hash = event.dataTransfer.getData 'text/plain'
-			_paq.push ['trackEvent', 'Landingpage', 'LoadModelFromImage', hash]
+			piwikTracking.trackEvent 'Landingpage', 'LoadModelFromImage', hash
 			modelCache.exists hash
 			.then -> loadFromHash hash
 			.catch -> bootbox.alert(
@@ -87,7 +87,7 @@ b1 = bundle1.init().then ->
 		@value = ''
 
 	$('.dropper').text 'Drop an stl file'
-	$('#preview img').on( 'dragstart'
+	$('#preview img, #preview a').on( 'dragstart'
 		(e) ->
 			e.originalEvent.dataTransfer.setData(
 				'text/plain'
@@ -97,7 +97,7 @@ b1 = bundle1.init().then ->
 
 # set not available message
 $('#downloadButton').click ->
-	_paq.push ['trackEvent', 'Landingpage', 'ButtonClick', 'Download']
+	piwikTracking.trackEvent 'Landingpage', 'ButtonClick', 'Download'
 	bootbox.alert({
 		title: 'Not available'
 		message: 'This feature is not available yet - please check back later.<br>' +

@@ -1,3 +1,5 @@
+piwikTracking = require '../../piwikTracking'
+
 ###
 # @class EditBrushUi
 ###
@@ -19,6 +21,11 @@ class EditBrushUi
 
 		@brushContainer = $(jQueryBrushContainerSelector)
 		@bigBrushContainer = $(jQueryBigBrushContainerSelector)
+
+		# because firefox ignores the draggable="false" attribute
+		# attached to the brush images
+		$('#brushContainer img').on 'dragstart', -> return false
+		$('#bigBrushContainer img').on 'dragstart', -> return false
 
 	onNodeSelect: (node) =>
 		@selectedNode = node
@@ -48,7 +55,7 @@ class EditBrushUi
 		# piwik select event
 		big = ''
 		big = 'Big' if @_bigBrushSelected
-		_paq.push ['trackEvent', 'Editor', 'BrushSelect', brush.containerId + big]
+		piwikTracking.trackEvent 'Editor', 'BrushSelect', brush.containerId + big
 
 		#select new brush
 		@_selectedBrush = brush

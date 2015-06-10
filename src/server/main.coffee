@@ -13,7 +13,6 @@ compress = require 'compression'
 morgan = require 'morgan'
 errorHandler = require 'errorhandler'
 favicon = require 'serve-favicon'
-compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
 exec = require('child_process').exec
@@ -206,8 +205,9 @@ module.exports.setupRouting = ->
 
 	webapp.use (req, res) ->
 		res
-		.status(404)
+		.status 404
 		.render '404'
+
 	return module.exports
 
 module.exports.startServer = (_port, _ip) ->

@@ -207,7 +207,7 @@ class LegoInstructions
 		html += pieceListHtml if pieceListHtml?
 
 		for i in [1..numLayers]
-			html += '<br>'
+			html += '<br><br>'
 			html += '<h3 class="pageBreak"> Layer ' + i + '</h3>'
 			html += '<p><img src="LEGO%20assembly%20instructions%20' + i + '.png"></p>'
 

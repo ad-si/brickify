@@ -18,7 +18,6 @@ globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
 globalConfig.orbitControls.autoRotate = true
 globalConfig.plugins.dummy = false
-globalConfig.plugins.stlImport = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false
@@ -88,7 +87,7 @@ b1 = bundle1.init().then ->
 		@value = ''
 
 	$('.dropper').text 'Drop an stl file'
-	$('#preview img').on( 'dragstart'
+	$('#preview img, #preview a').on( 'dragstart'
 		(e) ->
 			e.originalEvent.dataTransfer.setData(
 				'text/plain'

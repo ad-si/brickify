@@ -315,13 +315,13 @@ class NodeVisualizer
 	getDisplayMode: =>
 		return @visualizationMode
 
-	_applyLegoBrushMode: (cachedData) =>
+	_applyLegoBrushMode: (cachedData) ->
 		cachedData.brickVisualization.updateVisualization()
 		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 		cachedData.modelVisualization.setShadowVisibility false
 
-	_applyPrintBrushMode: (cachedData) =>
+	_applyPrintBrushMode: (cachedData) ->
 		cachedData.brickVisualization.updateVisualization()
 		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false

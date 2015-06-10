@@ -95,7 +95,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 200
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			id = 'abcdefgh'
 			existence = dataPackets.exists(id)
@@ -134,7 +134,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			id = 'abcdefgh'
 			existence = dataPackets.exists(id)
@@ -215,7 +215,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			get = dataPackets.get(packet.id)
 			Promise.all([
@@ -254,7 +254,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			put = dataPackets.put(packet)
@@ -275,7 +275,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 200
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			put = dataPackets.put(packet)
@@ -294,7 +294,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 200
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			dataPackets.put(packet).then(->
@@ -334,7 +334,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			del = dataPackets.delete(packet.id)
@@ -367,7 +367,7 @@ describe 'dataPacket client cache', ->
 			)
 
 		it 'should not find deleted dataPackets', ->
-			this.timeout(4000)
+			@timeout(4000)
 			$.mockjax(
 				type: 'DELETE'
 				url: /^\/datapacket\/delete\/([a-zA-Z0-9]+)$/
@@ -381,7 +381,7 @@ describe 'dataPacket client cache', ->
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
-					this.responseText = settings.urlParams.id
+					@responseText = settings.urlParams.id
 			)
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			dataPackets.delete(packet.id).then(->

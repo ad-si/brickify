@@ -58,31 +58,31 @@ module.exports = class VolumeFiller
 				while z <= numVoxelsZ
 					if grid[x][y][z]?
 						# current voxel already exists (shell voxel)
-						dir = grid[x][y][z]
+						dir = grid[x][y][z].dir
 
-						if dir > 0
+						@_setVoxels grid, x, y, currentFillVoxelQueue, 0
+
+						if dir is 1
 							# fill up voxels and leave model
-							for v in currentFillVoxelQueue
-								@_setVoxel grid, v, 0
 							insideModel = false
-						else if dir < 0
-							# re-entering model if inside? that seems odd. empty current fill queue
-							if insideModel
-								currentFillVoxelQueue = []
+						else if dir is -1
 							# entering model
 							insideModel = true
 						else
 							# if not sure fill up
-							for v in currentFillVoxelQueue
-								@_setVoxel grid, v, 0
 							currentFillVoxelQueue = []
 					else
 						# voxel does not exist yet. create if inside model
 						if insideModel
-							currentFillVoxelQueue.push {x: x, y: y, z: z}
+							currentFillVoxelQueue.push z
 					z++
+				return
 
-			_setVoxel: (grid, {x: x, y: y, z: z}, voxelData) ->
+			_setVoxels: (grid, x, y, zs, voxelData) ->
+				for z in zs
+					@_setVoxel grid, x, y, z, voxelData
+
+			_setVoxel: (grid, x, y, z, voxelData) ->
 				grid[x] ?= []
 				grid[x][y] ?= []
 				grid[x][y][z] ?= []

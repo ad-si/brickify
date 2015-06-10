@@ -70,6 +70,30 @@ class BrickLayouter
 
 
 	finalLayoutPass: (grid) =>
+		bricksToLayout = grid.getAllBricks()
+
+		bricksToLayout.forEach (brick) =>
+
+			if !brick?
+				return
+
+			mergeableNeighbors = @_findMergeableNeighbors brick
+
+			while(@_anyDefinedInArray(mergeableNeighbors))
+				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
+				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+
+				console.log 'merge'
+				@_mergeBricksAndUpdateGraphConnections brick,
+					neighborsToMergeWith, bricksToLayout
+
+				if @debugMode and not brick.isValid()
+					log.warn 'Invalid brick: ', brick
+					log.warn '> Using pseudoRandom:', @pseudoRandom
+					log.warn '> current seed:', Random.getSeed()
+
+				mergeableNeighbors = @_findMergeableNeighbors brick
+
 		return {grid: grid}
 
 	###

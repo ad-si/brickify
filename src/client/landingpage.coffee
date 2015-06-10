@@ -98,7 +98,7 @@ b1 = bundle1.init().then ->
 		@value = ''
 
 	$('.dropper').text 'Drop an stl file'
-	$('#preview img').on( 'dragstart'
+	$('#preview img, #preview a').on( 'dragstart'
 		(e) ->
 			e.originalEvent.dataTransfer.setData(
 				'text/plain'

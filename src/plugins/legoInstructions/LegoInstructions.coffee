@@ -194,6 +194,7 @@ class LegoInstructions
 		img{width: #{imgWidth}px; max-width: 100%;}
 		h1,h3,p,td{font-family:Helvetica, Arial, sans-serif;}
 		td{min-width: 80px;}
+		.pageBreak{page-break-before: always;}
 		</style>"
 
 		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -207,7 +208,7 @@ class LegoInstructions
 
 		for i in [1..numLayers]
 			html += '<br>'
-			html += '<h3> Layer ' + i + '</h3>'
+			html += '<h3 class="pageBreak"> Layer ' + i + '</h3>'
 			html += '<p><img src="LEGO%20assembly%20instructions%20' + i + '.png"></p>'
 
 		html += '</body></html>'

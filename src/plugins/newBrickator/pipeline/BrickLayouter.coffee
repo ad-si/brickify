@@ -61,8 +61,7 @@ class BrickLayouter
 		bricksToLayout = grid.getAllBricks()
 		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
-			if !brick?
-				return
+			return unless brick?
 			mergeableNeighbors = @_findMergeableNeighbors brick
 			if @_anyDefinedInArray(mergeableNeighbors)
 				finalPassMerges++

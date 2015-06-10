@@ -42,9 +42,9 @@ module.exports = class LegoPipeline
 		}
 
 		@pipelineSteps.push {
-			name: "Final merge pass"
+			name: 'Final merge pass'
 			decision: (options) -> return options.layouting
-			worker: (lastResult, options) => 
+			worker: (lastResult, options) =>
 				return @brickLayouter.finalLayoutPass lastResult.grid
 		}
 

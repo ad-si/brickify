@@ -67,12 +67,11 @@ class LegoInstructions
 					pieceListHtml = ''
 					promiseChain = promiseChain.then =>
 						@newBrickator._getCachedData(selectedNode).then (data) ->
-							pieceList = pieceListGenerator.generatePieceList data.grid.getAllBricks()
+							bricks = data.grid.getAllBricks()
+							pieceList = pieceListGenerator.generatePieceList bricks
 							pieceListHtml = pieceListGenerator.getHtml pieceList
 
-							resultingFiles.push openScadGenerator.generateScad(
-								data.grid.getAllBricks()
-							)
+							resultingFiles.push openScadGenerator.generateScad bricks
 
 					# save download
 					promiseChain = promiseChain.then =>

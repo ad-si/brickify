@@ -24,19 +24,19 @@ class LegoInstructions
 			log.debug 'Creating instructions...'
 
 			# pseudoisometric
-			cam = new THREE.PerspectiveCamera(
+			camera = new THREE.PerspectiveCamera(
 				@renderer.camera.fov, @renderer.camera.aspect, 1, 1000
 			)
 
-			cam.position.set(1, 1, 1)
-			cam.lookAt(new THREE.Vector3(0, 0, 0))
-			cam.up = new THREE.Vector3(0, 0, 1)
+			camera.position.set(1, 1, 1)
+			camera.lookAt(new THREE.Vector3(0, 0, 0))
+			camera.up = new THREE.Vector3(0, 0, 1)
 
 			@nodeVisualizer.getBrickThreeNode selectedNode
 			.then (brickNode) =>
 				boundingSphere = threeHelper.getBoundingSphere brickNode
 				threeHelper.zoomToBoundingSphere(
-					cam
+					camera
 					@renderer.scene
 					null
 					boundingSphere
@@ -55,7 +55,7 @@ class LegoInstructions
 					promiseChain = Promise.resolve()
 					imageWidth = 0
 					for layer in [1..numLayers]
-						promiseChain = @_createScreenshotOfLayer(promiseChain, layer, cam)
+						promiseChain = @_createScreenshotOfLayer promiseChain, layer, camera
 						promiseChain = promiseChain.then (fileData) ->
 							resultingFiles.push {
 								fileName: fileData.fileName
@@ -90,12 +90,12 @@ class LegoInstructions
 						@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
 						@fidelityControl.disableScreenshotMode()
 
-	_createScreenshotOfLayer: (promiseChain, layer, cam) =>
+	_createScreenshotOfLayer: (promiseChain, layer, camera) =>
 		return promiseChain.then =>
 			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
 			.then =>
 				log.debug 'Create screenshot of layer', layer
-				@renderer.renderToImage(cam, @imageResolution)
+				return @renderer.renderToImage camera, @imageResolution
 			.then (pixelData) =>
 				flippedImage = @_flipAndFitImage pixelData
 				return @_convertToPng(flippedImage)

@@ -39,7 +39,8 @@ know the size, download and print the&nbsp;
 	if lego
 		html += '
 <h4 class=\"disabled\">Download Instructions</h4>
-<div id=\"downloadInstructionsButton\" class=\"btn btn-success btn-block disabled\">
+<div id=\"downloadInstructionsButton\"
+class=\"btn btn-success btn-block disabled\">
     &nbsp;&nbsp;Download LEGO instructions and scad file
 </div>'
 	html += '

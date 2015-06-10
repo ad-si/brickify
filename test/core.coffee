@@ -10,7 +10,7 @@ describe 'Brickify', ->
 	server = {}
 
 	before (done) ->
-		this.timeout(5000)
+		@timeout(5000)
 
 		server = brickify
 			.setupRouting()

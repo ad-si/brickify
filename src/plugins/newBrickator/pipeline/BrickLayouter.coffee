@@ -52,51 +52,70 @@ class BrickLayouter
 				else
 					continue # randomly choose a new brick
 
-			while(@_anyDefinedInArray(mergeableNeighbors))
-				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
-				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
-				###
-				console.log 'TO BE MERGED'
-				if mergeIndex >= 4
-					console.log 'into size', brick.getSize().x, brick.getSize().y, 3
-				brick.debugLog()
-				neighborsToMergeWith.forEach (fBrick) ->
-					fBrick.debugLog()
-				###
-
-				@_mergeBricksAndUpdateGraphConnections brick,
-					neighborsToMergeWith, bricksToLayout
-
-				###
-				console.log 'NEW BRICK', mergeIndex
-				brick.debugLog()
-				console.log brick.isValid()
-				console.log '  '
-				###
-
-				if @debugMode and not brick.isValid()
-					log.warn 'Invalid brick: ', brick
-					log.warn '> Using pseudoRandom:', @pseudoRandom
-					log.warn '> current seed:', Random.getSeed()
-
-				###
-				if brick.getStability() == 0
-					neighborsXy = brick.getNeighborsXY()
-					if neighborsXy.size != 0
-						# split brick & neighbors into smallest components
-						#console.log 'instability to be remedied'
-						neighborsXy.add brick
-						newBricks = @_splitBricks neighborsXy
-						bricksToLayout.delete brick
-						newBricks.forEach (newBrick) ->
-							bricksToLayout.add newBrick
-						console.log 'instability removed'
-				###
-
-				mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
+			###
+			if brick.getStability() == 0
+				neighborsXy = brick.getNeighborsXY()
+				if neighborsXy.size != 0
+					# split brick & neighbors into smallest components
+					#console.log 'instability to be remedied'
+					neighborsXy.add brick
+					newBricks = @_splitBricks neighborsXy
+					bricksToLayout.delete brick
+					newBricks.forEach (newBrick) ->
+						bricksToLayout.add newBrick
+					console.log 'instability removed'
+			###
 
 		return {grid: grid}
+
+
+	finalLayoutPass: (grid) =>
+		bricksToLayout = grid.getAllBricks()
+		finalPassMerges = 0
+		bricksToLayout.forEach (brick) =>
+			return unless brick?
+			mergeableNeighbors = @_findMergeableNeighbors brick
+			if @_anyDefinedInArray(mergeableNeighbors)
+				finalPassMerges++
+				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
+
+		log.debug 'Final pass merged ', finalPassMerges, ' times.'
+		return {grid: grid}
+
+	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
+		while(@_anyDefinedInArray(mergeableNeighbors))
+			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
+			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+
+			###
+			console.log 'TO BE MERGED'
+			if mergeIndex >= 4
+				console.log 'into size', brick.getSize().x, brick.getSize().y, 3
+			brick.debugLog()
+			neighborsToMergeWith.forEach (fBrick) ->
+				fBrick.debugLog()
+			###
+
+			@_mergeBricksAndUpdateGraphConnections brick,
+				neighborsToMergeWith, bricksToLayout
+
+			###
+			console.log 'NEW BRICK', mergeIndex
+			brick.debugLog()
+			console.log brick.isValid()
+			console.log '  '
+			###
+
+			if @debugMode and not brick.isValid()
+				log.warn 'Invalid brick: ', brick
+				log.warn '> Using pseudoRandom:', @pseudoRandom
+				log.warn '> current seed:', Random.getSeed()
+
+			mergeableNeighbors = @_findMergeableNeighbors brick
+
+		return brick
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This

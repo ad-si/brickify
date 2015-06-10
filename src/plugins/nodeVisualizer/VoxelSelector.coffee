@@ -17,7 +17,7 @@ class VoxelSelector
 
 	getAllVoxels: =>
 		voxels = []
-		@grid.forEachVoxel (voxel) => voxels.push voxel
+		@grid.forEachVoxel (voxel) -> voxels.push voxel
 		return voxels
 
 	###

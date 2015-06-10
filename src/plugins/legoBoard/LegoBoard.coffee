@@ -22,6 +22,7 @@ module.exports = class LegoBoard
 		@highQualMode = false
 		@usePipeline = false
 		@isVisible = true
+		@isScreenshotMode = no
 
 		@_initMaterials()
 
@@ -76,7 +77,7 @@ module.exports = class LegoBoard
 
 	on3dUpdate: =>
 		# this check is only important if we don't use the pipeline
-		return if @usePipeline
+		return if @usePipeline or @isScreenshotMode
 
 		# check if the camera is below z=0. if yes, make the plate transparent
 		# and hide studs
@@ -93,7 +94,7 @@ module.exports = class LegoBoard
 			@studsContainer.visible = true if @highQualMode
 
 	onPaint: (threeRenderer, camera, target) =>
-		return if not @isVisible
+		return if not @isVisible or @isScreenshotMode
 
 		# recreate textures if either they havent been generated yet or
 		# the screen size has changed
@@ -145,7 +146,11 @@ module.exports = class LegoBoard
 		@threejsNode.visible = !@threejsNode.visible
 		@isVisible = !@isVisible
 
-	setFidelity: (fidelityLevel, availableLevels) =>
+	setFidelity: (fidelityLevel, availableLevels, options) =>
+		if options.screenshotMode?
+			@isScreenshotMode = options.screenshotMode
+			@threejsNode.visible = @isVisible and not @isScreenshotMode
+
 		# Determine whether to show or hide studs
 		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
 			@highQualMode = true

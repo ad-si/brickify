@@ -95,7 +95,7 @@ class LegoInstructions
 		return promiseChain.then =>
 			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
 			.then =>
-				log.debug 'create screenshot of layer',layer
+				log.debug 'Create screenshot of layer', layer
 				@renderer.renderToImage(cam, @imageResolution)
 				.then (pixelData) =>
 					flippedImage = @_flipAndFitImage pixelData

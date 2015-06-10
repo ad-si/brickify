@@ -36,6 +36,7 @@ class FidelityControl
 		@currentFidelityLevel = 0
 
 		@autoAdjust = true
+		@screenShotMode = false
 
 		@accumulatedFrames = 0
 		@accumulatedTime = 0
@@ -93,7 +94,7 @@ class FidelityControl
 		)
 
 	_adjustFidelity: (fps) =>
-		return unless @autoAdjust
+		return if @screenShotMode or not @autoAdjust
 
 		if fps < minimalAcceptableFps and @currentFidelityLevel > 0
 			# count how often we dropped below the desired fps
@@ -188,7 +189,11 @@ class FidelityControl
 
 	# disables pipeline for screenshots
 	enableScreenshotMode: =>
+		@screenShotMode = true
+
 		level = FidelityControl.fidelityLevels.indexOf 'DefaultHigh'
+		@_levelBeforeScreenshot = @currentFidelityLevel
+		@currentFidelityLevel = level
 
 		@pluginHooks.setFidelity(
 			level, FidelityControl.fidelityLevels
@@ -199,6 +204,10 @@ class FidelityControl
 
 	# resets screenshot mode, restores old fidelity level
 	disableScreenshotMode: =>
+		@screenShotMode = false
+
+		@currentFidelityLevel = @_levelBeforeScreenshot
+
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels
 		)

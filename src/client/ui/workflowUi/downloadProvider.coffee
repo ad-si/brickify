@@ -10,7 +10,7 @@ module.exports = class DownloadProvider
 	constructor: (@bundle) ->
 		return
 
-	init: (stlButtonId, pdfButtonId, @exportUi, @sceneManager) =>
+	init: (stlButtonId, instructionsButtonId, @exportUi, @sceneManager) =>
 		@stljQueryObject = $(stlButtonId)
 		@stljQueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
@@ -22,25 +22,25 @@ module.exports = class DownloadProvider
 					20
 				)
 
-		@pdfjQueryObject = $(pdfButtonId)
-		@pdfjQueryObject.on 'click', =>
+		@instructionsjQueryObject = $(instructionsButtonId)
+		@instructionsjQueryObject.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
-				Spinner.startOverlay @pdfjQueryObject[0]
-				@pdfjQueryObject.addClass 'disabled'
+				Spinner.startOverlay @instructionsjQueryObject[0]
+				@instructionsjQueryObject.addClass 'disabled'
 				window.setTimeout(
-					=> @_createDownload 'pdf', selNode
+					=> @_createDownload 'instructions', selNode
 					20
 				)
 
-	_createDownload: (fileType, selectedNode) =>
+	_createDownload: (type, selectedNode) =>
 		downloadOptions = {
-			fileType: fileType
+			type: type
 			studRadius: @exportUi.studRadius
 			holeRadius: @exportUi.holeRadius
 		}
 
-		if (fileType == 'stl')
+		if (type == 'stl')
 			piwikTracking.trackEvent 'EditorExport', 'DownloadStlClick'
 			piwikTracking.trackEvent(
 				'EditorExport', 'StudRadius', @exportUi.studRadiusSelection
@@ -55,9 +55,9 @@ module.exports = class DownloadProvider
 			files = @_collectFiles resultsArray
 
 			# Stop showing spinner
-			if (fileType == 'pdf')
-				Spinner.stop @pdfjQueryObject[0]
-				@pdfjQueryObject.removeClass 'disabled'
+			if (type == 'instructions')
+				Spinner.stop @instructionsjQueryObject[0]
+				@instructionsjQueryObject.removeClass 'disabled'
 			else
 				Spinner.stop @stljQueryObject[0]
 				@stljQueryObject.removeClass 'disabled'
@@ -84,7 +84,7 @@ module.exports = class DownloadProvider
 					for result in resultsArray
 						zip.file result.fileName, result.data, result.options
 					zipFile = zip.generate type: 'blob'
-					saveAs zipFile, "brickify-#{selectedNode.name}-#{fileType}.zip"
+					saveAs zipFile, "brickify-#{selectedNode.name}-#{type}.zip"
 
 	_collectFiles: (array) ->
 		files = []

@@ -159,7 +159,7 @@ class DummyPlugin
 	# @param {Node} selectedNode the selected node that should be processed
 	# @param {Object} downloadOptions Additional download options
 	# @param {Float} downloadOptions.studRadius Desired radius of the Lego studs
-	# @param {String} downloadOptions.fileType desired file type, 'stl' or 'pdf'
+	# @param {String} downloadOptions.type desired type, 'stl' or 'instructions'
 	###
 	getDownload: (downloadOptions, selectedNode) ->
 		return {

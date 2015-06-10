@@ -28,7 +28,7 @@ class DownloadUi
 		# stl download
 		@downloadProvider = new DownloadProvider @bundle
 		@downloadProvider.init(
-			'#stlDownloadButton', '#downloadPdfButton',
+			'#stlDownloadButton', '#downloadInstructionsButton',
 			@, @bundle.sceneManager
 		)
 

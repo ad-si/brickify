@@ -18,7 +18,7 @@ class LegoInstructions
 	onNodeDeselect: => @selectedNode = null
 
 	getDownload: (selectedNode, downloadOptions) =>
-		return null if downloadOptions.fileType != 'pdf'
+		return null if downloadOptions.type != 'instructions'
 
 		return new Promise (resolve, reject) =>
 			log.debug 'Creating pdf instructions...'

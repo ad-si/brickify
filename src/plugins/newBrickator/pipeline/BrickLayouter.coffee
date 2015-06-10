@@ -52,49 +52,41 @@ class BrickLayouter
 				else
 					continue # randomly choose a new brick
 
-			while(@_anyDefinedInArray(mergeableNeighbors))
-				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
-				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
-
-				@_mergeBricksAndUpdateGraphConnections brick,
-					neighborsToMergeWith, bricksToLayout
-
-				if @debugMode and not brick.isValid()
-					log.warn 'Invalid brick: ', brick
-					log.warn '> Using pseudoRandom:', @pseudoRandom
-					log.warn '> current seed:', Random.getSeed()
-
-				mergeableNeighbors = @_findMergeableNeighbors brick
+			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		return {grid: grid}
 
 
 	finalLayoutPass: (grid) =>
 		bricksToLayout = grid.getAllBricks()
-
+		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
-
 			if !brick?
 				return
+			mergeableNeighbors = @_findMergeableNeighbors brick
+			if @_anyDefinedInArray(mergeableNeighbors)
+				finalPassMerges++
+				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
+
+		log.debug 'Final pass merged ', finalPassMerges, ' times.'
+		return {grid: grid}
+
+	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
+		while(@_anyDefinedInArray(mergeableNeighbors))
+			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
+			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+
+			@_mergeBricksAndUpdateGraphConnections brick,
+				neighborsToMergeWith, bricksToLayout
+
+			if @debugMode and not brick.isValid()
+				log.warn 'Invalid brick: ', brick
+				log.warn '> Using pseudoRandom:', @pseudoRandom
+				log.warn '> current seed:', Random.getSeed()
 
 			mergeableNeighbors = @_findMergeableNeighbors brick
 
-			while(@_anyDefinedInArray(mergeableNeighbors))
-				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
-				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
-
-				console.log 'merge'
-				@_mergeBricksAndUpdateGraphConnections brick,
-					neighborsToMergeWith, bricksToLayout
-
-				if @debugMode and not brick.isValid()
-					log.warn 'Invalid brick: ', brick
-					log.warn '> Using pseudoRandom:', @pseudoRandom
-					log.warn '> current seed:', Random.getSeed()
-
-				mergeableNeighbors = @_findMergeableNeighbors brick
-
-		return {grid: grid}
+		return brick
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This

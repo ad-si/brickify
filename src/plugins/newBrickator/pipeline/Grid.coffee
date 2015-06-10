@@ -10,33 +10,41 @@ module.exports = class Grid
 
 		@voxels = {}
 
-	setUpForModel: (optimizedModel, options) =>
+	setUpForModel: (model, options) =>
 		@modelTransform = options.modelTransform
 
-		bb = optimizedModel.boundingBox()
+		return model
+			.getBoundingBox()
+			.then (boundingBox) =>
 
-		# if the object is moved in the scene (not in the origin),
-		# think about that while building the grid
-		if @modelTransform
-			bbMinWorld = new THREE.Vector3()
-			bbMinWorld.set bb.min.x, bb.min.y, bb.min.z
-			bbMinWorld.applyProjection(@modelTransform)
-		else
-			bbMinWorld = bb.min
+				# if the object is moved in the scene (not in the origin),
+				# think about that while building the grid
+				if @modelTransform
+					bbMinWorld = new THREE.Vector3()
+					bbMinWorld.set(
+						boundingBox.min.x
+						boundingBox.min.y
+						boundingBox.min.z
+					)
+					bbMinWorld.applyProjection(@modelTransform)
+				else
+					bbMinWorld = boundingBox.min
 
-		# 1.) Align bb minimum to next voxel position
-		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
-		# voxel center
-		# 3.) minimum z is to assure that grid is never below z=0
-		calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
-		calculatedZ -= @spacing.z / 2
-		minimumZ = @spacing.z / 2
+				# 1.) Align bb minimum to next voxel position
+				# 2.) spacing / 2 is subtracted to make the grid be aligned to the
+				# voxel center
+				# 3.) minimum z is to assure that grid is never below z=0
+				calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
+				calculatedZ -= @spacing.z / 2
+				minimumZ = @spacing.z / 2
 
-		@origin = {
-			x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
-			y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
-			z: Math.max(calculatedZ, minimumZ)
-		}
+				@origin = {
+					x: Math.floor(bbMinWorld.x / @spacing.x) *
+						@spacing.x - (@spacing.x / 2)
+					y: Math.floor(bbMinWorld.y / @spacing.y) *
+						@spacing.y - (@spacing.y / 2)
+					z: Math.max(calculatedZ, minimumZ)
+				}
 
 	getNumVoxelsX: =>
 		return @_maxVoxelX - @_minVoxelX + 1
@@ -327,7 +335,3 @@ module.exports = class Grid
 			return -1
 		else
 			return tmin
-
-
-
-

@@ -96,15 +96,15 @@ class LegoInstructions
 			.then =>
 				log.debug 'Create screenshot of layer', layer
 				@renderer.renderToImage(cam, @imageResolution)
-				.then (pixelData) =>
-					flippedImage = @_flipAndFitImage pixelData
-					@_convertToPng(flippedImage)
-					.then (pngData) ->
-						return ({
-							fileName: "LEGO assembly instructions #{layer}.png"
-							data: pngData.buffer
-							imageWidth: flippedImage.width
-						})
+			.then (pixelData) =>
+				flippedImage = @_flipAndFitImage pixelData
+				return @_convertToPng(flippedImage)
+				.then (pngData) ->
+					return (
+						fileName: "LEGO assembly instructions #{layer}.png"
+						data: pngData.buffer
+						imageWidth: flippedImage.width
+					)
 
 	_convertToPng: (image) ->
 		return new Promise (resolve, reject) ->

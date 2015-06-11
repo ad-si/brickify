@@ -47,8 +47,9 @@ class NewBrickator
 
 				@nodeVisualizer?.objectModified selectedNode, cachedData
 				Spinner.stop @bundle.renderer.getDomElement()
-			.catch =>
-				Spinner.stop @bundle.renderer.getDomElement()
+		.catch (error) =>
+			log.error error
+			Spinner.stop @bundle.renderer.getDomElement()
 
 	###
 	# If voxels have been selected as lego / as 3d print, the brick layout
@@ -84,8 +85,8 @@ class NewBrickator
 				cachedData.csgNeedsRecalculation = true
 
 				@nodeVisualizer?.objectModified selectedNode, cachedData
-			.catch (error) ->
-				log.debug error
+		.catch (error) ->
+			log.error error
 
 	everythingPrint: (selectedNode) =>
 		@_getCachedData selectedNode

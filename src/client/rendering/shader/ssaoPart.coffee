@@ -46,10 +46,10 @@ class SsaoPart extends ShaderPart
 				const float total_strength = 1.0;\n
 				const float base = 0.2;\n
 
-				const float area = 0.0075;\n
-				const float falloff = 0.0005;\n
+				const float area = 0.0175;\n
+				const float falloff = 0.0015;\n
 
-				const float radius = 0.008;\n
+				const float radius = 0.005;\n
 
 				vec3 sample_sphere[SSAO_SAMPLES];
 				sample_sphere[ 0] = vec3( 0.5381, 0.1856,-0.4319);
@@ -83,7 +83,9 @@ class SsaoPart extends ShaderPart
   					vec3 ray = radius_depth * reflect(sample_sphere[i], random);
   					vec3 hemi_ray = position + sign(dot(ray, normal)) * ray;
 
-  					float occ_depth =  linearizeDepth(texture2D(tDepth, clamp(hemi_ray.xy,0.0,1.0)).r);
+  					float occ_depth =  linearizeDepth(
+  						texture2D(tDepth, clamp(hemi_ray.xy,0.0,1.0)).r
+  					);
   					float difference = depth - occ_depth;
 
   					occlusion += step(falloff, difference) *
@@ -100,12 +102,11 @@ class SsaoPart extends ShaderPart
 			float ssao = ssaoCalculate(vUv);
 			float ssaoDepth = linearizeDepth(texture2D(tDepth, vUv).r);
 			vec3 normal = ssaoNormalFromDepth(ssaoDepth, vUv);
-			
+
 			/*normal = normal * 0.5 + 0.5;
     		col = vec4(normal.rgb, 1.0);*/
 
 			col = vec4( ssao, ssao, ssao, 1.0 );
-			/*col = col * 0.3 + (col * ssao * 0.7);*/
 		'
 
 #cameraNearPlane: 0.1

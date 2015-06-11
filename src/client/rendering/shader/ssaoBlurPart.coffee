@@ -50,9 +50,9 @@ class SsaoBlurPart extends ShaderPart
 			col = vec4(0.0);
 			currentOpacity = 1.0 - blur;
 
-			col = texture2D(tColor, vUv);
+			/*col = texture2D(tColor, vUv);
 			col.a = 1.0;
-			currentOpacity = 1.0;
+			currentOpacity = 1.0;*/
 		'
 
 module.exports = SsaoBlurPart

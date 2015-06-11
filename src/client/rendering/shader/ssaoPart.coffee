@@ -19,12 +19,18 @@ class SsaoPart extends ShaderPart
 
 	getFragmentPreMain: ->
 		return '
+			float linearizeDepth(float depth){
+				float zNear = 0.1;
+				float zFar = 2500.0;
+				return 2.0 * zNear  / (zFar + zNear - depth * (zFar - zNear));
+			}
+
 			vec3 ssaoNormalFromDepth(float depth, vec2 texCoords){
 				vec2 offset1 = vec2(0.0, 0.001);
 				vec2 offset2 = vec2(0.001, 0.0);
 
-				float depth1 = texture2D(tDepth, texCoords + offset1).r;
-				float depth2 = texture2D(tDepth, texCoords + offset2).r;
+				float depth1 = linearizeDepth(texture2D(tDepth, texCoords + offset1).r);
+				float depth2 = linearizeDepth(texture2D(tDepth, texCoords + offset2).r);
 
 				vec3 p1 = vec3(offset1, depth1 - depth);
 				vec3 p2 = vec3(offset2, depth2 - depth);
@@ -63,7 +69,8 @@ class SsaoPart extends ShaderPart
 				sample_sphere[14] = vec3( 0.0352,-0.0631, 0.5460);
 				sample_sphere[15] = vec3(-0.4776, 0.2847,-0.0271);
 
-				float depth = texture2D( tDepth, texCoords ).r;
+				float depth = linearizeDepth(texture2D( tDepth, texCoords ).r);
+
   				vec3 random = normalize(texture2D(tRandom,texCoords * (7.0 + depth)).rgb);
 
   				vec3 position = vec3(texCoords, depth);
@@ -76,7 +83,7 @@ class SsaoPart extends ShaderPart
   					vec3 ray = radius_depth * reflect(sample_sphere[i], random);
   					vec3 hemi_ray = position + sign(dot(ray, normal)) * ray;
 
-  					float occ_depth = texture2D(tDepth, clamp(hemi_ray.xy,0.0,1.0)).r;
+  					float occ_depth =  linearizeDepth(texture2D(tDepth, clamp(hemi_ray.xy,0.0,1.0)).r);
   					float difference = depth - occ_depth;
 
   					occlusion += step(falloff, difference) *
@@ -91,12 +98,17 @@ class SsaoPart extends ShaderPart
 	getFragmentInMain: ->
 		return '
 			float ssao = ssaoCalculate(vUv);
-			float ssaoDepth = texture2D(tDepth, vUv).r;
+			float ssaoDepth = linearizeDepth(texture2D(tDepth, vUv).r);
 			vec3 normal = ssaoNormalFromDepth(ssaoDepth, vUv);
-			normal = normal * 0.5 + 0.5;
-			/*col = vec4(normal.rgb, 1.0);*/
+			
+			/*normal = normal * 0.5 + 0.5;
+    		col = vec4(normal.rgb, 1.0);*/
+
 			col = vec4( ssao, ssao, ssao, 1.0 );
 			/*col = col * 0.3 + (col * ssao * 0.7);*/
 		'
+
+#cameraNearPlane: 0.1
+#cameraFarPlane: 2500
 
 module.exports = SsaoPart

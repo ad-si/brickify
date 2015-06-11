@@ -177,47 +177,43 @@ module.exports = class Voxelizer
 				roundB = @_roundVoxelSpaceToVoxel b
 
 				if roundA.x is x and roundA.y is y and roundA.z is z
-					aIsInVoxel = true
-				else
-					aIsInVoxel = false
-				if roundB.x is x and roundB.y is y and roundB.z is z
-					bIsInVoxel = true
-				else
-					bIsInVoxel = false
+					# aIsInVoxel
+					if roundB.x is x and roundB.y is y and roundB.z is z
+						# bIsInVoxel
+						return Math.max a.z, b.z
 
-				if aIsInVoxel and bIsInVoxel
-					return Math.max a.z, b.z
-
-				minX = x - 0.5
-				minY = y - 0.5
-				minZ = z - 0.5
-				maxX = x + 0.5
-				maxY = y + 0.5
-				maxZ = z + 0.5
 
 				d = @_normalize x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
 
 				if d.x isnt 0
-					k = (minX - a.x) / d.x
+					k = (x - 0.5 - a.x) / d.x
 					if k >= 0 and k <= 1
 						return a.z + k * d.z
-					k = (maxX - a.x) / d.x
+
+					k = (x + 0.5 - a.x) / d.x
 					if k >= 0 and k <= 1
 						return a.z + k * d.z
+
 				if d.y isnt 0
-					k = (minY - a.y) / d.y
+					k = (y - 0.5 - a.y) / d.y
 					if k >= 0 and k <= 1
 						return a.z + k * d.z
-					k = (maxY - a.y) / d.y
+
+					k = (y + 0.5 - a.y) / d.y
 					if k >= 0 and k <= 1
 						return a.z + k * d.z
+
 				if d.z isnt 0
+					minZ = z - 0.5
 					k = (minZ - a.z) / d.z
 					if k >= 0 and k <= 1
 						return minZ
+
+					maxZ = z + 0.5
 					k = (maxZ - a.z) / d.z
 					if k >= 0 and k <= 1
 						return maxZ
+
 				return z
 
 			_normalize: ({x: x, y: y, z: z}) ->

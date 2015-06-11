@@ -151,17 +151,21 @@ module.exports = class Coloring
 			return brick.visualizationMaterial
 
 		# collect materials of neighbors
-		neighbors = brick.getNeighbors()
-		neighborColors = []
+		neighbors = brick.getNeighborsXY()
+		connections = brick.connectedBricks()
+
+		neighborColors = new Set()
 		neighbors.forEach (neighbor) ->
-			neighborColors.push neighbor.visualizationMaterial
+			neighborColors.add neighbor.visualizationMaterial
+		connections.forEach (connection) ->
+			neighborColors.add connection.visualizationMaterial
 
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used
 		# by neighbors to visually distinguish bricks
 		for i in [0...@_brickMaterials.length]
 			material = @_getRandomBrickMaterial()
-			continue if neighborColors.indexOf(material) >= 0
+			continue if neighborColors.has(material)
 			break
 
 		brick.visualizationMaterial = material
@@ -176,14 +180,14 @@ module.exports = class Coloring
 
 	_createBrickMaterials: =>
 		@_brickMaterials = []
-		@_brickMaterials.push @_createMaterial 0x530000
-		@_brickMaterials.push @_createMaterial 0xfe2020
-		@_brickMaterials.push @_createMaterial 0xba0000
-		@_brickMaterials.push @_createMaterial 0xfe5c5c
-		@_brickMaterials.push @_createMaterial 0xdb0000
-		@_brickMaterials.push @_createMaterial 0x6b0000
-		@_brickMaterials.push @_createMaterial 0xfe3939
-		@_brickMaterials.push @_createMaterial 0xfe4d4d
+		@_brickMaterials.push @_createMaterial 0x550000
+		@_brickMaterials.push @_createMaterial 0x8e0000
+		@_brickMaterials.push @_createMaterial 0xc60000
+		@_brickMaterials.push @_createMaterial 0xff0000
+		@_brickMaterials.push @_createMaterial 0xcc4444
+		@_brickMaterials.push @_createMaterial 0xdd4f4f
+		@_brickMaterials.push @_createMaterial 0xee5b5b
+		@_brickMaterials.push @_createMaterial 0xff6666
 
 	_createMaterial: (color, opacity = 1) ->
 		return new THREE.MeshLambertMaterial(

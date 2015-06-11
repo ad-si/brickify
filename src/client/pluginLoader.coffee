@@ -50,11 +50,6 @@ module.exports = class PluginLoader
 				require '../plugins/dummy'
 				require '../plugins/dummy/package.json'
 			)
-		if @globalConfig.plugins.stlImport
-			@pluginInstances.push @_loadPlugin(
-				require '../plugins/stlImport'
-				require '../plugins/stlImport/package.json'
-			)
 		if @globalConfig.plugins.coordinateSystem
 			@pluginInstances.push @_loadPlugin(
 				require '../plugins/coordinateSystem'

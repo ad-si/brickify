@@ -303,13 +303,13 @@ class NodeVisualizer
 	getDisplayMode: =>
 		return @visualizationMode
 
-	_applyLegoBrushMode: (cachedData) =>
+	_applyLegoBrushMode: (cachedData) ->
 		cachedData.brickVisualization.updateVisualization()
 		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility true
 		cachedData.modelVisualization.setShadowVisibility false
 
-	_applyPrintBrushMode: (cachedData) =>
+	_applyPrintBrushMode: (cachedData) ->
 		cachedData.brickVisualization.updateVisualization()
 		cachedData.brickVisualization.showVoxelAndBricks()
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
@@ -325,7 +325,7 @@ class NodeVisualizer
 
 		cachedData.modelVisualization.setNodeVisibility false
 
-	_resetStabilityView: (cachedData) =>
+	_resetStabilityView: (cachedData) ->
 		if cachedData.stabilityViewEnabled
 			cachedData.brickVisualization.setStabilityView false
 			cachedData.brickVisualization.hideCsg()
@@ -341,7 +341,7 @@ class NodeVisualizer
 		cachedData.modelVisualization.setNodeVisibility false
 		return cachedData.numZLayers
 
-	_resetBuildMode: (cachedData) =>
+	_resetBuildMode: (cachedData) ->
 		cachedData.brickVisualization.hideCsg()
 		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true

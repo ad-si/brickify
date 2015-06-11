@@ -13,7 +13,6 @@ compress = require 'compression'
 morgan = require 'morgan'
 errorHandler = require 'errorhandler'
 favicon = require 'serve-favicon'
-compression = require 'compression'
 stylus = require 'stylus'
 nib = require 'nib'
 exec = require('child_process').exec

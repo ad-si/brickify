@@ -58,8 +58,6 @@ class ModelLoader
 	# adds a new model to the state
 	addModelToScene: (fileName, hash, model) ->
 		model
-			.buildFacesFromFaceVertexMesh()
-			.calculateNormals()
 			.getAutoAlignMatrix()
 			.then (matrix) =>
 				console.log matrix

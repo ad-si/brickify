@@ -50,7 +50,9 @@ requestDataFromServer = (hash) ->
 buildModelPromise = (hash) ->
 	return requestDataFromServer(hash)
 		.then (base64Model) ->
-			return meshlib.Model.fromBase64 base64Model
+			return meshlib.Model
+				.fromBase64 base64Model
+				.buildFacesFromFaceVertexMesh()
 
 
 # Request an optimized mesh with the given hash

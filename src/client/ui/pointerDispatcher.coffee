@@ -15,6 +15,8 @@ class PointerDispatcher
 			element.addEventListener event.toLowerCase(), @['on' + event]
 
 		element = @bundle.ui.renderer.getDomElement()
+		element.addEventListener 'wheel', @onMouseWheel
+
 		_registerEvent element, event for event of pointerEnums.events
 
 	onPointerOver: (event) ->
@@ -84,6 +86,15 @@ class PointerDispatcher
 
 	onLostPointerCapture: (event) ->
 		return
+
+	onMouseWheel: (event) =>
+		@hintUi.mouseWheel()
+
+		# this is needed because chrome (not firefox/IE) does not
+		# handle multiple listeners correctly
+		event.target.removeEventListener 'wheel', @onMouseWheel
+
+		return false
 
 	_capturePointerFor: (event) =>
 		element = @bundle.ui.renderer.getDomElement()

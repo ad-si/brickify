@@ -24,4 +24,7 @@ class HintUi
 				# right mouse button
 				@moveHint.fadeOut()
 
+	mouseWheel: =>
+		@zoomHint.fadeOut()
+
 module.exports = HintUi

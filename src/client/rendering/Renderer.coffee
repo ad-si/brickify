@@ -293,18 +293,6 @@ class Renderer
 		@_setupLighting(scene)
 		return scene
 
-	loadCamera: (state) =>
-		if state.controls?
-			@setCamera state.controls.position, state.controls.target
-
-	saveCamera: (state) =>
-		p = @camera.position
-		t = @controls.target
-		state.controls = {
-			position: { x: p.x, y: p.y, z: p.z }
-			target: { x: t.x, y: t.y, z: t.z }
-		}
-
 	getControls: =>
 		@controls
 

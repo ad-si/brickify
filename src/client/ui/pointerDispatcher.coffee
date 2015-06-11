@@ -2,7 +2,7 @@ interactionHelper = require '../interactionHelper'
 pointerEnums = require './pointerEnums'
 
 class PointerDispatcher
-	constructor: (@bundle) ->
+	constructor: (@bundle, @hintUi) ->
 		return
 
 	init: =>
@@ -40,10 +40,16 @@ class PointerDispatcher
 
 	onPointerMove: (event) =>
 		# don't call mouse events if there is no selected node
-		return unless @sceneManager.selectedNode?
+		if not @sceneManager.selectedNode?
+			# notify hint Ui of unhandeled event
+			@hintUi.pointerMove event, false
+			return
 
 		# dispatch event
 		handled = @_dispatchEvent event, pointerEnums.events.PointerMove
+
+		# notify hint ui
+		@hintUi.pointerMove event, handled
 
 		# stop event if a plugin handled it (else let orbit controls work)
 		@_stop event if handled

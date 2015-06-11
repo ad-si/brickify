@@ -114,6 +114,7 @@ module.exports.setupRouting = ->
 		'filesaver.js'
 		'jquery'
 		'mousetrap'
+		'nanobar'
 		'operative'
 		'PEP'
 		'path'

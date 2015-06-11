@@ -16,12 +16,44 @@ class BrickLayouter
 		grid.initializeBricks()
 		return grid
 
+	layout3LBricks: (grid) ->
+		numRandomChoices = 0
+		numRandomChoicesWithoutMerge = 0
+		numTotalInitialBricks = 0
+
+		bricksToLayout = grid.getAllBricks()
+		bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
+
+		numTotalInitialBricks += bricksToLayout.size
+		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks / 2
+		return unless numTotalInitialBricks > 0
+
+		loop
+			brick = @_chooseRandomBrick bricksToLayout
+			return {grid: grid} unless brick?
+			numRandomChoices++
+
+			mergeableNeighbors = []# @_findMergeableNeighbors brick, useThreeLayers
+
+			if !@_anyDefinedInArray(mergeableNeighbors)
+				numRandomChoicesWithoutMerge++
+				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
+					log.debug "\trandomChoices #{numRandomChoices}
+											withoutMerge #{numRandomChoicesWithoutMerge}"
+					break # done with initial layout
+				else
+					continue # randomly choose a new brick
+
+			#@_mergeLoop brick, mergeableNeighbors, bricksToLayout
+
+		return {grid: grid}
+
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
 	# !! Expects bricks to layout to be a Set !!
-	layoutByGreedyMerge: (grid, bricksToLayout, useThreeLayers = true) =>
+	layoutByGreedyMerge: (grid, bricksToLayout, useThreeLayers = false) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
@@ -32,21 +64,19 @@ class BrickLayouter
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-
 		return unless numTotalInitialBricks > 0
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
-			if !brick?
-				return {grid: grid}
-
+			return {grid: grid} unless brick?
 			numRandomChoices++
+			
 			mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
 
 			if !@_anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
-					log.debug " - randomChoices #{numRandomChoices}
+					log.debug "\trandomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
 					break # done with initial layout
 				else
@@ -81,7 +111,7 @@ class BrickLayouter
 				finalPassMerges++
 				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
-		log.debug 'Final pass merged ', finalPassMerges, ' times.'
+		log.debug '\tFinal pass merged ', finalPassMerges, ' times.'
 		return {grid: grid}
 
 	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
@@ -123,7 +153,7 @@ class BrickLayouter
 	#
 	# @param {Set<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid, useThreeLayers = true) =>
+	splitBricksAndRelayoutLocally: (bricks, grid, useThreeLayers = false) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->

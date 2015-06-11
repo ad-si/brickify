@@ -35,6 +35,13 @@ module.exports = class LegoPipeline
 		}
 
 		@pipelineSteps.push {
+			name: 'Layout 3L merge'
+			decision: (options) -> return options.layouting
+			worker: (lastResult, options) =>
+				return @brickLayouter.layout3LBricks lastResult.grid
+		}
+
+		@pipelineSteps.push {
 			name: 'Layout greedy merge'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
@@ -86,7 +93,8 @@ module.exports = class LegoPipeline
 			sum = 0
 			for s in profilingResults
 				sum += s
-			log.debug "Finished Lego Pipeline in #{sum}ms"
+			log.debug "Finished Lego Pipeline in #{sum}ms\n
+				------------------------------"
 
 		return {
 			profilingResults: profilingResults
@@ -108,7 +116,7 @@ module.exports = class LegoPipeline
 			start = new Date()
 			result = @runStep i, lastResult, options
 			stop = new Date() - start
-			log.debug "Step #{step.name} finished in #{stop}ms"
+			log.debug "\tfinished in #{stop}ms"
 		else
 			log.debug "(Skipping step #{step.name})"
 			result = lastResult

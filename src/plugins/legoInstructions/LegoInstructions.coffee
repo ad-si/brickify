@@ -180,13 +180,13 @@ class LegoInstructions
 			imageData[index + 3]
 		]
 
-	_setPixel: (imageData, imageWidth, x, y, rgbaArray) ->
+	_setPixel: (imageData, imageWidth, x, y, [r, g, b, a]) ->
 		index = (imageWidth * y) + x
 		index *= 4
-		imageData[index] = rgbaArray[0]
-		imageData[index + 1] = rgbaArray[1]
-		imageData[index + 2] = rgbaArray[2]
-		imageData[index + 3] = rgbaArray[3]
+		imageData[index] = r
+		imageData[index + 1] = g
+		imageData[index + 2] = b
+		imageData[index + 3] = a
 
 	_createHtml: (numLayers, imgWidth, pieceListHtml = null) ->
 		style = "<style>

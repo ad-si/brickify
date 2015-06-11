@@ -47,6 +47,10 @@ class BrickLayouter
 
 			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
+			# if brick is still 1x1x3 after mergeLoop3L, break it into pieces
+			# mark them as bad starting point for 3L brick
+			# TODO
+
 		return {grid: grid}
 
 	_findMergeableNeighbors3L: (brick) =>
@@ -108,27 +112,16 @@ class BrickLayouter
 			mergeVoxels.add mVoxel unless voxels.has mVoxel
 		return null if noMerge
 
-		# find neighbor bricks, noMerge if any if not there
+		# find neighbor bricks,
+		# noMerge if any not present
 		# noMerge if any brick not 1x1x1
 		mergeVoxels.forEach (mVoxel) =>
-			brick = mVoxel.brick
-			if brick == false or !brick?
+			mBrick = mVoxel.brick
+			if brick == false or !mBrick? or !mBrick.is1x1x1()
 				noMerge = true
 				return
-			mergeBricks.add brick
+			mergeBricks.add mBrick
 		return null if noMerge
-
-		#case1 : only 1x1x1 neighbors
-		mergeBricks.forEach (mBrick) =>
-			if !mBrick.is1x1x1()
-				noMerge = true
-		return null if noMerge
-
-		###
-		if mergeVoxels.size != mergeBricks.size
-			console.log ' should not get here'
-			return null
-		###
 
 		allVoxels = new Set()
 		voxels.forEach (voxel) =>
@@ -139,6 +132,10 @@ class BrickLayouter
 		size = Voxel.sizeFromVoxels(allVoxels)
 
 		return if !Brick.isValidSize(size.x,size.y,size.z)
+
+		# check another set of voxels in direction, starting from mergeVoxels
+		# necessary for 2 brick steps of larger bricks
+		# TODO
 
 		# check if at least half of the top and half of the bottom voxels
 		# offer connection possibilities; if not, return
@@ -163,6 +160,10 @@ class BrickLayouter
 			mergeableNeighbors = @_findMergeableNeighbors3L brick
 
 		return brick
+
+	_chooseNeighborsToMergeWith3L: (mergeableNeighbors) =>
+		# TODO
+		return
 
 
 	# main while loop condition:
@@ -332,9 +333,6 @@ class BrickLayouter
 
 	# chooses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) ->
-		###
-		console.log 'choosing Random Brick'
-		###
 		if setOfBricks.size == 0
 			return null
 
@@ -399,24 +397,7 @@ class BrickLayouter
 	###
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		neighborsInDirection = brick.getNeighbors(dir)
-		if neighborsInDirection.size == 0
-			return null
-
-		###
-		#special case: brick is 3 layer, all neighbors 1x1x1
-		if brick.getSize().z == 3
-			num1x1x1neighbors = 3 * widthFn(brick.getPosition())
-			if neighborsInDirection.size == num1x1x1neighbors
-				merge = true
-				neighborsInDirection.forEach (neighbor) ->
-					ns = neighbor.getSize()
-					if not (ns.x == 1 and ns.y == 1 and ns.z == 1)
-						merge = false
-				if merge
-					#check for valid brick size?
-					console.warn 'special case'
-					return neighborsInDirection
-		###
+		return null if neighborsInDirection.size == 0
 
 		# check that the neighbors together don't exceed this brick's width
 		width = 0
@@ -429,9 +410,7 @@ class BrickLayouter
 			if neighbor.getPosition().z != brick.getPosition().z
 				noMerge = true
 			width += widthFn neighborSize
-
-		if noMerge
-			return null
+		return null if noMerge
 
 		# if they have the same accumulative width
 		# check if they are in the correct positions,
@@ -447,19 +426,14 @@ class BrickLayouter
 			invalidSize = false
 			neighborsInDirection.forEach (neighbor) ->
 				length ?= lengthFn neighbor.getSize()
-
 				if widthFn(neighbor.getPosition()) < minWidth
 					invalidSize = true
-
 				nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
 				if nw > maxWidth
 					invalidSize = true
-
 				if lengthFn(neighbor.getSize()) != length
 					invalidSize = true
-
-			if invalidSize
-				return null
+			return null if invalidSize
 
 			if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
 			length, brick.getSize().z)
@@ -470,16 +444,13 @@ class BrickLayouter
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
 		noMerge = false
 
-		if brick.getSize().z != 1
-			return null
+		return null if brick.getSize().z != 1
 
 		# check if 3layer Brick possible according to xy dimensions
-		if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
-			return null
+		return null if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
 
 		# check if any slot is empty
-		if brick.getStabilityInDir(direction) != 1
-			return null
+		return null if brick.getStabilityInDir(direction) != 1
 
 		# then check if size of second layer fits
 		# if size fits and no slot empty -> position fits
@@ -487,8 +458,7 @@ class BrickLayouter
 		secondLayerBricks.forEach (slBrick) ->
 			if slBrick.getSize().z != 1
 				noMerge = true
-		if noMerge
-			return null
+		return null if noMerge
 
 		if @_layerHasSameSizeAsBrick brick, secondLayerBricks
 			# check next layer
@@ -501,8 +471,7 @@ class BrickLayouter
 						noMerge = true
 					thirdLayerBricks.add nBrick
 
-			if noMerge
-				return null
+			return null if noMerge
 
 			if @_layerHasSameSizeAsBrick brick, thirdLayerBricks
 				thirdLayerBricks.forEach (tlBrick) ->
@@ -518,8 +487,7 @@ class BrickLayouter
 		p = brick.getPosition()
 		s = brick.getSize()
 
-		if layerBricks.size == 0
-			return false
+		return false if layerBricks.size == 0
 
 		layerBricks.forEach (lBrick) ->
 			if lBrick.getSize().z != 1

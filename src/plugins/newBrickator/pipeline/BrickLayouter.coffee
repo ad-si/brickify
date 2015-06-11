@@ -33,20 +33,84 @@ class BrickLayouter
 			return {grid: grid} unless brick?
 			numRandomChoices++
 
-			mergeableNeighbors = []# @_findMergeableNeighbors brick, useThreeLayers
+			mergeableNeighbors = @_findMergeableNeighbors3L brick
 
 			if !@_anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
-					break # done with initial layout
+					break # done with 3L layout
 				else
 					continue # randomly choose a new brick
 
-			#@_mergeLoop brick, mergeableNeighbors, bricksToLayout
+			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
 		return {grid: grid}
+
+	_findMergeableNeighbors3L: (brick) =>
+		mergeableNeighbors = []
+
+		if brick.getSize().z == 1
+			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
+				brick
+				Brick.direction.Zp
+			)
+			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
+				brick
+				Brick.direction.Zm
+			)
+			return mergeableNeighbors
+
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+			brick
+			Brick.direction.Xm
+			(obj) -> return obj.y
+			(obj) -> return obj.x
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+			brick
+			Brick.direction.Xp
+			(obj) -> return obj.y
+			(obj) -> return obj.x
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+			brick
+			Brick.direction.Ym
+			(obj) -> return obj.x
+			(obj) -> return obj.y
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+			brick
+			Brick.direction.Yp
+			(obj) -> return obj.x
+			(obj) -> return obj.y
+		)
+
+		return mergeableNeighbors
+
+	_findMergeableNeighborsInDirection3L: (brick0, dir, widthFn, lengthFn) =>#
+		brick1 = brick0
+		return
+
+	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
+		while(@_anyDefinedInArray(mergeableNeighbors))
+			#TODO new @_chooseNeighborsToMergeWith3L method
+			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
+			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+
+			@_mergeBricksAndUpdateGraphConnections brick,
+				neighborsToMergeWith, bricksToLayout
+
+			if @debugMode and not brick.isValid()
+				log.warn 'Invalid brick: ', brick
+				log.warn '> Using pseudoRandom:', @pseudoRandom
+				log.warn '> current seed:', Random.getSeed()
+
+			mergeableNeighbors = @_findMergeableNeighbors3L brick
+
+		return brick
+
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -70,7 +134,10 @@ class BrickLayouter
 			brick = @_chooseRandomBrick bricksToLayout
 			return {grid: grid} unless brick?
 			numRandomChoices++
-			
+
+			if brick.getSize().z == 3
+				continue
+
 			mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
 
 			if !@_anyDefinedInArray(mergeableNeighbors)
@@ -234,6 +301,9 @@ class BrickLayouter
 	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
 	_findMergeableNeighbors: (brick, useThreeLayers) =>
+		if brick.getSize().z == 3
+			return [null, null, null, null]
+
 		mergeableNeighbors = []
 
 		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
@@ -260,15 +330,6 @@ class BrickLayouter
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
-		if useThreeLayers
-			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
-				brick
-				Brick.direction.Zp
-			)
-			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
-				brick
-				Brick.direction.Zm
-			)
 
 		return mergeableNeighbors
 
@@ -288,6 +349,7 @@ class BrickLayouter
 		if neighborsInDirection.size == 0
 			return null
 
+		###
 		#special case: brick is 3 layer, all neighbors 1x1x1
 		if brick.getSize().z == 3
 			num1x1x1neighbors = 3 * widthFn(brick.getPosition())
@@ -301,6 +363,7 @@ class BrickLayouter
 					#check for valid brick size?
 					console.warn 'special case'
 					return neighborsInDirection
+		###
 
 		# check that the neighbors together don't exceed this brick's width
 		width = 0
@@ -354,7 +417,7 @@ class BrickLayouter
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
 		noMerge = false
 
-		if brick.getSize().z == 3
+		if brick.getSize().z != 1
 			return null
 
 		# check if 3layer Brick possible according to xy dimensions
@@ -440,12 +503,6 @@ class BrickLayouter
 				neighborConnections = neighbor.connectedBricks()
 				neighborConnections.forEach (brick) ->
 					connectedBricks.add brick
-
-			###
-			if i == 4 or i == 5
-				connectedBricks = new Set()
-				connectedBricks.add 1
-			###
 
 			numConnections.push {
 				num: connectedBricks.size

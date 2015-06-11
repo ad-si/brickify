@@ -49,47 +49,50 @@ class LegoInstructions
 				grid = data.grid
 				{min: minLayer, max: maxLayer} = grid.getLegoVoxelsZRange()
 				numLayers = maxLayer - minLayer + 1
-				resultingFiles = []
+				@_takeScreenshots node, numLayers, camera
+				.then (resultingFiles) =>
+					promiseChain = Promise.resolve()
+					# scad and piece list generation
+					pieceListHtml = ''
+					promiseChain = promiseChain.then =>
+						bricks = grid.getAllBricks()
+						pieceList = pieceListGenerator.generatePieceList bricks
+						pieceListHtml = pieceListGenerator.getHtml pieceList
 
-				# screenshot of each layer
-				promiseChain = Promise.resolve()
-				imageWidth = 0
-				for layer in [1..numLayers]
-					promiseChain = promiseChain
-					.then do (layer) => => @_createScreenshotOfLayer node, layer, camera
-					.then (fileData) ->
-						resultingFiles.push {
-							fileName: fileData.fileName
-							data: fileData.data
-						}
-						imageWidth = fileData.imageWidth
+						resultingFiles.push openScadGenerator.generateScad bricks
 
-				# scad and piece list generation
-				pieceListHtml = ''
-				promiseChain = promiseChain.then =>
-					bricks = grid.getAllBricks()
-					pieceList = pieceListGenerator.generatePieceList bricks
-					pieceListHtml = pieceListGenerator.getHtml pieceList
+					# save download
+					promiseChain = promiseChain.then =>
+						log.debug 'Finished instruction screenshots'
 
-					resultingFiles.push openScadGenerator.generateScad bricks
+						# add instructions html to download
+						resultingFiles.push({
+							fileName: 'LEGO Assembly instructions.html'
+							data: @_createHtml numLayers, pieceListHtml
+						})
 
-				# save download
-				promiseChain = promiseChain.then =>
-					log.debug 'Finished instruction screenshots'
+						resolve resultingFiles
 
-					# add instructions html to download
-					resultingFiles.push({
-						fileName: 'LEGO Assembly instructions.html'
-						data: @_createHtml numLayers, imageWidth, pieceListHtml
-					})
-
-					resolve resultingFiles
-
-				# reset display mode
-				promiseChain.then =>
-					@nodeVisualizer.setDisplayMode node, oldVisualizationMode
-					@fidelityControl.disableScreenshotMode()
+					# reset display mode
+					promiseChain.then =>
+						@nodeVisualizer.setDisplayMode node, oldVisualizationMode
+						@fidelityControl.disableScreenshotMode()
 			.catch (error) -> log.error error
+
+	_takeScreenshots: (node, numLayers, camera) =>
+		resultingFiles = []
+
+		# screenshot of each layer
+		promiseChain = Promise.resolve()
+		for layer in [1..numLayers]
+			promiseChain = promiseChain
+			.then do (layer) => => @_createScreenshotOfLayer node, layer, camera
+			.then (fileData) ->
+				resultingFiles.push {
+					fileName: fileData.fileName
+					data: fileData.data
+				}
+		return promiseChain.then -> resultingFiles
 
 	_createScreenshotOfLayer: (node, layer, camera) =>
 		return @nodeVisualizer.showBuildLayer node, layer
@@ -188,9 +191,9 @@ class LegoInstructions
 		imageData[index + 2] = b
 		imageData[index + 3] = a
 
-	_createHtml: (numLayers, imgWidth, pieceListHtml = null) ->
+	_createHtml: (numLayers, pieceListHtml = null) ->
 		style = "<style>
-		img{width: #{imgWidth}px; max-width: 100%;}
+		img{max-width: 100%;}
 		h1,h3,p,td{font-family:Helvetica, Arial, sans-serif;}
 		td{min-width: 80px;}
 		.pageBreak{page-break-before: always;}

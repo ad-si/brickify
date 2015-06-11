@@ -23,9 +23,9 @@ class Renderer
 	renderToImage: (camera = @camera, resolution = null) =>
 		return new Promise (resolve, reject) =>
 			@imageRenderQueries.push {
-				resolve: resolve
-				reject: reject
-				camera: camera
+				resolve
+				reject
+				camera
 				resolution: renderTargetHelper.getNextValidTextureDimension resolution
 			}
 

@@ -31,14 +31,12 @@ class LegoInstructions
 
 		@nodeVisualizer.getBrickThreeNode node
 		.then (brickNode) =>
-			boundingSphere = threeHelper.getBoundingSphere brickNode
 			threeHelper.zoomToBoundingSphere(
 				camera
 				@renderer.scene
 				null
-				boundingSphere
+				threeHelper.getBoundingSphere brickNode
 			)
-		.then =>
 			# disable pipeline and fidelity changes
 			@fidelityControl.enableScreenshotMode()
 			# enter build mode

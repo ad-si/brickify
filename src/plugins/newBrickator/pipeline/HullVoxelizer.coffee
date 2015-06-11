@@ -71,6 +71,7 @@ module.exports = class Voxelizer
 					)
 					@_postProgress(progress, progressCallback)
 				progressCallback state: 'finished', data: grid
+				return
 
 			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, grid) ->
 				# transform model coordinates to voxel coordinates
@@ -122,6 +123,8 @@ module.exports = class Voxelizer
 					longSideIndex += longSideStepSize
 					@_voxelizeLine p0, p1, direction, lineStepSize, grid
 
+				return
+
 			_getLength: ({x: x1, y: y1, z: z1}, {x: x2, y: y2, z: z2}) ->
 				dx = x2 - x1
 				dy = y2 - y1
@@ -164,6 +167,7 @@ module.exports = class Voxelizer
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
+				return
 
 			_roundVoxelSpaceToVoxel: ({x: x, y: y, z: z}) ->
 				return {
@@ -174,10 +178,9 @@ module.exports = class Voxelizer
 
 			_getGreatestZInVoxel: (a, b, {x: x, y: y, z: z}) ->
 				roundA = @_roundVoxelSpaceToVoxel a
-				roundB = @_roundVoxelSpaceToVoxel b
-
 				if roundA.x is x and roundA.y is y and roundA.z is z
 					# aIsInVoxel
+					roundB = @_roundVoxelSpaceToVoxel b
 					if roundB.x is x and roundB.y is y and roundB.z is z
 						# bIsInVoxel
 						return Math.max a.z, b.z
@@ -225,8 +228,8 @@ module.exports = class Voxelizer
 				}
 
 			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
-				grid[x] ?= []
-				grid[x][y] ?= []
+				grid[x] = [] unless grid[x]
+				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
 					if oldValue.dir is 0 or (zValue > oldValue.z and direction isnt 0)

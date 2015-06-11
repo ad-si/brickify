@@ -48,63 +48,67 @@ class LegoInstructions
 				@fidelityControl.enableScreenshotMode()
 				# enter build mode
 				@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
-				.then (numLayers) =>
-					resultingFiles = []
+			.then => @newBrickator._getCachedData(selectedNode)
+			.then (data) =>
+				grid = data.grid
+				{min: minLayer, max: maxLayer} = grid.getLegoVoxelsZRange()
+				numLayers = maxLayer - minLayer + 1
+				resultingFiles = []
 
-					# screenshot of each layer
-					promiseChain = Promise.resolve()
-					imageWidth = 0
-					for layer in [1..numLayers]
-						promiseChain = @_createScreenshotOfLayer promiseChain, layer, camera
-						promiseChain = promiseChain.then (fileData) ->
-							resultingFiles.push {
-								fileName: fileData.fileName
-								data: fileData.data
-							}
-							imageWidth = fileData.imageWidth
+				# screenshot of each layer
+				promiseChain = Promise.resolve()
+				imageWidth = 0
+				for layer in [1..numLayers]
+					promiseChain = promiseChain
+					.then do (layer) => => @_createScreenshotOfLayer layer, camera
+					.then (fileData) ->
+						resultingFiles.push {
+							fileName: fileData.fileName
+							data: fileData.data
+						}
+						imageWidth = fileData.imageWidth
 
-					# scad and piece list generation
-					pieceListHtml = ''
-					promiseChain = promiseChain.then =>
-						@newBrickator._getCachedData(selectedNode).then (data) ->
-							bricks = data.grid.getAllBricks()
-							pieceList = pieceListGenerator.generatePieceList bricks
-							pieceListHtml = pieceListGenerator.getHtml pieceList
+				# scad and piece list generation
+				pieceListHtml = ''
+				promiseChain = promiseChain.then =>
+					bricks = grid.getAllBricks()
+					pieceList = pieceListGenerator.generatePieceList bricks
+					pieceListHtml = pieceListGenerator.getHtml pieceList
 
-							resultingFiles.push openScadGenerator.generateScad bricks
+					resultingFiles.push openScadGenerator.generateScad bricks
 
-					# save download
-					promiseChain = promiseChain.then =>
-						log.debug 'Finished instruction screenshots'
+				# save download
+				promiseChain = promiseChain.then =>
+					log.debug 'Finished instruction screenshots'
 
-						# add instructions html to download
-						resultingFiles.push({
-							fileName: 'LEGO Assembly instructions.html'
-							data: @_createHtml numLayers, imageWidth, pieceListHtml
-						})
+					# add instructions html to download
+					resultingFiles.push({
+						fileName: 'LEGO Assembly instructions.html'
+						data: @_createHtml numLayers, imageWidth, pieceListHtml
+					})
 
-						resolve resultingFiles
+					resolve resultingFiles
 
-					# reset display mode
-					promiseChain.then =>
-						@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
-						@fidelityControl.disableScreenshotMode()
+				# reset display mode
+				promiseChain.then =>
+					@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
+					@fidelityControl.disableScreenshotMode()
+			.catch (error) -> log.error error
 
-	_createScreenshotOfLayer: (promiseChain, layer, camera) =>
-		return promiseChain.then =>
-			return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
-			.then =>
-				log.debug 'Create screenshot of layer', layer
-				return @renderer.renderToImage camera, @imageResolution
-			.then (pixelData) =>
-				flippedImage = @_flipAndFitImage pixelData
-				return @_convertToPng(flippedImage)
-				.then (pngData) ->
-					return (
-						fileName: "LEGO assembly instructions #{layer}.png"
-						data: pngData.buffer
-						imageWidth: flippedImage.width
-					)
+	_createScreenshotOfLayer: (layer, camera) =>
+		return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
+		.then =>
+			log.debug 'Create screenshot of layer', layer
+			return @renderer.renderToImage camera, @imageResolution
+		.then (pixelData) =>
+			flippedImage = @_flipAndFitImage pixelData
+			return @_convertToPng(flippedImage)
+			.then (pngData) ->
+				return (
+					fileName: "LEGO assembly instructions #{layer}.png"
+					data: pngData.buffer
+					imageWidth: flippedImage.width
+				)
 
 	_convertToPng: (image) ->
 		return new Promise (resolve, reject) ->

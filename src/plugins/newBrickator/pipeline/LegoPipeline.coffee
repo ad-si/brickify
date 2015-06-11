@@ -50,14 +50,13 @@ module.exports = class LegoPipeline
 			worker: (lastResult, options, progressCallback) =>
 				return @brickLayouter.layoutByGreedyMerge lastResult.grid
 
-		@pipelineSteps.push {
+		@pipelineSteps.push
 			name: 'Final merge pass'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
 				return @brickLayouter.finalLayoutPass lastResult.grid
-		}
 
-		@pipelineSteps.push {
+		@pipelineSteps.push
 			name: 'Local reLayout'
 			decision: (options) -> return options.reLayout
 			worker: (lastResult, options, progressCallback) =>
@@ -65,7 +64,6 @@ module.exports = class LegoPipeline
 					lastResult.modifiedBricks
 					lastResult.grid
 				)
-		}
 
 	run: (data, options = null, profiling = false) =>
 		@terminated = false

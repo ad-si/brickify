@@ -29,54 +29,55 @@ class LegoInstructions
 
 		oldVisualizationMode = @nodeVisualizer.getDisplayMode()
 
-		return new Promise (resolve, reject) =>
-			@nodeVisualizer.getBrickThreeNode node
-			.then (brickNode) =>
-				boundingSphere = threeHelper.getBoundingSphere brickNode
-				threeHelper.zoomToBoundingSphere(
-					camera
-					@renderer.scene
-					null
-					boundingSphere
-				)
-			.then =>
-				# disable pipeline and fidelity changes
-				@fidelityControl.enableScreenshotMode()
-				# enter build mode
-				@nodeVisualizer.setDisplayMode node, 'build'
-			.then => @newBrickator._getCachedData node
-			.then (data) =>
-				{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
-				numLayers = maxLayer - minLayer + 1
+		@nodeVisualizer.getBrickThreeNode node
+		.then (brickNode) =>
+			boundingSphere = threeHelper.getBoundingSphere brickNode
+			threeHelper.zoomToBoundingSphere(
+				camera
+				@renderer.scene
+				null
+				boundingSphere
+			)
+		.then =>
+			# disable pipeline and fidelity changes
+			@fidelityControl.enableScreenshotMode()
+			# enter build mode
+			@nodeVisualizer.setDisplayMode node, 'build'
+		.then => @newBrickator._getCachedData node
+		.then (data) =>
+			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
+			numLayers = maxLayer - minLayer + 1
 
-				# scad and piece list generation
-				bricks = data.grid.getAllBricks()
+			# scad and piece list generation
+			bricks = data.grid.getAllBricks()
 
-				resultingFiles = []
-				resultingFiles.push openScadGenerator.generateScad bricks
+			files = []
+			files.push openScadGenerator.generateScad bricks
 
-				# add instructions html to download
-				resultingFiles.push @_createHtml numLayers, bricks
+			# add instructions html to download
+			files.push @_createHtml numLayers, bricks
 
-				@_takeScreenshots node, numLayers, camera
-				.then (images) =>
-					resultingFiles.push images...
-					log.debug 'Finished instruction screenshots'
+			@_takeScreenshots node, numLayers, camera
+			.then (images) =>
+				files.push images...
+				log.debug 'Finished instruction screenshots'
 
-					# save download
-					resolve resultingFiles
-			.then =>
-				# reset display mode
-				@nodeVisualizer.setDisplayMode node, oldVisualizationMode
-				@fidelityControl.disableScreenshotMode()
-			.catch (error) -> log.error error
+				# save download
+				return files
+		.then (files) =>
+			# reset display mode
+			@nodeVisualizer.setDisplayMode node, oldVisualizationMode
+			@fidelityControl.disableScreenshotMode()
+
+			return files
+		.catch (error) -> log.error error
 
 	_takeScreenshots: (node, numLayers, camera) =>
-		resultingFiles = []
+		files = []
 		takeScreenshot = (layer) => =>
 			@_createScreenshotOfLayer node, layer, camera
 			.then (fileData) ->
-				resultingFiles.push {
+				files.push {
 					fileName: fileData.fileName
 					data: fileData.data
 				}
@@ -86,7 +87,7 @@ class LegoInstructions
 		for layer in [1..numLayers]
 			promiseChain = promiseChain.then takeScreenshot layer
 
-		return promiseChain.then -> resultingFiles
+		return promiseChain.then -> files
 
 	_createScreenshotOfLayer: (node, layer, camera) =>
 		return @nodeVisualizer.showBuildLayer node, layer

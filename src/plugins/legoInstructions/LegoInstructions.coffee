@@ -52,17 +52,11 @@ class LegoInstructions
 				# scad and piece list generation
 				bricks = data.grid.getAllBricks()
 
-				pieceList = pieceListGenerator.generatePieceList bricks
-				pieceListHtml = pieceListGenerator.getHtml pieceList
-
 				resultingFiles = []
 				resultingFiles.push openScadGenerator.generateScad bricks
 
 				# add instructions html to download
-				resultingFiles.push({
-					fileName: 'LEGO Assembly instructions.html'
-					data: @_createHtml numLayers, pieceListHtml
-				})
+				resultingFiles.push @_createHtml numLayers, bricks
 
 				@_takeScreenshots node, numLayers, camera
 				.then (images) =>
@@ -189,7 +183,10 @@ class LegoInstructions
 		imageData[index + 2] = b
 		imageData[index + 3] = a
 
-	_createHtml: (numLayers, pieceListHtml = null) ->
+	_createHtml: (numLayers, bricks) ->
+		pieceList = pieceListGenerator.generatePieceList bricks
+		pieceListHtml = pieceListGenerator.getHtml pieceList
+
 		style = "<style>
 		img{max-width: 100%;}
 		h1,h3,p,td{font-family:Helvetica, Arial, sans-serif;}
@@ -202,9 +199,10 @@ class LegoInstructions
 		html += '<html><head>
 		<title>LEGO assembly instructions</title>
 		</head><body><h1>Build instructions</h1>'
+
 		html += style
 
-		html += pieceListHtml if pieceListHtml?
+		html += pieceListHtml
 
 		for i in [1..numLayers]
 			html += '<br><br>'
@@ -212,6 +210,10 @@ class LegoInstructions
 			html += '<p><img src="LEGO%20assembly%20instructions%20' + i + '.png"></p>'
 
 		html += '</body></html>'
-		return html
+
+		return {
+			fileName: 'LEGO Assembly instructions.html'
+			data: html
+		}
 
 module.exports = LegoInstructions

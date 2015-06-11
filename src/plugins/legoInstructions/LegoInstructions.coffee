@@ -13,11 +13,7 @@ class LegoInstructions
 		@fidelityControl = bundle.getPlugin 'fidelity-control'
 		@imageResolution = bundle.globalConfig.legoInstructionResolution
 
-	onNodeSelect: (@selectedNode) => return
-
-	onNodeDeselect: => @selectedNode = null
-
-	getDownload: (selectedNode, downloadOptions) =>
+	getDownload: (node, downloadOptions) =>
 		return null if downloadOptions.type != 'instructions'
 
 		return new Promise (resolve, reject) =>
@@ -29,12 +25,12 @@ class LegoInstructions
 			)
 
 			camera.position.set(1, 1, 1)
-			camera.lookAt(new THREE.Vector3(0, 0, 0))
+			camera.lookAt new THREE.Vector3(0, 0, 0)
 			camera.up = new THREE.Vector3(0, 0, 1)
 
 			oldVisualizationMode = @nodeVisualizer.getDisplayMode()
 
-			@nodeVisualizer.getBrickThreeNode selectedNode
+			@nodeVisualizer.getBrickThreeNode node
 			.then (brickNode) =>
 				boundingSphere = threeHelper.getBoundingSphere brickNode
 				threeHelper.zoomToBoundingSphere(
@@ -47,8 +43,8 @@ class LegoInstructions
 				# disable pipeline and fidelity changes
 				@fidelityControl.enableScreenshotMode()
 				# enter build mode
-				@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
-			.then => @newBrickator._getCachedData(selectedNode)
+				@nodeVisualizer.setDisplayMode node, 'build'
+			.then => @newBrickator._getCachedData node
 			.then (data) =>
 				grid = data.grid
 				{min: minLayer, max: maxLayer} = grid.getLegoVoxelsZRange()
@@ -60,7 +56,7 @@ class LegoInstructions
 				imageWidth = 0
 				for layer in [1..numLayers]
 					promiseChain = promiseChain
-					.then do (layer) => => @_createScreenshotOfLayer layer, camera
+					.then do (layer) => => @_createScreenshotOfLayer node, layer, camera
 					.then (fileData) ->
 						resultingFiles.push {
 							fileName: fileData.fileName
@@ -91,12 +87,12 @@ class LegoInstructions
 
 				# reset display mode
 				promiseChain.then =>
-					@nodeVisualizer.setDisplayMode @selectedNode, oldVisualizationMode
+					@nodeVisualizer.setDisplayMode node, oldVisualizationMode
 					@fidelityControl.disableScreenshotMode()
 			.catch (error) -> log.error error
 
-	_createScreenshotOfLayer: (layer, camera) =>
-		return @nodeVisualizer.showBuildLayer(@selectedNode, layer)
+	_createScreenshotOfLayer: (node, layer, camera) =>
+		return @nodeVisualizer.showBuildLayer node, layer
 		.then =>
 			log.debug 'Create screenshot of layer', layer
 			return @renderer.renderToImage camera, @imageResolution

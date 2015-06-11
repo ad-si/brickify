@@ -46,37 +46,35 @@ class LegoInstructions
 				@nodeVisualizer.setDisplayMode node, 'build'
 			.then => @newBrickator._getCachedData node
 			.then (data) =>
-				grid = data.grid
-				{min: minLayer, max: maxLayer} = grid.getLegoVoxelsZRange()
+				{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 				numLayers = maxLayer - minLayer + 1
-				@_takeScreenshots node, numLayers, camera
-				.then (resultingFiles) =>
-					promiseChain = Promise.resolve()
-					# scad and piece list generation
-					pieceListHtml = ''
-					promiseChain = promiseChain.then =>
-						bricks = grid.getAllBricks()
-						pieceList = pieceListGenerator.generatePieceList bricks
-						pieceListHtml = pieceListGenerator.getHtml pieceList
 
-						resultingFiles.push openScadGenerator.generateScad bricks
+				# scad and piece list generation
+				bricks = data.grid.getAllBricks()
+
+				pieceList = pieceListGenerator.generatePieceList bricks
+				pieceListHtml = pieceListGenerator.getHtml pieceList
+
+				resultingFiles = []
+				resultingFiles.push openScadGenerator.generateScad bricks
+
+				# add instructions html to download
+				resultingFiles.push({
+					fileName: 'LEGO Assembly instructions.html'
+					data: @_createHtml numLayers, pieceListHtml
+				})
+
+				@_takeScreenshots node, numLayers, camera
+				.then (images) =>
+					resultingFiles.push images...
+					log.debug 'Finished instruction screenshots'
 
 					# save download
-					promiseChain = promiseChain.then =>
-						log.debug 'Finished instruction screenshots'
-
-						# add instructions html to download
-						resultingFiles.push({
-							fileName: 'LEGO Assembly instructions.html'
-							data: @_createHtml numLayers, pieceListHtml
-						})
-
-						resolve resultingFiles
-
-					# reset display mode
-					promiseChain.then =>
-						@nodeVisualizer.setDisplayMode node, oldVisualizationMode
-						@fidelityControl.disableScreenshotMode()
+					resolve resultingFiles
+			.then =>
+				# reset display mode
+				@nodeVisualizer.setDisplayMode node, oldVisualizationMode
+				@fidelityControl.disableScreenshotMode()
 			.catch (error) -> log.error error
 
 	_takeScreenshots: (node, numLayers, camera) =>

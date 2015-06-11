@@ -47,7 +47,7 @@ class BrickLayouter
 
 			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
-			# if brick is still 1x1x3 after mergeLoop3L, break it into pieces
+			# if brick is 1x1x3 or instable after mergeLoop3L, break it into pieces
 			# mark them as bad starting point for 3L brick
 			# TODO
 
@@ -117,7 +117,7 @@ class BrickLayouter
 		# noMerge if any brick not 1x1x1
 		mergeVoxels.forEach (mVoxel) =>
 			mBrick = mVoxel.brick
-			if brick == false or !mBrick? or !mBrick.is1x1x1()
+			if mBrick == false or !mBrick? or !mBrick.is1x1x1()
 				noMerge = true
 				return
 			mergeBricks.add mBrick
@@ -131,22 +131,56 @@ class BrickLayouter
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 
-		return if !Brick.isValidSize(size.x,size.y,size.z)
+		if Brick.isValidSize(size.x,size.y,size.z)
+			# check if at least half of the top and half of the bottom voxels
+			# offer connection possibilities; if not, return
+			# TODO
+			return mergeBricks
 
-		# check another set of voxels in direction, starting from mergeVoxels
-		# necessary for 2 brick steps of larger bricks
-		# TODO
+		# check another set of voxels in merge direction, starting from mergeVoxels
+		# this is necessary for the 2 brick steps of larger bricks
+		mergeVoxels2 = new Set()
+		mergeVoxels.forEach (mVoxel) =>
+			mVoxel2 = mVoxel.neighbors[dir]
+			if !mVoxel2?
+				noMerge = true
+				return
+			mergeVoxels2.add mVoxel2
+		return null if noMerge
 
-		# check if at least half of the top and half of the bottom voxels
-		# offer connection possibilities; if not, return
-		# TODO
+		mergeVoxels2.forEach (mVoxel2) =>
+			mBrick2 = mVoxel2.brick
+			if mBrick2 == false or !mBrick2? or !mBrick2.is1x1x1()
+				noMerge = true
+				return
+			mergeBricks.add mBrick2
+		return null if noMerge
 
-		return mergeBricks
+		mergeVoxels2.forEach (mVoxel2) =>
+			allVoxels.add mVoxel2
+
+		size = Voxel.sizeFromVoxels(allVoxels)
+
+		if Brick.isValidSize(size.x,size.y,size.z)
+			# check if at least half of the top and half of the bottom voxels
+			# offer connection possibilities; if not, return
+			# TODO
+			return mergeBricks
+
+		return null
+
+	_percentageOfConnections: (voxels) =>
+		###
+		minZ = Infinity
+		maxZ = 0
+		voxels.forEach (voxel) =>
+			voxel
+		###
+		return 1
 
 	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
 		while(@_anyDefinedInArray(mergeableNeighbors))
-			#TODO new @_chooseNeighborsToMergeWith3L method
-			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
+			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
 			@_mergeBricksAndUpdateGraphConnections brick,
@@ -162,9 +196,22 @@ class BrickLayouter
 		return brick
 
 	_chooseNeighborsToMergeWith3L: (mergeableNeighbors) =>
-		# TODO
-		return
+		numBricks = []
+		maxBricks = 0
 
+		for neighborSet, i in mergeableNeighbors
+			continue if not neighborSet?
+			numBricks.push {
+				num: neighborSet.size
+				index: i
+			}
+			maxBricks = Math.max maxBricks, neighborSet.size
+
+		largestConnections = numBricks.filter (element) ->
+			return element.num == maxBricks
+
+		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
+		return randomOfLargest.index
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -192,7 +239,7 @@ class BrickLayouter
 			if brick.getSize().z == 3
 				continue
 
-			mergeableNeighbors = @_findMergeableNeighbors brick, useThreeLayers
+			mergeableNeighbors = @_findMergeableNeighbors brick
 
 			if !@_anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
@@ -204,20 +251,6 @@ class BrickLayouter
 					continue # randomly choose a new brick
 
 			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
-
-			###
-			if brick.getStability() == 0
-				neighborsXy = brick.getNeighborsXY()
-				if neighborsXy.size != 0
-					# split brick & neighbors into smallest components
-					#console.log 'instability to be remedied'
-					neighborsXy.add brick
-					newBricks = @_splitBricks neighborsXy
-					bricksToLayout.delete brick
-					newBricks.forEach (newBrick) ->
-						bricksToLayout.add newBrick
-					console.log 'instability removed'
-			###
 
 		return {grid: grid}
 
@@ -240,24 +273,8 @@ class BrickLayouter
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
-			###
-			console.log 'TO BE MERGED'
-			if mergeIndex >= 4
-				console.log 'into size', brick.getSize().x, brick.getSize().y, 3
-			brick.debugLog()
-			neighborsToMergeWith.forEach (fBrick) ->
-				fBrick.debugLog()
-			###
-
 			@_mergeBricksAndUpdateGraphConnections brick,
 				neighborsToMergeWith, bricksToLayout
-
-			###
-			console.log 'NEW BRICK', mergeIndex
-			brick.debugLog()
-			console.log brick.isValid()
-			console.log '  '
-			###
 
 			if @debugMode and not brick.isValid()
 				log.warn 'Invalid brick: ', brick
@@ -309,7 +326,8 @@ class BrickLayouter
 		bricksToBeDeleted.forEach (brick) ->
 			newBricks.delete brick
 
-		@layoutByGreedyMerge grid, newBricks, useThreeLayers
+		@layout3LBricks grid, newBricks
+		@layoutByGreedyMerge grid, newBricks
 
 		return {
 			removedBricks: bricksToSplit
@@ -351,7 +369,7 @@ class BrickLayouter
 
 	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
-	_findMergeableNeighbors: (brick, useThreeLayers) =>
+	_findMergeableNeighbors: (brick) =>
 		if brick.getSize().z == 3
 			return [null, null, null, null]
 

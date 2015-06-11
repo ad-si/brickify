@@ -1,76 +1,100 @@
+Grid = require './Grid'
+
 module.exports = class VolumeFiller
-	fillGrid: (grid, options) ->
+	fillGrid: (grid, gridPOJO, options, progressCallback) ->
 		# fills spaces in the grid. Goes up from z=0 to z=max and looks for
 		# voxels facing downwards (start filling), stops when it sees voxels
 		# facing upwards
 
-		for x in [0..grid.getNumVoxelsX() - 1] by 1
-			for y in [0..grid.getNumVoxelsY() - 1] by 1
-				@fillUp grid, x, y
+		callback = (message) =>
+			if message.state is 'progress'
+				progressCallback message.progress
+			else # if state is 'finished'
+				grid.fromPojo message.data
+				@resolve grid: grid
 
-		return {grid: grid}
+		@worker = @_getWorker()
+		@worker.fillGrid(
+			gridPOJO
+			callback
+		)
 
-	fillUp: (grid, x, y) =>
-		#fill up from z=0 to z=max
-		#fill up from z=0 to z=max
-		insideModel = false
-		z = 0
-		currentFillVoxelQueue = []
+		return new Promise (@resolve, reject) => return
 
-		while z < grid.getNumVoxelsZ()
-			if grid.hasVoxelAt x, y, z
-				# current voxel already exists (shell voxel)
-				dir = @calculateVoxelDirection grid, x, y, z
+	terminate: =>
+		@worker?.terminate()
+		@worker = null
 
-				if dir.definitelyUp
-					#fill up voxels and leave model
-					for v in currentFillVoxelQueue
-						grid.setVoxel v, {inside: true}
-					insideModel = false
-				else if dir.definitelyDown
-					# re-entering model if inside? that seems odd. empty current fill queue
-					if insideModel
-						currentFillVoxelQueue = []
-					#entering model
-					insideModel = true
-				else
-					#if not sure, fill up (precautious people might leave this out?)
-					for v in currentFillVoxelQueue
-						grid.setVoxel v, {inside: true}
-					currentFillVoxelQueue = []
+	_getWorker: ->
+		return @worker if @worker?
+		return operative {
+			fillGrid: (grid, callback) ->
+				numVoxelsX = grid.length - 1
+				numVoxelsY = 0
+				numVoxelsZ = 0
+				for x, voxelPlane of grid
+					numVoxelsY = Math.max numVoxelsY, voxelPlane.length - 1
+					for y, voxelColumn of voxelPlane
+						numVoxelsZ = Math.max numVoxelsZ, voxelColumn.length - 1
 
-					insideModel = false
-			else
-				#voxel does not yet exist. create if inside model
-				if insideModel
-					currentFillVoxelQueue.push {x: x, y: y, z: z}
-			z++
+				@_resetProgress()
 
-	calculateVoxelDirection: (grid, x, y, z, tolerance = 0.1) ->
-		# determines whether all polygons related to this voxel are either
-		# all aligned upwards or all aligned downwards
-		voxel = grid.getVoxel x, y, z
-		numUp = 0
-		numDown = 0
+				for x, voxelPlane of grid
+					x = parseInt x
+					for y, voxelColumn of voxelPlane
+						y = parseInt y
+						@_postProgress callback, x, y, numVoxelsX, numVoxelsY
+						@_fillUp grid, x, y, numVoxelsZ
+				callback state: 'finished', data: grid
 
-		for e in voxel.dataEntrys
-			# everything smaller than tolerance is considered level
-			if e.dZ > tolerance then numUp++ else if e.dZ < -tolerance then numDown++
+			#_fillUp: (grid, x, y, numVoxelsZ)
 
-		if numUp > 0 and numDown == 0
-			definitelyUp = true
-		else
-			definitelyUp = false
+			_fillUp: (grid, x, y, numVoxelsZ) ->
+				# fill up from z=0 to z=max
+				insideModel = false
+				z = 0
+				currentFillVoxelQueue = []
 
-		if numDown > 0 and numUp == 0
-			definitelyDown = true
-		else
-			definitelyDown = false
+				while z <= numVoxelsZ
+					if grid[x][y][z]?
+						# current voxel already exists (shell voxel)
+						dir = grid[x][y][z].dir
 
-		voxel.definitelyUp = definitelyUp
-		voxel.definitelyDown = definitelyDown
+						@_setVoxels grid, x, y, currentFillVoxelQueue, 0
 
-		return {
-			definitelyUp: definitelyUp
-			definitelyDown: definitelyDown
+						if dir is 1
+							# fill up voxels and leave model
+							insideModel = false
+						else if dir is -1
+							# entering model
+							insideModel = true
+						else
+							# if not sure fill up
+							currentFillVoxelQueue = []
+					else
+						# voxel does not exist yet. create if inside model
+						if insideModel
+							currentFillVoxelQueue.push z
+					z++
+				return
+
+			_setVoxels: (grid, x, y, zs, voxelData) ->
+				for z in zs
+					@_setVoxel grid, x, y, z, voxelData
+
+			_setVoxel: (grid, x, y, z, voxelData) ->
+				grid[x] ?= []
+				grid[x][y] ?= []
+				grid[x][y][z] ?= []
+				grid[x][y][z] = voxelData
+
+			_resetProgress: ->
+				@lastProgress = -1
+
+			_postProgress: (callback, x, y, numVoxelsX, numVoxelsY) ->
+				progress = Math.round(
+					100 * ((x - 1) * numVoxelsY + y - 1) / numVoxelsX / numVoxelsY)
+				return unless progress > @lastProgress
+				@lastProgress = progress
+				callback state: 'progress', progress: progress
 		}

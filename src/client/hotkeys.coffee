@@ -52,7 +52,8 @@ class Hotkeys
 		@events[titlegroup].push {hotkey: hotkey, description: description}
 
 	addEvents: (eventSpecs) ->
-		for event in eventSpecs.events
-			@bind(event.hotkey, eventSpecs.title, event.description, event.callback)
+		if eventSpecs?.events?
+			for event in eventSpecs.events
+				@bind(event.hotkey, eventSpecs.title, event.description, event.callback)
 
 module.exports = Hotkeys

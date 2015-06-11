@@ -14,7 +14,7 @@ class BrickLayouter
 
 	initializeBrickGraph: (grid) ->
 		grid.initializeBricks()
-		return grid
+		return Promise.resolve grid
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -33,12 +33,12 @@ class BrickLayouter
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 
-		return unless numTotalInitialBricks > 0
+		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
-				return {grid: grid}
+				return Promise.resolve {grid: grid}
 
 			numRandomChoices++
 			mergeableNeighbors = @_findMergeableNeighbors brick
@@ -52,21 +52,40 @@ class BrickLayouter
 				else
 					continue # randomly choose a new brick
 
-			while(@_anyDefinedInArray(mergeableNeighbors))
-				mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
-				neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
-				@_mergeBricksAndUpdateGraphConnections brick,
-					neighborsToMergeWith, bricksToLayout
+		return Promise.resolve {grid: grid}
 
-				if @debugMode and not brick.isValid()
-					log.warn 'Invalid brick: ', brick
-					log.warn '> Using pseudoRandom:', @pseudoRandom
-					log.warn '> current seed:', Random.getSeed()
 
-				mergeableNeighbors = @_findMergeableNeighbors brick
+	finalLayoutPass: (grid) =>
+		bricksToLayout = grid.getAllBricks()
+		finalPassMerges = 0
+		bricksToLayout.forEach (brick) =>
+			return unless brick?
+			mergeableNeighbors = @_findMergeableNeighbors brick
+			if @_anyDefinedInArray(mergeableNeighbors)
+				finalPassMerges++
+				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
-		return {grid: grid}
+		log.debug 'Final pass merged ', finalPassMerges, ' times.'
+		return Promise.resolve {grid: grid}
+
+	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
+		while(@_anyDefinedInArray(mergeableNeighbors))
+			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
+			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
+
+			@_mergeBricksAndUpdateGraphConnections brick,
+				neighborsToMergeWith, bricksToLayout
+
+			if @debugMode and not brick.isValid()
+				log.warn 'Invalid brick: ', brick
+				log.warn '> Using pseudoRandom:', @pseudoRandom
+				log.warn '> current seed:', Random.getSeed()
+
+			mergeableNeighbors = @_findMergeableNeighbors brick
+
+		return brick
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This
@@ -110,11 +129,11 @@ class BrickLayouter
 			newBricks.delete brick
 
 		@layoutByGreedyMerge grid, newBricks
-
-		return {
-			removedBricks: bricksToSplit
-			newBricks: newBricks
-		}
+		.then ->
+			return {
+				removedBricks: bricksToSplit
+				newBricks: newBricks
+			}
 
 	# splits each brick in bricks to split, returns all newly generated
 	# bricks as a set

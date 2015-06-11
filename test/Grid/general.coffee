@@ -53,13 +53,13 @@ describe 'Grid', ->
 	it 'should return the right voxel', ->
 		grid = new Grid()
 
-		grid.setVoxel {x: 1, y: 2, z: 3}, 'v1'
+		grid.setVoxel {x: 1, y: 2, z: 3}
 
 		v = grid.getVoxel 0, 0, 0
 		expect(v).to.equal(undefined)
 
 		v = grid.getVoxel 1, 2, 3
-		expect(v.dataEntrys[0]).to.equal('v1')
+		expect(v).not.to.be.null
 
 	it 'should link voxels correctly', ->
 		grid = new Grid()

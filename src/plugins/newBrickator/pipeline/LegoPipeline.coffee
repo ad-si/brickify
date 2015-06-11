@@ -4,6 +4,7 @@ HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
 BrickLayouter = require './BrickLayouter'
 Random = require './Random'
+operative = require 'operative'
 
 
 module.exports = class LegoPipeline
@@ -13,44 +14,56 @@ module.exports = class LegoPipeline
 		@brickLayouter = new BrickLayouter()
 
 		@pipelineSteps = []
-		@pipelineSteps.push {
+		@pipelineSteps.push
 			name: 'Hull voxelizing'
 			decision: (options) -> return options.voxelizing
-			worker: (lastResult, options) =>
-				return @voxelizer.voxelize lastResult.optimizedModel, options
-		}
+			worker: (lastResult, options, progressCallback) =>
+				return @voxelizer.voxelize(
+					lastResult.optimizedModel
+					options
+					progressCallback
+				)
 
-		@pipelineSteps.push {
+		@pipelineSteps.push
 			name: 'Volume filling'
 			decision: (options) -> return options.voxelizing
-			worker: (lastResult, options) =>
-				return @volumeFiller.fillGrid lastResult.grid, options
-		}
+			worker: (lastResult, options, progressCallback) =>
+				return @volumeFiller.fillGrid(
+					lastResult.grid
+					lastResult.gridPOJO
+					options
+					progressCallback
+				)
 
-		@pipelineSteps.push {
+		@pipelineSteps.push
 			name: 'Layout graph initialization'
 			decision: (options) -> return options.initLayout
-			worker: (lastResult, options) =>
+			worker: (lastResult, options, progressCallback) =>
 				return @brickLayouter.initializeBrickGraph lastResult.grid
-		}
 
-		@pipelineSteps.push {
+		@pipelineSteps.push
 			name: 'Layout greedy merge'
 			decision: (options) -> return options.layouting
-			worker: (lastResult, options) =>
+			worker: (lastResult, options, progressCallback) =>
 				return @brickLayouter.layoutByGreedyMerge lastResult.grid
-		}
 
-		@pipelineSteps.push {
+		@pipelineSteps.push
+			name: 'Final merge pass'
+			decision: (options) -> return options.layouting
+			worker: (lastResult, options) =>
+				return @brickLayouter.finalLayoutPass lastResult.grid
+
+		@pipelineSteps.push
 			name: 'Local reLayout'
 			decision: (options) -> return options.reLayout
-			worker: (lastResult, options) =>
-				@brickLayouter.splitBricksAndRelayoutLocally lastResult.modifiedBricks,
-				lastResult.grid
-				return lastResult
-		}
+			worker: (lastResult, options, progressCallback) =>
+				return @brickLayouter.splitBricksAndRelayoutLocally(
+					lastResult.modifiedBricks
+					lastResult.grid
+				)
 
 	run: (data, options = null, profiling = false) =>
+		@terminated = false
 		if profiling
 			log.debug "Starting Lego Pipeline
 			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
@@ -60,54 +73,53 @@ module.exports = class LegoPipeline
 			Random.setSeed randomSeed
 			log.debug 'Using random seed', randomSeed
 
-			profilingResults = []
+		start = new Date()
 
-		accumulatedResults = data
+		runPromise = @runPromise 0, data, options, profiling
+		.then (result) ->
+			log.debug "Finished Lego Pipeline in #{new Date() - start}ms" if profiling
+			return result
 
-		for i in [0..@pipelineSteps.length - 1] by 1
-			if profiling
-				r = @runStepProfiled i, accumulatedResults, options
-				profilingResults.push r.time
-				lastResult = r.result
-			else
-				lastResult = @runStep i, accumulatedResults, options
+		cancelPromise = new Promise (resolve, @reject) => return
 
-			for own key of lastResult
-				accumulatedResults[key] = lastResult[key]
+		return Promise.race([runPromise, cancelPromise])
 
-		if profiling
-			sum = 0
-			for s in profilingResults
-				sum += s
-			log.debug "Finished Lego Pipeline in #{sum}ms"
-
-		return {
-			profilingResults: profilingResults
-			accumulatedResults: accumulatedResults
-		}
-
-	runStep: (i, lastResult, options) ->
-		step = @pipelineSteps[i]
-
-		if step.decision options
-			return step.worker lastResult, options
-		return lastResult
-
-	runStepProfiled: (i, lastResult, options) ->
-		step = @pipelineSteps[i]
-
-		if step.decision options
-			log.debug "Running step #{step.name}"
-			start = new Date()
-			result = @runStep i, lastResult, options
-			stop = new Date() - start
-			log.debug "Step #{step.name} finished in #{stop}ms"
+	runPromise: (i, data, options, profiling) =>
+		progressCallback = (progress) =>
+			overallProgress =
+				100 * i / @pipelineSteps.length + progress / @pipelineSteps.length
+		finished = i >= @pipelineSteps.length or @terminated
+		if finished
+			@currentStep = null
+			@terminated = true
+			return data
 		else
-			log.debug "(Skipping step #{step.name})"
-			result = lastResult
-			stop = 0
+			return @runStep i, data, options, profiling, progressCallback
+				.then (result) =>
+					for own key of result
+						data[key] = result[key]
+					return @runPromise ++i, data, options, profiling, progressCallback
 
-		return {
-			time: stop
-			result: result
-		}
+	runStep: (i, lastResult, options, profiling, progressCallback) ->
+		step = @pipelineSteps[i]
+		@currentStep = step
+
+		if step.decision options
+			log.debug "Running step #{step.name}" if profiling
+			start = new Date()
+			return step.worker lastResult, options, progressCallback
+			.then (result) ->
+				stop = new Date() - start
+				log.debug "Step #{step.name} finished in #{stop}ms" if profiling
+				return result
+		else
+			log.debug "(Skipping step #{step.name})" if profiling
+			return Promise.resolve lastResult
+
+	terminate: =>
+		return if @terminated
+		@terminated = true
+		@currentStep?.terminate?()
+		@reject? "LegoPipeline was terminated at step #{@currentStep.name}"
+		@currentStep = null
+		@reject = null

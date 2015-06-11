@@ -36,7 +36,7 @@ config2 = clone globalConfig
 config1.plugins.newBrickator = false
 
 # configure right bundle to not show the model
-config2.showModel = false
+config2.rendering.showModel = false
 
 # instantiate 2 brickify bundles
 config1.renderAreaId = 'renderArea1'

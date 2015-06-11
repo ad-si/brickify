@@ -34,14 +34,14 @@ know the size, download and print the&nbsp;
 	if  stl
 		html += '
 <div id=\"stlDownloadButton\" class=\"btn btn-success btn-block disabled\">
-    &nbsp;&nbsp;Download stl for 3D printer
+    Download stl for 3D printer
 </div>'
 	if lego
 		html += '
 <h4 class=\"disabled\">Download Instructions</h4>
 <div id=\"downloadInstructionsButton\"
 class=\"btn btn-success btn-block disabled\">
-    &nbsp;&nbsp;Download LEGO instructions and scad file
+    Download LEGO instructions and scad file
 </div>'
 	html += '
 </div>

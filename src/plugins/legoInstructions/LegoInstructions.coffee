@@ -32,6 +32,8 @@ class LegoInstructions
 			camera.lookAt(new THREE.Vector3(0, 0, 0))
 			camera.up = new THREE.Vector3(0, 0, 1)
 
+			oldVisualizationMode = @nodeVisualizer.getDisplayMode()
+
 			@nodeVisualizer.getBrickThreeNode selectedNode
 			.then (brickNode) =>
 				boundingSphere = threeHelper.getBoundingSphere brickNode
@@ -42,11 +44,9 @@ class LegoInstructions
 					boundingSphere
 				)
 			.then =>
-				# disable pipeline
+				# disable pipeline and fidelity changes
 				@fidelityControl.enableScreenshotMode()
-
 				# enter build mode
-				oldVisualizationMode = @nodeVisualizer.getDisplayMode()
 				@nodeVisualizer.setDisplayMode(@selectedNode, 'build')
 				.then (numLayers) =>
 					resultingFiles = []

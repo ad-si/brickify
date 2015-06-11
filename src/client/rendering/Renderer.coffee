@@ -33,58 +33,7 @@ class Renderer
 		if @imageRenderQueries.length == 0
 			@_renderFrame timestamp, @camera, null
 		else
-			# render first query to image
-			imageQuery = @imageRenderQueries.shift()
-
-			# override render size if requested
-			if imageQuery.resolution?
-				renderTargetHelper.configureSize true, imageQuery.resolution
-
-			# create rendertarget
-			if not @imageRenderTarget? or
-			not renderTargetHelper.renderTargetHasRightSize(
-				@imageRenderTarget.renderTarget, @threeRenderer
-			)
-				if @imageRenderTarget?
-					renderTargetHelper.deleteRenderTarget @imageRenderTarget, @threeRenderer
-
-				@imageRenderTarget = renderTargetHelper.createRenderTarget(
-					@threeRenderer,
-					[],
-					null,
-					1.0
-				)
-
-			# render to target
-			@_renderFrame timestamp, imageQuery.camera, @imageRenderTarget.renderTarget
-
-			# save image data
-			width = @imageRenderTarget.renderTarget.width
-			height = @imageRenderTarget.renderTarget.height
-
-			pixels = new Uint8Array(width * height * 4)
-
-			# fix three inconsistency on current depthTarget dev branch
-			rt = @imageRenderTarget.renderTarget
-			rt.format = rt.texture.format
-
-			@threeRenderer.readRenderTargetPixels(
-				@imageRenderTarget.renderTarget, 0, 0,
-				width, height, pixels
-			)
-
-			# restore original renderTarget size if it was altered
-			if imageQuery.resolution?
-				renderTargetHelper.configureSize @useBigRendertargets
-
-			# resolve promise
-			imageQuery.resolve {
-				viewWidth: @size().width
-				viewHeight: @size().height
-				imageWidth: width
-				imageHeight: height
-				pixels: pixels
-			}
+			@_renderImage timestamp
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
@@ -121,6 +70,60 @@ class Renderer
 
 			# render our target to the screen
 			@threeRenderer.render @pipelineRenderTarget.quadScene, camera, renderTarget
+
+	_renderImage: (timestamp) =>
+		# render first query to image
+		imageQuery = @imageRenderQueries.shift()
+
+		# override render size if requested
+		if imageQuery.resolution?
+			renderTargetHelper.configureSize true, imageQuery.resolution
+
+		# create rendertarget
+		if not @imageRenderTarget? or
+			not renderTargetHelper.renderTargetHasRightSize(
+				@imageRenderTarget.renderTarget, @threeRenderer
+			)
+			if @imageRenderTarget?
+				renderTargetHelper.deleteRenderTarget @imageRenderTarget, @threeRenderer
+
+			@imageRenderTarget = renderTargetHelper.createRenderTarget(
+				@threeRenderer,
+				[],
+				null,
+				1.0
+			)
+
+		# render to target
+		@_renderFrame timestamp, imageQuery.camera, @imageRenderTarget.renderTarget
+
+		# save image data
+		width = @imageRenderTarget.renderTarget.width
+		height = @imageRenderTarget.renderTarget.height
+
+		pixels = new Uint8Array(width * height * 4)
+
+		# fix three inconsistency on current depthTarget dev branch
+		rt = @imageRenderTarget.renderTarget
+		rt.format = rt.texture.format
+
+		@threeRenderer.readRenderTargetPixels(
+			@imageRenderTarget.renderTarget, 0, 0,
+			width, height, pixels
+		)
+
+		# restore original renderTarget size if it was altered
+		if imageQuery.resolution?
+			renderTargetHelper.configureSize @useBigRendertargets
+
+		# resolve promise
+		imageQuery.resolve {
+			viewWidth: @size().width
+			viewHeight: @size().height
+			imageWidth: width
+			imageHeight: height
+			pixels: pixels
+		}
 
 	# create / update target for all pipeline passes
 	_initializePipelineTarget: =>

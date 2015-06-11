@@ -15,11 +15,26 @@ class ExportUi
 	_initDownloadModal: =>
 		@downloadButton = $('#downloadButton')
 		@downloadModal = $('#downloadModal')
+		$leftSidebar = $('#leftSidebar')
 
-		#show modal when clicking on download button
+		# Remove custom inline styles
+		@downloadModal.on(
+			'hidden.bs.modal'
+			-> $leftSidebar.removeAttr 'style'
+		)
+
+		# Show modal when clicking on download button
 		@downloadButton.click =>
-			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadButtonClick'
+			piwikTracking.trackEvent(
+				'Editor'
+				'ExportAction'
+				'DownloadButtonClick'
+			)
 			@downloadModal.modal 'show'
+
+			# Workaround to make overflow modal scrollable
+			$leftSidebar.attr 'style', 'height: auto !important'
+
 
 	_initDownloadModalContent: =>
 		# stl download

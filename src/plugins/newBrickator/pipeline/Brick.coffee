@@ -111,6 +111,13 @@ class Brick
 
 		return @_size
 
+	is1x1x1: =>
+		size = @getSize()
+		if size.x == 1 and size.y == 1 and size.z == 1
+			return true
+		else
+			return false
+
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>

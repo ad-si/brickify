@@ -1,6 +1,7 @@
 log = require 'loglevel'
 
 Brick = require './Brick'
+Voxel = require './Voxel'
 arrayHelper = require './arrayHelper'
 Random = require './Random'
 
@@ -89,9 +90,61 @@ class BrickLayouter
 
 		return mergeableNeighbors
 
-	_findMergeableNeighborsInDirection3L: (brick0, dir, widthFn, lengthFn) =>#
-		brick1 = brick0
-		return
+	_findMergeableNeighborsInDirection3L: (brick, dir, widthFn, lengthFn) =>
+		noMerge = false
+		voxels = brick.voxels
+		mergeVoxels = new Set()
+		mergeBricks = new Set()
+
+		if widthFn(brick.getSize()) > 2 and lengthFn(brick.getSize()) >= 2
+			return null
+
+		# find neighbor voxels, noMerge if any is empty
+		voxels.forEach (voxel) =>
+			mVoxel = voxel.neighbors[dir]
+			if !mVoxel?
+				noMerge = true
+				return
+			mergeVoxels.add mVoxel unless voxels.has mVoxel
+		return null if noMerge
+
+		# find neighbor bricks, noMerge if any if not there
+		# noMerge if any brick not 1x1x1
+		mergeVoxels.forEach (mVoxel) =>
+			brick = mVoxel.brick
+			if brick == false or !brick?
+				noMerge = true
+				return
+			mergeBricks.add brick
+		return null if noMerge
+
+		#case1 : only 1x1x1 neighbors
+		mergeBricks.forEach (mBrick) =>
+			if !mBrick.is1x1x1()
+				noMerge = true
+		return null if noMerge
+
+		###
+		if mergeVoxels.size != mergeBricks.size
+			console.log ' should not get here'
+			return null
+		###
+
+		allVoxels = new Set()
+		voxels.forEach (voxel) =>
+			allVoxels.add voxel
+		mergeVoxels.forEach (mVoxel) =>
+			allVoxels.add mVoxel
+
+		size = Voxel.sizeFromVoxels(allVoxels)
+
+		return if !Brick.isValidSize(size.x,size.y,size.z)
+
+		# check if at least half of the top and half of the bottom voxels
+		# offer connection possibilities; if not, return
+		# TODO
+
+		return mergeBricks
 
 	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
 		while(@_anyDefinedInArray(mergeableNeighbors))

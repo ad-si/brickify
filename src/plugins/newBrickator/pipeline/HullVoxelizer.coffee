@@ -30,17 +30,17 @@ module.exports = class Voxelizer
 		@worker = null
 
 	_getOptimizedVoxelSpaceModel: (optimizedModel, options) =>
-		positions = optimizedModel.positions
-		voxelSpacePositions = new Array positions.length
-		for i in [0...positions.length] by 3
+		coordinates = optimizedModel.coordinates
+		voxelSpaceCoordinates = new Array coordinates.length
+		for i in [0...coordinates.length] by 3
 			position =
-				x: positions[i]
-				y: positions[i + 1]
-				z: positions[i + 2]
+				x: coordinates[i]
+				y: coordinates[i + 1]
+				z: coordinates[i + 2]
 			position = @voxelGrid.mapModelToVoxelSpace position
-			voxelSpacePositions[i] = position.x
-			voxelSpacePositions[i + 1] = position.y
-			voxelSpacePositions[i + 2] = position.z
+			voxelSpaceCoordinates[i] = position.x
+			voxelSpaceCoordinates[i + 1] = position.y
+			voxelSpaceCoordinates[i + 2] = position.z
 
 		normals = optimizedModel.faceNormals
 		directions = []
@@ -49,8 +49,8 @@ module.exports = class Voxelizer
 			directions.push @_getTolerantDirection z, options.zTolerance
 
 		return {
-			positions: voxelSpacePositions
-			indices: optimizedModel.indices
+			coordinates: voxelSpaceCoordinates
+			faceVertexIndices: optimizedModel.faceVertexIndices
 			directions: directions
 		}
 
@@ -249,26 +249,26 @@ module.exports = class Voxelizer
 				callback state: 'progress', progress: currentProgress
 
 			_forEachPolygon: (model, visitor) ->
-				indices = model.indices
-				positions = model.positions
+				faceVertexIndices = model.faceVertexIndices
+				coordinates = model.coordinates
 				directions = model.directions
 				length = directions.length
 				for i in [0...length]
 					i3 = i * 3
 					p0 = {
-						x: positions[indices[i3] * 3]
-						y: positions[indices[i3] * 3 + 1]
-						z: positions[indices[i3] * 3 + 2]
+						x: coordinates[faceVertexIndices[i3] * 3]
+						y: coordinates[faceVertexIndices[i3] * 3 + 1]
+						z: coordinates[faceVertexIndices[i3] * 3 + 2]
 					}
 					p1 = {
-						x: positions[indices[i3 + 1] * 3]
-						y: positions[indices[i3 + 1] * 3 + 1]
-						z: positions[indices[i3 + 1] * 3 + 2]
+						x: coordinates[faceVertexIndices[i3 + 1] * 3]
+						y: coordinates[faceVertexIndices[i3 + 1] * 3 + 1]
+						z: coordinates[faceVertexIndices[i3 + 1] * 3 + 2]
 					}
 					p2 = {
-						x: positions[indices[i3 + 2] * 3]
-						y: positions[indices[i3 + 2] * 3 + 1]
-						z: positions[indices[i3 + 2] * 3 + 2]
+						x: coordinates[faceVertexIndices[i3 + 2] * 3]
+						y: coordinates[faceVertexIndices[i3 + 2] * 3 + 1]
+						z: coordinates[faceVertexIndices[i3 + 2] * 3 + 2]
 					}
 					direction = directions[i]
 

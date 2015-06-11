@@ -127,7 +127,7 @@ class LegoInstructions
 			png.on 'end', ->
 				resolve pngData
 
-	# flips the image horizontally (because renderer delivers it upside down)
+	# flips the image vertically (because renderer delivers it upside down)
 	# and scales it to actual recorded screen measurements (because it is always
 	# in size 2^n)
 	_flipAndFitImage: (renderedImage) =>

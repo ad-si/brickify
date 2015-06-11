@@ -16,20 +16,20 @@ class LegoInstructions
 	getDownload: (node, downloadOptions) =>
 		return null if downloadOptions.type != 'instructions'
 
+		log.debug 'Creating instructions...'
+
+		# pseudoisometric
+		camera = new THREE.PerspectiveCamera(
+			@renderer.camera.fov, @renderer.camera.aspect, 1, 1000
+		)
+
+		camera.position.set(1, 1, 1)
+		camera.lookAt new THREE.Vector3(0, 0, 0)
+		camera.up = new THREE.Vector3(0, 0, 1)
+
+		oldVisualizationMode = @nodeVisualizer.getDisplayMode()
+
 		return new Promise (resolve, reject) =>
-			log.debug 'Creating instructions...'
-
-			# pseudoisometric
-			camera = new THREE.PerspectiveCamera(
-				@renderer.camera.fov, @renderer.camera.aspect, 1, 1000
-			)
-
-			camera.position.set(1, 1, 1)
-			camera.lookAt new THREE.Vector3(0, 0, 0)
-			camera.up = new THREE.Vector3(0, 0, 1)
-
-			oldVisualizationMode = @nodeVisualizer.getDisplayMode()
-
 			@nodeVisualizer.getBrickThreeNode node
 			.then (brickNode) =>
 				boundingSphere = threeHelper.getBoundingSphere brickNode
@@ -73,17 +73,19 @@ class LegoInstructions
 
 	_takeScreenshots: (node, numLayers, camera) =>
 		resultingFiles = []
-
-		# screenshot of each layer
-		promiseChain = Promise.resolve()
-		for layer in [1..numLayers]
-			promiseChain = promiseChain
-			.then do (layer) => => @_createScreenshotOfLayer node, layer, camera
+		takeScreenshot = (layer) => =>
+			@_createScreenshotOfLayer node, layer, camera
 			.then (fileData) ->
 				resultingFiles.push {
 					fileName: fileData.fileName
 					data: fileData.data
 				}
+
+		# screenshot of each layer
+		promiseChain = Promise.resolve()
+		for layer in [1..numLayers]
+			promiseChain = promiseChain.then takeScreenshot layer
+
 		return promiseChain.then -> resultingFiles
 
 	_createScreenshotOfLayer: (node, layer, camera) =>

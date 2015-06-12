@@ -10,6 +10,12 @@ class Brick
 		Zm: 'Zm'
 	}
 
+	@axes = {
+		x: 'x'
+		y: 'y'
+		n: 'neutral'
+	}
+
 	@validBrickSizes = [
 		[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
 		[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
@@ -331,5 +337,14 @@ class Brick
 		console.log '(size, pos): (',
 			size.x, size.y, size.z, ',',
 			position.x, position.y, position.z, ')'
+
+	# returns whether the brick is large in x or in y dimension
+	primaryAxis: =>
+		if @getSize().x > @getSize().y
+			return @axes.x
+		else if @getSize().y > @getSize().x
+			return @axes.y
+		else
+			return @axes.n
 
 module.exports = Brick

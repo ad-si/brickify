@@ -1,3 +1,5 @@
+Brick = require './Brick'
+
 class Voxel
 	constructor: (@position, dataEntrys = []) ->
 		@dataEntrys = dataEntrys
@@ -46,6 +48,28 @@ class Voxel
 		}
 
 		return size
+
+	#TODO move somewhere else
+	@percentageOfConnections: (voxels) =>
+		minZ = null
+		maxZ = null
+
+		voxelCounter = 0
+		connectionCounter = 0
+
+		voxels.forEach (voxel) ->
+			maxZ ?= minZ ?= voxel.position.z
+			minY = voxel.position.z if minZ > voxel.position.z
+			maxZ = voxel.position.z if maxZ < voxel.position.z
+		voxels.forEach (voxel) ->
+			if voxel.position.z == maxZ
+				voxelCounter++
+				connectionCounter++ if voxel.neighbors[Brick.direction.Zp] != null
+			else if voxel.position.z == minZ
+				voxelCounter++
+				connectionCounter++ if voxel.neighbors[Brick.direction.Zm] != null
+
+		return connectionCounter / voxelCounter
 
 
 module.exports = Voxel

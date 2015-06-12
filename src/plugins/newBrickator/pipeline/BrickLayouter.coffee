@@ -26,7 +26,7 @@ class BrickLayouter
 		bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
 
 		numTotalInitialBricks += bricksToLayout.size
-		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks / 2
+		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 		return unless numTotalInitialBricks > 0
 
 		loop
@@ -51,11 +51,10 @@ class BrickLayouter
 			# mark new bricks as bad starting point for 3L brick
 			if brick.isSize(1, 1, 3) or brick.getStability() == 0
 				newBricks = brick.splitUp()
-				console.log newBricks
 				bricksToLayout.delete brick
 				newBricks.forEach (newBrick) ->
 					bricksToLayout.add newBrick
-					newBrick.disableThreeLayerStart = true
+					#newBrick.disableThreeLayerStart = true
 
 		return {grid: grid}
 
@@ -136,12 +135,11 @@ class BrickLayouter
 			allVoxels.add mVoxel
 
 		size = Voxel.sizeFromVoxels(allVoxels)
-
 		if Brick.isValidSize(size.x,size.y,size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			# TODO
-			return mergeBricks
+			return mergeBricks #if @_minPercentageOfConnectionsPresent(allVoxels)
+
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
 		# this is necessary for the 2 brick steps of larger bricks
@@ -166,23 +164,20 @@ class BrickLayouter
 			allVoxels.add mVoxel2
 
 		size = Voxel.sizeFromVoxels(allVoxels)
-
 		if Brick.isValidSize(size.x,size.y,size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			# TODO
-			return mergeBricks
+			return mergeBricks #if @_minPercentageOfConnectionsPresent(allVoxels)
+
 
 		return null
 
-	_percentageOfConnections: (voxels) =>
-		###
-		minZ = Infinity
-		maxZ = 0
-		voxels.forEach (voxel) ->
-			voxel
-		###
-		return 1
+	_minPercentageOfConnectionsPresent: (voxels) =>
+		minPercentage = .5
+		percentage = Voxel.percentageOfConnections voxels
+		console.log 'p', percentage
+		return true if percentage >= minPercentage
+		return false
 
 	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
 		while(@_anyDefinedInArray(mergeableNeighbors))

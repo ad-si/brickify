@@ -29,6 +29,7 @@ class Brick
 	# Creates a brick out of the given set of voxels
 	# Takes ownership of voxels without further processing
 	constructor: (arrayOfVoxels) ->
+		@disableThreeLayerStart = false
 		@voxels = new Set()
 		for voxel in arrayOfVoxels
 			voxel.brick = @
@@ -111,9 +112,9 @@ class Brick
 
 		return @_size
 
-	is1x1x1: =>
+	isSize: (x,y,z) =>
 		size = @getSize()
-		if size.x == 1 and size.y == 1 and size.z == 1
+		if size.x == x and size.y == y and size.z == z
 			return true
 		else
 			return false

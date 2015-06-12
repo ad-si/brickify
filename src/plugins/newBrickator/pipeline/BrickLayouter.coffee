@@ -31,7 +31,7 @@ class BrickLayouter
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
-			return {grid: grid} unless brick?
+			return {grid: grid} if !brick? or brick.disableThreeLayerStart
 			numRandomChoices++
 
 			mergeableNeighbors = @_findMergeableNeighbors3L brick
@@ -104,7 +104,7 @@ class BrickLayouter
 			return null
 
 		# find neighbor voxels, noMerge if any is empty
-		voxels.forEach (voxel) =>
+		voxels.forEach (voxel) ->
 			mVoxel = voxel.neighbors[dir]
 			if !mVoxel?
 				noMerge = true
@@ -115,18 +115,18 @@ class BrickLayouter
 		# find neighbor bricks,
 		# noMerge if any not present
 		# noMerge if any brick not 1x1x1
-		mergeVoxels.forEach (mVoxel) =>
+		mergeVoxels.forEach (mVoxel) ->
 			mBrick = mVoxel.brick
-			if mBrick == false or !mBrick? or !mBrick.is1x1x1()
+			if mBrick == false or !mBrick? or !mBrick.isSize(1,1,1)
 				noMerge = true
 				return
 			mergeBricks.add mBrick
 		return null if noMerge
 
 		allVoxels = new Set()
-		voxels.forEach (voxel) =>
+		voxels.forEach (voxel) ->
 			allVoxels.add voxel
-		mergeVoxels.forEach (mVoxel) =>
+		mergeVoxels.forEach (mVoxel) ->
 			allVoxels.add mVoxel
 
 		size = Voxel.sizeFromVoxels(allVoxels)
@@ -140,7 +140,7 @@ class BrickLayouter
 		# check another set of voxels in merge direction, starting from mergeVoxels
 		# this is necessary for the 2 brick steps of larger bricks
 		mergeVoxels2 = new Set()
-		mergeVoxels.forEach (mVoxel) =>
+		mergeVoxels.forEach (mVoxel) ->
 			mVoxel2 = mVoxel.neighbors[dir]
 			if !mVoxel2?
 				noMerge = true
@@ -148,15 +148,15 @@ class BrickLayouter
 			mergeVoxels2.add mVoxel2
 		return null if noMerge
 
-		mergeVoxels2.forEach (mVoxel2) =>
+		mergeVoxels2.forEach (mVoxel2) ->
 			mBrick2 = mVoxel2.brick
-			if mBrick2 == false or !mBrick2? or !mBrick2.is1x1x1()
+			if mBrick2 == false or !mBrick2? or !mBrick2.isSize(1,1,1)
 				noMerge = true
 				return
 			mergeBricks.add mBrick2
 		return null if noMerge
 
-		mergeVoxels2.forEach (mVoxel2) =>
+		mergeVoxels2.forEach (mVoxel2) ->
 			allVoxels.add mVoxel2
 
 		size = Voxel.sizeFromVoxels(allVoxels)
@@ -173,7 +173,7 @@ class BrickLayouter
 		###
 		minZ = Infinity
 		maxZ = 0
-		voxels.forEach (voxel) =>
+		voxels.forEach (voxel) ->
 			voxel
 		###
 		return 1

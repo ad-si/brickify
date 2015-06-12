@@ -29,7 +29,11 @@ module.exports.onLoadFile = (files, feedbackTarget, spinnerOptions) ->
 		.catch (error) ->
 			bootbox.alert(
 				title: 'Import failed'
-				message: 'Your file contains errors that we could not fix.'
+				message:
+					"<p>Your file contains errors that we could not fix.</p>
+					<p>Details:</br>
+					<small>#{error.message}</small>
+					</p>"
 			)
 			feedbackTarget.innerHTML = errorString
 			log.error error.stack

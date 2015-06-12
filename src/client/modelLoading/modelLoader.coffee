@@ -60,7 +60,6 @@ class ModelLoader
 		model
 			.getAutoAlignMatrix()
 			.then (matrix) =>
-				console.log matrix
 				node = new Node
 					name: fileName
 					modelHash: hash

@@ -27,8 +27,9 @@ class Brick
 	# returns true if the given size is a valid size
 	@isValidSize: (x, y, z) ->
 		for testSize in Brick.validBrickSizes
-			if testSize[0] == x and testSize[1] == y and
-			testSize[2] == z
+			if testSize[0] == x and testSize[1] == y and testSize[2] == z
+				return true
+			else if testSize[0] == y and testSize[1] == x and testSize[2] == z
 				return true
 		return false
 

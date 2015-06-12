@@ -62,6 +62,9 @@ class BrickLayouter
 
 	_findMergeableNeighbors3L: (brick) =>
 		mergeableNeighbors = []
+		# get position and size of brick once for debugging purposes
+		#brick.getPosition()
+		#brick.getSize()
 
 		if brick.getSize().z == 1
 			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(

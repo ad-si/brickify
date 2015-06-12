@@ -192,7 +192,7 @@ module.exports = class Voxelizer
 				aIsInVoxel = roundA.x is x and roundA.y is y and roundA.z is z
 				bIsInVoxel = roundB.x is x and roundB.y is y and roundB.z is z
 
-				if aIsInVoxel && bIsInVoxel
+				if aIsInVoxel and bIsInVoxel
 					return Math.max a.z, b.z
 				if aIsInVoxel && a.z > b.z
 					return a.z

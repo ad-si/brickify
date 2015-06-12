@@ -126,6 +126,7 @@ class Renderer
 
 			# Determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
+				# Only do something when FXAA is not already used
 				if not @usePipelineFxaa
 					@usePipelineFxaa = true
 					@pipelineRenderTarget = null
@@ -136,6 +137,7 @@ class Renderer
 
 			# Determine wether to use SSAO
 			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'
+				# Only do something when SSAO is not already used
 				if not @usePipelineSsao
 					@usePipelineSsao = true
 					@pipelineRenderTarget = null

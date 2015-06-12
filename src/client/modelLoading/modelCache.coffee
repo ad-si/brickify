@@ -40,7 +40,9 @@ module.exports.store = (model) ->
 		.then (base64Model) ->
 			hash = md5 base64Model
 			modelCache[hash] = Promise.resolve model
-			return submitDataToServer(hash, base64Model).then -> hash
+			return submitDataToServer(hash, base64Model)
+				.then ->
+					return hash
 
 # requests a mesh with the given hash from the server
 requestDataFromServer = (hash) ->

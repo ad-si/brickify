@@ -1,5 +1,7 @@
 Grid = require './Grid'
 
+floatDelta = 1e-50
+
 module.exports = class Voxelizer
 	constructor: ->
 		@voxelGrid = null
@@ -7,7 +9,6 @@ module.exports = class Voxelizer
 	_addDefaults: (options) ->
 		options.accuracy ?= 16
 		options.zTolerance ?= 0.01
-		options.floatDelta ?= 1e-50
 
 	voxelize: (optimizedModel, options = {}, progressCallback) =>
 		@_addDefaults options
@@ -27,7 +28,7 @@ module.exports = class Voxelizer
 		@worker.voxelize(
 			voxelSpaceModel
 			lineStepSize
-			options.floatDelta
+			floatDelta
 			callback
 		)
 
@@ -65,7 +66,7 @@ module.exports = class Voxelizer
 	_getWorker: ->
 		return @worker if @worker?
 		return operative {
-			voxelize: (model, lineStepSize, floatDelta, progressCallback) ->
+			voxelize: (model, lineStepSize, @floatDelta, progressCallback) ->
 				grid = []
 				@_resetProgress()
 				@_forEachPolygon model, (p0, p1, p2, direction, progress) ->
@@ -75,14 +76,13 @@ module.exports = class Voxelizer
 						p2
 						direction
 						lineStepSize
-						floatDelta
 						grid
 					)
 					@_postProgress(progress, progressCallback)
 				progressCallback state: 'finished', data: grid
 				return
 
-			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, floatDelta, grid) ->
+			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, grid) ->
 				# transform model coordinates to voxel coordinates
 				# (object may be moved/rotated)
 
@@ -124,13 +124,13 @@ module.exports = class Voxelizer
 					p0 = @_interpolateLine shortSide1, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@_voxelizeLine p0, p1, direction, lineStepSize, floatDelta, grid
+					@_voxelizeLine p0, p1, direction, lineStepSize, grid
 
 				for i in [0..1] by lineStepSize / shortSideLength2
 					p0 = @_interpolateLine shortSide2, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@_voxelizeLine p0, p1, direction, lineStepSize, floatDelta, grid
+					@_voxelizeLine p0, p1, direction, lineStepSize, grid
 
 				return
 
@@ -156,7 +156,7 @@ module.exports = class Voxelizer
 			# @param voxelData Object data to store in the voxel grid for each voxel
 			# @param stepSize Number the stepSize to use for sampling the line
 			###
-			_voxelizeLine: (a, b, direction, stepSize, floatDelta, grid) ->
+			_voxelizeLine: (a, b, direction, stepSize, grid) ->
 				length = @_getLength a, b
 				dx = (b.x - a.x) / length * stepSize
 				dy = (b.y - a.y) / length * stepSize
@@ -172,7 +172,7 @@ module.exports = class Voxelizer
 					(oldVoxel.y != currentVoxel.y) or
 					(oldVoxel.z != currentVoxel.z)
 						z = @_getGreatestZInVoxel a, b, currentVoxel
-						@_setVoxel currentVoxel, z, direction, grid, floatDelta
+						@_setVoxel currentVoxel, z, direction, grid
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
@@ -246,13 +246,13 @@ module.exports = class Voxelizer
 					z: z / length
 				}
 
-			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid, floatDelta) ->
+			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
 				grid[x] = [] unless grid[x]
 				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
 					if oldValue.dir is 0 or (direction isnt 0 and zValue > oldValue.z) or
-					(direction is 1 and Math.abs(zValue - oldValue.z) < floatDelta)
+					(direction is 1 and Math.abs(zValue - oldValue.z) < @floatDelta)
 						oldValue.z = zValue
 						oldValue.dir = direction
 				else

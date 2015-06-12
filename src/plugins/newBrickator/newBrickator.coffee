@@ -21,7 +21,14 @@ class NewBrickator
 	onNodeAdd: (node) =>
 		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
-		@runLegoPipeline node
+		Spinner.startOverlay @bundle.renderer.getDomElement()
+		@_getCachedData node
+		.then (cachedData) =>
+			@nodeVisualizer?.objectModified node, cachedData
+			Spinner.stop @bundle.renderer.getDomElement()
+		.catch (error) =>
+			log.error error
+			Spinner.stop @bundle.renderer.getDomElement()
 
 	onNodeRemove: (node) =>
 		@pipeline.terminate()
@@ -103,11 +110,10 @@ class NewBrickator
 				@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	_createDataStructure: (selectedNode) =>
-		selectedNode.getModel().then (model) =>
+		return selectedNode.getModel().then (model) =>
 			# create grid
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
-			settings.deactivateLayouting()
 
 			@pipeline.run(
 				optimizedModel: model
@@ -116,12 +122,14 @@ class NewBrickator
 			)
 			.then (results) ->
 				# create data structure
-				return {
+				data = {
 					node: selectedNode
 					grid: results.grid
 					optimizedModel: model
 					csgNeedsRecalculation: false
 				}
+				selectedNode.storePluginData 'newBrickator', data, true
+				return data
 
 	_checkDataStructure: (selectedNode, data) ->
 		return yes # Later: Check for node transforms
@@ -132,10 +140,7 @@ class NewBrickator
 			if data? and @_checkDataStructure selectedNode, data
 				return data
 			else
-				@_createDataStructure selectedNode
-				.then (data) ->
-					selectedNode.storePluginData 'newBrickator', data, true
-					return data
+				return @_createDataStructure selectedNode
 
 	getDownload: (selectedNode, downloadOptions) =>
 		options = @_prepareCSGOptions(

@@ -7,6 +7,7 @@ module.exports = class Voxelizer
 	_addDefaults: (options) ->
 		options.accuracy ?= 16
 		options.zTolerance ?= 0.01
+		options.floatDelta ?= 1e-50
 
 	voxelize: (optimizedModel, options = {}, progressCallback) =>
 		@_addDefaults options
@@ -16,12 +17,19 @@ module.exports = class Voxelizer
 
 		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel, options
 
-		@worker = @_getWorker()
-		@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
+		callback = (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
 				@resolve grid: @voxelGrid, gridPOJO: message.data
+
+		@worker = @_getWorker()
+		@worker.voxelize(
+			voxelSpaceModel
+			lineStepSize
+			options.floatDelta
+			callback
+		)
 
 		return new Promise (@resolve, reject) => return
 
@@ -57,7 +65,7 @@ module.exports = class Voxelizer
 	_getWorker: ->
 		return @worker if @worker?
 		return operative {
-			voxelize: (model, lineStepSize, progressCallback) ->
+			voxelize: (model, lineStepSize, floatDelta, progressCallback) ->
 				grid = []
 				@_resetProgress()
 				@_forEachPolygon model, (p0, p1, p2, direction, progress) ->
@@ -67,13 +75,14 @@ module.exports = class Voxelizer
 						p2
 						direction
 						lineStepSize
+						floatDelta
 						grid
 					)
 					@_postProgress(progress, progressCallback)
 				progressCallback state: 'finished', data: grid
 				return
 
-			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, grid) ->
+			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, floatDelta, grid) ->
 				# transform model coordinates to voxel coordinates
 				# (object may be moved/rotated)
 
@@ -115,13 +124,13 @@ module.exports = class Voxelizer
 					p0 = @_interpolateLine shortSide1, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@_voxelizeLine p0, p1, direction, lineStepSize, grid
+					@_voxelizeLine p0, p1, direction, lineStepSize, floatDelta, grid
 
 				for i in [0..1] by lineStepSize / shortSideLength2
 					p0 = @_interpolateLine shortSide2, i
 					p1 = @_interpolateLine longSide, longSideIndex
 					longSideIndex += longSideStepSize
-					@_voxelizeLine p0, p1, direction, lineStepSize, grid
+					@_voxelizeLine p0, p1, direction, lineStepSize, floatDelta, grid
 
 				return
 
@@ -147,7 +156,7 @@ module.exports = class Voxelizer
 			# @param voxelData Object data to store in the voxel grid for each voxel
 			# @param stepSize Number the stepSize to use for sampling the line
 			###
-			_voxelizeLine: (a, b, direction, stepSize, grid) ->
+			_voxelizeLine: (a, b, direction, stepSize, floatDelta, grid) ->
 				length = @_getLength a, b
 				dx = (b.x - a.x) / length * stepSize
 				dy = (b.y - a.y) / length * stepSize
@@ -163,7 +172,7 @@ module.exports = class Voxelizer
 					(oldVoxel.y != currentVoxel.y) or
 					(oldVoxel.z != currentVoxel.z)
 						z = @_getGreatestZInVoxel a, b, currentVoxel
-						@_setVoxel currentVoxel, z, direction, grid
+						@_setVoxel currentVoxel, z, direction, grid, floatDelta
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
@@ -178,13 +187,23 @@ module.exports = class Voxelizer
 
 			_getGreatestZInVoxel: (a, b, {x: x, y: y, z: z}) ->
 				roundA = @_roundVoxelSpaceToVoxel a
-				if roundA.x is x and roundA.y is y and roundA.z is z
-					# aIsInVoxel
-					roundB = @_roundVoxelSpaceToVoxel b
-					if roundB.x is x and roundB.y is y and roundB.z is z
-						# bIsInVoxel
-						return Math.max a.z, b.z
+				roundB = @_roundVoxelSpaceToVoxel b
 
+				if roundA.x is x and roundA.y is y and roundA.z is z
+					aIsInVoxel = true
+				else
+					aIsInVoxel = false
+				if roundB.x is x and roundB.y is y and roundB.z is z
+					bIsInVoxel = true
+				else
+					bIsInVoxel = false
+
+				if aIsInVoxel && bIsInVoxel
+					return Math.max a.z, b.z
+				if aIsInVoxel && a.z > b.z
+					return a.z
+				if bIsInVoxel && b.z > a.z
+					return b.z
 
 				d = @_normalize x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
 
@@ -227,12 +246,13 @@ module.exports = class Voxelizer
 					z: z / length
 				}
 
-			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
+			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid, floatDelta) ->
 				grid[x] = [] unless grid[x]
 				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
-					if oldValue.dir is 0 or (zValue > oldValue.z and direction isnt 0)
+					if oldValue.dir is 0 or (zValue > oldValue.z and direction isnt 0) or
+					(Math.abs(zValue - oldValue.z) < floatDelta and direction is 1)
 						oldValue.z = zValue
 						oldValue.dir = direction
 				else

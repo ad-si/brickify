@@ -48,8 +48,14 @@ class BrickLayouter
 			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
 			# if brick is 1x1x3 or instable after mergeLoop3L, break it into pieces
-			# mark them as bad starting point for 3L brick
-			# TODO
+			# mark new bricks as bad starting point for 3L brick
+			if brick.isSize(1, 1, 3) or brick.getStability() == 0
+				newBricks = brick.splitUp()
+				console.log newBricks
+				bricksToLayout.delete brick
+				newBricks.forEach (newBrick) ->
+					bricksToLayout.add newBrick
+					newBrick.disableThreeLayerStart = true
 
 		return {grid: grid}
 
@@ -218,7 +224,7 @@ class BrickLayouter
 	# keep a counter, break if last number of unsuccessful tries > (some number
 	# or some % of total bricks in object)
 	# !! Expects bricks to layout to be a Set !!
-	layoutByGreedyMerge: (grid, bricksToLayout, useThreeLayers = false) =>
+	layoutByGreedyMerge: (grid, bricksToLayout) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
@@ -291,7 +297,7 @@ class BrickLayouter
 	#
 	# @param {Set<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid, useThreeLayers = false) =>
+	splitBricksAndRelayoutLocally: (bricks, grid, useThreeLayers = true) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->
@@ -326,7 +332,8 @@ class BrickLayouter
 		bricksToBeDeleted.forEach (brick) ->
 			newBricks.delete brick
 
-		@layout3LBricks grid, newBricks
+		if useThreeLayers
+			@layout3LBricks grid, newBricks
 		@layoutByGreedyMerge grid, newBricks
 
 		return {

@@ -22,11 +22,18 @@ module.exports = class CsgExtractor
 		log.debug 'Creating CSG...'
 
 		d = new Date()
-		legoVoxels = @_analyzeGrid(grid)
+		gridAnalysis = @_analyzeGrid(grid)
 		if options.profile
 			log.debug "Grid analysis took #{new Date() - d}ms"
 
-		if legoVoxels.length == 0
+		if gridAnalysis.everythingBricks
+			log.debug "Everything is made out of bricks. Skipping CSG..."
+			return {
+				csg: null
+				isOriginalModel: false
+			}
+
+		if gridAnalysis.legoVoxels.length == 0
 			return {
 				csg: options.transformedModel
 				isOriginalModel: true
@@ -34,7 +41,7 @@ module.exports = class CsgExtractor
 
 		d = new Date()
 		voxunion = new VoxelUnion(grid)
-		voxelHull = voxunion.run legoVoxels, options
+		voxelHull = voxunion.run gridAnalysis.legoVoxels, options
 		if options.profile
 			log.debug "Voxel Geometrizer took #{new Date() - d}ms"
 
@@ -51,9 +58,12 @@ module.exports = class CsgExtractor
 	_analyzeGrid: (grid) ->
 		# creates a list of voxels to be legotized
 		legoVoxels = []
+		everythingBricks = true
 
 		grid.forEachVoxel (voxel) ->
-			return if not voxel.enabled # ignore 3d printed voxels
+			if not voxel.enabled
+				everythingBricks = false
+				return
 
 			x = voxel.position.x
 			y = voxel.position.y
@@ -79,7 +89,10 @@ module.exports = class CsgExtractor
 				studFromBelow: studFromBelow
 			}
 
-		return legoVoxels
+		return {
+			legoVoxels: legoVoxels
+			everythingBricks: everythingBricks
+		}
 
 	_extractPrintGeometry: (originalModel, voxelHull) ->
 		# returns volumetric subtraction (3d Geometry - LegoVoxels)

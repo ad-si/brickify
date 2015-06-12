@@ -46,7 +46,8 @@ class BrickVisualization
 
 	showCsg: (newCsgGeometry) =>
 		@csgSubnode.children = []
-		return if not newCsgGeometry?
+		if not newCsgGeometry?
+			@csgSubnode.visible = false
 
 		for geometry in newCsgGeometry
 			csgMesh = new THREE.Mesh geometry, @defaultColoring.csgMaterial

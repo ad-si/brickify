@@ -14,16 +14,15 @@ module.exports = class Voxelizer
 
 		lineStepSize = @voxelGrid.heightRatio / options.accuracy
 
-		@_getOptimizedVoxelSpaceModel model, options
-		.then (voxelSpaceModel) =>
-			@worker = @_getWorker()
-			@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
-				if message.state is 'progress'
-					progressCallback message.progress
-				else # if state is 'finished'
-					@resolve grid: @voxelGrid, gridPOJO: message.data
-
-		return new Promise (@resolve, reject) => return
+		return new Promise (resolve, reject) =>
+			@_getOptimizedVoxelSpaceModel model, options
+			.then (voxelSpaceModel) =>
+				@worker = @_getWorker()
+				@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
+					if message.state is 'progress'
+						progressCallback message.progress
+					else # if state is 'finished'
+						resolve grid: @voxelGrid, gridPOJO: message.data
 
 	terminate: =>
 		@worker?.terminate()

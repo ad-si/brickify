@@ -36,7 +36,7 @@ module.exports.onLoadFile = (files, feedbackTarget, spinnerOptions) ->
 					</p>"
 			)
 			feedbackTarget.innerHTML = errorString
-			log.error error.stack
+			log.error error
 			reject error
 
 loadFile = (feedbackTarget, file, spinnerOptions) ->

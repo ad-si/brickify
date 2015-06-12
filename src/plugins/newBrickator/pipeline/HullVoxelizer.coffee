@@ -14,14 +14,14 @@ module.exports = class Voxelizer
 
 		lineStepSize = @voxelGrid.heightRatio / options.accuracy
 
-		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel, options
-
-		@worker = @_getWorker()
-		@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
-			if message.state is 'progress'
-				progressCallback message.progress
-			else # if state is 'finished'
-				@resolve grid: @voxelGrid, gridPOJO: message.data
+		@_getOptimizedVoxelSpaceModel(optimizedModel, options)
+		.then (voxelSpaceModel) =>
+			@worker = @_getWorker()
+			@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
+				if message.state is 'progress'
+					progressCallback message.progress
+				else # if state is 'finished'
+					@resolve grid: @voxelGrid, gridPOJO: message.data
 
 		return new Promise (@resolve, reject) => return
 
@@ -30,29 +30,30 @@ module.exports = class Voxelizer
 		@worker = null
 
 	_getOptimizedVoxelSpaceModel: (optimizedModel, options) =>
-		coordinates = optimizedModel.coordinates
-		voxelSpaceCoordinates = new Array coordinates.length
-		for i in [0...coordinates.length] by 3
-			position =
-				x: coordinates[i]
-				y: coordinates[i + 1]
-				z: coordinates[i + 2]
-			position = @voxelGrid.mapModelToVoxelSpace position
-			voxelSpaceCoordinates[i] = position.x
-			voxelSpaceCoordinates[i + 1] = position.y
-			voxelSpaceCoordinates[i + 2] = position.z
+		optimizedModel.done().then =>
+			coordinates = optimizedModel.model.mesh.faceVertex.vertexCoordinates
+			voxelSpaceCoordinates = new Array coordinates.length
+			for i in [0...coordinates.length] by 3
+				position =
+					x: coordinates[i]
+					y: coordinates[i + 1]
+					z: coordinates[i + 2]
+				coordinate = @voxelGrid.mapModelToVoxelSpace position
+				voxelSpaceCoordinates[i] = coordinate.x
+				voxelSpaceCoordinates[i + 1] = coordinate.y
+				voxelSpaceCoordinates[i + 2] = coordinate.z
 
-		normals = optimizedModel.faceNormals
-		directions = []
-		for i in [2...normals.length] by 3
-			z = normals[i]
-			directions.push @_getTolerantDirection z, options.zTolerance
+			normals = optimizedModel.model.mesh.faceVertex.faceNormalCoordinates
+			directions = []
+			for i in [2...normals.length] by 3
+				z = normals[i]
+				directions.push @_getTolerantDirection z, options.zTolerance
 
-		return {
-			coordinates: voxelSpaceCoordinates
-			faceVertexIndices: optimizedModel.faceVertexIndices
-			directions: directions
-		}
+			return {
+				coordinates: voxelSpaceCoordinates
+				faceVertexIndices: optimizedModel.model.mesh.faceVertex.faceVertexIndices
+				directions: directions
+			}
 
 	_getWorker: ->
 		return @worker if @worker?

@@ -27,14 +27,16 @@ module.exports = class CsgExtractor
 			log.debug "Grid analysis took #{new Date() - d}ms"
 
 		if gridAnalysis.everythingBricks
-			log.debug "Everything is made out of bricks. Skipping CSG..."
+			log.debug "Everything is made out of bricks. Skipped CSG."
 			return {
+				modelBsp: options.modelBsp
 				csg: null
 				isOriginalModel: false
 			}
 
 		if gridAnalysis.legoVoxels.length == 0
 			return {
+				modelBsp: options.modelBsp
 				csg: options.transformedModel
 				isOriginalModel: true
 			}
@@ -45,13 +47,16 @@ module.exports = class CsgExtractor
 		if options.profile
 			log.debug "Voxel Geometrizer took #{new Date() - d}ms"
 
-		d = new Date()
-		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
-		if options.profile
-			log.debug "Print geometry took #{new Date() - d}ms"
+		extraction = @_extractPrintGeometry(
+			options.modelBsp
+			options.transformedModel
+			voxelHull
+			options.profile
+		)
 
 		return {
-			csg: printGeometry
+			modelBsp: extraction.modelBsp
+			csg: extraction.printGeometry
 			isOriginalModel: false
 		}
 
@@ -94,9 +99,22 @@ module.exports = class CsgExtractor
 			everythingBricks: everythingBricks
 		}
 
-	_extractPrintGeometry: (originalModel, voxelHull) ->
+	_extractPrintGeometry: (modelBsp, originalModel, voxelHull, profiling) ->
 		# returns volumetric subtraction (3d Geometry - LegoVoxels)
-		modelBsp = new ThreeBSP(originalModel)
+		if not modelBsp
+			d = new Date()
+			modelBsp = new ThreeBSP(originalModel)
+			if profiling
+				log.debug "ThreeBsp generation took #{new Date() - d}ms"
+		else if profiling
+			log.debug "ThreeBSP already exists. Skipped ThreeBSP generation."
 
+		d = new Date()
 		printBsp = modelBsp.subtract(voxelHull)
-		return printBsp.toGeometry()
+		if profiling
+			log.debug "Print geometry took #{new Date() - d}ms"
+
+		return {
+			modelBsp: modelBsp
+			printGeometry: printBsp.toGeometry()
+		}

@@ -66,8 +66,10 @@ class CSG
 
 			options.profile = true
 			options.transformedModel = cachedData.transformedThreeGeometry
+			options.modelBsp = cachedData.modelBsp
 
 			result = @csgExtractor.extractGeometry cachedData.grid, options
+			cachedData.modelBsp = result.modelBsp
 
 			options.split = true
 			options.filterSmallGeometries = !result.isOriginalModel

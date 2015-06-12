@@ -189,14 +189,8 @@ module.exports = class Voxelizer
 				roundA = @_roundVoxelSpaceToVoxel a
 				roundB = @_roundVoxelSpaceToVoxel b
 
-				if roundA.x is x and roundA.y is y and roundA.z is z
-					aIsInVoxel = true
-				else
-					aIsInVoxel = false
-				if roundB.x is x and roundB.y is y and roundB.z is z
-					bIsInVoxel = true
-				else
-					bIsInVoxel = false
+				aIsInVoxel = roundA.x is x and roundA.y is y and roundA.z is z
+				bIsInVoxel = roundB.x is x and roundB.y is y and roundB.z is z
 
 				if aIsInVoxel && bIsInVoxel
 					return Math.max a.z, b.z

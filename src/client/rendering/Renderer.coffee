@@ -20,30 +20,30 @@ class Renderer
 		@usePipelineSsao = false
 
 	localRenderer: (timestamp) =>
-		# clear screen
+		# Clear screen
 		@threeRenderer.context.stencilMask(0xFF)
 		@threeRenderer.clear()
 
-		# render the default scene (plugins add objects in the init3d hook)
+		# Render the default scene (plugins add objects in the init3d hook)
 		@threeRenderer.render @scene, @camera
 
-		# allow for custom render passes
+		# Allow for custom render passes
 		if @pipelineEnabled
-			# init render target
+			# Init render target
 			@_initializePipelineTarget()
 
-			# clear render target
+			# Clear render target
 			@threeRenderer.setRenderTarget(@pipelineRenderTarget.renderTarget)
 			@threeRenderer.context.stencilMask(0xFF)
 			@threeRenderer.clear()
 			@threeRenderer.setRenderTarget(null)
 
-			# set global config
+			# Set global config
 			pipelineConfig = {
 				useBigTargets: @useBigPipelineTargets
 			}
 
-			# let plugins render in our target
+			# Let plugins render in our target
 			@pluginHooks.onPaint(
 				@threeRenderer,
 				@camera,
@@ -51,29 +51,29 @@ class Renderer
 				pipelineConfig
 			)
 
-			# render our target to the screen
+			# Render our target to the screen
 			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
 
 			if @usePipelineSsao
-				# take data from our target and render SSAO
+				# Take data from our target and render SSAO
 				# data into gauss target
 				@threeRenderer.render(
 					@ssaoTarget.quadScene, @camera, @ssaoBlurTarget.renderTarget, true
 				)
 
-				# take the ssao values and render a gaussed version on the screen
+				# Take the ssao values and render a gaussed version on the screen
 				@threeRenderer.render(
 					@ssaoBlurTarget.quadScene, @camera
 				)
 
 
 
-		# call update hook
+		# Call update hook
 		@pluginHooks.on3dUpdate timestamp
 		@controls?.update()
 		@animationRequestID = requestAnimationFrame @localRenderer
 
-	# create / update target for all pipeline passes
+	# Create / update target for all pipeline passes
 	_initializePipelineTarget: =>
 		if not @pipelineRenderTarget? or
 		not renderTargetHelper.renderTargetHasRightSize(
@@ -93,12 +93,12 @@ class Renderer
 			)
 
 			if @usePipelineSsao
-				# get a random texture for SSAO
+				# Get a random texture for SSAO
 				randomTex = THREE.ImageUtils.loadTexture('img/randomTexture.png')
 				randomTex.wrapS = THREE.RepeatWrapping
 				randomTex.wrapT = THREE.RepeatWrapping
 
-				# clone the pipeline Rendertarget:
+				# Clone the pipeline Rendertarget:
 				# use this render target to create SSAO values out of scene
 				@ssaoTarget = renderTargetHelper.cloneRenderTarget(
 					@pipelineRenderTarget,
@@ -107,7 +107,7 @@ class Renderer
 					1.0
 				)
 
-				# create a rendertarget that applies a gauss filter on everything
+				# Create a rendertarget that applies a gauss filter on everything
 				@ssaoBlurTarget = renderTargetHelper.createRenderTarget(
 					@threeRenderer,
 					[new SsaoBlurPart()],
@@ -124,7 +124,7 @@ class Renderer
 			else
 				@useBigPipelineTargets = false
 
-			# determine whether to use FXAA
+			# Determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
 				if not @usePipelineFxaa
 					@usePipelineFxaa = true
@@ -134,7 +134,7 @@ class Renderer
 					@usePipelineFxaa = false
 					@pipelineRenderTarget = null
 
-			# determine wether to use SSAO
+			# Determine wether to use SSAO
 			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'
 				if not @usePipelineSsao
 					@usePipelineSsao = true
@@ -162,7 +162,7 @@ class Renderer
 		@threeRenderer.render @scene, @camera
 
 	zoomToBoundingSphere: (radiusAndPosition) ->
-		# zooms out/in the camera so that the object is fully visible
+		# Zooms out/in the camera so that the object is fully visible
 		radius = radiusAndPosition.radius
 		center = radiusAndPosition.center
 		center = new THREE.Vector3(center.x, center.y, center.z)
@@ -175,7 +175,7 @@ class Renderer
 		zoomAdjustmentFactor = 2.5
 		rv = rv.multiplyScalar(zoomAdjustmentFactor)
 
-		#apply scene transforms (e.g. rotation to make y the vector facing upwards)
+		# Apply scene transforms (e.g. rotation to make y the vector facing upwards)
 		target = center.clone().applyMatrix4(@scene.matrix)
 		position = target.clone().add(rv)
 		@setCamera position, target
@@ -220,7 +220,7 @@ class Renderer
 		)
 		@threeRenderer.sortObjects = false
 
-		# needed for rendering pipeline
+		# Needed for rendering pipeline
 		@threeRenderer.extensions.get 'EXT_frag_depth'
 
 		# Stencil test
@@ -298,7 +298,7 @@ class Renderer
 		directionalLight.position.set 20, -20, -30
 		scene.add directionalLight
 
-	# creates a scene with default light and rotation settings
+	# Creates a scene with default light and rotation settings
 	getDefaultScene: =>
 		scene = @_setupScene(@globalConfig)
 		@_setupLighting(scene)

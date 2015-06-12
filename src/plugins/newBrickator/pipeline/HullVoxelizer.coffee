@@ -8,13 +8,13 @@ module.exports = class Voxelizer
 		options.accuracy ?= 16
 		options.zTolerance ?= 0.01
 
-	voxelize: (optimizedModel, options = {}, progressCallback) =>
+	voxelize: (model, options = {}, progressCallback) =>
 		@_addDefaults options
-		@setupGrid optimizedModel, options
+		@setupGrid model, options
 
 		lineStepSize = @voxelGrid.heightRatio / options.accuracy
 
-		@_getOptimizedVoxelSpaceModel(optimizedModel, options)
+		@_getOptimizedVoxelSpaceModel model, options
 		.then (voxelSpaceModel) =>
 			@worker = @_getWorker()
 			@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
@@ -29,9 +29,9 @@ module.exports = class Voxelizer
 		@worker?.terminate()
 		@worker = null
 
-	_getOptimizedVoxelSpaceModel: (optimizedModel, options) =>
-		optimizedModel.done().then =>
-			coordinates = optimizedModel.model.mesh.faceVertex.vertexCoordinates
+	_getOptimizedVoxelSpaceModel: (model, options) =>
+		model.done().then =>
+			coordinates = model.model.mesh.faceVertex.vertexCoordinates
 			voxelSpaceCoordinates = new Array coordinates.length
 			for i in [0...coordinates.length] by 3
 				position =
@@ -43,7 +43,7 @@ module.exports = class Voxelizer
 				voxelSpaceCoordinates[i + 1] = coordinate.y
 				voxelSpaceCoordinates[i + 2] = coordinate.z
 
-			normals = optimizedModel.model.mesh.faceVertex.faceNormalCoordinates
+			normals = model.model.mesh.faceVertex.faceNormalCoordinates
 			directions = []
 			for i in [2...normals.length] by 3
 				z = normals[i]
@@ -51,7 +51,7 @@ module.exports = class Voxelizer
 
 			return {
 				coordinates: voxelSpaceCoordinates
-				faceVertexIndices: optimizedModel.model.mesh.faceVertex.faceVertexIndices
+				faceVertexIndices: model.model.mesh.faceVertex.faceVertexIndices
 				directions: directions
 			}
 
@@ -280,7 +280,7 @@ module.exports = class Voxelizer
 	_getTolerantDirection: (dZ, tolerance) ->
 		return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
 
-	setupGrid: (optimizedModel, options) ->
+	setupGrid: (model, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)
-		@voxelGrid.setUpForModel optimizedModel, options
+		@voxelGrid.setUpForModel model, options
 		return @voxelGrid

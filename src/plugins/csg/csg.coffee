@@ -75,6 +75,7 @@ class CSG
 			options.filterSmallGeometries = !result.isOriginalModel
 			cachedData.csg = csgCleaner.clean result.csg, options
 
+			cachedData.csgNeedsRecalculation = false
 			return cachedData.csg
 
 	# Converts the optimized model from the selected node to a three model
@@ -111,7 +112,6 @@ class CSG
 		# check if there was a brush action that forces us
 		# to recreate CSG
 		if cachedData.csgNeedsRecalculation
-			cachedData.csgNeedsRecalculation = false
 			return true
 		return false
 

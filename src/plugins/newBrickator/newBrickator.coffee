@@ -120,7 +120,7 @@ class NewBrickator
 					node: selectedNode
 					grid: results.grid
 					optimizedModel: model
-					csgNeedsRecalculation: true
+					csgNeedsRecalculation: false
 				}
 
 	_checkDataStructure: (selectedNode, data) ->

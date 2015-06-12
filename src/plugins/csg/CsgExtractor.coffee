@@ -27,7 +27,7 @@ module.exports = class CsgExtractor
 			log.debug "Grid analysis took #{new Date() - d}ms"
 
 		if gridAnalysis.everythingBricks
-			log.debug "Everything is made out of bricks. Skipped CSG."
+			log.debug 'Everything is made out of bricks. Skipped CSG.'
 			return {
 				modelBsp: options.modelBsp
 				csg: null
@@ -107,7 +107,7 @@ module.exports = class CsgExtractor
 			if profiling
 				log.debug "ThreeBsp generation took #{new Date() - d}ms"
 		else if profiling
-			log.debug "ThreeBSP already exists. Skipped ThreeBSP generation."
+			log.debug 'ThreeBSP already exists. Skipped ThreeBSP generation.'
 
 		d = new Date()
 		printBsp = modelBsp.subtract(voxelHull)

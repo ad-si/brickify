@@ -30,30 +30,32 @@ module.exports = class Voxelizer
 		@worker = null
 
 	_getOptimizedVoxelSpaceModel: (model, options) =>
-		model.done().then =>
-			coordinates = model.model.mesh.faceVertex.vertexCoordinates
-			voxelSpaceCoordinates = new Array coordinates.length
-			for i in [0...coordinates.length] by 3
-				position =
-					x: coordinates[i]
-					y: coordinates[i + 1]
-					z: coordinates[i + 2]
-				coordinate = @voxelGrid.mapModelToVoxelSpace position
-				voxelSpaceCoordinates[i] = coordinate.x
-				voxelSpaceCoordinates[i + 1] = coordinate.y
-				voxelSpaceCoordinates[i + 2] = coordinate.z
+		return model
+			.getFaceVertexMesh()
+			.then (faceVertexMesh) =>
+				coordinates = faceVertexMesh.vertexCoordinates
+				voxelSpaceCoordinates = new Array coordinates.length
+				for i in [0...coordinates.length] by 3
+					position =
+						x: coordinates[i]
+						y: coordinates[i + 1]
+						z: coordinates[i + 2]
+					coordinate = @voxelGrid.mapModelToVoxelSpace position
+					voxelSpaceCoordinates[i] = coordinate.x
+					voxelSpaceCoordinates[i + 1] = coordinate.y
+					voxelSpaceCoordinates[i + 2] = coordinate.z
 
-			normals = model.model.mesh.faceVertex.faceNormalCoordinates
-			directions = []
-			for i in [2...normals.length] by 3
-				z = normals[i]
-				directions.push @_getTolerantDirection z, options.zTolerance
+				normals = faceVertexMesh.faceNormalCoordinates
+				directions = []
+				for i in [2...normals.length] by 3
+					z = normals[i]
+					directions.push @_getTolerantDirection z, options.zTolerance
 
-			return {
-				coordinates: voxelSpaceCoordinates
-				faceVertexIndices: model.model.mesh.faceVertex.faceVertexIndices
-				directions: directions
-			}
+				return {
+					coordinates: voxelSpaceCoordinates
+					faceVertexIndices: faceVertexMesh.faceVertexIndices
+					directions: directions
+				}
 
 	_getWorker: ->
 		return @worker if @worker?

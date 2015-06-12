@@ -1,4 +1,4 @@
-# mainly inspired from http://theorangeduck.com/page/pure-depth-ssao
+# Mainly inspired from http://theorangeduck.com/page/pure-depth-ssao
 
 ShaderPart = require './shaderPart'
 

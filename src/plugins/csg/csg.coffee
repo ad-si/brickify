@@ -64,7 +64,6 @@ class CSG
 			cachedData.transformedThreeGeometry = threeGeometry
 			@csgExtractor ?= new CsgExtractor()
 
-			options.profile = true
 			options.transformedModel = cachedData.transformedThreeGeometry
 			options.modelBsp = cachedData.modelBsp
 

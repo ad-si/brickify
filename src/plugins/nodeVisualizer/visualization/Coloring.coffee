@@ -98,7 +98,6 @@ module.exports = class Coloring
 		@objectLineMat.depthWrite = false
 
 		@_createBrickMaterials()
-		@_createThreeLayerBrickMaterials()
 
 	setPipelineMode: (enabled) =>
 		if enabled
@@ -171,20 +170,10 @@ module.exports = class Coloring
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used
 		# by neighbors to visually distinguish bricks
-		if brick.getSize().z == 1
-			for i in [0...@_brickMaterials.length]
-				material = @_getRandomBrickMaterial()
-				continue if neighborColors.has(material)
-				break
-
-		else if brick.getSize().z == 3
-			for i in [0...@_tlBrickMaterials.length]
-				material = @_getRandomThreeLayerBrickMaterial()
-				continue if neighborColors.has(material)
-				break
-
-		else
-			material = @_createMaterial 0xffffff
+		for i in [0...@_brickMaterials.length]
+			material = @_getRandomBrickMaterial()
+			continue if neighborColors.has(material)
+			break
 
 		brick.visualizationMaterial = material
 		return brick.visualizationMaterial
@@ -206,19 +195,6 @@ module.exports = class Coloring
 		@_brickMaterials.push @_createMaterial 0xdd4f4f
 		@_brickMaterials.push @_createMaterial 0xee5b5b
 		@_brickMaterials.push @_createMaterial 0xff6666
-
-	_getRandomThreeLayerBrickMaterial: =>
-		i = Math.floor(Math.random() * @_tlBrickMaterials.length)
-		return @_tlBrickMaterials[i]
-
-	_createThreeLayerBrickMaterials: =>
-		@_tlBrickMaterials = []
-		@_tlBrickMaterials.push @_createMaterial 0x0000ff
-		@_tlBrickMaterials.push @_createMaterial 0x000066
-		@_tlBrickMaterials.push @_createMaterial 0x00ffff
-		@_tlBrickMaterials.push @_createMaterial 0x0099ff
-		@_tlBrickMaterials.push @_createMaterial 0x333399
-		@_tlBrickMaterials.push @_createMaterial 0x663366
 
 	_createMaterial: (color, opacity = 1) ->
 		return new THREE.MeshLambertMaterial(

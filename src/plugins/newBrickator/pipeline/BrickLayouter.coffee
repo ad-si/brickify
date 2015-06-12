@@ -49,7 +49,8 @@ class BrickLayouter
 
 			# if brick is 1x1x3 or instable after mergeLoop3L, break it into pieces
 			# mark new bricks as bad starting point for 3L brick
-			if brick.isSize(1, 1, 3) or brick.getStability() == 0
+			if brick.isSize(1, 1, 3) or brick.getStability() == 0 or
+			brick.isSize(1, 2, 3) or brick.isSize(2, 1, 3)
 				newBricks = brick.splitUp()
 				bricksToLayout.delete brick
 				newBricks.forEach (newBrick) ->
@@ -74,6 +75,18 @@ class BrickLayouter
 
 		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
 			brick
+			Brick.direction.Yp
+			(obj) -> return obj.x
+			(obj) -> return obj.y
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+			brick
+			Brick.direction.Ym
+			(obj) -> return obj.x
+			(obj) -> return obj.y
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+			brick
 			Brick.direction.Xm
 			(obj) -> return obj.y
 			(obj) -> return obj.x
@@ -84,18 +97,7 @@ class BrickLayouter
 			(obj) -> return obj.y
 			(obj) -> return obj.x
 		)
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
-			brick
-			Brick.direction.Ym
-			(obj) -> return obj.x
-			(obj) -> return obj.y
-		)
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
-			brick
-			Brick.direction.Yp
-			(obj) -> return obj.x
-			(obj) -> return obj.y
-		)
+
 
 		return mergeableNeighbors
 
@@ -138,7 +140,7 @@ class BrickLayouter
 		if Brick.isValidSize(size.x,size.y,size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			return mergeBricks #if @_minPercentageOfConnectionsPresent(allVoxels)
+			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
 
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
@@ -167,15 +169,15 @@ class BrickLayouter
 		if Brick.isValidSize(size.x,size.y,size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			return mergeBricks #if @_minPercentageOfConnectionsPresent(allVoxels)
+			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
 
 
 		return null
 
 	_minPercentageOfConnectionsPresent: (voxels) =>
-		minPercentage = .5
+		#TODO check if this is working
+		minPercentage = .51
 		percentage = Voxel.percentageOfConnections voxels
-		console.log 'p', percentage
 		return true if percentage >= minPercentage
 		return false
 
@@ -379,15 +381,9 @@ class BrickLayouter
 
 		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
-			Brick.direction.Xm
-			(obj) -> return obj.y
+			Brick.direction.Yp
 			(obj) -> return obj.x
-		)
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
-			brick
-			Brick.direction.Xp
 			(obj) -> return obj.y
-			(obj) -> return obj.x
 		)
 		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
@@ -397,9 +393,15 @@ class BrickLayouter
 		)
 		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
-			Brick.direction.Yp
-			(obj) -> return obj.x
+			Brick.direction.Xm
 			(obj) -> return obj.y
+			(obj) -> return obj.x
+		)
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
+			brick
+			Brick.direction.Xp
+			(obj) -> return obj.y
+			(obj) -> return obj.x
 		)
 
 		return mergeableNeighbors

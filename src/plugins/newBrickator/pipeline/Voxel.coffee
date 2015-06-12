@@ -64,10 +64,10 @@ class Voxel
 		voxels.forEach (voxel) ->
 			if voxel.position.z == maxZ
 				voxelCounter++
-				connectionCounter++ if voxel.neighbors[Brick.direction.Zp] != null
+				connectionCounter++ unless voxel.neighbors[Brick.direction.Zp] == null
 			else if voxel.position.z == minZ
 				voxelCounter++
-				connectionCounter++ if voxel.neighbors[Brick.direction.Zm] != null
+				connectionCounter++ unless voxel.neighbors[Brick.direction.Zm] == null
 
 		return connectionCounter / voxelCounter
 

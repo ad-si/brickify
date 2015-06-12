@@ -15,7 +15,7 @@ class BrickLayouter
 
 	initializeBrickGraph: (grid) ->
 		grid.initializeBricks()
-		return grid
+		return Promise.resolve grid
 
 	layout3LBricks: (grid) ->
 		numRandomChoices = 0
@@ -31,7 +31,8 @@ class BrickLayouter
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
-			return {grid: grid} if !brick? or brick.disableThreeLayerStart
+			if !brick? or brick.disableThreeLayerStart
+				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
 			mergeableNeighbors = @_findMergeableNeighbors3L brick
@@ -57,7 +58,7 @@ class BrickLayouter
 					bricksToLayout.add newBrick
 					#newBrick.disableThreeLayerStart = true
 
-		return {grid: grid}
+		return Promise.resolve {grid: grid}
 
 	_findMergeableNeighbors3L: (brick) =>
 		mergeableNeighbors = []
@@ -232,11 +233,14 @@ class BrickLayouter
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-		return unless numTotalInitialBricks > 0
+
+		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
-			return {grid: grid} unless brick?
+			if !brick?
+				return Promise.resolve {grid: grid}
+
 			numRandomChoices++
 
 			if brick.getSize().z == 3
@@ -255,7 +259,7 @@ class BrickLayouter
 
 			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
-		return {grid: grid}
+		return Promise.resolve {grid: grid}
 
 
 	finalLayoutPass: (grid) =>
@@ -269,7 +273,7 @@ class BrickLayouter
 				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		log.debug '\tFinal pass merged ', finalPassMerges, ' times.'
-		return {grid: grid}
+		return Promise.resolve {grid: grid}
 
 	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
 		while(@_anyDefinedInArray(mergeableNeighbors))
@@ -332,11 +336,11 @@ class BrickLayouter
 		if useThreeLayers
 			@layout3LBricks grid, newBricks
 		@layoutByGreedyMerge grid, newBricks
-
-		return {
-			removedBricks: bricksToSplit
-			newBricks: newBricks
-		}
+		.then ->
+			return {
+				removedBricks: bricksToSplit
+				newBricks: newBricks
+			}
 
 	# splits each brick in bricks to split, returns all newly generated
 	# bricks as a set

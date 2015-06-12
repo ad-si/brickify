@@ -1,12 +1,11 @@
 Brick = require './Brick'
 
 class Voxel
-	constructor: (@position, dataEntrys = []) ->
-		@dataEntrys = dataEntrys
+
+	constructor: (@position) ->
+
 		@brick = false
 		@enabled = true
-		@definitelyUp = false
-		@definitelyDown = false
 		@neighbors = {
 			Zp: null
 			Zm: null

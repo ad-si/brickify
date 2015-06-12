@@ -6,6 +6,12 @@ class HintUi
 		@rotateHint = @hintContainer.find('#rotateHint')
 		@zoomHint = @hintContainer.find('#zoomHint')
 
+		if not @_userNeedsHint()
+			@moveHint.hide()
+			@brushHint.hide()
+			@rotateHint.hide()
+			@zoomHint.hide()
+
 	pointerMove: (event, handeled) =>
 		# ignore plain mouse movement
 		return if event.buttons == 0
@@ -26,5 +32,22 @@ class HintUi
 
 	mouseWheel: =>
 		@zoomHint.fadeOut()
+
+	# Checks whether a cookie for hints exists,
+	# sets one if it does not exist
+	_userNeedsHint: ->
+		if document.cookie.indexOf('usageHintsShown=yes') >= 0
+			return false
+
+		d = new Date()
+		# Let cookie expire in 5 days
+		d.setDate(d.getDate() + 5)
+
+		cookieString = 'usageHintsShown=yes; expires='
+		cookieString += d.toUTCString()
+
+		document.cookie = cookieString
+		return true
+
 
 module.exports = HintUi

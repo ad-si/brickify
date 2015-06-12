@@ -50,8 +50,13 @@ handleLoadedFile = (feedbackTarget, filename, spinnerOptions) -> (event) ->
 	fileContent = event.target.result
 
 	return new Promise (resolve, reject) ->
-		stlParser(fileContent).on 'data', (data) ->
 
+		stlParserInstance = stlParser(fileContent)
+
+		stlParserInstance.on 'error', (error) ->
+			reject error
+
+		stlParserInstance.on 'data', (data) ->
 			model = meshlib.Model.fromObject {mesh: data}
 
 			model
@@ -69,3 +74,6 @@ handleLoadedFile = (feedbackTarget, filename, spinnerOptions) -> (event) ->
 				Spinner.stop feedbackTarget
 				feedbackTarget.innerHTML = loadedString
 				resolve md5hash
+
+			.catch (error) ->
+				reject error

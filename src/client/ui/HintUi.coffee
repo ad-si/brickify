@@ -2,9 +2,13 @@ class HintUi
 	constructor: ->
 		@hintContainer = $('#usageHintContainer')
 		@moveHint = @hintContainer.find('#moveHint')
+		@moveHintVisible = true
 		@brushHint = @hintContainer.find('#brushHint')
+		@brushHintVisible = true
 		@rotateHint = @hintContainer.find('#rotateHint')
+		@rotateHintVisible = true
 		@zoomHint = @hintContainer.find('#zoomHint')
+		@zoomHintVisible = true
 
 		if not @_userNeedsHint()
 			@moveHint.hide()
@@ -13,22 +17,29 @@ class HintUi
 			@zoomHint.hide()
 
 	pointerMove: (event, handeled) =>
-		# ignore plain mouse movement
+		# Ignore plain mouse movement
 		return if event.buttons == 0
 
 		switch event.button
 			when 0
-				# left mouse button
+				# Left mouse button
 				if not handeled
 					@rotateHint.fadeOut()
+					@rotateHintVisible = false
 				else
 					@brushHint.fadeOut()
+					@brushHintVisible = false
 			when 1
-				# middle mouse button
+				# Middle mouse button
 				@zoomHint.fadeOut()
+				@zoomHintVisible = false
 			when 2
-				# right mouse button
+				# Right mouse button
 				@moveHint.fadeOut()
+				@moveHintVisible = false
+
+		if not @_anyHintVisible()
+			@_disableHintsOnReload()
 
 	mouseWheel: =>
 		@zoomHint.fadeOut()
@@ -38,16 +49,20 @@ class HintUi
 	_userNeedsHint: ->
 		if document.cookie.indexOf('usageHintsShown=yes') >= 0
 			return false
+		return true
 
+	# Disables the hints for the next 5 days
+	_disableHintsOnReload: ->
 		d = new Date()
-		# Let cookie expire in 5 days
 		d.setDate(d.getDate() + 5)
 
 		cookieString = 'usageHintsShown=yes; expires='
 		cookieString += d.toUTCString()
 
 		document.cookie = cookieString
-		return true
 
+	_anyHintVisible: =>
+		return @moveHintVisible or @brushHintVisible or
+		@zoomHintVisible or @rotateHintVisible
 
 module.exports = HintUi

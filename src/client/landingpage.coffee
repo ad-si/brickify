@@ -37,7 +37,7 @@ config1.plugins.newBrickator = false
 config1.plugins.legoInstructions = false
 
 # configure right bundle to not show the model
-config2.showModel = false
+config2.rendering.showModel = false
 
 # configure right bundle to offer downloading lego instructions
 config2.offerDownload = true

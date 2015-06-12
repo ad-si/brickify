@@ -23,9 +23,13 @@ class NewBrickator
 
 		@runLegoPipeline node
 
+	onNodeRemove: (node) =>
+		@pipeline.terminate()
+
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData(selectedNode).then (cachedData) =>
+		@_getCachedData(selectedNode)
+		.then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.deactivateVoxelizing()
@@ -38,9 +42,13 @@ class NewBrickator
 			}
 
 			@pipeline.run data, settings, true
-			cachedData.csgNeedsRecalculation = true
+			.then =>
+				cachedData.csgNeedsRecalculation = true
 
-			@nodeVisualizer?.objectModified selectedNode, cachedData
+				@nodeVisualizer?.objectModified selectedNode, cachedData
+				Spinner.stop @bundle.renderer.getDomElement()
+		.catch (error) =>
+			log.error error
 			Spinner.stop @bundle.renderer.getDomElement()
 
 	###
@@ -73,9 +81,12 @@ class NewBrickator
 			}
 
 			@pipeline.run data, settings, true
-			cachedData.csgNeedsRecalculation = true
+			.then =>
+				cachedData.csgNeedsRecalculation = true
 
-			@nodeVisualizer?.objectModified selectedNode, cachedData
+				@nodeVisualizer?.objectModified selectedNode, cachedData
+		.catch (error) ->
+			log.error error
 
 	everythingPrint: (selectedNode) =>
 		@_getCachedData selectedNode
@@ -85,10 +96,11 @@ class NewBrickator
 
 			data = grid: cachedData.grid
 
-			results = @pipeline.run data, settings, true
-			cachedData.csgNeedsRecalculation = true
+			@pipeline.run data, settings, true
+			.then =>
+				cachedData.csgNeedsRecalculation = true
 
-			@nodeVisualizer?.objectModified selectedNode, cachedData
+				@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	_createDataStructure: (selectedNode) =>
 		selectedNode.getModel().then (model) =>
@@ -97,23 +109,19 @@ class NewBrickator
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
 			settings.deactivateLayouting()
 
-			results = @pipeline.run(
+			@pipeline.run(
 				optimizedModel: model
 				settings
 				true
 			)
-
-			# create visuals
-			grid = results.accumulatedResults.grid
-
-			# create datastructure
-			data = {
-				node: selectedNode
-				grid: grid
-				optimizedModel: model
-				csgNeedsRecalculation: true
-			}
-			return data
+			.then (results) ->
+				# create data structure
+				return {
+					node: selectedNode
+					grid: results.grid
+					optimizedModel: model
+					csgNeedsRecalculation: true
+				}
 
 	_checkDataStructure: (selectedNode, data) ->
 		return yes # Later: Check for node transforms
@@ -190,5 +198,17 @@ class NewBrickator
 
 		return options
 
+	getHotkeys: =>
+		return unless process.env.NODE_ENV is 'development'
+		return {
+			title: 'newBrickator'
+			events: [
+				{
+					hotkey: 'c'
+					description: 'cancel current pipeline operation'
+					callback: => @pipeline.terminate()
+				}
+			]
+		}
 
 module.exports = NewBrickator

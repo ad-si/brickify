@@ -251,8 +251,8 @@ module.exports = class Voxelizer
 				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
-					if oldValue.dir is 0 or (zValue > oldValue.z and direction isnt 0) or
-					(Math.abs(zValue - oldValue.z) < floatDelta and direction is 1)
+					if oldValue.dir is 0 or (direction isnt 0 and zValue > oldValue.z) or
+					(direction is 1 and Math.abs(zValue - oldValue.z) < floatDelta)
 						oldValue.z = zValue
 						oldValue.dir = direction
 				else

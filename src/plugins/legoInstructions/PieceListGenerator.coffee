@@ -36,8 +36,12 @@ module.exports.generatePieceList = (bricks) ->
 
 	return pieceList
 
-module.exports.getHtml = (list) ->
-	html = '<h3>Bricks needed</h3>'
+module.exports.getHtml = (list, caption = true) ->
+	html = ''
+
+	if caption
+		html = '<h3>Bricks needed</h3>'
+
 	html += '<p>This is a list of how many and what types of'
 	html += ' bricks you need to build this model:'
 	html += '<table>'

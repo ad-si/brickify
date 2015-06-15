@@ -185,7 +185,7 @@ module.exports = class Coloring
 
 	_getRandomBrickMaterials: =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
-		return {color: @_brickMaterials[i], gray:@_grayBrickMaterials[i]}
+		return {color: @_brickMaterials[i], gray: @_grayBrickMaterials[i]}
 
 	_createBrickMaterials: =>
 		@_brickMaterials = []

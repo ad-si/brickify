@@ -74,12 +74,11 @@ module.exports.getGridPosition = getGridPosition
 getPlanePosition = (event, renderer, z) ->
 	ray = calculateRay event, renderer
 
-	# we are calculating in camera coordinate system -> y and z are rotated
 	camera = renderer.getCamera()
-	ray.multiplyScalar -(camera.position.y - z) / ray.y
+	ray.multiplyScalar -(camera.position.z - z) / ray.z
 	posInWorld = camera.position.clone().add ray
 
-	return x: posInWorld.x, y: -posInWorld.z, z: posInWorld.y
+	return posInWorld
 module.exports.getPlanePosition = getPlanePosition
 
 ###

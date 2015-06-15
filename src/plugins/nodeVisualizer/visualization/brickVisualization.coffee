@@ -258,10 +258,13 @@ class BrickVisualization
 	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		@printVoxels = []
 		everything3D = true
 		for voxel in voxels
 			everything3D = everything3D && !voxel.isLego()
 			voxel.make3dPrinted()
+			@printVoxels.push voxel
+		@voxelSelector.clearSelection()
 		return !everything3D
 
 	resetTouchedVoxelsToLego: =>
@@ -297,9 +300,11 @@ class BrickVisualization
 	makeAllVoxelsLego: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
 		everythingLego = true
+		@printVoxels = []
 		for voxel in voxels
 			everythingLego = everythingLego && voxel.isLego()
 			voxel.makeLego()
+		@voxelSelector.clearSelection()
 		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>

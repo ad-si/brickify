@@ -22,7 +22,7 @@ class NewBrickator
 		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData node
+		@getNodeData node
 		.then (cachedData) =>
 			@nodeVisualizer?.objectModified node, cachedData
 			Spinner.stop @bundle.renderer.getDomElement()

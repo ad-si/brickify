@@ -199,35 +199,35 @@ module.exports = class Voxelizer
 				if bIsInVoxel && b.z > a.z
 					return b.z
 
-				d = @_normalize x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
+				d = x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
 
 				if d.x isnt 0
 					k = (x - 0.5 - a.x) / d.x
-					if k >= 0
+					if k >= 0 and k <= 1
 						return a.z + k * d.z
 
 					k = (x + 0.5 - a.x) / d.x
-					if k >= 0
+					if k >= 0 and k <= 1
 						return a.z + k * d.z
 
 				if d.y isnt 0
 					k = (y - 0.5 - a.y) / d.y
-					if k >= 0
+					if k >= 0 and k <= 1
 						return a.z + k * d.z
 
 					k = (y + 0.5 - a.y) / d.y
-					if k >= 0
+					if k >= 0 and k <= 1
 						return a.z + k * d.z
 
 				if d.z isnt 0
 					minZ = z - 0.5
 					k = (minZ - a.z) / d.z
-					if k >= 0
+					if k >= 0 and k <= 1
 						return minZ
 
 					maxZ = z + 0.5
 					k = (maxZ - a.z) / d.z
-					if k >= 0
+					if k >= 0 and k <= 1
 						return maxZ
 
 				return z

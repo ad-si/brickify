@@ -1,6 +1,8 @@
 log = require 'loglevel'
 
 clean = (geometry, options = {}) ->
+	return [] unless geometry
+
 	if options.split
 		d = new Date()
 		geometries = splitGeometry geometry

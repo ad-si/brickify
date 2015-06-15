@@ -1,20 +1,20 @@
 class HintUi
 	constructor: ->
-		@hintContainer = $('#usageHintContainer')
-		@moveHint = @hintContainer.find('#moveHint')
+		@$hintContainer = $('#usageHintContainer')
+		@$moveHint = @$hintContainer.find('#moveHint')
 		@moveHintVisible = true
-		@brushHint = @hintContainer.find('#brushHint')
+		@$brushHint = @$hintContainer.find('#brushHint')
 		@brushHintVisible = true
-		@rotateHint = @hintContainer.find('#rotateHint')
+		@$rotateHint = @$hintContainer.find('#rotateHint')
 		@rotateHintVisible = true
-		@zoomHint = @hintContainer.find('#zoomHint')
+		@$zoomHint = @$hintContainer.find('#zoomHint')
 		@zoomHintVisible = true
 
 		if not @_userNeedsHint()
-			@moveHint.hide()
-			@brushHint.hide()
-			@rotateHint.hide()
-			@zoomHint.hide()
+			@$moveHint.hide()
+			@$brushHint.hide()
+			@$rotateHint.hide()
+			@$zoomHint.hide()
 
 	pointerMove: (event, handeled) =>
 		# Ignore plain mouse movement
@@ -24,25 +24,25 @@ class HintUi
 			when 0
 				# Left mouse button
 				if not handeled
-					@rotateHint.fadeOut()
+					@$rotateHint.fadeOut()
 					@rotateHintVisible = false
 				else
-					@brushHint.fadeOut()
+					@$brushHint.fadeOut()
 					@brushHintVisible = false
 			when 1
 				# Middle mouse button
-				@zoomHint.fadeOut()
+				@$zoomHint.fadeOut()
 				@zoomHintVisible = false
 			when 2
 				# Right mouse button
-				@moveHint.fadeOut()
+				@$moveHint.fadeOut()
 				@moveHintVisible = false
 
 		if not @_anyHintVisible()
 			@_disableHintsOnReload()
 
 	mouseWheel: =>
-		@zoomHint.fadeOut()
+		@$zoomHint.fadeOut()
 
 	# Checks whether a cookie for hints exists,
 	# sets one if it does not exist

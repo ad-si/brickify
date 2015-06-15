@@ -43,6 +43,7 @@ class HintUi
 
 	mouseWheel: =>
 		@$zoomHint.fadeOut()
+		@zoomHintVisible = false
 
 	# Checks whether a cookie for hints exists,
 	# sets one if it does not exist

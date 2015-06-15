@@ -361,7 +361,7 @@ class NodeVisualizer
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @newBrickator._getCachedData selectedNode
+		return @newBrickator.getNodeData selectedNode
 		.then (data) =>
 			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 			@_getCachedData(selectedNode).then (cachedData) ->

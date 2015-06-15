@@ -28,7 +28,7 @@ class NewBrickator
 
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData(selectedNode)
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
 			settings = new PipelineSettings(@bundle.globalConfig)
@@ -62,7 +62,7 @@ class NewBrickator
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
 		log.debug 'relayouting modified parts, creating bricks:',createBricks
-		@_getCachedData(selectedNode)
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			modifiedBricks = new Set()
 			for v in modifiedVoxels
@@ -89,7 +89,7 @@ class NewBrickator
 			log.error error
 
 	everythingPrint: (selectedNode) =>
-		@_getCachedData selectedNode
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyInitLayout()
@@ -126,7 +126,7 @@ class NewBrickator
 	_checkDataStructure: (selectedNode, data) ->
 		return yes # Later: Check for node transforms
 
-	_getCachedData: (selectedNode) =>
+	getNodeData: (selectedNode) =>
 		return selectedNode.getPluginData 'newBrickator'
 		.then (data) =>
 			if data? and @_checkDataStructure selectedNode, data

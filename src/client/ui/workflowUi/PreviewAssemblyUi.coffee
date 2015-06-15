@@ -34,7 +34,7 @@ class PreviewAssemblyUi
 
 		@preBuildMode = @previewUi.nodeVisualizer.getDisplayMode()
 		@previewUi.nodeVisualizer.setDisplayMode selectedNode, 'build'
-		.then => @previewUi.newBrickator._getCachedData selectedNode
+		.then => @previewUi.newBrickator.getNodeData selectedNode
 		.then (data) =>
 			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 			numLayers = maxLayer - minLayer + 1

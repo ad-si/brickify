@@ -41,7 +41,7 @@ class LegoInstructions
 			@fidelityControl.enableScreenshotMode()
 			# enter build mode
 			@nodeVisualizer.setDisplayMode node, 'build'
-		.then => @newBrickator._getCachedData node
+		.then => @newBrickator.getNodeData node
 		.then (data) =>
 			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 			numLayers = maxLayer - minLayer + 1

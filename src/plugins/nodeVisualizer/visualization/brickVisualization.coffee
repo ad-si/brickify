@@ -112,9 +112,9 @@ class BrickVisualization
 
 			for brick in brickLayer
 				# create visual brick
-				material = coloring.getMaterialForBrick brick
+				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), material
+					brick.getPosition(), brick.getSize(), materials.color
 				)
 
 				# link data <-> visuals
@@ -129,8 +129,8 @@ class BrickVisualization
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
-					material = coloring.getMaterialForBrick visualBrick.brick
-					visualBrick.setMaterial material
+					material = coloring.getMaterialsForBrick visualBrick.brick
+					visualBrick.setMaterial material.color
 		@_oldColoring = coloring
 
 		@unhighlightBigBrush()

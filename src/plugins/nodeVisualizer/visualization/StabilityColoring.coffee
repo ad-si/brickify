@@ -17,6 +17,6 @@ module.exports = class StabilityColoring extends Coloring
 			opacity = if i == 0 then 1 else 1 - i * 0.02
 			@_stabilityMaterials.push @_createMaterial(color, opacity)
 
-	getMaterialForBrick: (brick) =>
+	getMaterialsForBrick: (brick) =>
 		index = Math.round brick.getStability() * 19
-		@_stabilityMaterials[index]
+		return color: @_stabilityMaterials[index]

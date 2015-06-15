@@ -146,16 +146,16 @@ module.exports = class Coloring
 		if gridEntry.enabled
 			# if there is a brick at the same position,
 			# take the same material
-			if gridEntry.brick?.visualizationMaterial?
-				return gridEntry.brick.visualizationMaterial
+			if gridEntry.brick?.visualizationMaterials?
+				return gridEntry.brick.visualizationMaterials.color
 			return @selectedMaterial
 		else
 			return @hiddenMaterial
 
-	getMaterialForBrick: (brick) =>
+	getMaterialsForBrick: (brick) =>
 		# return stored material or assign a random one
-		if brick.visualizationMaterial?
-			return brick.visualizationMaterial
+		if brick.visualizationMaterials?
+			return brick.visualizationMaterials
 
 		# collect materials of neighbors
 		neighbors = brick.getNeighborsXY()
@@ -163,27 +163,29 @@ module.exports = class Coloring
 
 		neighborColors = new Set()
 		neighbors.forEach (neighbor) ->
-			neighborColors.add neighbor.visualizationMaterial
+			if neighbor.visualizationMaterials?
+				neighborColors.add neighbor.visualizationMaterials.color
 		connections.forEach (connection) ->
-			neighborColors.add connection.visualizationMaterial
+			if connection.visualizationMaterials?
+				neighborColors.add connection.visualizationMaterials.color
 
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used
 		# by neighbors to visually distinguish bricks
 		for i in [0...@_brickMaterials.length]
-			material = @_getRandomBrickMaterial()
-			continue if neighborColors.has(material)
+			materials = @_getRandomBrickMaterials()
+			continue if neighborColors.has(materials.color)
 			break
 
-		brick.visualizationMaterial = material
-		return brick.visualizationMaterial
+		brick.visualizationMaterials = materials
+		return brick.visualizationMaterials
 
 	getStabilityMaterialForBrick: (brick) =>
 		 @getMaterialForBrick brick
 
-	_getRandomBrickMaterial: =>
+	_getRandomBrickMaterials: =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
-		return @_brickMaterials[i]
+		return {color: @_brickMaterials[i], gray:@_grayBrickMaterials[i]}
 
 	_createBrickMaterials: =>
 		@_brickMaterials = []

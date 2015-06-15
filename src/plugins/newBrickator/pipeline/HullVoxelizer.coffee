@@ -245,10 +245,8 @@ module.exports = class Voxelizer
 				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
-					# Overwrite any 0s
-					if oldValue.dir is 0 or
-					# If new z value is higher than the old one and we will not set it to 0
-					(direction isnt 0 and zValue > oldValue.z) or
+					# Update dir if new zValue is higher than the old one
+					if (direction isnt 0 and zValue > oldValue.z) or
 					# Prefer setting direction to 1 (i.e. close the voxel)
 					(direction is 1 and Math.abs(zValue - oldValue.z) < @floatDelta)
 						oldValue.z = zValue

@@ -44,7 +44,7 @@ module.exports.getHtml = (list, caption = true) ->
 
 	html += '<p>This is a list of how many and what types of'
 	html += ' bricks you need to build this model:'
-	html += '<table>'
+	html += '<table class="table">'
 	html += '<tr><td><strong>Amount</strong></td>'
 	html += '<td><strong>Type</strong></td>'
 	html += '<td><strong>Size</strong></td></tr>'

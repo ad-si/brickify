@@ -2,7 +2,7 @@ log = require 'loglevel'
 
 Brick = require './Brick'
 Voxel = require './Voxel'
-arrayHelper = require './arrayHelper'
+dataHelper = require './dataHelper'
 Random = require './Random'
 
 ###
@@ -37,7 +37,7 @@ class BrickLayouter
 
 			mergeableNeighbors = @_findMergeableNeighbors3L brick
 
-			if !@_anyDefinedInArray(mergeableNeighbors)
+			if !dataHelper.anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
@@ -134,18 +134,13 @@ class BrickLayouter
 			mergeBricks.add mBrick
 		return null if noMerge
 
-		allVoxels = new Set()
-		voxels.forEach (voxel) ->
-			allVoxels.add voxel
-		mergeVoxels.forEach (mVoxel) ->
-			allVoxels.add mVoxel
+		allVoxels = dataHelper.setUnion [voxels, mergeVoxels]
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x,size.y,size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
 			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
-
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
 		# this is necessary for the 2 brick steps of larger bricks
@@ -186,7 +181,7 @@ class BrickLayouter
 		return false
 
 	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
-		while(@_anyDefinedInArray(mergeableNeighbors))
+		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
 			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -251,7 +246,7 @@ class BrickLayouter
 
 			mergeableNeighbors = @_findMergeableNeighbors brick
 
-			if !@_anyDefinedInArray(mergeableNeighbors)
+			if !dataHelper.anyDefinedInArray(mergeableNeighbors)
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
@@ -271,7 +266,7 @@ class BrickLayouter
 		bricksToLayout.forEach (brick) =>
 			return unless brick?
 			mergeableNeighbors = @_findMergeableNeighbors brick
-			if @_anyDefinedInArray(mergeableNeighbors)
+			if dataHelper.anyDefinedInArray(mergeableNeighbors)
 				finalPassMerges++
 				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
@@ -279,7 +274,7 @@ class BrickLayouter
 		return Promise.resolve {grid: grid}
 
 	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
-		while(@_anyDefinedInArray(mergeableNeighbors))
+		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -356,9 +351,6 @@ class BrickLayouter
 				newBricks.add brick
 
 		return newBricks
-
-	_anyDefinedInArray: (mergeableNeighbors) ->
-		return mergeableNeighbors.some (entry) -> entry?
 
 	# chooses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) ->

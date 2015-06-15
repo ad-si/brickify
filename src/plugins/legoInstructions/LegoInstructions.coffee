@@ -45,6 +45,9 @@ class LegoInstructions
 		.then (data) =>
 			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 			numLayers = maxLayer - minLayer + 1
+			# If there is 3D print below first lego layer, show lego starting
+			# with layer 1 and show only 3D print in first instruction layer
+			numLayers += 1 if minLayer > 0
 
 			# scad and piece list generation
 			bricks = data.grid.getAllBricks()

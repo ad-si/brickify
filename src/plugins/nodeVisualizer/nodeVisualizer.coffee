@@ -237,7 +237,6 @@ class NodeVisualizer
 	_initializeData: (node, visualizationData, newBrickatorData) =>
 		# init node visualization
 		visualizationData.brickVisualization.initialize newBrickatorData.grid
-		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
 
 		# instead of creating csg live, show original semitransparent model
@@ -310,7 +309,7 @@ class NodeVisualizer
 					@_applyStabilityView cachedData
 				when 'build'
 					@_resetStabilityView cachedData
-					return @_applyBuildMode cachedData
+					@_applyBuildMode cachedData
 
 	getDisplayMode: =>
 		return @visualizationMode
@@ -352,7 +351,6 @@ class NodeVisualizer
 		@_showCsg cachedData
 
 		cachedData.modelVisualization.setNodeVisibility false
-		return cachedData.numZLayers
 
 	_resetBuildMode: (cachedData) ->
 		cachedData.brickVisualization.setHighlightVoxelVisibility true
@@ -363,8 +361,15 @@ class NodeVisualizer
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @_getCachedData(selectedNode).then (cachedData) ->
-			cachedData.brickVisualization.showBrickLayer layer - 1
+		return @newBrickator._getCachedData selectedNode
+		.then (data) =>
+			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
+			@_getCachedData(selectedNode).then (cachedData) ->
+				gridLayer = minLayer + layer - 1
+				# If there is 3D print below first lego layer, show lego starting
+				# with layer 1 and show only 3D print in first instruction layer
+				gridLayer -= 1 if minLayer > 0
+				cachedData.brickVisualization.showBrickLayer gridLayer
 
 	_updateBrickCount: (bricks) =>
 		@brickCounter?.text bricks.size

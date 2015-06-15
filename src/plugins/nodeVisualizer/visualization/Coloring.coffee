@@ -196,6 +196,20 @@ module.exports = class Coloring
 		@_brickMaterials.push @_createMaterial 0xee5b5b
 		@_brickMaterials.push @_createMaterial 0xff6666
 
+		@_grayBrickMaterials = []
+		for material in @_brickMaterials
+			@_grayBrickMaterials.push @_convertToGrayscale material
+
+	# Clones the material and converts its color to grayscale
+	_convertToGrayscale: (material) ->
+		newMaterial = material.clone()
+		gray = material.color.r * 0.3
+		gray += material.color.g * 0.6
+		gray += material.color.b * 0.1
+		newMaterial.color = new THREE.Color(gray, gray, gray)
+
+		return newMaterial
+
 	_createMaterial: (color, opacity = 1) ->
 		return new THREE.MeshLambertMaterial(
 			color: color

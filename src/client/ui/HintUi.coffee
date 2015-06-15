@@ -48,9 +48,7 @@ class HintUi
 	# Checks whether a cookie for hints exists,
 	# sets one if it does not exist
 	_userNeedsHint: ->
-		if document.cookie.indexOf('usageHintsShown=yes') >= 0
-			return false
-		return true
+		return document.cookie.indexOf('usageHintsShown=yes') < 0
 
 	# Disables the hints for the next 5 days
 	_disableHintsOnReload: ->

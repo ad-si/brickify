@@ -203,31 +203,31 @@ module.exports = class Voxelizer
 
 				if d.x isnt 0
 					k = (x - 0.5 - a.x) / d.x
-					if k >= 0 and k <= 1
+					if k >= 0
 						return a.z + k * d.z
 
 					k = (x + 0.5 - a.x) / d.x
-					if k >= 0 and k <= 1
+					if k >= 0
 						return a.z + k * d.z
 
 				if d.y isnt 0
 					k = (y - 0.5 - a.y) / d.y
-					if k >= 0 and k <= 1
+					if k >= 0
 						return a.z + k * d.z
 
 					k = (y + 0.5 - a.y) / d.y
-					if k >= 0 and k <= 1
+					if k >= 0
 						return a.z + k * d.z
 
 				if d.z isnt 0
 					minZ = z - 0.5
 					k = (minZ - a.z) / d.z
-					if k >= 0 and k <= 1
+					if k >= 0
 						return minZ
 
 					maxZ = z + 0.5
 					k = (maxZ - a.z) / d.z
-					if k >= 0 and k <= 1
+					if k >= 0
 						return maxZ
 
 				return z

@@ -46,8 +46,6 @@
 <g id="Icons">
 	<path id="rotate" display="none" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-miterlimit="10" d="M212.9,35.3
 		c35,0,63.4,28.4,63.4,63.4s-28.4,63.4-63.4,63.4s-63.4-28.4-63.4-63.4c0-12.4,3.5-23.9,9.6-33.6 M173.1,97.3l-12.8-34l-35,13.2"/>
-	<path id="Zoom" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-miterlimit="10" d="M216.5,33.8l1.2,120.5 M187.6,48.9
-		L216.4,32l28.1,16.1 M257.4,120.4l-39.4,40l-39.2-38.6"/>
 	<g id="Brush" display="none">
 		<path display="inline" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" d="
 			M217.7,116.3c15.4,14.8,12.4,23.2,34.7,36"/>
@@ -63,6 +61,11 @@
 			 M190.4,58.5L216.9,32l25.7,25.7 M243.6,137.1l-26.5,26.4l-25.7-25.7"/>
 		<path id="Zoom_1_" display="inline" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-miterlimit="10" d="M280,98H157
 			 M256.3,71.2l26.4,26.5L257,123.3 M177.7,124.3l-26.4-26.5L177,72.2"/>
+	</g>
+	<g id="Zoom">
+		<circle fill="none" stroke="#FFFFFF" stroke-width="10" stroke-miterlimit="10" cx="231.2" cy="74.8" r="47.2"/>
+		<polyline fill="none" stroke="#FFFFFF" stroke-width="10" stroke-miterlimit="10" points="202.9,115.8 156.5,162.2 142.5,146.2 
+			188.9,100.8 		"/>
 	</g>
 </g>
 </svg>

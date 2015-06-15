@@ -74,7 +74,15 @@ class LegoInstructions
 		.catch (error) -> log.error error
 
 	showPartListPopup: (node) =>
-		return
+		@newBrickator.getNodeData node
+		.then (data) =>
+			bricks = data.grid.getAllBricks()
+			pieceList = pieceListGenerator.generatePieceList bricks
+			pieceListHtml = pieceListGenerator.getHtml pieceList, false
+
+			bootbox.dialog
+				title: 'Parts needed'
+				message: pieceListHtml
 
 	_takeScreenshots: (node, numLayers, camera) =>
 		files = []

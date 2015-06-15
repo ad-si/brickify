@@ -1,4 +1,4 @@
-DownloadProvider = require './downloadProvider'
+DownloadProvider = require './DownloadProvider'
 downloadModal = require '../downloadModal'
 piwikTracking = require '../../piwikTracking'
 

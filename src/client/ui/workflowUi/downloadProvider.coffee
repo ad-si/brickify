@@ -11,23 +11,23 @@ module.exports = class DownloadProvider
 		return
 
 	init: (stlButtonId, instructionsButtonId, @exportUi, @sceneManager) =>
-		@stljQueryObject = $(stlButtonId)
-		@stljQueryObject.on 'click', =>
+		@$stlButton = $(stlButtonId)
+		@$stlButton.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
-				Spinner.startOverlay @stljQueryObject[0]
-				@stljQueryObject.addClass 'disabled'
+				Spinner.startOverlay @$stlButton[0]
+				@$stlButton.addClass 'disabled'
 				window.setTimeout(
 					=> @_createDownload 'stl', selNode
 					20
 				)
 
-		@instructionsjQueryObject = $(instructionsButtonId)
-		@instructionsjQueryObject.on 'click', =>
+		@$instructionsButton = $(instructionsButtonId)
+		@$instructionsButton.on 'click', =>
 			selNode = @sceneManager.selectedNode
 			if selNode?
-				Spinner.startOverlay @instructionsjQueryObject[0]
-				@instructionsjQueryObject.addClass 'disabled'
+				Spinner.startOverlay @$instructionsButton[0]
+				@$instructionsButton.addClass 'disabled'
 				window.setTimeout(
 					=> @_createDownload 'instructions', selNode
 					20
@@ -56,11 +56,11 @@ module.exports = class DownloadProvider
 
 			# Stop showing spinner
 			if (type == 'instructions')
-				Spinner.stop @instructionsjQueryObject[0]
-				@instructionsjQueryObject.removeClass 'disabled'
+				Spinner.stop @$instructionsButton[0]
+				@$instructionsButton.removeClass 'disabled'
 			else
-				Spinner.stop @stljQueryObject[0]
-				@stljQueryObject.removeClass 'disabled'
+				Spinner.stop @$stlButton[0]
+				@$stlButton.removeClass 'disabled'
 
 			if files.length is 0
 				bootbox.alert(

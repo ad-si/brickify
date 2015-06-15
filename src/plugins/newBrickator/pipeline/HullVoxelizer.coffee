@@ -232,14 +232,6 @@ module.exports = class Voxelizer
 
 				return z
 
-			_normalize: ({x: x, y: y, z: z}) ->
-				length = Math.sqrt x * x + y * y + z * z
-				return {
-					x: x / length
-					y: y / length
-					z: z / length
-				}
-
 			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
 				grid[x] = [] unless grid[x]
 				grid[x][y] = [] unless grid[x][y]

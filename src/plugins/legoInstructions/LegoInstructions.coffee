@@ -73,6 +73,9 @@ class LegoInstructions
 			return files
 		.catch (error) -> log.error error
 
+	showPartListPopup: (node) =>
+		return
+
 	_takeScreenshots: (node, numLayers, camera) =>
 		files = []
 		takeScreenshot = (layer) => =>

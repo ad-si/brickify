@@ -191,12 +191,12 @@ class LegoInstructions
 		pieceList = pieceListGenerator.generatePieceList bricks
 		pieceListHtml = pieceListGenerator.getHtml pieceList
 
-		style = "<style>
+		style = '<style>
 		img{max-width: 100%;}
 		h1,h3,p,td{font-family:Helvetica, Arial, sans-serif;}
 		td{min-width: 80px;}
 		.pageBreak{page-break-before: always;}
-		</style>"
+		</style>'
 
 		html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		"http://www.w3.org/TR/html4/strict.dtd">'

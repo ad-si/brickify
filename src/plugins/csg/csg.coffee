@@ -81,7 +81,7 @@ class CSG
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
 			if cachedData.transformedThreeGeometry?
-				resolve(cachedData.transformedThreeGeometry, cachedData)
+				resolve cachedData.transformedThreeGeometry
 				return
 
 			selectedNode.getModel()

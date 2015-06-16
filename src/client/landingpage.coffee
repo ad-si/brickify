@@ -47,7 +47,7 @@ b1 = bundle1.init().then ->
 	bundle2 = new Bundle config2, controls
 	b2 = bundle2.init()
 
-	loadAndConvert = (hash, animate) ->
+	loadAndConvert = (hash) ->
 		b1.then -> bundle1.modelLoader.loadByHash hash
 			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
 		b2.then -> bundle2.modelLoader.loadByHash hash

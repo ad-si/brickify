@@ -93,24 +93,25 @@ class BrickLayouter
 	#
 	# @param {Set<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid) =>
+	splitBricksAndRelayoutLocally: (bricks, grid, splitNeighbors = true) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->
 			# add this brick to be split
 			bricksToSplit.add brick
 
-			# get neighbours in same z layer
-			xp = brick.getNeighbors(Brick.direction.Xp)
-			xm = brick.getNeighbors(Brick.direction.Xm)
-			yp = brick.getNeighbors(Brick.direction.Yp)
-			ym = brick.getNeighbors(Brick.direction.Ym)
+			if splitNeighbors
+				# get neighbours in same z layer
+				xp = brick.getNeighbors(Brick.direction.Xp)
+				xm = brick.getNeighbors(Brick.direction.Xm)
+				yp = brick.getNeighbors(Brick.direction.Yp)
+				ym = brick.getNeighbors(Brick.direction.Ym)
 
-			# add them all to be split as well
-			xp.forEach (brick) -> bricksToSplit.add brick
-			xm.forEach (brick) -> bricksToSplit.add brick
-			yp.forEach (brick) -> bricksToSplit.add brick
-			ym.forEach (brick) -> bricksToSplit.add brick
+				# add them all to be split as well
+				xp.forEach (brick) -> bricksToSplit.add brick
+				xm.forEach (brick) -> bricksToSplit.add brick
+				yp.forEach (brick) -> bricksToSplit.add brick
+				ym.forEach (brick) -> bricksToSplit.add brick
 
 		newBricks = @_splitBricks bricksToSplit
 
@@ -290,5 +291,67 @@ class BrickLayouter
 			brick.mergeWith neighborToMergeWith
 
 		return brick
+
+
+	connectedComponentOptimization: (grid) =>
+		bricks = grid.getAllBricks()
+		log.debug '\t# of bricks: ', bricks.size
+
+		components = @findConnectedComponents bricks
+		log.debug '\t# of components: ', components.length
+
+		bricksToSplit = @findBricksToSplit components, bricks
+		log.debug '\t# of bricks to split: ', bricksToSplit.size
+
+		@splitBricksAndRelayoutLocally bricksToSplit, grid, false
+
+		bricks = grid.getAllBricks()
+		bricks.forEach (brick) ->
+			brick.component = null
+
+		components2 = @findConnectedComponents bricks
+		log.debug '\t# of components: ', components2.length
+
+		return Promise.resolve grid
+
+	findConnectedComponents: (bricks) =>
+		id = 0
+		components = []
+
+		bricks.forEach (brick) =>
+			return if brick.component != null
+			components[id] = new Set()
+
+			queue = new Set([brick])
+			while queue.size != 0
+				currentBrick = queue.values().next().value
+				# process current brick
+				currentBrick.component = id
+				components[id].add currentBrick
+				queue.delete currentBrick
+				# add all connected Bricks to the
+				conBricks = currentBrick.connectedBricks()
+				conBricks.forEach (conBrick) ->
+					queue.add conBrick if conBrick.component == null
+
+			id++
+
+		return components
+
+	findBricksToSplit: (components, bricks) =>
+		bricksToSplit = new Set()
+
+		bricks.forEach (brick) ->
+			neighborsXY = brick.getNeighborsXY()
+			neighborsXY.forEach (neighbor) ->
+				if neighbor.component != brick.component
+					bricksToSplit.add neighbor
+					bricksToSplit.add brick
+
+		return bricksToSplit
+
+
+
+
 
 module.exports = BrickLayouter

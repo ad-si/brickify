@@ -40,6 +40,7 @@ class Brick
 		for voxel in arrayOfVoxels
 			voxel.brick = @
 			@voxels.add voxel
+		@component = null
 
 	# enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>

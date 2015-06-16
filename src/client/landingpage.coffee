@@ -55,7 +55,7 @@ b1 = bundle1.init().then ->
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
 	#load and process model
-	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
+	loadAndConvert 'goggles'
 
 	loadFromHash = (hash) ->
 		b1.then -> bundle1.sceneManager.clearScene()

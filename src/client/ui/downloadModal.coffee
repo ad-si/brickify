@@ -27,7 +27,7 @@ addOptions = ($select, range, defaultValue, listFunction) ->
 		$select.append $('<option/>').attr('value', i).text(caption)
 	$select.val defaultValue
 
-disableWizard = () ->
+disableWizard = ->
 	$sizeSelect.fadeIn wizardFadeTime
 	$legoContent.fadeIn wizardFadeTime
 	$stlContent.fadeIn wizardFadeTime
@@ -55,7 +55,7 @@ initializeWizard = ($modal) ->
 	$legoContent = $modal.find('#legoContent')
 	$stlContent = $modal.find('#stlContent')
 
-	applyCurrentWizardStep = () ->
+	applyCurrentWizardStep = ->
 		if currentWizardStep == wizardSteps.length or
 		currentWizardStep == -1
 			# Finish wizard
@@ -66,24 +66,24 @@ initializeWizard = ($modal) ->
 			.fadeIn wizardFadeTime
 
 	# Bind button logic
-	$nextButton.click () ->
+	$nextButton.click ->
 		$wizardStepObjects[currentWizardStep]
-		.fadeOut wizardFadeTime, () ->
+		.fadeOut wizardFadeTime, ->
 			currentWizardStep++
 			applyCurrentWizardStep()
 
-	$backButton.click () ->
+	$backButton.click ->
 		$wizardStepObjects[currentWizardStep]
-		.fadeOut wizardFadeTime, () ->
+		.fadeOut wizardFadeTime, ->
 			currentWizardStep--
 			applyCurrentWizardStep()
 
 	# Fade out size select, start wizard on click
-	$startWizard.click () ->
+	$startWizard.click ->
 		currentWizardStep = 0
 		$legoContent.fadeOut wizardFadeTime
 		$stlContent.fadeOut wizardFadeTime
-		$sizeSelect.fadeOut wizardFadeTime, () ->
+		$sizeSelect.fadeOut wizardFadeTime, ->
 			$wizardStepObjects[0].fadeIn wizardFadeTime
 			$wizardButtons.fadeIn wizardFadeTime
 
@@ -113,7 +113,7 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
 		initializeWizard $modal
 
 	# Reset wizard when closing the modal
-	$modal.on 'hidden.bs.modal', () ->
+	$modal.on 'hidden.bs.modal', ->
 		disableWizard()
 
 	return $modal

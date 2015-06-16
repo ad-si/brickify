@@ -19,8 +19,7 @@ module.exports = class Grid
 			# if the object is moved in the scene (not in the origin),
 			# think about that while building the grid
 			if @modelTransform
-				bbMinWorld = new THREE.Vector3()
-				bbMinWorld.set(
+				bbMinWorld = new THREE.Vector3(
 					boundingBox.min.x
 					boundingBox.min.y
 					boundingBox.min.z

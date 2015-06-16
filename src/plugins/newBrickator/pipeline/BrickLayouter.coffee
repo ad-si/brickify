@@ -134,7 +134,7 @@ class BrickLayouter
 			mergeBricks.add mBrick
 		return null if noMerge
 
-		allVoxels = dataHelper.setUnion [voxels, mergeVoxels]
+		allVoxels = dataHelper.union [voxels, mergeVoxels]
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x,size.y,size.z)

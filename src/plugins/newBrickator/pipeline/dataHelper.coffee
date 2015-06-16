@@ -25,7 +25,7 @@ module.exports.anyDefinedInArray = (array) ->
 
 # returns the union of all sets in the argument
 # input sets remain intact
-module.exports.setUnion = (arrayOfSets) ->
+module.exports.union = (arrayOfSets) ->
 	union = new Set()
 	for set in arrayOfSets
 		set.forEach (element) ->
@@ -33,14 +33,14 @@ module.exports.setUnion = (arrayOfSets) ->
 	return union
 
 # returnsthe intersect of two sets
-module.exporst.setIntersection = (set1, set2) ->
+module.exports.intersection = (set1, set2) ->
 	intersection = new Set()
 	set1.forEach (element) ->
 		intersection.add element if set2.has element
 	return intersection
 
 #returns set1 \ set2
-module.exports.setDifference = (set1, set2) ->
+module.exports.difference = (set1, set2) ->
 	difference = new Set()
 	set1.forEach (element) ->
 		difference.add element unless set2.has element

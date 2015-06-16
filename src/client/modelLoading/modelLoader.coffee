@@ -15,29 +15,6 @@ class ModelLoader
 	constructor: (@bundle) ->
 		return
 
-	readFiles: (files) ->
-		@readFile file for file in files
-
-	readFile: (file) ->
-		reader = new FileReader()
-		reader.readAsArrayBuffer file
-		reader.onload = =>
-			fileBuffer = reader.result
-			@importFile file.name, fileBuffer, (error, model) =>
-				if error or not model
-					throw error
-				else
-					@load model
-
-	importFile: (filename, fileBuffer, callback) ->
-		# Load with first plugin capable of loading the file
-		for loader in @bundle.pluginHooks.get 'importFile'
-			loader filename, fileBuffer, (error, model) ->
-				if error or not model
-					callback error
-				else
-					callback null, model
-
 	load: (model) =>
 		return model
 			.getBase64()

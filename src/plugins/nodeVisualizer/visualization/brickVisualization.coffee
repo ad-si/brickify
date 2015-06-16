@@ -106,7 +106,7 @@ class BrickVisualization
 				brick.getVisualBrick().hasBeenSplit = no
 
 		# Create three layer object if it does not exist
-		for i in [0..maxZ]
+		for z in [0..maxZ]
 			if not @bricksSubnode.children[z]?
 				layerObject = new THREE.Object3D()
 				@bricksSubnode.add layerObject

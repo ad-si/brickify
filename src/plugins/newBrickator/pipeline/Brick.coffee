@@ -33,6 +33,13 @@ class Brick
 				return true
 		return false
 
+	# returns true if the two sizes are equal in terms of
+	# same height and same x/y dimensions which may be
+	# switched
+	@isSizeEqual: (a, b) ->
+		return ((a.x == b.x and a.y == b.y) or
+		(a.x == b.y and a.y == b.x)) and a.z == b.z
+
 	# Creates a brick out of the given set of voxels
 	# Takes ownership of voxels without further processing
 	constructor: (arrayOfVoxels) ->
@@ -193,7 +200,14 @@ class Brick
 		return @_visualBrick
 
 	# Sets the brick visualization that belongs to this brick
-	setVisualBrick: (@_visualBrick) => return
+	setVisualBrick: (visualBrick) =>
+		if visualBrick == null
+			# Clear reference from visual brick to this brick
+			if @_visualBrick?
+				@_visualBrick.brick = null
+				@_visualBrick = null
+		else
+			@_visualBrick = visualBrick
 
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that
@@ -209,7 +223,7 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
-		@_visualBrick = null
+		@setVisualBrick null
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,
@@ -219,6 +233,9 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
+
+		# Clear reference to visual brick (needs to be recreated)
+		@setVisualBrick null
 
 		# tell neighbors to update their cache
 		for direction of Brick.direction

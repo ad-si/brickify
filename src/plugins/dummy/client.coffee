@@ -159,11 +159,11 @@ class DummyPlugin
 	# @param {Node} selectedNode the selected node that should be processed
 	# @param {Object} downloadOptions Additional download options
 	# @param {Float} downloadOptions.studRadius Desired radius of the Lego studs
-	# @param {String} downloadOptions.fileType desired file type, 'stl' or 'pdf'
+	# @param {String} downloadOptions.type desired type, 'stl' or 'instructions'
 	###
 	getDownload: (downloadOptions, selectedNode) ->
 		return {
-			filename: ''
+			fileName: ''
 			data: ''
 		}
 
@@ -172,8 +172,10 @@ class DummyPlugin
 	# @param {Number} fidelityLevel the new level of fidelity, which is an index
 	# of
 	# @param {Array<String>} availableFidelityLevels all available fidelity levels
+	# @param {Object} options
+	# @param {Boolean} options.screenshotMode true while instructions are rendered
 	###
-	setFidelity: (fidelityLevel, availableFidelityLevels) ->
+	setFidelity: (fidelityLevel, availableFidelityLevels, options) ->
 		return
 
 module.exports = DummyPlugin

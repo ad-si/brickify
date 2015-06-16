@@ -68,29 +68,28 @@ module.exports = class LegoPipeline
 					lastResult.grid
 				)
 
-	run: (data, options = null, profiling = false) =>
+	run: (data, options = null) =>
 		@terminated = false
-		if profiling
-			log.debug "Starting Lego Pipeline
-			 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
-			 onlyReLayout: #{options.reLayout})"
+		log.debug "Starting Lego Pipeline
+		 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
+		 onlyReLayout: #{options.reLayout})"
 
-			randomSeed = Math.floor Math.random() * 1000000
-			Random.setSeed randomSeed
-			log.debug 'Using random seed', randomSeed
+		randomSeed = Math.floor Math.random() * 1000000
+		Random.setSeed randomSeed
+		log.debug 'Using random seed', randomSeed
 
 		start = new Date()
 
-		runPromise = @runPromise 0, data, options, profiling
+		runPromise = @runPromise 0, data, options
 		.then (result) ->
-			log.debug "Finished Lego Pipeline in #{new Date() - start}ms" if profiling
+			log.debug "Finished Lego Pipeline in #{new Date() - start}ms"
 			return result
 
 		cancelPromise = new Promise (resolve, @reject) => return
 
 		return Promise.race([runPromise, cancelPromise])
 
-	runPromise: (i, data, options, profiling) =>
+	runPromise: (i, data, options) =>
 		progressCallback = (progress) =>
 			overallProgress =
 				100 * i / @pipelineSteps.length + progress / @pipelineSteps.length
@@ -100,26 +99,26 @@ module.exports = class LegoPipeline
 			@terminated = true
 			return data
 		else
-			return @runStep i, data, options, profiling, progressCallback
+			return @runStep i, data, options, progressCallback
 				.then (result) =>
 					for own key of result
 						data[key] = result[key]
-					return @runPromise ++i, data, options, profiling, progressCallback
+					return @runPromise ++i, data, options, progressCallback
 
-	runStep: (i, lastResult, options, profiling, progressCallback) ->
+	runStep: (i, lastResult, options, progressCallback) ->
 		step = @pipelineSteps[i]
 		@currentStep = step
 
 		if step.decision options
-			log.debug "Running step #{step.name}" if profiling
+			log.debug "Running step #{step.name}"
 			start = new Date()
 			return step.worker lastResult, options, progressCallback
 			.then (result) ->
 				stop = new Date() - start
-				log.debug "Step #{step.name} finished in #{stop}ms" if profiling
+				log.debug "Step #{step.name} finished in #{stop}ms"
 				return result
 		else
-			log.debug "(Skipping step #{step.name})" if profiling
+			log.debug "(Skipping step #{step.name})"
 			return Promise.resolve lastResult
 
 	terminate: =>

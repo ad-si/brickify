@@ -122,27 +122,22 @@ class VoxelSelector
 		start = modelIntersects[0].point
 		end = modelIntersects[1].point
 
-		revTransform = new THREE.Matrix4()
-		revTransform.getInverse @renderer.scene.matrix
-
 		middle = new THREE.Vector3(
 			(start.x + end.x) / 2
 			(start.y + end.y) / 2
 			(start.z + end.z) / 2
 		)
+
+		revTransform = new THREE.Matrix4()
+		revTransform.getInverse @renderer.scene.matrix
 		middle.applyMatrix4 revTransform
+
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
 		return @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 
 	_getIntersections: (event) ->
 		rayDirection = interactionHelper.calculateRay event, @renderer
 		rayOrigin = @renderer.getCamera().position.clone()
-
-		# rotate to match scene that is rotated 90° around x-axis
-		m = new THREE.Matrix4()
-		m.makeRotationX(Math.PI / 2.0)
-		rayDirection.applyProjection(m)
-		rayOrigin.applyProjection(m)
 
 		return @grid.intersectVoxels rayOrigin, rayDirection
 

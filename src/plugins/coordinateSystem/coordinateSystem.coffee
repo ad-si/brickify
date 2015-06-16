@@ -21,7 +21,13 @@ module.exports = class CoordinateSystem
 	init3d: (@threejsNode) =>
 		setupGrid(@threejsNode, @globalConfig)
 		setupAxis(@threejsNode, @globalConfig)
+		@isVisible = no
 		@threejsNode.visible = false
 
 	toggleVisibility: =>
 		@threejsNode.visible = !@threejsNode.visible
+		@isVisible = !@isVisible
+
+	setFidelity: (fidelityLevel, availableLevels, options) =>
+		if options.screenshotMode?
+			@threejsNode.visible = @isVisible and not options.screenshotMode

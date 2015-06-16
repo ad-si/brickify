@@ -27,6 +27,7 @@ class BrickVisualization
 		@printVoxels = []
 
 		@isStabilityView = false
+		@_highlightVoxelVisiblity = true
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -46,7 +47,8 @@ class BrickVisualization
 
 	showCsg: (newCsgGeometry) =>
 		@csgSubnode.children = []
-		return if not newCsgGeometry?
+		if not newCsgGeometry?
+			@csgSubnode.visible = false
 
 		for geometry in newCsgGeometry
 			csgMesh = new THREE.Mesh geometry, @defaultColoring.csgMaterial
@@ -90,8 +92,11 @@ class BrickVisualization
 
 		# sort layerwise for build view
 		brickLayers = []
+		maxZ = 0
+
 		@grid.getAllBricks().forEach (brick) ->
 			z = brick.getPosition().z
+			maxZ = Math.max z, maxZ
 			brickLayers[z] ?= []
 
 			if (not recreate) and (not brick.getVisualBrick()?)
@@ -100,12 +105,14 @@ class BrickVisualization
 				brick.getVisualBrick().visible = yes
 				brick.getVisualBrick().hasBeenSplit = no
 
-		for z, brickLayer of brickLayers
-			# create layer object if it does not exist
+		# Create three layer object if it does not exist
+		for z in [0..maxZ]
 			if not @bricksSubnode.children[z]?
 				layerObject = new THREE.Object3D()
 				@bricksSubnode.add layerObject
 
+		for z, brickLayer of brickLayers
+			z = Number(z)
 			layerObject = @bricksSubnode.children[z]
 
 			for brick in brickLayer
@@ -182,7 +189,7 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			@_highlightVoxel.visible = true
+			@_highlightVoxel.visible = true and @_highlightVoxelVisiblity
 			worldPos = @grid.mapVoxelToWorld voxel.position
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
@@ -310,5 +317,7 @@ class BrickVisualization
 			.concat @voxelSelector.touchedVoxels
 			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
+
+	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
 
 module.exports = BrickVisualization

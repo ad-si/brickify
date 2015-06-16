@@ -14,63 +14,22 @@ block body
 				fit into class time.
 	.container#samples
 		table.table
-			tr
-				td.printTime
-					span.fa.fa-clock-o
-					p 20&nbsp;min
-				td#sample
-					a(href='app#initialModel=708d0b0b44f491523de951afa44b3e06')
-						img(src='/img/sample_ballista.png' width='255px')
-						img(src='/img/sample_editHover.png' width='255px').editHover
-				td
-					h3 penny ballista
-					p.
-						This is a fun model for children aged 7-12. Simply strap on a rubber
-						band and place your bets.
-				td.download
-					a.btn.btn-success.notAvailable Get course material!
-			tr
-				td.printTime
-					span.fa.fa-clock-o
-					p 20&nbsp;min
-				td#sample
-					a(href='app#initialModel=cd8a7a94eac03bf07f32048269e5cc1f')
-						img(src='/img/sample_CitrusJuicer.png' width='255px')
-						img(src='/img/sample_editHover.png' width='255px').editHover
-				td
-					h3 citrus juicer
-					p.
-						Make tasty orange juice with your students!
-				td.download
-					a.btn.btn-success.notAvailable Get course material!
-			tr
-				td.printTime
-					span.fa.fa-clock-o
-					p 20&nbsp;min
-				td#sample
-					a(href='app#initialModel=1c2395a3145ad77aee7479020b461ddf')
-						img(src='/img/sample_goggles.png' width='255px')
-						img(src='/img/sample_editHover.png' width='255px').editHover
-				td
-					h3 head mounted display
-					p.
-						Use this HMD to dive into virtual realities.
-				td.download
-					a.btn.btn-success.notAvailable Get course material!
-			tr
-				td.printTime
-					span.fa.fa-clock-o
-					p 20&nbsp;min
-				td#sample
-					a(href='app#initialModel=1b2512f0804dfd68b2783108d840ab6f')
-						img(src='/img/sample_printableWrench.png' width='255px')
-						img(src='/img/sample_editHover.png' width='255px').editHover
-				td
-					h3 wrench
-					p.
-						A tool with a fully functional adjustable jaw.
-				td.download
-					a.btn.btn-success.notAvailable Get course material!
+			for sample in samples
+				tr
+					td.printTime
+						span.fa.fa-clock-o
+						p #{sample.printTime}
+					td#sample
+						a(href='app#initialModel='+sample.name)
+							img(src='/img/modelSamples/'+sample.name+'.png'
+								width='255px' height='167px')
+							img.editHover(src='/img/modelSamples/editHover.png'
+								width='255px' height='167px')
+					td
+						h3 #{sample.title}
+						p #{sample.description}
+					td.download
+						a.btn.btn-success.notAvailable Get course materail!
 			tr
 				td.printTime
 				td#sample
@@ -86,8 +45,9 @@ block body
 				td.printTime
 				td#sample
 					a(href='/app')
-						img(src='img/sample_custom.png' width='255px')
-						img(src='/img/sample_editHover.png' width='255px').editHover
+						img(src='/img/modelSamples/custom.png' width='255px')
+						img.editHover(
+							src='/img/modelSamples/editHover.png' width='255px')
 				td
 					h3 Custom
 					p Click here if you want to use your own models

@@ -44,7 +44,6 @@ class ModelLoader
 			.then (base64Model) =>
 				hash = md5 base64Model
 				fileName = model.model.fileName
-				modelCache.store model
 				@addModelToScene fileName, hash, model
 
 	loadByHash: (hash) =>

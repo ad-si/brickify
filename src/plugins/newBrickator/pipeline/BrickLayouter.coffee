@@ -14,7 +14,7 @@ class BrickLayouter
 
 	initializeBrickGraph: (grid) ->
 		grid.initializeBricks()
-		return grid
+		return Promise.resolve grid
 
 	# main while loop condition:
 	# any brick can still merge --> use heuristic:
@@ -33,12 +33,12 @@ class BrickLayouter
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 
-		return unless numTotalInitialBricks > 0
+		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
-				return {grid: grid}
+				return Promise.resolve {grid: grid}
 
 			numRandomChoices++
 			mergeableNeighbors = @_findMergeableNeighbors brick
@@ -54,7 +54,7 @@ class BrickLayouter
 
 			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
-		return {grid: grid}
+		return Promise.resolve {grid: grid}
 
 
 	finalLayoutPass: (grid) =>
@@ -68,7 +68,7 @@ class BrickLayouter
 				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		log.debug 'Final pass merged ', finalPassMerges, ' times.'
-		return {grid: grid}
+		return Promise.resolve {grid: grid}
 
 	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
 		while(@_anyDefinedInArray(mergeableNeighbors))
@@ -129,11 +129,11 @@ class BrickLayouter
 			newBricks.delete brick
 
 		@layoutByGreedyMerge grid, newBricks
-
-		return {
-			removedBricks: bricksToSplit
-			newBricks: newBricks
-		}
+		.then ->
+			return {
+				removedBricks: bricksToSplit
+				newBricks: newBricks
+			}
 
 	# splits each brick in bricks to split, returns all newly generated
 	# bricks as a set

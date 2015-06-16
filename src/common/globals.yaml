@@ -45,6 +45,7 @@ staticRendererHeight: 100
 
 #ui and interaction
 buildUi: true
+offerDownload: false
 
 #load these plugins
 plugins:
@@ -56,6 +57,7 @@ plugins:
   fidelityControl: true
   editController: true
   csg: true
+  legoInstructions: true
 
 rendering:
   # shall modelVisualization display shadows and wireframe?
@@ -91,3 +93,12 @@ gridSpacing:
 addStuds: false
 
 exportStepSize: 0.033
+
+downloadSettings:
+  testStrip: true
+  stl: true
+  lego: true
+  steps: 4
+
+# resolution of the images in the build instructions
+legoInstructionResolution: 1024

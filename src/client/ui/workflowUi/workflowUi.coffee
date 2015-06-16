@@ -1,17 +1,17 @@
 perfectScrollbar = require 'perfect-scrollbar'
-piwikTracking = require '../../piwikTracking'
 
 LoadUi = require './LoadUi'
 EditUi = require './EditUi'
 PreviewUi = require './PreviewUi'
-ExportUi = require './ExportUi'
+DownloadUi = require './DownloadUi'
+ShareUi =  require './ShareUi'
 
 class WorkflowUi
 	constructor: (@bundle) -> return
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		@_enable ['load', 'edit', 'preview', 'export']
+		@_enable ['load', 'edit', 'preview', 'export', 'share']
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
@@ -41,30 +41,13 @@ class WorkflowUi
 			load: new LoadUi @
 			edit: new EditUi @
 			preview: new PreviewUi @
-			export: new ExportUi @
+			export: new DownloadUi @bundle
+			share: new ShareUi @bundle
 
 		@enableOnly @workflow.load
 
-		@_initNotImplementedMessages()
 		@_initScrollbar()
 		@_initToggleButton()
-
-	_initNotImplementedMessages: ->
-		alertCallback = ->
-			bootbox.alert({
-					title: 'Not implemented yet'
-					message: 'We are sorry, but this feature is not implemented yet.
-					 Please check back later.'
-			})
-
-		$('#downloadPdfButton').click ->
-			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadPdfClick'
-			alertCallback()
-		$('#shareButton').click ->
-			piwikTracking.trackEvent(
-				'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
-			)
-			alertCallback()
 
 	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'

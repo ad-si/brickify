@@ -32,11 +32,21 @@ globalConfig.rendering.usePipeline = false
 config1 = clone globalConfig
 config2 = clone globalConfig
 
-# configure left bundle to only show model
+# configure left bundle to only show model, disable lego instructions
 config1.plugins.newBrickator = false
+config1.plugins.legoInstructions = false
 
 # configure right bundle to not show the model
-config2.showModel = false
+config2.rendering.showModel = false
+
+# configure right bundle to offer downloading lego instructions
+config2.offerDownload = true
+config2.downloadSettings = {
+	testStrip: false
+	stl: false
+	lego: true
+	steps: 0
+}
 
 # instantiate 2 brickify bundles
 config1.renderAreaId = 'renderArea1'
@@ -48,9 +58,9 @@ b1 = bundle1.init().then ->
 	b2 = bundle2.init()
 
 	loadAndConvert = (hash, animate) ->
-		b1.then -> bundle1.modelLoader.loadByHash hash
+		b1.then -> bundle1.loadByHash hash
 			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
-		b2.then -> bundle2.modelLoader.loadByHash hash
+		b2.then -> bundle2.loadByHash hash
 			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
 		$('.applink').prop 'href', "app#initialModel=#{hash}"
 
@@ -94,13 +104,3 @@ b1 = bundle1.init().then ->
 				e.originalEvent.target.getAttribute 'data-hash'
 			)
 	)
-
-# set not available message
-$('#downloadButton').click ->
-	piwikTracking.trackEvent 'Landingpage', 'ButtonClick', 'Download'
-	bootbox.alert({
-		title: 'Not available'
-		message: 'This feature is not available yet - please check back later.<br>' +
-		'<br>However, you can edit and download the model with our editor '+
-		'by clicking the <strong>Customize</strong> Button'
-	})

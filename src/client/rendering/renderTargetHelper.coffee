@@ -6,6 +6,12 @@ ShaderGenerator = require './shader/ShaderGenerator'
 # @module renderTargetHelper
 ###
 
+_chooseBiggerSize = false
+_overrideSizeValue = null
+module.exports.configureSize = (chooseBiggerSize, overrideSizeValue = null) ->
+	_chooseBiggerSize = chooseBiggerSize
+	_overrideSizeValue = overrideSizeValue
+
 ###
 # Creates a structure that can be used as a render target and later
 # to render the content of the render target
@@ -25,7 +31,6 @@ module.exports.createRenderTarget = (
 	shaderParts = []
 	additionalUniforms = {}
 	opacity = 1.0
-	chooseBiggerSize = false
 	textureMagFilter = THREE.LinearFilter
 	textureMinFilter = THREE.LinearFilter) ->
 
@@ -33,8 +38,12 @@ module.exports.createRenderTarget = (
 	renderWidth = threeRenderer.domElement.width
 	renderHeight = threeRenderer.domElement.height
 
-	texWidth = getNextValidTextureDimension renderWidth, chooseBiggerSize
-	texHeight = getNextValidTextureDimension renderHeight, chooseBiggerSize
+	texWidth = getNextValidTextureDimension renderWidth
+	texHeight = getNextValidTextureDimension renderHeight
+
+	if _overrideSizeValue?
+		texWidth = _overrideSizeValue
+		texHeight = _overrideSizeValue
 
 	depthTexture = new THREE.DepthTexture texWidth, texHeight, true
 	renderTargetTexture = new THREE.WebGLRenderTarget(
@@ -128,7 +137,10 @@ generateQuad =  (
 module.exports.generateQuad = generateQuad
 
 # Chooses the next 2^n size that matches the screen resolution best
-getNextValidTextureDimension = (size, chooseBiggerValue) ->
+getNextValidTextureDimension = (size) ->
+	if not size?
+		return null
+
 	dims = [64, 128, 256, 512, 1024, 2048, 4096]
 
 	difference = 9999
@@ -139,7 +151,7 @@ getNextValidTextureDimension = (size, chooseBiggerValue) ->
 			difference = d
 			selectedDim = dim
 
-		if chooseBiggerValue and dim > size
+		if _chooseBiggerSize and dim > size
 			return dim
 
 	return selectedDim
@@ -148,14 +160,26 @@ module.exports.getNextValidTextureDimension = getNextValidTextureDimension
 # Returns true, if the render target has the right
 # (in terms of 2^n, see getNextValidTextureDimension)
 # size for the domElement of the threeRenderer
-renderTargetHasRightSize = (
-	renderTarget, threeRenderer,chooseBiggerValue = false) ->
+renderTargetHasRightSize = (renderTarget, threeRenderer) ->
 	screenW = threeRenderer.domElement.clientWidth
 	screenH = threeRenderer.domElement.clientHeight
 
-	targetTexWidth = getNextValidTextureDimension screenW, chooseBiggerValue
-	targetTexHeight = getNextValidTextureDimension screenH, chooseBiggerValue
+	targetTexWidth = getNextValidTextureDimension screenW, _chooseBiggerSize
+	targetTexHeight = getNextValidTextureDimension screenH, _chooseBiggerSize
+
+	if _overrideSizeValue
+		targetTexWidth = _overrideSizeValue
+		targetTexHeight = _overrideSizeValue
 
 	return (renderTarget.width == targetTexWidth) and
 	(renderTarget.height == targetTexHeight)
+
 module.exports.renderTargetHasRightSize = renderTargetHasRightSize
+
+deleteRenderTarget = (renderTarget, threeRenderer) ->
+	 renderTarget.renderTarget.dispose()
+
+	 if renderTarget.depthTexture?.__webglTexture?
+	 	threeRenderer.context.deleteTexture renderTarget.depthTexture.__webglTexture
+
+module.exports.deleteRenderTarget = deleteRenderTarget

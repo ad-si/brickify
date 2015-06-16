@@ -47,6 +47,15 @@ module.exports = class Grid
 	getNumVoxelsZ: =>
 		return @_maxVoxelZ - @_minVoxelZ + 1
 
+	getLegoVoxelsZRange: =>
+		min = Number.POSITIVE_INFINITY
+		max = Number.NEGATIVE_INFINITY
+		@forEachVoxel (voxel) ->
+			return unless voxel.isLego()
+			min = Math.min min, voxel.position.z
+			max = Math.max max, voxel.position.z
+		return { min, max }
+
 	# use this if you are not interested in the actual number of layers
 	# e.g. if you want to use them zero-indexed
 	getMaxZ: =>
@@ -139,18 +148,15 @@ module.exports = class Grid
 	_generateKey: (x, y, z) ->
 		return x + '-' + y + '-' + z
 
-	setVoxel: (position, data = true) ->
+	setVoxel: (position) ->
 		key = @_generateKey position.x, position.y, position.z
 		v = @voxels[key]
 
 		if not v?
-			v = new Voxel(position, [data])
+			v = new Voxel position
 			@_linkNeighbors v
 			@voxels[key] = v
 			@_updateMinMax position
-		else
-			v.dataEntrys.push data
-
 		return v
 
 	# links neighbours of this voxel with this voxel
@@ -271,6 +277,16 @@ module.exports = class Grid
 			if vox? and vox.brick
 				return vox.brick
 
+	# inserts voxels from a three-dimensional array in [x][y][z] order
+	fromPojo: (pojo) ->
+		for x, voxelPlane of pojo
+			x = parseInt x
+			for y, voxelColumn of voxelPlane
+				y = parseInt y
+				for z, direction of voxelColumn
+					z = parseInt z
+					@setVoxel x: x, y: y, z: z
+
 	intersectVoxels: (rayOrigin, rayDirection) =>
 		dirfrac = {
 			x: 1.0 / rayDirection.x
@@ -327,7 +343,3 @@ module.exports = class Grid
 			return -1
 		else
 			return tmin
-
-
-
-

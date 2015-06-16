@@ -15,24 +15,23 @@ class ModelLoader
 	constructor: (@bundle) ->
 		return
 
-	load: (model) =>
-		return model
-			.getBase64()
-			.then (base64Model) =>
-				hash = md5 base64Model
-				fileName = model.model.fileName
-				@addModelToScene fileName, hash, model
-
 	loadByHash: (hash) =>
 		modelCache
 		.request hash
-		.then @load
+		.then (model) => @_load model, hash
 		.catch (error) ->
 			log.error "Could not load model from hash #{hash}"
 			log.error error.stack
 
+	_load: (model, hash) =>
+		return model
+			.done()
+			.then =>
+				fileName = model.model.fileName
+				@_addModelToScene fileName, hash, model
+
 	# adds a new model to the state
-	addModelToScene: (fileName, hash, model) ->
+	_addModelToScene: (fileName, hash, model) ->
 		model
 			.getAutoAlignMatrix()
 			.then (matrix) =>

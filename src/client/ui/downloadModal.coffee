@@ -8,6 +8,12 @@ wizardSteps = [
 ]
 wizardFadeTime = 300
 
+#scoping variables
+$sizeSelect = undefined
+$legoContent = undefined
+$stlContent = undefined
+$wizardButtons = undefined
+
 alphabeticalList = (i, range) ->
 	# A = 65
 	return String.fromCharCode 65 + (range + i)
@@ -21,8 +27,16 @@ addOptions = ($select, range, defaultValue, listFunction) ->
 		$select.append $('<option/>').attr('value', i).text(caption)
 	$select.val defaultValue
 
+disableWizard = () ->
+	$sizeSelect.fadeIn wizardFadeTime
+	$legoContent.fadeIn wizardFadeTime
+	$stlContent.fadeIn wizardFadeTime
+	$wizardButtons.fadeOut wizardFadeTime
+	currentWizardStep = 0
 # Initializes the logic for the test strip wizard
 initializeWizard = ($modal) ->
+	wizardLogicInitialized = true
+
 	# Bind all jQuery Elements, hide everything
 	$wizardButtons = $modal.find('#wizardButtons')
 	$nextButton = $wizardButtons.find('#wizardNext')
@@ -40,13 +54,6 @@ initializeWizard = ($modal) ->
 	$sizeSelect = $modal.find('#sizeSelect')
 	$legoContent = $modal.find('#legoContent')
 	$stlContent = $modal.find('#stlContent')
-
-	disableWizard = () ->
-		$sizeSelect.fadeIn wizardFadeTime
-		$legoContent.fadeIn wizardFadeTime
-		$stlContent.fadeIn wizardFadeTime
-		$wizardButtons.fadeOut wizardFadeTime
-		currentWizardStep = 0
 
 	applyCurrentWizardStep = () ->
 		if currentWizardStep == wizardSteps.length or
@@ -104,6 +111,10 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
 
 	if not wizardLogicInitialized
 		initializeWizard $modal
+
+	# Reset wizard when closing the modal
+	$modal.on 'hidden.bs.modal', () ->
+		disableWizard()
 
 	return $modal
 

@@ -10,6 +10,8 @@ SyncObject.dataPacketProvider = require './sync/dataPackets'
 Node = require '../common/project/node'
 Node.modelProvider = require './modelLoading/modelCache'
 
+DownloadUi = require './ui/workflowUi/DownloadUi'
+
 ###
 # @class Bundle
 ###
@@ -22,7 +24,10 @@ module.exports = class Bundle
 		@sceneManager = new SceneManager(@)
 		@renderer = new Renderer(@pluginHooks, @globalConfig)
 		@pluginInstances = @pluginLoader.loadPlugins()
-		@ui = new Ui(@) if @globalConfig.buildUi
+		if @globalConfig.buildUi
+			@ui = new Ui(@)
+		if @globalConfig.offerDownload
+			@exportUi = new DownloadUi @
 
 	init: =>
 		@pluginLoader.initPlugins()
@@ -38,3 +43,9 @@ module.exports = class Bundle
 
 	getControls: =>
 		@renderer.getControls()
+
+	loadByHash: (hash) =>
+		@exportUi?.setEnabled false
+		return @modelLoader.loadByHash hash
+		.then =>
+			@exportUi?.setEnabled true

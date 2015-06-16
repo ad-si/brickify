@@ -7,6 +7,7 @@ class PreviewUi
 		bundle = @workflowUi.bundle
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
 		@editController = bundle.getPlugin 'editController'
+		@newBrickator = bundle.getPlugin 'newBrickator'
 		@sceneManager = bundle.sceneManager
 		@_initStabilityView()
 		@_initAssemblyView()

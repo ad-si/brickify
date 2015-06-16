@@ -85,5 +85,10 @@ module.exports = class PluginLoader
 				require '../plugins/csg'
 				require '../plugins/csg/package.json'
 			)
+		if @globalConfig.plugins.legoInstructions
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/legoInstructions'
+				require '../plugins/legoInstructions/package.json'
+			)
 
 		return @pluginInstances

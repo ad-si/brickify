@@ -45,40 +45,48 @@ class NodeVisualizer
 		@brickShadowRootNode = new THREE.Object3D()
 		@threeJsRootNode.add @brickShadowRootNode
 
-	onPaint: (@threeRenderer, camera, target, config) =>
+	onPaint: (@threeRenderer, camera, target) =>
 		threeRenderer = @threeRenderer
 
 		# recreate textures if either they haven't been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized and
 		RenderTargetHelper.renderTargetHasRightSize(
-			@brickSceneTarget.renderTarget, threeRenderer, config.useBigTargets
+			@brickSceneTarget.renderTarget, threeRenderer
 		))
 			# bricks
+			if @brickSceneTarget?
+				RenderTargetHelper.deleteRenderTarget @brickSceneTarget, @threeRenderer
+
 			@brickSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				null,
 				null,
-				1.0,
-				config.useBigTargets
+				1.0
 			)
 
 			# object target
+			if @objectsSceneTarget?
+				RenderTargetHelper.deleteRenderTarget @objectsSceneTarget, @threeRenderer
+
 			@objectsSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				[new ExpandBlackPart(2), new ColorMultPart()],
 				{colorMult: {type: 'v3', value: new THREE.Vector3(1, 1, 1)}},
 				@objectOpacity
-	  			config.useBigTargets
 			)
 
 			# brick shadow target
+			if @brickShadowSceneTarget?
+				RenderTargetHelper.deleteRenderTarget(
+					@brickShadowSceneTarget, @threeRenderer
+				)
+
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
 				null,
 				null,
-				@brickShadowOpacity,
-				config.useBigTargets
+				@brickShadowOpacity
 			)
 
 			@renderTargetsInitialized = true
@@ -222,15 +230,13 @@ class NodeVisualizer
 	onNodeDeselect: => @selectedNode = null
 
 	_zoomToNode: (threeNode) =>
-		boundingSphere = threeHelper.getBoundingSphere threeNode
-		@bundle.renderer.zoomToBoundingSphere boundingSphere
+		@bundle.renderer.zoomToNode threeNode
 
 	# initialize visualization with data from newBrickator
 	# change solid renderer appearance
 	_initializeData: (node, visualizationData, newBrickatorData) =>
 		# init node visualization
 		visualizationData.brickVisualization.initialize newBrickatorData.grid
-		visualizationData.numZLayers = newBrickatorData.grid.getMaxZ() + 1
 		visualizationData.initialized = true
 
 		# instead of creating csg live, show original semitransparent model
@@ -303,7 +309,7 @@ class NodeVisualizer
 					@_applyStabilityView cachedData
 				when 'build'
 					@_resetStabilityView cachedData
-					return @_applyBuildMode cachedData
+					@_applyBuildMode cachedData
 
 	getDisplayMode: =>
 		return @visualizationMode
@@ -340,13 +346,14 @@ class NodeVisualizer
 	_applyBuildMode: (cachedData) =>
 		# show bricks and csg
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
+		cachedData.brickVisualization.setHighlightVoxelVisibility false
 
 		@_showCsg cachedData
 
 		cachedData.modelVisualization.setNodeVisibility false
-		return cachedData.numZLayers
 
 	_resetBuildMode: (cachedData) ->
+		cachedData.brickVisualization.setHighlightVoxelVisibility true
 		cachedData.brickVisualization.hideCsg()
 		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
@@ -354,8 +361,15 @@ class NodeVisualizer
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @_getCachedData(selectedNode).then (cachedData) ->
-			cachedData.brickVisualization.showBrickLayer layer - 1
+		return @newBrickator.getNodeData selectedNode
+		.then (data) =>
+			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
+			@_getCachedData(selectedNode).then (cachedData) ->
+				gridLayer = minLayer + layer - 1
+				# If there is 3D print below first lego layer, show lego starting
+				# with layer 1 and show only 3D print in first instruction layer
+				gridLayer -= 1 if minLayer > 0
+				cachedData.brickVisualization.showBrickLayer gridLayer
 
 	_updateBrickCount: (bricks) =>
 		@brickCounter?.text bricks.size
@@ -418,5 +432,10 @@ class NodeVisualizer
 				event, @bundle.renderer, @threeJsRootNode.children
 			)
 			return mixedIntersections
+
+	getBrickThreeNode: (node) =>
+		return @_getCachedData(node)
+		.then (cachedData) ->
+			return cachedData.brickThreeNode
 
 module.exports = NodeVisualizer

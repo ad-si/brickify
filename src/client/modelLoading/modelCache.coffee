@@ -13,8 +13,10 @@ log = require 'loglevel'
 modelCache = {}
 
 exists = (hash) ->
-	return Promise.resolve $.get '/model/exists/' + hash
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
+	return Promise.resolve(
+		$.ajax '/model/' + hash,
+			type: 'HEAD'
+	).catch (jqXHR) -> throw new Error jqXHR.statusText
 module.exports.exists = exists
 
 # sends the model to the server if the server hasn't got a file
@@ -22,9 +24,9 @@ module.exports.exists = exists
 submitDataToServer = (hash, data) ->
 	send = ->
 		prom = Promise.resolve(
-			$.ajax '/model/submit/' + hash,
+			$.ajax '/model/' + hash,
 				data: data
-				type: 'POST'
+				type: 'PUT'
 				contentType: 'application/octet-stream'
 		).catch (jqXHR) -> throw new Error jqXHR.statusText
 		prom.then(
@@ -42,7 +44,7 @@ module.exports.store = (optimizedModel) ->
 
 # requests a mesh with the given hash from the server
 requestDataFromServer = (hash) ->
-	return Promise.resolve $.get '/model/get/' + hash
+	return Promise.resolve $.get '/model/' + hash
 		.catch (jqXHR) -> throw new Error jqXHR.statusText
 
 buildModelPromise = (hash) ->

@@ -216,7 +216,7 @@ class Renderer
 			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'
 				# Only do something when SSAO is not already used
 				if not @usePipelineSsao
-					@usePipelineSsao = true					
+					@usePipelineSsao = true
 
 					if @pipelineRenderTarget?
 						@pipelineRenderTarget.dirty = true

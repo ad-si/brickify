@@ -24,7 +24,10 @@ module.exports.generatePieceList = (bricks) ->
 
 	# sort so that most needed bricks are on top
 	pieceList.sort (a,b) ->
-		return b.count - a.count
+		if a.size.x is b.size.x
+			return a.size.y - b.size.y
+		else
+			return a.size.x - b.size.x
 
 	# switch sizes so that the smallest number
 	# is always first

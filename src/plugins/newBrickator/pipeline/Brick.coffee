@@ -200,7 +200,14 @@ class Brick
 		return @_visualBrick
 
 	# Sets the brick visualization that belongs to this brick
-	setVisualBrick: (@_visualBrick) => return
+	setVisualBrick: (visualBrick) =>
+		if visualBrick == null
+			# Clear reference from visual brick to this brick
+			if @_visualBrick?
+				@_visualBrick.brick = null
+				@_visualBrick = null
+		else
+			@_visualBrick = visualBrick
 
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that
@@ -216,7 +223,7 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
-		@_visualBrick = null
+		@setVisualBrick null
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,
@@ -226,6 +233,9 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
+
+		# Clear reference to visual brick (needs to be recreated)
+		@setVisualBrick null
 
 		# tell neighbors to update their cache
 		for direction of Brick.direction

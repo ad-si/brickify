@@ -112,9 +112,9 @@ class BrickVisualization
 
 			for brick in brickLayer
 				# create visual brick
-				material = coloring.getMaterialForBrick brick
+				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), material
+					brick.getPosition(), brick.getSize(), materials.color
 				)
 
 				# link data <-> visuals
@@ -129,8 +129,8 @@ class BrickVisualization
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
-					material = coloring.getMaterialForBrick visualBrick.brick
-					visualBrick.setMaterial material
+					material = coloring.getMaterialsForBrick visualBrick.brick
+					visualBrick.setMaterial material.color
 		@_oldColoring = coloring
 
 		@unhighlightBigBrush()
@@ -162,14 +162,28 @@ class BrickVisualization
 		@_highlightVoxel.visible = false
 
 		for i in [0..@bricksSubnode.children.length - 1] by 1
+			threeLayer = @bricksSubnode.children[i]
 			if i <= layer
-				@bricksSubnode.children[i].visible = true
+				threeLayer.visible = true
+				if i < layer
+					@_makeLayerGrayscale (threeLayer)
+				else
+					@_makeLayerColored (threeLayer)
 			else
-				@bricksSubnode.children[i].visible = false
+				threeLayer.visible = false
+
+	_makeLayerGrayscale: (layer) ->
+		for threeBrick in layer.children
+			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.gray
+
+	_makeLayerColored: (layer) ->
+		for threeBrick in layer.children
+			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.color
 
 	showAllBrickLayers: =>
 		for layer in @bricksSubnode.children
 			layer.visible = true
+			@_makeLayerColored layer
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>

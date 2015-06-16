@@ -39,8 +39,7 @@ log = winston.loggers.get('log')
 pluginLoader = require './pluginLoader'
 app = require '../../routes/app'
 landingPage = require '../../routes/landingpage'
-modelStorage = require './modelStorage'
-modelStorageApi = require '../../routes/modelStorageApi'
+models = require '../../routes/models'
 dataPackets = require '../../routes/dataPackets'
 sharelinkGen = require '../../routes/share'
 globalConfig = yaml.safeLoad(
@@ -95,7 +94,7 @@ module.exports.setupRouting = ->
 			.set 'include css', true
 			.use nib()
 			.use bootstrap()
-			# Fugly because of github.com/LearnBoost/stylus/issues/1828
+			# ugly because of github.com/LearnBoost/stylus/issues/1828
 			.define 'backgroundColor', '#' + ('000000' +
 				globalConfig.colors.background.toString 16).slice -6
 	)
@@ -154,8 +153,6 @@ module.exports.setupRouting = ->
 				write: (str) ->
 					log.info str.substring(0, str.length - 1)
 
-	modelStorage.init()
-
 	webapp.use cookieParser()
 	webapp.use urlSessions.middleware
 
@@ -170,9 +167,10 @@ module.exports.setupRouting = ->
 	webapp.get '/educators', landingPage.getEducators
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
-	webapp.get '/model/exists/:hash', urlParser, modelStorageApi.modelExists
-	webapp.get '/model/get/:hash', urlParser, modelStorageApi.getModel
-	webapp.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
+
+	webapp.head '/model/:key', urlParser, models.exists
+	webapp.get '/model/:key', urlParser, models.get
+	webapp.put '/model/:key', rawParser, models.store
 
 	webapp.get '/datapacket/exists/:id', urlParser, dataPackets.exists
 	webapp.get '/datapacket/get/:id', urlParser, dataPackets.get

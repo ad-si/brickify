@@ -1,6 +1,6 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
-threeExporter = require '../../client/threeExporter'
+threeConverter = require '../../client/threeConverter'
 
 class ModelVisualization
 	constructor: (@globalConfig, @node, threeNode, @coloring) ->
@@ -55,7 +55,7 @@ class ModelVisualization
 			return model
 				.getObject()
 				.then (modelObject) =>
-					geometry = threeExporter.toStandardGeometry modelObject
+					geometry = threeConverter.toStandardGeometry modelObject
 
 					if @globalConfig.rendering.showModel
 						_addSolid geometry, @threeNode

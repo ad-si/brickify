@@ -1,4 +1,5 @@
 Grid = require './Grid'
+log = require 'loglevel'
 
 module.exports = class Voxelizer
 	constructor: ->
@@ -10,19 +11,23 @@ module.exports = class Voxelizer
 
 	voxelize: (model, options = {}, progressCallback) =>
 		@_addDefaults options
-		@setupGrid model, options
-
-		lineStepSize = @voxelGrid.heightRatio / options.accuracy
 
 		return new Promise (resolve, reject) =>
-			@_getOptimizedVoxelSpaceModel model, options
-			.then (voxelSpaceModel) =>
-				@worker = @_getWorker()
-				@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
-					if message.state is 'progress'
-						progressCallback message.progress
-					else # if state is 'finished'
-						resolve grid: @voxelGrid, gridPOJO: message.data
+			return @setupGrid model, options
+				.then (voxelGrid) =>
+
+					lineStepSize = @voxelGrid.heightRatio / options.accuracy
+
+					@_getOptimizedVoxelSpaceModel model, options
+					.then (voxelSpaceModel) =>
+						@worker = @_getWorker()
+						@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
+							if message.state is 'progress'
+								progressCallback message.progress
+							else # if state is 'finished'
+								resolve grid: @voxelGrid, gridPOJO: message.data
+				.catch (error) ->
+					reject error
 
 	terminate: =>
 		@worker?.terminate()
@@ -72,7 +77,11 @@ module.exports = class Voxelizer
 						grid
 					)
 					@_postProgress(progress, progressCallback)
-				progressCallback state: 'finished', data: grid
+
+				progressCallback {
+					state: 'finished'
+					data: grid
+				}
 				return
 
 			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, grid) ->
@@ -283,5 +292,8 @@ module.exports = class Voxelizer
 
 	setupGrid: (model, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)
-		@voxelGrid.setUpForModel model, options
+
 		return @voxelGrid
+		.setUpForModel model, options
+		.then  =>
+			return @voxelGrid

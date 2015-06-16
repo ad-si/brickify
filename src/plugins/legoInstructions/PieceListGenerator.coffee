@@ -42,8 +42,7 @@ module.exports.getHtml = (list, caption = true) ->
 	if caption
 		html = '<h3>Bricks needed</h3>'
 
-	html += '<p>This is a list of how many and what types of'
-	html += ' bricks you need to build this model:'
+	html += '<p>To build this model you need the following bricks:'
 	html += '<table class="table">'
 	html += '<tr><td><strong>Amount</strong></td>'
 	html += '<td><strong>Type</strong></td>'

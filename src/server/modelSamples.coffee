@@ -1,6 +1,6 @@
 fs = require 'fs'
 yaml = require 'js-yaml'
-log = require('winston').loggers.get('log')
+log = require('winston').loggers.get 'log'
 
 samplesDirectory = 'modelSamples/'
 

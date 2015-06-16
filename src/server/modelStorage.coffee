@@ -2,8 +2,13 @@ fs = require 'fs'
 mkdirp = require 'mkdirp'
 path = require 'path'
 md5 = require('blueimp-md5').md5
+log = require('winston').loggers.get 'log'
 
 cacheDirectory = 'modelCache/'
+
+do createCacheDirectory = ->
+	mkdirp cacheDirectory, (error) ->
+		log.warn 'Unable to create cache directory: ' + error if error?
 
 module.exports.exists = (hash) ->
 	unless checkHash hash

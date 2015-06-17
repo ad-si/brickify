@@ -185,7 +185,7 @@ class NewBrickator
 
 						return {
 							data: stlExporter.toBinaryStl faceVertexMesh
-							fileName: name
+							fileName: fileName
 						}
 
 					resolve results

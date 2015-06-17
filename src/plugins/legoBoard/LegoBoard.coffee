@@ -49,6 +49,10 @@ module.exports = class LegoBoard
 		rotation.makeRotationX(1.571)
 		studGeometry.applyMatrix(rotation)
 
+		translation = new THREE.Matrix4()
+		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
+		studGeometry.applyMatrix translation
+
 		bufferGeometry = new THREE.BufferGeometry()
 		bufferGeometry.fromGeometry studGeometry
 

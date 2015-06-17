@@ -15,35 +15,33 @@ module.exports.generatePieceList = (bricks) ->
 		size = brick.getSize()
 		pieceList.push {
 			size: {
-				x: size.x
-				y: size.y
+				x: Math.min size.x, size.y
+				y: Math.max size.x, size.y
 				z: size.z
 			}
 			count: 1
 		}
 
-	# sort so that most needed bricks are on top
+	# sort bricks from small to big
 	pieceList.sort (a,b) ->
-		return b.count - a.count
-
-	# switch sizes so that the smallest number
-	# is always first
-	for piece in pieceList
-		if piece.size.x > piece.size.y
-			tmp = piece.size.x
-			piece.size.x = piece.size.y
-			piece.size.y = tmp
+		if a.size.x is b.size.x
+			return a.size.y - b.size.y
+		else
+			return a.size.x - b.size.x
 
 	return pieceList
 
-module.exports.getHtml = (list) ->
-	html = '<h3>Bricks needed</h3>'
-	html += '<p>This is a list of how many and what types of'
-	html += ' bricks you need to build this model:'
-	html += '<table>'
-	html += '<tr><td><strong>Amount</strong></td>'
+module.exports.getHtml = (list, caption = true) ->
+	html = ''
+
+	if caption
+		html = '<h3>Bricks needed</h3>'
+
+	html += '<p>To build this model you need the following bricks:'
+	html += '<table class="table">'
+	html += '<tr><td><strong>Size</strong></td>'
 	html += '<td><strong>Type</strong></td>'
-	html += '<td><strong>Size</strong></td></tr>'
+	html += '<td><strong>Amount</strong></td></tr>'
 	for piece in list
 		if piece.size.z == 1
 			type = 'Plate'
@@ -54,9 +52,9 @@ module.exports.getHtml = (list) ->
 			continue
 
 		html += '<tr>'
-		html += "<td>#{piece.count}x</td>"
-		html += "<td>#{type}</td>"
 		html += "<td>#{piece.size.x} x #{piece.size.y}</td>"
+		html += "<td>#{type}</td>"
+		html += "<td>#{piece.count}x</td>"
 		html += '</tr>'
 
 	html += '</table></p>'

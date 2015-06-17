@@ -16,7 +16,7 @@
     "blueimp-md5": "^1.1.0",
     "body-parser": "^1.9.1",
     "bootbox": "^4.4.0",
-    "bootstrap": "^3.3.2",
+    "bootstrap": "^3.3.5",
     "bootstrap-styl": "^4.0.2",
     "browserify": "^10.2.3",
     "browserify-data": "^0.2.0",

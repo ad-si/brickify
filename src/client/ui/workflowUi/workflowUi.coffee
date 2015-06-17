@@ -3,15 +3,14 @@ perfectScrollbar = require 'perfect-scrollbar'
 LoadUi = require './LoadUi'
 EditUi = require './EditUi'
 PreviewUi = require './PreviewUi'
-DownloadUi = require './DownloadUi'
-ShareUi =  require './ShareUi'
+ExportUi = require './ExportUi'
 
 class WorkflowUi
 	constructor: (@bundle) -> return
 
 	# Called by sceneManager when a node is added
 	onNodeAdd: (node) =>
-		@_enable ['load', 'edit', 'preview', 'export', 'share']
+		@_enable ['load', 'edit', 'preview', 'export']
 
 	# Called by sceneManager when a node is removed
 	onNodeRemove: (node) =>
@@ -41,8 +40,7 @@ class WorkflowUi
 			load: new LoadUi @
 			edit: new EditUi @
 			preview: new PreviewUi @
-			export: new DownloadUi @bundle
-			share: new ShareUi @bundle
+			export: new ExportUi @
 
 		@enableOnly @workflow.load
 

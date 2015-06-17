@@ -34,10 +34,13 @@
 				br
 				img(draggable='false' src='img/printBrush.png' width=64 height=64)
 	.row.twoButtonRow
+		.col-xs-6.estimate#brickCountContainer
+				span#brickCount 0
+				|  bricks
+				= ' '
+				span.fa.fa-info-circle
 		.col-xs-6.estimate
-			span#brickCount 0
-			span &nbsp;bricks
-		.col-xs-6.estimate
-			span.fa.fa-clock-o &nbsp;
+			span.fa.fa-clock-o
+			= ' '
 			span#timeEstimate 0
-			span &nbsp;min
+			|  min

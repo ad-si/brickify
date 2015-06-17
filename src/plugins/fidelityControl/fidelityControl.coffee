@@ -51,16 +51,18 @@ class FidelityControl
 		# allow pipeline only if we have the needed extension and a stencil buffer
 		# and if the pipeline is enabled in the global config
 		usePipeline = @bundle.globalConfig.rendering.usePipeline
+		depth = @bundle.renderer.threeRenderer.supportsDepthTextures()
 		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
 		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
 
 		capabilites = ''
-		capabilites += 'ExtFragDepth' if fragDepth?
-		capabilites += ' stencilBuffer' if stencilBuffer
+		capabilites += 'DepthTextures ' if depth?
+		capabilites += 'ExtFragDepth ' if fragDepth?
+		capabilites += 'stencilBuffer ' if stencilBuffer
 
 		piwikTracking.setCustomSessionVariable 0, 'GpuCapabilities', capabilites
 
-		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
+		@pipelineAvailable = usePipeline and depth? and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
 	on3dUpdate: (timestamp) =>

@@ -27,6 +27,7 @@ class BrickVisualization
 		@printVoxels = []
 
 		@isStabilityView = false
+		@_highlightVoxelVisiblity = true
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -46,7 +47,8 @@ class BrickVisualization
 
 	showCsg: (newCsgGeometry) =>
 		@csgSubnode.children = []
-		return if not newCsgGeometry?
+		if not newCsgGeometry?
+			@csgSubnode.visible = false
 
 		for geometry in newCsgGeometry
 			csgMesh = new THREE.Mesh geometry, @defaultColoring.csgMaterial
@@ -110,9 +112,9 @@ class BrickVisualization
 
 			for brick in brickLayer
 				# create visual brick
-				material = coloring.getMaterialForBrick brick
+				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), material
+					brick.getPosition(), brick.getSize(), materials.color
 				)
 
 				# link data <-> visuals
@@ -127,8 +129,8 @@ class BrickVisualization
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
-					material = coloring.getMaterialForBrick visualBrick.brick
-					visualBrick.setMaterial material
+					material = coloring.getMaterialsForBrick visualBrick.brick
+					visualBrick.setMaterial material.color
 		@_oldColoring = coloring
 
 		@unhighlightBigBrush()
@@ -160,14 +162,28 @@ class BrickVisualization
 		@_highlightVoxel.visible = false
 
 		for i in [0..@bricksSubnode.children.length - 1] by 1
+			threeLayer = @bricksSubnode.children[i]
 			if i <= layer
-				@bricksSubnode.children[i].visible = true
+				threeLayer.visible = true
+				if i < layer
+					@_makeLayerGrayscale (threeLayer)
+				else
+					@_makeLayerColored (threeLayer)
 			else
-				@bricksSubnode.children[i].visible = false
+				threeLayer.visible = false
+
+	_makeLayerGrayscale: (layer) ->
+		for threeBrick in layer.children
+			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.gray
+
+	_makeLayerColored: (layer) ->
+		for threeBrick in layer.children
+			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.color
 
 	showAllBrickLayers: =>
 		for layer in @bricksSubnode.children
 			layer.visible = true
+			@_makeLayerColored layer
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
@@ -182,7 +198,7 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			@_highlightVoxel.visible = true
+			@_highlightVoxel.visible = true and @_highlightVoxelVisiblity
 			worldPos = @grid.mapVoxelToWorld voxel.position
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
@@ -256,10 +272,13 @@ class BrickVisualization
 	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		@printVoxels = []
 		everything3D = true
 		for voxel in voxels
 			everything3D = everything3D && !voxel.isLego()
 			voxel.make3dPrinted()
+			@printVoxels.push voxel
+		@voxelSelector.clearSelection()
 		return !everything3D
 
 	resetTouchedVoxelsToLego: =>
@@ -295,9 +314,11 @@ class BrickVisualization
 	makeAllVoxelsLego: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
 		everythingLego = true
+		@printVoxels = []
 		for voxel in voxels
 			everythingLego = everythingLego && voxel.isLego()
 			voxel.makeLego()
+		@voxelSelector.clearSelection()
 		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>
@@ -310,5 +331,7 @@ class BrickVisualization
 			.concat @voxelSelector.touchedVoxels
 			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
+
+	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
 
 module.exports = BrickVisualization

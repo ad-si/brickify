@@ -21,14 +21,46 @@ module.exports.getTransformMatrix = (node) ->
 	return threeNode.matrix
 
 module.exports.getBoundingSphere = (threeNode) ->
-	geometry = threeNode.geometry
-	geometry.computeBoundingSphere()
-	result =
-		radius: geometry.boundingSphere.radius
-		center: geometry.boundingSphere.center
+	if threeNode.geometry?
+		geometry = threeNode.geometry
+		geometry.computeBoundingSphere()
+		boundingSphere = geometry.boundingSphere
+		threeNode.updateMatrix()
+		threeNode.parent?.updateMatrixWorld()
+		boundingSphere.center.applyProjection threeNode.matrixWorld
+		return boundingSphere
+	else if threeNode instanceof THREE.Object3D
+		boundingBox = new THREE.Box3().setFromObject threeNode
+		size = boundingBox.size()
+		radius = Math.sqrt(size.x * size.x + size.y * size.y + size.z * size.z) / 2
+		center = boundingBox.center()
+		return radius: radius, center: center
 
-	threeNode.updateMatrix()
-	threeNode.parent?.updateMatrixWorld()
-	result.center.applyProjection threeNode.matrixWorld
+module.exports.zoomToBoundingSphere = (
+	camera, scene, controls, boundingSphere) ->
+	radius = boundingSphere.radius
+	center = boundingSphere.center
 
-	return result
+	alpha = camera.fov
+	distanceToObject = radius / Math.sin(alpha)
+
+	rv = camera.position.clone()
+	rv.sub controls.target if controls?
+	rv = rv.normalize().multiplyScalar(distanceToObject)
+	zoomAdjustmentFactor = 2.5
+	rv = rv.multiplyScalar(zoomAdjustmentFactor)
+
+	#apply scene transforms (e.g. rotation to make y the vector facing upwards)
+	target = center.clone().applyMatrix4(scene.matrix)
+	position = target.clone().add(rv)
+
+	camera.position.set position.x, position.y, position.z
+	camera.lookAt target
+
+	_updateControls controls, position, target if controls?
+
+_updateControls = (controls, position, target) ->
+	controls.update()
+	controls.target = controls.target0 = target.clone()
+	controls.position = controls.position0 = position.clone()
+	controls.reset()

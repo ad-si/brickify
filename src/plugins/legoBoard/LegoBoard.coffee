@@ -23,6 +23,7 @@ module.exports = class LegoBoard
 		@highQualMode = false
 		@usePipeline = false
 		@isVisible = true
+		@isScreenshotMode = no
 
 		@_initMaterials()
 
@@ -79,34 +80,36 @@ module.exports = class LegoBoard
 
 	on3dUpdate: =>
 		# this check is only important if we don't use the pipeline
-		return if @usePipeline
+		return if @usePipeline or @isScreenshotMode
 
 		# check if the camera is below z=0. if yes, make the plate transparent
 		# and hide studs
 		if not @bundle?
 			return
 
-		cam = @bundle.renderer.camera
+		camera = @bundle.renderer.camera
 
-		# it should be z, but due to orbitcontrols the scene is rotated
-		if cam.position.y < 0
+		if camera.position.z < 0
 			@baseplateBox.material = @baseplateTransparentMaterial
 			@studsContainer.visible = false
 		else
 			@baseplateBox.material = @currentBaseplateMaterial
 			@studsContainer.visible = true if @highQualMode
 
-	onPaint: (threeRenderer, camera, target, config) =>
-		return if not @isVisible
+	onPaint: (threeRenderer, camera, target) =>
+		return if not @isVisible or @isScreenshotMode
 
 		# recreate textures if either they havent been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized? and
 		RenderTargetHelper.renderTargetHasRightSize(
-			@pipelineSceneTarget.renderTarget, threeRenderer, config.useBigTargets
+			@pipelineSceneTarget.renderTarget, threeRenderer
 		))
+			if @pipelineSceneTarget?
+				RenderTargetHelper.deleteRenderTarget @pipelineSceneTarget, threeRenderer
+
 			@pipelineSceneTarget = RenderTargetHelper.createRenderTarget(
-				threeRenderer, null, null, 1.0, config.useBigTargets
+				threeRenderer, null, null, 1.0
 			)
 			@renderTargetsInitialized = true
 
@@ -118,7 +121,7 @@ module.exports = class LegoBoard
 		gl = threeRenderer.context
 
 		# render baseplate transparent if cam looks from below
-		if camera.position.y < 0
+		if camera.position.z < 0
 			# one fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
@@ -146,7 +149,11 @@ module.exports = class LegoBoard
 		@threejsNode.visible = !@threejsNode.visible
 		@isVisible = !@isVisible
 
-	setFidelity: (fidelityLevel, availableLevels) =>
+	setFidelity: (fidelityLevel, availableLevels, options) =>
+		if options.screenshotMode?
+			@isScreenshotMode = options.screenshotMode
+			@threejsNode.visible = @isVisible and not @isScreenshotMode
+
 		# Determine whether to show or hide studs
 		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
 			@highQualMode = true

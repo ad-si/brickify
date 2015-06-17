@@ -23,14 +23,21 @@ class NewBrickator
 	onNodeAdd: (node) =>
 		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
-		@runLegoPipeline node
+		Spinner.startOverlay @bundle.renderer.getDomElement()
+		@getNodeData node
+		.then (cachedData) =>
+			@nodeVisualizer?.objectModified node, cachedData
+			Spinner.stop @bundle.renderer.getDomElement()
+		.catch (error) =>
+			log.error error
+			Spinner.stop @bundle.renderer.getDomElement()
 
 	onNodeRemove: (node) =>
 		@pipeline.terminate()
 
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData(selectedNode)
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
 			settings = new PipelineSettings(@bundle.globalConfig)
@@ -64,7 +71,7 @@ class NewBrickator
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
 		log.debug 'relayouting modified parts, creating bricks:',createBricks
-		@_getCachedData(selectedNode)
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			modifiedBricks = new Set()
 			for v in modifiedVoxels
@@ -91,7 +98,7 @@ class NewBrickator
 			log.error error
 
 	everythingPrint: (selectedNode) =>
-		@_getCachedData selectedNode
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyInitLayout()
@@ -105,11 +112,10 @@ class NewBrickator
 				@nodeVisualizer?.objectModified selectedNode, cachedData
 
 	_createDataStructure: (selectedNode) =>
-		selectedNode.getModel().then (model) =>
+		return selectedNode.getModel().then (model) =>
 			# create grid
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
-			settings.deactivateLayouting()
 
 			@pipeline.run(
 				optimizedModel: model
@@ -118,28 +124,29 @@ class NewBrickator
 			)
 			.then (results) ->
 				# create data structure
-				return {
+				data = {
 					node: selectedNode
 					grid: results.grid
 					optimizedModel: model
-					csgNeedsRecalculation: true
+					csgNeedsRecalculation: false
 				}
+				selectedNode.storePluginData 'newBrickator', data, true
+				return data
 
 	_checkDataStructure: (selectedNode, data) ->
 		return yes # Later: Check for node transforms
 
-	_getCachedData: (selectedNode) =>
+	getNodeData: (selectedNode) =>
 		return selectedNode.getPluginData 'newBrickator'
 		.then (data) =>
 			if data? and @_checkDataStructure selectedNode, data
 				return data
 			else
-				@_createDataStructure selectedNode
-				.then (data) ->
-					selectedNode.storePluginData 'newBrickator', data, true
-					return data
+				return @_createDataStructure selectedNode
 
 	getDownload: (selectedNode, downloadOptions) =>
+		return null if downloadOptions.type != 'stl'
+
 		options = @_prepareCSGOptions(
 			downloadOptions.studRadius, downloadOptions.holeRadius
 		)

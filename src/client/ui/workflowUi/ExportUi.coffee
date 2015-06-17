@@ -1,53 +1,23 @@
-DownloadProvider = require './downloadProvider'
-piwikTracking = require '../../piwikTracking'
+ShareUi =  require './ShareUi'
+DownloadUi = require './DownloadUi'
 
 class ExportUi
-	constructor: (@workflowUi) ->
-		{@studSize, @holeSize, @exportStepSize} = @workflowUi.bundle.globalConfig
-
+	constructor: (workflowUi) ->
 		@$panel = $('#exportGroup')
-		@_initDownloadModal()
-		@_initDownloadModalContent()
+		@bundle = workflowUi.bundle
+
+		@_initShare()
+		@_initDownload()
 
 	setEnabled: (enabled) =>
-		@$panel.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
+		@$panel.find('h4').toggleClass 'disabled', !enabled
+		@shareUi.setEnabled enabled
+		@downloadUi.setEnabled enabled
 
-	_initDownloadModal: =>
-		@downloadButton = $('#downloadButton')
-		@downloadModal = $('#downloadModal')
+	_initShare: =>
+		@shareUi = new ShareUi @
 
-		#show modal when clicking on download button
-		@downloadButton.click =>
-			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadButtonClick'
-			@downloadModal.modal 'show'
-
-	_initDownloadModalContent: =>
-		# stl download
-		@downloadProvider = new DownloadProvider @workflowUi.bundle
-		@downloadProvider.init(
-			'#stlDownloadButton', @, @workflowUi.bundle.sceneManager
-		)
-
-		@studSizeSelect = $('#studSizeSelect')
-		@holeSizeSelect = $('#holeSizeSelect')
-
-		@studSizeSelect.on 'input', =>
-			@_updateStudRadius()
-		@holeSizeSelect.on 'input', =>
-			@_updateHoleRadius()
-
-		@_updateStudRadius()
-		@_updateHoleRadius()
-
-	_updateStudRadius: =>
-		studSelection = parseInt @studSizeSelect.val()
-		@studRadiusSelection = @studSizeSelect.val()
-		@studRadius = @studSize.radius + studSelection * @exportStepSize
-
-	_updateHoleRadius: =>
-		holeSelection = parseInt @holeSizeSelect.val()
-		@holeRadiusSelection = @holeSizeSelect.val()
-		@holeRadius = @holeSize.radius + holeSelection * @exportStepSize
-
+	_initDownload: =>
+		@downloadUi = new DownloadUi @
 
 module.exports = ExportUi

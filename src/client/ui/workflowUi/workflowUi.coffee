@@ -1,5 +1,4 @@
 perfectScrollbar = require 'perfect-scrollbar'
-piwikTracking = require '../../piwikTracking'
 
 LoadUi = require './LoadUi'
 EditUi = require './EditUi'
@@ -45,26 +44,8 @@ class WorkflowUi
 
 		@enableOnly @workflow.load
 
-		@_initNotImplementedMessages()
 		@_initScrollbar()
 		@_initToggleButton()
-
-	_initNotImplementedMessages: ->
-		alertCallback = ->
-			bootbox.alert({
-					title: 'Not implemented yet'
-					message: 'We are sorry, but this feature is not implemented yet.
-					 Please check back later.'
-			})
-
-		$('#downloadPdfButton').click ->
-			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadPdfClick'
-			alertCallback()
-		$('#shareButton').click ->
-			piwikTracking.trackEvent(
-				'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
-			)
-			alertCallback()
 
 	_initScrollbar: ->
 		sidebar = document.getElementById 'leftSidebar'

@@ -63,6 +63,8 @@ module.exports = class DownloadProvider
 						zip.file result.fileName, result.data, options
 					zipFile = zip.generate type: 'blob'
 					saveAs zipFile, "brickify-#{selectedNode.name}.zip"
+		.catch (error) ->
+			log error
 
 	_collectFiles: (array) ->
 		files = []

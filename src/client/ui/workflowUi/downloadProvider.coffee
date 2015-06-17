@@ -42,7 +42,27 @@ module.exports = class DownloadProvider
 		.then (resultsArray) =>
 			files = @_collectFiles resultsArray
 
-			if files.length is 0
+			if files.length is 1
+				saveAs(
+					new Blob([files[0].data])
+					files[0].fileName
+				)
+
+			else if files.length > 1
+				zip = new JSZip()
+
+				files.forEach (file, index) ->
+					zip.file(
+						index + '_' + file.fileName
+						file.data
+					)
+
+				saveAs(
+					zip.generate {type: 'blob'}
+					"brickify-#{selectedNode.name}.zip"
+				)
+
+			else
 				bootbox.alert(
 					title: 'There is nothing to download at the moment'
 					message: 'This happens when your whole model
@@ -50,24 +70,7 @@ module.exports = class DownloadProvider
 						and you have not selected anything to be 3D-printed.
 						Use the Make 3D-print brush for that.'
 				)
-			if files.length is 1
-				data = files[0].data
-				fileName = files[0].fileName
-				saveAs data, fileName
-			if files.length > 1
-				promisesArray = []
-				for file in files
-					promisesArray.push(
-						@_arrayBufferFromBlob file.data, file.fileName
-					)
 
-				Promise.all(promisesArray).then (resultsArray) ->
-					zip = new JSZip()
-					options = binary: true
-					for result in resultsArray
-						zip.file result.fileName, result.data, options
-					zipFile = zip.generate type: 'blob'
-					saveAs zipFile, "brickify-#{selectedNode.name}.zip"
 		.catch (error) ->
 			log error
 

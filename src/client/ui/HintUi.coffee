@@ -2,19 +2,16 @@ class HintUi
 	constructor: ->
 		@$hintContainer = $('#usageHintContainer')
 		@$moveHint = @$hintContainer.find('#moveHint')
-		@moveHintVisible = true
 		@$brushHint = @$hintContainer.find('#brushHint')
-		@brushHintVisible = true
 		@$rotateHint = @$hintContainer.find('#rotateHint')
-		@rotateHintVisible = true
 		@$zoomHint = @$hintContainer.find('#zoomHint')
-		@zoomHintVisible = true
 
-		if not @_userNeedsHint()
-			@$moveHint.hide()
-			@$brushHint.hide()
-			@$rotateHint.hide()
-			@$zoomHint.hide()
+		if @_userNeedsHint()
+			@$hintContainer.show()
+			@moveHintVisible = true
+			@brushHintVisible = true
+			@rotateHintVisible = true
+			@zoomHintVisible = true
 
 	pointerMove: (event, handled) =>
 		# Ignore plain mouse movement
@@ -39,6 +36,7 @@ class HintUi
 				@moveHintVisible = false
 
 		if not @_anyHintVisible()
+			@$hintContainer.hide()
 			@_disableHintsOnReload()
 
 	mouseWheel: =>

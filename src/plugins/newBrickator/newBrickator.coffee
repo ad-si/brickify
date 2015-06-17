@@ -149,12 +149,12 @@ class NewBrickator
 			log.warn 'Unable to create download due to CSG Plugin missing'
 			return Promise.resolve { data: '', fileName: '' }
 
-		dlPromise = new Promise (resolve, reject) =>
+		downloadPromise = new Promise (resolve, reject) =>
 			@csg
 			.getCSG selectedNode, options
-			.then (detailedCsgGeometries) ->
+			.then (csgGeometries) ->
 
-				if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
+				if not csgGeometries? or csgGeometries.length is 0
 					resolve [{
 						data: ''
 						fileName: ''
@@ -165,7 +165,7 @@ class NewBrickator
 				.getName()
 				.then (name) ->
 
-					results = detailedCsgGeometries.map (threeGeometry, index) ->
+					results = csgGeometries.map (threeGeometry, index) ->
 
 						fileName = 'brickify-' +
 							name.replace /.stl$/, '' +
@@ -187,7 +187,7 @@ class NewBrickator
 				log.error error
 				reject error
 
-		return dlPromise
+		return downloadPromise
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}

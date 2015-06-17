@@ -83,6 +83,7 @@ class LegoInstructions
 			bootbox.dialog
 				title: 'Parts needed'
 				message: pieceListHtml
+				backdrop: true
 
 	_takeScreenshots: (node, numLayers, camera) =>
 		files = []

@@ -287,24 +287,13 @@ class BrickLayouter
 
 
 	optimizeLayoutStability: (grid) =>
-		passes = 0
+		minComponents = null
 
-		bricks = grid.getAllBricks()
-		log.debug '\t# of bricks: ', bricks.size
-
-		components = @findConnectedComponents bricks
-		minComponents = components.length
-		log.debug '\t# of components: ', components.length
-
-		bricksToSplit = @findBricksToSplit components, bricks
-		log.debug '\t# of bricks to split: ', bricksToSplit.size
-
-		@splitBricksAndRelayoutLocally bricksToSplit, grid, false
-
-		loop
-			passes++
-
+		for pass in [0..100]
 			bricks = grid.getAllBricks()
+			log.debug '\t# of bricks: ', bricks.size
+			minComponents ?= bricks.size
+
 			bricks.forEach (brick) ->
 				brick.component = null
 
@@ -313,17 +302,18 @@ class BrickLayouter
 				minComponents = components.length
 			log.debug '\t# of components: ', components.length
 
-			bricksToSplit = @findBricksToSplit components, bricks
+			#
+			bricksToSplit = @findBricksOnComponentInterfaces components, bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
 			if components.length <= minComponents and bricksToSplit.size == 0
-				break
-			else if passes == 100
+				# if components are > 1, but no bricks are on the interface
+				# between components, they cannot be merged and must remain seperate
 				break
 			else #if components.length > minComponents
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false
 
-		log.debug '\tfinished optimization after ', passes , 'passes'
+		log.debug '\tfinished optimization after ', pass + 1 , 'passes'
 		return Promise.resolve grid
 
 	findConnectedComponents: (bricks) =>
@@ -341,7 +331,7 @@ class BrickLayouter
 				currentBrick.component = id
 				components[id].add currentBrick
 				queue.delete currentBrick
-				# add all connected Bricks to the
+				# add all connected Bricks to the queue
 				conBricks = currentBrick.connectedBricks()
 				conBricks.forEach (conBrick) ->
 					queue.add conBrick if conBrick.component == null
@@ -350,7 +340,7 @@ class BrickLayouter
 
 		return components
 
-	findBricksToSplit: (components, bricks) =>
+	findBricksOnComponentInterfaces: (components, bricks) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->

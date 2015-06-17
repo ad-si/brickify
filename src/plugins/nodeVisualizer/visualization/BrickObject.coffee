@@ -3,24 +3,20 @@ THREE = require 'three'
 # @class BrickObject
 ###
 class BrickObject extends THREE.Object3D
-	constructor: (brickGeometry, studGeometry, planeGeometry, @material, @textureMaterial) ->
+	constructor: (brickGeometry, studGeometry, planeGeometry,
+								@material, @textureMaterial, highFidelity) ->
 		super()
 		brickMesh = new THREE.Mesh(brickGeometry, @material)
-		#studMesh = new THREE.Mesh(studGeometry, @material)
+		studMesh = new THREE.Mesh(studGeometry, @material)
 		planeMesh = new THREE.Mesh(planeGeometry, @textureMaterial)
 		@add brickMesh
-		#@add studMesh
+		@add studMesh
 		@add planeMesh
+		@_updateQuality highFidelity
 
 	setMaterial: (@material) =>
 		@children[0].material = @material
-		#@children[1].material = @material
-
-		# material override resets highlight state
-		@_isHighlighted = false
-
-	setStudVisibility: (boolean) =>
-		#@children[1].visible = boolean
+		@children[1].material = @material
 
 	# stores a reference of this bricks voxel coordinates for
 	# further usage
@@ -35,25 +31,19 @@ class BrickObject extends THREE.Object3D
 	# makes the voxel being 3d printed
 	make3dPrinted: =>
 		@gridEntry.enabled = false
-		@nonHighlightVisibility = false
 
 	# makes the voxel being legotized
 	makeLego: =>
 		@gridEntry.enabled = true
-		@nonHighlightVisibility = true
 
 	isLego: =>
 		return @gridEntry.enabled
 
-	# one may highlight this brick with a special material
-	setHighlight: (isHighlighted, material) =>
-		if isHighlighted
-			@visible = true
-			@children[0].material = material
-			#@children[1].material = material
-		else
-			@visible = @nonHighlightVisibility
-			@children[0].material = @material
-			#@children[1].material = @material
+	setFidelity: (highFidelity) =>
+		@_updateQuality highFidelity
+
+	_updateQuality: (highFidelity) =>
+		@children[1].visible = highFidelity
+		@children[2].visible = !highFidelity
 
 module.exports = BrickObject

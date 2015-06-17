@@ -20,6 +20,7 @@ class NodeVisualizer
 		@objectShadowOpacity = 0.5
 		@objectColorMult = new THREE.Vector3(1, 1, 1)
 		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
+		@brickVisualizations = {}
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
@@ -190,6 +191,9 @@ class NodeVisualizer
 				# change material properties
 				@coloring.setPipelineMode false
 
+		for nodeId, brickVisualization of @brickVisualizations
+			brickVisualization.setFidelity fidelityLevel, availableLevels
+
 	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
@@ -224,6 +228,7 @@ class NodeVisualizer
 		@brickRootNode.remove threeHelper.find node, @brickRootNode
 		@brickShadowRootNode.remove threeHelper.find node, @brickShadowRootNode
 		@objectsRootNode.remove threeHelper.find node, @objectsRootNode
+		delete @brickVisualizations[node.id]
 
 	onNodeSelect: (@selectedNode) => return
 
@@ -269,15 +274,18 @@ class NodeVisualizer
 		threeHelper.link node, brickShadowThreeNode
 		threeHelper.link node, modelThreeNode
 
+		brickVisualization = new BrickVisualization(
+				@bundle, brickThreeNode, brickShadowThreeNode, @coloring
+			)
+		@brickVisualizations[node.id] = brickVisualization
+
 		data = {
 			initialized: false
 			node: node
 			brickThreeNode: brickThreeNode
 			brickShadowThreeNode: brickShadowThreeNode
 			modelThreeNode: modelThreeNode
-			brickVisualization: new BrickVisualization(
-				@bundle, brickThreeNode, brickShadowThreeNode, @coloring
-			)
+			brickVisualization: brickVisualization
 			modelVisualization: new ModelVisualization(
 				@bundle.globalConfig, node, modelThreeNode, @coloring
 			)

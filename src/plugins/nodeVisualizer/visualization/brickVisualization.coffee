@@ -41,6 +41,7 @@ class BrickVisualization
 			{x: 1, y: 1, z: 1},
 			@defaultColoring.printHighlightMaterial
 			@defaultColoring.printHighlightTextureMaterial
+			@highFidelity
 		)
 		@_highlightVoxel.visible = false
 
@@ -119,6 +120,7 @@ class BrickVisualization
 					brick.getSize()
 					materials.color
 					@defaultColoring.getTextureMaterialForBrick brick
+					@highFidelity
 				)
 
 				# link data <-> visuals
@@ -261,6 +263,7 @@ class BrickVisualization
 							{x: 1, y: 1, z: 1}
 							visualBrick.material
 							@defaultColoring.printHighlightTextureMaterial
+							@highFidelity
 						)
 						temporaryVoxel.voxelPosition = voxel.position
 						@temporaryVoxels.add temporaryVoxel
@@ -313,6 +316,7 @@ class BrickVisualization
 				{x: 1, y: 1, z: 1}
 				@defaultColoring.selectedMaterial
 				@defaultColoring.getTextureMaterialForBrick voxel.brick
+				@highFidelity
 			)
 			temporaryVoxel.voxelPosition = voxel.position
 			@temporaryVoxels.add temporaryVoxel
@@ -343,5 +347,14 @@ class BrickVisualization
 		return @voxelSelector.clearSelection()
 
 	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
+
+	setFidelity: (fidelityLevel, availableLevels) =>
+		@highFidelity = fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+
+		@_highlightVoxel.setFidelity @highFidelity
+
+		for layer in @bricksSubnode.children
+			for threeBrick in layer.children
+				threeBrick.setFidelity @highFidelity
 
 module.exports = BrickVisualization

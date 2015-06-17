@@ -23,7 +23,8 @@ module.exports = class GeometryCreator
 		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
 		@stud.applyMatrix translation
 
-	getBrick: (gridPosition, brickDimensions, material, textureMaterial) =>
+	getBrick: (gridPosition, brickDimensions,
+						 material, textureMaterial, highFidelity) =>
 		# returns a THREE.Geometry that uses the given material and is
 		# transformed to match the given grid position
 		worldBrickSize = {
@@ -42,6 +43,7 @@ module.exports = class GeometryCreator
 			planeGeometry
 			material
 			textureMaterial
+			highFidelity
 		)
 
 		worldBrickPosition = @grid.mapVoxelToWorld gridPosition

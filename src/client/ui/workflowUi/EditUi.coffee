@@ -9,7 +9,7 @@ class EditUi
 		@_initBrushes()
 
 	setEnabled: (enabled) =>
-		@$panel.find('.btn, .panel, h4, span').toggleClass 'disabled', !enabled
+		@$panel.find('.btn, .panel, h4, .estimate').toggleClass 'disabled', !enabled
 
 	_initBrushes: =>
 		@brushUi = new EditBrushUi @workflowUi

@@ -316,49 +316,44 @@ class BrickLayouter
 		id = 0
 
 		# first pass
-		bricks.forEach (brick) =>
+		bricks.forEach (brick) ->
 			return if brick.label != null
 
 			conBricks = brick.connectedBricks()
 			conLabels = new Set()
 
-			conBricks.forEach (conBrick) =>
+			conBricks.forEach (conBrick) ->
 				conLabels.add conBrick.label if conBrick.label?
 
 			if conLabels.size > 0
 				minLabel = arrayHelper.minElement conLabels
 				# assign label to this brick
-				brick.label = minLabel
-				@resolveEquivalencies conLabels, equivalencies
-
+				brick.label = equivalencies[minLabel]
+				#console.log 'merging', conLabels
+				for i in [0..equivalencies.length]
+					if conLabels.has equivalencies[i]
+						equivalencies[i] = equivalencies[minLabel]
+				#console.log equivalencies
 
 			else # no neighbor has a label
 				brick.label = id
-				equivalencies[id] = new Set([id])
+				equivalencies[id] = id
 				conBricks.forEach (conBrick) ->
 					conBrick.label = id
+				#console.log 'NEW', id
+				#console.log equivalencies
 				id++
-
-		minimumLabels = (arrayHelper.minElement set for set in equivalencies)
 
 		# second pass - applying minimum labels
 		bricks.forEach (brick) ->
-			brick.label = minimumLabels[brick.label]
+			brick.label = equivalencies[brick.label]
 
 		finalLabels = new Set()
-		for label in minimumLabels
+		for label in equivalencies
 			finalLabels.add label
 		numberOfComponents = finalLabels.size
 
 		return numberOfComponents
-
-	resolveEquivalencies: (connectedLabels, equivalencies) =>
-		allLabels = new Set
-		connectedLabels.forEach (conLabel) ->
-			equivalencies[conLabel].forEach (label) ->
-				allLabels.add label
-		allLabels.forEach (conLabel) ->
-			equivalencies[conLabel] = allLabels
 
 	findBricksOnComponentInterfaces: (bricks) =>
 		bricksToSplit = new Set()

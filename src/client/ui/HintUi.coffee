@@ -16,14 +16,14 @@ class HintUi
 			@$rotateHint.hide()
 			@$zoomHint.hide()
 
-	pointerMove: (event, handeled) =>
+	pointerMove: (event, handled) =>
 		# Ignore plain mouse movement
 		return if event.buttons == 0
 
 		switch event.button
 			when 0
 				# Left mouse button
-				if not handeled
+				if not handled
 					@$rotateHint.fadeOut()
 					@rotateHintVisible = false
 				else

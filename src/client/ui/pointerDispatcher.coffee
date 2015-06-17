@@ -43,7 +43,7 @@ class PointerDispatcher
 	onPointerMove: (event) =>
 		# don't call mouse events if there is no selected node
 		if not @sceneManager.selectedNode?
-			# notify hint Ui of unhandeled event
+			# notify hint Ui of unhandled event
 			@hintUi.pointerMove event, false
 			return
 

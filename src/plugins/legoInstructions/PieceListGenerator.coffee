@@ -15,27 +15,19 @@ module.exports.generatePieceList = (bricks) ->
 		size = brick.getSize()
 		pieceList.push {
 			size: {
-				x: size.x
-				y: size.y
+				x: Math.min size.x, size.y
+				y: Math.max size.x, size.y
 				z: size.z
 			}
 			count: 1
 		}
 
-	# sort so that most needed bricks are on top
+	# sort bricks from small to big
 	pieceList.sort (a,b) ->
 		if a.size.x is b.size.x
 			return a.size.y - b.size.y
 		else
 			return a.size.x - b.size.x
-
-	# switch sizes so that the smallest number
-	# is always first
-	for piece in pieceList
-		if piece.size.x > piece.size.y
-			tmp = piece.size.x
-			piece.size.x = piece.size.y
-			piece.size.y = tmp
 
 	return pieceList
 

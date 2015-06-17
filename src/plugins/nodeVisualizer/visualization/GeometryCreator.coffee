@@ -18,6 +18,10 @@ module.exports = class GeometryCreator
 		rotation.makeRotationX(1.571)
 		@stud.applyMatrix(rotation)
 
+		translation = new THREE.Matrix4()
+		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
+		@stud.applyMatrix translation
+
 	getVoxel: (gridPosition, material) =>
 		brick = @getBrick gridPosition, {x: 1, y: 1, z: 1}, material
 
@@ -104,7 +108,7 @@ module.exports = class GeometryCreator
 			for yi in [0..brickDimensions.y - 1] by 1
 				tx = (@grid.spacing.x * (xi + 0.5)) - (worldBrickSize.x / 2)
 				ty = (@grid.spacing.y * (yi + 0.5)) - (worldBrickSize.y / 2)
-				tz = (@grid.spacing.z * 0.7)
+				tz = (@grid.spacing.z * brickDimensions.z) - (worldBrickSize.z / 2)
 
 				translation = new THREE.Matrix4()
 				translation.makeTranslation(tx, ty, tz)

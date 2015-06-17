@@ -173,6 +173,10 @@ class NewBrickator
 
 					resolve results
 
+			.catch (error) ->
+				log.error error
+				reject error
+
 		return dlPromise
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>

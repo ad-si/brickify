@@ -6,6 +6,7 @@ module.exports = class GeometryCreator
 	constructor: (@globalConfig, @grid) ->
 		@brickGeometryCache = {}
 		@studGeometryCache = {}
+		@planeGeometryCache = {}
 
 		@stud = new THREE.CylinderGeometry(
 			@globalConfig.studSize.radius
@@ -22,30 +23,27 @@ module.exports = class GeometryCreator
 		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
 		@stud.applyMatrix translation
 
-	getVoxel: (gridPosition, material) =>
-		brick = @getBrick gridPosition, {x: 1, y: 1, z: 1}, material
-
-		#store references (voxel) for further use
-		brick.setVoxelCoords gridPosition
-		brick.setGridReference @grid.getVoxel(
-			gridPosition.x, gridPosition.y, gridPosition.z
-		)
-
-		return brick
-
-	getBrick: (gridPosition, brickDimensions, material) =>
+	getBrick: (gridPosition, brickDimensions, material, textureMaterial) =>
 		# returns a THREE.Geometry that uses the given material and is
 		# transformed to match the given grid position
-		brickGeometry = @_getBrickGeometry(brickDimensions)
-		studGeometry = @_getStudsGeometry(brickDimensions)
-
-		brick = new BrickObject(brickGeometry, studGeometry, material)
-
 		worldBrickSize = {
 			x: brickDimensions.x * @grid.spacing.x
 			y: brickDimensions.y * @grid.spacing.y
 			z: brickDimensions.z * @grid.spacing.z
 		}
+
+		brickGeometry = @_getBrickGeometry brickDimensions, worldBrickSize
+		studGeometry = @_getStudsGeometry brickDimensions, worldBrickSize
+		planeGeometry = @_getPlaneGeometry brickDimensions, worldBrickSize
+
+		brick = new BrickObject(
+			brickGeometry
+			studGeometry
+			planeGeometry
+			material
+			textureMaterial
+		)
+
 		worldBrickPosition = @grid.mapVoxelToWorld gridPosition
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
@@ -73,7 +71,7 @@ module.exports = class GeometryCreator
 		box.dimensions = boxDimensions
 		return box
 
-	_getBrickGeometry: (brickDimensions) =>
+	_getBrickGeometry: (brickDimensions, worldBrickSize) =>
 		# returns a box geometry for the given dimensions
 
 		ident = @_getHash brickDimensions
@@ -81,15 +79,15 @@ module.exports = class GeometryCreator
 			return @brickGeometryCache[ident]
 
 		brickGeometry = new THREE.BoxGeometry(
-			brickDimensions.x * @grid.spacing.x
-			brickDimensions.y * @grid.spacing.y
-			brickDimensions.z * @grid.spacing.z
+			worldBrickSize.x
+			worldBrickSize.y
+			worldBrickSize.z
 		)
 
 		@brickGeometryCache[ident] = brickGeometry
 		return brickGeometry
 
-	_getStudsGeometry: (brickDimensions) =>
+	_getStudsGeometry: (brickDimensions, worldBrickSize) =>
 		# returns studs for the given brick size
 
 		ident = @_getHash brickDimensions
@@ -97,12 +95,6 @@ module.exports = class GeometryCreator
 			return @studGeometryCache[ident]
 
 		studs = new THREE.Geometry()
-
-		worldBrickSize = {
-			x: brickDimensions.x * @grid.spacing.x
-			y: brickDimensions.y * @grid.spacing.y
-			z: brickDimensions.z * @grid.spacing.z
-		}
 
 		for xi in [0..brickDimensions.x - 1] by 1
 			for yi in [0..brickDimensions.y - 1] by 1
@@ -116,6 +108,26 @@ module.exports = class GeometryCreator
 				studs.merge @stud, translation
 
 		@studGeometryCache[ident] = studs
+		return studs
+
+	_getPlaneGeometry: (brickDimensions, worldBrickSize) =>
+		# returns studs for the given brick size
+
+		ident = @_getHash brickDimensions
+		if @planeGeometryCache[ident]?
+			return @planeGeometryCache[ident]
+
+		studs = new THREE.PlaneGeometry(
+			@grid.spacing.x * brickDimensions.x
+			@grid.spacing.y * brickDimensions.y
+		)
+
+		tz = (@grid.spacing.z * brickDimensions.z) - (worldBrickSize.z / 2)
+		translation = new THREE.Matrix4()
+		translation.makeTranslation(0, 0, tz)
+		studs.applyMatrix translation
+
+		@planeGeometryCache[ident] = studs
 		return studs
 
 	_getHash: (dimensions) ->

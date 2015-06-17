@@ -40,6 +40,7 @@ class BrickVisualization
 			{x: 0, y: 0, z: 0},
 			{x: 1, y: 1, z: 1},
 			@defaultColoring.printHighlightMaterial
+			@defaultColoring.printHighlightTextureMaterial
 		)
 		@_highlightVoxel.visible = false
 
@@ -114,7 +115,10 @@ class BrickVisualization
 				# create visual brick
 				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), materials.color
+					brick.getPosition()
+					brick.getSize()
+					materials.color
+					@defaultColoring.getTextureMaterialForBrick brick
 				)
 
 				# link data <-> visuals
@@ -253,7 +257,10 @@ class BrickVisualization
 				if not visualBrick.hasBeenSplit
 					voxel.brick.forEachVoxel (voxel) =>
 						temporaryVoxel = @geometryCreator.getBrick(
-							voxel.position, {x: 1, y: 1, z: 1}, visualBrick.material
+							voxel.position
+							{x: 1, y: 1, z: 1}
+							visualBrick.material
+							@defaultColoring.printHighlightTextureMaterial
 						)
 						temporaryVoxel.voxelPosition = voxel.position
 						@temporaryVoxels.add temporaryVoxel
@@ -302,7 +309,10 @@ class BrickVisualization
 
 			# Create a visible temporary voxel at this position
 			temporaryVoxel = @geometryCreator.getBrick(
-				voxel.position, {x: 1, y: 1, z: 1}, @defaultColoring.selectedMaterial
+				voxel.position
+				{x: 1, y: 1, z: 1}
+				@defaultColoring.selectedMaterial
+				@defaultColoring.getTextureMaterialForBrick voxel.brick
 			)
 			temporaryVoxel.voxelPosition = voxel.position
 			@temporaryVoxels.add temporaryVoxel

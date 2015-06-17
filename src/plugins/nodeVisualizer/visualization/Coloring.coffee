@@ -4,9 +4,15 @@ LineMatGenerator = require './LineMatGenerator'
 # Provides a simple implementation on how to color voxels and bricks
 module.exports = class Coloring
 	constructor: (@globalConfig) ->
+		@textureMaterialCache = {}
+
 		@brickMaterial = new THREE.MeshLambertMaterial({
 			color: 0xfff000 #orange
 		})
+
+		@studTexture = THREE.ImageUtils.loadTexture('img/stud.png')
+		@studTexture.wrapS = THREE.RepeatWrapping
+		@studTexture.wrapT = THREE.RepeatWrapping
 
 		@selectedMaterial = new THREE.MeshLambertMaterial({
 			color: 0xff0000
@@ -28,6 +34,15 @@ module.exports = class Coloring
 		@printHighlightMaterial.polygonOffset = true
 		@printHighlightMaterial.polygonOffsetFactor = -1
 		@printHighlightMaterial.polygonOffsetUnits = -1
+
+		@printHighlightTextureMaterial = new THREE.MeshLambertMaterial({
+			map: @studTexture
+			transparent: true
+			opacity: 0.2
+		})
+		@printHighlightTextureMaterial.polygonOffset = true
+		@printHighlightTextureMaterial.polygonOffsetFactor = -1
+		@printHighlightTextureMaterial.polygonOffsetUnits = -1
 
 		@legoBoxHighlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0xff7755
@@ -218,3 +233,28 @@ module.exports = class Coloring
 			opacity: opacity
 			transparent: opacity < 1.0
 		)
+
+	getTextureMaterialForBrick: (brick) =>
+		if brick and brick.getVisualBrick()?
+			return brick.getVisualBrick().textureMaterial
+
+		size = if brick then brick.getSize() else {x: 1, y: 1}
+		ident = @_getHash size
+		if @textureMaterialCache[ident]?
+			return @textureMaterialCache[ident]
+
+		studsTexture = @studTexture.clone()
+		studsTexture.needsUpdate = true
+		studsTexture.repeat.set size.x, size.y
+
+		textureMaterial = new THREE.MeshLambertMaterial({
+			map: studsTexture
+			transparent: true
+			opacity: 0.2
+		})
+
+		@textureMaterialCache[ident] = textureMaterial
+		return textureMaterial
+
+	_getHash: (dimensions) ->
+		return dimensions.x + '-' + dimensions.y

@@ -3,22 +3,24 @@ THREE = require 'three'
 # @class BrickObject
 ###
 class BrickObject extends THREE.Object3D
-	constructor: (brickGeometry, studGeometry, @material) ->
+	constructor: (brickGeometry, studGeometry, planeGeometry, @material, @textureMaterial) ->
 		super()
 		brickMesh = new THREE.Mesh(brickGeometry, @material)
-		studMesh = new THREE.Mesh(studGeometry, @material)
+		#studMesh = new THREE.Mesh(studGeometry, @material)
+		planeMesh = new THREE.Mesh(planeGeometry, @textureMaterial)
 		@add brickMesh
-		@add studMesh
+		#@add studMesh
+		@add planeMesh
 
 	setMaterial: (@material) =>
 		@children[0].material = @material
-		@children[1].material = @material
+		#@children[1].material = @material
 
 		# material override resets highlight state
 		@_isHighlighted = false
 
 	setStudVisibility: (boolean) =>
-		@children[1].visible = boolean
+		#@children[1].visible = boolean
 
 	# stores a reference of this bricks voxel coordinates for
 	# further usage
@@ -48,10 +50,10 @@ class BrickObject extends THREE.Object3D
 		if isHighlighted
 			@visible = true
 			@children[0].material = material
-			@children[1].material = material
+			#@children[1].material = material
 		else
 			@visible = @nonHighlightVisibility
 			@children[0].material = @material
-			@children[1].material = @material
+			#@children[1].material = @material
 
 module.exports = BrickObject

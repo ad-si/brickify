@@ -317,8 +317,6 @@ class BrickLayouter
 
 		# first pass
 		bricks.forEach (brick) ->
-			return if brick.label != null
-
 			conBricks = brick.connectedBricks()
 			conLabels = new Set()
 
@@ -338,15 +336,16 @@ class BrickLayouter
 			else # no neighbor has a label
 				brick.label = id
 				equivalencies[id] = id
-				conBricks.forEach (conBrick) ->
-					conBrick.label = id
 				#console.log 'NEW', id
 				#console.log equivalencies
 				id++
 
+		console.log equivalencies
 		# second pass - applying minimum labels
 		bricks.forEach (brick) ->
 			brick.label = equivalencies[brick.label]
+			if brick.label == null
+				console.log 'null brick in algo', brick
 
 		finalLabels = new Set()
 		for label in equivalencies
@@ -361,6 +360,11 @@ class BrickLayouter
 		bricks.forEach (brick) ->
 			neighborsXY = brick.getNeighborsXY()
 			neighborsXY.forEach (neighbor) ->
+				if neighbor.label == null and neighbor.voxels.size == 0
+					console.warn 'neighbor with null label and no voxels'
+					#console.log brick
+					#console.log neighbor
+					return
 				if neighbor.label != brick.label
 					bricksToSplit.add neighbor
 					bricksToSplit.add brick

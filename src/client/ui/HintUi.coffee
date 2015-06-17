@@ -13,6 +13,20 @@ class HintUi
 			@rotateHintVisible = true
 			@zoomHintVisible = true
 
+	pointerDown: (event, handled) =>
+		return if event.buttons == 0
+
+		switch event.button
+			when 0
+				# Right mouse button
+				if handled
+					@$brushHint.fadeOut()
+					@brushHintVisible = false
+
+		if not @_anyHintVisible()
+			@$hintContainer.hide()
+			@_disableHintsOnReload()
+
 	pointerMove: (event, handled) =>
 		# Ignore plain mouse movement
 		return if event.buttons == 0

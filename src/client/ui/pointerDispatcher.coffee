@@ -35,6 +35,9 @@ class PointerDispatcher
 		# dispatch event
 		handled = @_dispatchEvent event, pointerEnums.events.PointerDown
 
+		#notify hint ui
+		@hintUi.pointerDown event, handled
+
 		# stop event if a plugin handled it (else let orbit controls work)
 		@_stop event if handled
 

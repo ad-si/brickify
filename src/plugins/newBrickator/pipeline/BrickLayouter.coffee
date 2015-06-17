@@ -296,7 +296,9 @@ class BrickLayouter
 			bricks.forEach (brick) ->
 				brick.label = null
 
-			@findConnectedComponents bricks
+			numberOfComponents = @findConnectedComponents bricks
+			log.debug '\t# of components: ', numberOfComponents
+
 			bricksToSplit = @findBricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
@@ -314,26 +316,21 @@ class BrickLayouter
 		id = 0
 
 		# first pass
-		bricks.forEach (brick) ->
+		bricks.forEach (brick) =>
 			return if brick.label != null
 
 			conBricks = brick.connectedBricks()
 			conLabels = new Set()
 
-			conBricks.forEach (conBrick) ->
+			conBricks.forEach (conBrick) =>
 				conLabels.add conBrick.label if conBrick.label?
 
 			if conLabels.size > 0
 				minLabel = arrayHelper.minElement conLabels
-				# assign label to this and all connected bricks
+				# assign label to this brick
 				brick.label = minLabel
-				# add all labels to each others equivalency
-				allLabels = new Set
-				conLabels.forEach (conLabel) ->
-					equivalencies[conLabel].forEach (label) ->
-						allLabels.add label
-				conLabels.forEach (conLabel) ->
-					equivalencies[conLabel] = allLabels
+				@resolveEquivalencies conLabels, equivalencies
+
 
 			else # no neighbor has a label
 				brick.label = id
@@ -348,9 +345,20 @@ class BrickLayouter
 		bricks.forEach (brick) ->
 			brick.label = minimumLabels[brick.label]
 
-		for set in equivalencies
-			console.log set.size,  set
-		return new Set()
+		finalLabels = new Set()
+		for label in minimumLabels
+			finalLabels.add label
+		numberOfComponents = finalLabels.size
+
+		return numberOfComponents
+
+	resolveEquivalencies: (connectedLabels, equivalencies) =>
+		allLabels = new Set
+		connectedLabels.forEach (conLabel) ->
+			equivalencies[conLabel].forEach (label) ->
+				allLabels.add label
+		allLabels.forEach (conLabel) ->
+			equivalencies[conLabel] = allLabels
 
 	findBricksOnComponentInterfaces: (bricks) =>
 		bricksToSplit = new Set()

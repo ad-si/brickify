@@ -40,9 +40,10 @@ module.exports = class DownloadProvider
 			if files.length is 0
 				bootbox.alert(
 					title: 'There is nothing to download at the moment'
-					message: 'This happens when your whole model is made out of LEGO
-										and you have not selected anything	to be 3D-printed. Use
-										the Make 3D-print brush for that'
+					message: 'This happens when your whole model
+						is made out of LEGO
+						and you have not selected anything to be 3D-printed.
+						Use the Make 3D-print brush for that.'
 				)
 			if files.length is 1
 				data = files[0].data
@@ -69,9 +70,15 @@ module.exports = class DownloadProvider
 			if Array.isArray entry
 				for subEntry in entry
 					if subEntry.fileName.length > 0
-						files.push data: subEntry.data, fileName: subEntry.fileName
+						files.push {
+							data: subEntry.data
+							fileName: subEntry.fileName
+						}
 			else if entry.fileName.length > 0
-				files.push data: entry.data, fileName: entry.fileName
+				files.push {
+					data: entry.data
+					fileName: entry.fileName
+				}
 		return files
 
 	_arrayBufferFromBlob: (blob, fileName) ->

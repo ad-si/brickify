@@ -294,10 +294,13 @@ class BrickLayouter
 
 
 	connectedComponentOptimization: (grid) =>
+		passes = 0
+
 		bricks = grid.getAllBricks()
 		log.debug '\t# of bricks: ', bricks.size
 
 		components = @findConnectedComponents bricks
+		minComponents = components.length
 		log.debug '\t# of components: ', components.length
 
 		bricksToSplit = @findBricksToSplit components, bricks
@@ -305,13 +308,27 @@ class BrickLayouter
 
 		@splitBricksAndRelayoutLocally bricksToSplit, grid, false
 
-		bricks = grid.getAllBricks()
-		bricks.forEach (brick) ->
-			brick.component = null
+		loop
+			passes++
 
-		components2 = @findConnectedComponents bricks
-		log.debug '\t# of components: ', components2.length
+			bricks = grid.getAllBricks()
+			bricks.forEach (brick) ->
+				brick.component = null
 
+			components = @findConnectedComponents bricks
+			if components.length < minComponents
+				minComponents = components.length
+			log.debug '\t# of components: ', components.length
+
+			bricksToSplit = @findBricksToSplit components, bricks
+			log.debug '\t# of bricks to split: ', bricksToSplit.size
+
+			if components.length <= minComponents and bricksToSplit.size == 0
+				break
+			else #if components.length > minComponents
+				@splitBricksAndRelayoutLocally bricksToSplit, grid, false
+
+		log.debug '\tfinished optimization after ', passes , 'passes'
 		return Promise.resolve grid
 
 	findConnectedComponents: (bricks) =>

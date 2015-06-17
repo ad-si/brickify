@@ -32,9 +32,14 @@ module.exports = class DownloadProvider
 				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
 			)
 
-		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
+		promisesArray = @bundle.pluginHooks.getDownload(
+			selectedNode
+			downloadOptions
+		)
 
-		Promise.all(promisesArray).then (resultsArray) =>
+		Promise
+		.all promisesArray
+		.then (resultsArray) =>
 			files = @_collectFiles resultsArray
 
 			if files.length is 0

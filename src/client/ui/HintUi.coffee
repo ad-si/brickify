@@ -18,7 +18,7 @@ class HintUi
 
 		switch event.button
 			when 0
-				# Right mouse button
+				# Left mouse button
 				if handled
 					@$brushHint.fadeOut()
 					@brushHintVisible = false

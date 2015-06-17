@@ -292,68 +292,74 @@ class BrickLayouter
 		for pass in [0..100]
 			bricks = grid.getAllBricks()
 			log.debug '\t# of bricks: ', bricks.size
-			minComponents ?= bricks.size
 
 			bricks.forEach (brick) ->
-				brick.component = null
+				brick.label = null
 
-			components = @findConnectedComponents bricks
-			if components.length < minComponents
-				minComponents = components.length
-			log.debug '\t# of components: ', components.length
-
-			#
-			bricksToSplit = @findBricksOnComponentInterfaces components, bricks
+			@findConnectedComponents bricks
+			bricksToSplit = @findBricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
-			if components.length <= minComponents and bricksToSplit.size == 0
-				# if components are > 1, but no bricks are on the interface
-				# between components, they cannot be merged and must remain seperate
+			if bricksToSplit.size == 0
 				break
-			else #if components.length > minComponents
+			else
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false
 
-		log.debug '\tfinished optimization after ', pass + 1 , 'passes'
+		log.debug '\tfinished optimization after ', pass , 'passes'
 		return Promise.resolve grid
 
+	# connected components using the connected component labelling algo
 	findConnectedComponents: (bricks) =>
+		equivalencies = []
 		id = 0
-		components = []
 
-		bricks.forEach (brick) =>
-			return if brick.component != null
-			components[id] = new Set()
+		# first pass
+		bricks.forEach (brick) ->
+			return if brick.label != null
 
-			queue = new Set([brick])
-			while queue.size != 0
-				currentBrick = queue.values().next().value
-				# process current brick
-				currentBrick.component = id
-				components[id].add currentBrick
-				queue.delete currentBrick
-				# add all connected Bricks to the queue
-				conBricks = currentBrick.connectedBricks()
+			conBricks = brick.connectedBricks()
+			conLabels = new Set()
+
+			conBricks.forEach (conBrick) ->
+				conLabels.add conBrick.label if conBrick.label?
+
+			if conLabels.size > 0
+				minLabel = arrayHelper.minElement conLabels
+				# assign label to this and all connected bricks
+				brick.label = minLabel
+				# add all labels to each others equivalency
+				conLabels.forEach (l) ->
+					equivalencies[l].forEach (id) ->
+						old = equivalencies[id]
+						equivalencies[id] = arrayHelper.union([old, conLabels])
+
+			else # no neighbor has a label
+				brick.label = id
+				equivalencies[id] = new Set([id])
 				conBricks.forEach (conBrick) ->
-					queue.add conBrick if conBrick.component == null
+					conBrick.label = id
+				id++
 
-			id++
+		minimumLabels = (arrayHelper.minElement set for set in equivalencies)
 
-		return components
+		# second pass - applying minimum labels
+		bricks.forEach (brick) ->
+			brick.label = minimumLabels[brick.label]
 
-	findBricksOnComponentInterfaces: (components, bricks) =>
+		for set in equivalencies
+			console.log set.size,  set
+		return new Set()
+
+	findBricksOnComponentInterfaces: (bricks) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->
 			neighborsXY = brick.getNeighborsXY()
 			neighborsXY.forEach (neighbor) ->
-				if neighbor.component != brick.component
+				if neighbor.label != brick.label
 					bricksToSplit.add neighbor
 					bricksToSplit.add brick
 
 		return bricksToSplit
-
-
-
-
 
 module.exports = BrickLayouter

@@ -29,6 +29,8 @@ class BrickVisualization
 		@isStabilityView = false
 		@_highlightVoxelVisiblity = true
 
+		@highFidelity = true
+
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
 			@bundle, @grid, @brickShadowThreeNode, @defaultColoring

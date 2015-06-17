@@ -6,22 +6,33 @@ module.exports = class GeometryCreator
 	constructor: (@globalConfig, @grid) ->
 		@brickGeometryCache = {}
 		@studGeometryCache = {}
+		@highFiStudGeometryCache = {}
 		@planeGeometryCache = {}
 
-		@stud = new THREE.CylinderGeometry(
+		studRotation = new THREE.Matrix4()
+		studRotation.makeRotationX(1.571)
+
+		studTranslation = new THREE.Matrix4()
+		studTranslation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
+
+		@studGeometry = new THREE.CylinderGeometry(
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.height
 			7
 		)
+		@studGeometry.applyMatrix studRotation
+		@studGeometry.applyMatrix studTranslation
 
-		rotation = new THREE.Matrix4()
-		rotation.makeRotationX(1.571)
-		@stud.applyMatrix(rotation)
+		@highFiStudGeometry = new THREE.CylinderGeometry(
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.height
+			21
+		)
 
-		translation = new THREE.Matrix4()
-		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
-		@stud.applyMatrix translation
+		@highFiStudGeometry.applyMatrix studRotation
+		@highFiStudGeometry.applyMatrix studTranslation
 
 	getBrick: (gridPosition, brickDimensions,
 						 material, textureMaterial, highFidelity) =>
@@ -34,7 +45,16 @@ module.exports = class GeometryCreator
 		}
 
 		brickGeometry = @_getBrickGeometry brickDimensions, worldBrickSize
-		studGeometry = @_getStudsGeometry brickDimensions, worldBrickSize
+
+		cache = if highFidelity then @highFiStudGeometryCache else @studGeometryCache
+		geometry = if highFidelity then @highFiStudGeometry else @studGeometry
+		studGeometry = @_getStudsGeometry(
+			brickDimensions
+			worldBrickSize
+			cache
+			geometry
+		)
+
 		planeGeometry = @_getPlaneGeometry brickDimensions, worldBrickSize
 
 		brick = new BrickObject(
@@ -89,12 +109,12 @@ module.exports = class GeometryCreator
 		@brickGeometryCache[ident] = brickGeometry
 		return brickGeometry
 
-	_getStudsGeometry: (brickDimensions, worldBrickSize) =>
+	_getStudsGeometry: (brickDimensions, worldBrickSize, cache, geometry) =>
 		# returns studs for the given brick size
 
 		ident = @_getHash brickDimensions
-		if @studGeometryCache[ident]?
-			return @studGeometryCache[ident]
+		if cache[ident]?
+			return cache[ident]
 
 		studs = new THREE.Geometry()
 
@@ -107,10 +127,13 @@ module.exports = class GeometryCreator
 				translation = new THREE.Matrix4()
 				translation.makeTranslation(tx, ty, tz)
 
-				studs.merge @stud, translation
+				studs.merge geometry, translation
 
-		@studGeometryCache[ident] = studs
-		return studs
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry studs
+
+		cache[ident] = bufferGeometry
+		return bufferGeometry
 
 	_getPlaneGeometry: (brickDimensions, worldBrickSize) =>
 		# returns studs for the given brick size

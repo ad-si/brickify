@@ -1,6 +1,7 @@
 Grid = require './Grid'
 
 floatDelta = 1e-50
+voxelRoundingThreshold = 1e-5
 
 module.exports = class Voxelizer
 	constructor: ->
@@ -29,6 +30,7 @@ module.exports = class Voxelizer
 			voxelSpaceModel
 			lineStepSize
 			floatDelta
+			voxelRoundingThreshold
 			callback
 		)
 
@@ -66,7 +68,8 @@ module.exports = class Voxelizer
 	_getWorker: ->
 		return @worker if @worker?
 		return operative {
-			voxelize: (model, lineStepSize, @floatDelta, progressCallback) ->
+			voxelize: (model, lineStepSize, @floatDelta, @voxelRoundingThreshold,
+			progressCallback) ->
 				grid = []
 				@_resetProgress()
 				@_forEachPolygon model, (p0, p1, p2, direction, progress) ->
@@ -166,17 +169,23 @@ module.exports = class Voxelizer
 				currentGridPosition = x: a.x, y: a.y, z: a.z
 
 				for i in [0..length] by stepSize
-					oldVoxel = currentVoxel
-					currentVoxel = @_roundVoxelSpaceToVoxel currentGridPosition
-					if (oldVoxel.x != currentVoxel.x) or
-					(oldVoxel.y != currentVoxel.y) or
-					(oldVoxel.z != currentVoxel.z)
-						z = @_getGreatestZInVoxel a, b, currentVoxel
-						@_setVoxel currentVoxel, z, direction, grid
+					unless @_isOnVoxelBorder currentGridPosition
+						oldVoxel = currentVoxel
+						currentVoxel = @_roundVoxelSpaceToVoxel currentGridPosition
+						if (oldVoxel.x != currentVoxel.x) or
+						(oldVoxel.y != currentVoxel.y) or
+						(oldVoxel.z != currentVoxel.z)
+							z = @_getGreatestZInVoxel a, b, currentVoxel
+							@_setVoxel currentVoxel, z, direction, grid
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
 				return
+
+			_isOnVoxelBorder: ({x, y, z}) ->
+				for c in [x, y]
+					return true if Math.abs(0.5 - (c % 1)) < @voxelRoundingThreshold
+				return false
 
 			_roundVoxelSpaceToVoxel: ({x: x, y: y, z: z}) ->
 				return {

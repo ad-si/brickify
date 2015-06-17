@@ -17,8 +17,8 @@ class HintUi
 		return if event.buttons == 0
 
 		switch event.button
-			when 0
-				# Left mouse button
+			when 0, 2
+				# Left or right mouse button
 				if handled
 					@$brushHint.fadeOut()
 					@brushHintVisible = false
@@ -46,8 +46,12 @@ class HintUi
 				@zoomHintVisible = false
 			when 2
 				# Right mouse button
-				@$moveHint.fadeOut()
-				@moveHintVisible = false
+				if not handled
+					@$moveHint.fadeOut()
+					@moveHintVisible = false
+				else
+					@$brushHint.fadeOut()
+					@brushHintVisible = false
 
 		if not @_anyHintVisible()
 			@$hintContainer.hide()

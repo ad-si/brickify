@@ -101,17 +101,10 @@ class BrickLayouter
 			bricksToSplit.add brick
 
 			if splitNeighbors
-				# get neighbours in same z layer
-				xp = brick.getNeighbors(Brick.direction.Xp)
-				xm = brick.getNeighbors(Brick.direction.Xm)
-				yp = brick.getNeighbors(Brick.direction.Yp)
-				ym = brick.getNeighbors(Brick.direction.Ym)
-
+				# get neighbors in same z layer
+				neighbors = brick.getNeighborsXY()
 				# add them all to be split as well
-				xp.forEach (brick) -> bricksToSplit.add brick
-				xm.forEach (brick) -> bricksToSplit.add brick
-				yp.forEach (brick) -> bricksToSplit.add brick
-				ym.forEach (brick) -> bricksToSplit.add brick
+				neighbors.forEach (nBrick) -> bricksToSplit.add nBrick
 
 		newBricks = @_splitBricks bricksToSplit
 

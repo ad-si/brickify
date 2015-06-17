@@ -286,7 +286,7 @@ class BrickLayouter
 		return brick
 
 
-	connectedComponentOptimization: (grid) =>
+	optimizeLayoutStability: (grid) =>
 		passes = 0
 
 		bricks = grid.getAllBricks()

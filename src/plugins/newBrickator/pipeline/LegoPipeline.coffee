@@ -54,10 +54,10 @@ module.exports = class LegoPipeline
 				return @brickLayouter.finalLayoutPass lastResult.grid
 
 		@pipelineSteps.push
-			name: 'Connected components optimization'
+			name: 'Stability optimization'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.connectedComponentOptimization lastResult.grid
+				return @brickLayouter.optimizeLayoutStability lastResult.grid
 
 		@pipelineSteps.push
 			name: 'Local reLayout'

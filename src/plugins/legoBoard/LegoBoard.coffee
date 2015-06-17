@@ -11,6 +11,8 @@ globalConfig = require '../../common/globals.yaml'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
 
+dimension = 400
+
 module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
 	init: (@bundle) ->
@@ -27,7 +29,7 @@ module.exports = class LegoBoard
 		@_initMaterials()
 
 		#create baseplate
-		box = new THREE.BoxGeometry(400, 400, 8)
+		box = new THREE.BoxGeometry(dimension, dimension, 8)
 		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox
@@ -37,16 +39,27 @@ module.exports = class LegoBoard
 		@threejsNode.add @studsContainer
 		@studsContainer.visible = false
 
-		modelCache
-		.request('1336affaf837a831f6b580ec75c3b73a')
-		.then (model) =>
-			geo = model.convertToThreeGeometry()
-			for x in [-160..160] by 80
-				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, @studMaterial)
-					object.translateX x
-					object.translateY y
-					@studsContainer.add object
+		studGeometry = new THREE.CylinderGeometry(
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.height
+			7
+		)
+		rotation = new THREE.Matrix4()
+		rotation.makeRotationX(1.571)
+		studGeometry.applyMatrix(rotation)
+
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry studGeometry
+
+		xSpacing = @globalConfig.gridSpacing.x
+		ySpacing = @globalConfig.gridSpacing.y
+		for x in [(-dimension + xSpacing) / 2...dimension / 2] by xSpacing
+			for y in [(-dimension + ySpacing) / 2...dimension / 2] by ySpacing
+				object = new THREE.Mesh(bufferGeometry, @studMaterial)
+				object.translateX x
+				object.translateY y
+				@studsContainer.add object
 
 		# create scene for pipeline
 		@pipelineScene = @bundle.renderer.getDefaultScene()
@@ -55,7 +68,7 @@ module.exports = class LegoBoard
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		studTexture.wrapS = THREE.RepeatWrapping
 		studTexture.wrapT = THREE.RepeatWrapping
-		studTexture.repeat.set 50,50
+		studTexture.repeat.set dimension / 8, dimension / 8
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
 			color: globalConfig.colors.basePlate

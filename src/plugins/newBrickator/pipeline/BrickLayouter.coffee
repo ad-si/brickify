@@ -325,6 +325,8 @@ class BrickLayouter
 
 			if components.length <= minComponents and bricksToSplit.size == 0
 				break
+			else if passes == 100
+				break
 			else #if components.length > minComponents
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false
 

@@ -77,16 +77,22 @@ module.exports = class DownloadProvider
 			else if files.length > 1
 				zip = new JSZip()
 
-				files.forEach (file, index) ->
-					zip.file(
-						index + '_' + file.fileName
-						file.data
-					)
+				downloadPromises = files.map (file) =>
+					return @_convertToZippableType file
 
-				saveAs(
-					zip.generate {type: 'blob'}
-					"brickify-#{selectedNode.name}.zip"
-				)
+				Promise
+				.all downloadPromises
+				.then (fileObjects) ->
+					fileObjects.forEach (fileObject) ->
+						zip.file(
+							fileObject.fileName
+							fileObject.data
+						)
+
+					saveAs(
+						zip.generate {type: 'blob'}
+						"brickify-#{selectedNode.name}.zip"
+					)
 
 			else
 				bootbox.alert(

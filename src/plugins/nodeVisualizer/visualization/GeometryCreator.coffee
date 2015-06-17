@@ -3,13 +3,15 @@ BrickObject = require './BrickObject'
 
 # This class provides basic functionality to create simple Voxel/Brick geometry
 module.exports = class GeometryCreator
-	constructor: (@grid) ->
+	constructor: (@globalConfig, @grid) ->
 		@brickGeometryCache = {}
 		@studGeometryCache = {}
 
 		@stud = new THREE.CylinderGeometry(
-			#these numbers are made up to look good. don't use for csg operations
-			@grid.spacing.x * 0.3, @grid.spacing.y * 0.3, @grid.spacing.z * 0.7, 7
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.height
+			7
 		)
 
 		rotation = new THREE.Matrix4()

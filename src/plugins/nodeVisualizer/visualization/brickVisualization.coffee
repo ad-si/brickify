@@ -33,7 +33,7 @@ class BrickVisualization
 		@voxelWireframe = new VoxelWireframe(
 			@bundle, @grid, @brickShadowThreeNode, @defaultColoring
 		)
-		@geometryCreator = new GeometryCreator(@grid)
+		@geometryCreator = new GeometryCreator(@bundle.globalConfig, @grid)
 		@voxelSelector = new VoxelSelector @
 
 		@_highlightVoxel = @geometryCreator.getBrick(

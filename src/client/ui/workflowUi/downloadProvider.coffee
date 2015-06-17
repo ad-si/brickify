@@ -112,28 +112,29 @@ module.exports = class DownloadProvider
 				files.push entry
 		return files
 
-	_convertToZippableType: ({data: data, fileName: fileName}) =>
-		if data instanceof Blob
-			return @_arrayBufferFromBlob data, fileName, options
-		if data instanceof ArrayBuffer
-			return Promise.resolve {
-				data: data
-				fileName: fileName
-				options: {
-					binary: true
-				}
-			}
-		if (data instanceof String) or (typeof(data) == 'string')
-			return Promise.resolve {
-				data: data
-				fileName: fileName
-				options: {
-					binary: false
-				}
-			}
 
-		log.warn "No conversion method found for file #{fileName}"
-		return null
+	_convertToZippableType: ({data: data, fileName: fileName}) =>
+		switch
+			when data instanceof Blob
+				return @_arrayBufferFromBlob data, fileName, options
+
+			when data instanceof ArrayBuffer
+				return Promise.resolve {
+					data: data
+					fileName: fileName
+					options:
+						binary: true
+				}
+
+			when typeof data is 'string' or data instanceof String
+				return Promise.resolve {
+					data: data
+					fileName: fileName
+					options:
+						binary: false
+				}
+			else
+				log.warn "No conversion method found for file #{fileName}"
 
 
 	_arrayBufferFromBlob: (blob, fileName) ->

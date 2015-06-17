@@ -59,3 +59,28 @@ module.exports.toBufferGeometry = (modelObject) ->
 	geometry.computeBoundingSphere()
 
 	return geometry
+
+
+module.exports.threeGeometryToFaceVertexMesh = (threeGeometry) ->
+
+	faceVertexMesh = {
+		vertexCoordinates: []
+		faceVertexIndices: []
+		faceNormalCoordinates: []
+	}
+
+	for vertex in threeGeometry.vertices
+		faceVertexMesh.vertexCoordinates.push vertex.x
+		faceVertexMesh.vertexCoordinates.push vertex.y
+		faceVertexMesh.vertexCoordinates.push vertex.z
+
+	for face in threeGeometry.faces
+		faceVertexMesh.faceVertexIndices.push face.a
+		faceVertexMesh.faceVertexIndices.push face.b
+		faceVertexMesh.faceVertexIndices.push face.c
+
+		faceVertexMesh.faceNormalCoordinates.push face.normal.x
+		faceVertexMesh.faceNormalCoordinates.push face.normal.y
+		faceVertexMesh.faceNormalCoordinates.push face.normal.z
+
+	return faceVertexMesh

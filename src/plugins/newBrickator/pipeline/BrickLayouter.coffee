@@ -328,10 +328,12 @@ class BrickLayouter
 				# assign label to this and all connected bricks
 				brick.label = minLabel
 				# add all labels to each others equivalency
-				conLabels.forEach (l) ->
-					equivalencies[l].forEach (id) ->
-						old = equivalencies[id]
-						equivalencies[id] = arrayHelper.union([old, conLabels])
+				allLabels = new Set
+				conLabels.forEach (conLabel) ->
+					equivalencies[conLabel].forEach (label) ->
+						allLabels.add label
+				conLabels.forEach (conLabel) ->
+					equivalencies[conLabel] = allLabels
 
 			else # no neighbor has a label
 				brick.label = id

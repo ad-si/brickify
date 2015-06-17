@@ -47,9 +47,9 @@ module.exports.getHtml = (list, caption = true) ->
 
 	html += '<p>To build this model you need the following bricks:'
 	html += '<table class="table">'
-	html += '<tr><td><strong>Amount</strong></td>'
+	html += '<tr><td><strong>Size</strong></td>'
 	html += '<td><strong>Type</strong></td>'
-	html += '<td><strong>Size</strong></td></tr>'
+	html += '<td><strong>Amount</strong></td></tr>'
 	for piece in list
 		if piece.size.z == 1
 			type = 'Plate'
@@ -60,9 +60,9 @@ module.exports.getHtml = (list, caption = true) ->
 			continue
 
 		html += '<tr>'
-		html += "<td>#{piece.count}x</td>"
-		html += "<td>#{type}</td>"
 		html += "<td>#{piece.size.x} x #{piece.size.y}</td>"
+		html += "<td>#{type}</td>"
+		html += "<td>#{piece.count}x</td>"
 		html += '</tr>'
 
 	html += '</table></p>'

@@ -103,9 +103,13 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
 	if testStrip
 		$modal.find('#testStripContent').show()
 		$studSizeSelect = $modal.find '#studSizeSelect'
+		$wizardStudSizeSelect = $modal.find '#wizardStudSizeSelect'
 		addOptions $studSizeSelect, steps, 0, alphabeticalList
+		addOptions $wizardStudSizeSelect, steps, 0, alphabeticalList
 		$holeSizeSelect = $modal.find '#holeSizeSelect'
+		$wizardHoleSizeSelect = $modal.find '#wizardHoleSizeSelect'
 		addOptions $holeSizeSelect, steps, 0, numericalList
+		addOptions $wizardHoleSizeSelect, steps, 0, numericalList
 	else
 		$modal.find('#testStripContent').hide()
 

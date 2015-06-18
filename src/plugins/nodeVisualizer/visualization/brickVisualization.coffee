@@ -124,7 +124,6 @@ class BrickVisualization
 
 				# link data <-> visuals
 				brick.setVisualBrick threeBrick
-				threeBrick.brick = brick
 
 				# add to scene graph
 				layerObject.add threeBrick

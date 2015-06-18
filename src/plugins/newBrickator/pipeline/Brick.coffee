@@ -123,6 +123,15 @@ class Brick
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
+		# checking the cache for correctness
+		if @_neighbors?[direction]?
+			@_neighbors[direction].forEach (neighbor) =>
+				if neighbor.voxels.size == 0
+					log.warn 'got outdated neighbor from cache'
+					log.warn 'neighbor', neighbor
+					log.warn 'from brick:', @
+					@clearNeighborsCache()
+
 		return @_neighbors[direction] if @_neighbors?[direction]?
 
 		neighbors = new Set()

@@ -358,9 +358,6 @@ class BrickLayouter
 		bricks.forEach (brick) ->
 			neighborsXY = brick.getNeighborsXY()
 			neighborsXY.forEach (neighbor) ->
-				if neighbor.label == null and neighbor.voxels.size == 0
-					log.warn 'got neighbor with null label and no voxels (from cache)'
-					return
 				if neighbor.label != brick.label
 					bricksToSplit.add neighbor
 					bricksToSplit.add brick

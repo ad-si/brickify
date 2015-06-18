@@ -198,7 +198,7 @@ class Brick
 	setVisualBrick: (visualBrick) =>
 		@_visualBrick?.brick = null if @_visualBrick isnt visualBrick
 		@_visualBrick = visualBrick
-		@_visualBrick.brick = @ if @_visualBrick?
+		@_visualBrick?.brick = @
 
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that

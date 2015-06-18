@@ -48,10 +48,11 @@ class BrickLayouter
 
 			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
-			# if brick is 1x1x3 or instable after mergeLoop3L, break it into pieces
+			# if brick is 1x1x3, 1x2x3 or instable after mergeLoop3L
+			# break it into pieces
 			# mark new bricks as bad starting point for 3L brick
 			if brick.isSize(1, 1, 3) or brick.getStability() == 0 or
-			brick.isSize(1, 2, 3) or brick.isSize(2, 1, 3)
+			brick.isSize(1, 2, 3)
 				newBricks = brick.splitUp()
 				bricksToLayout.delete brick
 				newBricks.forEach (newBrick) ->
@@ -174,7 +175,6 @@ class BrickLayouter
 		return null
 
 	_minPercentageOfConnectionsPresent: (voxels) =>
-		#TODO check if this is working
 		minPercentage = .51
 		percentage = Voxel.percentageOfConnections voxels
 		return true if percentage >= minPercentage

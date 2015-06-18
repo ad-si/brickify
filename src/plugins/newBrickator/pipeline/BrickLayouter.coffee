@@ -173,7 +173,7 @@ class BrickLayouter
 
 	_minFractionOfConnectionsPresent: (voxels) =>
 		minFraction = .51
-		fraction = Voxel.percentageOfConnections voxels
+		fraction = Voxel.fractionOfConnections voxels
 		return fraction >= minFraction
 
 	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>

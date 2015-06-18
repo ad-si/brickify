@@ -145,7 +145,7 @@ class BrickLayouter
 		mergeVoxel2Iter = mergeVoxels2.values()
 		while mVoxel2 = mergeVoxel2Iter.next().value
 			mBrick2 = mVoxel2.brick
-			return null unless mBrick2 or mBrick2.isSize(1, 1, 1)
+			return null unless mBrick2 and mBrick2.isSize(1, 1, 1)
 			mergeBricks.add mBrick2
 
 		mergeVoxels2.forEach (mVoxel2) ->

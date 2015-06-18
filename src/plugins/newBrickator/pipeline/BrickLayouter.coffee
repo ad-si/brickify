@@ -151,7 +151,7 @@ class BrickLayouter
 
 		mergeVoxels2.forEach (mVoxel2) ->
 			mBrick2 = mVoxel2.brick
-			if not mBrick2 or !mBrick2.isSize(1,1,1)
+			if not mBrick2 or !mBrick2.isSize(1, 1, 1)
 				noMerge = true
 				return
 			mergeBricks.add mBrick2
@@ -161,7 +161,7 @@ class BrickLayouter
 			allVoxels.add mVoxel2
 
 		size = Voxel.sizeFromVoxels(allVoxels)
-		if Brick.isValidSize(size.x,size.y,size.z)
+		if Brick.isValidSize(size.x, size.y, size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
@@ -180,7 +180,7 @@ class BrickLayouter
 		mergeableNeighbors = @_findMergeableNeighbors3L brick
 
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
-			merged ?= true
+			merged = true
 			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -275,7 +275,7 @@ class BrickLayouter
 		mergeableNeighbors = @_findMergeableNeighbors brick
 
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
-			merged ?= true
+			merged = true
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 

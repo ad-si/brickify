@@ -64,23 +64,25 @@ module.exports.toBufferGeometry = (modelObject) ->
 module.exports.threeGeometryToFaceVertexMesh = (threeGeometry) ->
 
 	faceVertexMesh = {
-		vertexCoordinates: []
-		faceVertexIndices: []
-		faceNormalCoordinates: []
+		vertexCoordinates: new Array threeGeometry.vertices.length * 3
+		faceVertexIndices: new Array threeGeometry.faces.length * 3
+		faceNormalCoordinates: new Array threeGeometry.faces.length * 3
 	}
 
-	for vertex in threeGeometry.vertices
-		faceVertexMesh.vertexCoordinates.push vertex.x
-		faceVertexMesh.vertexCoordinates.push vertex.y
-		faceVertexMesh.vertexCoordinates.push vertex.z
+	for vertex, index in threeGeometry.vertices
+		offset = index * 3
+		faceVertexMesh.vertexCoordinates[offset] = vertex.x
+		faceVertexMesh.vertexCoordinates[offset + 1] = vertex.y
+		faceVertexMesh.vertexCoordinates[offset + 2] = vertex.z
 
-	for face in threeGeometry.faces
-		faceVertexMesh.faceVertexIndices.push face.a
-		faceVertexMesh.faceVertexIndices.push face.b
-		faceVertexMesh.faceVertexIndices.push face.c
+	for face, index in threeGeometry.faces
+		offset = index * 3
+		faceVertexMesh.faceVertexIndices[offset] = face.a
+		faceVertexMesh.faceVertexIndices[offset + 1] = face.b
+		faceVertexMesh.faceVertexIndices[offset + 2] = face.c
 
-		faceVertexMesh.faceNormalCoordinates.push face.normal.x
-		faceVertexMesh.faceNormalCoordinates.push face.normal.y
-		faceVertexMesh.faceNormalCoordinates.push face.normal.z
+		faceVertexMesh.faceNormalCoordinates[offset] = face.normal.x
+		faceVertexMesh.faceNormalCoordinates[offset + 1] = face.normal.y
+		faceVertexMesh.faceNormalCoordinates[offset + 2] = face.normal.z
 
 	return faceVertexMesh

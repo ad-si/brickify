@@ -21,29 +21,41 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		@highQualMode = false
+		@qualMode = 0
 		@usePipeline = false
 		@isVisible = true
 		@isScreenshotMode = no
 
 		@_initMaterials()
+		@_initbaseplateBox()
+		@_initStudGeometries()
 
-		#create baseplate
+		# create scene for pipeline
+		@pipelineScene = @bundle.renderer.getDefaultScene()
+
+	_initbaseplateBox: =>
 		box = new THREE.BoxGeometry(dimension, dimension, 8)
 		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox
 
-		#create studs
+	_initStudGeometries: =>
 		@studsContainer = new THREE.Object3D()
 		@threejsNode.add @studsContainer
 		@studsContainer.visible = false
+		@_addStuds 7, @studsContainer
 
+		@highFiStudsContainer = new THREE.Object3D()
+		@threejsNode.add @highFiStudsContainer
+		@highFiStudsContainer.visible = false
+		@_addStuds 21, @highFiStudsContainer
+
+	_addStuds: (radiusSegments, container) =>
 		studGeometry = new THREE.CylinderGeometry(
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.height
-			7
+			radiusSegments
 		)
 		rotation = new THREE.Matrix4()
 		rotation.makeRotationX(1.571)
@@ -63,10 +75,7 @@ module.exports = class LegoBoard
 				object = new THREE.Mesh(bufferGeometry, @studMaterial)
 				object.translateX x
 				object.translateY y
-				@studsContainer.add object
-
-		# create scene for pipeline
-		@pipelineScene = @bundle.renderer.getDefaultScene()
+				container.add object
 
 	_initMaterials: =>
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
@@ -106,9 +115,11 @@ module.exports = class LegoBoard
 		if camera.position.z < 0
 			@baseplateBox.material = @baseplateTransparentMaterial
 			@studsContainer.visible = false
+			@highFiStudsContainer.visible = false
 		else
 			@baseplateBox.material = @currentBaseplateMaterial
-			@studsContainer.visible = true if @highQualMode
+			@studsContainer.visible = @qualMode is 1
+			@highFiStudsContainer.visible = @qualMode is 2
 
 	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible or @isScreenshotMode
@@ -169,17 +180,28 @@ module.exports = class LegoBoard
 			@threejsNode.visible = @isVisible and not @isScreenshotMode
 
 		# Determine whether to show or hide studs
+		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+			@qualMode = 2
+
+			@highFiStudsContainer.visible = true
+			@studsContainer.visible = false
+			#remove texture because we have physical studs
+			@baseplateBox.material = @baseplateMaterial
+
+			@currentBaseplateMaterial = @baseplateMaterial
+
 		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
-			@highQualMode = true
+			@qualMode = 1
 
 			#show studs
 			@studsContainer.visible = true
+			@highFiStudsContainer.visible = false
 			#remove texture because we have physical studs
 			@baseplateBox.material = @baseplateMaterial
 
 			@currentBaseplateMaterial = @baseplateMaterial
 		else
-			@highQualMode = false
+			@qualMode = 0
 
 			#hide studs
 			@studsContainer.visible = false
@@ -196,9 +218,11 @@ module.exports = class LegoBoard
 				#move lego board and studs from threeNode to pipeline scene
 				@threejsNode.remove @baseplateBox
 				@threejsNode.remove @studsContainer
+				@threejsNode.remove @highFiStudsContainer
 
 				@pipelineScene.add @baseplateBox
 				@pipelineScene.add @studsContainer
+				@pipelineScene.add @highFiStudsContainer
 		else
 			if @usePipeline
 				@usePipeline = false
@@ -206,6 +230,8 @@ module.exports = class LegoBoard
 				#move lego board and studs from pipeline to threeNode
 				@pipelineScene.remove @baseplateBox
 				@pipelineScene.remove @studsContainer
+				@pipelineScene.remove @highFiStudsContainer
 
 				@threejsNode.add @baseplateBox
 				@threejsNode.add @studsContainer
+				@threejsNode.add @highFiStudsContainer

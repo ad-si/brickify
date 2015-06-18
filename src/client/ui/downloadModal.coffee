@@ -44,7 +44,9 @@ initializeWizard = ($modal) ->
 	# Bind all jQuery Elements, hide everything
 	$wizardButtons = $modal.find('#wizardButtons')
 	$nextButton = $wizardButtons.find('#wizardNext')
+	$nextButtonText = $nextButton.find('#text')
 	$backButton = $wizardButtons.find('#wizardBack')
+	$backButtonText = $backButton.find('#text')
 	$calibrationSettings = $modal.find('#calibrationSettings')
 	$wizardButtons.hide()
 
@@ -88,22 +90,36 @@ initializeWizard = ($modal) ->
 			size += $wizardHoleSizeSelect.find('option:selected').html()
 			$calibrationSettings.html size
 
+	updateButtonCaptions = ->
+		if currentWizardStep == wizardSteps.length - 1
+			$nextButtonText.html 'Finish'
+		else
+			$nextButtonText.html 'Next step'
+
+		if currentWizardStep == 0
+			$backButtonText.html 'Cancel wizard'
+		else
+			$backButtonText.html 'Go back'
+
 	# Bind button logic
 	$nextButton.click ->
 		$wizardStepObjects[currentWizardStep]
 		.fadeOut wizardFadeTime, ->
 			currentWizardStep++
 			applyCurrentWizardStep()
+			updateButtonCaptions()
 
 	$backButton.click ->
 		$wizardStepObjects[currentWizardStep]
 		.fadeOut wizardFadeTime, ->
 			currentWizardStep--
 			applyCurrentWizardStep()
+			updateButtonCaptions()
 
 	# Fade out size select, start wizard on click
 	$startWizard.click ->
 		currentWizardStep = 0
+		updateButtonCaptions()
 		$legoContent.fadeOut wizardFadeTime
 		$stlContent.fadeOut wizardFadeTime
 		$sizeSelect.fadeOut wizardFadeTime, ->

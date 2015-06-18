@@ -17,13 +17,14 @@ class BrickLayouter
 		grid.initializeBricks()
 		return Promise.resolve grid
 
-	layout3LBricks: (grid) ->
+	layout3LBricks: (grid, bricksToLayout) ->
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
 
-		bricksToLayout = grid.getAllBricks()
-		bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
+		if not bricksToLayout?
+			bricksToLayout = grid.getAllBricks()
+			bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
@@ -62,9 +63,6 @@ class BrickLayouter
 
 	_findMergeableNeighbors3L: (brick) =>
 		mergeableNeighbors = []
-		# get position and size of brick once for debugging purposes
-		#brick.getPosition()
-		#brick.getSize()
 
 		if brick.getSize().z == 1
 			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(

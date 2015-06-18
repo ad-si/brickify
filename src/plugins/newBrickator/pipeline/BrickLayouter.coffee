@@ -432,31 +432,32 @@ class BrickLayouter
 		# if they have the same accumulative width
 		# check if they are in the correct positions,
 		# i.e. no spacing between neighbors
-		if width == widthFn(brick.getSize())
-			minWidth = widthFn brick.getPosition()
+		return null if width != widthFn(brick.getSize())
 
-			maxWidth = widthFn(brick.getPosition())
-			maxWidth += widthFn(brick.getSize()) - 1
+		minWidth = widthFn brick.getPosition()
 
-			length = null
+		maxWidth = widthFn(brick.getPosition())
+		maxWidth += widthFn(brick.getSize()) - 1
 
-			invalidSize = false
-			neighborsInDirection.forEach (neighbor) ->
-				length ?= lengthFn neighbor.getSize()
-				if widthFn(neighbor.getPosition()) < minWidth
-					invalidSize = true
-				nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
-				if nw > maxWidth
-					invalidSize = true
-				if lengthFn(neighbor.getSize()) != length
-					invalidSize = true
-			return null if invalidSize
+		length = null
 
-			if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
-			length, brick.getSize().z)
-				return neighborsInDirection
-			else
-				return null
+		invalidSize = false
+		neighborsInDirection.forEach (neighbor) ->
+			length ?= lengthFn neighbor.getSize()
+			if widthFn(neighbor.getPosition()) < minWidth
+				invalidSize = true
+			nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
+			if nw > maxWidth
+				invalidSize = true
+			if lengthFn(neighbor.getSize()) != length
+				invalidSize = true
+		return null if invalidSize
+
+		if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
+		length, brick.getSize().z)
+			return neighborsInDirection
+		else
+			return null
 
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
 		noMerge = false

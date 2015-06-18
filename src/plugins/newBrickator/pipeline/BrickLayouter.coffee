@@ -295,24 +295,19 @@ class BrickLayouter
 	#
 	# @param {Set<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid, useThreeLayers = true) =>
+	splitBricksAndRelayoutLocally: (bricks, grid, splitNeighbors = true, useThreeLayers = true) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->
 			# add this brick to be split
 			bricksToSplit.add brick
 
-			# get neighbors in same z layer
-			xp = brick.getNeighbors(Brick.direction.Xp)
-			xm = brick.getNeighbors(Brick.direction.Xm)
-			yp = brick.getNeighbors(Brick.direction.Yp)
-			ym = brick.getNeighbors(Brick.direction.Ym)
 
-			# add them all to be split as well
-			xp.forEach (brick) -> bricksToSplit.add brick
-			xm.forEach (brick) -> bricksToSplit.add brick
-			yp.forEach (brick) -> bricksToSplit.add brick
-			ym.forEach (brick) -> bricksToSplit.add brick
+			if splitNeighbors
+				# get neighbors in same z layer
+				neighbors = brick.getNeighborsXY()
+				# add them all to be split as well
+				neighbors.forEach (nBrick) -> bricksToSplit.add nBrick
 
 		newBricks = @_splitBricks bricksToSplit
 
@@ -566,5 +561,84 @@ class BrickLayouter
 			brick.mergeWith neighborToMergeWith
 
 		return brick
+
+
+	optimizeLayoutStability: (grid) =>
+		minComponents = null
+
+		for pass in [0..100]
+			bricks = grid.getAllBricks()
+			log.debug '\t# of bricks: ', bricks.size
+
+			bricks.forEach (brick) ->
+				brick.label = null
+
+			numberOfComponents = @findConnectedComponents bricks
+			log.debug '\t# of components: ', numberOfComponents
+
+			bricksToSplit = @findBricksOnComponentInterfaces bricks
+			log.debug '\t# of bricks to split: ', bricksToSplit.size
+
+			if bricksToSplit.size == 0
+				break
+			else
+				@splitBricksAndRelayoutLocally bricksToSplit, grid, false, false
+
+		log.debug '\tfinished optimization after ', pass , 'passes'
+		return Promise.resolve grid
+
+	# connected components using the connected component labelling algo
+	findConnectedComponents: (bricks) =>
+		labels = []
+		id = 0
+
+		# first pass
+		bricks.forEach (brick) ->
+			conBricks = brick.connectedBricks()
+			conLabels = new Set()
+
+			conBricks.forEach (conBrick) ->
+				conLabels.add conBrick.label if conBrick.label?
+
+			if conLabels.size > 0
+				smallestLabel = dataHelper.smallestElement conLabels
+				# assign label to this brick
+				brick.label = labels[smallestLabel]
+				#console.log 'merging', conLabels
+				for i in [0..labels.length]
+					if conLabels.has labels[i]
+						labels[i] = labels[smallestLabel]
+
+			else # no neighbor has a label
+				brick.label = id
+				labels[id] = id
+
+				id++
+
+		# second pass - applying labels
+		bricks.forEach (brick) ->
+			brick.label = labels[brick.label]
+			if brick.label == null
+				console.log 'null brick in algo', brick
+
+		# count number of components
+		finalLabels = new Set()
+		for label in labels
+			finalLabels.add label
+		numberOfComponents = finalLabels.size
+
+		return numberOfComponents
+
+	findBricksOnComponentInterfaces: (bricks) =>
+		bricksToSplit = new Set()
+
+		bricks.forEach (brick) ->
+			neighborsXY = brick.getNeighborsXY()
+			neighborsXY.forEach (neighbor) ->
+				if neighbor.label != brick.label
+					bricksToSplit.add neighbor
+					bricksToSplit.add brick
+
+		return bricksToSplit
 
 module.exports = BrickLayouter

@@ -343,12 +343,4 @@ class Brick
 
 		return usedSlots / possibleSlots
 
-	debugLog: =>
-		size = @getSize()
-		position = @getPosition()
-
-		console.log '(size, pos): (',
-			size.x, size.y, size.z, ',',
-			position.x, position.y, position.z, ')'
-
 module.exports = Brick

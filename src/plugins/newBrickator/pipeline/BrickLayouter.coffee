@@ -303,7 +303,7 @@ class BrickLayouter
 			# add this brick to be split
 			bricksToSplit.add brick
 
-			# get neighbours in same z layer
+			# get neighbors in same z layer
 			xp = brick.getNeighbors(Brick.direction.Xp)
 			xm = brick.getNeighbors(Brick.direction.Xm)
 			yp = brick.getNeighbors(Brick.direction.Yp)
@@ -370,7 +370,7 @@ class BrickLayouter
 
 		return brick
 
-	# Searches for mergeable neighbours in [x-, x+, y-, y+] direction
+	# Searches for mergeable neighbors in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
 	_findMergeableNeighbors: (brick) =>
 		if brick.getSize().z == 3

@@ -2,7 +2,7 @@ ShaderPart = require './ShaderPart'
 
 class PipelineTargetPart extends ShaderPart
 	getVertexInMain: ->
-		# make this a screen aligned quad with z=0.5
+		# Make this a screen aligned quad with z=0.5
 		return '
 			pos.x = pos.x;
 			pos.y = pos.y;

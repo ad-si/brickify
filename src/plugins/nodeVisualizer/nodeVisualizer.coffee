@@ -239,11 +239,6 @@ class NodeVisualizer
 		visualizationData.brickVisualization.initialize newBrickatorData.grid
 		visualizationData.initialized = true
 
-		# instead of creating csg live, show original semitransparent model
-		visualizationData.modelVisualization.setSolidMaterial(
-			@coloring.objectPrintMaterial
-		)
-
 	# returns the node visualization or creates one
 	_getCachedData: (selectedNode) =>
 		return selectedNode.getPluginData 'brickVisualizer'

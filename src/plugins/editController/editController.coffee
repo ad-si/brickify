@@ -47,23 +47,21 @@ class EditController
 			# when we are not above model, call only move and up events
 			switch eventType
 				when pointerEnums.events.PointerMove
-					@pointEventHandler.pointerMove event
+					return @pointEventHandler.pointerMove event
 				when pointerEnums.events.PointerUp
-					@pointEventHandler.pointerUp event
+					return @pointEventHandler.pointerUp event
 			return false
 
 		switch eventType
 			when pointerEnums.events.PointerDown
-				@pointEventHandler.pointerDown event
-				return true
+				return @pointEventHandler.pointerDown event
 			when pointerEnums.events.PointerMove
 				return @pointEventHandler.pointerMove event
 			when pointerEnums.events.PointerUp
-				@pointEventHandler.pointerUp event
-				return true
+				return @pointEventHandler.pointerUp event
 			when pointerEnums.events.PointerCancel
-				@pointEventHandler.PointerCancel event
-				return true
+				return @pointEventHandler.PointerCancel event
+		return false
 
 	# Methods called by brush handler
 	relayoutModifiedParts: (

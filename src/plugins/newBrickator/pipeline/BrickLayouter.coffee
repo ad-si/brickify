@@ -118,7 +118,7 @@ class BrickLayouter
 			if !mVoxel?
 				noMerge = true
 				return
-			mergeVoxels.add mVoxel unless voxels.has mVoxel
+			mergeVoxels.add mVoxel unless mVoxel.brick is brick
 		return null if noMerge
 
 		# find neighbor bricks,
@@ -126,7 +126,7 @@ class BrickLayouter
 		# noMerge if any brick not 1x1x1
 		mergeVoxels.forEach (mVoxel) ->
 			mBrick = mVoxel.brick
-			if mBrick == false or !mBrick? or !mBrick.isSize(1,1,1)
+			if not mBrick or !mBrick.isSize(1, 1, 1)
 				noMerge = true
 				return
 			mergeBricks.add mBrick
@@ -135,10 +135,10 @@ class BrickLayouter
 		allVoxels = dataHelper.union [voxels, mergeVoxels]
 
 		size = Voxel.sizeFromVoxels(allVoxels)
-		if Brick.isValidSize(size.x,size.y,size.z)
+		if Brick.isValidSize(size.x, size.y, size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
+			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
 		# this is necessary for the 2 brick steps of larger bricks
@@ -166,16 +166,15 @@ class BrickLayouter
 		if Brick.isValidSize(size.x,size.y,size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
+			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 
 		return null
 
-	_minPercentageOfConnectionsPresent: (voxels) =>
-		minPercentage = .51
-		percentage = Voxel.percentageOfConnections voxels
-		return true if percentage >= minPercentage
-		return false
+	_minFractionOfConnectionsPresent: (voxels) =>
+		minFraction = .51
+		fraction = Voxel.percentageOfConnections voxels
+		return fraction >= minFraction
 
 	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))

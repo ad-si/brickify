@@ -102,7 +102,6 @@ class BrickLayouter
 		return mergeableNeighbors
 
 	_findMergeableNeighborsInDirection3L: (brick, dir, widthFn, lengthFn) =>
-		noMerge = false
 		voxels = brick.voxels
 		mergeVoxels = new Set()
 		mergeBricks = new Set()
@@ -111,24 +110,20 @@ class BrickLayouter
 			return null
 
 		# find neighbor voxels, noMerge if any is empty
-		voxels.forEach (voxel) ->
+		voxelIter = voxels.values()
+		while voxel = voxelIter.next().value
 			mVoxel = voxel.neighbors[dir]
-			if !mVoxel?
-				noMerge = true
-				return
+			return null unless mVoxel?
 			mergeVoxels.add mVoxel unless mVoxel.brick is brick
-		return null if noMerge
 
 		# find neighbor bricks,
 		# noMerge if any not present
 		# noMerge if any brick not 1x1x1
-		mergeVoxels.forEach (mVoxel) ->
+		mergeVoxelIter = mergeVoxels.values()
+		while mVoxel = mergeVoxelIter.next().value
 			mBrick = mVoxel.brick
-			if not mBrick or !mBrick.isSize(1, 1, 1)
-				noMerge = true
-				return
+			return null unless mBrick and mBrick.isSize(1, 1, 1)
 			mergeBricks.add mBrick
-		return null if noMerge
 
 		allVoxels = dataHelper.union [voxels, mergeVoxels]
 
@@ -141,21 +136,17 @@ class BrickLayouter
 		# check another set of voxels in merge direction, starting from mergeVoxels
 		# this is necessary for the 2 brick steps of larger bricks
 		mergeVoxels2 = new Set()
-		mergeVoxels.forEach (mVoxel) ->
+		mergeVoxelIter = mergeVoxels.values()
+		while mVoxel = mergeVoxelIter.next().value
 			mVoxel2 = mVoxel.neighbors[dir]
-			if !mVoxel2?
-				noMerge = true
-				return
+			return null unless mVoxel2?
 			mergeVoxels2.add mVoxel2
-		return null if noMerge
 
-		mergeVoxels2.forEach (mVoxel2) ->
+		mergeVoxel2Iter = mergeVoxels2.values()
+		while mVoxel2 = mergeVoxel2Iter.next().value
 			mBrick2 = mVoxel2.brick
-			if not mBrick2 or !mBrick2.isSize(1, 1, 1)
-				noMerge = true
-				return
+			return null unless mBrick2 or mBrick2.isSize(1, 1, 1)
 			mergeBricks.add mBrick2
-		return null if noMerge
 
 		mergeVoxels2.forEach (mVoxel2) ->
 			allVoxels.add mVoxel2

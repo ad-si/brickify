@@ -142,7 +142,7 @@ module.exports = class GeometryCreator
 		if @planeGeometryCache[ident]?
 			return @planeGeometryCache[ident]
 
-		studs = new THREE.PlaneGeometry(
+		studs = new THREE.PlaneBufferGeometry(
 			@grid.spacing.x * brickDimensions.x
 			@grid.spacing.y * brickDimensions.y
 		)

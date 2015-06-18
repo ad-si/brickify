@@ -477,7 +477,7 @@ class BrickLayouter
 				noMerge = true
 		return null if noMerge
 
-		if @_layerHasSameSizeAsBrick brick, secondLayerBricks
+		if @_sameSizeAsBrick brick, secondLayerBricks
 			# check next layer
 			thirdLayerBricks = new Set()
 			secondLayerBricks.forEach (sLBrick) ->
@@ -490,7 +490,7 @@ class BrickLayouter
 
 			return null if noMerge
 
-			if @_layerHasSameSizeAsBrick brick, thirdLayerBricks
+			if @_sameSizeAsBrick brick, thirdLayerBricks
 				thirdLayerBricks.forEach (tlBrick) ->
 					secondLayerBricks.add tlBrick
 				return secondLayerBricks
@@ -499,12 +499,12 @@ class BrickLayouter
 		return null
 
 
-	_layerHasSameSizeAsBrick: (brick, layerBricks) =>
+	_sameSizeAsBrick: (brick, layerBricks) =>
+		return false if layerBricks.size == 0
+
 		sameSize = true
 		p = brick.getPosition()
 		s = brick.getSize()
-
-		return false if layerBricks.size == 0
 
 		layerBricks.forEach (lBrick) ->
 			if lBrick.getSize().z != 1

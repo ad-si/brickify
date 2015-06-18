@@ -26,7 +26,7 @@ module.exports.union = (arrayOfSets) ->
 			union.add element
 	return union
 
-module.exports.minElement = (set) =>
+module.exports.smallestElement = (set) =>
 	min = null
 	set.forEach (element) ->
 		min ?= element

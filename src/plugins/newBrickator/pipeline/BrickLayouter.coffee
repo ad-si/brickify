@@ -312,7 +312,7 @@ class BrickLayouter
 
 	# connected components using the connected component labelling algo
 	findConnectedComponents: (bricks) =>
-		equivalencies = []
+		labels = []
 		id = 0
 
 		# first pass
@@ -324,31 +324,29 @@ class BrickLayouter
 				conLabels.add conBrick.label if conBrick.label?
 
 			if conLabels.size > 0
-				minLabel = arrayHelper.minElement conLabels
+				smallestLabel = arrayHelper.smallestElement conLabels
 				# assign label to this brick
-				brick.label = equivalencies[minLabel]
+				brick.label = labels[smallestLabel]
 				#console.log 'merging', conLabels
-				for i in [0..equivalencies.length]
-					if conLabels.has equivalencies[i]
-						equivalencies[i] = equivalencies[minLabel]
-				#console.log equivalencies
+				for i in [0..labels.length]
+					if conLabels.has labels[i]
+						labels[i] = labels[smallestLabel]
 
 			else # no neighbor has a label
 				brick.label = id
-				equivalencies[id] = id
-				#console.log 'NEW', id
-				#console.log equivalencies
+				labels[id] = id
+
 				id++
 
-		console.log equivalencies
-		# second pass - applying minimum labels
+		# second pass - applying labels
 		bricks.forEach (brick) ->
-			brick.label = equivalencies[brick.label]
+			brick.label = labels[brick.label]
 			if brick.label == null
 				console.log 'null brick in algo', brick
 
+		# count number of components
 		finalLabels = new Set()
-		for label in equivalencies
+		for label in labels
 			finalLabels.add label
 		numberOfComponents = finalLabels.size
 
@@ -361,9 +359,7 @@ class BrickLayouter
 			neighborsXY = brick.getNeighborsXY()
 			neighborsXY.forEach (neighbor) ->
 				if neighbor.label == null and neighbor.voxels.size == 0
-					console.warn 'neighbor with null label and no voxels'
-					#console.log brick
-					#console.log neighbor
+					log.warn 'got neighbor with null label and no voxels (from cache)'
 					return
 				if neighbor.label != brick.label
 					bricksToSplit.add neighbor

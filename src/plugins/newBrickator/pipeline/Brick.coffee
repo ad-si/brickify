@@ -120,7 +120,7 @@ class Brick
 
 		return @_size
 
-	isSize: (x,y,z) =>
+	isSize: (x, y, z) =>
 		size = @getSize()
 		if size.x == x and size.y == y and size.z == z
 			return true
@@ -306,7 +306,7 @@ class Brick
 		lowerZ = p.z - 1
 		upperZ = p.z + s.z
 
-		# test for each possible slot if neighbour bricks have
+		# test for each possible slot if neighbor bricks have
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]
@@ -318,7 +318,7 @@ class Brick
 
 		return usedSlots / possibleSlots
 
-	getStabilityInDir: (directionZmOrZp) =>
+	getStabilityInZDir: (directionZmOrZp) =>
 		s = @getSize()
 		p = @getPosition()
 		conBricks = @connectedBricks()
@@ -334,7 +334,7 @@ class Brick
 		else if directionZmOrZp == Brick.direction.Zp
 			testZ = p.z + s.z
 
-		# test for each possible slot if neighbour bricks have
+		# test for each possible slot if neighbor bricks have
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]

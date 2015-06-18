@@ -471,7 +471,7 @@ class BrickLayouter
 		return null if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
 
 		# check if any slot is empty
-		return null if brick.getStabilityInDir(direction) != 1
+		return null if brick.getStabilityInZDir(direction) != 1
 
 		# then check if size of second layer fits
 		# if size fits and no slot empty -> position fits
@@ -485,7 +485,7 @@ class BrickLayouter
 			# check next layer
 			thirdLayerBricks = new Set()
 			secondLayerBricks.forEach (sLBrick) ->
-				if sLBrick.getStabilityInDir(direction) != 1
+				if sLBrick.getStabilityInZDir(direction) != 1
 					noMerge = true
 				sLBrick.getNeighbors(direction).forEach (nBrick) ->
 					if nBrick.getSize().z != 1

@@ -63,6 +63,8 @@ class FidelityControl
 		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
+		@_setFidelity()
+
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
 			@_lastTimestamp = timestamp
@@ -121,12 +123,7 @@ class FidelityControl
 
 		# Increase fidelity
 		@currentFidelityLevel++
-		@pluginHooks.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
-		)
-		@bundle.renderer.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
-		)
+		@_setFidelity()
 
 		# Enable pipeline
 		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
@@ -135,16 +132,23 @@ class FidelityControl
 	_decreaseFidelity: =>
 		# Decrease fidelity
 		@currentFidelityLevel--
+		@_setFidelity()
+
+		# Disable pipeline
+		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
+			@bundle.renderer.pipelineEnabled = false
+
+	_setDefaultFidelity: =>
+		@currentFidelityLevel = 0
+		@_setFidelity()
+
+	_setFidelity: =>
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 		@bundle.renderer.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
-
-		# Disable pipeline
-		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = false
 
 	getHotkeys: =>
 		return {

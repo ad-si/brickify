@@ -11,8 +11,8 @@ VoxelSelector = require '../VoxelSelector'
 # @class BrickVisualization
 ###
 class BrickVisualization
-	constructor: (
-		@bundle,  @brickThreeNode, @brickShadowThreeNode, @defaultColoring) ->
+	constructor: (@bundle,  @brickThreeNode, @brickShadowThreeNode,
+								@defaultColoring, @fidelity) ->
 
 		@csgSubnode = new THREE.Object3D()
 		@brickThreeNode.add @csgSubnode
@@ -29,7 +29,7 @@ class BrickVisualization
 		@isStabilityView = false
 		@_highlightVoxelVisiblity = true
 
-		@highFidelity = true
+		@fidelity = 0
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -43,7 +43,7 @@ class BrickVisualization
 			{x: 1, y: 1, z: 1},
 			@defaultColoring.printHighlightMaterial
 			@defaultColoring.printHighlightTextureMaterial
-			@highFidelity
+			@fidelity
 		)
 		@_highlightVoxel.visible = false
 
@@ -122,7 +122,7 @@ class BrickVisualization
 					brick.getSize()
 					materials.color
 					@defaultColoring.getTextureMaterialForBrick brick
-					@highFidelity
+					@fidelity
 				)
 
 				# link data <-> visuals
@@ -265,7 +265,7 @@ class BrickVisualization
 							{x: 1, y: 1, z: 1}
 							visualBrick.material
 							@defaultColoring.printHighlightTextureMaterial
-							@highFidelity
+							@fidelity
 						)
 						temporaryVoxel.voxelPosition = voxel.position
 						@temporaryVoxels.add temporaryVoxel
@@ -318,7 +318,7 @@ class BrickVisualization
 				{x: 1, y: 1, z: 1}
 				@defaultColoring.selectedMaterial
 				@defaultColoring.getTextureMaterialForBrick voxel.brick
-				@highFidelity
+				@fidelity
 			)
 			temporaryVoxel.voxelPosition = voxel.position
 			@temporaryVoxels.add temporaryVoxel
@@ -351,12 +351,17 @@ class BrickVisualization
 	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
 
 	setFidelity: (fidelityLevel, availableLevels) =>
-		@highFidelity = fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+		if fidelityLevel > availableLevels.indexOf 'PipelineHigh'
+			@fidelity = 2
+		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+			@fidelity = 1
+		else
+			@fidelity = 0
 
-		@_highlightVoxel.setFidelity @highFidelity
+		@_highlightVoxel?.setFidelity @fidelity
 
 		for layer in @bricksSubnode.children
 			for threeBrick in layer.children
-				threeBrick.setFidelity @highFidelity
+				threeBrick.setFidelity @fidelity
 
 module.exports = BrickVisualization

@@ -4,7 +4,7 @@ THREE = require 'three'
 ###
 class BrickObject extends THREE.Object3D
 	constructor: (brickGeometry, studGeometry, planeGeometry,
-								@material, @textureMaterial, highFidelity) ->
+								@material, @textureMaterial, fidelity) ->
 		super()
 		brickMesh = new THREE.Mesh(brickGeometry, @material)
 		studMesh = new THREE.Mesh(studGeometry, @material)
@@ -12,7 +12,7 @@ class BrickObject extends THREE.Object3D
 		@add brickMesh
 		@add studMesh
 		@add planeMesh
-		@_updateQuality highFidelity
+		@setFidelity fidelity
 
 	setMaterial: (@material) =>
 		@children[0].material = @material
@@ -39,11 +39,9 @@ class BrickObject extends THREE.Object3D
 	isLego: =>
 		return @gridEntry.enabled
 
-	setFidelity: (highFidelity) =>
-		@_updateQuality highFidelity
-
-	_updateQuality: (highFidelity) =>
-		@children[1].visible = highFidelity
-		@children[2].visible = !highFidelity
+	setFidelity: (fidelity) =>
+		@children[1].visible = fidelity is 1
+		@children[2].visible = fidelity is 0
+		#@children[3].visible = fidelity is 2
 
 module.exports = BrickObject

@@ -37,7 +37,6 @@ class Brick
 	# Creates a brick out of the given set of voxels
 	# Takes ownership of voxels without further processing
 	constructor: (arrayOfVoxels) ->
-		@disableThreeLayerStart = false
 		@voxels = new Set()
 		for voxel in arrayOfVoxels
 			voxel.brick = @

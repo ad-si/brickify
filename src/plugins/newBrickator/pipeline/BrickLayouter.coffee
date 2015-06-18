@@ -31,7 +31,7 @@ class BrickLayouter
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
-			if !brick? or brick.disableThreeLayerStart
+			if !brick?
 				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
@@ -57,7 +57,6 @@ class BrickLayouter
 				bricksToLayout.delete brick
 				newBricks.forEach (newBrick) ->
 					bricksToLayout.add newBrick
-					#newBrick.disableThreeLayerStart = true
 
 		return Promise.resolve {grid: grid}
 

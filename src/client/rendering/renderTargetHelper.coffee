@@ -129,7 +129,7 @@ generateQuad =  (
 		transparent: true
 	})
 
-	planeGeometry = new THREE.PlaneBufferGeometry(2,2)
+	planeGeometry = new THREE.PlaneBufferGeometry(2, 2)
 	mesh = new THREE.Mesh( planeGeometry, mat )
 	# Disable frustum culling since the plane is always visible
 	mesh.frustumCulled = false

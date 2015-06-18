@@ -456,8 +456,7 @@ class BrickLayouter
 			return null
 
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
-		noMerge = false
-
+		# only handle plates (z=1)
 		return null if brick.getSize().z != 1
 
 		# check if 3layer Brick possible according to xy dimensions
@@ -469,23 +468,21 @@ class BrickLayouter
 		# then check if size of second layer fits
 		# if size fits and no slot empty -> position fits
 		secondLayerBricks = brick.getNeighbors(direction)
-		secondLayerBricks.forEach (slBrick) ->
-			if slBrick.getSize().z != 1
-				noMerge = true
-		return null if noMerge
+		sLIterator = secondLayerBricks.values()
+		while sLBrick = sLIterator.next().value
+			return null unless sLBrick.getSize().z == 1
 
 		if @_sameSizeAsBrick brick, secondLayerBricks
 			# check next layer
 			thirdLayerBricks = new Set()
-			secondLayerBricks.forEach (sLBrick) ->
-				if sLBrick.getStabilityInZDir(direction) != 1
-					noMerge = true
-				sLBrick.getNeighbors(direction).forEach (nBrick) ->
-					if nBrick.getSize().z != 1
-						noMerge = true
+			sLIterator = secondLayerBricks.values()
+			while sLBrick = sLIterator.next().value
+				return unless sLBrick.getStabilityInZDir(direction) == 1
+				neighbors = sLBrick.getNeighbors(direction)
+				neighborsIter = neighbors.values()
+				while nBrick = neighborsIter.next().value
+					return unless nBrick.getSize().z == 1
 					thirdLayerBricks.add nBrick
-
-			return null if noMerge
 
 			if @_sameSizeAsBrick brick, thirdLayerBricks
 				thirdLayerBricks.forEach (tlBrick) ->

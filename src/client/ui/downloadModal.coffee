@@ -13,6 +13,10 @@ $sizeSelect = undefined
 $legoContent = undefined
 $stlContent = undefined
 $wizardButtons = undefined
+$wizardHoleSizeSelect = undefined
+$wizardStudSizeSelect = undefined
+$studSizeSelect = undefined
+$holeSizeSelect = undefined
 
 alphabeticalList = (i, range) ->
 	# A = 65
@@ -41,6 +45,7 @@ initializeWizard = ($modal) ->
 	$wizardButtons = $modal.find('#wizardButtons')
 	$nextButton = $wizardButtons.find('#wizardNext')
 	$backButton = $wizardButtons.find('#wizardBack')
+	$calibrationSettings = $modal.find('#calibrationSettings')
 	$wizardButtons.hide()
 
 	$startWizard = $modal.find('#startWizard')
@@ -59,11 +64,29 @@ initializeWizard = ($modal) ->
 		if currentWizardStep == wizardSteps.length or
 		currentWizardStep == -1
 			# Finish wizard
-			# ToDo apply values from wizard selections here
+
+			# Apply data values
+			studVal = $wizardStudSizeSelect.val()
+			$studSizeSelect.find("option[value=#{studVal}]").attr('selected', true)
+			holeVal = $wizardHoleSizeSelect.val()
+			$holeSizeSelect.find("option[value=#{holeVal}]").attr('selected', true)
+
+			# trigger intput event - so that 
+			# the selected settings get stored fpr csg
+			$studSizeSelect.trigger 'input'
+			$holeSizeSelect.trigger 'input'
+
 			disableWizard()
 		else
 			$wizardStepObjects[currentWizardStep]
 			.fadeIn wizardFadeTime
+
+		# Update calibration preview on last step
+		if currentWizardStep == wizardSteps.length - 1
+			size = $wizardStudSizeSelect.find('option:selected').html()
+			size += ' '
+			size += $wizardHoleSizeSelect.find('option:selected').html()
+			$calibrationSettings.html size
 
 	# Bind button logic
 	$nextButton.click ->
@@ -102,10 +125,13 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
 
 	if testStrip
 		$modal.find('#testStripContent').show()
+		
+		# Prefill select values
 		$studSizeSelect = $modal.find '#studSizeSelect'
 		$wizardStudSizeSelect = $modal.find '#wizardStudSizeSelect'
 		addOptions $studSizeSelect, steps, 0, alphabeticalList
 		addOptions $wizardStudSizeSelect, steps, 0, alphabeticalList
+		
 		$holeSizeSelect = $modal.find '#holeSizeSelect'
 		$wizardHoleSizeSelect = $modal.find '#wizardHoleSizeSelect'
 		addOptions $holeSizeSelect, steps, 0, numericalList

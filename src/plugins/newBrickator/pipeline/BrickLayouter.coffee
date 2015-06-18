@@ -153,7 +153,7 @@ class BrickLayouter
 
 		mergeVoxels2.forEach (mVoxel2) ->
 			mBrick2 = mVoxel2.brick
-			if mBrick2 == false or !mBrick2? or !mBrick2.isSize(1,1,1)
+			if not mBrick2 or !mBrick2.isSize(1,1,1)
 				noMerge = true
 				return
 			mergeBricks.add mBrick2

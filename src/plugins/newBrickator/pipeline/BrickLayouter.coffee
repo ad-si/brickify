@@ -36,9 +36,9 @@ class BrickLayouter
 				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
-			mergeableNeighbors = @_findMergeableNeighbors3L brick
+			merged = @_mergeLoop3L brick, bricksToLayout
 
-			if !dataHelper.anyDefinedInArray(mergeableNeighbors)
+			if not merged
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
@@ -46,8 +46,6 @@ class BrickLayouter
 					break # done with 3L layout
 				else
 					continue # randomly choose a new brick
-
-			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
 			# if brick is 1x1x3, 1x2x3 or instable after mergeLoop3L
 			# break it into pieces
@@ -176,8 +174,13 @@ class BrickLayouter
 		fraction = Voxel.fractionOfConnections voxels
 		return fraction >= minFraction
 
-	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
+	_mergeLoop3L: (brick, bricksToLayout) =>
+		merged = false
+
+		mergeableNeighbors = @_findMergeableNeighbors3L brick
+
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
+			merged ?= true
 			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -191,7 +194,7 @@ class BrickLayouter
 
 			mergeableNeighbors = @_findMergeableNeighbors3L brick
 
-		return brick
+		return merged
 
 	_chooseNeighborsToMergeWith3L: (mergeableNeighbors) =>
 		numBricks = []
@@ -240,9 +243,9 @@ class BrickLayouter
 			if brick.getSize().z == 3
 				continue
 
-			mergeableNeighbors = @_findMergeableNeighbors brick
+			merged = @_mergeLoop brick, bricksToLayout
 
-			if !dataHelper.anyDefinedInArray(mergeableNeighbors)
+			if not merged
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
@@ -250,8 +253,6 @@ class BrickLayouter
 					break # done with initial layout
 				else
 					continue # randomly choose a new brick
-
-			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		return Promise.resolve {grid: grid}
 
@@ -261,16 +262,20 @@ class BrickLayouter
 		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
 			return unless brick?
-			mergeableNeighbors = @_findMergeableNeighbors brick
-			if dataHelper.anyDefinedInArray(mergeableNeighbors)
+			merged = @_mergeLoop brick, bricksToLayout
+			if merged
 				finalPassMerges++
-				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		log.debug '\tFinal pass merged ', finalPassMerges, ' times.'
 		return Promise.resolve {grid: grid}
 
-	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
+	_mergeLoop: (brick, bricksToLayout) =>
+		merged = false
+
+		mergeableNeighbors = @_findMergeableNeighbors brick
+
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
+			merged ?= true
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -284,7 +289,7 @@ class BrickLayouter
 
 			mergeableNeighbors = @_findMergeableNeighbors brick
 
-		return brick
+		return merged
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This

@@ -304,7 +304,7 @@ module.exports = class Grid
 					voxel: voxel
 				}
 
-		intersections.sort (a,b) -> return a.distance - b.distance
+		intersections.sort (a, b) -> return a.distance - b.distance
 		return intersections
 
 	# Intersects a ray (1/direction + origin) with a voxel. returns the distance

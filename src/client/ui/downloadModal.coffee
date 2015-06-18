@@ -73,7 +73,7 @@ initializeWizard = ($modal) ->
 			holeVal = $wizardHoleSizeSelect.val()
 			$holeSizeSelect.find("option[value=#{holeVal}]").attr('selected', true)
 
-			# trigger intput event - so that 
+			# trigger intput event - so that
 			# the selected settings get stored fpr csg
 			$studSizeSelect.trigger 'input'
 			$holeSizeSelect.trigger 'input'
@@ -141,13 +141,13 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
 
 	if testStrip
 		$modal.find('#testStripContent').show()
-		
+
 		# Prefill select values
 		$studSizeSelect = $modal.find '#studSizeSelect'
 		$wizardStudSizeSelect = $modal.find '#wizardStudSizeSelect'
 		addOptions $studSizeSelect, steps, 0, alphabeticalList
 		addOptions $wizardStudSizeSelect, steps, 0, alphabeticalList
-		
+
 		$holeSizeSelect = $modal.find '#holeSizeSelect'
 		$wizardHoleSizeSelect = $modal.find '#wizardHoleSizeSelect'
 		addOptions $holeSizeSelect, steps, 0, numericalList

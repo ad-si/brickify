@@ -52,19 +52,20 @@ class LegoInstructions
 			# scad and piece list generation
 			bricks = data.grid.getAllBricks()
 
-			files = []
-			files.push openScadGenerator.generateScad bricks
+			if bricks.size > 0
+				files = []
+				files.push openScadGenerator.generateScad bricks
 
-			# add instructions html to download
-			files.push @_createHtml numLayers, bricks
+				# add instructions html to download
+				files.push @_createHtml numLayers, bricks
 
-			@_takeScreenshots node, numLayers, camera
-			.then (images) =>
-				files.push images...
-				log.debug 'Finished instruction screenshots'
+				@_takeScreenshots node, numLayers, camera
+				.then (images) =>
+					files.push images...
+					log.debug 'Finished instruction screenshots'
 
-				# save download
-				return files
+					# save download
+					return files
 		.then (files) =>
 			# reset display mode
 			@nodeVisualizer.setDisplayMode node, oldVisualizationMode

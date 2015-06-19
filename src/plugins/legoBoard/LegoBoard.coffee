@@ -55,7 +55,7 @@ module.exports = class LegoBoard
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		studTexture.wrapS = THREE.RepeatWrapping
 		studTexture.wrapT = THREE.RepeatWrapping
-		studTexture.repeat.set 50,50
+		studTexture.repeat.set 50, 50
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
 			color: globalConfig.colors.basePlate

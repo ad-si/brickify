@@ -28,7 +28,7 @@ loadPlugin = (directory) ->
 			throw error
 		return
 
-	for own key,value of require path.join directory, 'package.json'
+	for own key, value of require path.join directory, 'package.json'
 		instance[key] = value
 
 	initPluginInstance instance

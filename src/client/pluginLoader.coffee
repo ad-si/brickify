@@ -17,7 +17,7 @@ module.exports = class PluginLoader
 	_loadPlugin: (PluginClass, packageData) ->
 		instance = new PluginClass()
 
-		for own key,value of packageData
+		for own key, value of packageData
 			instance[key] = value
 
 		return instance

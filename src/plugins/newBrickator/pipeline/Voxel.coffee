@@ -48,8 +48,7 @@ class Voxel
 
 		return size
 
-	#TODO move somewhere else
-	@percentageOfConnections: (voxels) =>
+	@fractionOfConnections: (voxels) =>
 		minZ = null
 		maxZ = null
 

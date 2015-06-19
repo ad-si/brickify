@@ -25,7 +25,7 @@ class BrushHandler
 			onBrushOver: @_legoHover
 			onBrushUp: @_legoUp
 			onBrushCancel: @_legoCancel
-		},{
+		}, {
 			containerId: '#printBrush'
 			onBrushSelect: @_printSelect
 			onBrushDown: @_printDown

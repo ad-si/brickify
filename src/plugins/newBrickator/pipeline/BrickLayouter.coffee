@@ -17,13 +17,14 @@ class BrickLayouter
 		grid.initializeBricks()
 		return Promise.resolve grid
 
-	layout3LBricks: (grid) ->
+	layout3LBricks: (grid, bricksToLayout) ->
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
 
-		bricksToLayout = grid.getAllBricks()
-		bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
+		if not bricksToLayout?
+			bricksToLayout = grid.getAllBricks()
+			bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
@@ -35,9 +36,9 @@ class BrickLayouter
 				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
-			mergeableNeighbors = @_findMergeableNeighbors3L brick
+			merged = @_mergeLoop3L brick, bricksToLayout
 
-			if !dataHelper.anyDefinedInArray(mergeableNeighbors)
+			if not merged
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
@@ -45,8 +46,6 @@ class BrickLayouter
 					break # done with 3L layout
 				else
 					continue # randomly choose a new brick
-
-			@_mergeLoop3L brick, mergeableNeighbors, bricksToLayout
 
 			# if brick is 1x1x3, 1x2x3 or instable after mergeLoop3L
 			# break it into pieces
@@ -62,9 +61,6 @@ class BrickLayouter
 
 	_findMergeableNeighbors3L: (brick) =>
 		mergeableNeighbors = []
-		# get position and size of brick once for debugging purposes
-		#brick.getPosition()
-		#brick.getSize()
 
 		if brick.getSize().z == 1
 			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
@@ -106,7 +102,6 @@ class BrickLayouter
 		return mergeableNeighbors
 
 	_findMergeableNeighborsInDirection3L: (brick, dir, widthFn, lengthFn) =>
-		noMerge = false
 		voxels = brick.voxels
 		mergeVoxels = new Set()
 		mergeBricks = new Set()
@@ -115,72 +110,68 @@ class BrickLayouter
 			return null
 
 		# find neighbor voxels, noMerge if any is empty
-		voxels.forEach (voxel) ->
+		voxelIter = voxels.values()
+		while voxel = voxelIter.next().value
 			mVoxel = voxel.neighbors[dir]
-			if !mVoxel?
-				noMerge = true
-				return
-			mergeVoxels.add mVoxel unless voxels.has mVoxel
-		return null if noMerge
+			return null unless mVoxel?
+			mergeVoxels.add mVoxel unless mVoxel.brick is brick
 
 		# find neighbor bricks,
 		# noMerge if any not present
 		# noMerge if any brick not 1x1x1
-		mergeVoxels.forEach (mVoxel) ->
+		mergeVoxelIter = mergeVoxels.values()
+		while mVoxel = mergeVoxelIter.next().value
 			mBrick = mVoxel.brick
-			if mBrick == false or !mBrick? or !mBrick.isSize(1,1,1)
-				noMerge = true
-				return
+			return null unless mBrick and mBrick.isSize(1, 1, 1)
 			mergeBricks.add mBrick
-		return null if noMerge
 
 		allVoxels = dataHelper.union [voxels, mergeVoxels]
 
 		size = Voxel.sizeFromVoxels(allVoxels)
-		if Brick.isValidSize(size.x,size.y,size.z)
+		if Brick.isValidSize(size.x, size.y, size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
+			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
 		# this is necessary for the 2 brick steps of larger bricks
 		mergeVoxels2 = new Set()
-		mergeVoxels.forEach (mVoxel) ->
+		mergeVoxelIter = mergeVoxels.values()
+		while mVoxel = mergeVoxelIter.next().value
 			mVoxel2 = mVoxel.neighbors[dir]
-			if !mVoxel2?
-				noMerge = true
-				return
+			return null unless mVoxel2?
 			mergeVoxels2.add mVoxel2
-		return null if noMerge
 
-		mergeVoxels2.forEach (mVoxel2) ->
+		mergeVoxel2Iter = mergeVoxels2.values()
+		while mVoxel2 = mergeVoxel2Iter.next().value
 			mBrick2 = mVoxel2.brick
-			if mBrick2 == false or !mBrick2? or !mBrick2.isSize(1,1,1)
-				noMerge = true
-				return
+			return null unless mBrick2 and mBrick2.isSize(1, 1, 1)
 			mergeBricks.add mBrick2
-		return null if noMerge
 
 		mergeVoxels2.forEach (mVoxel2) ->
 			allVoxels.add mVoxel2
 
 		size = Voxel.sizeFromVoxels(allVoxels)
-		if Brick.isValidSize(size.x,size.y,size.z)
+		if Brick.isValidSize(size.x, size.y, size.z)
 			# check if at least half of the top and half of the bottom voxels
 			# offer connection possibilities; if not, return
-			return mergeBricks if @_minPercentageOfConnectionsPresent(allVoxels)
+			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 
 		return null
 
-	_minPercentageOfConnectionsPresent: (voxels) =>
-		minPercentage = .51
-		percentage = Voxel.percentageOfConnections voxels
-		return true if percentage >= minPercentage
-		return false
+	_minFractionOfConnectionsPresent: (voxels) =>
+		minFraction = .51
+		fraction = Voxel.fractionOfConnections voxels
+		return fraction >= minFraction
 
-	_mergeLoop3L: (brick, mergeableNeighbors, bricksToLayout) =>
+	_mergeLoop3L: (brick, bricksToLayout) =>
+		merged = false
+
+		mergeableNeighbors = @_findMergeableNeighbors3L brick
+
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
+			merged = true
 			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -194,7 +185,7 @@ class BrickLayouter
 
 			mergeableNeighbors = @_findMergeableNeighbors3L brick
 
-		return brick
+		return merged
 
 	_chooseNeighborsToMergeWith3L: (mergeableNeighbors) =>
 		numBricks = []
@@ -243,9 +234,9 @@ class BrickLayouter
 			if brick.getSize().z == 3
 				continue
 
-			mergeableNeighbors = @_findMergeableNeighbors brick
+			merged = @_mergeLoop brick, bricksToLayout
 
-			if !dataHelper.anyDefinedInArray(mergeableNeighbors)
+			if not merged
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
@@ -253,8 +244,6 @@ class BrickLayouter
 					break # done with initial layout
 				else
 					continue # randomly choose a new brick
-
-			@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		return Promise.resolve {grid: grid}
 
@@ -264,16 +253,20 @@ class BrickLayouter
 		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
 			return unless brick?
-			mergeableNeighbors = @_findMergeableNeighbors brick
-			if dataHelper.anyDefinedInArray(mergeableNeighbors)
+			merged = @_mergeLoop brick, bricksToLayout
+			if merged
 				finalPassMerges++
-				@_mergeLoop brick, mergeableNeighbors, bricksToLayout
 
 		log.debug '\tFinal pass merged ', finalPassMerges, ' times.'
 		return Promise.resolve {grid: grid}
 
-	_mergeLoop: (brick, mergeableNeighbors, bricksToLayout) =>
+	_mergeLoop: (brick, bricksToLayout) =>
+		merged = false
+
+		mergeableNeighbors = @_findMergeableNeighbors brick
+
 		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
+			merged = true
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
@@ -287,7 +280,7 @@ class BrickLayouter
 
 			mergeableNeighbors = @_findMergeableNeighbors brick
 
-		return brick
+		return merged
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This
@@ -430,35 +423,35 @@ class BrickLayouter
 		# if they have the same accumulative width
 		# check if they are in the correct positions,
 		# i.e. no spacing between neighbors
-		if width == widthFn(brick.getSize())
-			minWidth = widthFn brick.getPosition()
+		return null if width != widthFn(brick.getSize())
 
-			maxWidth = widthFn(brick.getPosition())
-			maxWidth += widthFn(brick.getSize()) - 1
+		minWidth = widthFn brick.getPosition()
 
-			length = null
+		maxWidth = widthFn(brick.getPosition())
+		maxWidth += widthFn(brick.getSize()) - 1
 
-			invalidSize = false
-			neighborsInDirection.forEach (neighbor) ->
-				length ?= lengthFn neighbor.getSize()
-				if widthFn(neighbor.getPosition()) < minWidth
-					invalidSize = true
-				nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
-				if nw > maxWidth
-					invalidSize = true
-				if lengthFn(neighbor.getSize()) != length
-					invalidSize = true
-			return null if invalidSize
+		length = null
 
-			if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
-			length, brick.getSize().z)
-				return neighborsInDirection
-			else
-				return null
+		invalidSize = false
+		neighborsInDirection.forEach (neighbor) ->
+			length ?= lengthFn neighbor.getSize()
+			if widthFn(neighbor.getPosition()) < minWidth
+				invalidSize = true
+			nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
+			if nw > maxWidth
+				invalidSize = true
+			if lengthFn(neighbor.getSize()) != length
+				invalidSize = true
+		return null if invalidSize
+
+		if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
+		length, brick.getSize().z)
+			return neighborsInDirection
+		else
+			return null
 
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
-		noMerge = false
-
+		# only handle plates (z=1)
 		return null if brick.getSize().z != 1
 
 		# check if 3layer Brick possible according to xy dimensions
@@ -470,25 +463,23 @@ class BrickLayouter
 		# then check if size of second layer fits
 		# if size fits and no slot empty -> position fits
 		secondLayerBricks = brick.getNeighbors(direction)
-		secondLayerBricks.forEach (slBrick) ->
-			if slBrick.getSize().z != 1
-				noMerge = true
-		return null if noMerge
+		sLIterator = secondLayerBricks.values()
+		while sLBrick = sLIterator.next().value
+			return null unless sLBrick.getSize().z == 1
 
-		if @_layerHasSameSizeAsBrick brick, secondLayerBricks
+		if @_sameSizeAsBrick brick, secondLayerBricks
 			# check next layer
 			thirdLayerBricks = new Set()
-			secondLayerBricks.forEach (sLBrick) ->
-				if sLBrick.getStabilityInZDir(direction) != 1
-					noMerge = true
-				sLBrick.getNeighbors(direction).forEach (nBrick) ->
-					if nBrick.getSize().z != 1
-						noMerge = true
+			sLIterator = secondLayerBricks.values()
+			while sLBrick = sLIterator.next().value
+				return unless sLBrick.getStabilityInZDir(direction) == 1
+				neighbors = sLBrick.getNeighbors(direction)
+				neighborsIter = neighbors.values()
+				while nBrick = neighborsIter.next().value
+					return unless nBrick.getSize().z == 1
 					thirdLayerBricks.add nBrick
 
-			return null if noMerge
-
-			if @_layerHasSameSizeAsBrick brick, thirdLayerBricks
+			if @_sameSizeAsBrick brick, thirdLayerBricks
 				thirdLayerBricks.forEach (tlBrick) ->
 					secondLayerBricks.add tlBrick
 				return secondLayerBricks
@@ -497,12 +488,12 @@ class BrickLayouter
 		return null
 
 
-	_layerHasSameSizeAsBrick: (brick, layerBricks) =>
+	_sameSizeAsBrick: (brick, layerBricks) =>
+		return false if layerBricks.size == 0
+
 		sameSize = true
 		p = brick.getPosition()
 		s = brick.getSize()
-
-		return false if layerBricks.size == 0
 
 		layerBricks.forEach (lBrick) ->
 			if lBrick.getSize().z != 1

@@ -109,5 +109,8 @@
     },
     "space_operators": {
         "level": "error"
+    },
+    "spacing_after_comma": {
+        "level": "error"
     }
 }

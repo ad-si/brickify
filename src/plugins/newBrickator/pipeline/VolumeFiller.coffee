@@ -75,9 +75,9 @@ module.exports = class VolumeFiller
 					z++
 				return
 
-			_setVoxels: (grid, x, y, zs, voxelData) ->
-				while zs.length > 0
-					@_setVoxel grid, x, y, zs.pop(), voxelData
+			_setVoxels: (grid, x, y, zValues, voxelData) ->
+				while zValue = zValues.pop()
+					@_setVoxel grid, x, y, zValue, voxelData
 
 			_setVoxel: (grid, x, y, z, voxelData) ->
 				grid[x] ?= []

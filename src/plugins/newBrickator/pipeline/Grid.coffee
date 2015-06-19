@@ -254,6 +254,7 @@ module.exports = class Grid
 	initializeBricks: =>
 		@forEachVoxel (voxel) ->
 			new Brick([voxel])
+		return Promise.resolve @
 
 	# returns all bricks as a set
 	getAllBricks: =>

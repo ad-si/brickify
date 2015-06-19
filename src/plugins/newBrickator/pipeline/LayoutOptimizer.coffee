@@ -1,5 +1,4 @@
 log = require 'loglevel'
-
 Brick = require './Brick'
 Voxel = require './Voxel'
 dataHelper = require './dataHelper'

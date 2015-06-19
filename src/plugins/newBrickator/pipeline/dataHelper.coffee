@@ -26,7 +26,7 @@ module.exports.difference = (set1, set2) ->
 		difference.add element unless set2.has element
 	return difference
 
-module.exports.smallestElement = (set) =>
+module.exports.smallestElement = (set) ->
 	min = null
 	set.forEach (element) ->
 		min ?= element

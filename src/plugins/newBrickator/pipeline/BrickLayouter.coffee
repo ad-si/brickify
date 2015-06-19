@@ -1,9 +1,9 @@
 log = require 'loglevel'
-
 Brick = require './Brick'
 Voxel = require './Voxel'
 dataHelper = require './dataHelper'
 Random = require './Random'
+Common = require './LayouterCommon'
 
 ###
 # @class BrickLayouter
@@ -12,10 +12,6 @@ Random = require './Random'
 class BrickLayouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
-
-	initializeBrickGraph: (grid) ->
-		grid.initializeBricks()
-		return Promise.resolve grid
 
 	layout3LBricks: (grid, bricksToLayout) ->
 		numRandomChoices = 0
@@ -157,8 +153,8 @@ class BrickLayouter
 			# offer connection possibilities; if not, return
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
-
 		return null
+
 
 	_minFractionOfConnectionsPresent: (voxels) =>
 		minFraction = .51
@@ -175,7 +171,7 @@ class BrickLayouter
 			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
-			@_mergeBricksAndUpdateGraphConnections brick,
+			Common.mergeBricksAndUpdateGraphConnections brick,
 				neighborsToMergeWith, bricksToLayout
 
 			if @debugMode and not brick.isValid()
@@ -204,25 +200,6 @@ class BrickLayouter
 
 		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index
-
-
-	# chooses a random brick out of the set
-	_chooseRandomBrick: (setOfBricks) ->
-		if setOfBricks.size == 0
-			return null
-
-		if setOfBricks.chooseRandomBrick?
-			return setOfBricks.chooseRandomBrick()
-
-		rnd = Random.next(setOfBricks.size)
-
-		iterator = setOfBricks.entries()
-		brick = iterator.next().value[0]
-		while rnd > 0
-			brick = iterator.next().value[0]
-			rnd--
-
-		return brick
 
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
 		# only handle plates (z=1)
@@ -285,14 +262,5 @@ class BrickLayouter
 				sameSize = false
 
 		return sameSize
-
-	_mergeBricksAndUpdateGraphConnections: (
-		brick, mergeNeighbors, bricksToLayout ) ->
-
-		mergeNeighbors.forEach (neighborToMergeWith) ->
-			bricksToLayout.delete neighborToMergeWith
-			brick.mergeWith neighborToMergeWith
-
-		return brick
 
 module.exports = BrickLayouter

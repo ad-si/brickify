@@ -78,8 +78,7 @@ describe 'Brick', ->
 		grid = new Grid()
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 
-		brickLayouter = new BrickLayouter()
-		brickLayouter.initializeBrickGraph(grid)
+		grid.initializeBricks()
 
 		connectedBricks = v0.brick.connectedBricks()
 		expect(connectedBricks.size).to.equal(0)
@@ -88,8 +87,7 @@ describe 'Brick', ->
 		v0 = grid.setVoxel {x: 0, y: 0, z: 0}
 		v1 = grid.setVoxel {x: 0, y: 0, z: 1}
 
-		brickLayouter = new BrickLayouter()
-		brickLayouter.initializeBrickGraph(grid)
+		grid.initializeBricks()
 
 		connectedBricks = v0.brick.connectedBricks()
 		expect(connectedBricks.size).to.equal(1)
@@ -99,8 +97,7 @@ describe 'Brick', ->
 		v1 = grid.setVoxel {x: 0, y: 0, z: 1}
 		v2 = grid.setVoxel {x: 0, y: 0, z: 2}
 
-		brickLayouter = new BrickLayouter()
-		brickLayouter.initializeBrickGraph(grid)
+		grid.initializeBricks()
 
 		connectedBricks = v1.brick.connectedBricks()
 		expect(connectedBricks.size).to.equal(2)

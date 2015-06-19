@@ -1,9 +1,9 @@
 log = require 'loglevel'
-
 Brick = require './Brick'
 Voxel = require './Voxel'
 dataHelper = require './dataHelper'
 Random = require './Random'
+Common = require './LayouterCommon'
 
 
 class PlateLayouter
@@ -30,7 +30,7 @@ class PlateLayouter
 		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
-			brick = @_chooseRandomBrick bricksToLayout
+			brick = Common.chooseRandomBrick bricksToLayout
 			if !brick?
 				return Promise.resolve {grid: grid}
 
@@ -63,7 +63,7 @@ class PlateLayouter
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
-			@_mergeBricksAndUpdateGraphConnections brick,
+			Common.mergeBricksAndUpdateGraphConnections brick,
 				neighborsToMergeWith, bricksToLayout
 
 			if @debugMode and not brick.isValid()
@@ -201,16 +201,6 @@ class PlateLayouter
 		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index
 
-	_mergeBricksAndUpdateGraphConnections: (
-		brick, mergeNeighbors, bricksToLayout ) ->
-
-		mergeNeighbors.forEach (neighborToMergeWith) ->
-			bricksToLayout.delete neighborToMergeWith
-			brick.mergeWith neighborToMergeWith
-
-		return brick
-
-
 	finalLayoutPass: (grid) =>
 		bricksToLayout = grid.getAllBricks()
 		finalPassMerges = 0
@@ -222,24 +212,5 @@ class PlateLayouter
 
 		log.debug '\tFinal pass merged ', finalPassMerges, ' times.'
 		return Promise.resolve {grid: grid}
-
-	# chooses a random brick out of the set
-	_chooseRandomBrick: (setOfBricks) ->
-		if setOfBricks.size == 0
-			return null
-
-		if setOfBricks.chooseRandomBrick?
-			return setOfBricks.chooseRandomBrick()
-
-		rnd = Random.next(setOfBricks.size)
-
-		iterator = setOfBricks.entries()
-		brick = iterator.next().value[0]
-		while rnd > 0
-			brick = iterator.next().value[0]
-			rnd--
-
-		return brick
-
 
 module.exports = PlateLayouter

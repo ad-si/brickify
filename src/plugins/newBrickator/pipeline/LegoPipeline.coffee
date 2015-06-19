@@ -46,16 +46,16 @@ module.exports = class LegoPipeline
 				return lastResult.grid.initializeBricks()
 
 		@pipelineSteps.push
-			name: 'Layout 3L merge'
+			name: 'Layout 3L Bricks'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.layout3LBricks lastResult.grid
+				return @brickLayouter.layout lastResult.grid
 
 		@pipelineSteps.push
-			name: 'Layout greedy merge'
+			name: 'Layout Plates'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options, progressCallback) =>
-				return @plateLayouter.layoutPlates lastResult.grid
+				return @plateLayouter.layout lastResult.grid
 
 		@pipelineSteps.push
 			name: 'Final merge pass'

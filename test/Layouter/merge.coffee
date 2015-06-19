@@ -61,7 +61,7 @@ describe 'brickLayouter merge', ->
 		plateLayouter = new PlateLayouter()
 
 		grid.initializeBricks()
-		plateLayouter.layoutPlates grid
+		plateLayouter.layout grid
 
 		expect(v0.brick.getPosition()).to.eql({x: 5, y: 5, z: 0})
 		expect(v0.brick.getSize()).to.eql({x: 1, y: 1, z: 1})
@@ -73,7 +73,7 @@ describe 'brickLayouter merge', ->
 		plateLayouter = new PlateLayouter()
 
 		grid.initializeBricks()
-		plateLayouter.layoutPlates grid
+		plateLayouter.layout grid
 
 		expect(grid.getAllBricks().size).to.equal(1)
 		expect(v0.brick).to.equal(v1.brick)
@@ -89,7 +89,7 @@ describe 'brickLayouter merge', ->
 
 		plateLayouter = new PlateLayouter()
 		grid.initializeBricks()
-		plateLayouter.layoutPlates grid
+		plateLayouter.layout grid
 
 		expect(grid.getAllBricks().size).to.equals(1)
 		expect(v0.brick.getPosition()).to.eql({x: 5, y: 5, z: 0})

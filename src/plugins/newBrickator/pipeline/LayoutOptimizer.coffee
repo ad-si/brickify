@@ -1,7 +1,8 @@
 log = require 'loglevel'
+
 Brick = require './Brick'
 Voxel = require './Voxel'
-dataHelper = require './dataHelper'
+DataHelper = require './DataHelper'
 Random = require './Random'
 
 
@@ -48,7 +49,7 @@ class LayoutOptimizer
 				conLabels.add conBrick.label if conBrick.label?
 
 			if conLabels.size > 0
-				smallestLabel = dataHelper.smallestElement conLabels
+				smallestLabel = DataHelper.smallestElement conLabels
 				# assign label to this brick
 				brick.label = labels[smallestLabel]
 				#console.log 'merging', conLabels
@@ -127,8 +128,8 @@ class LayoutOptimizer
 			newBricks.delete brick
 
 		if useThreeLayers
-			@brickLayouter.layout3LBricks grid, newBricks
-		@plateLayouter.layoutPlates grid, newBricks
+			@brickLayouter.layout grid, newBricks
+		@plateLayouter.layout grid, newBricks
 		.then ->
 			return {
 			removedBricks: bricksToSplit

@@ -1,7 +1,8 @@
 log = require 'loglevel'
+
 Brick = require './Brick'
 Voxel = require './Voxel'
-dataHelper = require './dataHelper'
+DataHelper = require './DataHelper'
 Random = require './Random'
 Common = require './LayouterCommon'
 
@@ -13,7 +14,7 @@ class BrickLayouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
-	layout3LBricks: (grid, bricksToLayout) ->
+	layout: (grid, bricksToLayout) ->
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
@@ -24,7 +25,7 @@ class BrickLayouter
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-		return unless numTotalInitialBricks > 0
+		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = Common.chooseRandomBrick bricksToLayout
@@ -32,22 +33,22 @@ class BrickLayouter
 				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
-			merged = @_mergeLoop3L brick, bricksToLayout
+			merged = Common.mergeLoop @, brick, bricksToLayout
 
 			if not merged
 				numRandomChoicesWithoutMerge++
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
 											withoutMerge #{numRandomChoicesWithoutMerge}"
-					break # done with 3L layout
+					break # done with layout
 				else
 					continue # randomly choose a new brick
 
-			# if brick is 1x1x3, 1x2x3 or instable after mergeLoop3L
+			# if brick is 1x1x3, 1x2x3 or instable after mergeLoop
 			# break it into pieces
-			# mark new bricks as bad starting point for 3L brick
 			if brick.isSize(1, 1, 3) or brick.getStability() == 0 or
 			brick.isSize(1, 2, 3)
+			# TODO, dont split up if all neighbors are 3L already
 				newBricks = brick.splitUp()
 				bricksToLayout.delete brick
 				newBricks.forEach (newBrick) ->
@@ -55,7 +56,7 @@ class BrickLayouter
 
 		return Promise.resolve {grid: grid}
 
-	_findMergeableNeighbors3L: (brick) =>
+	_findMergeableNeighbors: (brick) =>
 		mergeableNeighbors = []
 
 		if brick.getSize().z == 1
@@ -69,25 +70,25 @@ class BrickLayouter
 			)
 			return mergeableNeighbors
 
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
 			Brick.direction.Yp
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
 			Brick.direction.Ym
 			(obj) -> return obj.x
 			(obj) -> return obj.y
 		)
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
 			Brick.direction.Xm
 			(obj) -> return obj.y
 			(obj) -> return obj.x
 		)
-		mergeableNeighbors.push @_findMergeableNeighborsInDirection3L(
+		mergeableNeighbors.push @_findMergeableNeighborsInDirection(
 			brick
 			Brick.direction.Xp
 			(obj) -> return obj.y
@@ -97,7 +98,7 @@ class BrickLayouter
 
 		return mergeableNeighbors
 
-	_findMergeableNeighborsInDirection3L: (brick, dir, widthFn, lengthFn) =>
+	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) =>
 		voxels = brick.voxels
 		mergeVoxels = new Set()
 		mergeBricks = new Set()
@@ -121,7 +122,7 @@ class BrickLayouter
 			return null unless mBrick and mBrick.isSize(1, 1, 1)
 			mergeBricks.add mBrick
 
-		allVoxels = dataHelper.union [voxels, mergeVoxels]
+		allVoxels = DataHelper.union [voxels, mergeVoxels]
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x, size.y, size.z)
@@ -161,29 +162,7 @@ class BrickLayouter
 		fraction = Voxel.fractionOfConnections voxels
 		return fraction >= minFraction
 
-	_mergeLoop3L: (brick, bricksToLayout) =>
-		merged = false
-
-		mergeableNeighbors = @_findMergeableNeighbors3L brick
-
-		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
-			merged = true
-			mergeIndex = @_chooseNeighborsToMergeWith3L mergeableNeighbors
-			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
-
-			Common.mergeBricksAndUpdateGraphConnections brick,
-				neighborsToMergeWith, bricksToLayout
-
-			if @debugMode and not brick.isValid()
-				log.warn 'Invalid brick: ', brick
-				log.warn '> Using pseudoRandom:', @pseudoRandom
-				log.warn '> current seed:', Random.getSeed()
-
-			mergeableNeighbors = @_findMergeableNeighbors3L brick
-
-		return merged
-
-	_chooseNeighborsToMergeWith3L: (mergeableNeighbors) =>
+	_chooseNeighborsToMergeWith: (mergeableNeighbors) =>
 		numBricks = []
 		maxBricks = 0
 

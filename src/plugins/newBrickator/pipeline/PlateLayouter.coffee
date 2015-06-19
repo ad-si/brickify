@@ -1,21 +1,20 @@
 log = require 'loglevel'
+
 Brick = require './Brick'
 Voxel = require './Voxel'
-dataHelper = require './dataHelper'
 Random = require './Random'
 Common = require './LayouterCommon'
 
+
+###
+# @class PlateLayouter
+###
 
 class PlateLayouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
-	# main while loop condition:
-	# any brick can still merge --> use heuristic:
-	# keep a counter, break if last number of unsuccessful tries > (some number
-	# or some % of total bricks in object)
-	# !! Expects bricks to layout to be a Set !!
-	layoutPlates: (grid, bricksToLayout) =>
+	layout: (grid, bricksToLayout) =>
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
@@ -26,20 +25,18 @@ class PlateLayouter
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-
 		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = Common.chooseRandomBrick bricksToLayout
 			if !brick?
 				return Promise.resolve {grid: grid}
-
 			numRandomChoices++
 
 			if brick.getSize().z == 3
 				continue
 
-			merged = @_mergeLoop brick, bricksToLayout
+			merged = Common.mergeLoop @, brick, bricksToLayout
 
 			if not merged
 				numRandomChoicesWithoutMerge++
@@ -51,29 +48,6 @@ class PlateLayouter
 					continue # randomly choose a new brick
 
 		return Promise.resolve {grid: grid}
-
-
-	_mergeLoop: (brick, bricksToLayout) =>
-		merged = false
-
-		mergeableNeighbors = @_findMergeableNeighbors brick
-
-		while(dataHelper.anyDefinedInArray(mergeableNeighbors))
-			merged = true
-			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
-			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
-
-			Common.mergeBricksAndUpdateGraphConnections brick,
-				neighborsToMergeWith, bricksToLayout
-
-			if @debugMode and not brick.isValid()
-				log.warn 'Invalid brick: ', brick
-				log.warn '> Using pseudoRandom:', @pseudoRandom
-				log.warn '> current seed:', Random.getSeed()
-
-			mergeableNeighbors = @_findMergeableNeighbors brick
-
-		return merged
 
 	# Searches for mergeable neighbors in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
@@ -206,7 +180,7 @@ class PlateLayouter
 		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
 			return unless brick?
-			merged = @_mergeLoop brick, bricksToLayout
+			merged = Common.mergeLoop @, brick, bricksToLayout
 			if merged
 				finalPassMerges++
 

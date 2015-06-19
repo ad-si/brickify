@@ -28,14 +28,13 @@ module.exports = class GeometryCreator
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.height
-			21
+			42
 		)
 
 		@highFiStudGeometry.applyMatrix studRotation
 		@highFiStudGeometry.applyMatrix studTranslation
 
-	getBrick: (gridPosition, brickDimensions,
-						 material, textureMaterial, highFidelity) =>
+	getBrick: (gridPosition, brickDimensions, materials, fidelity) =>
 		# returns a THREE.Geometry that uses the given material and is
 		# transformed to match the given grid position
 		worldBrickSize = {
@@ -44,26 +43,27 @@ module.exports = class GeometryCreator
 			z: brickDimensions.z * @grid.spacing.z
 		}
 
-		brickGeometry = @_getBrickGeometry brickDimensions, worldBrickSize
-
-		cache = if highFidelity then @highFiStudGeometryCache else @studGeometryCache
-		geometry = if highFidelity then @highFiStudGeometry else @studGeometry
-		studGeometry = @_getStudsGeometry(
-			brickDimensions
-			worldBrickSize
-			cache
-			geometry
-		)
-
-		planeGeometry = @_getPlaneGeometry brickDimensions, worldBrickSize
+		geometries = {
+			brickGeometry: @_getBrickGeometry brickDimensions, worldBrickSize
+			studGeometry: @_getStudsGeometry(
+				brickDimensions
+				worldBrickSize
+				@studGeometryCache
+				@studGeometry
+			)
+			highFiStudGeometry: @_getStudsGeometry(
+				brickDimensions
+				worldBrickSize
+				@highFiStudGeometryCache
+				@highFiStudGeometry
+			)
+			planeGeometry: @_getPlaneGeometry brickDimensions, worldBrickSize
+		}
 
 		brick = new BrickObject(
-			brickGeometry
-			studGeometry
-			planeGeometry
-			material
-			textureMaterial
-			highFidelity
+			geometries
+			materials
+			fidelity
 		)
 
 		worldBrickPosition = @grid.mapVoxelToWorld gridPosition

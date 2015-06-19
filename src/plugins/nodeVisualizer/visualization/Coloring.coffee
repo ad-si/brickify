@@ -13,6 +13,7 @@ module.exports = class Coloring
 		@studTexture.wrapT = THREE.RepeatWrapping
 
 		@selectedMaterial = @_createMaterial 0xff0000
+		@selectedStudMaterial = @_lightenMaterial @selectedMaterial
 
 		@hiddenMaterial = @_createMaterial 0xffaaaa, 0.0
 
@@ -20,6 +21,8 @@ module.exports = class Coloring
 
 		@printHighlightMaterial = @_createMaterial 0xeeeeee
 		@_setPolygonOffset @printHighlightMaterial, -1, -1
+		@printHighlightStudMaterial = @_lightenMaterial @printHighlightMaterial
+		@_setPolygonOffset @printHighlightStudMaterial, -1, -1
 
 		@printHighlightTextureMaterial = @_createMaterial 0xffffff, 0.2
 		@printHighlightTextureMaterial.map = @studTexture
@@ -102,6 +105,20 @@ module.exports = class Coloring
 			}
 		return null
 
+	getPrintHighlightMaterials: =>
+		return  {
+			color: @printHighlightMaterial
+			colorStuds: @printHighlightStudMaterial
+			textureStuds: @_getTextureMaterialForBrick()
+		}
+
+	getSelectedMaterials: =>
+		return {
+			color: @selectedMaterial
+			colorStuds: @selectedStudMaterial
+			textureStuds: @_getTextureMaterialForBrick()
+		}
+
 	getMaterialsForBrick: (brick) =>
 		# return stored material or assign a random one
 		if brick.visualizationMaterials?
@@ -127,6 +144,8 @@ module.exports = class Coloring
 			continue if neighborColors.has(materials.color)
 			break
 
+		materials.textureStuds = @_getTextureMaterialForBrick brick
+
 		brick.visualizationMaterials = materials
 		return brick.visualizationMaterials
 
@@ -135,7 +154,12 @@ module.exports = class Coloring
 
 	_getRandomBrickMaterials: =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
-		return {color: @_brickMaterials[i], gray: @_grayBrickMaterials[i]}
+		return {
+			color: @_brickMaterials[i]
+			colorStuds: @_studMaterials[i]
+			gray: @_grayBrickMaterials[i]
+			grayStuds: @_grayStudMaterials[i]
+		}
 
 	_createBrickMaterials: =>
 		colorList = [
@@ -152,9 +176,22 @@ module.exports = class Coloring
 		for color in colorList
 			@_brickMaterials.push @_createMaterial color
 
+		@_studMaterials = []
+		for material in @_brickMaterials
+			@_studMaterials.push @_lightenMaterial material
+
 		@_grayBrickMaterials = []
 		for material in @_brickMaterials
 			@_grayBrickMaterials.push @_convertToGrayscale material
+
+		@_grayStudMaterials = []
+		for material in @_grayBrickMaterials
+			@_grayStudMaterials.push @_lightenMaterial material
+
+	_lightenMaterial: (material) ->
+		newMaterial = material.clone()
+		newMaterial.color.addScalar 0.05
+		return newMaterial
 
 	# Clones the material and converts its color to grayscale
 	_convertToGrayscale: (material) ->
@@ -173,7 +210,7 @@ module.exports = class Coloring
 			transparent: opacity < 1.0
 		)
 
-	getTextureMaterialForBrick: (brick) =>
+	_getTextureMaterialForBrick: (brick) =>
 		if brick and brick.getVisualBrick()?
 			return brick.getVisualBrick().textureMaterial
 

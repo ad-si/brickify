@@ -41,8 +41,7 @@ class BrickVisualization
 		@_highlightVoxel = @geometryCreator.getBrick(
 			{x: 0, y: 0, z: 0},
 			{x: 1, y: 1, z: 1},
-			@defaultColoring.printHighlightMaterial
-			@defaultColoring.printHighlightTextureMaterial
+			@defaultColoring.getPrintHighlightMaterials()
 			@fidelity
 		)
 		@_highlightVoxel.visible = false
@@ -120,8 +119,7 @@ class BrickVisualization
 				threeBrick = @geometryCreator.getBrick(
 					brick.getPosition()
 					brick.getSize()
-					materials.color
-					@defaultColoring.getTextureMaterialForBrick brick
+					materials
 					@fidelity
 				)
 
@@ -137,8 +135,8 @@ class BrickVisualization
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
-					material = coloring.getMaterialsForBrick visualBrick.brick
-					visualBrick.setMaterial material.color
+					materials = coloring.getMaterialsForBrick visualBrick.brick
+					visualBrick.setMaterial materials
 		@_oldColoring = coloring
 
 		@unhighlightBigBrush()
@@ -182,11 +180,11 @@ class BrickVisualization
 
 	_makeLayerGrayscale: (layer) ->
 		for threeBrick in layer.children
-			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.gray
+			threeBrick.setGray true
 
 	_makeLayerColored: (layer) ->
 		for threeBrick in layer.children
-			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.color
+			threeBrick.setGray false
 
 	showAllBrickLayers: =>
 		for layer in @bricksSubnode.children
@@ -263,8 +261,7 @@ class BrickVisualization
 						temporaryVoxel = @geometryCreator.getBrick(
 							voxel.position
 							{x: 1, y: 1, z: 1}
-							visualBrick.material
-							@defaultColoring.printHighlightTextureMaterial
+							visualBrick.materials
 							@fidelity
 						)
 						temporaryVoxel.voxelPosition = voxel.position
@@ -316,8 +313,7 @@ class BrickVisualization
 			temporaryVoxel = @geometryCreator.getBrick(
 				voxel.position
 				{x: 1, y: 1, z: 1}
-				@defaultColoring.selectedMaterial
-				@defaultColoring.getTextureMaterialForBrick voxel.brick
+				@defaultColoring.getSelectedMaterials()
 				@fidelity
 			)
 			temporaryVoxel.voxelPosition = voxel.position
@@ -351,7 +347,7 @@ class BrickVisualization
 	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
 
 	setFidelity: (fidelityLevel, availableLevels) =>
-		if fidelityLevel > availableLevels.indexOf 'PipelineHigh'
+		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
 			@fidelity = 2
 		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
 			@fidelity = 1

@@ -34,7 +34,8 @@ module.exports = class LegoBoard
 		@pipelineScene = @bundle.renderer.getDefaultScene()
 
 	_initbaseplateBox: =>
-		box = new THREE.BoxGeometry(dimension, dimension, 8)
+		# Create baseplate with 5 faces in each direction
+		box = new THREE.BoxGeometry(dimension, dimension, 8, 5, 5)
 		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox
@@ -102,10 +103,10 @@ module.exports = class LegoBoard
 		)
 
 	on3dUpdate: =>
-		# this check is only important if we don't use the pipeline
+		# This check is only important if we don't use the pipeline
 		return if @usePipeline or @isScreenshotMode
 
-		# check if the camera is below z=0. if yes, make the plate transparent
+		# Check if the camera is below z=0. if yes, make the plate transparent
 		# and hide studs
 		if not @bundle?
 			return
@@ -122,7 +123,7 @@ module.exports = class LegoBoard
 	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible or @isScreenshotMode
 
-		# recreate textures if either they havent been generated yet or
+		# Recreate textures if either they havent been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized? and
 		RenderTargetHelper.renderTargetHasRightSize(
@@ -136,24 +137,24 @@ module.exports = class LegoBoard
 			)
 			@renderTargetsInitialized = true
 
-		#render board
+		# Render board
 		threeRenderer.render(
 			@pipelineScene, camera, @pipelineSceneTarget.renderTarget, true
 		)
 
 		gl = threeRenderer.context
 
-		# render baseplate transparent if cam looks from below
+		# Render baseplate transparent if cam looks from below
 		if camera.position.z < 0
-			# one fully transparent render pass
+			# One fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 		else
-			# one default opaque pass
+			# One default opaque pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 1
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 
-			#render one pass transparent, where visible object or shadow is
+			# Render one pass transparent, where visible object or shadow is
 			# (= no lego)
 			gl.enable(gl.STENCIL_TEST)
 			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.legoMask)

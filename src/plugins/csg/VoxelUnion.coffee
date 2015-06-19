@@ -319,11 +319,11 @@ class VoxelUnion
 		# the values for studs (creates 3d printed holes) and holes
 		# (creates 3d printed studs) have to be switched
 
-		studRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
+		studRotation = new THREE.Matrix4().makeRotationX(3.14159 / 2)
 		dzBottom = -(gridSpacing.z / 2) + (studSize.height / 2)
-		studTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
+		studTranslationBottom = new THREE.Matrix4().makeTranslation(0, 0, dzBottom)
 		dzTop = (gridSpacing.z / 2) + (holeSize.height / 2)
-		studTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
+		studTranslationTop = new THREE.Matrix4().makeTranslation(0, 0, dzTop)
 
 		studGeometryBottom = new THREE.CylinderGeometry(
 			studSize.radius, studSize.radius, studSize.height, 20

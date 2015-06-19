@@ -6,21 +6,21 @@ class DownloadUi
 	constructor: (@bundle) ->
 		{@studSize, @holeSize, @exportStepSize} = @bundle.globalConfig
 
+		@$downloadButton = $('#downloadButton')
+
 		@_initDownloadModal()
 		@_initDownloadModalContent()
-		@$panel = $('#downloadButton')
 
 	setEnabled: (enabled) =>
-		@$panel.toggleClass 'disabled', !enabled
 		@$downloadModal.find('.btn, .panel, h4').toggleClass 'disabled', !enabled
+		@$downloadButton.toggleClass 'disabled', !enabled
 
 	_initDownloadModal: =>
 		@$downloadModal = downloadModal @bundle.globalConfig.downloadSettings
 		$('body').append @$downloadModal
-		@downloadButton = $('#downloadButton')
 
 		#show modal when clicking on download button
-		@downloadButton.click =>
+		@$downloadButton.click =>
 			piwikTracking.trackEvent 'Editor', 'ExportAction', 'DownloadButtonClick'
 			@$downloadModal.modal 'show'
 

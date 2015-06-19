@@ -75,16 +75,9 @@ module.exports = class Coloring
 		@legoShadowMat.polygonOffsetFactor = +2
 		@legoShadowMat.polygonOffsetUnits = +2
 
-		# object visualization
-		# default object material
-		@objectMaterial = new THREE.MeshLambertMaterial(
-			color: @globalConfig.colors.modelColor
-			ambient: @globalConfig.colors.modelColor
-		)
-
 		# printed object material
 		@objectPrintMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
+			color: @globalConfig.colors.modelColor
 			opacity: 0.8
 			transparent: true
 		})

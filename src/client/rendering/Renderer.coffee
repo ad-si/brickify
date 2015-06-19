@@ -2,6 +2,8 @@ THREE = require 'three'
 OrbitControls = require('three-orbit-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/FxaaPart'
+SsaoShaderPart = require './shader/ssaoPart'
+SsaoBlurPart = require './shader/ssaoBlurPart'
 log = require 'loglevel'
 threeHelper = require '../threeHelper'
 
@@ -16,6 +18,7 @@ class Renderer
 		@init globalConfig
 		@pipelineEnabled = false
 		@useBigRendertargets = false
+		@usePipelineSsao = false
 		@imageRenderQueries = []
 
 	# renders the current scene to an image, uses the camera if provided
@@ -42,20 +45,20 @@ class Renderer
 
 	# Renders all plugins
 	_renderFrame: (timestamp, camera, renderTarget = null) =>
-		# clear screen
+		# Clear screen
 		@threeRenderer.setRenderTarget(renderTarget)
 		@threeRenderer.context.stencilMask(0xFF)
 		@threeRenderer.clear()
 
-		# render the default scene (plugins add objects in the init3d hook)
+		# Render the default scene (plugins add objects in the init3d hook)
 		@threeRenderer.render @scene, camera, renderTarget
 
-		# allow for custom render passes
+		# Allow for custom render passes
 		if @pipelineEnabled
-			# init render target
+			# Init render target
 			@_initializePipelineTarget()
 
-			# clear render target
+			# Clear render target
 			@threeRenderer.setRenderTarget(@pipelineRenderTarget.renderTarget)
 			@threeRenderer.context.stencilMask(0xFF)
 			@threeRenderer.clear()
@@ -68,8 +71,20 @@ class Renderer
 				@pipelineRenderTarget.renderTarget
 			)
 
-			# render our target to the screen
-			@threeRenderer.render @pipelineRenderTarget.quadScene, camera, renderTarget
+			# Render our target to the screen
+			@threeRenderer.render @pipelineRenderTarget.quadScene, @camera
+
+			if @usePipelineSsao
+				# Take data from our target and render SSAO
+				# data into gauss target
+				@threeRenderer.render(
+					@ssaoTarget.quadScene, @camera, @ssaoBlurTarget.renderTarget, true
+				)
+
+				# Take the ssao values and render a gaussed version on the screen
+				@threeRenderer.render(
+					@ssaoBlurTarget.quadScene, @camera
+				)
 
 	_renderImage: (timestamp) =>
 		# render first query to image
@@ -125,12 +140,13 @@ class Renderer
 			pixels: pixels
 		}
 
-	# create / update target for all pipeline passes
+	# Create / update target for all pipeline passes
 	_initializePipelineTarget: =>
-		if not @pipelineRenderTarget? or
+		if not @pipelineRenderTarget? or @pipelineRenderTarget.dirty or
 		not renderTargetHelper.renderTargetHasRightSize(
 			@pipelineRenderTarget.renderTarget, @threeRenderer
 		)
+			# Create the render target that renders everything antialiased to the screen
 			shaderParts = []
 			if @usePipelineFxaa
 				shaderParts.push new FxaaShaderPart()
@@ -145,6 +161,36 @@ class Renderer
 				1.0
 			)
 
+			if @usePipelineSsao
+				# Get a random texture for SSAO
+				randomTex = THREE.ImageUtils.loadTexture('img/randomTexture.png')
+				randomTex.wrapS = THREE.RepeatWrapping
+				randomTex.wrapT = THREE.RepeatWrapping
+
+				# Delete existing Targets
+				if @ssaoTarget?
+					renderTargetHelper.deleteRenderTarget @ssaoTarget, @threeRenderer
+				if @ssaoBlurTarget?
+					renderTargetHelper.deleteRenderTarget @ssaoBlurTarget, @threeRenderer
+
+				# Clone the pipeline Rendertarget:
+				# use this render target to create SSAO values out of scene
+				@ssaoTarget = renderTargetHelper.cloneRenderTarget(
+					@pipelineRenderTarget,
+					[new SsaoShaderPart()],
+					{tRandom: {	type: 't', value: randomTex}},
+					1.0
+				)
+
+				# Create a rendertarget that applies a gauss filter on everything
+				@ssaoBlurTarget = renderTargetHelper.createRenderTarget(
+					@threeRenderer,
+					[new SsaoBlurPart()],
+					{},
+					1.0,
+					@useBigPipelineTargets
+				)
+
 	setFidelity: (fidelityLevel, availableLevels) =>
 		if @pipelineEnabled
 			# Determine whether to use bigger render targets (super sampling)
@@ -155,8 +201,9 @@ class Renderer
 
 			renderTargetHelper.configureSize @useBigRendertargets
 
-			# determine whether to use FXAA
+			# Determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
+				# Only do something when FXAA is not already used
 				if not @usePipelineFxaa
 					@usePipelineFxaa = true
 					@pipelineRenderTarget = null
@@ -164,6 +211,21 @@ class Renderer
 				if @usePipelineFxaa
 					@usePipelineFxaa = false
 					@pipelineRenderTarget = null
+
+			# Determine wether to use SSAO
+			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'
+				# Only do something when SSAO is not already used
+				if not @usePipelineSsao
+					@usePipelineSsao = true
+
+					if @pipelineRenderTarget?
+						@pipelineRenderTarget.dirty = true
+			else
+				if @usePipelineSsao
+					@usePipelineSsao = false
+
+					if @pipelineRenderTarget?
+						@pipelineRenderTarget.dirty = true
 
 	addToScene: (node) ->
 		@scene.add node
@@ -184,7 +246,7 @@ class Renderer
 
 	zoomToNode: (threeNode) ->
 		boundingSphere = threeHelper.getBoundingSphere threeNode
-		# zooms out/in the camera so that the object is fully visible
+		# Zooms out/in the camera so that the object is fully visible
 		threeHelper.zoomToBoundingSphere @camera, @scene, @controls, boundingSphere
 
 	init: (@globalConfig) ->
@@ -214,11 +276,12 @@ class Renderer
 			antialias: true
 			stencil: true
 			preserveDrawingBuffer: true
+			logarithmicDepthBuffer: false
 			canvas: document.getElementById globalConfig.renderAreaId
 		)
 		@threeRenderer.sortObjects = false
 
-		# needed for rendering pipeline
+		# Needed for rendering pipeline
 		@threeRenderer.extensions.get 'EXT_frag_depth'
 
 		# Stencil test
@@ -236,6 +299,7 @@ class Renderer
 
 	_setupScene: (globalConfig) ->
 		scene = new THREE.Scene()
+
 		scene.fog = new THREE.Fog(
 			globalConfig.colors.background
 			globalConfig.cameraNearPlane
@@ -287,7 +351,7 @@ class Renderer
 		directionalLight.position.set 20, -20, -30
 		scene.add directionalLight
 
-	# creates a scene with default light and rotation settings
+	# Creates a scene with default light and rotation settings
 	getDefaultScene: =>
 		scene = @_setupScene(@globalConfig)
 		@_setupLighting(scene)

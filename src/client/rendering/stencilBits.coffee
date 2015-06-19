@@ -1,10 +1,10 @@
 module.exports = {
-	# everything that is lego
+	# Everything that is lego
 	legoMask: 0x01
-	# every object that is visible
+	# Every object that is visible
 	visibleObjectMask: 0x01 << 1
-	# every object that is hidden
+	# Every object that is hidden
 	hiddenObjectMask: 0x01 << 2
-	# every visible shadow
+	# Every visible shadow
 	visibleShadowMask: 0x01 << 3
 }

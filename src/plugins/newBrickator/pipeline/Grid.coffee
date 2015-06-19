@@ -56,11 +56,16 @@ module.exports = class Grid
 	getLegoVoxelsZRange: =>
 		min = Number.POSITIVE_INFINITY
 		max = Number.NEGATIVE_INFINITY
+
 		@forEachVoxel (voxel) ->
 			return unless voxel.isLego()
 			min = Math.min min, voxel.position.z
 			max = Math.max max, voxel.position.z
-		return { min, max }
+
+		return {
+			min: if min is Number.POSITIVE_INFINITY then null else min
+			max: if max is Number.NEGATIVE_INFINITY then null else min
+		}
 
 	# use this if you are not interested in the actual number of layers
 	# e.g. if you want to use them zero-indexed

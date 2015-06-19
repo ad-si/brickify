@@ -58,7 +58,7 @@ class LegoInstructions
 			# add instructions html to download
 			pieceList = pieceListGenerator.generatePieceList bricks
 			files.push @_createHtml numLayers, pieceList
-			
+
 			# Create temporary data object, because we need more than
 			# Files
 			dataObject = {files: files, pieceList: pieceList}
@@ -263,7 +263,7 @@ class LegoInstructions
 				resolve {
 					fileName: fileName
 					# as requested, response is an ArrayBuffer
-					data: this.response
+					data: @response
 				}
 			xhr.send()
 

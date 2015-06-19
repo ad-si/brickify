@@ -41,7 +41,9 @@ module.exports.getHtml = (list, caption = true) ->
 
 	html +=
 		'<p>To build this model you need the following bricks:' +
-		'<style type="text/css"> .partListTable td{vertical-align:middle !important;} </style>' +
+		'<style type="text/css">' +
+		'.partListTable td{vertical-align:middle !important;}' +
+		'</style>' +
 		'<table class="table partListTable">' +
 		'<tr><td><strong>Size</strong></td>' +
 		'<td><strong>Type</strong></td>' +
@@ -62,7 +64,8 @@ module.exports.getHtml = (list, caption = true) ->
 			"<td>#{piece.size.x} x #{piece.size.y}</td>" +
 			"<td>#{type}</td>" +
 			"<td>#{piece.count}x</td>" +
-			"<td><img src='img/partList/partList (#{piece.sizeIndex + 1}).png' height='40px'></td>" +
+			'<td><img src="img/partList/partList' +
+			" (#{piece.sizeIndex + 1}).png\" height='40px'></td>" +
 			'</tr>'
 
 	html += '</table></p>'

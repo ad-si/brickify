@@ -17,3 +17,18 @@ module.exports.removeDuplicates = (array) ->
 			++j
 		++i
 	return a
+
+
+module.exports.union = (arrayOfSets) ->
+	union = new Set()
+	for set in arrayOfSets
+		set.forEach (element) ->
+			union.add element
+	return union
+
+module.exports.smallestElement = (set) =>
+	min = null
+	set.forEach (element) ->
+		min ?= element
+		min = element if element < min
+	return min

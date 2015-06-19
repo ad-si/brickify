@@ -27,7 +27,7 @@ class BrickLayouter
 		return unless numTotalInitialBricks > 0
 
 		loop
-			brick = @_chooseRandomBrick bricksToLayout
+			brick = Common.chooseRandomBrick bricksToLayout
 			if !brick?
 				return Promise.resolve {grid: grid}
 			numRandomChoices++

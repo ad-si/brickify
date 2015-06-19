@@ -40,7 +40,8 @@ module.exports.getHtml = (list, caption = true) ->
 		html = '<h3>Bricks needed</h3>'
 
 	html += '<p>To build this model you need the following bricks:'
-	html += '<table class="table">'
+	html += '<style type="text/css"> .partListTable td{vertical-align:middle !important;} </style>'
+	html += '<table class="table partListTable">'
 	html += '<tr><td><strong>Size</strong></td>'
 	html += '<td><strong>Type</strong></td>'
 	html += '<td><strong>Amount</strong></td>'

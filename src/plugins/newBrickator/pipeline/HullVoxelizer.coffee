@@ -19,7 +19,7 @@ module.exports = class Voxelizer
 
 		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel, options
 
-		callback = (message) =>
+		progressAndFinishedCallback = (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
@@ -31,7 +31,7 @@ module.exports = class Voxelizer
 			lineStepSize
 			floatDelta
 			voxelRoundingThreshold
-			callback
+			progressAndFinishedCallback
 		)
 
 		return new Promise (@resolve, reject) => return
@@ -172,9 +172,9 @@ module.exports = class Voxelizer
 					unless @_isOnVoxelBorder currentGridPosition
 						oldVoxel = currentVoxel
 						currentVoxel = @_roundVoxelSpaceToVoxel currentGridPosition
-						if (oldVoxel.x != currentVoxel.x) or
-						(oldVoxel.y != currentVoxel.y) or
-						(oldVoxel.z != currentVoxel.z)
+						if (oldVoxel.x isnt currentVoxel.x) or
+						(oldVoxel.y isnt currentVoxel.y) or
+						(oldVoxel.z isnt currentVoxel.z)
 							z = @_getGreatestZInVoxel a, b, currentVoxel
 							@_setVoxel currentVoxel, z, direction, grid
 					currentGridPosition.x += dx
@@ -203,9 +203,9 @@ module.exports = class Voxelizer
 
 				if aIsInVoxel and bIsInVoxel
 					return Math.max a.z, b.z
-				if aIsInVoxel && a.z > b.z
+				if aIsInVoxel and a.z > b.z
 					return a.z
-				if bIsInVoxel && b.z > a.z
+				if bIsInVoxel and b.z > a.z
 					return b.z
 
 				d = x: b.x - a.x, y: b.y - a.y, z: b.z - a.z

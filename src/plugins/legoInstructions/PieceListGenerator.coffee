@@ -58,7 +58,7 @@ module.exports.getHtml = (list, caption = true) ->
 		html += "<td>#{piece.size.x} x #{piece.size.y}</td>"
 		html += "<td>#{type}</td>"
 		html += "<td>#{piece.count}x</td>"
-		html += "<td><img src='/img/partList/partList (#{piece.sizeIndex + 1}).png' height='50px'></td>"
+		html += "<td><img src='/img/partList/partList (#{piece.sizeIndex + 1}).png' height='40px'></td>"
 		html += '</tr>'
 
 	html += '</table></p>'

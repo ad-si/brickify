@@ -1,5 +1,8 @@
 Grid = require './Grid'
 
+floatDelta = 1e-10
+voxelRoundingThreshold = 1e-5
+
 module.exports = class Voxelizer
 	constructor: ->
 		@voxelGrid = null
@@ -16,12 +19,20 @@ module.exports = class Voxelizer
 
 		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel, options
 
-		@worker = @_getWorker()
-		@worker.voxelize voxelSpaceModel, lineStepSize, (message) =>
+		progressAndFinishedCallback = (message) =>
 			if message.state is 'progress'
 				progressCallback message.progress
 			else # if state is 'finished'
 				@resolve grid: @voxelGrid, gridPOJO: message.data
+
+		@worker = @_getWorker()
+		@worker.voxelize(
+			voxelSpaceModel
+			lineStepSize
+			floatDelta
+			voxelRoundingThreshold
+			progressAndFinishedCallback
+		)
 
 		return new Promise (@resolve, reject) => return
 
@@ -57,7 +68,8 @@ module.exports = class Voxelizer
 	_getWorker: ->
 		return @worker if @worker?
 		return operative {
-			voxelize: (model, lineStepSize, progressCallback) ->
+			voxelize: (model, lineStepSize, @floatDelta, @voxelRoundingThreshold,
+			progressCallback) ->
 				grid = []
 				@_resetProgress()
 				@_forEachPolygon model, (p0, p1, p2, direction, progress) ->
@@ -154,20 +166,26 @@ module.exports = class Voxelizer
 				dz = (b.z - a.z) / length * stepSize
 
 				currentVoxel = x: 0, y: 0, z: -1 # not a valid voxel because of z < 0
-				currentGridPosition = x: a.x, y: a.y, z: a.z
+				currentGridPosition = a
 
 				for i in [0..length] by stepSize
-					oldVoxel = currentVoxel
-					currentVoxel = @_roundVoxelSpaceToVoxel currentGridPosition
-					if (oldVoxel.x != currentVoxel.x) or
-					(oldVoxel.y != currentVoxel.y) or
-					(oldVoxel.z != currentVoxel.z)
-						z = @_getGreatestZInVoxel a, b, currentVoxel
-						@_setVoxel currentVoxel, z, direction, grid
+					unless @_isOnVoxelBorder currentGridPosition
+						oldVoxel = currentVoxel
+						currentVoxel = @_roundVoxelSpaceToVoxel currentGridPosition
+						if (oldVoxel.x isnt currentVoxel.x) or
+						(oldVoxel.y isnt currentVoxel.y) or
+						(oldVoxel.z isnt currentVoxel.z)
+							z = @_getGreatestZInVoxel a, b, currentVoxel
+							@_setVoxel currentVoxel, z, direction, grid
 					currentGridPosition.x += dx
 					currentGridPosition.y += dy
 					currentGridPosition.z += dz
 				return
+
+			_isOnVoxelBorder: ({x, y, z}) ->
+				for c in [x, y]
+					return true if Math.abs(0.5 - (c % 1)) < @voxelRoundingThreshold
+				return false
 
 			_roundVoxelSpaceToVoxel: ({x: x, y: y, z: z}) ->
 				return {
@@ -178,61 +196,64 @@ module.exports = class Voxelizer
 
 			_getGreatestZInVoxel: (a, b, {x: x, y: y, z: z}) ->
 				roundA = @_roundVoxelSpaceToVoxel a
-				if roundA.x is x and roundA.y is y and roundA.z is z
-					# aIsInVoxel
-					roundB = @_roundVoxelSpaceToVoxel b
-					if roundB.x is x and roundB.y is y and roundB.z is z
-						# bIsInVoxel
-						return Math.max a.z, b.z
+				roundB = @_roundVoxelSpaceToVoxel b
 
+				aIsInVoxel = roundA.x is x and roundA.y is y and roundA.z is z
+				bIsInVoxel = roundB.x is x and roundB.y is y and roundB.z is z
 
-				d = @_normalize x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
+				if aIsInVoxel and bIsInVoxel
+					return Math.max a.z, b.z
+				if aIsInVoxel and a.z > b.z
+					return a.z
+				if bIsInVoxel and b.z > a.z
+					return b.z
+
+				d = x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
+
+				if d.z is 0
+					# return the value that must be the greatest z in voxel --> a.z == b.z
+					return a.z
 
 				if d.x isnt 0
 					k = (x - 0.5 - a.x) / d.x
-					if k >= 0 and k <= 1
+					if 0 <= k <= 1
 						return a.z + k * d.z
 
 					k = (x + 0.5 - a.x) / d.x
-					if k >= 0 and k <= 1
+					if 0 <= k <= 1
 						return a.z + k * d.z
 
 				if d.y isnt 0
 					k = (y - 0.5 - a.y) / d.y
-					if k >= 0 and k <= 1
+					if 0 <= k <= 1
 						return a.z + k * d.z
 
 					k = (y + 0.5 - a.y) / d.y
-					if k >= 0 and k <= 1
+					if 0 <= k <= 1
 						return a.z + k * d.z
 
 				if d.z isnt 0
 					minZ = z - 0.5
 					k = (minZ - a.z) / d.z
-					if k >= 0 and k <= 1
+					if 0 <= k <= 1
 						return minZ
 
 					maxZ = z + 0.5
 					k = (maxZ - a.z) / d.z
-					if k >= 0 and k <= 1
+					if 0 <= k <= 1
 						return maxZ
-
-				return z
-
-			_normalize: ({x: x, y: y, z: z}) ->
-				length = Math.sqrt x * x + y * y + z * z
-				return {
-					x: x / length
-					y: y / length
-					z: z / length
-				}
 
 			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
 				grid[x] = [] unless grid[x]
 				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
-					if oldValue.dir is 0 or (zValue > oldValue.z and direction isnt 0)
+					# Update dir if new zValue is higher than the old one
+					# by at least floatDelta to avoid setting direction to -1 if it is
+					# within the tolerance of floatDelta
+					if (direction isnt 0 and zValue > oldValue.z + @floatDelta) or
+					# Prefer setting direction to 1 (i.e. close the voxel)
+					(direction is 1 and zValue > oldValue.z - @floatDelta)
 						oldValue.z = zValue
 						oldValue.dir = direction
 				else

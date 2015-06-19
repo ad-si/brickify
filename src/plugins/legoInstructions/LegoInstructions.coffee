@@ -56,15 +56,27 @@ class LegoInstructions
 			files.push openScadGenerator.generateScad bricks
 
 			# add instructions html to download
-			files.push @_createHtml numLayers, bricks
+			pieceList = pieceListGenerator.generatePieceList bricks
+			files.push @_createHtml numLayers, pieceList
+			
+			# Create temporary data object, because we need more than
+			# Files
+			dataObject = {files: files, pieceList: pieceList}
 
+			# Take screenshots and convert them to png
 			@_takeScreenshots node, numLayers, camera
 			.then (images) =>
-				files.push images...
+				dataObject.files.push images...
 				log.debug 'Finished instruction screenshots'
 
 				# save download
-				return files
+				return dataObject
+		.then (dataObject) =>
+			# Load and save piece images
+			@_downloadPieceListImages dataObject.pieceList
+			.then (imageFiles) ->
+				dataObject.files.push imageFiles...
+				return dataObject.files
 		.then (files) =>
 			# reset display mode
 			@nodeVisualizer.setDisplayMode node, oldVisualizationMode
@@ -199,8 +211,7 @@ class LegoInstructions
 		imageData[index + 2] = b
 		imageData[index + 3] = a
 
-	_createHtml: (numLayers, bricks) ->
-		pieceList = pieceListGenerator.generatePieceList bricks
+	_createHtml: (numLayers, pieceList) =>
 		pieceListHtml = pieceListGenerator.getHtml pieceList
 
 		style = '<style>
@@ -231,5 +242,29 @@ class LegoInstructions
 			fileName: 'LEGO Assembly instructions.html'
 			data: html
 		}
+
+	_downloadPieceListImages: (pieceList) =>
+		return new Promise (resolve, reject) =>
+			downloadPromises = []
+			for piece in pieceList
+				downloadPromises.push @_downloadPieceImage piece
+
+			Promise.all(downloadPromises)
+			.then (pieceFiles) ->
+				resolve pieceFiles
+
+	_downloadPieceImage: (piece) ->
+		return new Promise (resolve, reject) ->
+			xhr = new XMLHttpRequest()
+			fileName = "img/partList/partList (#{piece.sizeIndex+1}).png"
+			xhr.open 'GET', fileName
+			xhr.responseType = 'arraybuffer'
+			xhr.onload = (event) ->
+				resolve {
+					fileName: fileName
+					# as requested, response is an ArrayBuffer
+					data: this.response
+				}
+			xhr.send()
 
 module.exports = LegoInstructions

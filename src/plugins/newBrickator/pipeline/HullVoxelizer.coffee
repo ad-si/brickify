@@ -1,6 +1,6 @@
 Grid = require './Grid'
 
-floatDelta = 1e-50
+floatDelta = 1e-10
 voxelRoundingThreshold = 1e-5
 
 module.exports = class Voxelizer
@@ -166,7 +166,7 @@ module.exports = class Voxelizer
 				dz = (b.z - a.z) / length * stepSize
 
 				currentVoxel = x: 0, y: 0, z: -1 # not a valid voxel because of z < 0
-				currentGridPosition = x: a.x, y: a.y, z: a.z
+				currentGridPosition = a
 
 				for i in [0..length] by stepSize
 					unless @_isOnVoxelBorder currentGridPosition
@@ -210,6 +210,10 @@ module.exports = class Voxelizer
 
 				d = x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
 
+				if d.z is 0
+					# return the value that must be the greatest z in voxel --> a.z == b.z
+					return a.z
+
 				if d.x isnt 0
 					k = (x - 0.5 - a.x) / d.x
 					if 0 <= k <= 1
@@ -239,17 +243,17 @@ module.exports = class Voxelizer
 					if 0 <= k <= 1
 						return maxZ
 
-				return z
-
 			_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
 				grid[x] = [] unless grid[x]
 				grid[x][y] = [] unless grid[x][y]
 				oldValue = grid[x][y][z]
 				if oldValue
 					# Update dir if new zValue is higher than the old one
-					if (direction isnt 0 and zValue > oldValue.z) or
+					# by at least floatDelta to avoid setting direction to -1 if it is
+					# within the tolerance of floatDelta
+					if (direction isnt 0 and zValue > oldValue.z + @floatDelta) or
 					# Prefer setting direction to 1 (i.e. close the voxel)
-					(direction is 1 and Math.abs(zValue - oldValue.z) < @floatDelta)
+					(direction is 1 and zValue > oldValue.z - @floatDelta)
 						oldValue.z = zValue
 						oldValue.dir = direction
 				else

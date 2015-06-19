@@ -21,7 +21,7 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		@qualMode = 0
+		@fidelity = 0
 		@usePipeline = false
 		@isVisible = true
 		@isScreenshotMode = no
@@ -48,7 +48,7 @@ module.exports = class LegoBoard
 		@highFiStudsContainer = new THREE.Object3D()
 		@threejsNode.add @highFiStudsContainer
 		@highFiStudsContainer.visible = false
-		@_addStuds 21, @highFiStudsContainer
+		@_addStuds 42, @highFiStudsContainer
 
 	_addStuds: (radiusSegments, container) =>
 		studGeometry = new THREE.CylinderGeometry(
@@ -117,9 +117,7 @@ module.exports = class LegoBoard
 			@studsContainer.visible = false
 			@highFiStudsContainer.visible = false
 		else
-			@baseplateBox.material = @currentBaseplateMaterial
-			@studsContainer.visible = @qualMode is 1
-			@highFiStudsContainer.visible = @qualMode is 2
+			@_updateFidelitySettings()
 
 	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible or @isScreenshotMode
@@ -181,57 +179,50 @@ module.exports = class LegoBoard
 
 		# Determine whether to show or hide studs
 		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-			@qualMode = 2
-
-			@highFiStudsContainer.visible = true
-			@studsContainer.visible = false
-			#remove texture because we have physical studs
-			@baseplateBox.material = @baseplateMaterial
-
-			@currentBaseplateMaterial = @baseplateMaterial
-
-		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
-			@qualMode = 1
-
-			#show studs
-			@studsContainer.visible = true
-			@highFiStudsContainer.visible = false
-			#remove texture because we have physical studs
-			@baseplateBox.material = @baseplateMaterial
-
-			@currentBaseplateMaterial = @baseplateMaterial
+			@fidelity = 2
+			@_updateFidelitySettings()
+		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+			@fidelity = 1
+			@_updateFidelitySettings()
 		else
-			@qualMode = 0
-
-			#hide studs
-			@studsContainer.visible = false
-			#change baseplate material to stud texture
-			@baseplateBox.material = @baseplateTexturedMaterial
-
-			@currentBaseplateMaterial = @baseplateTexturedMaterial
+			@fidelity = 0
+			@_updateFidelitySettings()
 
 		# Determine whether to use the pipeline or not
 		if fidelityLevel >= availableLevels.indexOf 'PipelineLow'
 			if not @usePipeline
 				@usePipeline = true
 
-				#move lego board and studs from threeNode to pipeline scene
-				@threejsNode.remove @baseplateBox
-				@threejsNode.remove @studsContainer
-				@threejsNode.remove @highFiStudsContainer
-
-				@pipelineScene.add @baseplateBox
-				@pipelineScene.add @studsContainer
-				@pipelineScene.add @highFiStudsContainer
+				# move lego board and studs from threeNode to pipeline scene
+				@_moveThreeObjects @threejsNode, @pipelineScene, [
+					@baseplateBox
+					@studsContainer
+					@highFiStudsContainer
+				]
 		else
 			if @usePipeline
 				@usePipeline = false
 
-				#move lego board and studs from pipeline to threeNode
-				@pipelineScene.remove @baseplateBox
-				@pipelineScene.remove @studsContainer
-				@pipelineScene.remove @highFiStudsContainer
+				# move lego board and studs from pipeline to threeNode
+				@_moveThreeObjects @pipelineScene, @threejsNode, [
+					@baseplateBox
+					@studsContainer
+					@highFiStudsContainer
+				]
 
-				@threejsNode.add @baseplateBox
-				@threejsNode.add @studsContainer
-				@threejsNode.add @highFiStudsContainer
+	_moveThreeObjects: (from, to, objects) ->
+		for object in objects
+			from.remove object
+			to.add object
+
+	_updateFidelitySettings: =>
+		# show studs?
+		@studsContainer.visible = @fidelity is 1
+		@highFiStudsContainer.visible = @fidelity is 2
+
+		# remove texture because we have physical studs?
+		if @fidelity is 0
+			@baseplateBox.material =  @baseplateTexturedMaterial
+		else
+			@baseplateBox.material = @baseplateMaterial
+		@currentBaseplateMaterial = @baseplateBox.material

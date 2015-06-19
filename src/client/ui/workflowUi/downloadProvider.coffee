@@ -71,7 +71,7 @@ module.exports = class DownloadProvider
 			if files.length is 1
 				saveAs(
 					new Blob([files[0].data])
-					files[0].fileName
+					files[0].fileName.replace(/\.stl$/gi, '') + '.stl'
 				)
 
 			else if files.length > 1

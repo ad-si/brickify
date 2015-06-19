@@ -2,7 +2,7 @@ path = require 'path'
 
 module.exports.getLandingpage = (request, response) ->
 	response.render(
-		path.join('landingpage','landingpage'),
+		path.join('landingpage', 'landingpage'),
 		page: 'landing'
 		models: [
 			{
@@ -26,25 +26,25 @@ module.exports.getLandingpage = (request, response) ->
 
 module.exports.getContribute = (request, response) ->
 	response.render(
-		path.join('landingpage','contribute'),
+		path.join('landingpage', 'contribute'),
 		pageTitle: 'Contribute'
 	)
 
 module.exports.getTeam = (request, response) ->
 	response.render(
-		path.join('landingpage','team'),
+		path.join('landingpage', 'team'),
 		pageTitle: 'Team'
 	)
 
 module.exports.getImprint = (request, response) ->
 	response.render(
-		path.join('landingpage','imprint'),
+		path.join('landingpage', 'imprint'),
 		pageTitle: 'Imprint'
 	)
 
 module.exports.getEducators = (request, response) ->
 	response.render(
-		path.join('landingpage','educators')
+		path.join('landingpage', 'educators')
 		{
 			page: 'landing',
 			pageTitle: 'Educators'

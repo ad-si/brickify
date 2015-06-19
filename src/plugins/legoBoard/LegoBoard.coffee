@@ -27,13 +27,13 @@ module.exports = class LegoBoard
 
 		@_initMaterials()
 
-		#create baseplate
-		box = new THREE.BoxGeometry(400, 400, 8)
+		# Create baseplate with 5 faces in each direction
+		box = new THREE.BoxGeometry(400, 400, 8, 5, 5)
 		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox
 
-		#create studs
+		# Create studs
 		@studsContainer = new THREE.Object3D()
 		@threejsNode.add @studsContainer
 		@studsContainer.visible = false
@@ -51,14 +51,14 @@ module.exports = class LegoBoard
 					object.translateY y
 					@studsContainer.add object
 
-		# create scene for pipeline
+		# Create scene for pipeline
 		@pipelineScene = @bundle.renderer.getDefaultScene()
 
 	_initMaterials: =>
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		studTexture.wrapS = THREE.RepeatWrapping
 		studTexture.wrapT = THREE.RepeatWrapping
-		studTexture.repeat.set 50,50
+		studTexture.repeat.set 50, 50
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
 			color: globalConfig.colors.basePlate
@@ -79,10 +79,10 @@ module.exports = class LegoBoard
 		)
 
 	on3dUpdate: =>
-		# this check is only important if we don't use the pipeline
+		# This check is only important if we don't use the pipeline
 		return if @usePipeline or @isScreenshotMode
 
-		# check if the camera is below z=0. if yes, make the plate transparent
+		# Check if the camera is below z=0. if yes, make the plate transparent
 		# and hide studs
 		if not @bundle?
 			return
@@ -99,7 +99,7 @@ module.exports = class LegoBoard
 	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible or @isScreenshotMode
 
-		# recreate textures if either they havent been generated yet or
+		# Recreate textures if either they havent been generated yet or
 		# the screen size has changed
 		if not (@renderTargetsInitialized? and
 		RenderTargetHelper.renderTargetHasRightSize(
@@ -113,24 +113,24 @@ module.exports = class LegoBoard
 			)
 			@renderTargetsInitialized = true
 
-		#render board
+		# Render board
 		threeRenderer.render(
 			@pipelineScene, camera, @pipelineSceneTarget.renderTarget, true
 		)
 
 		gl = threeRenderer.context
 
-		# render baseplate transparent if cam looks from below
+		# Render baseplate transparent if cam looks from below
 		if camera.position.z < 0
-			# one fully transparent render pass
+			# One fully transparent render pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 0.4
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 		else
-			# one default opaque pass
+			# One default opaque pass
 			@pipelineSceneTarget.blendingMaterial.uniforms.opacity.value = 1
 			threeRenderer.render @pipelineSceneTarget.quadScene, camera, target, false
 
-			#render one pass transparent, where visible object or shadow is
+			# Render one pass transparent, where visible object or shadow is
 			# (= no lego)
 			gl.enable(gl.STENCIL_TEST)
 			gl.stencilFunc(gl.EQUAL, 0x00, stencilBits.legoMask)
@@ -158,18 +158,18 @@ module.exports = class LegoBoard
 		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
 			@highQualMode = true
 
-			#show studs
+			# Show studs
 			@studsContainer.visible = true
-			#remove texture because we have physical studs
+			# Remove texture because we have physical studs
 			@baseplateBox.material = @baseplateMaterial
 
 			@currentBaseplateMaterial = @baseplateMaterial
 		else
 			@highQualMode = false
 
-			#hide studs
+			# Hide studs
 			@studsContainer.visible = false
-			#change baseplate material to stud texture
+			# Change baseplate material to stud texture
 			@baseplateBox.material = @baseplateTexturedMaterial
 
 			@currentBaseplateMaterial = @baseplateTexturedMaterial
@@ -179,7 +179,7 @@ module.exports = class LegoBoard
 			if not @usePipeline
 				@usePipeline = true
 
-				#move lego board and studs from threeNode to pipeline scene
+				# Move lego board and studs from threeNode to pipeline scene
 				@threejsNode.remove @baseplateBox
 				@threejsNode.remove @studsContainer
 
@@ -189,7 +189,7 @@ module.exports = class LegoBoard
 			if @usePipeline
 				@usePipeline = false
 
-				#move lego board and studs from pipeline to threeNode
+				# Move lego board and studs from pipeline to threeNode
 				@pipelineScene.remove @baseplateBox
 				@pipelineScene.remove @studsContainer
 

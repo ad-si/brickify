@@ -58,13 +58,13 @@ module.exports.createRenderTarget = (
 		}
 	)
 
-	# apply values to parent, due to broken THREE implementation / WIP pull request
+	# Apply values to parent, due to broken THREE implementation / WIP pull request
 	renderTargetTexture.wrapS = renderTargetTexture.texture.wrapS
 	renderTargetTexture.wrapT = renderTargetTexture.texture.wrapT
 	renderTargetTexture.magFilter = renderTargetTexture.texture.magFilter
 	renderTargetTexture.minFilter = renderTargetTexture.texture.minFilter
 
-	#create scene to render texture
+	# Create scene to render texture
 	quadScene = new THREE.Scene()
 	screenAlignedQuad = generateQuad(
 		renderTargetTexture, depthTexture, shaderParts, additionalUniforms, opacity
@@ -74,6 +74,27 @@ module.exports.createRenderTarget = (
 	return {
 		depthTexture: depthTexture
 		renderTarget: renderTargetTexture
+		quadScene: quadScene
+		blendingMaterial: screenAlignedQuad.material
+	}
+
+# Clones the originalTarget but creates a new custom blendingMat shader
+module.exports.cloneRenderTarget = (
+	originalTarget,
+	shaderParts = [], additionalUniforms = {}, opacity = 1.0,
+	) ->
+
+	# Create scene to render texture
+	quadScene = new THREE.Scene()
+	screenAlignedQuad = generateQuad(
+		originalTarget.renderTarget, originalTarget.depthTexture,
+		shaderParts, additionalUniforms, opacity
+	)
+	quadScene.add screenAlignedQuad
+
+	return {
+		depthTexture: originalTarget.depthTexture
+		renderTarget: originalTarget.renderTarget
 		quadScene: quadScene
 		blendingMaterial: screenAlignedQuad.material
 	}
@@ -108,9 +129,9 @@ generateQuad =  (
 		transparent: true
 	})
 
-	planeGeometry = new THREE.PlaneBufferGeometry(2,2)
+	planeGeometry = new THREE.PlaneBufferGeometry(2, 2)
 	mesh = new THREE.Mesh( planeGeometry, mat )
-	# disable frustum culling since the plane is always visible
+	# Disable frustum culling since the plane is always visible
 	mesh.frustumCulled = false
 	return mesh
 module.exports.generateQuad = generateQuad

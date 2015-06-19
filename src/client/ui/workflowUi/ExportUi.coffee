@@ -18,6 +18,6 @@ class ExportUi
 		@shareUi = new ShareUi @
 
 	_initDownload: =>
-		@downloadUi = new DownloadUi @
+		@downloadUi = new DownloadUi @bundle
 
 module.exports = ExportUi

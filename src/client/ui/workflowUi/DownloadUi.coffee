@@ -3,8 +3,7 @@ downloadModal = require '../downloadModal'
 piwikTracking = require '../../piwikTracking'
 
 class DownloadUi
-	constructor: (exportUi) ->
-		@bundle = exportUi.bundle
+	constructor: (@bundle) ->
 		{@studSize, @holeSize, @exportStepSize} = @bundle.globalConfig
 
 		@$downloadButton = $('#downloadButton')

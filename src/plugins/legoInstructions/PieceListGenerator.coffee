@@ -13,7 +13,7 @@ module.exports.generatePieceList = (bricks) ->
 				return
 
 		size = brick.getSize()
-		pieceList.push {
+		brickType = {
 			size: {
 				x: Math.min size.x, size.y
 				y: Math.max size.x, size.y
@@ -21,6 +21,8 @@ module.exports.generatePieceList = (bricks) ->
 			}
 			count: 1
 		}
+		brickType.sizeIndex = Brick.getSizeIndex brickType.size
+		pieceList.push brickType
 
 	# sort bricks from small to big
 	pieceList.sort (a,b) ->
@@ -41,7 +43,8 @@ module.exports.getHtml = (list, caption = true) ->
 	html += '<table class="table">'
 	html += '<tr><td><strong>Size</strong></td>'
 	html += '<td><strong>Type</strong></td>'
-	html += '<td><strong>Amount</strong></td></tr>'
+	html += '<td><strong>Amount</strong></td>'
+	html += '<td><strong>Image</strong></td></tr>'
 	for piece in list
 		if piece.size.z == 1
 			type = 'Plate'
@@ -55,6 +58,7 @@ module.exports.getHtml = (list, caption = true) ->
 		html += "<td>#{piece.size.x} x #{piece.size.y}</td>"
 		html += "<td>#{type}</td>"
 		html += "<td>#{piece.count}x</td>"
+		html += "<td><img src='/img/partList/partList (#{piece.sizeIndex + 1}).png' height='50px'></td>"
 		html += '</tr>'
 
 	html += '</table></p>'

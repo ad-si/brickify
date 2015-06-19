@@ -288,7 +288,8 @@ class BrickLayouter
 	#
 	# @param {Set<Brick>} bricks bricks that should be split
 	###
-	splitBricksAndRelayoutLocally: (bricks, grid, splitNeighbors = true, useThreeLayers = true) =>
+	splitBricksAndRelayoutLocally: (bricks, grid,
+			splitNeighbors = true, useThreeLayers = true) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->

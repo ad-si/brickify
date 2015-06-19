@@ -14,46 +14,14 @@ class BrickLayouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
-	layout: (grid, bricksToLayout) ->
-		numRandomChoices = 0
-		numRandomChoicesWithoutMerge = 0
-		numTotalInitialBricks = 0
+	isBrickLayouter: ->
+		return true
 
-		if not bricksToLayout?
-			bricksToLayout = grid.getAllBricks()
-			bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
+	isPlateLayouter: ->
+		return false
 
-		numTotalInitialBricks += bricksToLayout.size
-		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
-
-		loop
-			brick = Common.chooseRandomBrick bricksToLayout
-			if !brick?
-				return Promise.resolve {grid: grid}
-			numRandomChoices++
-
-			merged = Common.mergeLoop @, brick, bricksToLayout
-
-			if not merged
-				numRandomChoicesWithoutMerge++
-				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
-					log.debug "\trandomChoices #{numRandomChoices}
-											withoutMerge #{numRandomChoicesWithoutMerge}"
-					break # done with layout
-				else
-					continue # randomly choose a new brick
-
-			# if brick is 1x1x3, 1x2x3 or instable after mergeLoop
-			# break it into pieces
-			if brick.isSize(1, 1, 3) or brick.getStability() == 0 or
-			brick.isSize(1, 2, 3)
-			# TODO, dont split up if all neighbors are 3L already
-				newBricks = brick.splitUp()
-				bricksToLayout.delete brick
-				newBricks.forEach (newBrick) ->
-					bricksToLayout.add newBrick
-
+	layout: (grid, bricksToLayout) =>
+		grid = Common.layout @, grid, bricksToLayout
 		return Promise.resolve {grid: grid}
 
 	_findMergeableNeighbors: (brick) =>

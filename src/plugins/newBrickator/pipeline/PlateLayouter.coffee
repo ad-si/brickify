@@ -14,39 +14,14 @@ class PlateLayouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
+	isBrickLayouter: ->
+		return false
+
+	isPlateLayouter: ->
+		return true
+
 	layout: (grid, bricksToLayout) =>
-		numRandomChoices = 0
-		numRandomChoicesWithoutMerge = 0
-		numTotalInitialBricks = 0
-
-		if not bricksToLayout?
-			bricksToLayout = grid.getAllBricks()
-			bricksToLayout.chooseRandomBrick = grid.chooseRandomBrick
-
-		numTotalInitialBricks += bricksToLayout.size
-		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
-
-		loop
-			brick = Common.chooseRandomBrick bricksToLayout
-			if !brick?
-				return Promise.resolve {grid: grid}
-			numRandomChoices++
-
-			if brick.getSize().z == 3
-				continue
-
-			merged = Common.mergeLoop @, brick, bricksToLayout
-
-			if not merged
-				numRandomChoicesWithoutMerge++
-				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
-					log.debug "\trandomChoices #{numRandomChoices}
-											withoutMerge #{numRandomChoicesWithoutMerge}"
-					break # done with initial layout
-				else
-					continue # randomly choose a new brick
-
+		grid = Common.layout @, grid, bricksToLayout
 		return Promise.resolve {grid: grid}
 
 	# Searches for mergeable neighbors in [x-, x+, y-, y+] direction

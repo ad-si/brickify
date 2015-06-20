@@ -36,7 +36,9 @@ module.exports = class LegoBoard
 	_initbaseplateBox: =>
 		# Create baseplate with 5 faces in each direction
 		box = new THREE.BoxGeometry(dimension, dimension, 8, 5, 5)
-		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry box
+		@baseplateBox = new THREE.Mesh(bufferGeometry, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox
 

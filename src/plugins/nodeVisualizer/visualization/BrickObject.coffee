@@ -49,7 +49,7 @@ class BrickObject extends THREE.Object3D
 		if isGray
 			@children[0].material = @materials.gray
 			@children[1].material = @materials.grayStuds
-			@children[1].material = @materials.grayStuds
+			@children[2].material = @materials.grayStuds
 		else
 			@children[0].material = @materials.color
 			@children[1].material = @materials.colorStuds

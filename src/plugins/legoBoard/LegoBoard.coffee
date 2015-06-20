@@ -41,17 +41,15 @@ module.exports = class LegoBoard
 		@threejsNode.add @baseplateBox
 
 	_initStudGeometries: =>
-		@studsContainer = new THREE.Object3D()
-		@threejsNode.add @studsContainer
+		@studsContainer = @_generateStuds 7
 		@studsContainer.visible = false
-		@_addStuds 7, @studsContainer
+		@threejsNode.add @studsContainer
 
-		@highFiStudsContainer = new THREE.Object3D()
-		@threejsNode.add @highFiStudsContainer
+		@highFiStudsContainer = @_generateStuds 42
 		@highFiStudsContainer.visible = false
-		@_addStuds 42, @highFiStudsContainer
+		@threejsNode.add @highFiStudsContainer
 
-	_addStuds: (radiusSegments, container) =>
+	_generateStuds: (radiusSegments) =>
 		studGeometry = new THREE.CylinderGeometry(
 			@globalConfig.studSize.radius
 			@globalConfig.studSize.radius
@@ -66,17 +64,26 @@ module.exports = class LegoBoard
 		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
 		studGeometry.applyMatrix translation
 
-		bufferGeometry = new THREE.BufferGeometry()
-		bufferGeometry.fromGeometry studGeometry
-
+		studsGeometry = new THREE.Geometry()
 		xSpacing = @globalConfig.gridSpacing.x
 		ySpacing = @globalConfig.gridSpacing.y
-		for x in [(-dimension + xSpacing) / 2...dimension / 2] by xSpacing
-			for y in [(-dimension + ySpacing) / 2...dimension / 2] by ySpacing
-				object = new THREE.Mesh(bufferGeometry, @studMaterial)
-				object.translateX x
-				object.translateY y
-				container.add object
+		studsGeometrySize = 80
+		for x in [0...studsGeometrySize] by xSpacing
+			for y in [0...studsGeometrySize] by ySpacing
+				translation.makeTranslation x, y, 0
+				studsGeometry.merge studGeometry, translation
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry studsGeometry
+
+		container = new THREE.Object3D()
+		for x in [(-dimension + xSpacing) / 2 ... dimension / 2] by studsGeometrySize
+			for y in [(-dimension + ySpacing) / 2 ... dimension / 2] by studsGeometrySize
+				mesh = new THREE.Mesh(bufferGeometry, @studMaterial)
+				mesh.translateX x
+				mesh.translateY y
+				container.add mesh
+
+		return container
 
 	_initMaterials: =>
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')

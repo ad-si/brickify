@@ -29,8 +29,6 @@ class BrickVisualization
 		@isStabilityView = false
 		@_highlightVoxelVisiblity = true
 
-		@fidelity = 0
-
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
 			@bundle, @grid, @brickShadowThreeNode, @defaultColoring
@@ -346,14 +344,7 @@ class BrickVisualization
 
 	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
 
-	setFidelity: (fidelityLevel, availableLevels) =>
-		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-			@fidelity = 2
-		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
-			@fidelity = 1
-		else
-			@fidelity = 0
-
+	setFidelity: (@fidelity) =>
 		@_highlightVoxel?.setFidelity @fidelity
 
 		for layer in @bricksSubnode.children

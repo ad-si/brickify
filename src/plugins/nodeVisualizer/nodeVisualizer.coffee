@@ -21,6 +21,7 @@ class NodeVisualizer
 		@objectColorMult = new THREE.Vector3(1, 1, 1)
 		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
 		@brickVisualizations = {}
+		@fidelity = 0
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
@@ -191,8 +192,15 @@ class NodeVisualizer
 				# change material properties
 				@coloring.setPipelineMode false
 
+		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+			@fidelity = 2
+		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+			@fidelity = 1
+		else
+			@fidelity = 0
+
 		for nodeId, brickVisualization of @brickVisualizations
-			brickVisualization.setFidelity fidelityLevel, availableLevels
+			brickVisualization.setFidelity @fidelity
 
 	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
@@ -270,7 +278,7 @@ class NodeVisualizer
 		threeHelper.link node, modelThreeNode
 
 		brickVisualization = new BrickVisualization(
-				@bundle, brickThreeNode, brickShadowThreeNode, @coloring
+				@bundle, brickThreeNode, brickShadowThreeNode, @coloring, @fidelity
 			)
 		@brickVisualizations[node.id] = brickVisualization
 

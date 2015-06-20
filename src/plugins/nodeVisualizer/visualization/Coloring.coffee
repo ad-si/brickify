@@ -19,15 +19,6 @@ module.exports = class Coloring
 
 		@legoHighlightMaterial = @_createMaterial 0xff7755
 
-		@printHighlightMaterial = @_createMaterial 0xeeeeee
-		@_setPolygonOffset @printHighlightMaterial, -1, -1
-		@printHighlightStudMaterial = @_lightenMaterial @printHighlightMaterial
-		@_setPolygonOffset @printHighlightStudMaterial, -1, -1
-
-		@printHighlightTextureMaterial = @_createMaterial 0xffffff, 0.2
-		@printHighlightTextureMaterial.map = @studTexture
-		@_setPolygonOffset @printHighlightTextureMaterial, -1, -1
-
 		@legoBoxHighlightMaterial = @_createMaterial 0xff7755, 0.5
 		@_setPolygonOffset @legoBoxHighlightMaterial, -1, -1
 
@@ -106,10 +97,17 @@ module.exports = class Coloring
 		return null
 
 	getPrintHighlightMaterials: =>
+		printHighlightMaterial = @_createMaterial 0xeeeeee
+		@_setPolygonOffset printHighlightMaterial, -1, -1
+		printHighlightStudMaterial = @_lightenMaterial printHighlightMaterial
+		@_setPolygonOffset printHighlightStudMaterial, -1, -1
+
+		printHighlightTextureMaterial = @_getTextureMaterialForBrick()
+		@_setPolygonOffset printHighlightTextureMaterial, -1, -1
 		return  {
-			color: @printHighlightMaterial
-			colorStuds: @printHighlightStudMaterial
-			textureStuds: @_getTextureMaterialForBrick()
+			color: printHighlightMaterial
+			colorStuds: printHighlightStudMaterial
+			textureStuds: printHighlightTextureMaterial
 		}
 
 	getSelectedMaterials: =>

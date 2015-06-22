@@ -58,11 +58,10 @@ initializeWizard = ($modal) ->
 
 	$startWizard = $modal.find('#startWizard')
 
-	$wizardStepObjects = []
-	for selector in wizardSteps
+	$wizardStepObjects = wizardSteps.map (selector) ->
 		$wizardStep = $modal.find(selector)
 		$wizardStep.hide()
-		$wizardStepObjects.push $wizardStep
+		return $wizardStep
 
 	$sizeSelect = $modal.find('#sizeSelect')
 

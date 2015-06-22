@@ -95,8 +95,11 @@ class BrickVisualization
 
 		# sort layerwise for build view
 		brickLayers = []
+		maxZ = 0
+
 		@grid.getAllBricks().forEach (brick) ->
 			z = brick.getPosition().z
+			maxZ = Math.max z, maxZ
 			brickLayers[z] ?= []
 
 			if (not recreate) and (not brick.getVisualBrick()?)
@@ -105,12 +108,14 @@ class BrickVisualization
 				brick.getVisualBrick().visible = yes
 				brick.getVisualBrick().hasBeenSplit = no
 
-		for z, brickLayer of brickLayers
-			# create layer object if it does not exist
+		# Create three layer object if it does not exist
+		for z in [0..maxZ]
 			if not @bricksSubnode.children[z]?
 				layerObject = new THREE.Object3D()
 				@bricksSubnode.add layerObject
 
+		for z, brickLayer of brickLayers
+			z = Number(z)
 			layerObject = @bricksSubnode.children[z]
 
 			for brick in brickLayer
@@ -125,7 +130,6 @@ class BrickVisualization
 
 				# link data <-> visuals
 				brick.setVisualBrick threeBrick
-				threeBrick.brick = brick
 
 				# add to scene graph
 				layerObject.add threeBrick

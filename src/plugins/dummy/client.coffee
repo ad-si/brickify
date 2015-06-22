@@ -98,20 +98,6 @@ class DummyPlugin
 		console.log node, ' removed'
 		return
 
-
-	###
-	# When a file is loaded into brickify, the `fileLoader` will try to import
-	# it with every plugin that implements importFile until one succeeds.
-	# The file's name and its content are provided as arguments.
-	#
-	# @param {String} fileName the name of the file to import
-	# @param {String} fileContent the content of the file to import
-	# @see ModelLoader
-	###
-	importFile: (fileName, fileContent) ->
-		console.log 'Dummy Client Plugin imports a file'
-		return undefined
-
 	###
 	# Plugins should return an object with a title property (String) that is
 	# displayed in the help and an array of events. These should have an event

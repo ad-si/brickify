@@ -17,6 +17,9 @@ class BrickLayouter
 		grid.initializeBricks()
 		return Promise.resolve grid
 
+	# first pass of layout algorithm
+	# input should be a grid of only 1x1x1 bricks
+	# produced bricks are exclusively XxYx3 bricks
 	layout3LBricks: (grid, bricksToLayout) ->
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
@@ -129,8 +132,6 @@ class BrickLayouter
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x, size.y, size.z)
-			# check if at least half of the top and half of the bottom voxels
-			# offer connection possibilities; if not, return
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
@@ -153,13 +154,13 @@ class BrickLayouter
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x, size.y, size.z)
-			# check if at least half of the top and half of the bottom voxels
-			# offer connection possibilities; if not, return
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 
 		return null
 
+	# check if at least half of the top and half of the bottom voxels
+	# offer connection possibilities
 	_minFractionOfConnectionsPresent: (voxels) =>
 		minFraction = .51
 		fraction = Voxel.fractionOfConnections voxels

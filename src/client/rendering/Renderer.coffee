@@ -195,14 +195,6 @@ class Renderer
 		@pipelineEnabled = fidelityLevel >= availableLevels.indexOf 'PipelineLow'
 
 		if @pipelineEnabled
-			# Determine whether to use bigger render targets (super sampling)
-			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-				@useBigRendertargets = true
-			else
-				@useBigRendertargets = false
-
-			renderTargetHelper.configureSize @useBigRendertargets
-
 			# Determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
 				# Only do something when FXAA is not already used
@@ -213,6 +205,14 @@ class Renderer
 				if @usePipelineFxaa
 					@usePipelineFxaa = false
 					@pipelineRenderTarget = null
+
+			# Determine whether to use bigger render targets (super sampling)
+			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+				@useBigRendertargets = true
+			else
+				@useBigRendertargets = false
+
+			renderTargetHelper.configureSize @useBigRendertargets
 
 			# Determine wether to use SSAO
 			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'

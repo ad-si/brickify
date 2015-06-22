@@ -22,5 +22,5 @@ module.exports = class StabilityColoring extends Coloring
 		return {
 			color: @_stabilityMaterials[index]
 			colorStuds: @_stabilityMaterials[index]
-			textureStuds: @getTextureMaterialForBrick brick
+			textureStuds: @_getTextureMaterialForBrick brick
 		}

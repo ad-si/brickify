@@ -597,7 +597,6 @@ class BrickLayouter
 				smallestLabel = dataHelper.smallestElement conLabels
 				# assign label to this brick
 				brick.label = labels[smallestLabel]
-				#console.log 'merging', conLabels
 				for i in [0..labels.length]
 					if conLabels.has labels[i]
 						labels[i] = labels[smallestLabel]
@@ -611,8 +610,6 @@ class BrickLayouter
 		# second pass - applying labels
 		bricks.forEach (brick) ->
 			brick.label = labels[brick.label]
-			if brick.label == null
-				console.log 'null brick in algo', brick
 
 		# count number of components
 		finalLabels = new Set()

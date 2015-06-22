@@ -28,7 +28,12 @@ numericalList = (i, range) ->
 addOptions = ($select, range, defaultValue, listFunction) ->
 	for i in [-range..range]
 		caption = listFunction(i, range)
-		$select.append $('<option/>').attr('value', i).text(caption)
+		$select.append(
+			$('<option/>')
+				.attr('value', i)
+				.text(caption)
+		)
+
 	$select.val defaultValue
 
 disableWizard = ->
@@ -69,9 +74,13 @@ initializeWizard = ($modal) ->
 
 			# Apply data values
 			studVal = $wizardStudSizeSelect.val()
-			$studSizeSelect.find("option[value=#{studVal}]").attr('selected', true)
+			$studSizeSelect
+				.find("option[value=#{studVal}]")
+				.attr('selected', true)
 			holeVal = $wizardHoleSizeSelect.val()
-			$holeSizeSelect.find("option[value=#{holeVal}]").attr('selected', true)
+			$holeSizeSelect
+				.find("option[value=#{holeVal}]")
+				.attr('selected', true)
 
 			# trigger intput event - so that
 			# the selected settings get stored fpr csg
@@ -85,9 +94,13 @@ initializeWizard = ($modal) ->
 
 		# Update calibration preview on last step
 		if currentWizardStep is wizardSteps.length - 1
-			size = $wizardStudSizeSelect.find('option:selected').html()
-			size += ' '
-			size += $wizardHoleSizeSelect.find('option:selected').html()
+			size = $wizardStudSizeSelect
+				.find('option:selected')
+				.html() +
+				' ' +
+				$wizardHoleSizeSelect
+				.find('option:selected')
+				.html()
 			$calibrationSettings.html size
 
 	updateButtonCaptions = ->

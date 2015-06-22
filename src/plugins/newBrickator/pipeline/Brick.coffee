@@ -18,6 +18,17 @@ class Brick
 		[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
 	]
 
+	# returns the array index of the first size that
+	# matches isSizeEqual
+	@getSizeIndex: (testSize) =>
+		for size, i in @validBrickSizes
+			if @isSizeEqual(
+				{x: testSize.x, y: testSize.y, z: testSize.z}
+				{x: size[0], y: size[1], z: size[2]}
+			)
+				return i
+		return -1
+
 	# returns true if the given size is a valid size
 	@isValidSize: (x, y, z) ->
 		for testSize in Brick.validBrickSizes

@@ -207,9 +207,9 @@ class Brick
 
 	# Sets the brick visualization that belongs to this brick
 	setVisualBrick: (visualBrick) =>
-		@_visualBrick?.brick = null if @_visualBrick isnt visualBrick
+		@_visualBrick?.setBrick(null) if @_visualBrick isnt visualBrick
 		@_visualBrick = visualBrick
-		@_visualBrick?.brick = @
+		@_visualBrick?.setBrick @
 
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that

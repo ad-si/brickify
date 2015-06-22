@@ -19,6 +19,8 @@ class BrickObject extends THREE.Object3D
 
 		@setFidelity fidelity
 
+	setBrick: (@brick) => return
+
 	setMaterial: (@materials) =>
 		@children[0].material = @materials.color
 		@children[1].material = @materials.colorStuds

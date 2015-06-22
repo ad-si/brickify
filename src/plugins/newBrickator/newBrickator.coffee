@@ -1,5 +1,6 @@
 THREE = require 'three'
 meshlib = require 'meshlib'
+stlExporter = require 'stl-exporter'
 log = require 'loglevel'
 
 modelCache = require '../../client/modelLoading/modelCache'
@@ -7,6 +8,7 @@ LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 Brick = require './pipeline/Brick'
 threeHelper = require '../../client/threeHelper'
+threeConverter = require '../../client/threeConverter'
 Spinner = require '../../client/Spinner'
 
 ###
@@ -154,33 +156,45 @@ class NewBrickator
 			log.warn 'Unable to create download due to CSG Plugin missing'
 			return Promise.resolve { data: '', fileName: '' }
 
-		dlPromise = new Promise (resolve, reject) =>
-			@csg.getCSG selectedNode, options
-			.then (detailedCsgGeometries) ->
-				if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
-					resolve [{ data: '', fileName: '' }]
+		downloadPromise = new Promise (resolve, reject) =>
+			@csg
+			.getCSG selectedNode, options
+			.then (csgGeometries) ->
+
+				if not csgGeometries? or csgGeometries.length is 0
+					resolve [{
+						data: ''
+						fileName: ''
+					}]
 					return
 
-				results = []
+				return selectedNode
+				.getName()
+				.then (name) ->
 
-				for i in [0..detailedCsgGeometries.length - 1]
-					geometry = detailedCsgGeometries[i]
+					results = csgGeometries.map (threeGeometry, index) ->
 
-					optimizedModel = new meshlib.OptimizedModel()
-					optimizedModel.fromThreeGeometry(geometry)
+						fileName = 'brickify-' +
+							name.replace /.stl$/, '' +
+							"-#{index}.stl"
 
-					meshlib
-					.model(optimizedModel)
-					.export null, (error, binaryStl) ->
-						fn = "brickify-#{selectedNode.name}"
-						fn = fn.replace /.stl$/, ''
-						fn += "-#{i}"
-						fn += '.stl'
-						results.push { data: binaryStl, fileName: fn }
+						faceVertexMesh = threeConverter
+							.threeGeometryToFaceVertexMesh threeGeometry
+
+						faceVertexMesh.name = name
+
+						return {
+							data: stlExporter.toBinaryStl faceVertexMesh
+							fileName: fileName
+						}
 
 					resolve results
 
-		return dlPromise
+			.catch (error) ->
+				log.error error
+				reject error
+
+		return downloadPromise
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}

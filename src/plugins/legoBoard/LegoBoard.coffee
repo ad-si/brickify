@@ -6,6 +6,7 @@
 ###
 
 THREE = require 'three'
+threeConverter = require '../../client/threeConverter'
 modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'

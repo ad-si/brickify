@@ -14,15 +14,27 @@ class Brick
 		[1, 1, 1], [1, 2, 1], [1, 3, 1], [1, 4, 1], [1, 6, 1], [1, 8, 1],
 		[2, 2, 1], [2, 3, 1], [2, 4, 1], [2, 6, 1], [2, 8, 1], [2, 10, 1],
 		[1, 1, 3], [1, 2, 3], [1, 3, 3], [1, 4, 3],
-		[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3]
+		[1, 6, 3], [1, 8, 3], [1, 10, 3], [1, 12, 3], [1, 16, 3],
 		[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
 	]
+
+	# returns the array index of the first size that
+	# matches isSizeEqual
+	@getSizeIndex: (testSize) =>
+		for size, i in @validBrickSizes
+			if @isSizeEqual(
+				{x: testSize.x, y: testSize.y, z: testSize.z}
+				{x: size[0], y: size[1], z: size[2]}
+			)
+				return i
+		return -1
 
 	# returns true if the given size is a valid size
 	@isValidSize: (x, y, z) ->
 		for testSize in Brick.validBrickSizes
-			if testSize[0] == x and testSize[1] == y and
-			testSize[2] == z
+			if testSize[0] == x and testSize[1] == y and testSize[2] == z
+				return true
+			else if testSize[0] == y and testSize[1] == x and testSize[2] == z
 				return true
 		return false
 
@@ -118,6 +130,15 @@ class Brick
 
 		return @_size
 
+	isSize: (x, y, z) =>
+		size = @getSize()
+		if size.x == x and size.y == y and size.z == z
+			return true
+		else if size.x == y and size.y == x and size.z == z
+			return true
+		else
+			return false
+
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
@@ -140,7 +161,8 @@ class Brick
 
 		[Brick.direction.Xp, Brick.direction.Xm, Brick.direction.Yp,
 		Brick.direction.Ym].forEach (direction) =>
-			@getNeighbors(direction).forEach (brick) -> neighbors.add brick
+			@getNeighbors(direction).forEach (brick) ->
+				neighbors.add brick
 
 		return neighbors
 
@@ -184,7 +206,10 @@ class Brick
 		return @_visualBrick
 
 	# Sets the brick visualization that belongs to this brick
-	setVisualBrick: (@_visualBrick) => return
+	setVisualBrick: (visualBrick) =>
+		@_visualBrick?.brick = null if @_visualBrick isnt visualBrick
+		@_visualBrick = visualBrick
+		@_visualBrick?.brick = @
 
 	# removes all references to this brick from voxels
 	# this brick has to be deleted after that
@@ -200,7 +225,7 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
-		@_visualBrick = null
+		@setVisualBrick null
 		@voxels.clear()
 
 	# merges this brick with the other brick specified,
@@ -210,6 +235,9 @@ class Brick
 		@_size = null
 		@_position = null
 		@_neighbors = null
+
+		# Clear reference to visual brick (needs to be recreated)
+		@setVisualBrick null
 
 		# tell neighbors to update their cache
 		for direction of Brick.direction
@@ -273,7 +301,7 @@ class Brick
 	getStability: =>
 		s = @getSize()
 		p = @getPosition()
-		cons = @connectedBricks()
+		conBricks = @connectedBricks()
 
 		# possible slots top & bottom
 		possibleSlots = s.x * s.y * 2
@@ -284,14 +312,40 @@ class Brick
 		lowerZ = p.z - 1
 		upperZ = p.z + s.z
 
-		# test for each possible slot if neighbour bricks have
+		# test for each possible slot if neighbor bricks have
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]
-				cons.forEach (brick) ->
+				conBricks.forEach (brick) ->
 					if brick.isVoxelInBrick(x, y, upperZ)
 						usedSlots++
 					if brick.isVoxelInBrick(x, y, lowerZ)
+						usedSlots++
+
+		return usedSlots / possibleSlots
+
+	getStabilityInZDir: (directionZmOrZp) =>
+		s = @getSize()
+		p = @getPosition()
+		conBricks = @connectedBricks()
+
+		# possible slots top or bottom
+		possibleSlots = s.x * s.y
+
+		# how many slots are actually connected?
+		usedSlots = 0
+
+		if directionZmOrZp == Brick.direction.Zm
+			testZ = p.z - 1
+		else if directionZmOrZp == Brick.direction.Zp
+			testZ = p.z + s.z
+
+		# test for each possible slot if neighbor bricks have
+		# voxels that belong to this slot
+		for x in [p.x...(p.x + s.x)]
+			for y in [p.y...(p.y + s.y)]
+				conBricks.forEach (brick) ->
+					if brick.isVoxelInBrick(x, y, testZ)
 						usedSlots++
 
 		return usedSlots / possibleSlots

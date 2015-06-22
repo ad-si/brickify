@@ -49,9 +49,14 @@ module.exports = class DownloadProvider
 				'EditorExport', 'HoleRadius', @exportUi.holeRadiusSelection
 			)
 
-		promisesArray = @bundle.pluginHooks.getDownload selectedNode, downloadOptions
+		promisesArray = @bundle.pluginHooks.getDownload(
+			selectedNode
+			downloadOptions
+		)
 
-		Promise.all(promisesArray).then (resultsArray) =>
+		Promise
+		.all promisesArray
+		.then (resultsArray) =>
 			files = @_collectFiles resultsArray
 
 			# Stop showing spinner
@@ -62,29 +67,44 @@ module.exports = class DownloadProvider
 				Spinner.stop @$stlButton[0]
 				@$stlButton.removeClass 'disabled'
 
-			if files.length is 0
+
+			if files.length is 1
+				saveAs(
+					new Blob([files[0].data])
+					files[0].fileName.replace(/\.stl$/gi, '') + '.stl'
+				)
+
+			else if files.length > 1
+				zip = new JSZip()
+
+				downloadPromises = files.map (file) =>
+					return @_convertToZippableType file
+
+				Promise
+				.all downloadPromises
+				.then (fileObjects) ->
+					fileObjects.forEach (fileObject) ->
+						zip.file(
+							fileObject.fileName
+							fileObject.data
+						)
+
+					saveAs(
+						zip.generate {type: 'blob'}
+						"brickify-#{selectedNode.name}.zip"
+					)
+
+			else
 				bootbox.alert(
 					title: 'There is nothing to download at the moment'
-					message: 'This happens when your whole model is made out of LEGO
-										and you have not selected anything	to be 3D-printed. Use
-										the Make 3D-print brush for that'
+					message: 'This happens when your whole model
+						is made out of LEGO
+						and you have not selected anything to be 3D-printed.
+						Use the Make 3D-print brush for that.'
 				)
-			if files.length is 1
-				data = files[0].data
-				fileName = files[0].fileName
-				saveAs data, fileName
-			if files.length > 1
-				promisesArray = []
-				for file in files
-					fileConversion = @_convertToZippableType file
-					promisesArray.push fileConversion if fileConversion?
 
-				Promise.all(promisesArray).then (resultsArray) ->
-					zip = new JSZip()
-					for result in resultsArray
-						zip.file result.fileName, result.data, result.options
-					zipFile = zip.generate type: 'blob'
-					saveAs zipFile, "brickify-#{selectedNode.name}-#{type}.zip"
+		.catch (error) ->
+			log error
 
 	_collectFiles: (array) ->
 		files = []
@@ -98,28 +118,29 @@ module.exports = class DownloadProvider
 				files.push entry
 		return files
 
-	_convertToZippableType: ({data: data, fileName: fileName}) =>
-		if data instanceof Blob
-			return @_arrayBufferFromBlob data, fileName, options
-		if data instanceof ArrayBuffer
-			return Promise.resolve {
-				data: data
-				fileName: fileName
-				options: {
-					binary: true
-				}
-			}
-		if (data instanceof String) or (typeof(data) == 'string')
-			return Promise.resolve {
-				data: data
-				fileName: fileName
-				options: {
-					binary: false
-				}
-			}
 
-		log.warn "No conversion method found for file #{fileName}"
-		return null
+	_convertToZippableType: ({data: data, fileName: fileName}) =>
+		switch
+			when data instanceof Blob
+				return @_arrayBufferFromBlob data, fileName, options
+
+			when data instanceof ArrayBuffer
+				return Promise.resolve {
+					data: data
+					fileName: fileName
+					options:
+						binary: true
+				}
+
+			when typeof data is 'string' or data instanceof String
+				return Promise.resolve {
+					data: data
+					fileName: fileName
+					options:
+						binary: false
+				}
+			else
+				log.warn "No conversion method found for file #{fileName}"
 
 
 	_arrayBufferFromBlob: (blob, fileName) ->

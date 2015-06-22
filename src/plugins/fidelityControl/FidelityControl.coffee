@@ -21,15 +21,15 @@ piwikStatInterval = 20
 ###
 class FidelityControl
 	@fidelityLevels = [
-		'DefaultLow',
-		'DefaultMedium',
-		'DefaultHigh',
-		'PipelineLow',
-		'PipelineMedium',
-		'PipelineHigh',
+		'DefaultLow'
+		'DefaultMedium'
+		'DefaultHigh'
+		'PipelineLow'
+		'PipelineMedium'
+		'PipelineHigh'
 		'PipelineUltra'
 	]
-	@minimalPipelineLevel = 3
+	@minimalPipelineLevel = @fidelityLevels.indexOf 'PipelineLow'
 
 	init: (@bundle) =>
 		@pluginHooks = @bundle.pluginHooks
@@ -65,8 +65,6 @@ class FidelityControl
 
 		@pipelineAvailable = usePipeline and depth? and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
-
-		@_setFidelity()
 
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
@@ -128,27 +126,16 @@ class FidelityControl
 		@currentFidelityLevel++
 		@_setFidelity()
 
-		# Enable pipeline
-		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = true
-
 	_decreaseFidelity: =>
 		# Decrease fidelity
 		@currentFidelityLevel--
-		@_setFidelity()
-
-		# Disable pipeline
-		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = false
-
-	_setDefaultFidelity: =>
-		@currentFidelityLevel = 0
 		@_setFidelity()
 
 	_setFidelity: =>
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
+
 		@bundle.renderer.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)

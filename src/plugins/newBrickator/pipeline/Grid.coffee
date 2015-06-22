@@ -170,7 +170,7 @@ module.exports = class Grid
 			@_updateMinMax position
 		return v
 
-	# links neighbours of this voxel with this voxel
+	# links neighbors of this voxel with this voxel
 	_linkNeighbors: (voxel) ->
 		p = voxel.position
 

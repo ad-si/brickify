@@ -242,13 +242,13 @@ module.exports = class Grid
 
 		return list
 
-	getSurrounding: ({x, y, z}, size, selectionCallback) =>
+	getSurrounding: ({x, y, z}, size) =>
 		list = []
 
 		_collect = (vx, vy, vz) =>
 			voxel = @voxels[@_generateKey vx, vy, vz]
 			if voxel?
-				list.push voxel if selectionCallback voxel
+				list.push voxel
 
 		sizeX_2 = Math.floor size.x / 2
 		sizeY_2 = Math.floor size.y / 2

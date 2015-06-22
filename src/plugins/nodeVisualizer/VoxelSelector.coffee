@@ -34,7 +34,7 @@ class VoxelSelector
 		return null unless mainVoxel?.position?
 
 		size = @getBrushSize options.bigBrush
-		gridEntries = @grid.getSurrounding mainVoxel.position, size, -> true
+		gridEntries = @grid.getSurrounding mainVoxel.position, size
 		voxels = gridEntries
 			.filter (voxel) => @_hasType voxel, type
 			.filter (voxel) => voxel not in @touchedVoxels

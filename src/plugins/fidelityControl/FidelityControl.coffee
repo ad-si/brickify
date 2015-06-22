@@ -21,14 +21,15 @@ piwikStatInterval = 20
 ###
 class FidelityControl
 	@fidelityLevels = [
-		'DefaultLow',
-		'DefaultMedium',
-		'DefaultHigh',
-		'PipelineLow',
-		'PipelineMedium',
-		'PipelineHigh',
+		'DefaultLow'
+		'DefaultMedium'
+		'DefaultHigh'
+		'PipelineLow'
+		'PipelineMedium'
+		'PipelineHigh'
 		'PipelineUltra'
 	]
+	@minimalPipelineLevel = @fidelityLevels.indexOf 'PipelineLow'
 
 	init: (@bundle) =>
 		@pluginHooks = @bundle.pluginHooks

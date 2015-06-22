@@ -45,10 +45,10 @@ module.exports.getHtml = (list, caption = true) ->
 		'.partListTable td{vertical-align:middle !important;}' +
 		'</style>' +
 		'<table class="table partListTable">' +
-		'<tr><td><strong>Size</strong></td>' +
-		'<td><strong>Type</strong></td>' +
-		'<td><strong>Amount</strong></td>' +
-		'<td><strong>Image</strong></td></tr>'
+		'<tr><th>Size</th>' +
+		'<th>Type</th>' +
+		'<th>Amount</th>' +
+		'<th>Image</th></tr>'
 
 	for piece in list
 		if piece.size.z == 1

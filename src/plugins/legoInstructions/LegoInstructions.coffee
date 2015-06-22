@@ -258,6 +258,9 @@ class LegoInstructions
 					# as requested, response is an ArrayBuffer
 					data: @response
 				}
+			xhr.onerror = reject
+			xhr.onabort = reject
+			xhr.ontimeout = reject
 			xhr.send()
 
 module.exports = LegoInstructions

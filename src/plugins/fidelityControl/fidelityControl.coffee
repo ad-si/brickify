@@ -29,7 +29,6 @@ class FidelityControl
 		'PipelineHigh',
 		'PipelineUltra'
 	]
-	@minimalPipelineLevel = 3
 
 	init: (@bundle) =>
 		@pluginHooks = @bundle.pluginHooks
@@ -126,23 +125,16 @@ class FidelityControl
 		@currentFidelityLevel++
 		@_setFidelity()
 
-		# Enable pipeline
-		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = true
-
 	_decreaseFidelity: =>
 		# Decrease fidelity
 		@currentFidelityLevel--
 		@_setFidelity()
 
-		# Disable pipeline
-		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = false
-
 	_setFidelity: =>
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
+
 		@bundle.renderer.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)

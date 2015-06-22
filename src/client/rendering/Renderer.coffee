@@ -192,6 +192,8 @@ class Renderer
 				)
 
 	setFidelity: (fidelityLevel, availableLevels) =>
+		@pipelineEnabled = fidelityLevel >= availableLevels.indexOf 'PipelineLow'
+
 		if @pipelineEnabled
 			# Determine whether to use bigger render targets (super sampling)
 			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'

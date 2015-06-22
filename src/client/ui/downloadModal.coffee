@@ -8,7 +8,7 @@ wizardSteps = [
 ]
 wizardFadeTime = 300
 
-#scoping variables
+# Scoping variables
 $sizeSelect = undefined
 $legoContent = undefined
 $stlContent = undefined
@@ -82,7 +82,7 @@ initializeWizard = ($modal) ->
 				.find("option[value=#{holeVal}]")
 				.attr('selected', true)
 
-			# trigger intput event - so that
+			# Trigger intput event - so that
 			# the selected settings get stored fpr csg
 			$studSizeSelect.trigger 'input'
 			$holeSizeSelect.trigger 'input'

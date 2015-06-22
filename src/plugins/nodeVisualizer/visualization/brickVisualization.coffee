@@ -165,8 +165,8 @@ class BrickVisualization
 		# hide highlight when in build mode
 		@_highlightVoxel.visible = false
 
-		for i in [0..@bricksSubnode.children.length - 1] by 1
-			threeLayer = @bricksSubnode.children[i]
+		for i in [0..@_visibleChildLayers.length - 1] by 1
+			threeLayer = @_visibleChildLayers[i]
 			if i <= layer
 				threeLayer.visible = true
 				if i < layer
@@ -185,9 +185,16 @@ class BrickVisualization
 			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.color
 
 	showAllBrickLayers: =>
-		for layer in @bricksSubnode.children
+		for layer in @_visibleChildLayers
 			layer.visible = true
 			@_makeLayerColored layer
+
+	getNumberOfVisibleLayers: =>
+		@_visibleChildLayers = @bricksSubnode.children.filter (layer) ->
+			if layer.children.length > 0
+				return true
+			return false
+		return @_visibleChildLayers.length
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
@@ -215,7 +222,6 @@ class BrickVisualization
 			@unhighlightBigBrush()
 
 		return voxel
-
 
 	_highlightBigBrush: (voxel, material) =>
 		size = @voxelSelector.getBrushSize true

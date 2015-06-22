@@ -34,20 +34,21 @@ class PreviewAssemblyUi
 
 		@preBuildMode = @previewUi.nodeVisualizer.getDisplayMode()
 		@previewUi.nodeVisualizer.setDisplayMode selectedNode, 'build'
-		.then => @previewUi.newBrickator.getNodeData selectedNode
-		.then (data) =>
-			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
-			numLayers = maxLayer - minLayer + 1
-			# If there is 3D print below first lego layer, show lego starting
-			# with layer 1 and show only 3D print in first instruction layer
-			numLayers += 1 if minLayer > 0
+		.then (numLayers) =>
+			@previewUi.newBrickator.getNodeData selectedNode
+			.then (data) =>
+				{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 
-			@buildLayerUi.slider.attr 'min', 1
-			@buildLayerUi.slider.attr 'max', numLayers
-			@buildLayerUi.maxLayer.text numLayers
+				# If there is 3D print below first lego layer, show lego starting
+				# with layer 1 and show only 3D print in first instruction layer
+				numLayers += 1 if minLayer > 0
 
-			@buildLayerUi.slider.val 1
-			@_updateBuildLayer selectedNode
+				@buildLayerUi.slider.attr 'min', 1
+				@buildLayerUi.slider.attr 'max', numLayers
+				@buildLayerUi.maxLayer.text numLayers
+
+				@buildLayerUi.slider.val 1
+				@_updateBuildLayer selectedNode
 
 	_updateBuildLayer: (selectedNode) =>
 		layer = Number @buildLayerUi.slider.val()

@@ -304,7 +304,7 @@ class NodeVisualizer
 					@_applyStabilityView cachedData
 				when 'build'
 					@_resetStabilityView cachedData
-					@_applyBuildMode cachedData
+					return @_applyBuildMode cachedData
 				else
 					@_resetStabilityView cachedData
 					@_resetBuildMode cachedData
@@ -342,13 +342,15 @@ class NodeVisualizer
 			cachedData.stabilityViewEnabled = false
 
 	_applyBuildMode: (cachedData) =>
-		# show bricks and csg
+		# Show bricks and csg
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 		cachedData.brickVisualization.setHighlightVoxelVisibility false
 
 		@_showCsg cachedData
 
 		cachedData.modelVisualization.setNodeVisibility false
+
+		return cachedData.brickVisualization.getNumberOfVisibleLayers()
 
 	_resetBuildMode: (cachedData) ->
 		cachedData.brickVisualization.setHighlightVoxelVisibility true

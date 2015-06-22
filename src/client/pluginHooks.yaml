@@ -84,17 +84,6 @@
 
 - onNodeRemove
 
-
-#  ## File import
-#
-#  When a file is loaded into brickify, the [fileLoader](fileLoader.html) will
-#  try to import it with every plugin that implements `importFile` until one
-#  succeeds and returns an [OptimizedModel](../common/OptimizedModel.html).
-#  The file's name and its content are provided as arguments.
-#  Must (only) be provided by import plugins
-
-- importFile
-
 # ## Hotkeys
 #
 # Plugins should return an object with a title property (String) that is

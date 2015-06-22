@@ -25,7 +25,7 @@ module.exports.generatePieceList = (bricks) ->
 		pieceList.push brickType
 
 	# sort bricks from small to big
-	pieceList.sort (a,b) ->
+	pieceList.sort (a, b) ->
 		if a.size.x is b.size.x
 			return a.size.y - b.size.y
 		else

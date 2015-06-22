@@ -1,6 +1,7 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
 csgCleaner = require './csgCleaner'
+threeConverter = require '../../client/threeConverter'
 
 class CSG
 
@@ -82,12 +83,12 @@ class CSG
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
 			if cachedData.transformedThreeGeometry?
-				resolve(cachedData.transformedThreeGeometry, cachedData)
+				resolve cachedData.transformedThreeGeometry
 				return
 
 			selectedNode.getModel()
 			.then (model) ->
-				threeGeometry = model.convertToThreeGeometry()
+				threeGeometry = threeConverter.toStandardGeometry model.model
 				threeGeometry.applyMatrix threeHelper.getTransformMatrix selectedNode
 				resolve(threeGeometry)
 			.catch (error) ->

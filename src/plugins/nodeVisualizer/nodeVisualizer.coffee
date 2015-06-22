@@ -305,6 +305,9 @@ class NodeVisualizer
 				when 'build'
 					@_resetStabilityView cachedData
 					@_applyBuildMode cachedData
+				else
+					@_resetStabilityView cachedData
+					@_resetBuildMode cachedData
 
 	getDisplayMode: =>
 		return @visualizationMode

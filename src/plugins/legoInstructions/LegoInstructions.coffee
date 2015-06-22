@@ -51,6 +51,7 @@ class LegoInstructions
 
 			# scad and piece list generation
 			bricks = data.grid.getAllBricks()
+			return null if bricks.size is 0
 
 			files = []
 			files.push openScadGenerator.generateScad bricks
@@ -59,24 +60,19 @@ class LegoInstructions
 			pieceList = pieceListGenerator.generatePieceList bricks
 			files.push @_createHtml numLayers, pieceList
 
-			# Create temporary data object, because we need more than
-			# Files
-			dataObject = {files: files, pieceList: pieceList}
-
 			# Take screenshots and convert them to png
-			@_takeScreenshots node, numLayers, camera
-			.then (images) =>
-				dataObject.files.push images...
+			screenshots = @_takeScreenshots node, numLayers, camera
+			.then (images) ->
+				files.push images...
 				log.debug 'Finished instruction screenshots'
 
-				# save download
-				return dataObject
-		.then (dataObject) =>
 			# Load and save piece images
-			@_downloadPieceListImages dataObject.pieceList
+			imageDownload = @_downloadPieceListImages pieceList
 			.then (imageFiles) ->
-				dataObject.files.push imageFiles...
-				return dataObject.files
+				files.push imageFiles...
+
+			Promise.all [screenshots, imageDownload]
+			.then -> return files
 		.then (files) =>
 			# reset display mode
 			@nodeVisualizer.setDisplayMode node, oldVisualizationMode
@@ -102,10 +98,9 @@ class LegoInstructions
 		takeScreenshot = (layer) => =>
 			@_createScreenshotOfLayer node, layer, camera
 			.then (fileData) ->
-				files.push {
+				files.push
 					fileName: fileData.fileName
 					data: fileData.data
-				}
 
 		# screenshot of each layer
 		promiseChain = Promise.resolve()

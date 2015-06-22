@@ -1,4 +1,5 @@
 Grid = require './Grid'
+log = require 'loglevel'
 
 floatDelta = 1e-10
 voxelRoundingThreshold = 1e-5
@@ -11,59 +12,68 @@ module.exports = class Voxelizer
 		options.accuracy ?= 16
 		options.zTolerance ?= 0.01
 
-	voxelize: (optimizedModel, options = {}, progressCallback) =>
+	voxelize: (model, options = {}, progressCallback) =>
 		@_addDefaults options
-		@setupGrid optimizedModel, options
 
-		lineStepSize = @voxelGrid.heightRatio / options.accuracy
+		return new Promise (resolve, reject) =>
+			return @setupGrid model, options
+				.then (voxelGrid) =>
 
-		voxelSpaceModel = @_getOptimizedVoxelSpaceModel optimizedModel, options
+					lineStepSize = voxelGrid.heightRatio / options.accuracy
 
-		progressAndFinishedCallback = (message) =>
-			if message.state is 'progress'
-				progressCallback message.progress
-			else # if state is 'finished'
-				@resolve grid: @voxelGrid, gridPOJO: message.data
+					progressAndFinishedCallback = (message) =>
+						if message.state is 'progress'
+							progressCallback message.progress
+						else # if state is 'finished'
+							resolve(
+								grid: voxelGrid
+								gridPOJO: message.data
+							)
 
-		@worker = @_getWorker()
-		@worker.voxelize(
-			voxelSpaceModel
-			lineStepSize
-			floatDelta
-			voxelRoundingThreshold
-			progressAndFinishedCallback
-		)
-
-		return new Promise (@resolve, reject) => return
+					@_getOptimizedVoxelSpaceModel model, options
+					.then (voxelSpaceModel) =>
+						@worker = @_getWorker()
+						@worker.voxelize(
+							voxelSpaceModel
+							lineStepSize
+							floatDelta
+							voxelRoundingThreshold
+							progressAndFinishedCallback
+						)
+				.catch (error) ->
+					reject console.error
 
 	terminate: =>
 		@worker?.terminate()
 		@worker = null
 
-	_getOptimizedVoxelSpaceModel: (optimizedModel, options) =>
-		positions = optimizedModel.positions
-		voxelSpacePositions = new Array positions.length
-		for i in [0...positions.length] by 3
-			position =
-				x: positions[i]
-				y: positions[i + 1]
-				z: positions[i + 2]
-			position = @voxelGrid.mapModelToVoxelSpace position
-			voxelSpacePositions[i] = position.x
-			voxelSpacePositions[i + 1] = position.y
-			voxelSpacePositions[i + 2] = position.z
+	_getOptimizedVoxelSpaceModel: (model, options) =>
+		return model
+			.getFaceVertexMesh()
+			.then (faceVertexMesh) =>
+				coordinates = faceVertexMesh.vertexCoordinates
+				voxelSpaceCoordinates = new Array coordinates.length
+				for i in [0...coordinates.length] by 3
+					position =
+						x: coordinates[i]
+						y: coordinates[i + 1]
+						z: coordinates[i + 2]
+					coordinate = @voxelGrid.mapModelToVoxelSpace position
+					voxelSpaceCoordinates[i] = coordinate.x
+					voxelSpaceCoordinates[i + 1] = coordinate.y
+					voxelSpaceCoordinates[i + 2] = coordinate.z
 
-		normals = optimizedModel.faceNormals
-		directions = []
-		for i in [2...normals.length] by 3
-			z = normals[i]
-			directions.push @_getTolerantDirection z, options.zTolerance
+				normals = faceVertexMesh.faceNormalCoordinates
+				directions = []
+				for i in [2...normals.length] by 3
+					z = normals[i]
+					directions.push @_getTolerantDirection z, options.zTolerance
 
-		return {
-			positions: voxelSpacePositions
-			indices: optimizedModel.indices
-			directions: directions
-		}
+				return {
+					coordinates: voxelSpaceCoordinates
+					faceVertexIndices: faceVertexMesh.faceVertexIndices
+					directions: directions
+				}
 
 	_getWorker: ->
 		return @worker if @worker?
@@ -82,7 +92,11 @@ module.exports = class Voxelizer
 						grid
 					)
 					@_postProgress(progress, progressCallback)
-				progressCallback state: 'finished', data: grid
+
+				progressCallback {
+					state: 'finished'
+					data: grid
+				}
 				return
 
 			_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, grid) ->
@@ -270,26 +284,26 @@ module.exports = class Voxelizer
 				callback state: 'progress', progress: currentProgress
 
 			_forEachPolygon: (model, visitor) ->
-				indices = model.indices
-				positions = model.positions
+				faceVertexIndices = model.faceVertexIndices
+				coordinates = model.coordinates
 				directions = model.directions
 				length = directions.length
 				for i in [0...length]
 					i3 = i * 3
 					p0 = {
-						x: positions[indices[i3] * 3]
-						y: positions[indices[i3] * 3 + 1]
-						z: positions[indices[i3] * 3 + 2]
+						x: coordinates[faceVertexIndices[i3] * 3]
+						y: coordinates[faceVertexIndices[i3] * 3 + 1]
+						z: coordinates[faceVertexIndices[i3] * 3 + 2]
 					}
 					p1 = {
-						x: positions[indices[i3 + 1] * 3]
-						y: positions[indices[i3 + 1] * 3 + 1]
-						z: positions[indices[i3 + 1] * 3 + 2]
+						x: coordinates[faceVertexIndices[i3 + 1] * 3]
+						y: coordinates[faceVertexIndices[i3 + 1] * 3 + 1]
+						z: coordinates[faceVertexIndices[i3 + 1] * 3 + 2]
 					}
 					p2 = {
-						x: positions[indices[i3 + 2] * 3]
-						y: positions[indices[i3 + 2] * 3 + 1]
-						z: positions[indices[i3 + 2] * 3 + 2]
+						x: coordinates[faceVertexIndices[i3 + 2] * 3]
+						y: coordinates[faceVertexIndices[i3 + 2] * 3 + 1]
+						z: coordinates[faceVertexIndices[i3 + 2] * 3 + 2]
 					}
 					direction = directions[i]
 
@@ -300,7 +314,10 @@ module.exports = class Voxelizer
 	_getTolerantDirection: (dZ, tolerance) ->
 		return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
 
-	setupGrid: (optimizedModel, options) ->
+	setupGrid: (model, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)
-		@voxelGrid.setUpForModel optimizedModel, options
+
 		return @voxelGrid
+		.setUpForModel model, options
+		.then  =>
+			return @voxelGrid

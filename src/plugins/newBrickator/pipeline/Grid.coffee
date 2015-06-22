@@ -10,33 +10,39 @@ module.exports = class Grid
 
 		@voxels = {}
 
-	setUpForModel: (optimizedModel, options) =>
+	setUpForModel: (model, options) =>
 		@modelTransform = options.modelTransform
 
-		bb = optimizedModel.boundingBox()
+		return model
+		.getBoundingBox()
+		.then (boundingBox) =>
+			# if the object is moved in the scene (not in the origin),
+			# think about that while building the grid
+			if @modelTransform
+				bbMinWorld = new THREE.Vector3(
+					boundingBox.min.x
+					boundingBox.min.y
+					boundingBox.min.z
+				)
+				bbMinWorld.applyProjection(@modelTransform)
+			else
+				bbMinWorld = boundingBox.min
 
-		# if the object is moved in the scene (not in the origin),
-		# think about that while building the grid
-		if @modelTransform
-			bbMinWorld = new THREE.Vector3()
-			bbMinWorld.set bb.min.x, bb.min.y, bb.min.z
-			bbMinWorld.applyProjection(@modelTransform)
-		else
-			bbMinWorld = bb.min
+			# 1.) Align bb minimum to next voxel position
+			# 2.) spacing / 2 is subtracted to make the grid be aligned to the
+			# voxel center
+			# 3.) minimum z is to assure that grid is never below z=0
+			calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
+			calculatedZ -= @spacing.z / 2
+			minimumZ = @spacing.z / 2
 
-		# 1.) Align bb minimum to next voxel position
-		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
-		# voxel center
-		# 3.) minimum z is to assure that grid is never below z=0
-		calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
-		calculatedZ -= @spacing.z / 2
-		minimumZ = @spacing.z / 2
-
-		@origin = {
-			x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
-			y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
-			z: Math.max(calculatedZ, minimumZ)
-		}
+			@origin = {
+				x: Math.floor(bbMinWorld.x / @spacing.x) *
+					@spacing.x - (@spacing.x / 2)
+				y: Math.floor(bbMinWorld.y / @spacing.y) *
+					@spacing.y - (@spacing.y / 2)
+				z: Math.max(calculatedZ, minimumZ)
+			}
 
 	getNumVoxelsX: =>
 		return @_maxVoxelX - @_minVoxelX + 1
@@ -50,11 +56,16 @@ module.exports = class Grid
 	getLegoVoxelsZRange: =>
 		min = Number.POSITIVE_INFINITY
 		max = Number.NEGATIVE_INFINITY
+
 		@forEachVoxel (voxel) ->
 			return unless voxel.isLego()
 			min = Math.min min, voxel.position.z
 			max = Math.max max, voxel.position.z
-		return { min, max }
+
+		return {
+			min: if min is Number.POSITIVE_INFINITY then null else min
+			max: if max is Number.NEGATIVE_INFINITY then null else max
+		}
 
 	# use this if you are not interested in the actual number of layers
 	# e.g. if you want to use them zero-indexed

@@ -13,7 +13,7 @@ module.exports.generatePieceList = (bricks) ->
 				return
 
 		size = brick.getSize()
-		pieceList.push {
+		brickType = {
 			size: {
 				x: Math.min size.x, size.y
 				y: Math.max size.x, size.y
@@ -21,6 +21,8 @@ module.exports.generatePieceList = (bricks) ->
 			}
 			count: 1
 		}
+		brickType.sizeIndex = Brick.getSizeIndex brickType.size
+		pieceList.push brickType
 
 	# sort bricks from small to big
 	pieceList.sort (a, b) ->
@@ -37,11 +39,17 @@ module.exports.getHtml = (list, caption = true) ->
 	if caption
 		html = '<h3>Bricks needed</h3>'
 
-	html += '<p>To build this model you need the following bricks:'
-	html += '<table class="table">'
-	html += '<tr><td><strong>Size</strong></td>'
-	html += '<td><strong>Type</strong></td>'
-	html += '<td><strong>Amount</strong></td></tr>'
+	html +=
+		'<p>To build this model you need the following bricks:' +
+		'<style type="text/css">' +
+		'.partListTable td{vertical-align:middle !important;}' +
+		'</style>' +
+		'<table class="table partListTable">' +
+		'<tr><th>Size</th>' +
+		'<th>Type</th>' +
+		'<th>Amount</th>' +
+		'<th>Image</th></tr>'
+
 	for piece in list
 		if piece.size.z == 1
 			type = 'Plate'
@@ -51,11 +59,14 @@ module.exports.getHtml = (list, caption = true) ->
 			log.warn 'Invalid LEGO height for piece list'
 			continue
 
-		html += '<tr>'
-		html += "<td>#{piece.size.x} x #{piece.size.y}</td>"
-		html += "<td>#{type}</td>"
-		html += "<td>#{piece.count}x</td>"
-		html += '</tr>'
+		html +=
+			'<tr>' +
+			"<td>#{piece.size.x} x #{piece.size.y}</td>" +
+			"<td>#{type}</td>" +
+			"<td>#{piece.count}x</td>" +
+			'<td><img src="img/partList/partList' +
+			" (#{piece.sizeIndex + 1}).png\" height='40px'></td>" +
+			'</tr>'
 
 	html += '</table></p>'
 	return html

@@ -51,28 +51,37 @@ class LegoInstructions
 
 			# scad and piece list generation
 			bricks = data.grid.getAllBricks()
+			return null if bricks.size is 0
 
-			if bricks.size > 0
-				files = []
-				files.push openScadGenerator.generateScad bricks
+			files = []
+			files.push openScadGenerator.generateScad bricks
 
-				# add instructions html to download
-				files.push @_createHtml numLayers, bricks
+			# add instructions html to download
+			pieceList = pieceListGenerator.generatePieceList bricks
+			files.push @_createHtml numLayers, pieceList
 
-				@_takeScreenshots node, numLayers, camera
-				.then (images) =>
-					files.push images...
-					log.debug 'Finished instruction screenshots'
+			# Take screenshots and convert them to png
+			screenshots = @_takeScreenshots node, numLayers, camera
+			.then (images) ->
+				files.push images...
+				log.debug 'Finished instruction screenshots'
 
-					# save download
-					return files
+			# Load and save piece images
+			imageDownload = @_downloadPieceListImages pieceList
+			.then (imageFiles) ->
+				files.push imageFiles...
+
+			Promise.all [screenshots, imageDownload]
+			.then -> return files
 		.then (files) =>
 			# reset display mode
 			@nodeVisualizer.setDisplayMode node, oldVisualizationMode
 			@fidelityControl.disableScreenshotMode()
 
 			return files
-		.catch (error) -> log.error error
+		.catch (error) ->
+			log.error error
+			return null
 
 	showPartListPopup: (node) =>
 		@newBrickator.getNodeData node
@@ -91,10 +100,9 @@ class LegoInstructions
 		takeScreenshot = (layer) => =>
 			@_createScreenshotOfLayer node, layer, camera
 			.then (fileData) ->
-				files.push {
+				files.push
 					fileName: fileData.fileName
 					data: fileData.data
-				}
 
 		# screenshot of each layer
 		promiseChain = Promise.resolve()
@@ -200,8 +208,7 @@ class LegoInstructions
 		imageData[index + 2] = b
 		imageData[index + 3] = a
 
-	_createHtml: (numLayers, bricks) ->
-		pieceList = pieceListGenerator.generatePieceList bricks
+	_createHtml: (numLayers, pieceList) =>
 		pieceListHtml = pieceListGenerator.getHtml pieceList
 
 		style = '<style>
@@ -232,5 +239,25 @@ class LegoInstructions
 			fileName: 'LEGO Assembly instructions.html'
 			data: html
 		}
+
+	_downloadPieceListImages: (pieceList) =>
+		return Promise.all pieceList.map (piece) => @_downloadPieceImage piece
+
+	_downloadPieceImage: (piece) ->
+		return new Promise (resolve, reject) ->
+			xhr = new XMLHttpRequest()
+			fileName = "img/partList/partList (#{piece.sizeIndex+1}).png"
+			xhr.open 'GET', fileName
+			xhr.responseType = 'arraybuffer'
+			xhr.onload = (event) ->
+				resolve {
+					fileName: fileName
+					# as requested, response is an ArrayBuffer
+					data: @response
+				}
+			xhr.onerror = reject
+			xhr.onabort = reject
+			xhr.ontimeout = reject
+			xhr.send()
 
 module.exports = LegoInstructions

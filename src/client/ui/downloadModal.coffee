@@ -9,9 +9,11 @@ wizardSteps = [
 wizardFadeTime = 300
 
 # Scoping variables
+$modal = undefined
 $sizeSelect = undefined
 $legoContent = undefined
 $stlContent = undefined
+$testStripContent = undefined
 $wizardButtons = undefined
 $wizardHoleSizeSelect = undefined
 $wizardStudSizeSelect = undefined

@@ -368,7 +368,7 @@ class NodeVisualizer
 				gridLayer = minLayer + layer - 1
 				# If there is 3D print below first lego layer, show lego starting
 				# with layer 1 and show only 3D print in first instruction layer
-				gridLayer -= 1 if minLayer > 0
+				gridLayer -= 2 if minLayer > 0
 				cachedData.brickVisualization.showBrickLayer gridLayer
 
 	_updateBrickCount: (bricks) =>

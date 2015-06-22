@@ -64,7 +64,7 @@ module.exports = class Grid
 
 		return {
 			min: if min is Number.POSITIVE_INFINITY then null else min
-			max: if max is Number.NEGATIVE_INFINITY then null else min
+			max: if max is Number.NEGATIVE_INFINITY then null else max
 		}
 
 	# use this if you are not interested in the actual number of layers

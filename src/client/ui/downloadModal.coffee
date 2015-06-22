@@ -42,6 +42,7 @@ disableWizard = ->
 	$stlContent.fadeIn wizardFadeTime
 	$wizardButtons.fadeOut wizardFadeTime
 	currentWizardStep = 0
+
 # Initializes the logic for the test strip wizard
 initializeWizard = ($modal) ->
 	wizardLogicInitialized = true
@@ -64,8 +65,6 @@ initializeWizard = ($modal) ->
 		$wizardStepObjects.push $wizardStep
 
 	$sizeSelect = $modal.find('#sizeSelect')
-	$legoContent = $modal.find('#legoContent')
-	$stlContent = $modal.find('#stlContent')
 
 	applyCurrentWizardStep = ->
 		if currentWizardStep is wizardSteps.length or
@@ -139,21 +138,24 @@ initializeWizard = ($modal) ->
 			$wizardStepObjects[0].fadeIn wizardFadeTime
 			$wizardButtons.fadeIn wizardFadeTime
 
-getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
-	$modal = $('#downloadModal')
+getModal = ({testStrip, stl, lego, steps} = {}) ->
+	$modal ?= $('#downloadModal')
+	$legoContent ?= $modal.find('#legoContent')
+	$stlContent ?= $modal.find('#stlContent')
+	$testStripContent ?= $modal.find('#testStripContent')
 
 	if lego
-		$modal.find('#legoContent').show()
+		$legoContent.show()
 	else
-		$modal.find('#legoContent').hide()
+		$legoContent.hide()
 
 	if stl
-		$modal.find('#stlContent').show()
+		$stlContent.show()
 	else
-		$modal.find('#stlContent').hide()
+		$stlContent.hide()
 
 	if testStrip
-		$modal.find('#testStripContent').show()
+		$testStripContent.show()
 
 		# Prefill select values
 		$studSizeSelect = $modal.find '#studSizeSelect'
@@ -166,7 +168,7 @@ getModal = ({testStrip: testStrip, stl: stl, lego: lego, steps: steps}) ->
 		addOptions $holeSizeSelect, steps, 0, numericalList
 		addOptions $wizardHoleSizeSelect, steps, 0, numericalList
 	else
-		$modal.find('#testStripContent').hide()
+		$testStripContent.hide()
 
 	if not wizardLogicInitialized
 		initializeWizard $modal

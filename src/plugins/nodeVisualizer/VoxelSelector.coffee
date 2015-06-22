@@ -146,15 +146,26 @@ class VoxelSelector
 			not voxel.isLego() and type is '3d'
 
 	###
-	# Gets the brush size to be used dependent on the `bigBrush` flag
+	# Gets the brush size to be used depending on the `bigBrush` flag
 	# @param {Boolean} bigBrush should a big Brush be used?
 	###
 	getBrushSize: (bigBrush) =>
 		return x: 1, y: 1, z: 1 unless bigBrush
 		length = Math.max(
-			@grid.getNumVoxelsX(), @grid.getNumVoxelsY(), @grid.getNumVoxelsZ())
+			@grid.getNumVoxelsX()
+			@grid.getNumVoxelsY()
+			@grid.getNumVoxelsZ()
+		)
 		size = Math.sqrt length
 		height = Math.round size * @grid.heightRatio
+		size = Math.round size
+
+		# Make sure that the size is odd. This is needed because the big brush
+		# stretches over the middle voxel and the same number of voxels in all
+		# directions (+ and -). Thus 1 + 2n means that we need an odd number.
+		size += 1 if size % 2 == 0
+		height += 1 if height % 2 == 0
+
 		return x: size, y: size, z: height
 
 	###

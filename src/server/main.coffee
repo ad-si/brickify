@@ -24,6 +24,8 @@ coffeeify = require 'coffeeify'
 # Load yaml configuration into javascript file
 browserifyData = require 'browserify-data'
 envify = require 'envify'
+# Load strings with browserify
+stringify = require 'stringify'
 browserify = require 'browserify-middleware'
 urlSessions = require './urlSessions'
 cookieParser = require 'cookie-parser'
@@ -62,7 +64,7 @@ loggingLevel = if developmentMode then 'debug' else 'warn'
 loggingLevel = 'error' if testMode
 
 browserify.settings({
-	transform: [coffeeify, browserifyData, envify]
+	transform: [stringify(['.scad']), coffeeify, browserifyData, envify]
 })
 
 server = http.createServer(webapp)
@@ -111,6 +113,7 @@ module.exports.setupRouting = ->
 		'filesaver.js'
 		'jquery'
 		'mousetrap'
+		'nanobar'
 		'operative'
 		'PEP'
 		'path'

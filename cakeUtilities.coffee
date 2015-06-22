@@ -37,7 +37,7 @@ compileFile = (inputfileEntry) ->
 
 deleteAllJsFiles = (directory, afterDeleteCallback) ->
 	buildLog.info "Clearing directory #{directory}..."
-	readdirp root: directory, fileFilter: ['*.js','*.js.map']
+	readdirp root: directory, fileFilter: ['*.js', '*.js.map']
 	.on 'data', (entry) -> fs.unlinkSync entry.fullPath
 	.on 'error', (error) -> buildLog.error error
 	.on 'warn', (warning) -> buildLog.warn warning

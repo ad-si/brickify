@@ -17,7 +17,7 @@ module.exports = class PluginLoader
 	_loadPlugin: (PluginClass, packageData) ->
 		instance = new PluginClass()
 
-		for own key,value of packageData
+		for own key, value of packageData
 			instance[key] = value
 
 		return instance
@@ -84,6 +84,11 @@ module.exports = class PluginLoader
 			@pluginInstances.push @_loadPlugin(
 				require '../plugins/csg'
 				require '../plugins/csg/package.json'
+			)
+		if @globalConfig.plugins.legoInstructions
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/legoInstructions'
+				require '../plugins/legoInstructions/package.json'
 			)
 
 		return @pluginInstances

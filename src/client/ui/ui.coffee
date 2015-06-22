@@ -1,6 +1,7 @@
 Hotkeys = require '../hotkeys'
 PointerDispatcher = require './pointerDispatcher'
 WorkflowUi = require './workflowUi/workflowUi'
+HintUi = require './HintUi'
 
 ###
 # @module ui
@@ -12,7 +13,8 @@ module.exports = class Ui
 		@pluginHooks = @bundle.pluginHooks
 		@workflowUi = new WorkflowUi(@bundle)
 		@workflowUi.init()
-		@pointerDispatcher = new PointerDispatcher(@bundle)
+		@hintUi = new HintUi()
+		@pointerDispatcher = new PointerDispatcher(@bundle, @hintUi)
 
 	# Bound to updates to the window size:
 	# Called whenever the window is resized.

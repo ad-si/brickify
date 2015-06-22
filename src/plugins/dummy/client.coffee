@@ -98,20 +98,6 @@ class DummyPlugin
 		console.log node, ' removed'
 		return
 
-
-	###
-	# When a file is loaded into brickify, the `fileLoader` will try to import
-	# it with every plugin that implements importFile until one succeeds.
-	# The file's name and its content are provided as arguments.
-	#
-	# @param {String} fileName the name of the file to import
-	# @param {String} fileContent the content of the file to import
-	# @see ModelLoader
-	###
-	importFile: (fileName, fileContent) ->
-		console.log 'Dummy Client Plugin imports a file'
-		return undefined
-
 	###
 	# Plugins should return an object with a title property (String) that is
 	# displayed in the help and an array of events. These should have an event
@@ -159,11 +145,11 @@ class DummyPlugin
 	# @param {Node} selectedNode the selected node that should be processed
 	# @param {Object} downloadOptions Additional download options
 	# @param {Float} downloadOptions.studRadius Desired radius of the Lego studs
-	# @param {String} downloadOptions.fileType desired file type, 'stl' or 'pdf'
+	# @param {String} downloadOptions.type desired type, 'stl' or 'instructions'
 	###
 	getDownload: (downloadOptions, selectedNode) ->
 		return {
-			filename: ''
+			fileName: ''
 			data: ''
 		}
 
@@ -172,8 +158,10 @@ class DummyPlugin
 	# @param {Number} fidelityLevel the new level of fidelity, which is an index
 	# of
 	# @param {Array<String>} availableFidelityLevels all available fidelity levels
+	# @param {Object} options
+	# @param {Boolean} options.screenshotMode true while instructions are rendered
 	###
-	setFidelity: (fidelityLevel, availableFidelityLevels) ->
+	setFidelity: (fidelityLevel, availableFidelityLevels, options) ->
 		return
 
 module.exports = DummyPlugin

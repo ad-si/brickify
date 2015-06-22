@@ -1,5 +1,6 @@
 THREE = require 'three'
 meshlib = require 'meshlib'
+stlExporter = require 'stl-exporter'
 log = require 'loglevel'
 
 modelCache = require '../../client/modelLoading/modelCache'
@@ -7,6 +8,7 @@ LegoPipeline = require './pipeline/LegoPipeline'
 PipelineSettings = require './pipeline/PipelineSettings'
 Brick = require './pipeline/Brick'
 threeHelper = require '../../client/threeHelper'
+threeConverter = require '../../client/threeConverter'
 Spinner = require '../../client/Spinner'
 
 ###
@@ -22,7 +24,7 @@ class NewBrickator
 		@nodeVisualizer = @bundle.getPlugin 'nodeVisualizer'
 
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData node
+		@getNodeData node
 		.then (cachedData) =>
 			@nodeVisualizer?.objectModified node, cachedData
 			Spinner.stop @bundle.renderer.getDomElement()
@@ -35,7 +37,7 @@ class NewBrickator
 
 	runLegoPipeline: (selectedNode) =>
 		Spinner.startOverlay @bundle.renderer.getDomElement()
-		@_getCachedData(selectedNode)
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			#since cached data already contains voxel grid, only run lego
 			settings = new PipelineSettings(@bundle.globalConfig)
@@ -68,8 +70,8 @@ class NewBrickator
 	# brick. this happens when using the lego brush to create new bricks
 	###
 	relayoutModifiedParts: (selectedNode, modifiedVoxels, createBricks = false) =>
-		log.debug 'relayouting modified parts, creating bricks:',createBricks
-		@_getCachedData(selectedNode)
+		log.debug 'relayouting modified parts, creating bricks:', createBricks
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			modifiedBricks = new Set()
 			for v in modifiedVoxels
@@ -96,7 +98,7 @@ class NewBrickator
 			log.error error
 
 	everythingPrint: (selectedNode) =>
-		@_getCachedData selectedNode
+		@getNodeData selectedNode
 		.then (cachedData) =>
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.onlyInitLayout()
@@ -134,7 +136,7 @@ class NewBrickator
 	_checkDataStructure: (selectedNode, data) ->
 		return yes # Later: Check for node transforms
 
-	_getCachedData: (selectedNode) =>
+	getNodeData: (selectedNode) =>
 		return selectedNode.getPluginData 'newBrickator'
 		.then (data) =>
 			if data? and @_checkDataStructure selectedNode, data
@@ -143,6 +145,8 @@ class NewBrickator
 				return @_createDataStructure selectedNode
 
 	getDownload: (selectedNode, downloadOptions) =>
+		return null if downloadOptions.type != 'stl'
+
 		options = @_prepareCSGOptions(
 			downloadOptions.studRadius, downloadOptions.holeRadius
 		)
@@ -152,33 +156,45 @@ class NewBrickator
 			log.warn 'Unable to create download due to CSG Plugin missing'
 			return Promise.resolve { data: '', fileName: '' }
 
-		dlPromise = new Promise (resolve, reject) =>
-			@csg.getCSG selectedNode, options
-			.then (detailedCsgGeometries) ->
-				if not detailedCsgGeometries? or detailedCsgGeometries.length is 0
-					resolve [{ data: '', fileName: '' }]
+		downloadPromise = new Promise (resolve, reject) =>
+			@csg
+			.getCSG selectedNode, options
+			.then (csgGeometries) ->
+
+				if not csgGeometries? or csgGeometries.length is 0
+					resolve [{
+						data: ''
+						fileName: ''
+					}]
 					return
 
-				results = []
+				return selectedNode
+				.getName()
+				.then (name) ->
 
-				for i in [0..detailedCsgGeometries.length - 1]
-					geometry = detailedCsgGeometries[i]
+					results = csgGeometries.map (threeGeometry, index) ->
 
-					optimizedModel = new meshlib.OptimizedModel()
-					optimizedModel.fromThreeGeometry(geometry)
+						fileName = 'brickify-' +
+							name.replace /.stl$/, '' +
+							"-#{index}.stl"
 
-					meshlib
-					.model(optimizedModel)
-					.export null, (error, binaryStl) ->
-						fn = "brickify-#{selectedNode.name}"
-						fn = fn.replace /.stl$/, ''
-						fn += "-#{i}"
-						fn += '.stl'
-						results.push { data: binaryStl, fileName: fn }
+						faceVertexMesh = threeConverter
+							.threeGeometryToFaceVertexMesh threeGeometry
+
+						faceVertexMesh.name = name
+
+						return {
+							data: stlExporter.toBinaryStl faceVertexMesh
+							fileName: fileName
+						}
 
 					resolve results
 
-		return dlPromise
+			.catch (error) ->
+				log.error error
+				reject error
+
+		return downloadPromise
 
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}

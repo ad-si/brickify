@@ -102,7 +102,10 @@ module.exports = class GeometryCreator
 			for yi in [0..brickDimensions.y - 1] by 1
 				tx = (@grid.spacing.x * (xi + 0.5)) - (worldBrickSize.x / 2)
 				ty = (@grid.spacing.y * (yi + 0.5)) - (worldBrickSize.y / 2)
-				tz = (@grid.spacing.z * 0.7)
+				if brickDimensions.z == 1
+					tz = (@grid.spacing.z * 0.7)
+				else if brickDimensions.z == 3
+					tz = (@grid.spacing.z * 1.7)
 
 				translation = new THREE.Matrix4()
 				translation.makeTranslation(tx, ty, tz)

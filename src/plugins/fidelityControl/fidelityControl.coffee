@@ -27,6 +27,7 @@ class FidelityControl
 		'PipelineLow',
 		'PipelineMedium',
 		'PipelineHigh',
+		'PipelineUltra'
 	]
 	@minimalPipelineLevel = 3
 
@@ -36,6 +37,7 @@ class FidelityControl
 		@currentFidelityLevel = 0
 
 		@autoAdjust = true
+		@screenShotMode = false
 
 		@accumulatedFrames = 0
 		@accumulatedTime = 0
@@ -50,16 +52,18 @@ class FidelityControl
 		# allow pipeline only if we have the needed extension and a stencil buffer
 		# and if the pipeline is enabled in the global config
 		usePipeline = @bundle.globalConfig.rendering.usePipeline
+		depth = @bundle.renderer.threeRenderer.supportsDepthTextures()
 		fragDepth = @bundle.renderer.threeRenderer.extensions.get 'EXT_frag_depth'
 		stencilBuffer = @bundle.renderer.threeRenderer.hasStencilBuffer
 
 		capabilites = ''
-		capabilites += 'ExtFragDepth' if fragDepth?
-		capabilites += ' stencilBuffer' if stencilBuffer
+		capabilites += 'DepthTextures ' if depth?
+		capabilites += 'ExtFragDepth ' if fragDepth?
+		capabilites += 'stencilBuffer ' if stencilBuffer
 
 		piwikTracking.setCustomSessionVariable 0, 'GpuCapabilities', capabilites
 
-		@pipelineAvailable = usePipeline and fragDepth? and stencilBuffer
+		@pipelineAvailable = usePipeline and depth? and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
 	on3dUpdate: (timestamp) =>
@@ -93,7 +97,7 @@ class FidelityControl
 		)
 
 	_adjustFidelity: (fps) =>
-		return unless @autoAdjust
+		return if @screenShotMode or not @autoAdjust
 
 		if fps < minimalAcceptableFps and @currentFidelityLevel > 0
 			# count how often we dropped below the desired fps
@@ -121,10 +125,10 @@ class FidelityControl
 		# Increase fidelity
 		@currentFidelityLevel++
 		@pluginHooks.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 		@bundle.renderer.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 
 		# Enable pipeline
@@ -135,10 +139,10 @@ class FidelityControl
 		# Decrease fidelity
 		@currentFidelityLevel--
 		@pluginHooks.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 		@bundle.renderer.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels
+			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
 
 		# Disable pipeline
@@ -185,6 +189,38 @@ class FidelityControl
 				.match(/[A-Z]/g).join('')
 			fpsText = Math.round(fps) + '/' + levelAbbreviation
 			@$fpsDisplay.text fpsText
+
+	# disables pipeline for screenshots
+	enableScreenshotMode: =>
+		@screenShotMode = true
+
+		level = FidelityControl.fidelityLevels.indexOf 'DefaultHigh'
+		@_levelBeforeScreenshot = @currentFidelityLevel
+		@currentFidelityLevel = level
+
+		@pluginHooks.setFidelity(
+			level, FidelityControl.fidelityLevels
+			screenshotMode: true
+		)
+		@bundle.renderer.setFidelity(
+			level, FidelityControl.fidelityLevels
+			screenshotMode: true
+		)
+
+	# resets screenshot mode, restores old fidelity level
+	disableScreenshotMode: =>
+		@screenShotMode = false
+
+		@currentFidelityLevel = @_levelBeforeScreenshot
+
+		@pluginHooks.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+			screenshotMode: false
+		)
+		@bundle.renderer.setFidelity(
+			@currentFidelityLevel, FidelityControl.fidelityLevels
+			screenshotMode: false
+		)
 
 	reset: =>
 		@accumulatedFrames = 0

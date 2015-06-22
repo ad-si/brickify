@@ -1,5 +1,5 @@
 ###
-# base class to describe a part (in terms of special functionality) of a shader
+# Base class to describe a part (in terms of special functionality) of a shader
 ###
 class ShaderPart
 	constructor: (options) -> return

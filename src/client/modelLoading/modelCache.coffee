@@ -36,11 +36,15 @@ submitDataToServer = (hash, data) ->
 		return prom
 	return exists(hash).catch(send)
 
-module.exports.store = (optimizedModel) ->
-	modelData = optimizedModel.toBase64()
-	hash = md5(modelData)
-	modelCache[hash] = Promise.resolve optimizedModel
-	return submitDataToServer(hash, modelData).then -> hash
+module.exports.store = (model) ->
+	return model
+		.getBase64()
+		.then (base64Model) ->
+			hash = md5 base64Model
+			modelCache[hash] = Promise.resolve model
+			return submitDataToServer(hash, base64Model)
+				.then ->
+					return hash
 
 # requests a mesh with the given hash from the server
 requestDataFromServer = (hash) ->
@@ -48,11 +52,12 @@ requestDataFromServer = (hash) ->
 		.catch (jqXHR) -> throw new Error jqXHR.statusText
 
 buildModelPromise = (hash) ->
-	return requestDataFromServer(hash).then((data) ->
-		model = new meshlib.OptimizedModel()
-		model.fromBase64 data
-		return model
-	)
+	return requestDataFromServer(hash)
+		.then (base64Model) ->
+			return meshlib.Model
+				.fromBase64 base64Model
+				.buildFacesFromFaceVertexMesh()
+
 
 # Request an optimized mesh with the given hash
 # The mesh will be provided by the cache if present or loaded from the server

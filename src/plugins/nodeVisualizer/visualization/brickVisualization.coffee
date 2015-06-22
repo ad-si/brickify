@@ -27,6 +27,7 @@ class BrickVisualization
 		@printVoxels = []
 
 		@isStabilityView = false
+		@_highlightVoxelVisiblity = true
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -91,8 +92,11 @@ class BrickVisualization
 
 		# sort layerwise for build view
 		brickLayers = []
+		maxZ = 0
+
 		@grid.getAllBricks().forEach (brick) ->
 			z = brick.getPosition().z
+			maxZ = Math.max z, maxZ
 			brickLayers[z] ?= []
 
 			if (not recreate) and (not brick.getVisualBrick()?)
@@ -101,24 +105,25 @@ class BrickVisualization
 				brick.getVisualBrick().visible = yes
 				brick.getVisualBrick().hasBeenSplit = no
 
-		for z, brickLayer of brickLayers
-			# create layer object if it does not exist
+		# Create three layer object if it does not exist
+		for z in [0..maxZ]
 			if not @bricksSubnode.children[z]?
 				layerObject = new THREE.Object3D()
 				@bricksSubnode.add layerObject
 
+		for z, brickLayer of brickLayers
+			z = Number(z)
 			layerObject = @bricksSubnode.children[z]
 
 			for brick in brickLayer
 				# create visual brick
-				material = coloring.getMaterialForBrick brick
+				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), material
+					brick.getPosition(), brick.getSize(), materials.color
 				)
 
 				# link data <-> visuals
 				brick.setVisualBrick threeBrick
-				threeBrick.brick = brick
 
 				# add to scene graph
 				layerObject.add threeBrick
@@ -128,8 +133,8 @@ class BrickVisualization
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
-					material = coloring.getMaterialForBrick visualBrick.brick
-					visualBrick.setMaterial material
+					material = coloring.getMaterialsForBrick visualBrick.brick
+					visualBrick.setMaterial material.color
 		@_oldColoring = coloring
 
 		@unhighlightBigBrush()
@@ -161,14 +166,28 @@ class BrickVisualization
 		@_highlightVoxel.visible = false
 
 		for i in [0..@bricksSubnode.children.length - 1] by 1
+			threeLayer = @bricksSubnode.children[i]
 			if i <= layer
-				@bricksSubnode.children[i].visible = true
+				threeLayer.visible = true
+				if i < layer
+					@_makeLayerGrayscale (threeLayer)
+				else
+					@_makeLayerColored (threeLayer)
 			else
-				@bricksSubnode.children[i].visible = false
+				threeLayer.visible = false
+
+	_makeLayerGrayscale: (layer) ->
+		for threeBrick in layer.children
+			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.gray
+
+	_makeLayerColored: (layer) ->
+		for threeBrick in layer.children
+			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.color
 
 	showAllBrickLayers: =>
 		for layer in @bricksSubnode.children
 			layer.visible = true
+			@_makeLayerColored layer
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
@@ -183,7 +202,7 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			@_highlightVoxel.visible = true
+			@_highlightVoxel.visible = true and @_highlightVoxelVisiblity
 			worldPos = @grid.mapVoxelToWorld voxel.position
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
@@ -257,10 +276,13 @@ class BrickVisualization
 	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
+		@printVoxels = []
 		everything3D = true
 		for voxel in voxels
 			everything3D = everything3D && !voxel.isLego()
 			voxel.make3dPrinted()
+			@printVoxels.push voxel
+		@voxelSelector.clearSelection()
 		return !everything3D
 
 	resetTouchedVoxelsToLego: =>
@@ -296,9 +318,11 @@ class BrickVisualization
 	makeAllVoxelsLego: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
 		everythingLego = true
+		@printVoxels = []
 		for voxel in voxels
 			everythingLego = everythingLego && voxel.isLego()
 			voxel.makeLego()
+		@voxelSelector.clearSelection()
 		return !everythingLego
 
 	resetTouchedVoxelsTo3dPrinted: =>
@@ -311,5 +335,7 @@ class BrickVisualization
 			.concat @voxelSelector.touchedVoxels
 			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
+
+	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
 
 module.exports = BrickVisualization

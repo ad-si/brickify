@@ -1,5 +1,6 @@
 THREE = require 'three'
 threeHelper = require '../../client/threeHelper'
+threeConverter = require '../../client/threeConverter'
 
 class ModelVisualization
 	constructor: (@globalConfig, @node, threeNode, @coloring) ->
@@ -30,7 +31,7 @@ class ModelVisualization
 	_createVisualization: (node) =>
 
 		_addSolid = (geometry, parent) =>
-			solid = new THREE.Mesh geometry, @coloring.objectMaterial
+			solid = new THREE.Mesh geometry, @coloring.objectPrintMaterial
 			parent.add solid
 			parent.solid = solid
 
@@ -51,14 +52,17 @@ class ModelVisualization
 			parent.wireframe = wireframe
 
 		_addModel = (model) =>
-			geometry = model.convertToThreeGeometry()
+			return model
+				.getObject()
+				.then (modelObject) =>
+					geometry = threeConverter.toStandardGeometry modelObject
 
-			if @globalConfig.rendering.showModel
-				_addSolid geometry, @threeNode
-			if @globalConfig.rendering.showShadowAndWireframe
-				_addWireframe geometry, @threeNode
+					if @globalConfig.rendering.showModel
+						_addSolid geometry, @threeNode
+					if @globalConfig.rendering.showShadowAndWireframe
+						_addWireframe geometry, @threeNode
 
-			threeHelper.applyNodeTransforms node, @threeNode
+					threeHelper.applyNodeTransforms node, @threeNode
 
 		@afterCreationPromise = node.getModel().then _addModel
 		return @afterCreationPromise

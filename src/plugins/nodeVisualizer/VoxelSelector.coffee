@@ -34,7 +34,7 @@ class VoxelSelector
 		return null unless mainVoxel?.position?
 
 		size = @getBrushSize options.bigBrush
-		gridEntries = @grid.getSurrounding mainVoxel.position, size, -> true
+		gridEntries = @grid.getSurrounding mainVoxel.position, size
 		voxels = gridEntries
 			.filter (voxel) => @_hasType voxel, type
 			.filter (voxel) => voxel not in @touchedVoxels
@@ -122,27 +122,22 @@ class VoxelSelector
 		start = modelIntersects[0].point
 		end = modelIntersects[1].point
 
-		revTransform = new THREE.Matrix4()
-		revTransform.getInverse @renderer.scene.matrix
-
 		middle = new THREE.Vector3(
 			(start.x + end.x) / 2
 			(start.y + end.y) / 2
 			(start.z + end.z) / 2
 		)
+
+		revTransform = new THREE.Matrix4()
+		revTransform.getInverse @renderer.scene.matrix
 		middle.applyMatrix4 revTransform
+
 		voxelPos = @grid.mapGridToVoxel @grid.mapWorldToGrid middle
 		return @grid.getVoxel voxelPos.x, voxelPos.y, voxelPos.z
 
 	_getIntersections: (event) ->
 		rayDirection = interactionHelper.calculateRay event, @renderer
 		rayOrigin = @renderer.getCamera().position.clone()
-
-		# rotate to match scene that is rotated 90° around x-axis
-		m = new THREE.Matrix4()
-		m.makeRotationX(Math.PI / 2.0)
-		rayDirection.applyProjection(m)
-		rayOrigin.applyProjection(m)
 
 		return @grid.intersectVoxels rayOrigin, rayDirection
 
@@ -151,15 +146,27 @@ class VoxelSelector
 			not voxel.isLego() and type is '3d'
 
 	###
-	# Gets the brush size to be used dependent on the `bigBrush` flag
+	# Gets the brush size to be used depending on the `bigBrush` flag. The big
+	# brush size is set to a reasonable size according to the model size.
 	# @param {Boolean} bigBrush should a big Brush be used?
 	###
 	getBrushSize: (bigBrush) =>
 		return x: 1, y: 1, z: 1 unless bigBrush
-		length = Math.max(
-			@grid.getNumVoxelsX(), @grid.getNumVoxelsY(), @grid.getNumVoxelsZ())
-		size = Math.sqrt length
-		height = Math.round size * @grid.heightRatio
+		length = Math.sqrt Math.max(
+			@grid.getNumVoxelsX()
+			@grid.getNumVoxelsY()
+			@grid.getNumVoxelsZ()
+		)
+
+		height = Math.round length * @grid.heightRatio
+		size = Math.round length
+
+		# Make sure that the size is odd. This is needed because the big brush
+		# stretches over the middle voxel and the same number of voxels in all
+		# directions (+ and -) -> 1 + 2n -> we need an odd number.
+		size += 1 if size % 2 == 0
+		height += 1 if height % 2 == 0
+
 		return x: size, y: size, z: height
 
 	###

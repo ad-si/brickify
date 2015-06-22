@@ -63,14 +63,11 @@ module.exports = class VolumeFiller
 						@_setVoxels grid, x, y, currentFillVoxelQueue, 0
 
 						if dir is 1
-							# fill up voxels and leave model
+							# leaving model
 							insideModel = false
 						else if dir is -1
 							# entering model
 							insideModel = true
-						else
-							# if not sure fill up
-							currentFillVoxelQueue = []
 					else
 						# voxel does not exist yet. create if inside model
 						if insideModel
@@ -78,9 +75,9 @@ module.exports = class VolumeFiller
 					z++
 				return
 
-			_setVoxels: (grid, x, y, zs, voxelData) ->
-				for z in zs
-					@_setVoxel grid, x, y, z, voxelData
+			_setVoxels: (grid, x, y, zValues, voxelData) ->
+				while zValue = zValues.pop()
+					@_setVoxel grid, x, y, zValue, voxelData
 
 			_setVoxel: (grid, x, y, z, voxelData) ->
 				grid[x] ?= []

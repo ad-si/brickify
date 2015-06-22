@@ -24,27 +24,6 @@ class BrickObject extends THREE.Object3D
 		@children[1].material = @materials.colorStuds
 		@children[2].material = @materials.colorStuds
 
-	# stores a reference of this bricks voxel coordinates for
-	# further usage
-	setVoxelCoords: (@voxelCoords) =>
-		return
-
-	setGridReference: (@gridEntry) =>
-		return unless @gridEntry?
-		@gridEntry.visibleVoxel = @
-		return
-
-	# makes the voxel being 3d printed
-	make3dPrinted: =>
-		@gridEntry.enabled = false
-
-	# makes the voxel being legotized
-	makeLego: =>
-		@gridEntry.enabled = true
-
-	isLego: =>
-		return @gridEntry.enabled
-
 	setGray: (isGray) =>
 		if isGray
 			@children[0].material = @materials.gray

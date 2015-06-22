@@ -244,14 +244,7 @@ class LegoInstructions
 		}
 
 	_downloadPieceListImages: (pieceList) =>
-		return new Promise (resolve, reject) =>
-			downloadPromises = []
-			for piece in pieceList
-				downloadPromises.push @_downloadPieceImage piece
-
-			Promise.all(downloadPromises)
-			.then (pieceFiles) ->
-				resolve pieceFiles
+		return Promise.all pieceList.map (piece) => @_downloadPieceImage piece
 
 	_downloadPieceImage: (piece) ->
 		return new Promise (resolve, reject) ->

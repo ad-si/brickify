@@ -79,7 +79,9 @@ class LegoInstructions
 			@fidelityControl.disableScreenshotMode()
 
 			return files
-		.catch (error) -> log.error error
+		.catch (error) ->
+			log.error error
+			return null
 
 	showPartListPopup: (node) =>
 		@newBrickator.getNodeData node

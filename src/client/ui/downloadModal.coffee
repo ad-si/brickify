@@ -63,8 +63,8 @@ initializeWizard = ($modal) ->
 	$stlContent = $modal.find('#stlContent')
 
 	applyCurrentWizardStep = ->
-		if currentWizardStep == wizardSteps.length or
-		currentWizardStep == -1
+		if currentWizardStep is wizardSteps.length or
+		currentWizardStep is -1
 			# Finish wizard
 
 			# Apply data values
@@ -84,19 +84,19 @@ initializeWizard = ($modal) ->
 			.fadeIn wizardFadeTime
 
 		# Update calibration preview on last step
-		if currentWizardStep == wizardSteps.length - 1
+		if currentWizardStep is wizardSteps.length - 1
 			size = $wizardStudSizeSelect.find('option:selected').html()
 			size += ' '
 			size += $wizardHoleSizeSelect.find('option:selected').html()
 			$calibrationSettings.html size
 
 	updateButtonCaptions = ->
-		if currentWizardStep == wizardSteps.length - 1
+		if currentWizardStep is wizardSteps.length - 1
 			$nextButtonText.html 'Finish'
 		else
 			$nextButtonText.html 'Next step'
 
-		if currentWizardStep == 0
+		if currentWizardStep is 0
 			$backButtonText.html 'Cancel wizard'
 		else
 			$backButtonText.html 'Go back'

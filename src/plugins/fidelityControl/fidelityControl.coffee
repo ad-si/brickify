@@ -66,8 +66,6 @@ class FidelityControl
 		@pipelineAvailable = usePipeline and depth? and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
-		@_setFidelity()
-
 	on3dUpdate: (timestamp) =>
 		if not @_lastTimestamp?
 			@_lastTimestamp = timestamp
@@ -140,10 +138,6 @@ class FidelityControl
 		# Disable pipeline
 		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
 			@bundle.renderer.pipelineEnabled = false
-
-	_setDefaultFidelity: =>
-		@currentFidelityLevel = 0
-		@_setFidelity()
 
 	_setFidelity: =>
 		@pluginHooks.setFidelity(

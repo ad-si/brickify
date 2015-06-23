@@ -260,6 +260,9 @@ class BrickVisualization
 				visualBrick = voxel.brick.getVisualBrick()
 				if not visualBrick.hasBeenSplit
 					voxel.brick.forEachVoxel (voxel) =>
+						# give this brick a 1x1 stud texture
+						visualBrick.materials.textureStuds =
+							@defaultColoring.getTextureMaterialForBrick()
 						temporaryVoxel = @geometryCreator.getBrick(
 							voxel.position
 							{x: 1, y: 1, z: 1}

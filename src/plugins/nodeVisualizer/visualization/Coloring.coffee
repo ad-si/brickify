@@ -102,7 +102,7 @@ module.exports = class Coloring
 		printHighlightStudMaterial = @_lightenMaterial printHighlightMaterial
 		@_setPolygonOffset printHighlightStudMaterial, -1, -1
 
-		printHighlightTextureMaterial = @_getTextureMaterialForBrick()
+		printHighlightTextureMaterial = @getTextureMaterialForBrick()
 		@_setPolygonOffset printHighlightTextureMaterial, -1, -1
 		return  {
 			color: printHighlightMaterial
@@ -114,7 +114,7 @@ module.exports = class Coloring
 		return {
 			color: @selectedMaterial
 			colorStuds: @selectedStudMaterial
-			textureStuds: @_getTextureMaterialForBrick()
+			textureStuds: @getTextureMaterialForBrick()
 		}
 
 	getMaterialsForBrick: (brick) =>
@@ -142,7 +142,7 @@ module.exports = class Coloring
 			continue if neighborColors.has(materials.color)
 			break
 
-		materials.textureStuds = @_getTextureMaterialForBrick brick
+		materials.textureStuds = @getTextureMaterialForBrick brick
 
 		brick.visualizationMaterials = materials
 		return brick.visualizationMaterials
@@ -208,7 +208,7 @@ module.exports = class Coloring
 			transparent: opacity < 1.0
 		)
 
-	_getTextureMaterialForBrick: (brick) =>
+	getTextureMaterialForBrick: (brick) =>
 		if brick and brick.getVisualBrick()?
 			return brick.getVisualBrick().textureMaterial
 

@@ -5,25 +5,32 @@
 ###
 $ = require 'jquery'
 
+sanitizeJqXHRError = (jqXHR) ->
+	return Promise.reject {
+		status: jqXHR.status
+		statusText: jqXHR.statusText
+		responseText: jqXHR.responseText
+	}
+
 module.exports.create = ->
 	return Promise.resolve $.ajax '/datapacket/create', type: 'GET'
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
+		.catch sanitizeJqXHRError
 
 module.exports.exists = (id) ->
 	return Promise.resolve $.ajax '/datapacket/exists/' + id, type: 'GET'
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
+		.catch sanitizeJqXHRError
 
 module.exports.get = (id) ->
 	return Promise.resolve $.ajax '/datapacket/get/' + id, type: 'GET'
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
+		.catch sanitizeJqXHRError
 
 module.exports.put = (packet) ->
 	return Promise.resolve(
 		$.ajax '/datapacket/put/' + packet.id, type: 'PUT',
 			contentType: 'application/json'
 			data: JSON.stringify packet.data
-	).catch (jqXHR) -> throw new Error jqXHR.statusText
+	).catch sanitizeJqXHRError
 
 module.exports.delete = (id) ->
 	return Promise.resolve $.ajax '/datapacket/delete/' + id, type: 'DELETE'
-		.catch (jqXHR) -> throw new Error jqXHR.statusText
+		.catch sanitizeJqXHRError

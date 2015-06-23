@@ -48,7 +48,6 @@ class VoxelSelector
 	# @param {Object} event usually a mouse or tap or pointer event
 	# @param {Object} options some options for the voxel to be found
 	# @param {String} [options.type='lego'] 'lego' or '3d'
-	# @param {Boolean} [options.touch=true] false for highlighting
 	###
 	getVoxel: (event, options) =>
 		type = options.type || 'lego'

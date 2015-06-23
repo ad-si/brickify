@@ -96,6 +96,12 @@ module.exports = class GeometryCreator
 	_getBrickGeometry: (brickDimensions, worldBrickSize) =>
 		# returns a box geometry for the given dimensions
 
+		worldBrickSize ?= {
+			x: brickDimensions.x * @grid.spacing.x
+			y: brickDimensions.y * @grid.spacing.y
+			z: brickDimensions.z * @grid.spacing.z
+		}
+
 		ident = @_getHash brickDimensions
 		if @brickGeometryCache[ident]?
 			return @brickGeometryCache[ident]

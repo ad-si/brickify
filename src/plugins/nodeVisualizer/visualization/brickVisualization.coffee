@@ -39,7 +39,7 @@ class BrickVisualization
 		@_highlightVoxel = @geometryCreator.getBrick(
 			{x: 0, y: 0, z: 0},
 			{x: 1, y: 1, z: 1},
-			@defaultColoring.getPrintHighlightMaterials()
+			@defaultColoring.getHighlightMaterial '3d'
 			@fidelity
 		)
 		@_highlightVoxel.visible = false
@@ -211,7 +211,7 @@ class BrickVisualization
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
 			)
-			@_highlightVoxel.material = hVoxel
+			@_highlightVoxel.setMaterial hVoxel
 			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse

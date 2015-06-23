@@ -304,7 +304,7 @@ class NodeVisualizer
 					@_applyStabilityView cachedData
 				when 'build'
 					@_resetStabilityView cachedData
-					return @_applyBuildMode cachedData
+					@_applyBuildMode cachedData
 				else
 					@_resetStabilityView cachedData
 					@_resetBuildMode cachedData
@@ -350,13 +350,18 @@ class NodeVisualizer
 
 		cachedData.modelVisualization.setNodeVisibility false
 
-		return cachedData.brickVisualization.getNumberOfVisibleLayers()
-
 	_resetBuildMode: (cachedData) ->
 		cachedData.brickVisualization.setHighlightVoxelVisibility true
 		cachedData.brickVisualization.hideCsg()
 		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
+
+	# Returns the amount of LEGO-Layers that can be shown in build mode.
+	# Layers without bricks are discarded
+	getNumberOfBuildLayers: (selectedNode) =>
+		return @_getCachedData(selectedNode)
+			.then (cachedData) ->
+				return cachedData.brickVisualization.getNumberOfVisibleLayers()
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer

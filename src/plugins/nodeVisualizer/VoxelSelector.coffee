@@ -56,7 +56,7 @@ class VoxelSelector
 		voxels = intersections.map (obj) ->
 			return obj.voxel
 
-		return @_getLeveledVoxel event, voxels if @level
+		return @_getLeveledVoxel event, voxels if @level?
 
 		voxel = @_getFrontierVoxel voxels, type
 		# We found a frontier voxel but there is no valid previous voxel:

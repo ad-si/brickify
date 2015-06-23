@@ -1,34 +1,34 @@
 samples = require '../src/server/modelSamples'
 storage = require '../src/server/modelStorage'
 
-exists = (key) ->
-	return samples.exists key
-	.catch -> storage.exists key
+exists = (identifier) ->
+	return samples.exists identifier
+	.catch -> storage.exists identifier
 
 module.exports.exists = (request, response) ->
-	key = request.params.key
+	identifier = request.params.identifier
 
-	exists key
-	.then -> response.status(200).send key
-	.catch -> response.status(404).send key
+	exists identifier
+	.then -> response.status(200).send identifier
+	.catch -> response.status(404).send identifier
 
-get = (key) ->
-	return samples.get key
-	.catch -> storage.get key
+get = (identifier) ->
+	return samples.get identifier
+	.catch -> storage.get identifier
 
 module.exports.get = (request, response) ->
-	key = request.params.key
+	identifier = request.params.identifier
 
-	get key
+	get identifier
 	.then (model) ->
 		response.set 'Content-Type', 'application/octet-stream'
 		response.send model
-	.catch -> response.status(404).send key
+	.catch -> response.status(404).send identifier
 
 module.exports.store = (request, response) ->
-	key = request.params.key
+	identifier = request.params.identifier
 	model = request.body
 
-	storage.store key, model
-	.then -> response.status(200).send key
+	storage.store identifier, model
+	.then -> response.status(200).send identifier
 	.catch -> response.status(500).send 'Model could not be stored.'

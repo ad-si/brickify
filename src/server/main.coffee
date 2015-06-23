@@ -171,9 +171,9 @@ module.exports.setupRouting = ->
 	webapp.get '/app', app
 	webapp.get '/share', sharelinkGen
 
-	webapp.head '/model/:key', urlParser, models.exists
-	webapp.get '/model/:key', urlParser, models.get
-	webapp.put '/model/:key', rawParser, models.store
+	webapp.head '/model/:identifier', urlParser, models.exists
+	webapp.get '/model/:identifier', urlParser, models.get
+	webapp.put '/model/:identifier', rawParser, models.store
 
 	webapp.get '/datapacket/exists/:id', urlParser, dataPackets.exists
 	webapp.get '/datapacket/get/:id', urlParser, dataPackets.get

@@ -17,20 +17,20 @@ module.exports.create = ->
 		.catch sanitizeJqXHRError
 
 module.exports.exists = (id) ->
-	return Promise.resolve $.ajax '/datapacket/exists/' + id, type: 'GET'
+	return Promise.resolve $.ajax '/datapacket/' + id, type: 'HEAD'
 		.catch sanitizeJqXHRError
 
 module.exports.get = (id) ->
-	return Promise.resolve $.ajax '/datapacket/get/' + id, type: 'GET'
+	return Promise.resolve $.ajax '/datapacket/' + id, type: 'GET'
 		.catch sanitizeJqXHRError
 
 module.exports.put = (packet) ->
 	return Promise.resolve(
-		$.ajax '/datapacket/put/' + packet.id, type: 'PUT',
+		$.ajax '/datapacket/' + packet.id, type: 'PUT',
 			contentType: 'application/json'
 			data: JSON.stringify packet.data
 	).catch sanitizeJqXHRError
 
 module.exports.delete = (id) ->
-	return Promise.resolve $.ajax '/datapacket/delete/' + id, type: 'DELETE'
+	return Promise.resolve $.ajax '/datapacket/' + id, type: 'DELETE'
 		.catch sanitizeJqXHRError

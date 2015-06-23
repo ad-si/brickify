@@ -72,8 +72,8 @@ describe 'dataPacket client cache', ->
 	describe 'dataPacket existence checks', ->
 		it 'should fail with a malformed id', ->
 			$.mockjax(
-				type: 'GET'
-				url: /^\/datapacket\/exists\/(.*)$/
+				type: 'HEAD'
+				url: /^\/datapacket\/(.*)$/
 				urlParams: ['id']
 				status: 400
 				responseText: 'Invalid data packet id provided'
@@ -90,19 +90,14 @@ describe 'dataPacket client cache', ->
 
 		it 'should check with the server about unknown dataPackets', ->
 			$.mockjax(
-				type: 'GET'
-				url: /^\/datapacket\/exists\/([a-zA-Z0-9]+)$/
+				type: 'HEAD'
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 200
-				response: (settings) ->
-					@responseText = settings.urlParams.id
 			)
 			id = 'abcdefgh'
-			existence = dataPackets.exists(id)
-			Promise.all([
-				expect(existence).to.be.fulfilled
-				expect(existence).to.eventually.equal(id)
-			]).then(->
+			dataPackets.exists(id)
+			.then(->
 				expect($.mockjax.mockedAjaxCalls()).to.have.length(1)
 				expect($.mockjax.unmockedAjaxCalls()).to.be.empty
 			)
@@ -129,8 +124,8 @@ describe 'dataPacket client cache', ->
 
 		it 'should fail if dataPacket does not exist', ->
 			$.mockjax(
-				type: 'GET'
-				url: /^\/datapacket\/exists\/([a-zA-Z0-9]+)$/
+				type: 'HEAD'
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
@@ -152,7 +147,7 @@ describe 'dataPacket client cache', ->
 		it 'should fail with a malformed id', ->
 			$.mockjax(
 				type: 'GET'
-				url: /^\/datapacket\/get\/(.*)$/
+				url: /^\/datapacket\/(.*)$/
 				urlParams: ['id']
 				status: 400
 				responseText: 'Invalid data packet id provided'
@@ -171,7 +166,7 @@ describe 'dataPacket client cache', ->
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			$.mockjax(
 				type: 'GET'
-				url: /^\/datapacket\/get\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 200
 				contentType: 'application/json'
@@ -190,7 +185,7 @@ describe 'dataPacket client cache', ->
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			$.mockjax(
 				type: 'GET'
-				url: /^\/datapacket\/get\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 200
 				contentType: 'application/json'
@@ -211,7 +206,7 @@ describe 'dataPacket client cache', ->
 			packet = {id: 'abcdefgh', data: {a: 0, b: 'c'}}
 			$.mockjax(
 				type: 'GET'
-				url: /^\/datapacket\/get\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
@@ -232,7 +227,7 @@ describe 'dataPacket client cache', ->
 		it 'should fail with a malformed id', ->
 			$.mockjax(
 				type: 'PUT'
-				url: /^\/datapacket\/put\/(.*)$/
+				url: /^\/datapacket\/(.*)$/
 				urlParams: ['id']
 				status: 400
 				responseText: 'Invalid data packet id provided'
@@ -250,7 +245,7 @@ describe 'dataPacket client cache', ->
 		it 'should fail if dataPacket does not exist', ->
 			$.mockjax(
 				type: 'PUT'
-				url: /^\/datapacket\/put\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
@@ -271,7 +266,7 @@ describe 'dataPacket client cache', ->
 		it 'should put to server', ->
 			$.mockjax(
 				type: 'PUT'
-				url: /^\/datapacket\/put\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 200
 				response: (settings) ->
@@ -290,7 +285,7 @@ describe 'dataPacket client cache', ->
 		it 'should cache changes', ->
 			$.mockjax(
 				type: 'PUT'
-				url: /^\/datapacket\/put\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 200
 				response: (settings) ->
@@ -312,7 +307,7 @@ describe 'dataPacket client cache', ->
 		it 'should fail with a malformed id', ->
 			$.mockjax(
 				type: 'DELETE'
-				url: /^\/datapacket\/delete\/(.*)$/
+				url: /^\/datapacket\/(.*)$/
 				urlParams: ['id']
 				status: 400
 				responseText: 'Invalid data packet id provided'
@@ -330,7 +325,7 @@ describe 'dataPacket client cache', ->
 		it 'should fail if dataPacket does not exist', ->
 			$.mockjax(
 				type: 'DELETE'
-				url: /^\/datapacket\/delete\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->
@@ -351,7 +346,7 @@ describe 'dataPacket client cache', ->
 		it 'should delete dataPackets from server', ->
 			$.mockjax(
 				type: 'DELETE'
-				url: /^\/datapacket\/delete\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 204
 				responseText: ''
@@ -370,14 +365,14 @@ describe 'dataPacket client cache', ->
 			@timeout(4000)
 			$.mockjax(
 				type: 'DELETE'
-				url: /^\/datapacket\/delete\/([a-zA-Z0-9]+)$/
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 204
 				responseText: ''
 			)
 			$.mockjax(
-				type: 'GET'
-				url: /^\/datapacket\/exists\/([a-zA-Z0-9]+)$/
+				type: 'HEAD'
+				url: /^\/datapacket\/([a-zA-Z0-9]+)$/
 				urlParams: ['id']
 				status: 404
 				response: (settings) ->

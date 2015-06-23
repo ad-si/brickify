@@ -191,9 +191,7 @@ class BrickVisualization
 
 	getNumberOfVisibleLayers: =>
 		@_visibleChildLayers = @bricksSubnode.children.filter (layer) ->
-			if layer.children.length > 0
-				return true
-			return false
+			return layer.children.length > 0
 		return @_visibleChildLayers.length
 
 	# highlights the voxel below mouse and returns it

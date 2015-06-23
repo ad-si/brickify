@@ -26,6 +26,8 @@ class LayouterCommon
 			numRandomChoices++
 
 			if layouter.isPlateLayouter() and brick.getSize().z == 3
+				bricksToLayout.delete brick
+				return Promise.resolve {grid: grid} if bricksToLayout.size == 0
 				continue
 
 			merged = @mergeLoop layouter, brick, bricksToLayout

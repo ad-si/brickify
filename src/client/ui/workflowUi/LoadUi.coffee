@@ -32,7 +32,7 @@ class LoadUi
 				files
 				document.getElementById 'loadButtonFeedback'
 				spinnerOptions
-			).then @workflowUi.bundle.modelLoader.loadByHash
+			).then @workflowUi.bundle.modelLoader.loadFromIdentifier
 
 	_checkReplaceModel: =>
 		question = 'You already have a model in your scene.

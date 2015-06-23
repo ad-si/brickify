@@ -18,14 +18,14 @@ else
 	log.setLevel 'warn'
 
 commandFunctions = {
-	initialModel: (value) ->
+	initialModel: (identifier) ->
 		piwikTracking.trackEvent(
-			'trackEvent', 'Editor', 'StartWithInitialModel', value
+			'trackEvent', 'Editor', 'StartWithInitialModel', identifier
 		)
 		# load selected model
 		log.debug 'loading initial model'
 		bundle.sceneManager.clearScene()
-		bundle.modelLoader.loadByHash value
+		bundle.modelLoader.loadFromIdentifier identifier
 }
 
 postInitCallback = ->

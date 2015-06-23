@@ -94,7 +94,7 @@ describe 'Scene tests', ->
 			dataPackets.nextGets.push scene
 			node = {
 				id: 'nodeid'
-				data: { modelHash: 'abcdefghijklmnop', name: 'Beautiful Model' }
+				data: { modelIdentifier: 'abcdefghijklmnop', name: 'Beautiful Model' }
 			}
 			dataPackets.nextGets.push node
 

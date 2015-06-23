@@ -6,11 +6,11 @@ SyncObject = require '../sync/syncObject'
 # @class Node
 ###
 class Node extends SyncObject
-	constructor: ({name, modelHash, transform} = {}) ->
+	constructor: ({name, modelIdentifier, transform} = {}) ->
 		super arguments[0]
 		@transientProperties = []
 		@name = name || null
-		@modelHash = modelHash || null
+		@modelIdentifier = modelIdentifier || null
 		@transform = {}
 		@_setTransform transform
 
@@ -29,14 +29,14 @@ class Node extends SyncObject
 				index = @transientProperties.indexOf key
 				@transientProperties.splice index, 1
 
-	setModelHash: (hash) =>
-		return @next => @modelHash = hash
+	setModelIdentifier: (identifier) =>
+		return @next => @modelIdentifier = identifier
 
-	getModelHash: =>
-		return @done => @modelHash
+	getModelIdentifier: =>
+		return @done => @modelIdentifier
 
 	getModel: =>
-		return @done => Node.modelProvider.request @modelHash
+		return @done => Node.modelProvider.request @modelIdentifier
 
 	setName: (name) =>
 		return @next => @name = name

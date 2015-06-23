@@ -15,29 +15,29 @@ class ModelLoader
 	constructor: (@bundle) ->
 		return
 
-	loadByHash: (hash) =>
+	loadFromIdentifier: (identifier) =>
 		modelCache
-		.request hash
-		.then (model) => @_load model, hash
+		.request identifier
+		.then (model) => @_load model, identifier
 		.catch (error) ->
-			log.error "Could not load model from hash #{hash}"
+			log.error "Could not load model #{identifier}"
 			log.error error.stack
 
-	_load: (model, hash) =>
+	_load: (model, identifier) =>
 		return model
 			.done()
 			.then =>
 				fileName = model.model.fileName
-				@_addModelToScene fileName, hash, model
+				@_addModelToScene fileName, identifier, model
 
 	# adds a new model to the state
-	_addModelToScene: (fileName, hash, model) ->
+	_addModelToScene: (fileName, identifier, model) ->
 		model
 			.getAutoAlignMatrix()
 			.then (matrix) =>
 				node = new Node
 					name: fileName
-					modelHash: hash
+					modelIdentifier: identifier
 					transform:
 						position:
 							x: matrix[0][3]

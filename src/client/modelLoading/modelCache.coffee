@@ -12,19 +12,19 @@ log = require 'loglevel'
 # The cache of optimized model promises
 modelCache = {}
 
-exists = (hash) ->
+exists = (identifier) ->
 	return Promise.resolve(
-		$.ajax '/model/' + hash,
+		$.ajax '/model/' + identifier,
 			type: 'HEAD'
 	).catch (jqXHR) -> throw new Error jqXHR.statusText
 module.exports.exists = exists
 
-# sends the model to the server if the server hasn't got a file
-# with the same hash value
-submitDataToServer = (hash, data) ->
+# sends the model to the server if the server hasn't got a model
+# with the same identifier
+submitDataToServer = (identifier, data) ->
 	send = ->
 		prom = Promise.resolve(
-			$.ajax '/model/' + hash,
+			$.ajax '/model/' + identifier,
 				data: data
 				type: 'PUT'
 				contentType: 'application/octet-stream'
@@ -34,33 +34,33 @@ submitDataToServer = (hash, data) ->
 			-> log.error 'Unable to send model to the server'
 		)
 		return prom
-	return exists(hash).catch(send)
+	return exists(identifier).catch(send)
 
 module.exports.store = (model) ->
 	return model
 		.getBase64()
 		.then (base64Model) ->
-			hash = md5 base64Model
-			modelCache[hash] = Promise.resolve model
-			return submitDataToServer(hash, base64Model)
+			identifier = md5 base64Model
+			modelCache[identifier] = Promise.resolve model
+			return submitDataToServer identifier, base64Model
 				.then ->
-					return hash
+					return identifier
 
-# requests a mesh with the given hash from the server
-requestDataFromServer = (hash) ->
-	return Promise.resolve $.get '/model/' + hash
+# requests a mesh with the given identifier from the server
+requestDataFromServer = (identifier) ->
+	return Promise.resolve $.get '/model/' + identifier
 		.catch (jqXHR) -> throw new Error jqXHR.statusText
 
-buildModelPromise = (hash) ->
-	return requestDataFromServer(hash)
+buildModelPromise = (identifier) ->
+	return requestDataFromServer identifier
 		.then (base64Model) ->
 			return meshlib.Model
 				.fromBase64 base64Model
 				.buildFacesFromFaceVertexMesh()
 
 
-# Request an optimized mesh with the given hash
+# Request an optimized mesh with the given identifier
 # The mesh will be provided by the cache if present or loaded from the server
 # if available.
-module.exports.request = (hash) ->
-	return modelCache[hash] ?= buildModelPromise(hash)
+module.exports.request = (identifier) ->
+	return modelCache[identifier] ?= buildModelPromise(identifier)

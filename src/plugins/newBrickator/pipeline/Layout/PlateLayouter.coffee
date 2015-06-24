@@ -1,8 +1,8 @@
 log = require 'loglevel'
 
-Brick = require './Brick'
-Voxel = require './Voxel'
-Random = require './Random'
+Brick = require '../Brick'
+Voxel = require '../Voxel'
+Random = require '../Random'
 Layouter = require './Layouter'
 
 

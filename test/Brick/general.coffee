@@ -1,6 +1,7 @@
 expect = require('chai').expect
 NewBrick = require '../../src/plugins/newBrickator/pipeline/Brick'
-BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
+BrickLayouter =
+	require '../../src/plugins/newBrickator/pipeline/Layout/BrickLayouter'
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'Brick', ->

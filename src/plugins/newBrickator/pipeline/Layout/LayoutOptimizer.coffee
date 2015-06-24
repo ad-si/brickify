@@ -1,9 +1,9 @@
 log = require 'loglevel'
 
-Brick = require './Brick'
-Voxel = require './Voxel'
-DataHelper = require './DataHelper'
-Random = require './Random'
+Brick = require '../Brick'
+Voxel = require '../Voxel'
+DataHelper = require '../DataHelper'
+Random = require '../Random'
 
 
 class LayoutOptimizer

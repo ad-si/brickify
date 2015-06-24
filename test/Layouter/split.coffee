@@ -1,7 +1,8 @@
 expect = require('chai').expect
-PlateLayouter = require '../../src/plugins/newBrickator/pipeline/PlateLayouter'
+PlateLayouter =
+	require '../../src/plugins/newBrickator/pipeline/Layout/PlateLayouter'
 LayoutOptimizer =
-	require '../../src/plugins/newBrickator/pipeline/LayoutOptimizer'
+	require '../../src/plugins/newBrickator/pipeline/Layout/LayoutOptimizer'
 Brick = require '../../src/plugins/newBrickator/pipeline/Brick'
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 

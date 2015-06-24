@@ -1,7 +1,7 @@
 log = require 'loglevel'
 
-Random = require './Random'
-DataHelper = require './DataHelper'
+Random = require '../Random'
+DataHelper = require '../DataHelper'
 
 class Layouter
 	constructor: ->

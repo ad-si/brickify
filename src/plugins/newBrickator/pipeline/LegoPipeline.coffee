@@ -2,9 +2,9 @@ log = require 'loglevel'
 
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
-BrickLayouter = require './BrickLayouter'
-PlateLayouter = require './Platelayouter'
-LayoutOptimizer = require './LayoutOptimizer'
+BrickLayouter = require './Layout/BrickLayouter'
+PlateLayouter = require './Layout/Platelayouter'
+LayoutOptimizer = require './Layout/LayoutOptimizer'
 Random = require './Random'
 operative = require 'operative'
 

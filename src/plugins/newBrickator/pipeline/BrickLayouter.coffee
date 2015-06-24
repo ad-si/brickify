@@ -232,9 +232,9 @@ class BrickLayouter
 
 			numRandomChoices++
 
-			if brick.getSize().z == 3
+			if brick.getSize().z is 3
 				bricksToLayout.delete brick
-				return Promise.resolve {grid: grid} if bricksToLayout.size == 0
+				return Promise.resolve {grid: grid} if bricksToLayout.size is 0
 				continue
 
 			merged = @_mergeLoop brick, bricksToLayout

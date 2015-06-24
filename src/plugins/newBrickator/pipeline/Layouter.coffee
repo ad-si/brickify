@@ -26,9 +26,9 @@ class Layouter
 				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
-			if @isPlateLayouter() and brick.getSize().z == 3
+			if @isPlateLayouter() and brick.getSize().z is 3
 				bricksToLayout.delete brick
-				return Promise.resolve {grid: grid} if bricksToLayout.size == 0
+				return Promise.resolve {grid: grid} if bricksToLayout.size is 0
 				continue
 
 			merged = @mergeLoop brick, bricksToLayout
@@ -45,7 +45,7 @@ class Layouter
 			if @isBrickLayouter()
 				# if brick is 1x1x3, 1x2x3 or instable after mergeLoop
 				# break it into pieces
-				if brick.isSize(1, 1, 3) or brick.getStability() == 0 or
+				if brick.isSize(1, 1, 3) or brick.getStability() is 0 or
 				brick.isSize(1, 2, 3)
 					# TODO, dont split up if all neighbors are 3L already
 					newBricks = brick.splitUp()
@@ -57,7 +57,7 @@ class Layouter
 
 	# chooses a random brick out of the set
 	chooseRandomBrick: (setOfBricks) =>
-		if setOfBricks.size == 0
+		if setOfBricks.size is 0
 			return null
 
 		if setOfBricks.chooseRandomBrick?

@@ -23,7 +23,7 @@ class BrickLayouter extends Layouter
 	_findMergeableNeighbors: (brick) =>
 		mergeableNeighbors = []
 
-		if brick.getSize().z == 1
+		if brick.getSize().z is 1
 			mergeableNeighbors.push @_findMergeableNeighborsUpOrDownwards(
 				brick
 				Brick.direction.Zp
@@ -136,7 +136,7 @@ class BrickLayouter extends Layouter
 			maxBricks = Math.max maxBricks, neighborSet.size
 
 		largestConnections = numBricks.filter (element) ->
-			return element.num == maxBricks
+			return element.num is maxBricks
 
 		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index
@@ -156,18 +156,18 @@ class BrickLayouter extends Layouter
 		secondLayerBricks = brick.getNeighbors(direction)
 		sLIterator = secondLayerBricks.values()
 		while sLBrick = sLIterator.next().value
-			return null unless sLBrick.getSize().z == 1
+			return null unless sLBrick.getSize().z is 1
 
 		if @_sameSizeAsBrick brick, secondLayerBricks
 			# check next layer
 			thirdLayerBricks = new Set()
 			sLIterator = secondLayerBricks.values()
 			while sLBrick = sLIterator.next().value
-				return unless sLBrick.getStabilityInZDir(direction) == 1
+				return unless sLBrick.getStabilityInZDir(direction) is 1
 				neighbors = sLBrick.getNeighbors(direction)
 				neighborsIter = neighbors.values()
 				while nBrick = neighborsIter.next().value
-					return unless nBrick.getSize().z == 1
+					return unless nBrick.getSize().z is 1
 					thirdLayerBricks.add nBrick
 
 			if @_sameSizeAsBrick brick, thirdLayerBricks
@@ -180,7 +180,7 @@ class BrickLayouter extends Layouter
 
 
 	_sameSizeAsBrick: (brick, layerBricks) =>
-		return false if layerBricks.size == 0
+		return false if layerBricks.size is 0
 
 		sameSize = true
 		p = brick.getPosition()

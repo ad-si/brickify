@@ -28,7 +28,7 @@ class LayoutOptimizer
 			bricksToSplit = @findBricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
-			if bricksToSplit.size == 0
+			if bricksToSplit.size is 0
 				break
 			else
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false, false
@@ -67,7 +67,7 @@ class LayoutOptimizer
 		# second pass - applying labels
 		bricks.forEach (brick) ->
 			brick.label = labels[brick.label]
-			if brick.label == null
+			if brick.label is null
 				console.log 'null brick in algo', brick
 
 		# count number of components

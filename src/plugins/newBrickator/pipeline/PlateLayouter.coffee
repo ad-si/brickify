@@ -23,7 +23,7 @@ class PlateLayouter extends Layouter
 	# Searches for mergeable neighbors in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
 	_findMergeableNeighbors: (brick) =>
-		if brick.getSize().z == 3
+		if brick.getSize().z is 3
 			return [null, null, null, null]
 
 		mergeableNeighbors = []
@@ -68,7 +68,7 @@ class PlateLayouter extends Layouter
 	###
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
 		neighborsInDirection = brick.getNeighbors(dir)
-		return null if neighborsInDirection.size == 0
+		return null if neighborsInDirection.size is 0
 
 		# check that the neighbors together don't exceed this brick's width
 		width = 0
@@ -141,7 +141,7 @@ class PlateLayouter extends Layouter
 			maxConnections = Math.max maxConnections, connectedBricks.size
 
 		largestConnections = numConnections.filter (element) ->
-			return element.num == maxConnections
+			return element.num is maxConnections
 
 		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index

@@ -182,14 +182,13 @@ class BrickLayouter extends Layouter
 	_sameSizeAsBrick: (brick, layerBricks) =>
 		return false if layerBricks.size is 0
 
-		sameSize = true
 		p = brick.getPosition()
 		s = brick.getSize()
 
-		layerBricks.forEach (lBrick) ->
+		lBIterator = layerBricks.values()
+		while lBrick = lBIterator.next().value
 			if lBrick.getSize().z != 1
-				sameSize = false
-				return
+				return false
 			lp = lBrick.getPosition()
 			ls = lBrick.getSize()
 
@@ -199,8 +198,8 @@ class BrickLayouter extends Layouter
 			yMaxInBrick = lp.y + ls.y <= p.y + s.y
 
 			if not (xMinInBrick and xMaxInBrick and yMinInBrick and yMaxInBrick)
-				sameSize = false
+				return false
 
-		return sameSize
+		return true
 
 module.exports = BrickLayouter

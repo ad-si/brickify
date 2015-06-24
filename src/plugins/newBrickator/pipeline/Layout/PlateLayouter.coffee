@@ -14,10 +14,10 @@ class PlateLayouter extends Layouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
-	isBrickLayouter: ->
+	_isBrickLayouter: ->
 		return false
 
-	isPlateLayouter: ->
+	_isPlateLayouter: ->
 		return true
 
 	# Searches for mergeable neighbors in [x-, x+, y-, y+] direction
@@ -151,7 +151,7 @@ class PlateLayouter extends Layouter
 		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
 			return unless brick?
-			merged = @mergeLoop brick, bricksToLayout
+			merged = @_mergeLoop brick, bricksToLayout
 			if merged
 				finalPassMerges++
 

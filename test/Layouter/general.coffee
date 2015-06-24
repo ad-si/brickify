@@ -11,7 +11,7 @@ describe 'Layouter', ->
 
 		grid.initializeBricks()
 
-		brick = layouter.chooseRandomBrick(grid.getAllBricks())
+		brick = layouter._chooseRandomBrick(grid.getAllBricks())
 		position = brick.getPosition()
 		expect(position.x).to.equal(0)
 		expect(position.y).to.equal(0)

@@ -22,10 +22,10 @@ class LayoutOptimizer
 			bricks.forEach (brick) ->
 				brick.label = null
 
-			numberOfComponents = @findConnectedComponents bricks
+			numberOfComponents = @_findConnectedComponents bricks
 			log.debug '\t# of components: ', numberOfComponents
 
-			bricksToSplit = @findBricksOnComponentInterfaces bricks
+			bricksToSplit = @_findBricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
 			if bricksToSplit.size is 0
@@ -37,7 +37,7 @@ class LayoutOptimizer
 		return Promise.resolve grid
 
 	# connected components using the connected component labelling algo
-	findConnectedComponents: (bricks) =>
+	_findConnectedComponents: (bricks) =>
 		labels = []
 		id = 0
 
@@ -78,7 +78,7 @@ class LayoutOptimizer
 
 		return numberOfComponents
 
-	findBricksOnComponentInterfaces: (bricks) =>
+	_findBricksOnComponentInterfaces: (bricks) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->

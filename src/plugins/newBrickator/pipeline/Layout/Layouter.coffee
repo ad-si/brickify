@@ -21,17 +21,17 @@ class Layouter
 		return {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
-			brick = @chooseRandomBrick bricksToLayout
+			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
 				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
-			if @isPlateLayouter() and brick.getSize().z is 3
+			if @_isPlateLayouter() and brick.getSize().z is 3
 				bricksToLayout.delete brick
 				return Promise.resolve {grid: grid} if bricksToLayout.size is 0
 				continue
 
-			merged = @mergeLoop brick, bricksToLayout
+			merged = @_mergeLoop brick, bricksToLayout
 
 			if not merged
 				numRandomChoicesWithoutMerge++
@@ -42,7 +42,7 @@ class Layouter
 				else
 					continue # randomly choose a new brick
 
-			if @isBrickLayouter()
+			if @_isBrickLayouter()
 				# if brick is 1x1x3, 1x2x3 or instable after mergeLoop
 				# break it into pieces
 				if brick.isSize(1, 1, 3) or brick.getStability() is 0 or
@@ -56,7 +56,7 @@ class Layouter
 		return Promise.resolve {grid: grid}
 
 	# chooses a random brick out of the set
-	chooseRandomBrick: (setOfBricks) =>
+	_chooseRandomBrick: (setOfBricks) =>
 		if setOfBricks.size is 0
 			return null
 
@@ -73,7 +73,7 @@ class Layouter
 
 		return brick
 
-	mergeBricksAndUpdateGraphConnections: (brick,
+	_mergeBricksAndUpdateGraphConnections: (brick,
 			mergeNeighbors, bricksToLayout) =>
 		mergeNeighbors.forEach (neighborToMergeWith) ->
 			bricksToLayout.delete neighborToMergeWith
@@ -81,7 +81,7 @@ class Layouter
 		return brick
 
 
-	mergeLoop: (brick, bricksToLayout) =>
+	_mergeLoop: (brick, bricksToLayout) =>
 		merged = false
 
 		mergeableNeighbors = @_findMergeableNeighbors brick
@@ -91,7 +91,7 @@ class Layouter
 			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
-			@mergeBricksAndUpdateGraphConnections brick,
+			@_mergeBricksAndUpdateGraphConnections brick,
 				neighborsToMergeWith, bricksToLayout
 
 			if not brick.isValid()

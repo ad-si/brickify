@@ -14,10 +14,10 @@ class BrickLayouter extends Layouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
-	isBrickLayouter: ->
+	_isBrickLayouter: ->
 		return true
 
-	isPlateLayouter: ->
+	_isPlateLayouter: ->
 		return false
 
 	_findMergeableNeighbors: (brick) =>

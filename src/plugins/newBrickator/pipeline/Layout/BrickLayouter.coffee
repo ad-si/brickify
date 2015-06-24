@@ -149,7 +149,7 @@ class BrickLayouter extends Layouter
 		return null if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
 
 		# check if any slot is empty
-		return null if brick.getStabilityInZDir(direction) != 1
+		return null if brick.fractionOfConnectionsInZDirection(direction) != 1
 
 		# then check if size of second layer fits
 		# if size fits and no slot empty -> position fits
@@ -163,7 +163,7 @@ class BrickLayouter extends Layouter
 			thirdLayerBricks = new Set()
 			sLIterator = secondLayerBricks.values()
 			while sLBrick = sLIterator.next().value
-				return unless sLBrick.getStabilityInZDir(direction) is 1
+				return unless sLBrick.fractionOfConnectionsInZDirection(direction) is 1
 				neighbors = sLBrick.getNeighbors(direction)
 				neighborsIter = neighbors.values()
 				while nBrick = neighborsIter.next().value

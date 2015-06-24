@@ -24,7 +24,7 @@ class LayoutOptimizer
 			numberOfComponents = @_findConnectedComponents bricks
 			log.debug '\t# of components: ', numberOfComponents
 
-			bricksToSplit = @_findBricksOnComponentInterfaces bricks
+			bricksToSplit = @_bricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
 			if bricksToSplit.size is 0
@@ -66,8 +66,6 @@ class LayoutOptimizer
 		# second pass - applying labels
 		bricks.forEach (brick) ->
 			brick.label = labels[brick.label]
-			if brick.label is null
-				console.log 'null brick in algo', brick
 
 		# count number of components
 		finalLabels = new Set()
@@ -77,7 +75,7 @@ class LayoutOptimizer
 
 		return numberOfComponents
 
-	_findBricksOnComponentInterfaces: (bricks) =>
+	_bricksOnComponentInterfaces: (bricks) =>
 		bricksToSplit = new Set()
 
 		bricks.forEach (brick) ->
@@ -132,8 +130,8 @@ class LayoutOptimizer
 		@plateLayouter.layout grid, newBricks
 		.then ->
 			return {
-			removedBricks: bricksToSplit
-			newBricks: newBricks
+				removedBricks: bricksToSplit
+				newBricks: newBricks
 			}
 
 	# splits each brick in bricks to split, returns all newly generated

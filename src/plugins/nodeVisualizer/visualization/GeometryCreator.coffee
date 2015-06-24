@@ -102,9 +102,9 @@ module.exports = class GeometryCreator
 			z: brickDimensions.z * @grid.spacing.z
 		}
 
-		ident = @_getHash brickDimensions
-		if @brickGeometryCache[ident]?
-			return @brickGeometryCache[ident]
+		dimensionsHash = @_getHash brickDimensions
+		if @brickGeometryCache[dimensionsHash]?
+			return @brickGeometryCache[dimensionsHash]
 
 		brickGeometry = new THREE.BoxGeometry(
 			worldBrickSize.x
@@ -112,15 +112,15 @@ module.exports = class GeometryCreator
 			worldBrickSize.z
 		)
 
-		@brickGeometryCache[ident] = brickGeometry
+		@brickGeometryCache[dimensionsHash] = brickGeometry
 		return brickGeometry
 
 	_getStudsGeometry: (brickDimensions, worldBrickSize, cache, geometry) =>
 		# returns studs for the given brick size
 
-		ident = @_getHash brickDimensions
-		if cache[ident]?
-			return cache[ident]
+		dimensionsHash = @_getHash brickDimensions
+		if cache[dimensionsHash]?
+			return cache[dimensionsHash]
 
 		studs = new THREE.Geometry()
 
@@ -138,15 +138,15 @@ module.exports = class GeometryCreator
 		bufferGeometry = new THREE.BufferGeometry()
 		bufferGeometry.fromGeometry studs
 
-		cache[ident] = bufferGeometry
+		cache[dimensionsHash] = bufferGeometry
 		return bufferGeometry
 
 	_getPlaneGeometry: (brickDimensions, worldBrickSize) =>
 		# returns studs for the given brick size
 
-		ident = @_getHash brickDimensions
-		if @planeGeometryCache[ident]?
-			return @planeGeometryCache[ident]
+		dimensionsHash = @_getHash brickDimensions
+		if @planeGeometryCache[dimensionsHash]?
+			return @planeGeometryCache[dimensionsHash]
 
 		studs = new THREE.PlaneBufferGeometry(
 			@grid.spacing.x * brickDimensions.x
@@ -158,7 +158,7 @@ module.exports = class GeometryCreator
 		translation.makeTranslation(0, 0, tz)
 		studs.applyMatrix translation
 
-		@planeGeometryCache[ident] = studs
+		@planeGeometryCache[dimensionsHash] = studs
 		return studs
 
 	_getHash: (dimensions) ->

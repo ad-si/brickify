@@ -225,9 +225,9 @@ module.exports = class Coloring
 			return brick.getVisualBrick().textureMaterial
 
 		size = if brick then brick.getSize() else {x: 1, y: 1}
-		ident = @_getHash size
-		if @textureMaterialCache[ident]?
-			return @textureMaterialCache[ident]
+		dimensionsHash = @_getHash size
+		if @textureMaterialCache[dimensionsHash]?
+			return @textureMaterialCache[dimensionsHash]
 
 		studsTexture = @studTexture.clone()
 		studsTexture.needsUpdate = true
@@ -239,7 +239,7 @@ module.exports = class Coloring
 			opacity: 0.2
 		)
 
-		@textureMaterialCache[ident] = textureMaterial
+		@textureMaterialCache[dimensionsHash] = textureMaterial
 		return textureMaterial
 
 	_getHash: (dimensions) ->

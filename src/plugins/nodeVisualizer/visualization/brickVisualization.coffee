@@ -66,15 +66,15 @@ class BrickVisualization
 	showVoxelAndBricks: =>
 		@bricksSubnode.visible  = true
 
-	# updates brick and voxel visualization
+	# Updates brick and voxel visualization
 	updateVisualization: (coloring = @defaultColoring, recreate = false) =>
-		# delete temporary voxels
+		# Delete temporary voxels
 		@temporaryVoxels.children = []
 
 		if recreate
 			@bricksSubnode.children = []
 		else
-			# throw out all visual bricks that have no valid linked brick
+			# Throw out all visual bricks that have no valid linked brick
 			for layer in @bricksSubnode.children
 				deletionList = []
 				for visualBrick in layer.children
@@ -85,16 +85,16 @@ class BrickVisualization
 						@_setStudVisibility visualBrick.getBrick()
 
 				for delBrick in deletionList
-					# remove from scenegraph
+					# Remove from scenegraph
 					layer.remove delBrick
-					# delete reference from datastructure brick
+					# Delete reference from datastructure brick
 					if delBrick.brick?
 						delBrick.brick.setVisualBrick null
 
 		# Recreate visible bricks for all bricks in the datastructure that
 		# have no linked brick
 
-		# sort layerwise for build view
+		# Sort layerwise for build view
 		brickLayers = []
 		maxZ = 0
 
@@ -120,7 +120,7 @@ class BrickVisualization
 			layerObject = @bricksSubnode.children[z]
 
 			for brick in brickLayer
-				# create visual brick
+				# Create visual brick
 				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
 					brick.getPosition()
@@ -129,16 +129,16 @@ class BrickVisualization
 					@fidelity
 				)
 
-				# link data <-> visuals
+				# Link data <-> visuals
 				brick.setVisualBrick threeBrick
 
-				# add to scene graph
+				# Add to scene graph
 				layerObject.add threeBrick
 
 				# Set stud visibility
 				@_setStudVisibility brick
 
-		# if this coloring differs from the last used coloring, go through
+		# If this coloring differs from the last used coloring, go through
 		# all visible bricks to update their material
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
@@ -149,13 +149,11 @@ class BrickVisualization
 
 		@unhighlightBigBrush()
 
-		# show not filled lego shape as outline
+		# Show not filled lego shape as outline
 		outlineCoords = @printVoxels.map (voxel) -> voxel.position
 		@voxelWireframe.createWireframe outlineCoords
 
 		@_visibleChildLayers = null
-
-		#ToDo: hide studs when brick is completely below other brick
 
 	_setStudVisibility: (brick) ->
 		if brick.isCoveredOnTop()
@@ -180,7 +178,7 @@ class BrickVisualization
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 
 	showBrickLayer: (layer) =>
-		# hide highlight when in build mode
+		# Hide highlight when in build mode
 		@_highlightVoxel.visible = false
 
 		visibleLayers = @_getVisibleLayers()
@@ -216,9 +214,9 @@ class BrickVisualization
 			return layer.children.length > 0
 		return @_visibleChildLayers
 
-	# highlights the voxel below mouse and returns it
+	# Highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
-		# invert type, because if we are highlighting a 'lego' voxel
+		# Invert type, because if we are highlighting a 'lego' voxel,
 		# we want to display it as 'could be 3d printed'
 		voxelType = '3d'
 		voxelType = 'lego' if type == '3d'
@@ -237,7 +235,7 @@ class BrickVisualization
 			@_highlightVoxel.setMaterial hVoxel
 			@_highlightBigBrush voxel, hBox if bigBrush
 		else
-			# clear highlight if no voxel is below mouse
+			# Clear highlight if no voxel is below mouse
 			@_highlightVoxel.visible = false
 			@unhighlightBigBrush()
 
@@ -263,9 +261,9 @@ class BrickVisualization
 	unhighlightBigBrush: =>
 		@bigBrushHighlight?.visible = false
 
-	# makes the voxel below mouse to be 3d printed
+	# Makes the voxel below mouse to be 3d printed
 	makeVoxel3dPrinted: (event, selectedNode, bigBrush) =>
-		# hide highlight voxel since it will be made invisible
+		# Hide highlight voxel since it will be made invisible
 		@_highlightVoxel.visible = false
 
 		if bigBrush
@@ -277,7 +275,7 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.make3dPrinted()
-			# show studs of brick below
+			# Show studs of brick below
 			brickBelow = voxel.neighbors.Zm?.brick?.getVisualBrick()
 			if brickBelow?
 				brickBelow.setStudVisibility true
@@ -287,7 +285,7 @@ class BrickVisualization
 				visualBrick = voxel.brick.getVisualBrick()
 				if not visualBrick.hasBeenSplit
 					voxel.brick.forEachVoxel (voxel) =>
-						# give this brick a 1x1 stud texture
+						# Give this brick a 1x1 stud texture
 						visualBrick.materials.textureStuds =
 							@defaultColoring.getTextureMaterialForBrick()
 						temporaryVoxel = @geometryCreator.getBrick(
@@ -300,7 +298,7 @@ class BrickVisualization
 						@temporaryVoxels.add temporaryVoxel
 					visualBrick.hasBeenSplit = true
 					visualBrick.visible = false
-			# hide visual voxels for 3d printed geometry
+			# Hide visual voxels for 3d printed geometry
 			for temporaryVoxel in @temporaryVoxels.children
 				if temporaryVoxel.voxelPosition == voxel.position
 					temporaryVoxel.visible = false
@@ -326,9 +324,9 @@ class BrickVisualization
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
 		@voxelSelector.clearSelection()
 
-	# makes the voxel below mouse to be made out of lego
+	# Makes the voxel below mouse to be made out of lego
 	makeVoxelLego: (event, selectedNode, bigBrush) =>
-		# hide highlight
+		# Hide highlight
 		@_highlightVoxel.visible = false
 
 		if bigBrush
@@ -369,7 +367,7 @@ class BrickVisualization
 		voxel.make3dPrinted() for voxel in @voxelSelector.touchedVoxels
 		@voxelSelector.clearSelection()
 
-	# clears the selection and updates the possibleLegoWireframe
+	# Clears the selection and updates the possibleLegoWireframe
 	updateModifiedVoxels: =>
 		@printVoxels = @printVoxels
 			.concat @voxelSelector.touchedVoxels

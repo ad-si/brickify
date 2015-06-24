@@ -21,15 +21,15 @@ piwikStatInterval = 20
 ###
 class FidelityControl
 	@fidelityLevels = [
-		'DefaultLow',
-		'DefaultMedium',
-		'DefaultHigh',
-		'PipelineLow',
-		'PipelineMedium',
-		'PipelineHigh',
+		'DefaultLow'
+		'DefaultMedium'
+		'DefaultHigh'
+		'PipelineLow'
+		'PipelineMedium'
+		'PipelineHigh'
 		'PipelineUltra'
 	]
-	@minimalPipelineLevel = 3
+	@minimalPipelineLevel = @fidelityLevels.indexOf 'PipelineLow'
 
 	init: (@bundle) =>
 		@pluginHooks = @bundle.pluginHooks
@@ -124,30 +124,21 @@ class FidelityControl
 
 		# Increase fidelity
 		@currentFidelityLevel++
-		@pluginHooks.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
-		)
-		@bundle.renderer.setFidelity(
-			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
-		)
-
-		# Enable pipeline
-		if @currentFidelityLevel >= FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = true
+		@_setFidelity()
 
 	_decreaseFidelity: =>
 		# Decrease fidelity
 		@currentFidelityLevel--
+		@_setFidelity()
+
+	_setFidelity: =>
 		@pluginHooks.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
+
 		@bundle.renderer.setFidelity(
 			@currentFidelityLevel, FidelityControl.fidelityLevels, {}
 		)
-
-		# Disable pipeline
-		if @currentFidelityLevel < FidelityControl.minimalPipelineLevel
-			@bundle.renderer.pipelineEnabled = false
 
 	getHotkeys: =>
 		return {

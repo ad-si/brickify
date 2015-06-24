@@ -81,7 +81,7 @@ class Renderer
 					@ssaoTarget.quadScene, @camera, @ssaoBlurTarget.renderTarget, true
 				)
 
-				# Take the ssao values and render a gaussed version on the screen
+				# Take the SSAO values and render a gaussed version on the screen
 				@threeRenderer.render(
 					@ssaoBlurTarget.quadScene, @camera
 				)
@@ -146,7 +146,7 @@ class Renderer
 		not renderTargetHelper.renderTargetHasRightSize(
 			@pipelineRenderTarget.renderTarget, @threeRenderer
 		)
-			# Create the render target that renders everything antialiased to the screen
+			# Create the render target that renders everything anti-aliased to the screen
 			shaderParts = []
 			if @usePipelineFxaa
 				shaderParts.push new FxaaShaderPart()
@@ -173,7 +173,7 @@ class Renderer
 				if @ssaoBlurTarget?
 					renderTargetHelper.deleteRenderTarget @ssaoBlurTarget, @threeRenderer
 
-				# Clone the pipeline Rendertarget:
+				# Clone the pipeline render target:
 				# use this render target to create SSAO values out of scene
 				@ssaoTarget = renderTargetHelper.cloneRenderTarget(
 					@pipelineRenderTarget,
@@ -192,15 +192,9 @@ class Renderer
 				)
 
 	setFidelity: (fidelityLevel, availableLevels) =>
+		@pipelineEnabled = fidelityLevel >= availableLevels.indexOf 'PipelineLow'
+
 		if @pipelineEnabled
-			# Determine whether to use bigger render targets (super sampling)
-			if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
-				@useBigRendertargets = true
-			else
-				@useBigRendertargets = false
-
-			renderTargetHelper.configureSize @useBigRendertargets
-
 			# Determine whether to use FXAA
 			if fidelityLevel >= availableLevels.indexOf 'PipelineMedium'
 				# Only do something when FXAA is not already used
@@ -212,20 +206,24 @@ class Renderer
 					@usePipelineFxaa = false
 					@pipelineRenderTarget = null
 
-			# Determine wether to use SSAO
+			# Determine whether to use bigger render targets (super sampling)
+			@useBigRendertargets =
+				fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+
+			renderTargetHelper.configureSize @useBigRendertargets
+
+			# Determine whether to use SSAO
 			if fidelityLevel >= availableLevels.indexOf 'PipelineUltra'
 				# Only do something when SSAO is not already used
 				if not @usePipelineSsao
 					@usePipelineSsao = true
 
-					if @pipelineRenderTarget?
-						@pipelineRenderTarget.dirty = true
+					@pipelineRenderTarget?.dirty = true
 			else
 				if @usePipelineSsao
 					@usePipelineSsao = false
 
-					if @pipelineRenderTarget?
-						@pipelineRenderTarget.dirty = true
+					@pipelineRenderTarget?.dirty = true
 
 	addToScene: (node) ->
 		@scene.add node

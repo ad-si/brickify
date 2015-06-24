@@ -3,10 +3,11 @@ log = require 'loglevel'
 Random = require './Random'
 DataHelper = require './DataHelper'
 
+class Layouter
+	constructor: ->
+		return
 
-class LayouterCommon
-
-	@layout: (layouter, grid, bricksToLayout) ->
+	layout: (grid, bricksToLayout) ->
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0
 		numTotalInitialBricks = 0
@@ -22,15 +23,15 @@ class LayouterCommon
 		loop
 			brick = @chooseRandomBrick bricksToLayout
 			if !brick?
-				return grid
+				return Promise.resolve {grid: grid}
 			numRandomChoices++
 
-			if layouter.isPlateLayouter() and brick.getSize().z == 3
+			if @isPlateLayouter() and brick.getSize().z == 3
 				bricksToLayout.delete brick
 				return Promise.resolve {grid: grid} if bricksToLayout.size == 0
 				continue
 
-			merged = @mergeLoop layouter, brick, bricksToLayout
+			merged = @mergeLoop brick, bricksToLayout
 
 			if not merged
 				numRandomChoicesWithoutMerge++
@@ -41,7 +42,7 @@ class LayouterCommon
 				else
 					continue # randomly choose a new brick
 
-			if layouter.isBrickLayouter()
+			if @isBrickLayouter()
 				# if brick is 1x1x3, 1x2x3 or instable after mergeLoop
 				# break it into pieces
 				if brick.isSize(1, 1, 3) or brick.getStability() == 0 or
@@ -52,10 +53,10 @@ class LayouterCommon
 					newBricks.forEach (newBrick) ->
 						bricksToLayout.add newBrick
 
-		return grid
+		return Promise.resolve {grid: grid}
 
-# chooses a random brick out of the set
-	@chooseRandomBrick: (setOfBricks) =>
+	# chooses a random brick out of the set
+	chooseRandomBrick: (setOfBricks) =>
 		if setOfBricks.size == 0
 			return null
 
@@ -72,7 +73,7 @@ class LayouterCommon
 
 		return brick
 
-	@mergeBricksAndUpdateGraphConnections: (brick,
+	mergeBricksAndUpdateGraphConnections: (brick,
 			mergeNeighbors, bricksToLayout) =>
 		mergeNeighbors.forEach (neighborToMergeWith) ->
 			bricksToLayout.delete neighborToMergeWith
@@ -80,14 +81,14 @@ class LayouterCommon
 		return brick
 
 
-	@mergeLoop: (layouter, brick, bricksToLayout) =>
+	mergeLoop: (brick, bricksToLayout) =>
 		merged = false
 
-		mergeableNeighbors = layouter._findMergeableNeighbors brick
+		mergeableNeighbors = @_findMergeableNeighbors brick
 
 		while(DataHelper.anyDefinedInArray(mergeableNeighbors))
 			merged = true
-			mergeIndex = layouter._chooseNeighborsToMergeWith mergeableNeighbors
+			mergeIndex = @_chooseNeighborsToMergeWith mergeableNeighbors
 			neighborsToMergeWith = mergeableNeighbors[mergeIndex]
 
 			@mergeBricksAndUpdateGraphConnections brick,
@@ -98,8 +99,8 @@ class LayouterCommon
 				log.warn '> Using pseudoRandom:', @pseudoRandom
 				log.warn '> current seed:', Random.getSeed()
 
-			mergeableNeighbors = layouter._findMergeableNeighbors brick
+			mergeableNeighbors = @_findMergeableNeighbors brick
 
 		return merged
 
-module.exports = LayouterCommon
+module.exports = Layouter

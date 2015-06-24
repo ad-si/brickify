@@ -4,13 +4,13 @@ Brick = require './Brick'
 Voxel = require './Voxel'
 DataHelper = require './DataHelper'
 Random = require './Random'
-Common = require './LayouterCommon'
+Layouter = require './Layouter'
 
 ###
 # @class BrickLayouter
 ###
 
-class BrickLayouter
+class BrickLayouter extends Layouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
@@ -19,10 +19,6 @@ class BrickLayouter
 
 	isPlateLayouter: ->
 		return false
-
-	layout: (grid, bricksToLayout) =>
-		grid = Common.layout @, grid, bricksToLayout
-		return Promise.resolve {grid: grid}
 
 	_findMergeableNeighbors: (brick) =>
 		mergeableNeighbors = []
@@ -94,8 +90,6 @@ class BrickLayouter
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x, size.y, size.z)
-			# check if at least half of the top and half of the bottom voxels
-			# offer connection possibilities; if not, return
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 		# check another set of voxels in merge direction, starting from mergeVoxels
@@ -118,13 +112,12 @@ class BrickLayouter
 
 		size = Voxel.sizeFromVoxels(allVoxels)
 		if Brick.isValidSize(size.x, size.y, size.z)
-			# check if at least half of the top and half of the bottom voxels
-			# offer connection possibilities; if not, return
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
 		return null
 
-
+	# check if at least half of the top and half of the bottom voxels
+	# offer connection possibilities
 	_minFractionOfConnectionsPresent: (voxels) =>
 		minFraction = .51
 		fraction = Voxel.fractionOfConnections voxels

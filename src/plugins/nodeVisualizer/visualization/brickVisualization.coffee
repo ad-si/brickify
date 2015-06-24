@@ -11,8 +11,8 @@ VoxelSelector = require '../VoxelSelector'
 # @class BrickVisualization
 ###
 class BrickVisualization
-	constructor: (
-		@bundle,  @brickThreeNode, @brickShadowThreeNode, @defaultColoring) ->
+	constructor: (@bundle,  @brickThreeNode, @brickShadowThreeNode,
+								@defaultColoring, @fidelity) ->
 
 		@csgSubnode = new THREE.Object3D()
 		@brickThreeNode.add @csgSubnode
@@ -33,13 +33,14 @@ class BrickVisualization
 		@voxelWireframe = new VoxelWireframe(
 			@bundle, @grid, @brickShadowThreeNode, @defaultColoring
 		)
-		@geometryCreator = new GeometryCreator(@grid)
+		@geometryCreator = new GeometryCreator(@bundle.globalConfig, @grid)
 		@voxelSelector = new VoxelSelector @
 
 		@_highlightVoxel = @geometryCreator.getBrick(
 			{x: 0, y: 0, z: 0},
 			{x: 1, y: 1, z: 1},
-			@defaultColoring.printHighlightMaterial
+			@defaultColoring.getHighlightMaterial '3d'
+			@fidelity
 		)
 		@_highlightVoxel.visible = false
 
@@ -119,7 +120,10 @@ class BrickVisualization
 				# create visual brick
 				materials = coloring.getMaterialsForBrick brick
 				threeBrick = @geometryCreator.getBrick(
-					brick.getPosition(), brick.getSize(), materials.color
+					brick.getPosition()
+					brick.getSize()
+					materials
+					@fidelity
 				)
 
 				# link data <-> visuals
@@ -133,8 +137,8 @@ class BrickVisualization
 		if @_oldColoring != coloring
 			for layer in @bricksSubnode.children
 				for visualBrick in layer.children
-					material = coloring.getMaterialsForBrick visualBrick.brick
-					visualBrick.setMaterial material.color
+					materials = coloring.getMaterialsForBrick visualBrick.brick
+					visualBrick.setMaterial materials
 		@_oldColoring = coloring
 
 		@unhighlightBigBrush()
@@ -178,11 +182,11 @@ class BrickVisualization
 
 	_makeLayerGrayscale: (layer) ->
 		for threeBrick in layer.children
-			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.gray
+			threeBrick.setGray true
 
 	_makeLayerColored: (layer) ->
 		for threeBrick in layer.children
-			threeBrick.setMaterial threeBrick.brick.visualizationMaterials.color
+			threeBrick.setGray false
 
 	showAllBrickLayers: =>
 		for layer in @bricksSubnode.children
@@ -207,7 +211,7 @@ class BrickVisualization
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
 			)
-			@_highlightVoxel.material = hVoxel
+			@_highlightVoxel.setMaterial hVoxel
 			@_highlightBigBrush voxel, hBox if bigBrush
 		else
 			# clear highlight if no voxel is below mouse
@@ -256,8 +260,14 @@ class BrickVisualization
 				visualBrick = voxel.brick.getVisualBrick()
 				if not visualBrick.hasBeenSplit
 					voxel.brick.forEachVoxel (voxel) =>
+						# give this brick a 1x1 stud texture
+						visualBrick.materials.textureStuds =
+							@defaultColoring.getTextureMaterialForBrick()
 						temporaryVoxel = @geometryCreator.getBrick(
-							voxel.position, {x: 1, y: 1, z: 1}, visualBrick.material
+							voxel.position
+							{x: 1, y: 1, z: 1}
+							visualBrick.materials
+							@fidelity
 						)
 						temporaryVoxel.voxelPosition = voxel.position
 						@temporaryVoxels.add temporaryVoxel
@@ -306,7 +316,10 @@ class BrickVisualization
 
 			# Create a visible temporary voxel at this position
 			temporaryVoxel = @geometryCreator.getBrick(
-				voxel.position, {x: 1, y: 1, z: 1}, @defaultColoring.selectedMaterial
+				voxel.position
+				{x: 1, y: 1, z: 1}
+				@defaultColoring.getSelectedMaterials()
+				@fidelity
 			)
 			temporaryVoxel.voxelPosition = voxel.position
 			@temporaryVoxels.add temporaryVoxel
@@ -337,5 +350,12 @@ class BrickVisualization
 		return @voxelSelector.clearSelection()
 
 	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
+
+	setFidelity: (@fidelity) =>
+		@_highlightVoxel?.setFidelity @fidelity
+
+		for layer in @bricksSubnode.children
+			for threeBrick in layer.children
+				threeBrick.setFidelity @fidelity
 
 module.exports = BrickVisualization

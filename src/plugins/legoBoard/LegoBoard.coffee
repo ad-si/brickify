@@ -6,10 +6,13 @@
 ###
 
 THREE = require 'three'
+threeConverter = require '../../client/threeConverter'
 modelCache = require '../../client/modelLoading/modelCache'
 globalConfig = require '../../common/globals.yaml'
 RenderTargetHelper = require '../../client/rendering/renderTargetHelper'
 stencilBits = require '../../client/rendering/stencilBits'
+
+dimension = 400
 
 module.exports = class LegoBoard
 	# Store the global configuration for later use by init3d
@@ -19,43 +22,77 @@ module.exports = class LegoBoard
 
 	# Load the board
 	init3d: (@threejsNode) =>
-		@highQualMode = false
+		@fidelity = 0
 		@usePipeline = false
 		@isVisible = true
 		@isScreenshotMode = no
 
 		@_initMaterials()
+		@_initbaseplateBox()
+		@_initStudGeometries()
 
+		# create scene for pipeline
+		@pipelineScene = @bundle.renderer.getDefaultScene()
+
+	_initbaseplateBox: =>
 		# Create baseplate with 5 faces in each direction
-		box = new THREE.BoxGeometry(400, 400, 8, 5, 5)
-		@baseplateBox = new THREE.Mesh(box, @baseplateMaterial)
+		box = new THREE.BoxGeometry(dimension, dimension, 8, 5, 5)
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry box
+		@baseplateBox = new THREE.Mesh(bufferGeometry, @baseplateMaterial)
 		@baseplateBox.translateZ -4
 		@threejsNode.add @baseplateBox
 
-		# Create studs
-		@studsContainer = new THREE.Object3D()
-		@threejsNode.add @studsContainer
+	_initStudGeometries: =>
+		@studsContainer = @_generateStuds 7
 		@studsContainer.visible = false
+		@threejsNode.add @studsContainer
 
-		modelCache
-		.request('1336affaf837a831f6b580ec75c3b73a')
-		.then (model) =>
-			geo = model.convertToThreeGeometry()
-			for x in [-160..160] by 80
-				for y in [-160..160] by 80
-					object = new THREE.Mesh(geo, @studMaterial)
-					object.translateX x
-					object.translateY y
-					@studsContainer.add object
+		@highFiStudsContainer = @_generateStuds 42
+		@highFiStudsContainer.visible = false
+		@threejsNode.add @highFiStudsContainer
 
-		# Create scene for pipeline
-		@pipelineScene = @bundle.renderer.getDefaultScene()
+	_generateStuds: (radiusSegments) =>
+		studGeometry = new THREE.CylinderGeometry(
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.height
+			radiusSegments
+		)
+		rotation = new THREE.Matrix4()
+		rotation.makeRotationX(1.571)
+		studGeometry.applyMatrix(rotation)
+
+		translation = new THREE.Matrix4()
+		translation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
+		studGeometry.applyMatrix translation
+
+		studsGeometry = new THREE.Geometry()
+		xSpacing = @globalConfig.gridSpacing.x
+		ySpacing = @globalConfig.gridSpacing.y
+		studsGeometrySize = 80
+		for x in [0...studsGeometrySize] by xSpacing
+			for y in [0...studsGeometrySize] by ySpacing
+				translation.makeTranslation x, y, 0
+				studsGeometry.merge studGeometry, translation
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry studsGeometry
+
+		container = new THREE.Object3D()
+		for x in [(-dimension + xSpacing) / 2 ... dimension / 2] by studsGeometrySize
+			for y in [(-dimension + ySpacing) / 2 ... dimension / 2] by studsGeometrySize
+				mesh = new THREE.Mesh(bufferGeometry, @studMaterial)
+				mesh.translateX x
+				mesh.translateY y
+				container.add mesh
+
+		return container
 
 	_initMaterials: =>
 		studTexture = THREE.ImageUtils.loadTexture('img/baseplateStud.png')
 		studTexture.wrapS = THREE.RepeatWrapping
 		studTexture.wrapT = THREE.RepeatWrapping
-		studTexture.repeat.set 50, 50
+		studTexture.repeat.set dimension / 8, dimension / 8
 
 		@baseplateMaterial = new THREE.MeshLambertMaterial(
 			color: globalConfig.colors.basePlate
@@ -89,9 +126,9 @@ module.exports = class LegoBoard
 		if camera.position.z < 0
 			@baseplateBox.material = @baseplateTransparentMaterial
 			@studsContainer.visible = false
+			@highFiStudsContainer.visible = false
 		else
-			@baseplateBox.material = @currentBaseplateMaterial
-			@studsContainer.visible = true if @highQualMode
+			@_updateFidelitySettings()
 
 	onPaint: (threeRenderer, camera, target) =>
 		return if not @isVisible or @isScreenshotMode
@@ -152,43 +189,51 @@ module.exports = class LegoBoard
 			@threejsNode.visible = @isVisible and not @isScreenshotMode
 
 		# Determine whether to show or hide studs
-		if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
-			@highQualMode = true
-
-			# Show studs
-			@studsContainer.visible = true
-			# Remove texture because we have physical studs
-			@baseplateBox.material = @baseplateMaterial
-
-			@currentBaseplateMaterial = @baseplateMaterial
+		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+			@fidelity = 2
+			@_updateFidelitySettings()
+		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+			@fidelity = 1
+			@_updateFidelitySettings()
 		else
-			@highQualMode = false
-
-			# Hide studs
-			@studsContainer.visible = false
-			# Change baseplate material to stud texture
-			@baseplateBox.material = @baseplateTexturedMaterial
-
-			@currentBaseplateMaterial = @baseplateTexturedMaterial
+			@fidelity = 0
+			@_updateFidelitySettings()
 
 		# Determine whether to use the pipeline or not
 		if fidelityLevel >= availableLevels.indexOf 'PipelineLow'
 			if not @usePipeline
 				@usePipeline = true
 
-				# Move lego board and studs from threeNode to pipeline scene
-				@threejsNode.remove @baseplateBox
-				@threejsNode.remove @studsContainer
-
-				@pipelineScene.add @baseplateBox
-				@pipelineScene.add @studsContainer
+				# move lego board and studs from threeNode to pipeline scene
+				@_moveThreeObjects @threejsNode, @pipelineScene, [
+					@baseplateBox
+					@studsContainer
+					@highFiStudsContainer
+				]
 		else
 			if @usePipeline
 				@usePipeline = false
 
-				# Move lego board and studs from pipeline to threeNode
-				@pipelineScene.remove @baseplateBox
-				@pipelineScene.remove @studsContainer
+				# move lego board and studs from pipeline to threeNode
+				@_moveThreeObjects @pipelineScene, @threejsNode, [
+					@baseplateBox
+					@studsContainer
+					@highFiStudsContainer
+				]
 
-				@threejsNode.add @baseplateBox
-				@threejsNode.add @studsContainer
+	_moveThreeObjects: (from, to, objects) ->
+		for object in objects
+			from.remove object
+			to.add object
+
+	_updateFidelitySettings: =>
+		# show studs?
+		@studsContainer.visible = @fidelity is 1
+		@highFiStudsContainer.visible = @fidelity is 2
+
+		# remove texture because we have physical studs?
+		if @fidelity is 0
+			@baseplateBox.material =  @baseplateTexturedMaterial
+		else
+			@baseplateBox.material = @baseplateMaterial
+		@currentBaseplateMaterial = @baseplateBox.material

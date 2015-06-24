@@ -3,14 +3,14 @@ log = require 'loglevel'
 Brick = require './Brick'
 Voxel = require './Voxel'
 Random = require './Random'
-Common = require './LayouterCommon'
+Layouter = require './Layouter'
 
 
 ###
 # @class PlateLayouter
 ###
 
-class PlateLayouter
+class PlateLayouter extends Layouter
 	constructor: (@pseudoRandom = false, @debugMode = false) ->
 		Random.usePseudoRandom @pseudoRandom
 
@@ -19,10 +19,6 @@ class PlateLayouter
 
 	isPlateLayouter: ->
 		return true
-
-	layout: (grid, bricksToLayout) =>
-		grid = Common.layout @, grid, bricksToLayout
-		return Promise.resolve {grid: grid}
 
 	# Searches for mergeable neighbors in [x-, x+, y-, y+] direction
 	# and returns an array out of arrays of IDs for each direction
@@ -155,7 +151,7 @@ class PlateLayouter
 		finalPassMerges = 0
 		bricksToLayout.forEach (brick) =>
 			return unless brick?
-			merged = Common.mergeLoop @, brick, bricksToLayout
+			merged = @mergeLoop brick, bricksToLayout
 			if merged
 				finalPassMerges++
 

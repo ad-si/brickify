@@ -52,6 +52,7 @@ class Brick
 		for voxel in arrayOfVoxels
 			voxel.brick = @
 			@voxels.add voxel
+		@label = null
 
 	# enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>
@@ -142,6 +143,12 @@ class Brick
 	# returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
+		# checking the cache for correctness
+		if @_neighbors?[direction]?
+			@_neighbors[direction].forEach (neighbor) =>
+				if neighbor.voxels.size == 0
+					@clearNeighborsCache()
+
 		return @_neighbors[direction] if @_neighbors?[direction]?
 
 		neighbors = new Set()

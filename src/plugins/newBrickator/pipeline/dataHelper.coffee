@@ -19,9 +19,16 @@ module.exports.intersection = (set1, set2) ->
 		intersection.add element if set2.has element
 	return intersection
 
-#returns set1 \ set2
+# returns set1 \ set2
 module.exports.difference = (set1, set2) ->
 	difference = new Set()
 	set1.forEach (element) ->
 		difference.add element unless set2.has element
 	return difference
+
+module.exports.smallestElement = (set) =>
+	min = null
+	set.forEach (element) ->
+		min ?= element
+		min = element if element < min
+	return min

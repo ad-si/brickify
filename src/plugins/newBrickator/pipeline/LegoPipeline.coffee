@@ -46,7 +46,7 @@ module.exports = class LegoPipeline
 				return lastResult.grid.initializeBricks()
 
 		@pipelineSteps.push
-			name: 'Layout 3L Bricks'
+			name: 'Layout Bricks'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
 				return @brickLayouter.layout lastResult.grid

@@ -12,10 +12,9 @@ class LayoutOptimizer
 		Random.usePseudoRandom @pseudoRandom
 
 	optimizeLayoutStability: (grid) =>
-		minComponents = null
 		maxNumPasses = 15
 
-		for pass in [0..maxNumPasses]
+		for pass in [0...maxNumPasses]
 			bricks = grid.getAllBricks()
 			log.debug '\t# of bricks: ', bricks.size
 

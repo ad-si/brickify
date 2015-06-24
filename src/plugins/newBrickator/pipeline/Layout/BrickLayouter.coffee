@@ -11,8 +11,8 @@ Layouter = require './Layouter'
 ###
 
 class BrickLayouter extends Layouter
-	constructor: (@pseudoRandom = false, @debugMode = false) ->
-		Random.usePseudoRandom @pseudoRandom
+	constructor: (pseudoRandom) ->
+		Random.usePseudoRandom pseudoRandom
 
 	_isBrickLayouter: ->
 		return true

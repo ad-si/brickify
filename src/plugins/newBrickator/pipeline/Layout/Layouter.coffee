@@ -47,7 +47,7 @@ class Layouter
 				# break it into pieces
 				if brick.isSize(1, 1, 3) or brick.getStability() is 0 or
 				brick.isSize(1, 2, 3)
-					# TODO, dont split up if all neighbors are 3L already
+					# TODO dont split up if all neighbors are Bricks (z=3) already
 					newBricks = brick.splitUp()
 					bricksToLayout.delete brick
 					newBricks.forEach (newBrick) ->

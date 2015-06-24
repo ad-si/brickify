@@ -358,7 +358,7 @@ class NodeVisualizer
 			cachedData.stabilityViewEnabled = false
 
 	_applyBuildMode: (cachedData) =>
-		# show bricks and csg
+		# Show bricks and csg
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 		cachedData.brickVisualization.setHighlightVoxelVisibility false
 
@@ -372,6 +372,13 @@ class NodeVisualizer
 		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
 
+	# Returns the amount of LEGO-Layers that can be shown in build mode.
+	# Layers without bricks are discarded
+	getNumberOfBuildLayers: (selectedNode) =>
+		return @_getCachedData(selectedNode)
+			.then (cachedData) ->
+				return cachedData.brickVisualization.getNumberOfVisibleLayers()
+
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
@@ -382,7 +389,7 @@ class NodeVisualizer
 				gridLayer = minLayer + layer - 1
 				# If there is 3D print below first lego layer, show lego starting
 				# with layer 1 and show only 3D print in first instruction layer
-				gridLayer -= 1 if minLayer > 0
+				gridLayer -= 2 if minLayer > 0
 				cachedData.brickVisualization.showBrickLayer gridLayer
 
 	_updateBrickCount: (bricks) =>

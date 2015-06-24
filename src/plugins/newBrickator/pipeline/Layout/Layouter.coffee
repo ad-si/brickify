@@ -18,7 +18,7 @@ class Layouter
 
 		numTotalInitialBricks += bricksToLayout.size
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
-		return {grid: grid} unless numTotalInitialBricks > 0
+		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
 		loop
 			brick = @_chooseRandomBrick bricksToLayout

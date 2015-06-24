@@ -96,7 +96,7 @@ class Layouter
 
 			if not brick.isValid()
 				log.warn 'Invalid brick: ', brick
-				log.warn '> Using pseudoRandom:', @pseudoRandom
+				log.warn '> Using pseudoRandom:', Random.usePseudoRandom
 				log.warn '> current seed:', Random.getSeed()
 
 			mergeableNeighbors = @_findMergeableNeighbors brick

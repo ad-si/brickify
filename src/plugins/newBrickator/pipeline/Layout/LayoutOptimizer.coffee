@@ -8,8 +8,8 @@ Random = require '../Random'
 
 class LayoutOptimizer
 	constructor: (@brickLayouter, @plateLayouter,
-								@pseudoRandom = false, @debugMode = false) ->
-		Random.usePseudoRandom @pseudoRandom
+								pseudoRandom = false) ->
+		Random.usePseudoRandom pseudoRandom
 
 	optimizeLayoutStability: (grid) =>
 		maxNumPasses = 15

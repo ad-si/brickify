@@ -147,9 +147,10 @@ class Brick
 		if @_neighbors?[direction]?
 			@_neighbors[direction].forEach (neighbor) =>
 				if neighbor.voxels.size == 0
-					#log.warn 'got outdated neighbor from cache'
-					#log.warn 'neighbor', neighbor
-					#log.warn 'from brick:', @
+					###
+					log.warn "got outdated neighbor
+						from cache\nneighbor', #{neighbor}\nfrom brick #{@}"
+					###
 					@clearNeighborsCache()
 
 		return @_neighbors[direction] if @_neighbors?[direction]?

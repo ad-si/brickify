@@ -11,7 +11,7 @@ Layouter = require './Layouter'
 ###
 
 class PlateLayouter extends Layouter
-	constructor: (pseudoRandom) ->
+	constructor: (pseudoRandom = false) ->
 		Random.usePseudoRandom pseudoRandom
 
 	_isBrickLayouter: ->

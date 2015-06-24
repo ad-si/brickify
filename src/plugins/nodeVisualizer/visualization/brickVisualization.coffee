@@ -39,7 +39,7 @@ class BrickVisualization
 		@_highlightVoxel = @geometryCreator.getBrick(
 			{x: 0, y: 0, z: 0},
 			{x: 1, y: 1, z: 1},
-			@defaultColoring.getHighlightMaterial '3d'
+			@defaultColoring.getHighlightMaterial('3d').voxel
 			@fidelity
 		)
 		@_highlightVoxel.visible = false
@@ -147,6 +147,8 @@ class BrickVisualization
 		outlineCoords = @printVoxels.map (voxel) -> voxel.position
 		@voxelWireframe.createWireframe outlineCoords
 
+		@_visibleChildLayers = null
+
 		#ToDo: hide studs when brick is completely below other brick
 
 	setPossibleLegoBoxVisibility: (isVisible) =>
@@ -169,8 +171,9 @@ class BrickVisualization
 		# hide highlight when in build mode
 		@_highlightVoxel.visible = false
 
-		for i in [0..@bricksSubnode.children.length - 1] by 1
-			threeLayer = @bricksSubnode.children[i]
+		visibleLayers = @_getVisibleLayers()
+		for i in [0..visibleLayers.length - 1] by 1
+			threeLayer = visibleLayers[i]
 			if i <= layer
 				threeLayer.visible = true
 				if i < layer
@@ -189,9 +192,17 @@ class BrickVisualization
 			threeBrick.setGray false
 
 	showAllBrickLayers: =>
-		for layer in @bricksSubnode.children
+		for layer in @_getVisibleLayers()
 			layer.visible = true
 			@_makeLayerColored layer
+
+	getNumberOfVisibleLayers: =>
+		return @_getVisibleLayers().length
+
+	_getVisibleLayers: =>
+		@_visibleChildLayers ?= @bricksSubnode.children.filter (layer) ->
+			return layer.children.length > 0
+		return @_visibleChildLayers
 
 	# highlights the voxel below mouse and returns it
 	highlightVoxel: (event, selectedNode, type, bigBrush) =>
@@ -219,7 +230,6 @@ class BrickVisualization
 			@unhighlightBigBrush()
 
 		return voxel
-
 
 	_highlightBigBrush: (voxel, material) =>
 		size = @voxelSelector.getBrushSize true

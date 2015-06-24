@@ -39,7 +39,7 @@ class BrickVisualization
 		@_highlightVoxel = @geometryCreator.getBrick(
 			{x: 0, y: 0, z: 0},
 			{x: 1, y: 1, z: 1},
-			@defaultColoring.getHighlightMaterial '3d'
+			@defaultColoring.getHighlightMaterial('3d').voxel
 			@fidelity
 		)
 		@_highlightVoxel.visible = false

@@ -80,6 +80,9 @@ class BrickVisualization
 				for visualBrick in layer.children
 					if not visualBrick.brick? or not visualBrick.brick.isValid()
 						deletionList.push visualBrick
+					else
+						# If this brick will not be deleted, update stud visibility
+						@_setStudVisibility visualBrick.getBrick()
 
 				for delBrick in deletionList
 					# remove from scenegraph
@@ -95,7 +98,7 @@ class BrickVisualization
 		brickLayers = []
 		maxZ = 0
 
-		@grid.getAllBricks().forEach (brick) ->
+		@grid.getAllBricks().forEach (brick) =>
 			z = brick.getPosition().z
 			maxZ = Math.max z, maxZ
 			brickLayers[z] ?= []
@@ -132,6 +135,9 @@ class BrickVisualization
 				# add to scene graph
 				layerObject.add threeBrick
 
+				# Set stud visibility
+				@_setStudVisibility brick
+
 		# if this coloring differs from the last used coloring, go through
 		# all visible bricks to update their material
 		if @_oldColoring != coloring
@@ -150,6 +156,12 @@ class BrickVisualization
 		@_visibleChildLayers = null
 
 		#ToDo: hide studs when brick is completely below other brick
+
+	_setStudVisibility: (brick) ->
+		if brick.isCoveredOnTop()
+			brick.getVisualBrick().setStudVisibility false
+		else
+			brick.getVisualBrick().setStudVisibility true
 
 	setPossibleLegoBoxVisibility: (isVisible) =>
 		@voxelWireframe.setVisibility isVisible
@@ -265,6 +277,11 @@ class BrickVisualization
 
 		for voxel in voxels
 			voxel.make3dPrinted()
+			# show studs of brick below
+			brickBelow = voxel.neighbors.Zm?.brick?.getVisualBrick()
+			if brickBelow?
+				brickBelow.setStudVisibility true
+
 			# Split visual brick into voxels (only once per brick)
 			if (voxel.brick)
 				visualBrick = voxel.brick.getVisualBrick()

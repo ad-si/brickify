@@ -93,7 +93,6 @@ class SsaoBlurPart extends ShaderPart
 				float dY = 1.0 / texHeight;
 				const int kernelSize = 4;
 				float value = 0.0;
-				int kernelIndex = 0;
 
 				for (int kernelIndex = 0; kernelIndex < 81; kernelIndex++){
 					float x = mod(float(kernelIndex), float(kernelSize*2+1))

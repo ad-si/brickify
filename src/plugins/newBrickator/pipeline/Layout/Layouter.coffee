@@ -61,10 +61,16 @@ class Layouter
 
 			if @_isBrickLayouter()
 				# If brick is 1x1x3, 1x2x3 or instable after mergeLoop
-				# break it into pieces
+				# break it into pieces ...
 				if brick.isSize(1, 1, 3) or brick.getStability() is 0 or
 				brick.isSize(1, 2, 3)
-					# TODO dont split up if all neighbors are Bricks (z=3) already
+					# .. unless it has no neighbors ..
+					neighbors = brick.getNeighborsXY()
+					continue if neighbors.size == 0
+					neighborIterator = neighbors.values()
+					#.. unless all neighbors are already bricks
+					while neighbor = neighborIterator.next().value
+						continue if neighbor.getSize().z == 1
 					newBricks = brick.splitUp()
 					bricksToLayout.delete brick
 					newBricks.forEach (newBrick) ->

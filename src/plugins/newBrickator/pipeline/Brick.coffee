@@ -18,7 +18,7 @@ class Brick
 		[2, 2, 3], [2, 3, 3], [2, 4, 3], [2, 6, 3], [2, 8, 3], [2, 10, 3]
 	]
 
-	# returns the array index of the first size that
+	# Returns the array index of the first size that
 	# matches isSizeEqual
 	@getSizeIndex: (testSize) =>
 		for size, i in @validBrickSizes
@@ -29,7 +29,7 @@ class Brick
 				return i
 		return -1
 
-	# returns true if the given size is a valid size
+	# Returns true if the given size is a valid size
 	@isValidSize: (x, y, z) ->
 		for testSize in Brick.validBrickSizes
 			if testSize[0] == x and testSize[1] == y and testSize[2] == z
@@ -38,7 +38,7 @@ class Brick
 				return true
 		return false
 
-	# returns true if the two sizes are equal in terms of
+	# Returns true if the two sizes are equal in terms of
 	# same height and same x/y dimensions which may be
 	# switched
 	@isSizeEqual: (a, b) ->
@@ -54,11 +54,11 @@ class Brick
 			@voxels.add voxel
 		@label = null
 
-	# enumerates over each voxel that belongs to this brick
+	# Enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>
 		@voxels.forEach callback
 
-	# returns the voxel the brick consists of, if it consists out
+	# Returns the voxel the brick consists of, if it consists out
 	# of one voxel. else returns null
 	getVoxel: =>
 		if @voxels.size > 1
@@ -77,14 +77,14 @@ class Brick
 				inBrick = true
 		return inBrick
 
-	# returns the {x, y, z} values of the voxel with
+	# Returns the {x, y, z} values of the voxel with
 	# the smallest x, y and z.
 	# To work properly, this function assumes that there
 	# are no holes in the brick and the brick is a proper cuboid
 	getPosition: =>
 		return @_position if @_position?
 
-		# to bring variables to correct scope
+		# To bring variables to correct scope
 		x = undefined
 		y = undefined
 		z = undefined
@@ -104,7 +104,7 @@ class Brick
 		}
 		return @_position
 
-	# returns the size of the brick
+	# Returns the size of the brick
 	getSize: =>
 		return @_size if @_size?
 		@_size = {}
@@ -140,10 +140,10 @@ class Brick
 		else
 			return false
 
-	# returns a set of all bricks that are next to this brick
+	# Returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
-		# checking the cache for correctness
+		# Checking the cache for correctness
 		if @_neighbors?[direction]?
 			@_neighbors[direction].forEach (neighbor) =>
 				if neighbor.voxels.size == 0
@@ -177,7 +177,7 @@ class Brick
 
 		return neighbors
 
-	# tells this brick to update cached neighbors indices
+	# Tells this brick to update cached neighbors indices
 	clearNeighborsCache: =>
 		@_neighbors = null
 
@@ -197,12 +197,12 @@ class Brick
 	# Splits up this brick in 1x1x1 bricks and returns them as a set
 	# This brick has no voxels after this operation
 	splitUp: =>
-		# tell neighbors to update their cache
+		# Tell neighbors to update their cache
 		for direction of Brick.direction
 			neighbors = @getNeighbors direction
 			neighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
 
-		# create new bricks
+		# Create new bricks
 		newBricks = new Set()
 
 		@forEachVoxel (voxel) ->
@@ -222,13 +222,13 @@ class Brick
 		@_visualBrick = visualBrick
 		@_visualBrick?.setBrick @
 
-	# removes all references to this brick from voxels
+	# Removes all references to this brick from voxels
 	# this brick has to be deleted after that
 	clear: =>
-		# clear references
+		# Clear references
 		@forEachVoxel (voxel) ->
 			voxel.brick = false
-		# and stored data
+		# And stored data
 		@_clearData()
 
 	_clearData: =>
@@ -239,7 +239,7 @@ class Brick
 		@setVisualBrick null
 		@voxels.clear()
 
-	# merges this brick with the other brick specified,
+	# Merges this brick with the other brick specified,
 	# the other brick gets deleted in the process
 	mergeWith: (otherBrick) =>
 		#clear size, position and neighbors (to be recomputed)
@@ -250,7 +250,7 @@ class Brick
 		# Clear reference to visual brick (needs to be recreated)
 		@setVisualBrick null
 
-		# tell neighbors to update their cache
+		# Tell neighbors to update their cache
 		for direction of Brick.direction
 			neighbors = @getNeighbors direction
 			neighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
@@ -270,14 +270,14 @@ class Brick
 			voxel.brick = @
 			@voxels.add voxel
 
-	# returns true if the size of the brick matches one of @validBrickSizes
+	# Returns true if the size of the brick matches one of @validBrickSizes
 	hasValidSize: =>
 		size = @getSize()
 		variation1 = Brick.isValidSize(size.x, size.y, size.z)
 		variation2 = Brick.isValidSize(size.y, size.x, size.z)
 		return variation1 || variation2
 
-	# returns true if the brick has no holes in it, i.e. is a cuboid
+	# Returns true if the brick has no holes in it, i.e. is a cuboid
 	# voxels marked to be 3d printed count as holes
 	isHoleFree: =>
 		voxelCheck  = {}
@@ -303,7 +303,7 @@ class Brick
 
 		return !hasHoles
 
-	# returns true if the brick is valid
+	# Returns true if the brick is valid
 	# a brick is valid when it has voxels, is hole free and
 	# has a valid size
 	isValid: =>
@@ -314,16 +314,16 @@ class Brick
 		p = @getPosition()
 		conBricks = @connectedBricks()
 
-		# possible slots top & bottom
+		# Possible slots top & bottom
 		possibleSlots = s.x * s.y * 2
 
-		# how many slots are actually connected?
+		# How many slots are actually connected?
 		usedSlots = 0
 
 		lowerZ = p.z - 1
 		upperZ = p.z + s.z
 
-		# test for each possible slot if neighbor bricks have
+		# Test for each possible slot if neighbor bricks have
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]
@@ -340,10 +340,10 @@ class Brick
 		p = @getPosition()
 		conBricks = @connectedBricks()
 
-		# possible slots top or bottom
+		# Possible slots top or bottom
 		possibleSlots = s.x * s.y
 
-		# how many slots are actually connected?
+		# How many slots are actually connected?
 		usedSlots = 0
 
 		if directionZmOrZp == Brick.direction.Zm
@@ -351,7 +351,7 @@ class Brick
 		else if directionZmOrZp == Brick.direction.Zp
 			testZ = p.z + s.z
 
-		# test for each possible slot if neighbor bricks have
+		# Test for each possible slot if neighbor bricks have
 		# voxels that belong to this slot
 		for x in [p.x...(p.x + s.x)]
 			for y in [p.y...(p.y + s.y)]

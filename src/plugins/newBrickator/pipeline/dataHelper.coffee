@@ -1,9 +1,9 @@
-# returns whether or not at least one element of the input
+# Returns whether or not at least one element of the input
 # array in not null/undefined
 module.exports.anyDefinedInArray = (array) ->
 	return array.some (entry) -> entry?
 
-# returns the union of all sets in the argument
+# Returns the union of all sets in the argument
 # input sets remain intact
 module.exports.union = (arrayOfSets) ->
 	union = new Set()
@@ -12,14 +12,14 @@ module.exports.union = (arrayOfSets) ->
 			union.add element
 	return union
 
-# returns the intersect of two sets
+# Returns the intersect of two sets
 module.exports.intersection = (set1, set2) ->
 	intersection = new Set()
 	set1.forEach (element) ->
 		intersection.add element if set2.has element
 	return intersection
 
-# returns set1 \ set2
+# Returns set1 \ set2
 module.exports.difference = (set1, set2) ->
 	difference = new Set()
 	set1.forEach (element) ->

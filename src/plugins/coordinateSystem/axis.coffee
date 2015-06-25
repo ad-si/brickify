@@ -13,7 +13,7 @@ module.exports = (threejsNode, globalConfig) ->
 		new THREE.Vector3(0, 0, 0)
 	)
 	geometryXAxis.vertices.push(
-		new THREE.Vector3( globalConfig.axisLength, 0, 0)
+		new THREE.Vector3(globalConfig.axisLength, 0, 0)
 	)
 	materialXAxis = new THREE.LineBasicMaterial(
 		color: globalConfig.colors.axisX
@@ -25,10 +25,10 @@ module.exports = (threejsNode, globalConfig) ->
 	# **Create and add y-axis**
 	geometryYAxis = new THREE.Geometry()
 	geometryYAxis.vertices.push(
-		new THREE.Vector3( 0,0, 0)
+		new THREE.Vector3(0, 0, 0)
 	)
 	geometryYAxis.vertices.push(
-		new THREE.Vector3( 0, globalConfig.axisLength, 0)
+		new THREE.Vector3(0, globalConfig.axisLength, 0)
 	)
 	materialYAxis = new THREE.LineBasicMaterial(
 		color: globalConfig.colors.axisY
@@ -40,10 +40,10 @@ module.exports = (threejsNode, globalConfig) ->
 	# **Create and add z-axis**
 	geometryZAxis = new THREE.Geometry()
 	geometryZAxis.vertices.push(
-		new THREE.Vector3( 0, 0, 0)
+		new THREE.Vector3(0, 0, 0)
 	)
 	geometryZAxis.vertices.push(
-		new THREE.Vector3( 0, 0, globalConfig.axisLength)
+		new THREE.Vector3(0, 0, globalConfig.axisLength)
 	)
 	materialZAxis = new THREE.LineBasicMaterial(
 		color: globalConfig.colors.axisZ

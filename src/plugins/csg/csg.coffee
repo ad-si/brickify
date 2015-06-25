@@ -1,6 +1,7 @@
 CsgExtractor = require './CsgExtractor'
 threeHelper = require '../../client/threeHelper'
 csgCleaner = require './csgCleaner'
+threeConverter = require '../../client/threeConverter'
 
 class CSG
 
@@ -64,15 +65,17 @@ class CSG
 			cachedData.transformedThreeGeometry = threeGeometry
 			@csgExtractor ?= new CsgExtractor()
 
-			options.profile = true
 			options.transformedModel = cachedData.transformedThreeGeometry
+			options.modelBsp = cachedData.modelBsp
 
 			result = @csgExtractor.extractGeometry cachedData.grid, options
+			cachedData.modelBsp = result.modelBsp
 
 			options.split = true
 			options.filterSmallGeometries = !result.isOriginalModel
 			cachedData.csg = csgCleaner.clean result.csg, options
 
+			cachedData.csgNeedsRecalculation = false
 			return cachedData.csg
 
 	# Converts the optimized model from the selected node to a three model
@@ -80,12 +83,12 @@ class CSG
 	_prepareModel: (cachedData, selectedNode) ->
 		return new Promise (resolve, reject) ->
 			if cachedData.transformedThreeGeometry?
-				resolve(cachedData.transformedThreeGeometry, cachedData)
+				resolve cachedData.transformedThreeGeometry
 				return
 
 			selectedNode.getModel()
 			.then (model) ->
-				threeGeometry = model.convertToThreeGeometry()
+				threeGeometry = threeConverter.toStandardGeometry model.model
 				threeGeometry.applyMatrix threeHelper.getTransformMatrix selectedNode
 				resolve(threeGeometry)
 			.catch (error) ->
@@ -109,7 +112,6 @@ class CSG
 		# check if there was a brush action that forces us
 		# to recreate CSG
 		if cachedData.csgNeedsRecalculation
-			cachedData.csgNeedsRecalculation = false
 			return true
 		return false
 

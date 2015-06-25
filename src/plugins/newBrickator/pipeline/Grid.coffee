@@ -10,33 +10,39 @@ module.exports = class Grid
 
 		@voxels = {}
 
-	setUpForModel: (optimizedModel, options) =>
+	setUpForModel: (model, options) =>
 		@modelTransform = options.modelTransform
 
-		bb = optimizedModel.boundingBox()
+		return model
+		.getBoundingBox()
+		.then (boundingBox) =>
+			# if the object is moved in the scene (not in the origin),
+			# think about that while building the grid
+			if @modelTransform
+				bbMinWorld = new THREE.Vector3(
+					boundingBox.min.x
+					boundingBox.min.y
+					boundingBox.min.z
+				)
+				bbMinWorld.applyProjection(@modelTransform)
+			else
+				bbMinWorld = boundingBox.min
 
-		# if the object is moved in the scene (not in the origin),
-		# think about that while building the grid
-		if @modelTransform
-			bbMinWorld = new THREE.Vector3()
-			bbMinWorld.set bb.min.x, bb.min.y, bb.min.z
-			bbMinWorld.applyProjection(@modelTransform)
-		else
-			bbMinWorld = bb.min
+			# 1.) Align bb minimum to next voxel position
+			# 2.) spacing / 2 is subtracted to make the grid be aligned to the
+			# voxel center
+			# 3.) minimum z is to assure that grid is never below z=0
+			calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
+			calculatedZ -= @spacing.z / 2
+			minimumZ = @spacing.z / 2
 
-		# 1.) Align bb minimum to next voxel position
-		# 2.) spacing / 2 is subtracted to make the grid be aligned to the
-		# voxel center
-		# 3.) minimum z is to assure that grid is never below z=0
-		calculatedZ = Math.floor(bbMinWorld.z / @spacing.z) * @spacing.z
-		calculatedZ -= @spacing.z / 2
-		minimumZ = @spacing.z / 2
-
-		@origin = {
-			x: Math.floor(bbMinWorld.x / @spacing.x) * @spacing.x - (@spacing.x / 2)
-			y: Math.floor(bbMinWorld.y / @spacing.y) * @spacing.y - (@spacing.y / 2)
-			z: Math.max(calculatedZ, minimumZ)
-		}
+			@origin = {
+				x: Math.floor(bbMinWorld.x / @spacing.x) *
+					@spacing.x - (@spacing.x / 2)
+				y: Math.floor(bbMinWorld.y / @spacing.y) *
+					@spacing.y - (@spacing.y / 2)
+				z: Math.max(calculatedZ, minimumZ)
+			}
 
 	getNumVoxelsX: =>
 		return @_maxVoxelX - @_minVoxelX + 1
@@ -46,6 +52,20 @@ module.exports = class Grid
 
 	getNumVoxelsZ: =>
 		return @_maxVoxelZ - @_minVoxelZ + 1
+
+	getLegoVoxelsZRange: =>
+		min = Number.POSITIVE_INFINITY
+		max = Number.NEGATIVE_INFINITY
+
+		@forEachVoxel (voxel) ->
+			return unless voxel.isLego()
+			min = Math.min min, voxel.position.z
+			max = Math.max max, voxel.position.z
+
+		return {
+			min: if min is Number.POSITIVE_INFINITY then null else min
+			max: if max is Number.NEGATIVE_INFINITY then null else max
+		}
 
 	# use this if you are not interested in the actual number of layers
 	# e.g. if you want to use them zero-indexed
@@ -139,21 +159,18 @@ module.exports = class Grid
 	_generateKey: (x, y, z) ->
 		return x + '-' + y + '-' + z
 
-	setVoxel: (position, data = true) ->
+	setVoxel: (position) ->
 		key = @_generateKey position.x, position.y, position.z
 		v = @voxels[key]
 
 		if not v?
-			v = new Voxel(position, [data])
+			v = new Voxel position
 			@_linkNeighbors v
 			@voxels[key] = v
 			@_updateMinMax position
-		else
-			v.dataEntrys.push data
-
 		return v
 
-	# links neighbours of this voxel with this voxel
+	# links neighbors of this voxel with this voxel
 	_linkNeighbors: (voxel) ->
 		p = voxel.position
 
@@ -225,13 +242,13 @@ module.exports = class Grid
 
 		return list
 
-	getSurrounding: ({x, y, z}, size, selectionCallback) =>
+	getSurrounding: ({x, y, z}, size) =>
 		list = []
 
 		_collect = (vx, vy, vz) =>
 			voxel = @voxels[@_generateKey vx, vy, vz]
 			if voxel?
-				list.push voxel if selectionCallback voxel
+				list.push voxel
 
 		sizeX_2 = Math.floor size.x / 2
 		sizeY_2 = Math.floor size.y / 2
@@ -271,6 +288,16 @@ module.exports = class Grid
 			if vox? and vox.brick
 				return vox.brick
 
+	# inserts voxels from a three-dimensional array in [x][y][z] order
+	fromPojo: (pojo) ->
+		for x, voxelPlane of pojo
+			x = parseInt x
+			for y, voxelColumn of voxelPlane
+				y = parseInt y
+				for z, direction of voxelColumn
+					z = parseInt z
+					@setVoxel x: x, y: y, z: z
+
 	intersectVoxels: (rayOrigin, rayDirection) =>
 		dirfrac = {
 			x: 1.0 / rayDirection.x
@@ -288,7 +315,7 @@ module.exports = class Grid
 					voxel: voxel
 				}
 
-		intersections.sort (a,b) -> return a.distance - b.distance
+		intersections.sort (a, b) -> return a.distance - b.distance
 		return intersections
 
 	# Intersects a ray (1/direction + origin) with a voxel. returns the distance
@@ -327,7 +354,3 @@ module.exports = class Grid
 			return -1
 		else
 			return tmin
-
-
-
-

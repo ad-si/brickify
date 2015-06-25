@@ -17,7 +17,6 @@ class VoxelUnion
 	# studOnTop / studFromBelow flags.
 	# @param {Object} options
 	# @param {Boolean} options.addStuds
-	# @param {Boolean} options.profile
 	# @param {Boolean} options.threeBoxGeometryOnly
 	###
 	run: (voxelsToBeGeometrized, options = {}) =>
@@ -28,15 +27,13 @@ class VoxelUnion
 			return boxGeometry
 
 		boxGeometryBsp = new ThreeBSP(boxGeometry)
-		if options.profile
-			log.debug "Geometrizer: voxel geometry took #{new Date() - d}ms"
+		log.debug "Geometrizer: voxel geometry took #{new Date() - d}ms"
 
 		if options.addStuds
 			d = new Date()
 			bspWithStuds = @_addStuds(
 				boxGeometryBsp, options, voxelsToBeGeometrized, @grid)
-			if options.profile
-				log.debug "Geometrizer: stud geometry took #{new Date() - d}ms"
+			log.debug "Geometrizer: stud geometry took #{new Date() - d}ms"
 			return bspWithStuds
 
 		return boxGeometryBsp
@@ -322,11 +319,11 @@ class VoxelUnion
 		# the values for studs (creates 3d printed holes) and holes
 		# (creates 3d printed studs) have to be switched
 
-		studRotation = new THREE.Matrix4().makeRotationX( 3.14159 / 2 )
+		studRotation = new THREE.Matrix4().makeRotationX(3.14159 / 2)
 		dzBottom = -(gridSpacing.z / 2) + (studSize.height / 2)
-		studTranslationBottom = new THREE.Matrix4().makeTranslation(0,0,dzBottom)
+		studTranslationBottom = new THREE.Matrix4().makeTranslation(0, 0, dzBottom)
 		dzTop = (gridSpacing.z / 2) + (holeSize.height / 2)
-		studTranslationTop = new THREE.Matrix4().makeTranslation(0,0,dzTop)
+		studTranslationTop = new THREE.Matrix4().makeTranslation(0, 0, dzTop)
 
 		studGeometryBottom = new THREE.CylinderGeometry(
 			studSize.radius, studSize.radius, studSize.height, 20

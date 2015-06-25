@@ -25,6 +25,9 @@
     "empty_constructor_needs_parens": {
         "level": "ignore"
     },
+    "eol_last": {
+      "level": "error"
+    },
     "indentation": {
         "value": 2,
         "level": "ignore"
@@ -44,11 +47,6 @@
     "newlines_after_classes": {
         "value": 3,
         "level": "ignore"
-    },
-    "newline_at_eof": {
-        "module": "coffeelint-newline-at-eof",
-        "level": "error",
-        "behaviour": "require"
     },
     "no_backticks": {
         "level": "error"
@@ -82,6 +80,9 @@
     "no_tabs": {
         "level": "ignore"
     },
+    "no_this": {
+        "level": "error"
+    },
     "no_throwing_strings": {
         "level": "error"
     },
@@ -107,6 +108,9 @@
         "doubleNotLevel": "ignore"
     },
     "space_operators": {
+        "level": "error"
+    },
+    "spacing_after_comma": {
         "level": "error"
     }
 }

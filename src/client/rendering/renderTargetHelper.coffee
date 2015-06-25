@@ -6,6 +6,12 @@ ShaderGenerator = require './shader/ShaderGenerator'
 # @module renderTargetHelper
 ###
 
+_chooseBiggerSize = false
+_overrideSizeValue = null
+module.exports.configureSize = (chooseBiggerSize, overrideSizeValue = null) ->
+	_chooseBiggerSize = chooseBiggerSize
+	_overrideSizeValue = overrideSizeValue
+
 ###
 # Creates a structure that can be used as a render target and later
 # to render the content of the render target
@@ -25,7 +31,6 @@ module.exports.createRenderTarget = (
 	shaderParts = []
 	additionalUniforms = {}
 	opacity = 1.0
-	chooseBiggerSize = false
 	textureMagFilter = THREE.LinearFilter
 	textureMinFilter = THREE.LinearFilter) ->
 
@@ -33,8 +38,12 @@ module.exports.createRenderTarget = (
 	renderWidth = threeRenderer.domElement.width
 	renderHeight = threeRenderer.domElement.height
 
-	texWidth = getNextValidTextureDimension renderWidth, chooseBiggerSize
-	texHeight = getNextValidTextureDimension renderHeight, chooseBiggerSize
+	texWidth = getNextValidTextureDimension renderWidth
+	texHeight = getNextValidTextureDimension renderHeight
+
+	if _overrideSizeValue?
+		texWidth = _overrideSizeValue
+		texHeight = _overrideSizeValue
 
 	depthTexture = new THREE.DepthTexture texWidth, texHeight, true
 	renderTargetTexture = new THREE.WebGLRenderTarget(
@@ -49,13 +58,13 @@ module.exports.createRenderTarget = (
 		}
 	)
 
-	# apply values to parent, due to broken THREE implementation / WIP pull request
+	# Apply values to parent, due to broken THREE implementation / WIP pull request
 	renderTargetTexture.wrapS = renderTargetTexture.texture.wrapS
 	renderTargetTexture.wrapT = renderTargetTexture.texture.wrapT
 	renderTargetTexture.magFilter = renderTargetTexture.texture.magFilter
 	renderTargetTexture.minFilter = renderTargetTexture.texture.minFilter
 
-	#create scene to render texture
+	# Create scene to render texture
 	quadScene = new THREE.Scene()
 	screenAlignedQuad = generateQuad(
 		renderTargetTexture, depthTexture, shaderParts, additionalUniforms, opacity
@@ -65,6 +74,27 @@ module.exports.createRenderTarget = (
 	return {
 		depthTexture: depthTexture
 		renderTarget: renderTargetTexture
+		quadScene: quadScene
+		blendingMaterial: screenAlignedQuad.material
+	}
+
+# Clones the originalTarget but creates a new custom blendingMat shader
+module.exports.cloneRenderTarget = (
+	originalTarget,
+	shaderParts = [], additionalUniforms = {}, opacity = 1.0,
+	) ->
+
+	# Create scene to render texture
+	quadScene = new THREE.Scene()
+	screenAlignedQuad = generateQuad(
+		originalTarget.renderTarget, originalTarget.depthTexture,
+		shaderParts, additionalUniforms, opacity
+	)
+	quadScene.add screenAlignedQuad
+
+	return {
+		depthTexture: originalTarget.depthTexture
+		renderTarget: originalTarget.renderTarget
 		quadScene: quadScene
 		blendingMaterial: screenAlignedQuad.material
 	}
@@ -99,15 +129,18 @@ generateQuad =  (
 		transparent: true
 	})
 
-	planeGeometry = new THREE.PlaneBufferGeometry(2,2)
+	planeGeometry = new THREE.PlaneBufferGeometry(2, 2)
 	mesh = new THREE.Mesh( planeGeometry, mat )
-	# disable frustum culling since the plane is always visible
+	# Disable frustum culling since the plane is always visible
 	mesh.frustumCulled = false
 	return mesh
 module.exports.generateQuad = generateQuad
 
 # Chooses the next 2^n size that matches the screen resolution best
-getNextValidTextureDimension = (size, chooseBiggerValue) ->
+getNextValidTextureDimension = (size) ->
+	if not size?
+		return null
+
 	dims = [64, 128, 256, 512, 1024, 2048, 4096]
 
 	difference = 9999
@@ -118,7 +151,7 @@ getNextValidTextureDimension = (size, chooseBiggerValue) ->
 			difference = d
 			selectedDim = dim
 
-		if chooseBiggerValue and dim > size
+		if _chooseBiggerSize and dim > size
 			return dim
 
 	return selectedDim
@@ -127,14 +160,26 @@ module.exports.getNextValidTextureDimension = getNextValidTextureDimension
 # Returns true, if the render target has the right
 # (in terms of 2^n, see getNextValidTextureDimension)
 # size for the domElement of the threeRenderer
-renderTargetHasRightSize = (
-	renderTarget, threeRenderer,chooseBiggerValue = false) ->
+renderTargetHasRightSize = (renderTarget, threeRenderer) ->
 	screenW = threeRenderer.domElement.clientWidth
 	screenH = threeRenderer.domElement.clientHeight
 
-	targetTexWidth = getNextValidTextureDimension screenW, chooseBiggerValue
-	targetTexHeight = getNextValidTextureDimension screenH, chooseBiggerValue
+	targetTexWidth = getNextValidTextureDimension screenW, _chooseBiggerSize
+	targetTexHeight = getNextValidTextureDimension screenH, _chooseBiggerSize
+
+	if _overrideSizeValue
+		targetTexWidth = _overrideSizeValue
+		targetTexHeight = _overrideSizeValue
 
 	return (renderTarget.width == targetTexWidth) and
 	(renderTarget.height == targetTexHeight)
+
 module.exports.renderTargetHasRightSize = renderTargetHasRightSize
+
+deleteRenderTarget = (renderTarget, threeRenderer) ->
+	 renderTarget.renderTarget.dispose()
+
+	 if renderTarget.depthTexture?.__webglTexture?
+	 	threeRenderer.context.deleteTexture renderTarget.depthTexture.__webglTexture
+
+module.exports.deleteRenderTarget = deleteRenderTarget

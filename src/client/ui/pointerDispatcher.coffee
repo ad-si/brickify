@@ -2,7 +2,7 @@ interactionHelper = require '../interactionHelper'
 pointerEnums = require './pointerEnums'
 
 class PointerDispatcher
-	constructor: (@bundle) ->
+	constructor: (@bundle, @hintUi) ->
 		return
 
 	init: =>
@@ -15,6 +15,8 @@ class PointerDispatcher
 			element.addEventListener event.toLowerCase(), @['on' + event]
 
 		element = @bundle.ui.renderer.getDomElement()
+		element.addEventListener 'wheel', @onMouseWheel
+
 		_registerEvent element, event for event of pointerEnums.events
 
 	onPointerOver: (event) ->
@@ -33,6 +35,9 @@ class PointerDispatcher
 		# dispatch event
 		handled = @_dispatchEvent event, pointerEnums.events.PointerDown
 
+		#notify hint ui
+		@hintUi.pointerDown event, handled
+
 		# stop event if a plugin handled it (else let orbit controls work)
 		@_stop event if handled
 
@@ -40,10 +45,16 @@ class PointerDispatcher
 
 	onPointerMove: (event) =>
 		# don't call mouse events if there is no selected node
-		return unless @sceneManager.selectedNode?
+		if not @sceneManager.selectedNode?
+			# notify hint Ui of unhandled event
+			@hintUi.pointerMove event, false
+			return
 
 		# dispatch event
 		handled = @_dispatchEvent event, pointerEnums.events.PointerMove
+
+		# notify hint ui
+		@hintUi.pointerMove event, handled
 
 		# stop event if a plugin handled it (else let orbit controls work)
 		@_stop event if handled
@@ -78,6 +89,15 @@ class PointerDispatcher
 
 	onLostPointerCapture: (event) ->
 		return
+
+	onMouseWheel: (event) =>
+		@hintUi.mouseWheel()
+
+		# this is needed because chrome (not firefox/IE) does not
+		# handle multiple listeners correctly
+		event.target.removeEventListener 'wheel', @onMouseWheel
+
+		return false
 
 	_capturePointerFor: (event) =>
 		element = @bundle.ui.renderer.getDomElement()

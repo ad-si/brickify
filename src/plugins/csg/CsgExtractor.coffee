@@ -13,7 +13,6 @@ module.exports = class CsgExtractor
 
 		# options may be
 		# {
-		#	profiling: true/false # print performance values
 		#	addStuds: true/false # add lego studs to csg (slow!)
 		#	studSize: {radius, height} of studs
 		# 	holeSize: {radius, height} of holes (to fit lego studs into)
@@ -22,38 +21,50 @@ module.exports = class CsgExtractor
 		log.debug 'Creating CSG...'
 
 		d = new Date()
-		legoVoxels = @_analyzeGrid(grid)
-		if options.profile
-			log.debug "Grid analysis took #{new Date() - d}ms"
+		gridAnalysis = @_analyzeGrid(grid)
+		log.debug "Grid analysis took #{new Date() - d}ms"
 
-		if legoVoxels.length == 0
+		if gridAnalysis.everythingBricks
+			log.debug 'Everything is made out of bricks. Skipped CSG.'
 			return {
+				modelBsp: options.modelBsp
+				csg: null
+				isOriginalModel: false
+			}
+
+		if gridAnalysis.legoVoxels.length == 0
+			return {
+				modelBsp: options.modelBsp
 				csg: options.transformedModel
 				isOriginalModel: true
 			}
 
 		d = new Date()
 		voxunion = new VoxelUnion(grid)
-		voxelHull = voxunion.run legoVoxels, options
-		if options.profile
-			log.debug "Voxel Geometrizer took #{new Date() - d}ms"
+		voxelHull = voxunion.run gridAnalysis.legoVoxels, options
+		log.debug "Voxel Geometrizer took #{new Date() - d}ms"
 
-		d = new Date()
-		printGeometry = @_extractPrintGeometry options.transformedModel, voxelHull
-		if options.profile
-			log.debug "Print geometry took #{new Date() - d}ms"
+		extraction = @_extractPrintGeometry(
+			options.modelBsp
+			options.transformedModel
+			voxelHull
+		)
 
 		return {
-			csg: printGeometry
+			modelBsp: extraction.modelBsp
+			csg: extraction.printGeometry
 			isOriginalModel: false
 		}
 
 	_analyzeGrid: (grid) ->
 		# creates a list of voxels to be legotized
 		legoVoxels = []
+		everythingBricks = true
 
 		grid.forEachVoxel (voxel) ->
-			return if not voxel.enabled # ignore 3d printed voxels
+			if not voxel.enabled
+				everythingBricks = false
+				return
 
 			x = voxel.position.x
 			y = voxel.position.y
@@ -79,11 +90,25 @@ module.exports = class CsgExtractor
 				studFromBelow: studFromBelow
 			}
 
-		return legoVoxels
+		return {
+			legoVoxels: legoVoxels
+			everythingBricks: everythingBricks
+		}
 
-	_extractPrintGeometry: (originalModel, voxelHull) ->
+	_extractPrintGeometry: (modelBsp, originalModel, voxelHull) ->
 		# returns volumetric subtraction (3d Geometry - LegoVoxels)
-		modelBsp = new ThreeBSP(originalModel)
+		if not modelBsp
+			d = new Date()
+			modelBsp = new ThreeBSP(originalModel)
+			log.debug "ThreeBsp generation took #{new Date() - d}ms"
+		else
+			log.debug 'ThreeBSP already exists. Skipped ThreeBSP generation.'
 
+		d = new Date()
 		printBsp = modelBsp.subtract(voxelHull)
-		return printBsp.toGeometry()
+		log.debug "Print geometry took #{new Date() - d}ms"
+
+		return {
+			modelBsp: modelBsp
+			printGeometry: printBsp.toGeometry()
+		}

@@ -1,0 +1,54 @@
+h4.disabled Download stl for 3d printer
+#sizeSelect
+	p.
+		Please enter your printer type:
+	.row
+		.col-sm-6
+			select.form-control#studSizeSelect
+		.col-sm-6
+			select.form-control#holeSizeSelect
+	br
+	p.
+		If you don't know your printer's type, use our wizard to find it out:
+	button.btn.btn-primary.btn-block#startWizard Start wizard
+	br
+#wizardStepIntro
+	p.
+		Every 3D-printer is different and produces slightly differnt 3D-printed objects.
+		Therefore, to ensure a good fit between the 3D-printed parts and your LEGO-bricks,
+		you need to calibrate your printer.
+	p.
+		For the calibration, download the #[a(href='download/testStrip.zip') test strip] and print it.
+#wizardStepStuds
+	p.
+		Try to connect the test strip studs into a LEGO-brick. Which size fits best?
+	img(src='img/testStripWizard-studSize.png')
+	p.wizardSelect This size fits best:
+		select.form-control#wizardStudSizeSelect
+#wizardStepHoles
+	p.
+		Now connect the LEGO-brick studs into the test strip. Which size fits best?
+	img(src='img/testStripWizard-holeSize.png')
+	p.wizardSelect This size fits best:
+		select.form-control#wizardHoleSizeSelect
+#wizardStepFinished
+	p.
+		You're all set! If you don't change your 3D-printer's settings, you can re-use
+		the calibration settings for further prints.
+	p#calibrationResult
+		| Your calibration settings:
+		br
+		strong#calibrationSettings A 4
+
+#wizardButtons
+	br
+	.row
+		.col-sm-6
+			button.btn.btn-primary.btn-block#wizardBack
+				span #[i.fa.fa-chevron-left] &nbsp;
+				span#text Go back
+		.col-sm-6
+			button.btn.btn-primary.btn-block#wizardNext
+				span#text Next step
+				span &nbsp; #[i.fa.fa-chevron-right]
+	br

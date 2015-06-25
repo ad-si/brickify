@@ -22,6 +22,11 @@ class EditBrushUi
 		@brushContainer = $(jQueryBrushContainerSelector)
 		@bigBrushContainer = $(jQueryBigBrushContainerSelector)
 
+		# because firefox ignores the draggable="false" attribute
+		# attached to the brush images
+		$('#brushContainer img').on 'dragstart', -> return false
+		$('#bigBrushContainer img').on 'dragstart', -> return false
+
 	onNodeSelect: (node) =>
 		@selectedNode = node
 

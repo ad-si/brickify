@@ -14,11 +14,11 @@ describe 'brickLayouter merge', ->
 		bricks = grid.getAllBricks()
 
 		mergeableNeighbors = brickLayouter._findMergeableNeighbors v0.brick
-		mergeableNeighborsXp = mergeableNeighbors[1]
+		mergeableNeighborsXp = mergeableNeighbors[3]
 		expect(mergeableNeighborsXp.has(v1.brick)).to.equal(true)
 
 		mergeableNeighbors = brickLayouter._findMergeableNeighbors v1.brick
-		mergeableNeighborsXm = mergeableNeighbors[0]
+		mergeableNeighborsXm = mergeableNeighbors[2]
 		expect(mergeableNeighborsXm.has(v0.brick)).to.equal(true)
 
 	it 'should find mergeable neighbor brick yp and ym', ->
@@ -30,11 +30,11 @@ describe 'brickLayouter merge', ->
 		brickLayouter.initializeBrickGraph(grid)
 
 		mergeableNeighbors = brickLayouter._findMergeableNeighbors v0.brick
-		mergeableNeighborsYp = mergeableNeighbors[3]
+		mergeableNeighborsYp = mergeableNeighbors[0]
 		expect(mergeableNeighborsYp.has(v1.brick)).to.equal(true)
 
 		mergeableNeighbors = brickLayouter._findMergeableNeighbors v1.brick
-		mergeableNeighborsYm = mergeableNeighbors[2]
+		mergeableNeighborsYm = mergeableNeighbors[1]
 		expect(mergeableNeighborsYm.has(v0.brick)).to.equal(true)
 
 	it 'should choose the better brick 10 out of 10 times', ->

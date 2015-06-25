@@ -56,6 +56,13 @@ and [CroJSDoc](http://croquiscom.github.io/crojsdoc/) for api documentation.
 Call `$ npm run documentation` and
 `$ npm run apiDocumentation` respectively.
 
+
+## Styleguide
+
+The code must be formatted as described in
+https://github.com/style-guides/CoffeeScript/tree/v0.1.1
+
+
 ## Server
 
 The server currently serves:

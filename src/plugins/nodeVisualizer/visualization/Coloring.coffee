@@ -60,16 +60,9 @@ module.exports = class Coloring
 		@legoShadowMat.polygonOffsetFactor = +2
 		@legoShadowMat.polygonOffsetUnits = +2
 
-		# object visualization
-		# default object material
-		@objectMaterial = new THREE.MeshLambertMaterial(
-			color: @globalConfig.colors.modelColor
-			ambient: @globalConfig.colors.modelColor
-		)
-
 		# printed object material
 		@objectPrintMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
+			color: @globalConfig.colors.modelColor
 			opacity: 0.8
 			transparent: true
 		})
@@ -146,51 +139,71 @@ module.exports = class Coloring
 		if gridEntry.enabled
 			# if there is a brick at the same position,
 			# take the same material
-			if gridEntry.brick?.visualizationMaterial?
-				return gridEntry.brick.visualizationMaterial
+			if gridEntry.brick?.visualizationMaterials?
+				return gridEntry.brick.visualizationMaterials.color
 			return @selectedMaterial
 		else
 			return @hiddenMaterial
 
-	getMaterialForBrick: (brick) =>
+	getMaterialsForBrick: (brick) =>
 		# return stored material or assign a random one
-		if brick.visualizationMaterial?
-			return brick.visualizationMaterial
+		if brick.visualizationMaterials?
+			return brick.visualizationMaterials
 
 		# collect materials of neighbors
-		neighbors = brick.getNeighbors()
-		neighborColors = []
+		neighbors = brick.getNeighborsXY()
+		connections = brick.connectedBricks()
+
+		neighborColors = new Set()
 		neighbors.forEach (neighbor) ->
-			neighborColors.push neighbor.visualizationMaterial
+			if neighbor.visualizationMaterials?
+				neighborColors.add neighbor.visualizationMaterials.color
+		connections.forEach (connection) ->
+			if connection.visualizationMaterials?
+				neighborColors.add connection.visualizationMaterials.color
 
 		# try max. (brickMaterials.length) times to
 		# find a material that has not been used
 		# by neighbors to visually distinguish bricks
 		for i in [0...@_brickMaterials.length]
-			material = @_getRandomBrickMaterial()
-			continue if neighborColors.indexOf(material) >= 0
+			materials = @_getRandomBrickMaterials()
+			continue if neighborColors.has(materials.color)
 			break
 
-		brick.visualizationMaterial = material
-		return brick.visualizationMaterial
+		brick.visualizationMaterials = materials
+		return brick.visualizationMaterials
 
 	getStabilityMaterialForBrick: (brick) =>
 		 @getMaterialForBrick brick
 
-	_getRandomBrickMaterial: =>
+	_getRandomBrickMaterials: =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
-		return @_brickMaterials[i]
+		return {color: @_brickMaterials[i], gray: @_grayBrickMaterials[i]}
 
 	_createBrickMaterials: =>
 		@_brickMaterials = []
-		@_brickMaterials.push @_createMaterial 0x530000
-		@_brickMaterials.push @_createMaterial 0xfe2020
-		@_brickMaterials.push @_createMaterial 0xba0000
-		@_brickMaterials.push @_createMaterial 0xfe5c5c
-		@_brickMaterials.push @_createMaterial 0xdb0000
-		@_brickMaterials.push @_createMaterial 0x6b0000
-		@_brickMaterials.push @_createMaterial 0xfe3939
-		@_brickMaterials.push @_createMaterial 0xfe4d4d
+		@_brickMaterials.push @_createMaterial 0x550000
+		@_brickMaterials.push @_createMaterial 0x8e0000
+		@_brickMaterials.push @_createMaterial 0xc60000
+		@_brickMaterials.push @_createMaterial 0xff0000
+		@_brickMaterials.push @_createMaterial 0xcc4444
+		@_brickMaterials.push @_createMaterial 0xdd4f4f
+		@_brickMaterials.push @_createMaterial 0xee5b5b
+		@_brickMaterials.push @_createMaterial 0xff6666
+
+		@_grayBrickMaterials = []
+		for material in @_brickMaterials
+			@_grayBrickMaterials.push @_convertToGrayscale material
+
+	# Clones the material and converts its color to grayscale
+	_convertToGrayscale: (material) ->
+		newMaterial = material.clone()
+		gray = material.color.r * 0.3
+		gray += material.color.g * 0.6
+		gray += material.color.b * 0.1
+		newMaterial.color = new THREE.Color(gray, gray, gray)
+
+		return newMaterial
 
 	_createMaterial: (color, opacity = 1) ->
 		return new THREE.MeshLambertMaterial(

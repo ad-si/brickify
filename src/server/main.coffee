@@ -177,11 +177,12 @@ module.exports.setupRouting = ->
 	webapp.get '/model/get/:hash', urlParser, modelStorageApi.getModel
 	webapp.post '/model/submit/:hash', rawParser, modelStorageApi.saveModel
 
-	webapp.head '/datapacket/:id', urlParser, dataPackets.exists
-	webapp.get '/datapacket/:id', urlParser, dataPackets.get
-	webapp.put '/datapacket/:id', jsonParser, dataPackets.put
-	webapp.delete '/datapacket/:id', urlParser, dataPackets.delete
 	webapp.post '/datapacket', urlParser, dataPackets.create
+	webapp.route '/datapacket/:id'
+		.head dataPackets.exists
+		.get dataPackets.get
+		.put jsonParser, dataPackets.put
+		.delete dataPackets.delete
 
 	webapp.post '/updateGitAndRestart', jsonParser, (request, response) ->
 		if request.body.ref?

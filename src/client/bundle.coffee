@@ -44,8 +44,8 @@ module.exports = class Bundle
 	getControls: =>
 		@renderer.getControls()
 
-	loadFromIdentifier: (identifier) =>
+	loadByIdentifier: (identifier) =>
 		@exportUi?.setEnabled false
-		return @modelLoader.loadFromIdentifier identifier
+		return @modelLoader.loadByIdentifier identifier
 		.then =>
 			@exportUi?.setEnabled true

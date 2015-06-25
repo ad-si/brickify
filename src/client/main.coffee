@@ -25,7 +25,7 @@ commandFunctions = {
 		# load selected model
 		log.debug 'loading initial model'
 		bundle.sceneManager.clearScene()
-		bundle.modelLoader.loadFromIdentifier identifier
+		bundle.modelLoader.loadByIdentifier identifier
 }
 
 postInitCallback = ->

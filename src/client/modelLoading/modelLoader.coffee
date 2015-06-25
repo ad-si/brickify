@@ -15,7 +15,7 @@ class ModelLoader
 	constructor: (@bundle) ->
 		return
 
-	loadFromIdentifier: (identifier) =>
+	loadByIdentifier: (identifier) =>
 		modelCache
 		.request identifier
 		.then (model) => @_load model, identifier

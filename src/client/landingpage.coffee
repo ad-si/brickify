@@ -60,11 +60,11 @@ b1 = bundle1.init().then ->
 	loadAndConvert = (identifier) ->
 		b1
 			.then -> bundle1.sceneManager.clearScene()
-			.then -> bundle1.loadFromIdentifier identifier
+			.then -> bundle1.loadByIdentifier identifier
 			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
 		b2
 			.then -> bundle2.sceneManager.clearScene()
-			.then -> bundle2.loadFromIdentifier identifier
+			.then -> bundle2.loadByIdentifier identifier
 			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
 		$('.applink').prop 'href', "app#initialModel=#{identifier}"
 

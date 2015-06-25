@@ -1,4 +1,4 @@
-fs = require 'fs-promise'
+fsp = require 'fs-promise'
 yaml = require 'js-yaml'
 log = require('winston').loggers.get 'log'
 
@@ -8,10 +8,10 @@ samples = {}
 
 # load samples on require (read: on server startup)
 do loadSamples = ->
-	fs
+	fsp
 		.readdirSync samplesDirectory
 		.filter (file) -> file.endsWith '.yaml'
-		.map (file) -> yaml.load fs.readFileSync samplesDirectory + file
+		.map (file) -> yaml.load fsp.readFileSync samplesDirectory + file
 		.forEach (sample) -> samples[sample.name] = sample
 	log.info 'Sample models loaded'
 
@@ -25,7 +25,7 @@ exists = (name) ->
 
 get = (name) ->
 	if samples[name]?
-		return fs.readFile samplesDirectory + name
+		return fsp.readFile samplesDirectory + name
 	else
 		return Promise.reject name
 

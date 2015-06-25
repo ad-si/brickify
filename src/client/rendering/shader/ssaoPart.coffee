@@ -3,15 +3,6 @@
 ShaderPart = require './shaderPart'
 
 class SsaoPart extends ShaderPart
-	getVertexVariables: ->
-		return ''
-
-	getVertexPreMain: ->
-		return ''
-
-	getVertexInMain: ->
-		return''
-
 	getFragmentVariables: ->
 		return '
 			uniform sampler2D tRandom;
@@ -108,8 +99,5 @@ class SsaoPart extends ShaderPart
 
 			col = vec4( ssao, ssao, ssao, 1.0 );
 		'
-
-#cameraNearPlane: 0.1
-#cameraFarPlane: 2500
 
 module.exports = SsaoPart

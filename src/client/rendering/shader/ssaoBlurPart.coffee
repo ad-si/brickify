@@ -3,18 +3,6 @@
 ShaderPart = require './shaderPart'
 
 class SsaoBlurPart extends ShaderPart
-	getVertexVariables: ->
-		return ''
-
-	getVertexPreMain: ->
-		return ''
-
-	getVertexInMain: ->
-		return''
-
-	getFragmentVariables: ->
-		return ''
-
 	getFragmentPreMain: ->
 		return '
 			float ssaoBlur(vec2 texCoords){

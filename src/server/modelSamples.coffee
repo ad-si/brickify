@@ -1,4 +1,4 @@
-fs = require 'fs'
+fs = require 'fs-promise'
 yaml = require 'js-yaml'
 log = require('winston').loggers.get 'log'
 
@@ -25,12 +25,7 @@ exists = (name) ->
 
 get = (name) ->
 	if samples[name]?
-		return new Promise (resolve, reject) ->
-			fs.readFile samplesDirectory + name, (error, data) ->
-				if error
-					reject error
-				else
-					resolve data
+		return fs.readFile samplesDirectory + name
 	else
 		return Promise.reject name
 

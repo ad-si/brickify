@@ -64,12 +64,6 @@ module.exports = class LegoPipeline
 				return @plateLayouter.finalLayoutPass lastResult.grid
 
 		@pipelineSteps.push
-			name: 'Stability optimization'
-			decision: (options) -> return options.layouting
-			worker: (lastResult, options) =>
-				return @layoutOptimizer.optimizeLayoutStability lastResult.grid
-
-		@pipelineSteps.push
 			name: 'Local reLayout'
 			decision: (options) -> return options.reLayout
 			worker: (lastResult, options, progressCallback) =>
@@ -77,6 +71,13 @@ module.exports = class LegoPipeline
 					lastResult.modifiedBricks
 					lastResult.grid
 				)
+
+		@pipelineSteps.push
+			name: 'Stability optimization'
+			decision: (options) ->
+				return options.layouting or options.reLayout
+			worker: (lastResult, options) =>
+				return @layoutOptimizer.optimizeLayoutStability lastResult.grid
 
 	run: (data, options = null) =>
 		@terminated = false

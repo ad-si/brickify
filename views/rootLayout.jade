@@ -18,7 +18,7 @@ html
 
 		block body
 
-		if piwikEnabled
+		if app.get('env') !== 'development'
 			script(src='/js/piwik.js')
 			noscript
 				img(src='//piwik.brickify.it/piwik.php?idsite=1' style='border:0;' alt='')

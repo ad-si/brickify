@@ -23,7 +23,7 @@ describe 'dataPacket client cache', ->
 			$.mockjax(
 				type: 'POST'
 				url: '/datapacket'
-				status: 200
+				status: 201
 				contentType: 'application/json'
 				responseText: newPacket
 			)
@@ -38,7 +38,7 @@ describe 'dataPacket client cache', ->
 			$.mockjax(
 				type: 'POST'
 				url: '/datapacket'
-				status: 200
+				status: 201
 				contentType: 'application/json'
 				responseText: newPacket
 			)
@@ -107,7 +107,7 @@ describe 'dataPacket client cache', ->
 			$.mockjax(
 				type: 'POST'
 				url: '/datapacket'
-				status: 200
+				status: 201
 				contentType: 'application/json'
 				responseText: newPacket
 			)

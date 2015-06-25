@@ -319,5 +319,5 @@ module.exports = class Voxelizer
 
 		return @voxelGrid
 		.setUpForModel model, options
-		.then  =>
+		.then =>
 			return @voxelGrid

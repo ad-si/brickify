@@ -280,7 +280,7 @@ class Brick
 	# Returns true if the brick has no holes in it, i.e. is a cuboid
 	# voxels marked to be 3d printed count as holes
 	isHoleFree: =>
-		voxelCheck  = {}
+		voxelCheck = {}
 
 		p = @getPosition()
 		s = @getSize()

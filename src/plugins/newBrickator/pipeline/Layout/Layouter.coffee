@@ -53,12 +53,14 @@ class Layouter
 				if numRandomChoicesWithoutMerge >= maxNumRandomChoicesWithoutMerge
 					log.debug "\trandomChoices #{numRandomChoices}
 												withoutMerge #{numRandomChoicesWithoutMerge}"
-					break # done with layout
+					# Done with layout
+					break
 				else
-					continue # randomly choose a new brick
+					# Choose a new brick
+					continue
 
 			if @_isBrickLayouter()
-				# if brick is 1x1x3, 1x2x3 or instable after mergeLoop
+				# If brick is 1x1x3, 1x2x3 or instable after mergeLoop
 				# break it into pieces
 				if brick.isSize(1, 1, 3) or brick.getStability() is 0 or
 				brick.isSize(1, 2, 3)
@@ -70,7 +72,7 @@ class Layouter
 
 		return Promise.resolve {grid: grid}
 
-	# chooses a random brick out of the set
+	# Chooses a random brick out of the set
 	_chooseRandomBrick: (setOfBricks) =>
 		if setOfBricks.size is 0
 			return null

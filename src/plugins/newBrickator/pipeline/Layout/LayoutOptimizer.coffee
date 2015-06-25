@@ -35,12 +35,12 @@ class LayoutOptimizer
 		log.debug '\tfinished optimization after ', pass , 'passes'
 		return Promise.resolve grid
 
-	# connected components using the connected component labelling algo
+	# Connected components using the connected component labelling algo
 	_findConnectedComponents: (bricks) =>
 		labels = []
 		id = 0
 
-		# first pass
+		# First pass
 		bricks.forEach (brick) ->
 			conBricks = brick.connectedBricks()
 			conLabels = new Set()
@@ -50,24 +50,23 @@ class LayoutOptimizer
 
 			if conLabels.size > 0
 				smallestLabel = DataHelper.smallestElement conLabels
-				# assign label to this brick
+				# Assign label to this brick
 				brick.label = labels[smallestLabel]
-				#console.log 'merging', conLabels
 				for i in [0..labels.length]
 					if conLabels.has labels[i]
 						labels[i] = labels[smallestLabel]
 
-			else # no neighbor has a label
+			else # No neighbor has a label
 				brick.label = id
 				labels[id] = id
 
 				id++
 
-		# second pass - applying labels
+		# Second pass - applying labels
 		bricks.forEach (brick) ->
 			brick.label = labels[brick.label]
 
-		# count number of components
+		# Count number of components
 		finalLabels = new Set()
 		for label in labels
 			finalLabels.add label
@@ -89,11 +88,17 @@ class LayoutOptimizer
 
 
 	###
-# Split up all supplied bricks into single bricks and relayout locally. This
-# means that all supplied bricks and their neighbors will be relayouted.
-#
-# @param {Set<Brick>} bricks bricks that should be split
-###
+	# Split up all supplied bricks into single bricks and relayout locally. This
+	# means that all supplied bricks and (optionally) their neighbors
+	# will be relayouted.
+	#
+	# @param {Set<Brick>} bricks bricks that should be split
+	# @param {Grid} grid the grid the bricks belong to
+	# @param {Boolean} [splitNeighbors=true ] whether or not neighbors will be
+	# split up and relayouted
+	# @param {Boolean} [useThreeLayers=true] whether BrickLayouter should be used
+	# first before PlateLayouter
+	###
 	splitBricksAndRelayoutLocally: (bricks, grid,
 																	splitNeighbors = true, useThreeLayers = true) =>
 		bricksToSplit = new Set()
@@ -104,9 +109,9 @@ class LayoutOptimizer
 
 
 			if splitNeighbors
-				# get neighbors in same z layer
+				# Get neighbors in same z layer
 				neighbors = brick.getNeighborsXY()
-				# add them all to be split as well
+				# Add them all to be split as well
 				neighbors.forEach (nBrick) -> bricksToSplit.add nBrick
 
 		newBricks = @_splitBricks bricksToSplit
@@ -115,11 +120,11 @@ class LayoutOptimizer
 
 		newBricks.forEach (brick) ->
 			brick.forEachVoxel (voxel) ->
-				# delete bricks where voxels are disabled (3d printed)
+				# Delete bricks where voxels are disabled (3d printed)
 				if not voxel.enabled
-					# remove from relayout list
+					# Remove from relayout list
 					bricksToBeDeleted.add brick
-					# delete brick from structure
+					# Delete brick from structure
 					brick.clear()
 
 		bricksToBeDeleted.forEach (brick) ->
@@ -134,7 +139,7 @@ class LayoutOptimizer
 				newBricks: newBricks
 			}
 
-	# splits each brick in bricks to split, returns all newly generated
+	# Splits each brick in bricks to split, returns all newly generated
 	# bricks as a set
 	_splitBricks: (bricksToSplit) ->
 		newBricks = new Set()

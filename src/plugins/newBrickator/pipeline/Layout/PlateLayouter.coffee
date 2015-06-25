@@ -70,7 +70,7 @@ class PlateLayouter extends Layouter
 		neighborsInDirection = brick.getNeighbors(dir)
 		return null if neighborsInDirection.size is 0
 
-		# check that the neighbors together don't exceed this brick's width
+		# Check that the neighbors together don't exceed this brick's width
 		width = 0
 		noMerge = false
 
@@ -83,7 +83,7 @@ class PlateLayouter extends Layouter
 			width += widthFn neighborSize
 		return null if noMerge
 
-		# if they have the same accumulative width
+		# If they have the same accumulative width
 		# check if they are in the correct positions,
 		# i.e. no spacing between neighbors
 		return null if width != widthFn(brick.getSize())

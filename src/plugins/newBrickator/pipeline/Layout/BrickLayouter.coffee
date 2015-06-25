@@ -70,14 +70,14 @@ class BrickLayouter extends Layouter
 		if widthFn(brick.getSize()) > 2 and lengthFn(brick.getSize()) >= 2
 			return null
 
-		# find neighbor voxels, noMerge if any is empty
+		# Find neighbor voxels, noMerge if any is empty
 		voxelIter = voxels.values()
 		while voxel = voxelIter.next().value
 			mVoxel = voxel.neighbors[dir]
 			return null unless mVoxel?
 			mergeVoxels.add mVoxel unless mVoxel.brick is brick
 
-		# find neighbor bricks,
+		# Find neighbor bricks,
 		# noMerge if any not present
 		# noMerge if any brick not 1x1x1
 		mergeVoxelIter = mergeVoxels.values()
@@ -92,8 +92,8 @@ class BrickLayouter extends Layouter
 		if Brick.isValidSize(size.x, size.y, size.z)
 			return mergeBricks if @_minFractionOfConnectionsPresent(allVoxels)
 
-		# check another set of voxels in merge direction, starting from mergeVoxels
-		# this is necessary for the 2 brick steps of larger bricks
+		# Check another set of voxels in merge direction, starting from mergeVoxels
+		# This is necessary for the 2 brick steps of larger bricks
 		mergeVoxels2 = new Set()
 		mergeVoxelIter = mergeVoxels.values()
 		while mVoxel = mergeVoxelIter.next().value
@@ -117,7 +117,7 @@ class BrickLayouter extends Layouter
 		return null
 
 	###
-		check if at least half of the top and half of the bottom voxels
+		Check if at least half of the top and half of the bottom voxels
 		offer connection possibilities
 		This is used as a heuristic to determine whether or not to merge bricks:
 		if a brick has less than minFraction connection
@@ -147,16 +147,16 @@ class BrickLayouter extends Layouter
 		return randomOfLargest.index
 
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
-		# only handle plates (z=1)
+		# Only handle plates (z=1)
 		return null if brick.getSize().z != 1
 
-		# check if 3layer Brick possible according to xy dimensions
+		# Check if 3layer Brick possible according to xy dimensions
 		return null if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
 
-		# check if any slot is empty
+		# Check if any slot is empty
 		return null if brick.fractionOfConnectionsInZDirection(direction) != 1
 
-		# then check if size of second layer fits
+		# Then check if size of second layer fits
 		# if size fits and no slot empty -> position fits
 		secondLayerBricks = brick.getNeighbors(direction)
 		sLIterator = secondLayerBricks.values()
@@ -164,7 +164,7 @@ class BrickLayouter extends Layouter
 			return null unless sLBrick.getSize().z is 1
 
 		if @_sameSizeAsBrick brick, secondLayerBricks
-			# check next layer
+			# Check next layer
 			thirdLayerBricks = new Set()
 			sLIterator = secondLayerBricks.values()
 			while sLBrick = sLIterator.next().value
@@ -180,7 +180,7 @@ class BrickLayouter extends Layouter
 					secondLayerBricks.add tlBrick
 				return secondLayerBricks
 
-		# no mergeable neighbors
+		# No mergeable neighbors
 		return null
 
 

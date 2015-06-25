@@ -57,50 +57,49 @@ b1 = bundle1.init().then ->
 	bundle2 = new Bundle config2, controls
 	b2 = bundle2.init()
 
-	loadAndConvert = (hash, animate) ->
-		b1.then -> bundle1.loadByHash hash
+	loadAndConvert = (identifier) ->
+		b1
+			.then -> bundle1.sceneManager.clearScene()
+			.then -> bundle1.loadByIdentifier identifier
 			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
-		b2.then -> bundle2.loadByHash hash
+		b2
+			.then -> bundle2.sceneManager.clearScene()
+			.then -> bundle2.loadByIdentifier identifier
 			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
-		$('.applink').prop 'href', "app#initialModel=#{hash}"
+		$('.applink').prop 'href', "app#initialModel=#{identifier}"
 
 	#load and process model
-	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
+	loadAndConvert 'goggles'
 
-	loadFromHash = (hash) ->
-		b1.then -> bundle1.sceneManager.clearScene()
-		b2.then -> bundle2.sceneManager.clearScene()
-		loadAndConvert hash, true
-
-	callback = (event) ->
+	dropAndInputCallback = (event) ->
 		files = event.target.files ? event.dataTransfer.files
 		if files.length
 			piwikTracking.trackEvent 'Landingpage', 'LoadModel', files[0].name
 			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
-			.then loadFromHash
+			.then loadAndConvert
 		else
-			hash = event.dataTransfer.getData 'text/plain'
-			piwikTracking.trackEvent 'Landingpage', 'LoadModelFromImage', hash
-			modelCache.exists hash
-			.then -> loadFromHash hash
+			identifier = event.dataTransfer.getData 'text/plain'
+			piwikTracking.trackEvent 'Landingpage', 'LoadModelFromImage', identifier
+			modelCache.exists identifier
+			.then -> loadAndConvert identifier
 			.catch -> bootbox.alert(
 				title: 'This is not a valid model!'
 				message: 'You can only drop stl files or our example images.'
 			)
 
 	fileDropper = require './modelLoading/fileDropper'
-	fileDropper.init callback
+	fileDropper.init dropAndInputCallback
 
 	fileInput = document.getElementById('fileInput')
 	fileInput.addEventListener 'change', (event) ->
-		callback event
-		@value = ''
+		dropAndInputCallback event
+		fileInput.value = ''
 
 	$('.dropper').text 'Drop an stl file'
 	$('#preview img, #preview a').on( 'dragstart'
 		(e) ->
 			e.originalEvent.dataTransfer.setData(
 				'text/plain'
-				e.originalEvent.target.getAttribute 'data-hash'
+				e.originalEvent.target.getAttribute 'data-identifier'
 			)
 	)

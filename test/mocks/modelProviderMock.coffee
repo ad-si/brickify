@@ -14,9 +14,9 @@ class ModelProviderMock
 		else
 			return Promise.reject()
 
-	request: (hash) =>
+	request: (identifier) =>
 		@calls++
-		@requestCalls.push hash: hash, request: @nextRequest
+		@requestCalls.push identifier: identifier, request: @nextRequest
 		if @nextRequest
 			return Promise.resolve @nextRequest
 		else

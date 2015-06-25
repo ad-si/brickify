@@ -6,6 +6,7 @@ samplesDirectory = 'modelSamples/'
 
 samples = {}
 
+# load samples on require (read: on server startup)
 do loadSamples = ->
 	fs
 		.readdirSync samplesDirectory
@@ -14,26 +15,31 @@ do loadSamples = ->
 		.forEach (sample) -> samples[sample.name] = sample
 	log.info 'Sample models loaded'
 
-module.exports.exists = (name) ->
+# API
+
+exists = (name) ->
 	if samples[name]?
 		return Promise.resolve name
 	else
 		return Promise.reject name
 
-get = (sample) ->
-	return new Promise (resolve, reject) ->
-		fs.readFile samplesDirectory + sample.name, (error, data) ->
-			if error
-				reject error
-			else
-				resolve data
-
-module.exports.get = (name) ->
+get = (name) ->
 	if samples[name]?
-		return get samples[name]
+		return new Promise (resolve, reject) ->
+			fs.readFile samplesDirectory + name, (error, data) ->
+				if error
+					reject error
+				else
+					resolve data
 	else
 		return Promise.reject name
 
-module.exports.getSamples = ->
+getSamples = ->
 	return Object.keys samples
 		.map (key) -> samples[key]
+
+module.exports = {
+	exists
+	get
+	getSamples
+}

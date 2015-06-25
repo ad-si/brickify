@@ -156,10 +156,7 @@ class BrickVisualization
 		@_visibleChildLayers = null
 
 	_setStudVisibility: (brick) ->
-		if brick.isCoveredOnTop()
-			brick.getVisualBrick().setStudVisibility false
-		else
-			brick.getVisualBrick().setStudVisibility true
+		brick.getVisualBrick().setStudVisibility not brick.isCoveredOnTop()
 
 	setPossibleLegoBoxVisibility: (isVisible) =>
 		@voxelWireframe.setVisibility isVisible

@@ -16,7 +16,7 @@ module.exports = class Grid
 		return model
 		.getBoundingBox()
 		.then (boundingBox) =>
-			# if the object is moved in the scene (not in the origin),
+			# If the object is moved in the scene (not in the origin),
 			# think about that while building the grid
 			if @modelTransform
 				bbMinWorld = new THREE.Vector3(
@@ -67,7 +67,7 @@ module.exports = class Grid
 			max: if max is Number.NEGATIVE_INFINITY then null else max
 		}
 
-	# use this if you are not interested in the actual number of layers
+	# Use this if you are not interested in the actual number of layers
 	# e.g. if you want to use them zero-indexed
 	getMaxZ: =>
 		return @_maxVoxelZ
@@ -90,7 +90,7 @@ module.exports = class Grid
 		@_minVoxelZ = Math.min @_minVoxelZ, z
 
 	mapWorldToGrid: (point) =>
-		# maps world coordinates to aligned grid coordinates
+		# Maps world coordinates to aligned grid coordinates
 		# aligned grid coordinates are world units, but relative to the
 		# grid origin
 
@@ -101,7 +101,7 @@ module.exports = class Grid
 		}
 
 	mapModelToGrid: (point) =>
-		# maps the model local coordinates to the grid coordinates by first
+		# Maps the model local coordinates to the grid coordinates by first
 		# transforming it with the modelTransform to world coordinates
 		# and then converting it to aligned grid coordinates
 
@@ -110,7 +110,7 @@ module.exports = class Grid
 			v.applyProjection(@modelTransform)
 			return @mapWorldToGrid v
 		else
-			# if model is placed at 0|0|0,
+			# If model is placed at 0|0|0,
 			# model and world coordinates are in the same system
 			return @mapWorldToGrid point
 
@@ -119,7 +119,7 @@ module.exports = class Grid
 		return @mapGridToVoxel gridPoint, false
 
 	mapGridToVoxel: (point, round = true) =>
-		# maps aligned grid coordinates to voxel indices
+		# Maps aligned grid coordinates to voxel indices
 		# cut z<0 to z=0, since the grid cannot have
 		# voxels in negative direction
 		x = point.x / @spacing.x
@@ -132,7 +132,7 @@ module.exports = class Grid
 		return x: x, y: y, z: z
 
 	mapVoxelToGrid: (point) =>
-		# maps voxel indices to aligned grid coordinates
+		# Maps voxel indices to aligned grid coordinates
 		return {
 			x: point.x * @spacing.x
 			y: point.y * @spacing.y
@@ -140,7 +140,7 @@ module.exports = class Grid
 		}
 
 	mapVoxelToWorld: (point) =>
-		# maps voxel indices to world coordinates
+		# Maps voxel indices to world coordinates
 		relative = @mapVoxelToGrid point
 		return {
 			x: relative.x + @origin.x
@@ -155,7 +155,7 @@ module.exports = class Grid
 			z: Math.round point.z
 		}
 
-	# generates a key for a hashmap from the given coordinates
+	# Generates a key for a hashmap from the given coordinates
 	_generateKey: (x, y, z) ->
 		return x + '-' + y + '-' + z
 
@@ -170,7 +170,7 @@ module.exports = class Grid
 			@_updateMinMax position
 		return v
 
-	# links neighbors of this voxel with this voxel
+	# Links neighbors of this voxel with this voxel
 	_linkNeighbors: (voxel) ->
 		p = voxel.position
 
@@ -221,7 +221,7 @@ module.exports = class Grid
 		return voxels
 
 	getNeighbors: (x, y, z, selectionCallback) =>
-		# returns a list of neighbors for this voxel position.
+		# Returns a list of neighbors for this voxel position.
 		# the selectionCallback(neighbor) defines what to return
 		# and has to return true, if the voxel neighbor should be collected
 		list = []
@@ -267,7 +267,7 @@ module.exports = class Grid
 			new Brick([voxel])
 		return Promise.resolve @
 
-	# returns all bricks as a set
+	# Returns all bricks as a set
 	getAllBricks: =>
 		bricks = new Set()
 
@@ -277,7 +277,7 @@ module.exports = class Grid
 
 		return bricks
 
-	# chooses a random brick
+	# Chooses a random brick
 	chooseRandomBrick: =>
 		while true
 			x = @_minVoxelX + Random.next @getNumVoxelsX()
@@ -289,7 +289,7 @@ module.exports = class Grid
 			if vox? and vox.brick
 				return vox.brick
 
-	# inserts voxels from a three-dimensional array in [x][y][z] order
+	# Inserts voxels from a three-dimensional array in [x][y][z] order
 	fromPojo: (pojo) ->
 		for x, voxelPlane of pojo
 			x = parseInt x
@@ -322,8 +322,7 @@ module.exports = class Grid
 	# Intersects a ray (1/direction + origin) with a voxel. returns the distance
 	# until intersection, a value <0 means no intersection
 	_intersectVoxel: (voxel, dirfrac, rayOrigin) =>
-		# source:
-		# http://gamedev.stackexchange.com/questions/18436/
+		# Source: http://gamedev.stackexchange.com/questions/18436/
 
 		worldPosition = @mapVoxelToWorld voxel.position
 		lower = {

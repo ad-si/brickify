@@ -71,12 +71,12 @@ class Layouter
 					neighborIterator = neighbors.values()
 					#.. unless all neighbors are already bricks
 					while neighbor = neighborIterator.next().value
-						if neighbor.getSize().z == 3
+						if neighbor.getSize().z == 1
+							newBricks = brick.splitUp()
+							bricksToLayout.delete brick
+							newBricks.forEach (newBrick) ->
+								bricksToLayout.add newBrick
 							`continue MAINLOOP//`
-					newBricks = brick.splitUp()
-					bricksToLayout.delete brick
-					newBricks.forEach (newBrick) ->
-						bricksToLayout.add newBrick
 
 		return Promise.resolve {grid: grid}
 

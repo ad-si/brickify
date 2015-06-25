@@ -76,16 +76,16 @@ class LayoutOptimizer
 		return numberOfComponents
 
 	_bricksOnComponentInterfaces: (bricks) =>
-		bricksToSplit = new Set()
+		bricksOnInterfaces = new Set()
 
 		bricks.forEach (brick) ->
 			neighborsXY = brick.getNeighborsXY()
 			neighborsXY.forEach (neighbor) ->
 				if neighbor.label != brick.label
-					bricksToSplit.add neighbor
-					bricksToSplit.add brick
+					bricksOnInterfaces.add neighbor
+					bricksOnInterfaces.add brick
 
-		return bricksToSplit
+		return bricksOnInterfaces
 
 
 	###

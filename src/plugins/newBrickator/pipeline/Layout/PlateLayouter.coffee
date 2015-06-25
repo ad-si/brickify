@@ -61,7 +61,7 @@ class PlateLayouter extends Layouter
 	# @param {Brick} brick the brick whose neighbors to check
 	# @param {Number} dir the merge direction as specified in Brick.direction
 	# @param {Function} widthFn the function to determine the brick's width
-	# @param {Function} lengthFn the function to determine the brick's height
+	# @param {Function} lengthFn the function to determine the brick's length
 	# @return {Array<Brick>} Bricks in the merge direction if this brick can merge
 	# in this dir undefined otherwise.
 	# @see Brick

@@ -88,20 +88,20 @@ class PlateLayouter extends Layouter
 		# i.e. no spacing between neighbors
 		return null if width != widthFn(brick.getSize())
 
-		minWidth = widthFn brick.getPosition()
+		minWidth = widthFn(brick.getPosition())
 
-		maxWidth = widthFn(brick.getPosition())
-		maxWidth += widthFn(brick.getSize()) - 1
+		maxWidth = minWidth + widthFn(brick.getSize()) - 1
 
 		length = null
 
 		invalidSize = false
 		neighborsInDirection.forEach (neighbor) ->
-			length ?= lengthFn neighbor.getSize()
+			length ?= lengthFn(neighbor.getSize())
 			if widthFn(neighbor.getPosition()) < minWidth
 				invalidSize = true
-			nw = widthFn(neighbor.getPosition()) + widthFn(neighbor.getSize()) - 1
-			if nw > maxWidth
+			neighborWidth = widthFn(neighbor.getPosition()) +
+				widthFn(neighbor.getSize()) - 1
+			if neighborWidth > maxWidth
 				invalidSize = true
 			if lengthFn(neighbor.getSize()) != length
 				invalidSize = true
@@ -117,7 +117,7 @@ class PlateLayouter extends Layouter
 
 	# Returns the index of the mergeableNeighbors sub-set-in-this-array,
 	# where the bricks have the most connected neighbors.
-	# If multiple sub-arrays have the same number of connected neighbors,
+	# If multiple sub-sets have the same number of connected neighbors,
 	# one is randomly chosen
 	_chooseNeighborsToMergeWith: (mergeableNeighbors) ->
 		numConnections = []

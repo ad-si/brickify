@@ -18,14 +18,14 @@ block body
 				tr
 					td.printTime
 						span.fa.fa-clock-o
-						p #{sample.printTime}
+						p= sample.printTime
 					td.sample
 						a(href='app#initialModel='+sample.name)
 							img(src='/img/modelSamples/'+sample.name+'.png')
 							img.editHover(src='/img/modelSamples/editHover.png')
 					td
-						h3 #{sample.title}
-						p #{sample.description}
+						h3= sample.title
+						p= sample.description
 					td.download
 						a.btn.btn-success.notAvailable Get course material!
 			tr

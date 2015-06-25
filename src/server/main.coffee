@@ -96,7 +96,7 @@ module.exports.setupRouting = ->
 			.set 'include css', true
 			.use nib()
 			.use bootstrap()
-			# ugly because of github.com/LearnBoost/stylus/issues/1828
+			# Ugly because of github.com/LearnBoost/stylus/issues/1828
 			.define 'backgroundColor', '#' + ('000000' +
 				globalConfig.colors.background.toString 16).slice -6
 	)

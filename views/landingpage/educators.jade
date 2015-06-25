@@ -19,12 +19,10 @@ block body
 					td.printTime
 						span.fa.fa-clock-o
 						p #{sample.printTime}
-					td#sample
+					td.sample
 						a(href='app#initialModel='+sample.name)
-							img(src='/img/modelSamples/'+sample.name+'.png'
-								width='255px' height='167px')
-							img.editHover(src='/img/modelSamples/editHover.png'
-								width='255px' height='167px')
+							img(src='/img/modelSamples/'+sample.name+'.png')
+							img.editHover(src='/img/modelSamples/editHover.png')
 					td
 						h3 #{sample.title}
 						p #{sample.description}
@@ -32,7 +30,7 @@ block body
 						a.btn.btn-success.notAvailable Get course materail!
 			tr
 				td.printTime
-				td#sample
+				td.sample
 				td
 					h3 Thingiverse
 					p Search thingiverse. You can use Brickolage with any .stl file.
@@ -43,11 +41,10 @@ block body
 				td
 			tr
 				td.printTime
-				td#sample
+				td.sample
 					a(href='/app')
-						img(src='/img/modelSamples/custom.png' width='255px')
-						img.editHover(
-							src='/img/modelSamples/editHover.png' width='255px')
+						img(src='/img/modelSamples/custom.png')
+						img.editHover(src='/img/modelSamples/editHover.png')
 				td
 					h3 Custom
 					p Click here if you want to use your own models

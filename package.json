@@ -73,7 +73,6 @@
     "karma-browserify": "^1.0.1",
     "karma-chai": "^0.1.0",
     "karma-chai-plugins": "^0.2.4",
-    "karma-chrome-launcher": "^0.1.7",
     "karma-cli": "0.0.4",
     "karma-mocha": "^0.1.10",
     "mocha": "^2.1.0"

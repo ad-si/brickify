@@ -4,7 +4,11 @@ dpStorage = require '../src/server/sync/dataPacketRamStorage'
 
 module.exports.create = (request, response) ->
 	dpStorage.create()
-	.then (packet) -> response.status(201).json packet
+	.then (packet) ->
+		response
+			.location('/datapacket/' + packet.id)
+			.status(201)
+			.json packet
 	.catch -> response.status(500).send 'Packet could not be created'
 
 module.exports.exists = (request, response) ->

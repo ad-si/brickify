@@ -2,7 +2,9 @@ log = require 'loglevel'
 
 HullVoxelizer = require './HullVoxelizer'
 VolumeFiller = require './VolumeFiller'
-BrickLayouter = require './BrickLayouter'
+BrickLayouter = require './Layout/BrickLayouter'
+PlateLayouter = require './Layout/Platelayouter'
+LayoutOptimizer = require './Layout/LayoutOptimizer'
 Random = require './Random'
 operative = require 'operative'
 
@@ -12,6 +14,8 @@ module.exports = class LegoPipeline
 		@voxelizer = new HullVoxelizer()
 		@volumeFiller = new VolumeFiller()
 		@brickLayouter = new BrickLayouter()
+		@plateLayouter = new PlateLayouter()
+		@layoutOptimizer = new LayoutOptimizer(@brickLayouter, @plateLayouter)
 
 		@pipelineSteps = []
 		@pipelineSteps.push
@@ -39,34 +43,41 @@ module.exports = class LegoPipeline
 			name: 'Layout graph initialization'
 			decision: (options) -> return options.initLayout
 			worker: (lastResult, options, progressCallback) =>
-				return @brickLayouter.initializeBrickGraph lastResult.grid
+				return lastResult.grid.initializeBricks()
 
 		@pipelineSteps.push
-			name: 'Layout 3L merge'
+			name: 'Layout Bricks'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.layout3LBricks lastResult.grid
+				return @brickLayouter.layout lastResult.grid
 
 		@pipelineSteps.push
-			name: 'Layout greedy merge'
+			name: 'Layout Plates'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options, progressCallback) =>
-				return @brickLayouter.layoutByGreedyMerge lastResult.grid
+				return @plateLayouter.layout lastResult.grid
 
 		@pipelineSteps.push
 			name: 'Final merge pass'
 			decision: (options) -> return options.layouting
 			worker: (lastResult, options) =>
-				return @brickLayouter.finalLayoutPass lastResult.grid
+				return @plateLayouter.finalLayoutPass lastResult.grid
 
 		@pipelineSteps.push
 			name: 'Local reLayout'
 			decision: (options) -> return options.reLayout
 			worker: (lastResult, options, progressCallback) =>
-				return @brickLayouter.splitBricksAndRelayoutLocally(
+				return @layoutOptimizer.splitBricksAndRelayoutLocally(
 					lastResult.modifiedBricks
 					lastResult.grid
 				)
+
+		@pipelineSteps.push
+			name: 'Stability optimization'
+			decision: (options) ->
+				return options.layouting or options.reLayout
+			worker: (lastResult, options) =>
+				return @layoutOptimizer.optimizeLayoutStability lastResult.grid
 
 	run: (data, options = null) =>
 		@terminated = false

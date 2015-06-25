@@ -13,7 +13,7 @@ sanitizeJqXHRError = (jqXHR) ->
 	}
 
 module.exports.create = ->
-	return Promise.resolve $.ajax '/datapacket/create', type: 'GET'
+	return Promise.resolve $.ajax '/datapacket', type: 'POST'
 		.catch sanitizeJqXHRError
 
 module.exports.exists = (id) ->

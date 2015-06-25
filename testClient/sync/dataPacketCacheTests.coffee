@@ -21,8 +21,8 @@ describe 'dataPacket client cache', ->
 		it 'should call the server to create a dataPacket', ->
 			newPacket = {id: 'abcdefgh', data: {}}
 			$.mockjax(
-				type: 'GET'
-				url: '/datapacket/create'
+				type: 'POST'
+				url: '/datapacket'
 				status: 200
 				contentType: 'application/json'
 				responseText: newPacket
@@ -36,8 +36,8 @@ describe 'dataPacket client cache', ->
 		it 'should cache a newly created dataPacket', ->
 			newPacket = {id: 'abcdefgh', data: {}}
 			$.mockjax(
-				type: 'GET'
-				url: '/datapacket/create'
+				type: 'POST'
+				url: '/datapacket'
 				status: 200
 				contentType: 'application/json'
 				responseText: newPacket
@@ -52,8 +52,8 @@ describe 'dataPacket client cache', ->
 
 		it 'should fail if the server cannot create a dataPacket', ->
 			$.mockjax(
-				type: 'GET'
-				url: '/datapacket/create'
+				type: 'POST'
+				url: '/datapacket'
 				status: 500
 				responseText: 'Packet could not be created'
 			)
@@ -105,8 +105,8 @@ describe 'dataPacket client cache', ->
 		it 'should answer from cache if dataPacket is known', ->
 			newPacket = {id: 'abcdefgh', data: {}}
 			$.mockjax(
-				type: 'GET'
-				url: '/datapacket/create'
+				type: 'POST'
+				url: '/datapacket'
 				status: 200
 				contentType: 'application/json'
 				responseText: newPacket

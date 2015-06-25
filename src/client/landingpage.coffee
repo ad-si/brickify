@@ -9,7 +9,10 @@ globalConfig = require '../common/globals.yaml'
 Bundle = require './bundle'
 clone = require 'clone'
 fileLoader = require './modelLoading/fileLoader'
+fileDropper = require './modelLoading/fileDropper'
 modelCache = require './modelLoading/modelCache'
+readFiles = require './modelLoading/readFiles'
+
 
 # Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -72,35 +75,47 @@ b1 = bundle1.init().then ->
 		b2.then -> bundle2.sceneManager.clearScene()
 		loadAndConvert hash, true
 
-	callback = (event) ->
-		files = event.target.files ? event.dataTransfer.files
+	fileInputCallback = (files) ->
+
 		if files.length
-			piwikTracking.trackEvent 'Landingpage', 'LoadModel', files[0].name
-			fileLoader.onLoadFile files, $('#loadButton')[0], shadow: false
-			.then loadFromHash
+			piwikTracking.trackEvent(
+				'Landingpage'
+				'LoadModel'
+				files[0].name
+			)
+
+			readFiles files
+				.then loadFromHash
+
 		else
 			hash = event.dataTransfer.getData 'text/plain'
-			piwikTracking.trackEvent 'Landingpage', 'LoadModelFromImage', hash
+
+			piwikTracking.trackEvent(
+				'Landingpage'
+				'LoadModelFromImage'
+				hash
+			)
+
 			modelCache.exists hash
-			.then -> loadFromHash hash
-			.catch -> bootbox.alert(
-				title: 'This is not a valid model!'
-				message: 'You can only drop stl files or our example images.'
-			)
+				.then -> loadFromHash hash
+				.catch -> bootbox.alert(
+					title: 'This is not a valid model!'
+					message: 'You can only drop stl files
+						or our example images.'
+				)
 
-	fileDropper = require './modelLoading/fileDropper'
-	fileDropper.init callback
+	fileDropper.init fileInputCallback
 
-	fileInput = document.getElementById('fileInput')
-	fileInput.addEventListener 'change', (event) ->
-		callback event
-		@value = ''
+	document
+		.getElementById 'fileInput'
+		.addEventListener 'change', (event) ->
+			fileInputCallback @files
+			@value = ''
 
-	$('.dropper').text 'Drop an stl file'
-	$('#preview img, #preview a').on( 'dragstart'
-		(e) ->
-			e.originalEvent.dataTransfer.setData(
+	$('#loadButton img').hide()
+	$('#loadButton span').text 'Drop an STL file'
+	$('#preview img, #preview a').on 'dragstart', (event) ->
+			event.originalEvent.dataTransfer.setData(
 				'text/plain'
-				e.originalEvent.target.getAttribute 'data-hash'
+				event.originalEvent.target.getAttribute 'data-hash'
 			)
-	)

@@ -9,8 +9,8 @@ class Node extends SyncObject
 	constructor: ({name, modelIdentifier, transform} = {}) ->
 		super arguments[0]
 		@transientProperties = []
-		@name = name || null
-		@modelIdentifier = modelIdentifier || null
+		@name = name ? null
+		@modelIdentifier = modelIdentifier ? null
 		@transform = {}
 		@_setTransform transform
 

@@ -18,11 +18,11 @@ class SsaoBlurPart extends ShaderPart
 	getFragmentPreMain: ->
 		return '
 			float ssaoBlur(vec2 texCoords){
-				float gaussKernelValues[81];\n
-				gaussKernelValues[0] = 0.00839;\n
-				gaussKernelValues[1] = 0.00965;\n
-				gaussKernelValues[2] = 0.01066;\n
-				gaussKernelValues[3] = 0.01132;\n
+				float gaussKernelValues[81];
+				gaussKernelValues[0] = 0.00839;
+				gaussKernelValues[1] = 0.00965;
+				gaussKernelValues[2] = 0.01066;
+				gaussKernelValues[3] = 0.01132;
 				gaussKernelValues[4] = 0.01155;
 				gaussKernelValues[5] = 0.01132;
 				gaussKernelValues[6] = 0.01066;
@@ -99,7 +99,7 @@ class SsaoBlurPart extends ShaderPart
 				gaussKernelValues[77] = 0.01132;
 				gaussKernelValues[78] = 0.01066;
 				gaussKernelValues[79] = 0.00965;
-				gaussKernelValues[80] = 0.00839;\n
+				gaussKernelValues[80] = 0.00839;
 
 				float dX = 1.0 / texWidth;
 				float dY = 1.0 / texHeight;
@@ -114,10 +114,10 @@ class SsaoBlurPart extends ShaderPart
 					- float(kernelSize);
 
 					float tx = texCoords.x + x * dX;
-					float ty = texCoords.y + y * dY;\n
+					float ty = texCoords.y + y * dY;
 
-					float weight = gaussKernelValues[kernelIndex];\n
-					float currentValue = texture2D(tColor, vec2(tx, ty)).r;\n
+					float weight = gaussKernelValues[kernelIndex];
+					float currentValue = texture2D(tColor, vec2(tx, ty)).r;
 					value = value + currentValue * weight;
 				}
 

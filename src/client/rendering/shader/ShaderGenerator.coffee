@@ -91,7 +91,7 @@ class ShaderGenerator
 		shaderCode += preMain
 		shaderCode += '
 			void main(){
-				vec4 col = vec4(0.0, 0.0, 0.0, 0.0);\n
+				vec4 col = vec4(0.0);\n
 				float currentOpacity = opacity;
 				\n
 				' + inMain + '

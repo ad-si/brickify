@@ -20,6 +20,8 @@ class NodeVisualizer
 		@objectShadowOpacity = 0.5
 		@objectColorMult = new THREE.Vector3(1, 1, 1)
 		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
+		@brickVisualizations = {}
+		@fidelity = 0
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
@@ -190,6 +192,16 @@ class NodeVisualizer
 				# change material properties
 				@coloring.setPipelineMode false
 
+		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
+			@fidelity = 2
+		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+			@fidelity = 1
+		else
+			@fidelity = 0
+
+		for nodeId, brickVisualization of @brickVisualizations
+			brickVisualization.setFidelity @fidelity
+
 	# called by newBrickator when an object's data structure is modified
 	objectModified: (node, newBrickatorData) =>
 		@_getCachedData(node)
@@ -224,6 +236,7 @@ class NodeVisualizer
 		@brickRootNode.remove threeHelper.find node, @brickRootNode
 		@brickShadowRootNode.remove threeHelper.find node, @brickShadowRootNode
 		@objectsRootNode.remove threeHelper.find node, @objectsRootNode
+		delete @brickVisualizations[node.id]
 
 	onNodeSelect: (@selectedNode) => return
 
@@ -264,15 +277,18 @@ class NodeVisualizer
 		threeHelper.link node, brickShadowThreeNode
 		threeHelper.link node, modelThreeNode
 
+		brickVisualization = new BrickVisualization(
+				@bundle, brickThreeNode, brickShadowThreeNode, @coloring, @fidelity
+			)
+		@brickVisualizations[node.id] = brickVisualization
+
 		data = {
 			initialized: false
 			node: node
 			brickThreeNode: brickThreeNode
 			brickShadowThreeNode: brickShadowThreeNode
 			modelThreeNode: modelThreeNode
-			brickVisualization: new BrickVisualization(
-				@bundle, brickThreeNode, brickShadowThreeNode, @coloring
-			)
+			brickVisualization: brickVisualization
 			modelVisualization: new ModelVisualization(
 				@bundle.globalConfig, node, modelThreeNode, @coloring
 			)
@@ -342,7 +358,7 @@ class NodeVisualizer
 			cachedData.stabilityViewEnabled = false
 
 	_applyBuildMode: (cachedData) =>
-		# show bricks and csg
+		# Show bricks and csg
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 		cachedData.brickVisualization.setHighlightVoxelVisibility false
 
@@ -356,6 +372,13 @@ class NodeVisualizer
 		cachedData.brickVisualization.showAllBrickLayers()
 		cachedData.modelVisualization.setNodeVisibility true
 
+	# Returns the amount of LEGO-Layers that can be shown in build mode.
+	# Layers without bricks are discarded
+	getNumberOfBuildLayers: (selectedNode) =>
+		return @_getCachedData(selectedNode)
+			.then (cachedData) ->
+				return cachedData.brickVisualization.getNumberOfVisibleLayers()
+
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
@@ -366,7 +389,7 @@ class NodeVisualizer
 				gridLayer = minLayer + layer - 1
 				# If there is 3D print below first lego layer, show lego starting
 				# with layer 1 and show only 3D print in first instruction layer
-				gridLayer -= 1 if minLayer > 0
+				gridLayer -= 2 if minLayer > 0
 				cachedData.brickVisualization.showBrickLayer gridLayer
 
 	_updateBrickCount: (bricks) =>

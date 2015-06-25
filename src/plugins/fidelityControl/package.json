@@ -5,5 +5,5 @@
   "brickify": {
     "type": "controller"
   },
-  "browser": "./fidelityControl.coffee"
+  "browser": "./FidelityControl.coffee"
 }

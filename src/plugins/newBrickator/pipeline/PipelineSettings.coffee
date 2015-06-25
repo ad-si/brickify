@@ -1,4 +1,4 @@
-module.exports  = class PipelineSettings
+module.exports = class PipelineSettings
 	constructor: (globalConfig) ->
 		@gridSpacing = globalConfig.gridSpacing
 		@modelTransform = null

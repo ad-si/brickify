@@ -3,43 +3,69 @@ BrickObject = require './BrickObject'
 
 # This class provides basic functionality to create simple Voxel/Brick geometry
 module.exports = class GeometryCreator
-	constructor: (@grid) ->
+	constructor: (@globalConfig, @grid) ->
 		@brickGeometryCache = {}
 		@studGeometryCache = {}
+		@highFiStudGeometryCache = {}
+		@planeGeometryCache = {}
 
-		@stud = new THREE.CylinderGeometry(
-			#these numbers are made up to look good. don't use for csg operations
-			@grid.spacing.x * 0.3, @grid.spacing.y * 0.3, @grid.spacing.z * 0.7, 7
+		studRotation = new THREE.Matrix4()
+		studRotation.makeRotationX(1.571)
+
+		studTranslation = new THREE.Matrix4()
+		studTranslation.makeTranslation 0, 0, @globalConfig.studSize.height / 2
+
+		@studGeometry = new THREE.CylinderGeometry(
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.height
+			7
+		)
+		@studGeometry.applyMatrix studRotation
+		@studGeometry.applyMatrix studTranslation
+
+		@highFiStudGeometry = new THREE.CylinderGeometry(
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.radius
+			@globalConfig.studSize.height
+			42
 		)
 
-		rotation = new THREE.Matrix4()
-		rotation.makeRotationX(1.571)
-		@stud.applyMatrix(rotation)
+		@highFiStudGeometry.applyMatrix studRotation
+		@highFiStudGeometry.applyMatrix studTranslation
 
-	getVoxel: (gridPosition, material) =>
-		brick = @getBrick gridPosition, {x: 1, y: 1, z: 1}, material
-
-		#store references (voxel) for further use
-		brick.setVoxelCoords gridPosition
-		brick.setGridReference @grid.getVoxel(
-			gridPosition.x, gridPosition.y, gridPosition.z
-		)
-
-		return brick
-
-	getBrick: (gridPosition, brickDimensions, material) =>
+	getBrick: (gridPosition, brickDimensions, materials, fidelity) =>
 		# returns a THREE.Geometry that uses the given material and is
 		# transformed to match the given grid position
-		brickGeometry = @_getBrickGeometry(brickDimensions)
-		studGeometry = @_getStudsGeometry(brickDimensions)
-
-		brick = new BrickObject(brickGeometry, studGeometry, material)
-
 		worldBrickSize = {
 			x: brickDimensions.x * @grid.spacing.x
 			y: brickDimensions.y * @grid.spacing.y
 			z: brickDimensions.z * @grid.spacing.z
 		}
+
+		geometries = {
+			brickGeometry: @_getBrickGeometry brickDimensions, worldBrickSize
+			studGeometry: @_getStudsGeometry(
+				brickDimensions
+				worldBrickSize
+				@studGeometryCache
+				@studGeometry
+			)
+			highFiStudGeometry: @_getStudsGeometry(
+				brickDimensions
+				worldBrickSize
+				@highFiStudGeometryCache
+				@highFiStudGeometry
+			)
+			planeGeometry: @_getPlaneGeometry brickDimensions, worldBrickSize
+		}
+
+		brick = new BrickObject(
+			geometries
+			materials
+			fidelity
+		)
+
 		worldBrickPosition = @grid.mapVoxelToWorld gridPosition
 
 		#translate so that the x:0 y:0 z:0 coordinate matches the models corner
@@ -67,52 +93,72 @@ module.exports = class GeometryCreator
 		box.dimensions = boxDimensions
 		return box
 
-	_getBrickGeometry: (brickDimensions) =>
+	_getBrickGeometry: (brickDimensions, worldBrickSize) =>
 		# returns a box geometry for the given dimensions
 
-		ident = @_getHash brickDimensions
-		if @brickGeometryCache[ident]?
-			return @brickGeometryCache[ident]
-
-		brickGeometry = new THREE.BoxGeometry(
-			brickDimensions.x * @grid.spacing.x
-			brickDimensions.y * @grid.spacing.y
-			brickDimensions.z * @grid.spacing.z
-		)
-
-		@brickGeometryCache[ident] = brickGeometry
-		return brickGeometry
-
-	_getStudsGeometry: (brickDimensions) =>
-		# returns studs for the given brick size
-
-		ident = @_getHash brickDimensions
-		if @studGeometryCache[ident]?
-			return @studGeometryCache[ident]
-
-		studs = new THREE.Geometry()
-
-		worldBrickSize = {
+		worldBrickSize ?= {
 			x: brickDimensions.x * @grid.spacing.x
 			y: brickDimensions.y * @grid.spacing.y
 			z: brickDimensions.z * @grid.spacing.z
 		}
 
+		dimensionsHash = @_getHash brickDimensions
+		if @brickGeometryCache[dimensionsHash]?
+			return @brickGeometryCache[dimensionsHash]
+
+		brickGeometry = new THREE.BoxGeometry(
+			worldBrickSize.x
+			worldBrickSize.y
+			worldBrickSize.z
+		)
+
+		@brickGeometryCache[dimensionsHash] = brickGeometry
+		return brickGeometry
+
+	_getStudsGeometry: (brickDimensions, worldBrickSize, cache, geometry) =>
+		# returns studs for the given brick size
+
+		dimensionsHash = @_getHash brickDimensions
+		if cache[dimensionsHash]?
+			return cache[dimensionsHash]
+
+		studs = new THREE.Geometry()
+
 		for xi in [0..brickDimensions.x - 1] by 1
 			for yi in [0..brickDimensions.y - 1] by 1
 				tx = (@grid.spacing.x * (xi + 0.5)) - (worldBrickSize.x / 2)
 				ty = (@grid.spacing.y * (yi + 0.5)) - (worldBrickSize.y / 2)
-				if brickDimensions.z == 1
-					tz = (@grid.spacing.z * 0.7)
-				else if brickDimensions.z == 3
-					tz = (@grid.spacing.z * 1.7)
+				tz = (@grid.spacing.z * brickDimensions.z) - (worldBrickSize.z / 2)
 
 				translation = new THREE.Matrix4()
 				translation.makeTranslation(tx, ty, tz)
 
-				studs.merge @stud, translation
+				studs.merge geometry, translation
 
-		@studGeometryCache[ident] = studs
+		bufferGeometry = new THREE.BufferGeometry()
+		bufferGeometry.fromGeometry studs
+
+		cache[dimensionsHash] = bufferGeometry
+		return bufferGeometry
+
+	_getPlaneGeometry: (brickDimensions, worldBrickSize) =>
+		# returns studs for the given brick size
+
+		dimensionsHash = @_getHash brickDimensions
+		if @planeGeometryCache[dimensionsHash]?
+			return @planeGeometryCache[dimensionsHash]
+
+		studs = new THREE.PlaneBufferGeometry(
+			@grid.spacing.x * brickDimensions.x
+			@grid.spacing.y * brickDimensions.y
+		)
+
+		tz = (@grid.spacing.z * brickDimensions.z) - (worldBrickSize.z / 2)
+		translation = new THREE.Matrix4()
+		translation.makeTranslation(0, 0, tz)
+		studs.applyMatrix translation
+
+		@planeGeometryCache[dimensionsHash] = studs
 		return studs
 
 	_getHash: (dimensions) ->

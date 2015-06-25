@@ -1,4 +1,5 @@
 fs = require 'fs'
+fsp = require 'fs-promise'
 mkdirp = require 'mkdirp'
 path = require 'path'
 md5 = require('blueimp-md5').md5
@@ -28,12 +29,7 @@ get = (hash) ->
 	unless checkHash hash
 		return Promise.reject 'invalid hash'
 
-	return new Promise (resolve, reject) ->
-		fs.readFile cacheDirectory + hash, (error, data) ->
-			if error
-				reject error
-			else
-				resolve data
+	return fsp.readFile cacheDirectory + hash
 
 store = (hash, model) ->
 	unless checkHash hash
@@ -42,12 +38,8 @@ store = (hash, model) ->
 	if hash isnt md5 model
 		return Promise.reject 'wrong hash'
 
-	return new Promise (resolve, reject) ->
-		fs.writeFile cacheDirectory + hash, model, (error) ->
-			if error
-				reject error
-			else
-				resolve hash
+	return fsp.writeFile cacheDirectory + hash, model
+		.then -> return hash
 
 # checks if the hash has the correct format
 checkHash = (hash) ->

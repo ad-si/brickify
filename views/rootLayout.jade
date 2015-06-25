@@ -18,7 +18,8 @@ html
 
 		block body
 
-		script(src='/js/piwik.js')
-		noscript
-			img(src='//piwik.brickify.it/piwik.php?idsite=1' style='border:0;' alt='')
+		if piwikEnabled
+			script(src='/js/piwik.js')
+			noscript
+				img(src='//piwik.brickify.it/piwik.php?idsite=1' style='border:0;' alt='')
 		block scripts

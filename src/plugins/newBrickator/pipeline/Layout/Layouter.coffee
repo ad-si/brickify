@@ -71,7 +71,7 @@ class Layouter
 					neighborIterator = neighbors.values()
 					#.. unless all neighbors are already bricks
 					while neighbor = neighborIterator.next().value
-						if neighbor.getSize().z == 1
+						if neighbor.getSize().z == 3
 							`continue MAINLOOP//`
 					newBricks = brick.splitUp()
 					bricksToLayout.delete brick

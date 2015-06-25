@@ -188,7 +188,7 @@ class Brick
 		if @_isCoveredOnTop?
 			return @_isCoveredOnTop
 
-		stability = @getStabilityInZDir Brick.direction.Zp
+		stability = @fractionOfConnectionsInZDirection Brick.direction.Zp
 
 		@_isCoveredOnTop = stability > 0.99
 		return @_isCoveredOnTop

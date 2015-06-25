@@ -115,7 +115,7 @@ class SsaoBlurPart extends ShaderPart
 	getFragmentInMain: ->
 		return '
 			float blur = ssaoBlur(vUv);
-			/* Current color is black as it is initialized as such */
+			col = vec4(0.0);
 			currentOpacity = 1.0 - blur;
 		'
 

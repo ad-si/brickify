@@ -35,6 +35,7 @@ class Layouter
 		maxNumRandomChoicesWithoutMerge = numTotalInitialBricks
 		return Promise.resolve {grid: grid} unless numTotalInitialBricks > 0
 
+		`MAINLOOP: //`
 		loop
 			brick = @_chooseRandomBrick bricksToLayout
 			if !brick?
@@ -66,11 +67,12 @@ class Layouter
 				brick.isSize(1, 2, 3)
 					# .. unless it has no neighbors ..
 					neighbors = brick.getNeighborsXY()
-					continue if neighbors.size == 0
+					continue  if neighbors.size == 0
 					neighborIterator = neighbors.values()
 					#.. unless all neighbors are already bricks
 					while neighbor = neighborIterator.next().value
-						continue if neighbor.getSize().z == 1
+						if neighbor.getSize().z == 1
+							`continue MAINLOOP//`
 					newBricks = brick.splitUp()
 					bricksToLayout.delete brick
 					newBricks.forEach (newBrick) ->

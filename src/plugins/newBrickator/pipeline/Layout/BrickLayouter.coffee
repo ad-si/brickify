@@ -116,8 +116,13 @@ class BrickLayouter extends Layouter
 
 		return null
 
-	# check if at least half of the top and half of the bottom voxels
-	# offer connection possibilities
+	###
+		check if at least half of the top and half of the bottom voxels
+		offer connection possibilities
+		This is used as a heuristic to determine whether or not to merge bricks:
+		if a brick has less than minFraction connection
+		it may lead to a more unstable layout
+	###
 	_minFractionOfConnectionsPresent: (voxels) =>
 		minFraction = .51
 		fraction = Voxel.fractionOfConnections voxels

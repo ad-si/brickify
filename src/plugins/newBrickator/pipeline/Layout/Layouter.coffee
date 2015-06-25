@@ -3,10 +3,25 @@ log = require 'loglevel'
 Random = require '../Random'
 DataHelper = require '../DataHelper'
 
+###
+# @class PlateLayouter
+#
+# Abstract class containing most of the execution logic
+# for inheriting classes
+###
+
 class Layouter
 	constructor: ->
 		return
 
+	###
+	# Performs one layout pass.
+	#
+	# @param {Grid} grid the grid that contains the voxels/bricks to be layouted
+	# @param {Set<Brick>} [bricksToLayout] if present, layouter only works on
+	# the bricks in this set, not on the entire grid
+	# @return {Grid} updated version of the original grid passed to the function
+	###
 	layout: (grid, bricksToLayout) ->
 		numRandomChoices = 0
 		numRandomChoicesWithoutMerge = 0

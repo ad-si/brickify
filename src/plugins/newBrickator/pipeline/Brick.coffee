@@ -169,6 +169,18 @@ class Brick
 	# tells this brick to update cached neighbors indices
 	clearNeighborsCache: =>
 		@_neighbors = null
+		@_isCoveredOnTop = null
+
+	# Returns true if the brick is fully covered by other bricks on its top,
+	# or false, if there is (partly) 3D-print-geometry above it
+	isCoveredOnTop: =>
+		if @_isCoveredOnTop?
+			return @_isCoveredOnTop
+
+		stability = @getStabilityInZDir Brick.direction.Zp
+
+		@_isCoveredOnTop = stability > 0.99
+		return @_isCoveredOnTop
 
 	# Connected Bricks are neighbors in Zp and Zm direction
 	# because they are connected with studs to each other

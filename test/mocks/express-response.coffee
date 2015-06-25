@@ -12,4 +12,7 @@ class Response
 		send: @setContent 'text'
 		}
 
+	location: (@location) =>
+		return @
+
 module.exports = Response

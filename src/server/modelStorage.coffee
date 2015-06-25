@@ -6,11 +6,14 @@ log = require('winston').loggers.get 'log'
 
 cacheDirectory = 'modelCache/'
 
+# create cache directory on require (read: on server startup)
 do createCacheDirectory = ->
 	mkdirp cacheDirectory, (error) ->
 		log.warn 'Unable to create cache directory: ' + error if error?
 
-module.exports.exists = (hash) ->
+# API
+
+exists = (hash) ->
 	unless checkHash hash
 		return Promise.reject 'invalid hash'
 
@@ -21,7 +24,7 @@ module.exports.exists = (hash) ->
 			else
 				reject hash
 
-module.exports.get = (hash) ->
+get = (hash) ->
 	unless checkHash hash
 		return Promise.reject 'invalid hash'
 
@@ -32,7 +35,7 @@ module.exports.get = (hash) ->
 			else
 				resolve data
 
-module.exports.store = (hash, model) ->
+store = (hash, model) ->
 	unless checkHash hash
 		return Promise.reject 'invalid hash'
 
@@ -50,3 +53,9 @@ module.exports.store = (hash, model) ->
 checkHash = (hash) ->
 	p = /^[0-9a-z]{32}$/
 	return p.test hash
+
+module.exports = {
+	exists
+	get
+	store
+}

@@ -1,12 +1,10 @@
 path = require 'path'
 
-piwikEnabled = process.env.NODE_ENV isnt 'development'
-
 module.exports.getLandingpage = (request, response) ->
 	response.render(
 		path.join('landingpage', 'landingpage')
 		page: 'landing'
-		piwikEnabled
+		piwikEnabled: request.app.get('env') isnt 'development'
 		models: [
 			{
 				hash: '708d0b0b44f491523de951afa44b3e06'
@@ -31,21 +29,21 @@ module.exports.getContribute = (request, response) ->
 	response.render(
 		path.join('landingpage', 'contribute')
 		pageTitle: 'Contribute'
-		piwikEnabled
+		piwikEnabled: request.app.get('env') isnt 'development'
 	)
 
 module.exports.getTeam = (request, response) ->
 	response.render(
 		path.join('landingpage', 'team')
 		pageTitle: 'Team'
-		piwikEnabled
+		piwikEnabled: request.app.get('env') isnt 'development'
 	)
 
 module.exports.getImprint = (request, response) ->
 	response.render(
 		path.join('landingpage', 'imprint')
 		pageTitle: 'Imprint'
-		piwikEnabled
+		piwikEnabled: request.app.get('env') isnt 'development'
 	)
 
 module.exports.getEducators = (request, response) ->
@@ -54,6 +52,6 @@ module.exports.getEducators = (request, response) ->
 		{
 			page: 'landing',
 			pageTitle: 'Educators'
-			piwikEnabled
+			piwikEnabled: request.app.get('env') isnt 'development'
 		}
 	)

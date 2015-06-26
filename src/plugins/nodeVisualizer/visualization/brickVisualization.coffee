@@ -293,9 +293,9 @@ class BrickVisualization
 		for voxel in voxels
 			voxel.make3dPrinted()
 			# Show studs of brick below
-			brickBelow = voxel.neighbors.Zm?.brick?.getVisualBrick()
-			if brickBelow?
-				brickBelow.setStudVisibility true
+			brickBelow = voxel.neighbors.Zm?.brick
+			if brickBelow
+				brickBelow.getVisualBrick().setStudVisibility true
 
 			# Split visual brick into voxels (only once per brick)
 			if (voxel.brick)

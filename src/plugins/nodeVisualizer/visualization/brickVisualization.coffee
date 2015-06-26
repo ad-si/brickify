@@ -136,7 +136,7 @@ class BrickVisualization
 				layerObject.add threeBrick
 
 		# Set stud visibility in second pass so that visibility of
-		# all bricks is in the correct state
+		# all bricks in all layers is in the correct state
 		for z, brickLayer of brickLayers
 			for brick in brickLayer
 				@_setStudVisibility brick
@@ -206,7 +206,7 @@ class BrickVisualization
 					visibleBrick.visible = false
 
 		# Set stud visibility in second pass so that visibility of
-		# all bricks is in the correct state
+		# all bricks in all layers is in the correct state
 		for i in [0...layer] by 1
 			threeLayer = visibleLayers[i]
 			for visibleBrick in threeLayer.children

@@ -1,5 +1,8 @@
 log = require 'loglevel'
 
+###
+# @class Brick
+###
 class Brick
 	@direction = {
 		Xp: 'Xp'
@@ -182,8 +185,13 @@ class Brick
 		@_neighbors = null
 		@_isCoveredOnTop = null
 
-	# Returns whether the brick is completely covered by other bricks
-	# (isCompletelyCovered) and a set of covering bricks (coveringBricks)
+
+	###
+	# Returns whether this brick is completely covered by other bricks.
+	# @return {Object}
+	# @returnprop {Boolean} isCompletelyCovered is this brick completely covered
+	# @returnprop {Set} coveringBricks the bricks that cover this brick
+	###
 	getCover: =>
 		if not @_isCoveredOnTop?
 			stability = @fractionOfConnectionsInZDirection Brick.direction.Zp

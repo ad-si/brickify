@@ -350,7 +350,7 @@ class Brick
 	fractionOfConnectionsInZDirection: (directionZmOrZp) =>
 		s = @getSize()
 		p = @getPosition()
-		conBricks = @connectedBricks()
+		conBricks = @getNeighbors(directionZmOrZp)
 
 		# Possible slots top or bottom
 		possibleSlots = s.x * s.y

@@ -80,9 +80,6 @@ class BrickVisualization
 				for visualBrick in layer.children
 					if not visualBrick.brick? or not visualBrick.brick.isValid()
 						deletionList.push visualBrick
-					else
-						# If this brick will not be deleted, update stud visibility
-						@_setStudVisibility visualBrick.getBrick()
 
 				for delBrick in deletionList
 					# Remove from scenegraph

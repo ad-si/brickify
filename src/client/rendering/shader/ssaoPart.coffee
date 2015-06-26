@@ -1,6 +1,6 @@
 # Mainly inspired from http://theorangeduck.com/page/pure-depth-ssao
 
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class SsaoPart extends ShaderPart
 	getFragmentVariables: ->

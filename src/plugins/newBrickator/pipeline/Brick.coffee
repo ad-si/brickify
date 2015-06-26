@@ -184,7 +184,7 @@ class Brick
 
 	# Returns the covering bricks if the brick is fully covered by other bricks
 	# on its top, or null, if there is (partly) 3D-print-geometry above it
-	isCoveredOnTop: =>
+	getCover: =>
 		if @_isCoveredOnTop?
 			return if @_isCoveredOnTop then @getNeighbors Brick.direction.Zp else null
 

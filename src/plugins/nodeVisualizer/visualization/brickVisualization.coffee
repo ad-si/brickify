@@ -159,7 +159,7 @@ class BrickVisualization
 		@_visibleChildLayers = null
 
 	_setStudVisibility: (brick) ->
-		result = brick.isCoveredOnTop()
+		result = brick.getCover()
 		if result?
 			showStuds = false
 			result.forEach (brick) ->

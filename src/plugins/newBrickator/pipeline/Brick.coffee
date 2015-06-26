@@ -182,17 +182,17 @@ class Brick
 		@_neighbors = null
 		@_isCoveredOnTop = null
 
-	# Returns the covering bricks if the brick is fully covered by other bricks
-	# on its top, or null, if there is (partly) 3D-print-geometry above it
+	# Returns whether the brick is completely covered by other bricks
+	# (isCompletelyCovered) and a set of covering bricks (coveringBricks)
 	getCover: =>
-		if @_isCoveredOnTop?
-			return if @_isCoveredOnTop then @getNeighbors Brick.direction.Zp else null
+		if not @_isCoveredOnTop?
+			stability = @fractionOfConnectionsInZDirection Brick.direction.Zp
+			@_isCoveredOnTop = stability > 0.99
 
-		stability = @fractionOfConnectionsInZDirection Brick.direction.Zp
-
-		@_isCoveredOnTop = stability > 0.99
-
-		return if @_isCoveredOnTop then @getNeighbors Brick.direction.Zp else null
+		return {
+			isCompletelyCovered: @_isCoveredOnTop
+			coveringBricks: @getNeighbors Brick.direction.Zp
+		}
 
 	# Connected Bricks are neighbors in Zp and Zm direction
 	# because they are connected with studs to each other

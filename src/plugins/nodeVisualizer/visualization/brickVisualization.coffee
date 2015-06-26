@@ -135,7 +135,10 @@ class BrickVisualization
 				# Add to scene graph
 				layerObject.add threeBrick
 
-				# Set stud visibility
+		# Set stud visibility in second pass so that visibility of
+		# all bricks is correct
+		for z, brickLayer of brickLayers
+			for brick in brickLayer
 				@_setStudVisibility brick
 
 		# If this coloring differs from the last used coloring, go through
@@ -156,7 +159,15 @@ class BrickVisualization
 		@_visibleChildLayers = null
 
 	_setStudVisibility: (brick) ->
-		brick.getVisualBrick().setStudVisibility not brick.isCoveredOnTop()
+		result = brick.isCoveredOnTop()
+		if result?
+			showStuds = false
+			result.forEach (brick) ->
+				showStuds = showStuds or not brick.getVisualBrick().visible
+		else
+			showStuds = true
+
+		brick.getVisualBrick().setStudVisibility showStuds
 
 	setPossibleLegoBoxVisibility: (isVisible) =>
 		@voxelWireframe.setVisibility isVisible
@@ -179,16 +190,28 @@ class BrickVisualization
 		@_highlightVoxel.visible = false
 
 		visibleLayers = @_getVisibleLayers()
-		for i in [0..visibleLayers.length - 1] by 1
+		for i in [0...visibleLayers.length] by 1
 			threeLayer = visibleLayers[i]
 			if i <= layer
 				threeLayer.visible = true
 				if i < layer
-					@_makeLayerGrayscale (threeLayer)
+					@_makeLayerGrayscale threeLayer
 				else
-					@_makeLayerColored (threeLayer)
+					@_makeLayerColored threeLayer
+					for visibleBrick in threeLayer.children
+						visibleBrick.visible = true
+						visibleBrick.setStudVisibility true
 			else
-				threeLayer.visible = false
+				for visibleBrick in threeLayer.children
+						visibleBrick.visible = false
+
+		# Set stud visibility in second pass so that visibility of
+		# all bricks is correct
+		for i in [0...layer] by 1
+			threeLayer = visibleLayers[i]
+			for visibleBrick in threeLayer.children
+				visibleBrick.visible = true
+				@_setStudVisibility visibleBrick.brick
 
 	_makeLayerGrayscale: (layer) ->
 		for threeBrick in layer.children

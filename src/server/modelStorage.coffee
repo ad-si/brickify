@@ -1,67 +1,53 @@
 fs = require 'fs'
+fsp = require 'fs-promise'
 mkdirp = require 'mkdirp'
 path = require 'path'
 md5 = require('blueimp-md5').md5
+log = require('winston').loggers.get 'log'
 
-winston = require 'winston'
-log = winston.loggers.get('log')
+cacheDirectory = 'modelCache/'
 
-modelCacheDir = ''
+# create cache directory on require (read: on server startup)
+do createCacheDirectory = ->
+	mkdirp cacheDirectory, (error) ->
+		log.warn 'Unable to create cache directory: ' + error if error?
 
-module.exports.init = (cacheDir = 'modelCache') ->
-	modelCacheDir = cacheDir
-	mkdirp cacheDir, (err) ->
-		log.warn 'Unable to create model cache dir: ' + err if err?
+# API
 
-module.exports.hasModel = (hash, callback) ->
-	if not checkHash hash
-		callback false
-		return
-
-	fs.exists buildFileName(hash), (exists) ->
-		callback(exists)
-
-loadModel = (hash) ->
-	if not checkHash hash
+exists = (hash) ->
+	unless checkHash hash
 		return Promise.reject 'invalid hash'
 
-	return new Promise((resolve, reject) ->
-		fs.readFile buildFileName(hash), (err, data) ->
-			if err
-				reject err
-			else
-				resolve data
-	)
-module.exports.loadModel = loadModel
-
-module.exports.request = (hash) ->
-	return loadModel hash
-
-saveModel = (hash, data) ->
-	if not checkHash hash
-		return Promise.reject 'invalid hash'
-
-	return new Promise((resolve, reject) ->
-		fs.writeFile buildFileName(hash), data, (err) ->
-			if err
-				reject err
-			else
+	return new Promise (resolve, reject) ->
+		fs.exists cacheDirectory + hash, (exists) ->
+			if exists
 				resolve hash
-	)
-module.exports.saveModel = saveModel
+			else
+				reject hash
 
-module.exports.store = (optimizedModel) ->
-	modelData = optimizedModel.toBase64()
-	hash = md5 modelData
-	return saveModel hash, modelData
+get = (hash) ->
+	unless checkHash hash
+		return Promise.reject 'invalid hash'
 
-buildFileName = (hash) ->
-	return path.normalize modelCacheDir + '/' + hash
+	return fsp.readFile cacheDirectory + hash
 
-# checks if the hash and fileEnding are in a valid format
+store = (hash, model) ->
+	unless checkHash hash
+		return Promise.reject 'invalid hash'
+
+	if hash isnt md5 model
+		return Promise.reject 'wrong hash'
+
+	return fsp.writeFile cacheDirectory + hash, model
+		.then -> return hash
+
+# checks if the hash has the correct format
 checkHash = (hash) ->
 	p = /^[0-9a-z]{32}$/
-	if p.test hash
-		return true
-	log.warn "Requested model #{hash} is no valid hash"
-	return false
+	return p.test hash
+
+module.exports = {
+	exists
+	get
+	store
+}

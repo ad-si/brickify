@@ -386,10 +386,10 @@ class NodeVisualizer
 		.then (data) =>
 			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
 			@_getCachedData(selectedNode).then (cachedData) ->
-				gridLayer = minLayer + layer - 1
+				gridLayer = layer - 1
 				# If there is 3D print below first lego layer, show lego starting
 				# with layer 1 and show only 3D print in first instruction layer
-				gridLayer -= 2 if minLayer > 0
+				gridLayer -= 1 if minLayer > 0
 				cachedData.brickVisualization.showBrickLayer gridLayer
 
 	_updateBrickCount: (bricks) =>

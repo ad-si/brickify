@@ -32,53 +32,53 @@ describe 'Node tests', ->
 				expect(node).to.be.an.instanceof(SyncObject)
 
 	describe 'Node manipulation', ->
-		it 'should set the model\'s hash chainable', ->
+		it 'should set the model\'s identifier chainable', ->
 			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
-			hash = 'randomModelHash'
-			result = node.setModelHash(hash)
+			identifier = 'randomModelIdentifier'
+			result = node.setModelIdentifier(identifier)
 			expect(result).to.equal(node)
 			result.done ->
-				expect(node).to.have.property('modelHash', hash)
+				expect(node).to.have.property('modelIdentifier', identifier)
 
-		it 'should get the model\'s hash', ->
+		it 'should get the model\'s identifier', ->
 			dataPackets.nextIds.push 'abcdefgh'
 			node = new Node()
-			hash = 'randomModelHash'
-			node.setModelHash(hash)
-			expect(node.getModelHash()).to.eventually.equal(hash)
+			identifier = 'randomModelIdentifier'
+			node.setModelIdentifier(identifier)
+			expect(node.getModelIdentifier()).to.eventually.equal(identifier)
 
-		it 'should store the model\'s hash', ->
+		it 'should store the model\'s identifier', ->
 			dataPackets.nextIds.push 'abcdefgh'
 			dataPackets.nextPuts.push true
 			node = new Node()
-			hash = 'randomModelHash'
-			node.setModelHash(hash)
+			identifier = 'randomModelIdentifier'
+			node.setModelIdentifier(identifier)
 			node.save().then ->
 				expect(dataPackets.calls).to.equal(2)
 				expect(dataPackets.createCalls).to.have.length(1)
 				expect(dataPackets.putCalls).
-					to.deep.have.deep.property('[0].packet.data.modelHash', hash)
+					to.deep.have.deep.property('[0].packet.data.modelIdentifier', identifier)
 
-		it 'should set the model\'s hash in constructor', ->
+		it 'should set the model\'s identifier in constructor', ->
 			dataPackets.nextIds.push 'abcdefgh'
-			hash = 'randomModelHash'
-			node = new Node modelHash: hash
-			expect(node.getModelHash()).to.eventually.equal(hash)
+			identifier = 'randomModelIdentifier'
+			node = new Node modelIdentifier: identifier
+			expect(node.getModelIdentifier()).to.eventually.equal(identifier)
 
 		it 'should request the correct model', ->
 			dataPackets.nextIds.push 'abcdefgh'
 			dataPackets.nextPuts.push true
 			modelProvider.nextRequest = 'dummy'
 			node = new Node()
-			hash = 'randomModelHash'
-			node.setModelHash(hash)
+			identifier = 'randomModelIdentifier'
+			node.setModelIdentifier(identifier)
 			model = node.getModel()
 			expect(model).to.eventually.equal('dummy')
 			model.then ->
 				expect(modelProvider.calls).to.equal(1)
 				expect(modelProvider.requestCalls).
-					to.have.deep.property('[0].hash', hash)
+					to.have.deep.property('[0].identifier', identifier)
 
 		it 'should set the node\'s name chainable', ->
 			dataPackets.nextIds.push 'abcdefgh'

@@ -1,5 +1,8 @@
 log = require 'loglevel'
 
+###
+# @class Brick
+###
 class Brick
 	@direction = {
 		Xp: 'Xp'
@@ -182,16 +185,22 @@ class Brick
 		@_neighbors = null
 		@_isCoveredOnTop = null
 
-	# Returns true if the brick is fully covered by other bricks on its top,
-	# or false, if there is (partly) 3D-print-geometry above it
-	isCoveredOnTop: =>
-		if @_isCoveredOnTop?
-			return @_isCoveredOnTop
 
-		stability = @fractionOfConnectionsInZDirection Brick.direction.Zp
+	###
+	# Returns whether this brick is completely covered by other bricks.
+	# @return {Object}
+	# @returnprop {Boolean} isCompletelyCovered is this brick completely covered
+	# @returnprop {Set} coveringBricks the bricks that cover this brick
+	###
+	getCover: =>
+		if not @_isCoveredOnTop?
+			stability = @fractionOfConnectionsInZDirection Brick.direction.Zp
+			@_isCoveredOnTop = stability > 0.99
 
-		@_isCoveredOnTop = stability > 0.99
-		return @_isCoveredOnTop
+		return {
+			isCompletelyCovered: @_isCoveredOnTop
+			coveringBricks: @getNeighbors Brick.direction.Zp
+		}
 
 	# Connected Bricks are neighbors in Zp and Zm direction
 	# because they are connected with studs to each other
@@ -350,7 +359,7 @@ class Brick
 	fractionOfConnectionsInZDirection: (directionZmOrZp) =>
 		s = @getSize()
 		p = @getPosition()
-		conBricks = @connectedBricks()
+		conBricks = @getNeighbors(directionZmOrZp)
 
 		# Possible slots top or bottom
 		possibleSlots = s.x * s.y

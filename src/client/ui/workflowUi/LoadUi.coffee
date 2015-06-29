@@ -1,5 +1,4 @@
 fileDropper = require '../../modelLoading/fileDropper'
-fileLoader = require '../../modelLoading/fileLoader'
 readFiles = require '../../modelLoading/readFiles'
 piwikTracking = require '../../piwikTracking'
 
@@ -15,13 +14,13 @@ class LoadUi
 		fileDropper.init @fileLoadHandler
 
 		$('#fileInput').on 'change', (event) =>
-			@fileLoadHandler(event)
+			@fileLoadHandler(event.target.files)
 				.then =>
 					$('#fileInput').val('')
 					@workflowUi.hideMenuIfPossible()
 
-	fileLoadHandler: (event) =>
-		files = event.target.files ? event.dataTransfer.files
+	fileLoadHandler: (files) =>
+		return unless files.length
 
 		@_checkReplaceModel()
 			.then (loadConfirmed) ->

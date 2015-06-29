@@ -44,6 +44,13 @@
 
 - onPaint
 
+# ## setFidelity
+#
+# Plugins should adapt their visual fidelity to match the device's rendering power.
+# When the framerate is above / below a certain threshold, setFidelity is called
+
+- setFidelity
+
 #  ## scene interaction and administration
 
 #  ### New nodes
@@ -119,9 +126,3 @@
 # Download objects with an empty filename are ignored.
 
 - getDownload
-
-# ## setFidelity
-# Plugins should adapt their visual fidelity to match the device's rendering power.
-# When the framerate is above / below a certain threshold, setFidelity is called
-
-- setFidelity

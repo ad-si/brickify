@@ -28,8 +28,11 @@ h4.disabled Download stl for 3d printer
 #wizardStepHoles
 	p.
 		Now connect the LEGO-brick studs into the test strip. Which size fits best?
-	img(src='img/testStripWizard-holeSize.png')
-	p.wizardSelect This size fits best:
+	.selectContainer
+		img(src='img/testStripWizard/holes/numberOverlay.png')
+		img(src='img/testStripWizard/holes/0.png')
+
+	p.wizardSelect.clear This size fits best:
 		select.form-control#wizardHoleSizeSelect
 #wizardStepFinished
 	p.

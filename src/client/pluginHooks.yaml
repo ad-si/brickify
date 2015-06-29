@@ -25,16 +25,6 @@
 
 - init3d
 
-# ## Focus manipulation
-#
-# A Plugin can specify that its visualization has a new bounding sphere.
-# This can be a new model or a "region of interest". It is expected to
-# either return null (for 'no new bounding sphere') or return
-# {center: vec3d, radius: float}. The renderer will then focus
-# the camera on this region
-
-- newBoundingSphere
-
 #  ## 3D scene update and animation
 #
 #  On each render frame the [renderer](render.html) will call the `on3dUpdate`

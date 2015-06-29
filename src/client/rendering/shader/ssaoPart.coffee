@@ -1,17 +1,8 @@
 # Mainly inspired from http://theorangeduck.com/page/pure-depth-ssao
 
-ShaderPart = require './shaderPart'
+ShaderPart = require './ShaderPart'
 
 class SsaoPart extends ShaderPart
-	getVertexVariables: ->
-		return ''
-
-	getVertexPreMain: ->
-		return ''
-
-	getVertexInMain: ->
-		return''
-
 	getFragmentVariables: ->
 		return '
 			uniform sampler2D tRandom;
@@ -71,29 +62,29 @@ class SsaoPart extends ShaderPart
 
 				float depth = linearizeDepth(texture2D( tDepth, texCoords ).r);
 
-  				vec3 random = normalize(texture2D(tRandom,texCoords * (7.0 + depth)).rgb);
+				vec3 random = normalize(texture2D(tRandom,texCoords * (7.0 + depth)).rgb);
 
-  				vec3 position = vec3(texCoords, depth);
-  				vec3 normal = ssaoNormalFromDepth(depth, texCoords);
+				vec3 position = vec3(texCoords, depth);
+				vec3 normal = ssaoNormalFromDepth(depth, texCoords);
 
-  				float radius_depth = radius / depth;
-  				float occlusion = 0.0;
+				float radius_depth = radius / depth;
+				float occlusion = 0.0;
 
-  				for (int i = 0; i < SSAO_SAMPLES; i++){
-  					vec3 ray = radius_depth * reflect(sample_sphere[i], random);
-  					vec3 hemi_ray = position + sign(dot(ray, normal)) * ray;
+				for (int i = 0; i < SSAO_SAMPLES; i++){
+					vec3 ray = radius_depth * reflect(sample_sphere[i], random);
+					vec3 hemi_ray = position + sign(dot(ray, normal)) * ray;
 
-  					float occ_depth =  linearizeDepth(
-  						texture2D(tDepth, clamp(hemi_ray.xy,0.0,1.0)).r
-  					);
-  					float difference = depth - occ_depth;
+					float occ_depth =  linearizeDepth(
+						texture2D(tDepth, clamp(hemi_ray.xy,0.0,1.0)).r
+					);
+					float difference = depth - occ_depth;
 
-  					occlusion += step(falloff, difference) *
-  					(1.0 - smoothstep(falloff, area, difference));
-  				}\n
+					occlusion += step(falloff, difference) *
+					(1.0 - smoothstep(falloff, area, difference));
+				}\n
 
-  				float ao = 1.0 - total_strength * occlusion * (1.0 / float(SSAO_SAMPLES));
-  				return clamp(ao + base, 0.0, 1.0);
+				float ao = 1.0 - total_strength * occlusion * (1.0 / float(SSAO_SAMPLES));
+				return clamp(ao + base, 0.0, 1.0);
 			}\n
 		'
 
@@ -104,12 +95,9 @@ class SsaoPart extends ShaderPart
 			vec3 normal = ssaoNormalFromDepth(ssaoDepth, vUv);
 
 			/*normal = normal * 0.5 + 0.5;
-    		col = vec4(normal.rgb, 1.0);*/
+			col = vec4(normal.rgb, 1.0);*/
 
 			col = vec4( ssao, ssao, ssao, 1.0 );
 		'
-
-#cameraNearPlane: 0.1
-#cameraFarPlane: 2500
 
 module.exports = SsaoPart

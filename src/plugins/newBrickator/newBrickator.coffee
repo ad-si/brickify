@@ -113,7 +113,7 @@ class NewBrickator
 
 	_createDataStructure: (selectedNode) =>
 		return selectedNode.getModel().then (model) =>
-			# create grid
+			# Create grid
 			settings = new PipelineSettings(@bundle.globalConfig)
 			settings.setModelTransform threeHelper.getTransformMatrix selectedNode
 
@@ -123,7 +123,7 @@ class NewBrickator
 				true
 			)
 			.then (results) ->
-				# create data structure
+				# Create data structure
 				data = {
 					node: selectedNode
 					grid: results.grid
@@ -199,7 +199,7 @@ class NewBrickator
 	_prepareCSGOptions: (studRadius, holeRadius) =>
 		options = {}
 
-		# set stud and hole size
+		# Set stud and hole size
 		if studRadius?
 			options.studSize = {
 				radius: studRadius
@@ -212,7 +212,7 @@ class NewBrickator
 				height: @bundle.globalConfig.holeSize.height
 			}
 
-		# add studs
+		# Add studs
 		options.addStuds = true
 
 		return options

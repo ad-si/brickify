@@ -60,23 +60,21 @@ b1 = bundle1.init().then ->
 	bundle2 = new Bundle config2, controls
 	b2 = bundle2.init()
 
-	loadAndConvert = (hash, animate) ->
-		b1.then -> bundle1.loadByHash hash
+	loadAndConvert = (identifier) ->
+		b1
+			.then -> bundle1.sceneManager.clearScene()
+			.then -> bundle1.loadByIdentifier identifier
 			.then -> $('#' + config1.renderAreaId).css 'backgroundImage', 'none'
-		b2.then -> bundle2.loadByHash hash
+		b2
+			.then -> bundle2.sceneManager.clearScene()
+			.then -> bundle2.loadByIdentifier identifier
 			.then -> $('#' + config2.renderAreaId).css 'backgroundImage', 'none'
-		$('.applink').prop 'href', "app#initialModel=#{hash}"
+		$('.applink').prop 'href', "app#initialModel=#{identifier}"
 
 	#load and process model
-	loadAndConvert('1c2395a3145ad77aee7479020b461ddf', false)
-
-	loadFromHash = (hash) ->
-		b1.then -> bundle1.sceneManager.clearScene()
-		b2.then -> bundle2.sceneManager.clearScene()
-		loadAndConvert hash, true
+	loadAndConvert 'goggles'
 
 	fileInputCallback = (files) ->
-
 		if files.length
 			piwikTracking.trackEvent(
 				'Landingpage'
@@ -85,23 +83,19 @@ b1 = bundle1.init().then ->
 			)
 
 			readFiles files
-				.then loadFromHash
-
+				.then loadAndConvert
 		else
-			hash = event.dataTransfer.getData 'text/plain'
-
+			identifier = event.dataTransfer.getData 'text/plain'
 			piwikTracking.trackEvent(
 				'Landingpage'
 				'LoadModelFromImage'
-				hash
+				identifier
 			)
-
-			modelCache.exists hash
-				.then -> loadFromHash hash
+			modelCache.exists identifier
+				.then -> loadAndConvert identifier
 				.catch -> bootbox.alert(
 					title: 'This is not a valid model!'
-					message: 'You can only drop stl files
-						or our example images.'
+					message: 'You can only drop stl files or our example images.'
 				)
 
 	fileDropper.init fileInputCallback
@@ -117,5 +111,5 @@ b1 = bundle1.init().then ->
 	$('#preview img, #preview a').on 'dragstart', (event) ->
 			event.originalEvent.dataTransfer.setData(
 				'text/plain'
-				event.originalEvent.target.getAttribute 'data-hash'
+				event.originalEvent.target.getAttribute 'data-identifier'
 			)

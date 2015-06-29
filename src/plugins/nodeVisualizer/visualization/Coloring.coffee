@@ -4,73 +4,39 @@ LineMatGenerator = require './LineMatGenerator'
 # Provides a simple implementation on how to color voxels and bricks
 module.exports = class Coloring
 	constructor: (@globalConfig) ->
-		@brickMaterial = new THREE.MeshLambertMaterial({
-			color: 0xfff000 #orange
-		})
+		@textureMaterialCache = {}
 
-		@selectedMaterial = new THREE.MeshLambertMaterial({
-			color: 0xff0000
-		})
+		@brickMaterial = @_createMaterial 0xfff000 #orange
 
-		@hiddenMaterial = new THREE.MeshLambertMaterial({
-			color: 0xffaaaa #gray
-			opacity: 0.0
-			transparent: true
-		})
+		@studTexture = THREE.ImageUtils.loadTexture('img/stud.png')
+		@studTexture.wrapS = THREE.RepeatWrapping
+		@studTexture.wrapT = THREE.RepeatWrapping
 
-		@legoHighlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0xff7755
-		})
+		@selectedMaterial = @_createMaterial 0xff0000
+		@selectedStudMaterial = @_lightenMaterial @selectedMaterial
 
-		@printHighlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
-		})
-		@printHighlightMaterial.polygonOffset = true
-		@printHighlightMaterial.polygonOffsetFactor = -1
-		@printHighlightMaterial.polygonOffsetUnits = -1
+		@hiddenMaterial = @_createMaterial 0xffaaaa, 0.0
 
-		@legoBoxHighlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0xff7755
-			opacity: 0.5
-			transparent: true
-		})
-		@legoBoxHighlightMaterial.polygonOffset = true
-		@legoBoxHighlightMaterial.polygonOffsetFactor = -1
-		@legoBoxHighlightMaterial.polygonOffsetUnits = -1
+		@legoBoxHighlightMaterial = @_createMaterial 0xff7755, 0.5
+		@_setPolygonOffset @legoBoxHighlightMaterial, -1, -1
 
-		@printBoxHighlightMaterial = new THREE.MeshLambertMaterial({
-			color: 0xeeeeee
-			opacity: 0.4
-			transparent: true
-		})
-		@printBoxHighlightMaterial.polygonOffset = true
-		@printBoxHighlightMaterial.polygonOffsetFactor = -1
-		@printBoxHighlightMaterial.polygonOffsetUnits = -1
+		@printBoxHighlightMaterial = @_createMaterial 0xeeeeee, 0.4
+		@_setPolygonOffset @printBoxHighlightMaterial, -1, -1
 
-		@csgMaterial = new THREE.MeshLambertMaterial({
-			color: 0xb5ffb8 #greenish gray
-		})
+		@csgMaterial = @_createMaterial 0xb5ffb8 #greenish gray
 
 		@legoShadowMat = new THREE.MeshBasicMaterial({
 			color: 0x707070
 			transparent: true
 			opacity: 0.3
 		})
-		@legoShadowMat.polygonOffset = true
-		@legoShadowMat.polygonOffsetFactor = +2
-		@legoShadowMat.polygonOffsetUnits = +2
+		@_setPolygonOffset @legoShadowMat, +2, +2
 
 		# printed object material
-		@objectPrintMaterial = new THREE.MeshLambertMaterial({
-			color: @globalConfig.colors.modelColor
-			opacity: 0.8
-			transparent: true
-		})
+		@objectPrintMaterial = @_createMaterial @globalConfig.colors.modelColor, 0.8
 
 		# remove z-Fighting on baseplate
-		@objectPrintMaterial.polygonOffset = true
-		@objectPrintMaterial.polygonOffsetFactor = 3
-		@objectPrintMaterial.polygonOffsetUnits = 3
+		@_setPolygonOffset @objectPrintMaterial, +3, +3
 
 		@objectShadowMat = new THREE.MeshBasicMaterial(
 			color: 0x000000
@@ -78,9 +44,7 @@ module.exports = class Coloring
 			opacity: 0.4
 			depthFunc: THREE.GreaterDepth
 		)
-		@objectShadowMat.polygonOffset = true
-		@objectShadowMat.polygonOffsetFactor = 3
-		@objectShadowMat.polygonOffsetUnits = 3
+		@_setPolygonOffset @objectShadowMat, +3, +3
 
 		lineMaterialGenerator = new LineMatGenerator()
 		@objectLineMat = lineMaterialGenerator.generate 0x000000
@@ -92,31 +56,26 @@ module.exports = class Coloring
 
 		@_createBrickMaterials()
 
+	_setPolygonOffset: (material, polygonOffsetFactor, polygonOffsetUnits) ->
+		material.polygonOffset = true
+		material.polygonOffsetFactor = polygonOffsetFactor
+		material.polygonOffsetUnits = polygonOffsetUnits
+
 	setPipelineMode: (enabled) =>
+		@objectPrintMaterial.transparent = !enabled
+
+		@objectShadowMat.visible = !enabled
+		@objectLineMat.transparent = !enabled
+		@objectLineMat.depthWrite = enabled
 		if enabled
-			@objectPrintMaterial.transparent = false
-
-			@objectShadowMat.visible = false
-			@objectLineMat.transparent = false
-			@objectLineMat.depthWrite = true
 			@objectLineMat.depthFunc = THREE.LessEqualDepth
-
-			@legoBoxHighlightMaterial.transparent = false
-			@printBoxHighlightMaterial.transparent = false
-			@objectPrintMaterial.transparent = false
-			@legoShadowMat.transparent = false
 		else
-			@objectPrintMaterial.transparent = true
-
-			@objectShadowMat.visible = true
-			@objectLineMat.transparent = true
-			@objectLineMat.depthWrite = false
 			@objectLineMat.depthFunc = THREE.GreaterDepth
 
-			@legoBoxHighlightMaterial.transparent = true
-			@printBoxHighlightMaterial.transparent = true
-			@objectPrintMaterial.transparent = true
-			@legoShadowMat.transparent = true
+		@legoBoxHighlightMaterial.transparent = !enabled
+		@printBoxHighlightMaterial.transparent = !enabled
+		@objectPrintMaterial.transparent = !enabled
+		@legoShadowMat.transparent = !enabled
 
 	###
 	# Returns the highlight material collection for the supplied type of voxel
@@ -125,25 +84,50 @@ module.exports = class Coloring
 	getHighlightMaterial: (type) =>
 		if type == 'lego'
 			return {
-				voxel: @legoHighlightMaterial
+				voxel: @_getLegoHighlightMaterials()
 				box: @legoBoxHighlightMaterial
 			}
 		else if type == '3d'
 			return {
-				voxel: @printHighlightMaterial
+				voxel: @_getPrintHighlightMaterials()
 				box: @printBoxHighlightMaterial
 			}
 		return null
 
-	getMaterialForVoxel: (gridEntry) =>
-		if gridEntry.enabled
-			# if there is a brick at the same position,
-			# take the same material
-			if gridEntry.brick?.visualizationMaterials?
-				return gridEntry.brick.visualizationMaterials.color
-			return @selectedMaterial
-		else
-			return @hiddenMaterial
+	_getLegoHighlightMaterials: =>
+		return @legoHighlightMaterials if @legoHighlightMaterials?
+
+		legoHighlightMaterial = @_createMaterial 0xff7755
+		legoHighlightStudMaterial = @_lightenMaterial legoHighlightMaterial
+		legoHighlightTextureMaterial = @getTextureMaterialForBrick()
+		return @legoHighlightMaterials = {
+			color: legoHighlightMaterial
+			colorStuds: legoHighlightStudMaterial
+			textureStuds: legoHighlightTextureMaterial
+		}
+
+	_getPrintHighlightMaterials: =>
+		return @printHighlightMaterials if @printHighlightMaterials?
+
+		printHighlightMaterial = @_createMaterial 0xeeeeee
+		@_setPolygonOffset printHighlightMaterial, -1, -1
+		printHighlightStudMaterial = @_lightenMaterial printHighlightMaterial
+		@_setPolygonOffset printHighlightStudMaterial, -1, -1
+
+		printHighlightTextureMaterial = @getTextureMaterialForBrick()
+		@_setPolygonOffset printHighlightTextureMaterial, -1, -1
+		return @printHighlightMaterials = {
+			color: printHighlightMaterial
+			colorStuds: printHighlightStudMaterial
+			textureStuds: printHighlightTextureMaterial
+		}
+
+	getSelectedMaterials: =>
+		return {
+			color: @selectedMaterial
+			colorStuds: @selectedStudMaterial
+			textureStuds: @getTextureMaterialForBrick()
+		}
 
 	getMaterialsForBrick: (brick) =>
 		# return stored material or assign a random one
@@ -170,6 +154,8 @@ module.exports = class Coloring
 			continue if neighborColors.has(materials.color)
 			break
 
+		materials.textureStuds = @getTextureMaterialForBrick brick
+
 		brick.visualizationMaterials = materials
 		return brick.visualizationMaterials
 
@@ -178,22 +164,44 @@ module.exports = class Coloring
 
 	_getRandomBrickMaterials: =>
 		i = Math.floor(Math.random() * @_brickMaterials.length)
-		return {color: @_brickMaterials[i], gray: @_grayBrickMaterials[i]}
+		return {
+			color: @_brickMaterials[i]
+			colorStuds: @_studMaterials[i]
+			gray: @_grayBrickMaterials[i]
+			grayStuds: @_grayStudMaterials[i]
+		}
 
 	_createBrickMaterials: =>
+		colorList = [
+			0x550000
+			0x8e0000
+			0xc60000
+			0xff0000
+			0xcc4444
+			0xdd4f4f
+			0xee5b5b
+			0xff6666
+		]
 		@_brickMaterials = []
-		@_brickMaterials.push @_createMaterial 0x550000
-		@_brickMaterials.push @_createMaterial 0x8e0000
-		@_brickMaterials.push @_createMaterial 0xc60000
-		@_brickMaterials.push @_createMaterial 0xff0000
-		@_brickMaterials.push @_createMaterial 0xcc4444
-		@_brickMaterials.push @_createMaterial 0xdd4f4f
-		@_brickMaterials.push @_createMaterial 0xee5b5b
-		@_brickMaterials.push @_createMaterial 0xff6666
+		for color in colorList
+			@_brickMaterials.push @_createMaterial color
+
+		@_studMaterials = []
+		for material in @_brickMaterials
+			@_studMaterials.push @_lightenMaterial material
 
 		@_grayBrickMaterials = []
 		for material in @_brickMaterials
 			@_grayBrickMaterials.push @_convertToGrayscale material
+
+		@_grayStudMaterials = []
+		for material in @_grayBrickMaterials
+			@_grayStudMaterials.push @_lightenMaterial material
+
+	_lightenMaterial: (material) ->
+		newMaterial = material.clone()
+		newMaterial.color.addScalar 0.05
+		return newMaterial
 
 	# Clones the material and converts its color to grayscale
 	_convertToGrayscale: (material) ->
@@ -201,7 +209,7 @@ module.exports = class Coloring
 		gray = material.color.r * 0.3
 		gray += material.color.g * 0.6
 		gray += material.color.b * 0.1
-		newMaterial.color = new THREE.Color(gray, gray, gray)
+		newMaterial.color.setRGB gray, gray, gray
 
 		return newMaterial
 
@@ -211,3 +219,28 @@ module.exports = class Coloring
 			opacity: opacity
 			transparent: opacity < 1.0
 		)
+
+	getTextureMaterialForBrick: (brick) =>
+		if brick and brick.getVisualBrick()?
+			return brick.getVisualBrick().textureMaterial
+
+		size = if brick then brick.getSize() else {x: 1, y: 1}
+		dimensionsHash = @_getHash size
+		if @textureMaterialCache[dimensionsHash]?
+			return @textureMaterialCache[dimensionsHash]
+
+		studsTexture = @studTexture.clone()
+		studsTexture.needsUpdate = true
+		studsTexture.repeat.set size.x, size.y
+
+		textureMaterial = new THREE.MeshLambertMaterial(
+			map: studsTexture
+			transparent: true
+			opacity: 0.2
+		)
+
+		@textureMaterialCache[dimensionsHash] = textureMaterial
+		return textureMaterial
+
+	_getHash: (dimensions) ->
+		return dimensions.x + '-' + dimensions.y

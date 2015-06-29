@@ -17,16 +17,16 @@ header
 
 			#educators
 				#preview
-					for model in models
+					for sample in samples
 						a(
 							href = '/educators'
 							draggable = 'true'
-							data-hash = model.hash
+							data-identifier = sample.name
 						)
 							img(
-								src = '/img/' + model.img
+								src = '/img/modelSamples/' + sample.name + '.png'
 								draggable = 'true'
-								data-hash = model.hash
+								data-identifier = sample.name
 							)
 
 				p Are you an educator? Check out our example models!

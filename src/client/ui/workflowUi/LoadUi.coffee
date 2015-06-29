@@ -35,7 +35,7 @@ class LoadUi
 
 				return readFiles files
 
-			.then @workflowUi.bundle.modelLoader.loadByHash
+			.then @workflowUi.bundle.modelLoader.loadByIdentifier
 
 	_checkReplaceModel: =>
 		question = 'You already have a model in your scene.

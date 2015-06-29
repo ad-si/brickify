@@ -27,8 +27,6 @@ module.exports = (files) ->
 
 		file = files[0]
 
-		console.log file.name
-
 		if not /stl$/i.test file.name
 			bootbox.alert(
 				title: 'Your file does not have the right format!'

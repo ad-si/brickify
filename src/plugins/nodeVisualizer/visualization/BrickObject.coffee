@@ -3,55 +3,49 @@ THREE = require 'three'
 # @class BrickObject
 ###
 class BrickObject extends THREE.Object3D
-	constructor: (brickGeometry, studGeometry, @material) ->
+	constructor: (geometries, @materials, fidelity) ->
 		super()
-		brickMesh = new THREE.Mesh(brickGeometry, @material)
-		studMesh = new THREE.Mesh(studGeometry, @material)
-		@add brickMesh
-		@add studMesh
+		{
+			brickGeometry
+			studGeometry
+			highFiStudGeometry
+			planeGeometry
+		} = geometries
 
-	setMaterial: (@material) =>
-		@children[0].material = @material
-		@children[1].material = @material
+		@areStudsVisible = true
 
-		# material override resets highlight state
-		@_isHighlighted = false
+		@add new THREE.Mesh brickGeometry, @materials.color
+		@add new THREE.Mesh studGeometry, @materials.colorStuds
+		@add new THREE.Mesh highFiStudGeometry, @materials.colorStuds
+		@add new THREE.Mesh planeGeometry, @materials.textureStuds
 
-	setStudVisibility: (boolean) =>
-		@children[1].visible = boolean
+		@setFidelity fidelity
 
-	# stores a reference of this bricks voxel coordinates for
-	# further usage
-	setVoxelCoords: (@voxelCoords) =>
-		return
+	setBrick: (@brick) => return
+	getBrick: => return @brick
+	setMaterial: (@materials) =>
+		@children[0].material = @materials.color
+		@children[1].material = @materials.colorStuds
+		@children[2].material = @materials.colorStuds
 
-	setGridReference: (@gridEntry) =>
-		return unless @gridEntry?
-		@gridEntry.visibleVoxel = @
-		return
-
-	# makes the voxel being 3d printed
-	make3dPrinted: =>
-		@gridEntry.enabled = false
-		@nonHighlightVisibility = false
-
-	# makes the voxel being legotized
-	makeLego: =>
-		@gridEntry.enabled = true
-		@nonHighlightVisibility = true
-
-	isLego: =>
-		return @gridEntry.enabled
-
-	# one may highlight this brick with a special material
-	setHighlight: (isHighlighted, material) =>
-		if isHighlighted
-			@visible = true
-			@children[0].material = material
-			@children[1].material = material
+	setGray: (isGray) =>
+		if isGray
+			@children[0].material = @materials.gray
+			@children[1].material = @materials.grayStuds
+			@children[2].material = @materials.grayStuds
 		else
-			@visible = @nonHighlightVisibility
-			@children[0].material = @material
-			@children[1].material = @material
+			@children[0].material = @materials.color
+			@children[1].material = @materials.colorStuds
+			@children[2].material = @materials.colorStuds
+
+	setFidelity: (fidelity) =>
+		@children[1].visible = fidelity is 1 and @areStudsVisible
+		@children[2].visible = fidelity is 2 and @areStudsVisible
+		@children[3].visible = fidelity is 0 and @areStudsVisible
+
+	setStudVisibility: (@areStudsVisible) =>
+		@children[1].visible = @areStudsVisible
+		@children[2].visible = @areStudsVisible
+		@children[3].visible = @areStudsVisible
 
 module.exports = BrickObject

@@ -1,11 +1,15 @@
 expect = require('chai').expect
-BrickLayouter = require '../../src/plugins/newBrickator/pipeline/BrickLayouter'
+PlateLayouter =
+	require '../../src/plugins/newBrickator/pipeline/Layout/PlateLayouter'
+LayoutOptimizer =
+	require '../../src/plugins/newBrickator/pipeline/Layout/LayoutOptimizer'
 Brick = require '../../src/plugins/newBrickator/pipeline/Brick'
 Grid = require '../../src/plugins/newBrickator/pipeline/Grid'
 
 describe 'brickLayouter split', ->
 	it 'should split one brick and relayout locally', ->
-		brickLayouter = new BrickLayouter(true)
+		plateLayouter = new PlateLayouter(true)
+		layoutOptimizer = new LayoutOptimizer(null, plateLayouter)
 		grid = new Grid()
 
 		v0 = grid.setVoxel { x: 0, y: 0, z: 0 }
@@ -23,7 +27,7 @@ describe 'brickLayouter split', ->
 		v0.brick.mergeWith v4.brick
 
 		#split it up and relayout
-		brickLayouter.splitBricksAndRelayoutLocally [v0.brick], grid
+		layoutOptimizer.splitBricksAndRelayoutLocally [v0.brick], grid, true, false
 
 		#expect to be more than 1 brick
 		bricks = grid.getAllBricks()

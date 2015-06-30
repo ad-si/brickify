@@ -146,14 +146,17 @@ class Brick
 	# Returns a set of all bricks that are next to this brick
 	# in the given direction
 	getNeighbors: (direction) =>
+		###
+			TODO
+			This check can now 2015-30-06 potentially be removed
+			However, I am leaving this check in place for some time
+			If the issue does not reappear within two weeks, I will remove it
+		###
 		# Checking the cache for correctness
 		if @_neighbors?[direction]?
 			@_neighbors[direction].forEach (neighbor) =>
 				if neighbor.voxels.size == 0
-					###
-					log.warn "got outdated neighbor
-						from cache\nneighbor', #{neighbor}\nfrom brick #{@}"
-					###
+					log.warn 'got outdated neighbor from cache'
 					@clearNeighborsCache()
 
 		return @_neighbors[direction] if @_neighbors?[direction]?
@@ -179,12 +182,6 @@ class Brick
 				neighbors.add brick
 
 		return neighbors
-
-	# Tells this brick to update cached neighbors indices
-	clearNeighborsCache: =>
-		@_neighbors = null
-		@_isCoveredOnTop = null
-
 
 	###
 	# Returns whether this brick is completely covered by other bricks.
@@ -254,23 +251,24 @@ class Brick
 
 	_clearData: =>
 		#clear stored data
-		@_size = null
-		@_position = null
-		@_neighbors = null
+		@_clearCache()
 		@setVisualBrick null
 		@voxels.clear()
+
+	_clearCache: =>
+		@_size = null
+		@_position = null
+		@label = null
+		@clearNeighborsCache()
+
+	clearNeighborsCache: =>
+		@_neighbors = null
+		@_isCoveredOnTop = null
+
 
 	# Merges this brick with the other brick specified,
 	# the other brick gets deleted in the process
 	mergeWith: (otherBrick) =>
-		#clear size, position and neighbors (to be recomputed)
-		@_size = null
-		@_position = null
-		@_neighbors = null
-
-		# Clear reference to visual brick (needs to be recreated)
-		@setVisualBrick null
-
 		# Tell neighbors to update their cache
 		for direction of Brick.direction
 			neighbors = @getNeighbors direction
@@ -278,6 +276,12 @@ class Brick
 
 			otherNeighbors = otherBrick.getNeighbors direction
 			otherNeighbors.forEach (neighbor) -> neighbor.clearNeighborsCache()
+
+		#clear size, position and neighbors (to be recomputed)
+		@_clearCache()
+
+		# Clear reference to visual brick (needs to be recreated)
+		@setVisualBrick null
 
 		#take voxels from other brick
 		newVoxels = new Set()

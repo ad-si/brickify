@@ -320,7 +320,7 @@ class Brick
 
 		hasHoles = false
 		for val of voxelCheck
-			if voxelCheck[val] == false
+			if voxelCheck[val] is false
 				hasHoles = true
 				break
 
@@ -369,9 +369,9 @@ class Brick
 		# How many slots are actually connected?
 		usedSlots = 0
 
-		if directionZmOrZp == Brick.direction.Zm
+		if directionZmOrZp is Brick.direction.Zm
 			testZ = p.z - 1
-		else if directionZmOrZp == Brick.direction.Zp
+		else if directionZmOrZp is Brick.direction.Zp
 			testZ = p.z + s.z
 
 		# Test for each possible slot if neighbor bricks have

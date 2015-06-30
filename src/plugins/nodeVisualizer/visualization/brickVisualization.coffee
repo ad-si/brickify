@@ -236,7 +236,7 @@ class BrickVisualization
 		# Invert type, because if we are highlighting a 'lego' voxel,
 		# we want to display it as 'could be 3d printed'
 		voxelType = '3d'
-		voxelType = 'lego' if type == '3d'
+		voxelType = 'lego' if type is '3d'
 
 		highlightMaterial = @defaultColoring.getHighlightMaterial voxelType
 		hVoxel = highlightMaterial.voxel
@@ -317,7 +317,7 @@ class BrickVisualization
 					visualBrick.visible = false
 			# Hide visual voxels for 3d printed geometry
 			for temporaryVoxel in @temporaryVoxels.children
-				if temporaryVoxel.voxelPosition == voxel.position
+				if temporaryVoxel.voxelPosition is voxel.position
 					temporaryVoxel.visible = false
 					break
 

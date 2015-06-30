@@ -151,13 +151,13 @@ class BrickLayouter extends Layouter
 		return null if brick.getSize().z != 1
 
 		secondLayerBricks = brick.getNeighbors(Brick.direction.Zp)
-		return null unless secondLayerBricks.size == 1
+		return null unless secondLayerBricks.size is 1
 
 		slBrick = secondLayerBricks.values().next().value
 		return null unless slBrick.isSize(1, 1, 1)
 
 		thirdLayerBricks = slBrick.getNeighbors(Brick.direction.Zp)
-		return null unless thirdLayerBricks.size == 1
+		return null unless thirdLayerBricks.size is 1
 
 		tlBrick = thirdLayerBricks.values().next().value
 		return null unless tlBrick.isSize(1, 1, 1)

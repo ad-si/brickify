@@ -294,9 +294,7 @@ class Brick
 	# Returns true if the size of the brick matches one of @validBrickSizes
 	hasValidSize: =>
 		size = @getSize()
-		variation1 = Brick.isValidSize(size.x, size.y, size.z)
-		variation2 = Brick.isValidSize(size.y, size.x, size.z)
-		return variation1 || variation2
+		return Brick.isValidSize(size.x, size.y, size.z)
 
 	# Returns true if the brick has no holes in it, i.e. is a cuboid
 	# voxels marked to be 3d printed count as holes

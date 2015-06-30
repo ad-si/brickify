@@ -35,7 +35,7 @@ module.exports = (files) ->
 			)
 			return Promise.reject('Wrong file format')
 
-		faceCounter = 0
+		faceCounter = file.size / averageFaceSize
 
 		nanobar.go 0
 		$loadingTextElement.text 'Loading File'
@@ -54,11 +54,8 @@ module.exports = (files) ->
 		streamingStlParser = stlParser {blocking: false}
 		streamingStlParser.on 'data', (data) ->
 			# if data-chunk is the header
-			if not data.number?
-				faceCounter =
-					if data.faceCount
-					then data.faceCount
-					else file.size / averageFaceSize
+			if data.faceCount?
+				faceCounter = data.faceCount
 			# or a face
 			else
 				progress = (data.number / faceCounter) * 80

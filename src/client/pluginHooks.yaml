@@ -15,35 +15,25 @@
 
 - init
 
-#  ## 3D scene initialization
+# ## 3D scene initialization
 #
-#  Each plugin that provides a `init3d` method is able to initialize its 3D
-#  rendering there and receives a three.js node as argument.
+# Each plugin that provides a `init3d` method is able to initialize its 3D
+# rendering there and receives a three.js node as argument.
 #
-#  If the plugin needs its node for later use it has to store it in `init3d`
-#  because it won't be handed the node again later.
+# If the plugin needs its node for later use it has to store it in `init3d`
+# because it won't be handed the node again later.
 
 - init3d
 
-# ## Focus manipulation
+# ## 3D scene update and animation
 #
-# A Plugin can specify that its visualization has a new bounding sphere.
-# This can be a new model or a "region of interest". It is expected to
-# either return null (for 'no new bounding sphere') or return
-# {center: vec3d, radius: float}. The renderer will then focus
-# the camera on this region
-
-- newBoundingSphere
-
-#  ## 3D scene update and animation
+# On each render frame the [renderer](render.html) will call the `on3dUpdate`
+# method of all plugins that provide it.
 #
-#  On each render frame the [renderer](render.html) will call the `on3dUpdate`
-#  method of all plugins that provide it.
-#
-#  The callback has one single argument, a DOMHighResTimeStamp, which indicates
-#  the current time for when requestAnimationFrame starts to fire callbacks.
-#  (according to
-#  https://developer.mozilla.org/en/docs/Web/API/window.requestAnimationFrame)
+# The callback has one single argument, a DOMHighResTimeStamp, which indicates
+# the current time for when requestAnimationFrame starts to fire callbacks.
+# (according to
+# https://developer.mozilla.org/en/docs/Web/API/window.requestAnimationFrame)
 
 - on3dUpdate
 
@@ -54,33 +44,40 @@
 
 - onPaint
 
-#  ## scene interaction and administration
-
-#  ### New nodes
+# ## setFidelity
 #
-#  Each time a new node is added to the scene, the sceneManager will inform
-#  plugins by calling onNodeAdd
+# Plugins should adapt their visual fidelity to match the device's rendering power.
+# When the framerate is above / below a certain threshold, setFidelity is called
+
+- setFidelity
+
+# ## scene interaction and administration
+
+# ### New nodes
+#
+# Each time a new node is added to the scene, the sceneManager will inform
+# plugins by calling onNodeAdd
 
 - onNodeAdd
 
-#  ### Node selection
+# ### Node selection
 #
-#  Each time a scene's node is selected, the sceneManager will inform plugins by
-#  calling onNodeSelect
+# Each time a scene's node is selected, the sceneManager will inform plugins by
+# calling onNodeSelect
 
 - onNodeSelect
 
-#  ### Node deselection
+# ### Node deselection
 #
-#  Each time a scene's node is deselected, the sceneManager will inform plugins
-#  by calling onNodeDeselect
+# Each time a scene's node is deselected, the sceneManager will inform plugins
+# by calling onNodeDeselect
 
 - onNodeDeselect
 
-#  ### Node deletion
+# ### Node deletion
 #
-#  When a node is removed from the scene, the sceneManager will inform plugins
-#  by calling onNodeRemove
+# When a node is removed from the scene, the sceneManager will inform plugins
+# by calling onNodeRemove
 
 - onNodeRemove
 
@@ -129,9 +126,3 @@
 # Download objects with an empty filename are ignored.
 
 - getDownload
-
-# ## setFidelity
-# Plugins should adapt their visual fidelity to match the device's rendering power.
-# When the framerate is above / below a certain threshold, setFidelity is called
-
-- setFidelity

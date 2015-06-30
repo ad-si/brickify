@@ -38,14 +38,15 @@ class BrickObject extends THREE.Object3D
 			@children[1].material = @materials.colorStuds
 			@children[2].material = @materials.colorStuds
 
-	setFidelity: (fidelity) =>
-		@children[1].visible = fidelity is 1 and @areStudsVisible
-		@children[2].visible = fidelity is 2 and @areStudsVisible
-		@children[3].visible = fidelity is 0 and @areStudsVisible
+	setFidelity: (@fidelity) =>
+		@_updateStuds()
 
 	setStudVisibility: (@areStudsVisible) =>
-		@children[1].visible = @areStudsVisible
-		@children[2].visible = @areStudsVisible
-		@children[3].visible = @areStudsVisible
+		@_updateStuds()
+
+	_updateStuds: =>
+		@children[1].visible = @fidelity is 1 and @areStudsVisible
+		@children[2].visible = @fidelity is 2 and @areStudsVisible
+		@children[3].visible = @fidelity is 0 and @areStudsVisible
 
 module.exports = BrickObject

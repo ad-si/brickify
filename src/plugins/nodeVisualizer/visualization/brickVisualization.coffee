@@ -396,6 +396,9 @@ class BrickVisualization
 	setFidelity: (@fidelity) =>
 		@_highlightVoxel?.setFidelity @fidelity
 
+		for voxel in @temporaryVoxels.children
+			voxel.setFidelity @fidelity
+
 		for layer in @bricksSubnode.children
 			for threeBrick in layer.children
 				threeBrick.setFidelity @fidelity

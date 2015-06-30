@@ -1,7 +1,7 @@
 log = require 'loglevel'
 
-HullVoxelizer = require './HullVoxelizer'
-VolumeFiller = require './VolumeFiller'
+HullVoxelizer = require './voxelization/HullVoxelizer'
+VolumeFiller = require './voxelization/VolumeFiller'
 BrickLayouter = require './Layout/BrickLayouter'
 PlateLayouter = require './Layout/PlateLayouter'
 LayoutOptimizer = require './Layout/LayoutOptimizer'

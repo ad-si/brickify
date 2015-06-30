@@ -106,7 +106,7 @@ b1 = bundle1.init().then ->
 			@value = ''
 
 	$('#loadButton img').hide()
-	$('#loadButton span').text 'Drop an STL file'
+	$('#loadingStatus').text 'Drop an STL file'
 	$('#preview img, #preview a').on 'dragstart', (event) ->
 			event.originalEvent.dataTransfer.setData(
 				'text/plain'

@@ -11,7 +11,7 @@ nanobar = new Nanobar {
 	target: document.getElementById 'loadButton'
 	id: 'progressBar'
 }
-$loadingTextElement = $ '#loadButton span'
+$loadingTextElement = $ '#loadingStatus'
 
 module.exports = (files) ->
 
@@ -78,7 +78,7 @@ module.exports = (files) ->
 					return modelCache.store model
 				.then (hash) ->
 					nanobar.go 100
-					$('#loadButton span').text 'Drop an STL File'
+					$loadingTextElement.text 'Drop an STL File'
 					resolve hash
 
 			# Give time to render text

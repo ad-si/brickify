@@ -27,7 +27,7 @@ class BrickVisualization
 		@printVoxels = []
 
 		@isStabilityView = false
-		@_highlightVoxelVisiblity = true
+		@_highlightVoxelVisibility = true
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -244,7 +244,7 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			@_highlightVoxel.visible = true and @_highlightVoxelVisiblity
+			@_highlightVoxel.visible = true and @_highlightVoxelVisibility
 			worldPos = @grid.mapVoxelToWorld voxel.position
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
@@ -391,7 +391,7 @@ class BrickVisualization
 			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
 
-	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
+	setHighlightVoxelVisibility: (@_highlightVoxelVisibility) => return
 
 	setFidelity: (@fidelity) =>
 		@_highlightVoxel?.setFidelity @fidelity

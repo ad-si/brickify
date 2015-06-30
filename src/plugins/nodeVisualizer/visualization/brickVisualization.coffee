@@ -187,6 +187,7 @@ class BrickVisualization
 
 		# Hide highlight when in build mode
 		@_highlightVoxel.visible = false
+		@unhighlightBigBrush()
 
 		visibleLayers = @_getVisibleLayers()
 		for i in [0...visibleLayers.length] by 1

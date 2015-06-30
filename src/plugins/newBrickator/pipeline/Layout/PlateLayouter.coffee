@@ -72,40 +72,33 @@ class PlateLayouter extends Layouter
 
 		# Check that the neighbors together don't exceed this brick's width
 		width = 0
-		noMerge = false
 
-		neighborsInDirection.forEach (neighbor) ->
+		neighborIter = neighborsInDirection.values()
+		while neighbor = neighborIter.next().value
 			neighborSize = neighbor.getSize()
-			if neighborSize.z != brick.getSize().z
-				noMerge = true
-			if neighbor.getPosition().z != brick.getPosition().z
-				noMerge = true
+			return null if neighborSize.z != brick.getSize().z
+			return null if neighbor.getPosition().z != brick.getPosition().z
 			width += widthFn neighborSize
-		return null if noMerge
+
+		return null if width != widthFn(brick.getSize())
 
 		# If they have the same accumulative width
 		# check if they are in the correct positions,
 		# i.e. no spacing between neighbors
-		return null if width != widthFn(brick.getSize())
 
 		minWidth = widthFn(brick.getPosition())
-
 		maxWidth = minWidth + widthFn(brick.getSize()) - 1
 
 		length = null
 
-		invalidSize = false
-		neighborsInDirection.forEach (neighbor) ->
+		neighborIter = neighborsInDirection.values()
+		while neighbor = neighborIter.next().value
 			length ?= lengthFn(neighbor.getSize())
-			if widthFn(neighbor.getPosition()) < minWidth
-				invalidSize = true
+			return null if widthFn(neighbor.getPosition()) < minWidth
 			neighborWidth = widthFn(neighbor.getPosition()) +
 				widthFn(neighbor.getSize()) - 1
-			if neighborWidth > maxWidth
-				invalidSize = true
-			if lengthFn(neighbor.getSize()) != length
-				invalidSize = true
-		return null if invalidSize
+			return null if neighborWidth > maxWidth
+			return null if lengthFn(neighbor.getSize()) != length
 
 		if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
 				length, brick.getSize().z)

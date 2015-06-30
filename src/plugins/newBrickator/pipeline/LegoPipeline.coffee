@@ -6,8 +6,6 @@ BrickLayouter = require './Layout/BrickLayouter'
 PlateLayouter = require './Layout/PlateLayouter'
 LayoutOptimizer = require './Layout/LayoutOptimizer'
 Random = require './Random'
-operative = require 'operative'
-
 
 module.exports = class LegoPipeline
 	constructor: ->

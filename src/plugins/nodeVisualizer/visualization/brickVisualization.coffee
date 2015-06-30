@@ -190,25 +190,23 @@ class BrickVisualization
 		for i in [0...visibleLayers.length] by 1
 			threeLayer = visibleLayers[i]
 			if i <= layer
-				threeLayer.visible = true
 				if i < layer
 					@_makeLayerGrayscale threeLayer
 				else
 					@_makeLayerColored threeLayer
-					for visibleBrick in threeLayer.children
-						visibleBrick.visible = true
-						visibleBrick.setStudVisibility true
+				for visibleBrick in threeLayer.children
+					visibleBrick.visible = true
 			else
 				for visibleBrick in threeLayer.children
 					visibleBrick.visible = false
 
 		# Set stud visibility in second pass so that visibility of
 		# all bricks in all layers is in the correct state
-		for i in [0...layer] by 1
-			threeLayer = visibleLayers[i]
+		for threeLayer in visibleLayers
 			for visibleBrick in threeLayer.children
-				visibleBrick.visible = true
 				@_setStudVisibility visibleBrick.brick
+
+		return
 
 	_makeLayerGrayscale: (layer) ->
 		for threeBrick in layer.children

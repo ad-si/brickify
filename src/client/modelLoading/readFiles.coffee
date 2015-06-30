@@ -11,6 +11,8 @@ nanobar = new Nanobar {
 	target: document.getElementById 'loadButton'
 	id: 'progressBar'
 }
+loadingPercentage = 80
+processingPercentage = 90
 $loadingTextElement = $ '#loadingStatus'
 
 module.exports = (files) ->
@@ -58,13 +60,13 @@ module.exports = (files) ->
 				faceCounter = data.faceCount
 			# or a face
 			else
-				progress = (data.number / faceCounter) * 80
-				if progress < 80
+				progress = (data.number / faceCounter) * loadingPercentage
+				if progress < loadingPercentage
 					nanobar.go progress
 
 		modelBuilder = new meshlib.ModelBuilder()
 		modelBuilder.on 'model', (model) ->
-			nanobar.go 90
+			nanobar.go processingPercentage
 			$loadingTextElement.text 'Processing Geometry'
 
 			processModel = ->

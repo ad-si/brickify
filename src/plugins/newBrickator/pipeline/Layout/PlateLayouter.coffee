@@ -4,6 +4,7 @@ Brick = require '../Brick'
 Voxel = require '../Voxel'
 Random = require '../Random'
 Layouter = require './Layouter'
+DataHelper = require '../DataHelper'
 
 
 ###

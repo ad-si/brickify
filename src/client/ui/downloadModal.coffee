@@ -21,6 +21,7 @@ $wizardStudImage = undefined
 $wizardHoleImage = undefined
 $studSizeSelect = undefined
 $holeSizeSelect = undefined
+$wizardStepObjects = undefined
 
 alphabeticalList = (i, range) ->
 	# A = 65
@@ -45,6 +46,10 @@ disableWizard = ->
 	$legoContent.fadeIn wizardFadeTime
 	$stlContent.fadeIn wizardFadeTime
 	$wizardButtons.fadeOut wizardFadeTime
+
+	for $step in $wizardStepObjects
+		$step.fadeOut wizardFadeTime
+
 	currentWizardStep = 0
 
 # Initializes the logic for the test strip wizard

@@ -63,7 +63,7 @@ class PlateLayouter extends Layouter
 	# @param {Number} dir the merge direction as specified in Brick.direction
 	# @param {Function} widthFn the function to determine the brick's width
 	# @param {Function} lengthFn the function to determine the brick's length
-	# @return {Array<Brick>} Bricks in the merge direction if this brick can merge
+	# @return {Set<Brick>} Bricks in the merge direction if this brick can merge
 	# in this dir undefined otherwise.
 	# @see Brick
 	###
@@ -75,16 +75,16 @@ class PlateLayouter extends Layouter
 		return null if neighbors.size is 0
 
 		# Check all requirements for mergeability except validSize
-		checkResult = @_checkNeighbors brick, neighbors, widthFn, lengthFn
-		return null if checkResult is false
+		neighborLength = @_checkNeighbors brick, neighbors, widthFn, lengthFn
+		return null if neighborLength is false
 
 		if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
-				checkResult.length, brick.getSize().z)
+				neighborLength, brick.getSize().z)
 			return neighbors
 
-		# If the neighbors are mergeable except for unvalid brick dimensions
+		# If the neighbors are mergeable, except for unvalid brick dimensions,
 		# test the neighbors' neighbors
-		firstNeighborsLength = checkResult.length
+		firstNeighborsLength = neighborLength
 
 		neighborsNeighbors = new Set()
 		neighbors.forEach (neighbor) ->
@@ -92,18 +92,19 @@ class PlateLayouter extends Layouter
 				neighborsNeighbors.add nNeighbor
 
 		# Check the neighbors of the neighbors
-		checkResult = @_checkNeighbors brick, neighborsNeighbors, widthFn, lengthFn
-		return null if checkResult is false
+		neighborLength = @_checkNeighbors brick, neighborsNeighbors, widthFn, lengthFn
+		return null if neighborLength is false
 
 		if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
-				firstNeighborsLength + checkResult.length, brick.getSize().z)
+				firstNeighborsLength + neighborLength, brick.getSize().z)
 			return DataHelper.union([neighbors, neighborsNeighbors])
 
 		return null
 
-	# Checks all requirements for mergeability except validSize
+	# Checks all requirements for neighbor mergeability except valid bricksize
+	# returns the length the neighbors would add to the current brick if merged
 	_checkNeighbors: (brick, neighbors, widthFn, lengthFn) =>
-		# Get the bricks minimal and maximal Position in its width dimension
+		# Get the bricks minimal and maximal position in its width dimension
 		minWPos = widthFn(brick.getPosition())
 		maxWPos = minWPos + widthFn(brick.getSize()) - 1
 
@@ -125,16 +126,13 @@ class PlateLayouter extends Layouter
 			# check if all neighbors have same length
 			individualNeighborLength ?= lengthFn(neighborSize)
 			return false unless lengthFn(neighborSize) is individualNeighborLength
-			# add
+			# accumulate all neighbors' width
 			totalNeighborWidth += widthFn(neighborSize)
 
-		# Check that the neighbors combined match this brick's width
+		# Check that the neighbors combined match the brick's width
 		return false unless totalNeighborWidth is widthFn(brick.getSize())
 
-		return {
-			mergeable: true,
-			length: individualNeighborLength
-		}
+		return individualNeighborLength
 
 
 	# Returns the index of the mergeableNeighbors sub-set-in-this-array,

@@ -24,18 +24,18 @@ h4.disabled Download stl for 3d printer
 		Try to connect the test strip studs into a LEGO-brick. Which size fits best?
 	.selectContainer
 		img(src='img/testStripWizard/studs/textOverlay.png')
-		img(src='img/testStripWizard/studs/E.png' usemap='#textMap')
+		img(src='img/testStripWizard/studs/E.png' usemap='#textMap' id='wizardStudImage')
 
-	map(name="textMap")
-		area(shape="circle" coords="594, 273, 61")
-		area(shape="circle" coords="639, 421, 61")
-		area(shape="circle" coords="570, 572, 61")
-		area(shape="circle" coords="385, 638, 61")
-		area(shape="circle" coords="199, 567, 61")
-		area(shape="circle" coords="128, 415, 61")
-		area(shape="circle" coords="188, 277, 61")
-		area(shape="circle" coords="314, 200, 61")
-		area(shape="circle" coords="461, 197, 61")
+	map(name='textMap' id='textMap')
+		area(shape="circle" coords="594, 273, 61" id='A' href='a')
+		area(shape="circle" coords="639, 421, 61" id='B' href='a')
+		area(shape="circle" coords="570, 572, 61" id='C' href='a')
+		area(shape="circle" coords="385, 638, 61" id='D' href='a')
+		area(shape="circle" coords="199, 567, 61" id='E' href='a')
+		area(shape="circle" coords="128, 415, 61" id='F' href='a')
+		area(shape="circle" coords="188, 277, 61" id='G' href='a')
+		area(shape="circle" coords="314, 200, 61" id='H' href='a')
+		area(shape="circle" coords="461, 197, 61" id='I' href='a')
 
 	p.wizardSelect This size fits best:
 		select.form-control#wizardStudSizeSelect
@@ -45,18 +45,18 @@ h4.disabled Download stl for 3d printer
 		Now connect the LEGO-brick studs into the test strip. Which size fits best?
 	.selectContainer
 		img(src='img/testStripWizard/holes/numberOverlay.png')
-		img(src='img/testStripWizard/holes/5.png' usemap='#numberMap')
+		img(src='img/testStripWizard/holes/5.png' usemap='#numberMap' id='wizardHoleImage')
 
-	map(name='numberMap')
-		area(shape="circle" coords="587, 290, 61")
-		area(shape="circle" coords="637, 432, 61")
-		area(shape="circle" coords="563, 579, 61")
-		area(shape="circle" coords="385, 649, 61")
-		area(shape="circle" coords="468, 208, 61")
-		area(shape="circle" coords="209, 582, 61")
-		area(shape="circle" coords="143, 436, 61")
-		area(shape="circle" coords="189, 294, 61")
-		area(shape="circle" coords="310, 209, 61")
+	map(name='numberMap' id='numberMap')
+		area(shape="circle" coords="587, 290, 61" id='0')
+		area(shape="circle" coords="637, 432, 61" id='1')
+		area(shape="circle" coords="563, 579, 61" id='2')
+		area(shape="circle" coords="385, 649, 61" id='3')
+		area(shape="circle" coords="468, 208, 61" id='4')
+		area(shape="circle" coords="209, 582, 61" id='5')
+		area(shape="circle" coords="143, 436, 61" id='6')
+		area(shape="circle" coords="189, 294, 61" id='7')
+		area(shape="circle" coords="310, 209, 61" id='8')
 
 	p.wizardSelect.clear This size fits best:
 		select.form-control#wizardHoleSizeSelect

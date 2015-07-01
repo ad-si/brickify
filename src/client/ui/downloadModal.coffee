@@ -17,6 +17,8 @@ $testStripContent = undefined
 $wizardButtons = undefined
 $wizardHoleSizeSelect = undefined
 $wizardStudSizeSelect = undefined
+$wizardStudImage = undefined
+$wizardHoleImage = undefined
 $studSizeSelect = undefined
 $holeSizeSelect = undefined
 
@@ -59,6 +61,9 @@ initializeWizard = ($modal) ->
 	$wizardButtons.hide()
 
 	$startWizard = $modal.find('#startWizard')
+
+	# init imagemaps
+	initializeImageMaps $modal
 
 	$wizardStepObjects = wizardSteps.map (selector) ->
 		$wizardStep = $modal.find(selector)
@@ -129,6 +134,15 @@ initializeWizard = ($modal) ->
 			applyCurrentWizardStep()
 			updateButtonCaptions()
 
+	# Update image on selection change
+	$wizardHoleSizeSelect.on 'change', ->
+		id = $wizardHoleSizeSelect.find('option:selected').html()
+		$wizardHoleImage.attr 'src', "img/testStripWizard/holes/#{id}.png"
+
+	$wizardStudSizeSelect.on 'change', ->
+		id = $wizardStudSizeSelect.find('option:selected').html()
+		$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
+
 	# Fade out size select, start wizard on click
 	$startWizard.click ->
 		currentWizardStep = 0
@@ -138,6 +152,24 @@ initializeWizard = ($modal) ->
 		$sizeSelect.fadeOut wizardFadeTime, ->
 			$wizardStepObjects[0].fadeIn wizardFadeTime
 			$wizardButtons.fadeIn wizardFadeTime
+
+initializeImageMaps = ($modal) ->
+	$wizardStudImage = $modal.find '#wizardStudImage'
+	$wizardHoleImage = $modal.find '#wizardHoleImage'
+
+	# Image maps currently don't work. Maybe we'll find a way?
+	$modal.find('#textMap area').each ->
+		thisArea  = $(@)
+		id = thisArea.attr 'id'
+		thisArea.mouseover ->
+			console.log 'area mouseover'
+			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
+		thisArea.hover ->
+			console.log 'area hover'
+			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
+		thisArea.click ->
+			console.log 'area click'
+			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
 
 getModal = ({testStrip, stl, lego, steps} = {}) ->
 	$modal ?= $('#downloadModal')

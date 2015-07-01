@@ -68,6 +68,9 @@ class PlateLayouter extends Layouter
 	# @see Brick
 	###
 	_findMergeableNeighborsInDirection: (brick, dir, widthFn, lengthFn) ->
+		if widthFn(brick.getSize()) > 2 and lengthFn(brick.getSize()) >= 2
+			return null
+
 		neighbors = brick.getNeighbors(dir)
 		return null if neighbors.size is 0
 

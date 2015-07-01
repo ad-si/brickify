@@ -146,65 +146,22 @@ class BrickLayouter extends Layouter
 		randomOfLargest = largestConnections[Random.next(largestConnections.length)]
 		return randomOfLargest.index
 
+	# Assumes brick is 1x1x1
 	_findMergeableNeighborsUpOrDownwards: (brick, direction) =>
-		# Only handle plates (z=1)
 		return null if brick.getSize().z != 1
 
-		# Check if 3layer Brick possible according to xy dimensions
-		return null if !Brick.isValidSize brick.getSize().x, brick.getSize().y, 3
+		secondLayerBricks = brick.getNeighbors(Brick.direction.Zp)
+		return null unless secondLayerBricks.size is 1
 
-		# Check if any slot is empty
-		return null if brick.fractionOfConnectionsInZDirection(direction) != 1
+		slBrick = secondLayerBricks.values().next().value
+		return null unless slBrick.isSize(1, 1, 1)
 
-		# Then check if size of second layer fits
-		# if size fits and no slot empty -> position fits
-		secondLayerBricks = brick.getNeighbors(direction)
-		sLIterator = secondLayerBricks.values()
-		while sLBrick = sLIterator.next().value
-			return null unless sLBrick.getSize().z is 1
+		thirdLayerBricks = slBrick.getNeighbors(Brick.direction.Zp)
+		return null unless thirdLayerBricks.size is 1
 
-		if @_sameSizeAsBrick brick, secondLayerBricks
-			# Check next layer
-			thirdLayerBricks = new Set()
-			sLIterator = secondLayerBricks.values()
-			while sLBrick = sLIterator.next().value
-				return unless sLBrick.fractionOfConnectionsInZDirection(direction) is 1
-				neighbors = sLBrick.getNeighbors(direction)
-				neighborsIter = neighbors.values()
-				while nBrick = neighborsIter.next().value
-					return unless nBrick.getSize().z is 1
-					thirdLayerBricks.add nBrick
+		tlBrick = thirdLayerBricks.values().next().value
+		return null unless tlBrick.isSize(1, 1, 1)
 
-			if @_sameSizeAsBrick brick, thirdLayerBricks
-				thirdLayerBricks.forEach (tlBrick) ->
-					secondLayerBricks.add tlBrick
-				return secondLayerBricks
-
-		# No mergeable neighbors
-		return null
-
-
-	_sameSizeAsBrick: (brick, layerBricks) =>
-		return false if layerBricks.size is 0
-
-		p = brick.getPosition()
-		s = brick.getSize()
-
-		lBIterator = layerBricks.values()
-		while lBrick = lBIterator.next().value
-			if lBrick.getSize().z != 1
-				return false
-			lp = lBrick.getPosition()
-			ls = lBrick.getSize()
-
-			xMinInBrick = lp.x >= p.x
-			xMaxInBrick = lp.x + ls.x <= p.x + s.x
-			yMinInBrick = lp.y >= p.y
-			yMaxInBrick = lp.y + ls.y <= p.y + s.y
-
-			if not (xMinInBrick and xMaxInBrick and yMinInBrick and yMaxInBrick)
-				return false
-
-		return true
+		return new Set([slBrick, tlBrick])
 
 module.exports = BrickLayouter

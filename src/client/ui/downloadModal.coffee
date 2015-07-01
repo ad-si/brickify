@@ -1,3 +1,5 @@
+require 'image-map-resizer'
+
 wizardLogicInitialized = false
 currentWizardStep = 0
 wizardSteps = [
@@ -161,6 +163,9 @@ initializeWizard = ($modal) ->
 initializeImageMaps = ($modal) ->
 	$wizardStudImage = $modal.find '#wizardStudImage'
 	$wizardHoleImage = $modal.find '#wizardHoleImage'
+
+	$modal.find('#textMap').imageMapResize()
+	$modal.find('#numberMap').imageMapResize()
 
 	# Image maps currently don't work. Maybe we'll find a way?
 	$modal.find('#textMap area').each ->

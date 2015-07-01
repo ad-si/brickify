@@ -242,7 +242,7 @@ class LegoInstructions
 	_downloadPieceImage: (piece) ->
 		return new Promise (resolve, reject) ->
 			xhr = new XMLHttpRequest()
-			fileName = "img/partList/partList (#{piece.sizeIndex+1}).png"
+			fileName = "img/partList/partList-#{piece.sizeIndex + 1}.png"
 			xhr.open 'GET', fileName
 			xhr.responseType = 'arraybuffer'
 			xhr.onload = (event) ->

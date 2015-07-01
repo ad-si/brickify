@@ -27,16 +27,16 @@ class ModelLoader
 		return model
 			.done()
 			.then =>
-				fileName = model.model.fileName
-				@_addModelToScene fileName, identifier, model
+				name = model.model.name || model.model.fileName || identifier
+				@_addModelToScene name, identifier, model
 
 	# adds a new model to the state
-	_addModelToScene: (fileName, identifier, model) ->
+	_addModelToScene: (name, identifier, model) ->
 		model
 			.getAutoAlignMatrix()
 			.then (matrix) =>
 				node = new Node
-					name: fileName
+					name: name
 					modelIdentifier: identifier
 					transform:
 						position:

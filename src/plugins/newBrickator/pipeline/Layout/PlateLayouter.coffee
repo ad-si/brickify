@@ -82,8 +82,6 @@ class PlateLayouter extends Layouter
 				checkResult.length, brick.getSize().z)
 			return neighbors
 
-		console.log 'mergeable but invalid size'
-
 		# If the neighbors are mergeable except for unvalid brick dimensions
 		# test the neighbors' neighbors
 		firstNeighborsLength = checkResult.length
@@ -99,8 +97,7 @@ class PlateLayouter extends Layouter
 
 		if Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
 				firstNeighborsLength + checkResult.length, brick.getSize().z)
-			console.log 'merging neighborsNeighbors'
-			return DataHelper.union(neighbors, neighborsNeighbors)
+			return DataHelper.union([neighbors, neighborsNeighbors])
 
 		return null
 

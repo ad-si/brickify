@@ -167,19 +167,17 @@ initializeImageMaps = ($modal) ->
 	$modal.find('#textMap').imageMapResize()
 	$modal.find('#numberMap').imageMapResize()
 
-	# Image maps currently don't work. Maybe we'll find a way?
 	$modal.find('#textMap area').each ->
 		thisArea  = $(@)
 		id = thisArea.attr 'id'
-		thisArea.mouseover ->
-			console.log 'area mouseover'
-			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
 		thisArea.hover ->
-			console.log 'area hover'
 			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
 		thisArea.click ->
-			console.log 'area click'
 			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
+			$wizardStudSizeSelect
+			.find('option')
+			.filter -> return $(this).html() == id
+			.attr('selected', true)
 
 getModal = ({testStrip, stl, lego, steps} = {}) ->
 	$modal ?= $('#downloadModal')

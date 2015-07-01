@@ -14,7 +14,6 @@ class ShareUi
 			})
 
 		@$shareButton.click ->
-			_paq.push ['trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick']
 			piwikTracking.trackEvent(
 				'trackEvent', 'Editor', 'ExportAction', 'ShareButtonClick'
 			)

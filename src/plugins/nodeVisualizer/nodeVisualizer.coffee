@@ -377,20 +377,17 @@ class NodeVisualizer
 	getNumberOfBuildLayers: (selectedNode) =>
 		return @_getCachedData(selectedNode)
 			.then (cachedData) ->
-				return cachedData.brickVisualization.getNumberOfVisibleLayers()
+				return cachedData.brickVisualization.getNumberOfBuildLayers()
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @newBrickator.getNodeData selectedNode
-		.then (data) =>
-			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
-			@_getCachedData(selectedNode).then (cachedData) ->
-				gridLayer = layer - 1
-				# If there is 3D print below first lego layer, show lego starting
-				# with layer 1 and show only 3D print in first instruction layer
-				gridLayer -= 1 if minLayer > 0
-				cachedData.brickVisualization.showBrickLayer gridLayer
+
+		# Start counting at 0 internally
+		layer--
+
+		return @_getCachedData(selectedNode).then (cachedData) ->
+			cachedData.brickVisualization.showBrickLayer layer
 
 	_updateBrickCount: (bricks) =>
 		@brickCounter?.text bricks.size

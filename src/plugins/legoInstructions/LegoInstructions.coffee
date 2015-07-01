@@ -43,36 +43,32 @@ class LegoInstructions
 			@nodeVisualizer.setDisplayMode node, 'build'
 		.then => @newBrickator.getNodeData node
 		.then (data) =>
-			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
-			numLayers = maxLayer - minLayer + 1
-			# If there is 3D print below first lego layer, show lego starting
-			# with layer 1 and show only 3D print in first instruction layer
-			numLayers += 1 if minLayer > 0
+			return @nodeVisualizer.getNumberOfBuildLayers node
+			.then (numLayers) =>
+				# scad and piece list generation
+				bricks = data.grid.getAllBricks()
+				return null if bricks.size is 0
 
-			# scad and piece list generation
-			bricks = data.grid.getAllBricks()
-			return null if bricks.size is 0
+				files = []
+				files.push openScadGenerator.generateScad bricks
 
-			files = []
-			files.push openScadGenerator.generateScad bricks
+				# add instructions html to download
+				pieceList = pieceListGenerator.generatePieceList bricks
+				files.push @_createHtml numLayers, pieceList
 
-			# add instructions html to download
-			pieceList = pieceListGenerator.generatePieceList bricks
-			files.push @_createHtml numLayers, pieceList
+				# Take screenshots and convert them to png
+				screenshots = @_takeScreenshots node, numLayers, camera
+				.then (images) ->
+					files.push images...
+					log.debug 'Finished instruction screenshots'
 
-			# Take screenshots and convert them to png
-			screenshots = @_takeScreenshots node, numLayers, camera
-			.then (images) ->
-				files.push images...
-				log.debug 'Finished instruction screenshots'
+				# Load and save piece images
+				imageDownload = @_downloadPieceListImages pieceList
+				.then (imageFiles) ->
+					files.push imageFiles...
 
-			# Load and save piece images
-			imageDownload = @_downloadPieceListImages pieceList
-			.then (imageFiles) ->
-				files.push imageFiles...
-
-			Promise.all [screenshots, imageDownload]
-			.then -> return files
+				Promise.all [screenshots, imageDownload]
+				.then -> return files
 		.then (files) =>
 			# reset display mode
 			@nodeVisualizer.setDisplayMode node, oldVisualizationMode

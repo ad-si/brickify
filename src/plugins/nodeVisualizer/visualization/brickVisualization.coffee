@@ -183,32 +183,33 @@ class BrickVisualization
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 
 	showBrickLayer: (layer) =>
+		layer += @_getBuildLayerModifier()
+
 		# Hide highlight when in build mode
 		@_highlightVoxel.visible = false
+		@unhighlightBigBrush()
 
 		visibleLayers = @_getVisibleLayers()
 		for i in [0...visibleLayers.length] by 1
 			threeLayer = visibleLayers[i]
 			if i <= layer
-				threeLayer.visible = true
 				if i < layer
 					@_makeLayerGrayscale threeLayer
 				else
 					@_makeLayerColored threeLayer
-					for visibleBrick in threeLayer.children
-						visibleBrick.visible = true
-						visibleBrick.setStudVisibility true
+				for visibleBrick in threeLayer.children
+					visibleBrick.visible = true
 			else
 				for visibleBrick in threeLayer.children
 					visibleBrick.visible = false
 
 		# Set stud visibility in second pass so that visibility of
 		# all bricks in all layers is in the correct state
-		for i in [0...layer] by 1
-			threeLayer = visibleLayers[i]
+		for threeLayer in visibleLayers
 			for visibleBrick in threeLayer.children
-				visibleBrick.visible = true
 				@_setStudVisibility visibleBrick.brick
+
+		return
 
 	_makeLayerGrayscale: (layer) ->
 		for threeBrick in layer.children
@@ -225,6 +226,17 @@ class BrickVisualization
 
 	getNumberOfVisibleLayers: =>
 		return @_getVisibleLayers().length
+
+	getNumberOfBuildLayers: =>
+		numLayers = @getNumberOfVisibleLayers()
+		numLayers -= @_getBuildLayerModifier()
+		return numLayers
+
+	_getBuildLayerModifier: =>
+		# If there is 3D print below first lego layer, show lego starting
+		# with layer 1 and show only 3D print in first instruction layer
+		minLayer = @grid.getLegoVoxelsZRange().min
+		return if minLayer > 0 then -1 else 0
 
 	_getVisibleLayers: =>
 		@_visibleChildLayers ?= @bricksSubnode.children.filter (layer) ->

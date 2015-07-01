@@ -232,7 +232,7 @@ class LegoInstructions
 		html += '</body></html>'
 
 		return {
-			fileName: 'LEGO Assembly instructions.html'
+			fileName: 'LEGO_Assembly_instructions.html'
 			data: html
 		}
 

@@ -117,7 +117,7 @@ class LegoInstructions
 			return @_convertToPng(flippedImage)
 			.then (pngData) ->
 				return (
-					fileName: "LEGO assembly instructions #{layer}.png"
+					fileName: "img/instructions/layer-#{layer}.png"
 					data: pngData.buffer
 					imageWidth: flippedImage.width
 				)
@@ -227,7 +227,7 @@ class LegoInstructions
 		for i in [1..numLayers]
 			html += '<br><br>'
 			html += '<h3 class="pageBreak"> Layer ' + i + '</h3>'
-			html += '<p><img src="LEGO%20assembly%20instructions%20' + i + '.png"></p>'
+			html += '<p><img src="img/instructions/layer-' + i + '.png"></p>'
 
 		html += '</body></html>'
 

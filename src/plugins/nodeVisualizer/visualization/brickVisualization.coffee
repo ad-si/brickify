@@ -27,7 +27,7 @@ class BrickVisualization
 		@printVoxels = []
 
 		@isStabilityView = false
-		@_highlightVoxelVisiblity = true
+		@_highlightVoxelVisibility = true
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -256,7 +256,7 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			@_highlightVoxel.visible = true and @_highlightVoxelVisiblity
+			@_highlightVoxel.visible = true and @_highlightVoxelVisibility
 			worldPos = @grid.mapVoxelToWorld voxel.position
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
@@ -341,13 +341,13 @@ class BrickVisualization
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
 		@printVoxels = []
-		everything3D = true
+		changedVoxels = []
 		for voxel in voxels
-			everything3D = everything3D && !voxel.isLego()
+			changedVoxels.push voxel if voxel.isLego()
 			voxel.make3dPrinted()
 			@printVoxels.push voxel
 		@voxelSelector.clearSelection()
-		return !everything3D
+		return changedVoxels
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
@@ -403,10 +403,13 @@ class BrickVisualization
 			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
 
-	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
+	setHighlightVoxelVisibility: (@_highlightVoxelVisibility) => return
 
 	setFidelity: (@fidelity) =>
 		@_highlightVoxel?.setFidelity @fidelity
+
+		for voxel in @temporaryVoxels.children
+			voxel.setFidelity @fidelity
 
 		for layer in @bricksSubnode.children
 			for threeBrick in layer.children

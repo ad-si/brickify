@@ -107,11 +107,6 @@ class LayoutOptimizer
 		return articulationPoints
 
 	_dfsWithAP: (brick, discoveryTime, articulationPoints) =>
-		ap = new Set()
-
-		# Count of children in DFS Tree
-		children = 0;
-
 		# Mark the current node as visited
 		brick.visited = true
 
@@ -123,7 +118,7 @@ class LayoutOptimizer
 		connectedBricks = brick.connectedBricks()
 		connectedBricks.forEach (conBrick) =>
 			if not conBrick.visited
-				children++
+				brick.children++
 				conBrick.parent = brick
 				@_dfsWithAP conBrick, discoveryTime, articulationPoints
 
@@ -134,7 +129,7 @@ class LayoutOptimizer
 				# brick is an articulation point in following cases
 
 				# (1) brick is root of DFS tree and has two or more children
-				if (brick.parent is null and children > 1)
+				if (brick.parent is null and brick.children > 1)
 					articulationPoints.add brick
 
 				# (2) If u is not root and low value of one of its child is more

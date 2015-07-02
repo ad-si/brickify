@@ -65,6 +65,8 @@ class Brick
 		@low = null
 		@parent = null
 		@discoveryTime = 0
+		# Count of children in DFS Tree
+		@children = 0
 
 	# Enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>

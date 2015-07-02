@@ -2,8 +2,9 @@ log = require 'loglevel'
 
 Brick = require '../Brick'
 Voxel = require '../Voxel'
-DataHelper = require '../DataHelper'
 Random = require '../Random'
+ConComp = require './ConnectedComponents'
+AP = require './ArticulationPoints'
 
 
 class LayoutOptimizer
@@ -21,10 +22,10 @@ class LayoutOptimizer
 			bricks.forEach (brick) ->
 				brick.label = null
 
-			numberOfComponents = @_findConnectedComponents bricks
+			numberOfComponents = ConComp.findConnectedComponents bricks
 			log.debug '\t# of components: ', numberOfComponents
 
-			bricksToSplit = @_bricksOnComponentInterfaces bricks
+			bricksToSplit = ConComp.bricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
 			if bricksToSplit.size is 0
@@ -34,114 +35,9 @@ class LayoutOptimizer
 
 		log.debug '\tfinished optimization after ', pass , 'passes'
 
-		@_findArticulationPoints bricks
+		AP.findArticulationPoints bricks
 
 		return Promise.resolve grid
-
-	# Connected components using the connected component labelling algo
-	_findConnectedComponents: (bricks) =>
-		labels = []
-		id = 0
-
-		# First pass
-		bricks.forEach (brick) ->
-			conBricks = brick.connectedBricks()
-			conLabels = new Set()
-
-			conBricks.forEach (conBrick) ->
-				conLabels.add conBrick.label if conBrick.label?
-
-			if conLabels.size > 0
-				smallestLabel = DataHelper.smallestElement conLabels
-				# Assign label to this brick
-				brick.label = labels[smallestLabel]
-				for i in [0..labels.length]
-					if conLabels.has labels[i]
-						labels[i] = labels[smallestLabel]
-
-			else # No neighbor has a label
-				brick.label = id
-				labels[id] = id
-
-				id++
-
-		# Second pass - applying labels
-		bricks.forEach (brick) ->
-			brick.label = labels[brick.label]
-
-		# Count number of components
-		finalLabels = new Set()
-		for label in labels
-			finalLabels.add label
-		numberOfComponents = finalLabels.size
-
-		return numberOfComponents
-
-	_bricksOnComponentInterfaces: (bricks) =>
-		bricksOnInterfaces = new Set()
-
-		bricks.forEach (brick) ->
-			neighborsXY = brick.getNeighborsXY()
-			neighborsXY.forEach (neighbor) ->
-				if neighbor.label != brick.label
-					bricksOnInterfaces.add neighbor
-					bricksOnInterfaces.add brick
-
-		return bricksOnInterfaces
-
-	# Finds Articulation Points in a Graph
-	# Algorithm inspired from
-	# http://www.geeksforgeeks.org/articulation-points-or-cut-vertices-in-a-graph/
-	_findArticulationPoints: (bricks) =>
-		articulationPoints = new Set()
-		discoveryTime = 0
-
-		bricks.forEach (brick) =>
-			return if brick.visited
-			@_dfsWithAP brick, discoveryTime, articulationPoints
-
-		bricks.forEach (brick) =>
-			brick.resetArticulationPointData()
-
-		console.log articulationPoints
-		return articulationPoints
-
-	_dfsWithAP: (brick, discoveryTime, articulationPoints) =>
-		# Mark the current node as visited
-		brick.visited = true
-
-		# Initialize discovery time and low value
-		++discoveryTime
-		brick.discoveryTime = discoveryTime
-		brick.low = discoveryTime
-
-		connectedBricks = brick.connectedBricks()
-		connectedBricks.forEach (conBrick) =>
-			if not conBrick.visited
-				brick.children++
-				conBrick.parent = brick
-				@_dfsWithAP conBrick, discoveryTime, articulationPoints
-
-				# Check if the subtree rooted with v has a connection to
-				# one of the ancestors of u
-				brick.low  = Math.min brick.low, conBrick.low
-
-				# brick is an articulation point in following cases
-
-				# (1) brick is root of DFS tree and has two or more children
-				if (brick.parent is null and brick.children > 1)
-					articulationPoints.add brick
-
-				# (2) If u is not root and low value of one of its child is more
-				# than discovery value of u
-				if (brick.parent isnt null and conBrick.low >= brick.discoveryTime)
-					articulationPoints.add brick
-
-			# Update low value of u for parent function calls
-			else if conBrick isnt brick.parent
-				brick.low = Math.min brick.low, conBrick.discoveryTime
-
-
 
 	###
 	# Split up all supplied bricks into single bricks and relayout locally. This

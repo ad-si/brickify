@@ -53,6 +53,19 @@ dfsWithAP = (brick, discoveryTime, articulationPoints) =>
 		else if conBrick isnt brick.parent
 			brick.low = Math.min brick.low, conBrick.discoveryTime
 
-subgraphIsSmallerThan2Bricks = (apBrick, subgraphStartingBrick) ->
+subgraphIsSmallerThan2Bricks = (apBrick, subgraphBrick) ->
+	cBricks = subgraphBrick.connectedBricks()
+	cBricks.delete apBrick
+
+	return false if cBricks.size >= 2
+
+	subgraphBricks = new Set()
+	cBricks.forEach (cBrick) ->
+		cBrick.connectedBricks().forEach (ccBrick) ->
+			# Ignore terminal 1x1x1 plates
+			return if ccBrick.isSize(1, 1, 1) and ccBrick.connectedBricks().size is 1
+			subgraphBricks.add ccBrick
+
+	return true if subgraphBricks.size <= 1
 	return false
 

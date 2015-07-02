@@ -134,23 +134,24 @@ module.exports = class Coloring
 		if brick.visualizationMaterials?
 			return brick.visualizationMaterials
 
+
 		if brick.isInsignificantAP
-			blue = 0x000000
-			iapMaterial = @_createMaterial blue
-			return {
-				color: iapMaterial
-				colorStuds: iapMaterial
-				gray: iapMaterial
-				grayStuds: iapMaterial
-			}
-		else if brick.isArticulationPoint
-			randomColor = @_getRandomColor()
-			apMaterial = @_createMaterial randomColor
+			blue = @_getRandomBlueColor()
+			apMaterial = @_createMaterial blue
 			return {
 				color: apMaterial
 				colorStuds: apMaterial
 				gray: apMaterial
 				grayStuds: apMaterial
+			}
+		else if brick.isArticulationPoint
+			green = @_getRandomGreenColor()
+			iapMaterial = @_createMaterial green
+			return {
+				color: iapMaterial
+				colorStuds: iapMaterial
+				gray: iapMaterial
+				grayStuds: iapMaterial
 			}
 
 		# collect materials of neighbors
@@ -264,13 +265,28 @@ module.exports = class Coloring
 	_getHash: (dimensions) ->
 		return dimensions.x + '-' + dimensions.y
 
-	_getRandomColor: ->
-		# Excluded 0123 to avoid very dark colors
-		# Add 0123 to get random color from full spectrum
-		letters = '456789ABCDEF'.split('')
+	_getRandomBlueColor: ->
+		letters = '0123456789'.split('')
 		color = '#'
 		i = 0
-		while i < 6
+		while i < 4
+			color += letters[Math.floor(Math.random() * letters.length)]
+			i++
+		color += 'ff'
+		return color
+
+	_getRandomGreenColor: ->
+				# Excluded 0123 to avoid very dark colors
+				# Add 0123 to get random color from full spectrum
+		letters = '0123'.split('')
+		color = '#'
+		i = 0
+		while i < 2
+			color += letters[Math.floor(Math.random() * letters.length)]
+			i++
+		color += 'ff'
+		i = 0
+		while i < 2
 			color += letters[Math.floor(Math.random() * letters.length)]
 			i++
 		return color

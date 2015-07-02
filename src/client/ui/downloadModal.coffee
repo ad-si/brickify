@@ -176,7 +176,19 @@ initializeImageMaps = ($modal) ->
 			$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
 			$wizardStudSizeSelect
 			.find('option')
-			.filter -> return $(this).html() == id
+			.filter -> return $(@).html() is id
+			.attr('selected', true)
+
+	$modal.find('#numberMap area').each ->
+		thisArea  = $(@)
+		id = thisArea.attr 'id'
+		thisArea.hover ->
+			$wizardHoleImage.attr 'src', "img/testStripWizard/holes/#{id}.png"
+		thisArea.click ->
+			$wizardHoleImage.attr 'src', "img/testStripWizard/holes/#{id}.png"
+			$wizardHoleSizeSelect
+			.find('option')
+			.filter -> return $(@).html() is id
 			.attr('selected', true)
 
 getModal = ({testStrip, stl, lego, steps} = {}) ->

@@ -362,7 +362,7 @@ class NodeVisualizer
 		cachedData.brickVisualization.setPossibleLegoBoxVisibility false
 		cachedData.brickVisualization.setHighlightVoxelVisibility false
 
-		@_showCsg cachedData
+		@_showCsg cachedData, false
 
 		cachedData.modelVisualization.setNodeVisibility false
 
@@ -374,10 +374,14 @@ class NodeVisualizer
 
 	# Returns the amount of LEGO-Layers that can be shown in build mode.
 	# Layers without bricks are discarded
-	getNumberOfBuildLayers: (selectedNode) =>
+	getNumberOfBuildSteps: (selectedNode) =>
 		return @_getCachedData(selectedNode)
 			.then (cachedData) ->
-				return cachedData.brickVisualization.getNumberOfBuildLayers()
+				numLayers = cachedData.brickVisualization.getNumberOfBuildSteps()
+
+				# Extra layer is for 3D geometry
+				numLayers++
+				return numLayers
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
@@ -386,7 +390,17 @@ class NodeVisualizer
 		# Start counting at 0 internally
 		layer--
 
-		return @_getCachedData(selectedNode).then (cachedData) ->
+		return @_getCachedData(selectedNode).then (cachedData) =>
+			@getNumberOfBuildSteps(selectedNode).then (numLayers) =>
+
+				# Start counting at 0 internally
+				numLayers--
+
+				if layer is numLayers
+					@_showCsg cachedData, true
+				else
+					cachedData.brickVisualization.hideCsg()
+
 			cachedData.brickVisualization.showBrickLayer layer
 
 	_updateBrickCount: (bricks) =>
@@ -405,7 +419,7 @@ class NodeVisualizer
 		time = Math.round time
 		@timeEstimate?.text time
 
-	_showCsg: (cachedData) =>
+	_showCsg: (cachedData, makeVisible = true) =>
 		@csg ?= @bundle.getPlugin 'csg'
 		return Promise.resolve() if not @csg?
 
@@ -416,7 +430,7 @@ class NodeVisualizer
 
 		return @csg.getCSG(cachedData.node, options)
 				.then (csg) =>
-					cachedData.brickVisualization.showCsg csg
+					cachedData.brickVisualization.showCsg csg if makeVisible
 					@_updatePrintTime csg
 
 	# check whether the pointer is over a model/brick visualization

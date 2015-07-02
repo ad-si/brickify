@@ -35,8 +35,9 @@ class PreviewAssemblyUi
 		@preBuildMode = @previewUi.nodeVisualizer.getDisplayMode()
 		@previewUi.nodeVisualizer.setDisplayMode selectedNode, 'build'
 		.then =>
-			@previewUi.nodeVisualizer.getNumberOfBuildLayers selectedNode
+			@previewUi.nodeVisualizer.getNumberOfBuildSteps selectedNode
 			.then (numLayers) =>
+				# Last layer is for print geometry
 				@buildLayerUi.slider.attr 'min', 1
 				@buildLayerUi.slider.attr 'max', numLayers
 				@buildLayerUi.maxLayer.text numLayers

@@ -227,7 +227,7 @@ class BrickVisualization
 	getNumberOfVisibleLayers: =>
 		return @_getVisibleLayers().length
 
-	getNumberOfBuildLayers: =>
+	getNumberOfBuildSteps: =>
 		numLayers = @getNumberOfVisibleLayers()
 		numLayers -= @_getBuildLayerModifier()
 		return numLayers

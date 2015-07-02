@@ -15,16 +15,26 @@ PrintingTimeEstimator = require './printingTimeEstimator'
 class NodeVisualizer
 	constructor: ->
 		# rendering properties
-		@brickShadowOpacity = 0.5
-		@objectOpacity = 0.8
-		@objectShadowOpacity = 0.5
-		@objectColorMult = new THREE.Vector3(1, 1, 1)
-		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
 		@brickVisualizations = {}
 		@fidelity = 0
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
+
+		@objectColorMult = new THREE.Vector3(
+			@bundle.globalConfig.colors.objectColorMult
+			@bundle.globalConfig.colors.objectColorMult
+			@bundle.globalConfig.colors.objectColorMult
+		)
+		@objectShadowColorMult = new THREE.Vector3(
+			@bundle.globalConfig.colors.objectShadowColorMult
+			@bundle.globalConfig.colors.objectShadowColorMult
+			@bundle.globalConfig.colors.objectShadowColorMult
+		)
+		@brickShadowOpacity = @bundle.globalConfig.colors.brickShadowOpacity
+		@objectOpacity = @bundle.globalConfig.colors.modelOpacity
+		@objectShadowOpacity = @bundle.globalConfig.colors.modelShadowOpacity
+
 		if @bundle.globalConfig.buildUi
 			@brickCounter = $ '#brickCount'
 			@timeEstimate = $ '#timeEstimate'

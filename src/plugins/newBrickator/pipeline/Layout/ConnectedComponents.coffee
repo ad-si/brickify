@@ -7,6 +7,9 @@ module.exports.findConnectedComponents = (bricks) =>
 
 	# First pass
 	bricks.forEach (brick) ->
+		# TODO
+		# Check whether looking at upper / lower neighbors suffices
+		# and speeds up runtime
 		conBricks = brick.connectedBricks()
 		conLabels = new Set()
 

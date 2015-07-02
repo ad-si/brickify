@@ -26,6 +26,12 @@ class LayoutOptimizer
 			bricksToSplit = ConComp.bricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
+			# TODO
+			# break if
+			# pass > 1 and
+				# bricksToSplit.size is 0
+				# or
+				# if all bricksToSplit are Articulation Points
 			if bricksToSplit.size is 0
 				break
 			else
@@ -35,8 +41,9 @@ class LayoutOptimizer
 			bricks.forEach (brick) =>
 				brick.resetArticulationPointData()
 			articulationPoints = AP.findArticulationPoints bricks
-			console.log articulationPoints
-
+			# TODO
+			# ignore APs in next connected components
+			# add them to the bricksToSplit for the next round
 
 		log.debug '\tfinished optimization after ', pass , 'passes'
 		return Promise.resolve grid

@@ -182,7 +182,7 @@ class BrickVisualization
 		else
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 
-	showBrickLayer: (layer) =>
+	showBrickLayer: (layer, grayOut = true) =>
 		layer += @_getBuildStepModifier()
 
 		# Hide highlight when in build mode
@@ -194,7 +194,10 @@ class BrickVisualization
 			threeLayer = visibleLayers[i]
 			if i <= layer
 				if i < layer
-					@_makeLayerGrayscale threeLayer
+					if grayOut
+						@_makeLayerGrayscale threeLayer
+					else
+						@_makeLayerColored threeLayer
 				else
 					@_makeLayerColored threeLayer
 				for visibleBrick in threeLayer.children

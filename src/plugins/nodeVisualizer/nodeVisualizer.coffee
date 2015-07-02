@@ -379,6 +379,10 @@ class NodeVisualizer
 				@_getCsg cachedData
 				.then (csg) ->
 					numLayers++ if csg? && csg.length > 0
+
+					# Add extra step to show the complete model in all its glory
+					numLayers++
+
 					return numLayers
 
 	# when build mode is enabled, this tells the visualization to show
@@ -394,12 +398,15 @@ class NodeVisualizer
 				# Start counting at 0 internally
 				numLayers--
 
-				if layer is numLayers
+				if layer + 1 >= numLayers # Account for extra last layer
 					@_showCsg cachedData
 				else
 					cachedData.brickVisualization.hideCsg()
 
-			cachedData.brickVisualization.showBrickLayer layer
+				# Don't gray out in last step
+				grayOut = layer isnt numLayers
+
+				cachedData.brickVisualization.showBrickLayer layer, grayOut
 
 	_updateBrickCount: (bricks) =>
 		@brickCounter?.text bricks.size

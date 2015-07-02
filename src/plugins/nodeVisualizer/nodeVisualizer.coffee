@@ -385,7 +385,7 @@ class NodeVisualizer
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
-	showBuildLayer: (selectedNode, layer) =>
+	showBuildStep: (selectedNode, layer) =>
 
 		# Start counting at 0 internally
 		layer--

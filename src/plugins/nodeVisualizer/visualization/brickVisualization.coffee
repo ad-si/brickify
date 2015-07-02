@@ -183,7 +183,7 @@ class BrickVisualization
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 
 	showBrickLayer: (layer) =>
-		layer += @_getBuildLayerModifier()
+		layer += @_getBuildStepModifier()
 
 		# Hide highlight when in build mode
 		@_highlightVoxel.visible = false
@@ -229,10 +229,10 @@ class BrickVisualization
 
 	getNumberOfBuildSteps: =>
 		numLayers = @getNumberOfVisibleLayers()
-		numLayers -= @_getBuildLayerModifier()
+		numLayers -= @_getBuildStepModifier()
 		return numLayers
 
-	_getBuildLayerModifier: =>
+	_getBuildStepModifier: =>
 		# If there is 3D print below first lego layer, show lego starting
 		# with layer 1 and show only 3D print in first instruction layer
 		minLayer = @grid.getLegoVoxelsZRange().min

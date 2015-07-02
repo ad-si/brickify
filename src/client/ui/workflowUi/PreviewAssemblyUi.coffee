@@ -4,24 +4,24 @@ class PreviewAssemblyUi
 		@buildContainer.hide()
 		@buildContainer.removeClass 'hidden'
 
-		@buildLayerUi = {
+		@buildStepUi = {
 			slider: $('#buildSlider')
 			decrement: $('#buildDecrement')
 			increment: $('#buildIncrement')
-			curLayer: $('#currentBuildLayer')
-			maxLayer: $('#maxBuildLayer')
+			curLayer: $('#currentBuildStep')
+			maxLayer: $('#maxBuildStep')
 		}
 
-		@buildLayerUi.slider.on 'input', =>
-			@_updateBuildLayer @previewUi.sceneManager.selectedNode
+		@buildStepUi.slider.on 'input', =>
+			@_updateBuildStep @previewUi.sceneManager.selectedNode
 
-		@buildLayerUi.increment.on 'click', =>
-			@buildLayerUi.slider.val Number(@buildLayerUi.slider.val()) + 1
-			@_updateBuildLayer @previewUi.sceneManager.selectedNode
+		@buildStepUi.increment.on 'click', =>
+			@buildStepUi.slider.val Number(@buildStepUi.slider.val()) + 1
+			@_updateBuildStep @previewUi.sceneManager.selectedNode
 
-		@buildLayerUi.decrement.on 'click', =>
-			@buildLayerUi.slider.val Number(@buildLayerUi.slider.val()) - 1
-			@_updateBuildLayer @previewUi.sceneManager.selectedNode
+		@buildStepUi.decrement.on 'click', =>
+			@buildStepUi.slider.val Number(@buildStepUi.slider.val()) - 1
+			@_updateBuildStep @previewUi.sceneManager.selectedNode
 
 	setEnabled: (enabled) =>
 		if enabled
@@ -38,17 +38,17 @@ class PreviewAssemblyUi
 			@previewUi.nodeVisualizer.getNumberOfBuildSteps selectedNode
 			.then (numLayers) =>
 				# Last layer is for print geometry
-				@buildLayerUi.slider.attr 'min', 1
-				@buildLayerUi.slider.attr 'max', numLayers
-				@buildLayerUi.maxLayer.text numLayers
+				@buildStepUi.slider.attr 'min', 1
+				@buildStepUi.slider.attr 'max', numLayers
+				@buildStepUi.maxLayer.text numLayers
 
-				@buildLayerUi.slider.val 1
-				@_updateBuildLayer selectedNode
+				@buildStepUi.slider.val 1
+				@_updateBuildStep selectedNode
 
-	_updateBuildLayer: (selectedNode) =>
-		layer = Number @buildLayerUi.slider.val()
-		@buildLayerUi.curLayer.text layer
-		@previewUi.nodeVisualizer.showBuildLayer selectedNode, layer
+	_updateBuildStep: (selectedNode) =>
+		layer = Number @buildStepUi.slider.val()
+		@buildStepUi.curLayer.text layer
+		@previewUi.nodeVisualizer.showBuildStep selectedNode, layer
 
 	_disableBuildMode: (selectedNode) =>
 		@buildContainer.slideUp()

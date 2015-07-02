@@ -43,7 +43,7 @@ class LegoInstructions
 			@nodeVisualizer.setDisplayMode node, 'build'
 		.then => @newBrickator.getNodeData node
 		.then (data) =>
-			return @nodeVisualizer.getNumberOfBuildLayers node
+			return @nodeVisualizer.getNumberOfBuildSteps node
 			.then (numLayers) =>
 				# scad and piece list generation
 				bricks = data.grid.getAllBricks()
@@ -108,7 +108,7 @@ class LegoInstructions
 		return promiseChain.then -> files
 
 	_createScreenshotOfLayer: (node, layer, camera) =>
-		return @nodeVisualizer.showBuildLayer node, layer
+		return @nodeVisualizer.showBuildStep node, layer
 		.then =>
 			log.debug 'Create screenshot of layer', layer
 			return @renderer.renderToImage camera, @imageResolution

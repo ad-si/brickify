@@ -19,12 +19,10 @@ class LayoutOptimizer
 			bricks = grid.getAllBricks()
 			log.debug '\t# of bricks: ', bricks.size
 
-			bricks.forEach (brick) ->
-				brick.label = null
-
+			# Connected Components
+			bricks.forEach (brick) -> brick.label = null
 			numberOfComponents = ConComp.findConnectedComponents bricks
 			log.debug '\t# of components: ', numberOfComponents
-
 			bricksToSplit = ConComp.bricksOnComponentInterfaces bricks
 			log.debug '\t# of bricks to split: ', bricksToSplit.size
 
@@ -33,10 +31,14 @@ class LayoutOptimizer
 			else
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false, false
 
+			# Articulation Points
+			bricks.forEach (brick) =>
+				brick.resetArticulationPointData()
+			articulationPoints = AP.findArticulationPoints bricks
+			console.log articulationPoints
+
+
 		log.debug '\tfinished optimization after ', pass , 'passes'
-
-		AP.findArticulationPoints bricks
-
 		return Promise.resolve grid
 
 	###

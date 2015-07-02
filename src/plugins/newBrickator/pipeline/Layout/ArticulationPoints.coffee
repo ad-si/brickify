@@ -9,10 +9,6 @@ module.exports.findArticulationPoints = (bricks) =>
 		return if brick.visited
 		dfsWithAP brick, discoveryTime, articulationPoints
 
-	bricks.forEach (brick) =>
-		brick.resetArticulationPointData()
-
-	console.log articulationPoints
 	return articulationPoints
 
 dfsWithAP = (brick, discoveryTime, articulationPoints) =>
@@ -39,13 +35,24 @@ dfsWithAP = (brick, discoveryTime, articulationPoints) =>
 
 			# (1) brick is root of DFS tree and has two or more children
 			if (brick.parent is null and brick.children > 1)
+				# TODO
+				# test for insignificant
+				brick.isArticulationPoint = true
 				articulationPoints.add brick
 
 			# (2) If u is not root and low value of one of its child is more
 			# than discovery value of u
 			if (brick.parent isnt null and conBrick.low >= brick.discoveryTime)
-				articulationPoints.add brick
+				brick.isArticulationPoint = true
+				if subgraphIsSmallerThan2Bricks brick, conBrick
+					brick.isInsignificantAP = true
+				else
+					articulationPoints.add brick
 
 			# Update low value of u for parent function calls
 		else if conBrick isnt brick.parent
 			brick.low = Math.min brick.low, conBrick.discoveryTime
+
+subgraphIsSmallerThan2Bricks = (apBrick, subgraphStartingBrick) ->
+	return false
+

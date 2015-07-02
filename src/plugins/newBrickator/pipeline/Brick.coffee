@@ -67,6 +67,8 @@ class Brick
 		@discoveryTime = 0
 		# Count of children in DFS Tree
 		@children = 0
+		@isArticulationPoint = false
+		@isInsignificantAP = false
 
 	# Enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>

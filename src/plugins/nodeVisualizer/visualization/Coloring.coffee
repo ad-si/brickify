@@ -134,6 +134,25 @@ module.exports = class Coloring
 		if brick.visualizationMaterials?
 			return brick.visualizationMaterials
 
+		if brick.isInsignificantAP
+			blue = 0x000000
+			iapMaterial = @_createMaterial blue
+			return {
+				color: iapMaterial
+				colorStuds: iapMaterial
+				gray: iapMaterial
+				grayStuds: iapMaterial
+			}
+		else if brick.isArticulationPoint
+			randomColor = @_getRandomColor()
+			apMaterial = @_createMaterial randomColor
+			return {
+				color: apMaterial
+				colorStuds: apMaterial
+				gray: apMaterial
+				grayStuds: apMaterial
+			}
+
 		# collect materials of neighbors
 		neighbors = brick.getNeighborsXY()
 		connections = brick.connectedBricks()
@@ -244,3 +263,14 @@ module.exports = class Coloring
 
 	_getHash: (dimensions) ->
 		return dimensions.x + '-' + dimensions.y
+
+	_getRandomColor: ->
+		# Excluded 0123 to avoid very dark colors
+		# Add 0123 to get random color from full spectrum
+		letters = '456789ABCDEF'.split('')
+		color = '#'
+		i = 0
+		while i < 6
+			color += letters[Math.floor(Math.random() * letters.length)]
+			i++
+		return color

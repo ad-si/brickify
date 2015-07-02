@@ -19,7 +19,13 @@ colors:
   modelOpacityLandingPage: 1.0
 
   modelShadowColor: 0x000000
-  modelShadowOpacity: 0.4
+  modelShadowOpacity: 0.5
+
+  # pipeline settings
+  brickShadowOpacity: 0.5
+
+  objectShadowColorMult: 0.1
+  objectColorMult: 1
 
 # camera adjustments
 fov: 40

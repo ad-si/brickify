@@ -135,7 +135,7 @@ module.exports = class Coloring
 			return brick.visualizationMaterials
 
 
-		if brick.isSignificantAP and not brick.isArticulationPoint
+		if brick.isSignificantAP
 			green = @_getRandomGreenColor()
 			apMaterial = @_createMaterial green
 			return {

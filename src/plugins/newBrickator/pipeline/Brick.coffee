@@ -70,6 +70,9 @@ class Brick
 		@isArticulationPoint = false
 		@isInsignificantAP = false
 
+	isSignificantArticulationPoint: =>
+		return @isArticulationPoint and not @isInsignificantAP
+
 	# Enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>
 		@voxels.forEach callback

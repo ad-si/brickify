@@ -1,12 +1,18 @@
 DataHelper = require '../DataHelper'
 
 # Connected components using the connected component labelling algo
-module.exports.findConnectedComponents = (bricks) =>
+module.exports.findConnectedComponents = (
+		bricks,
+		ignoreArticulationPoints = false) =>
 	labels = []
 	id = 0
 
 	# First pass
 	bricks.forEach (brick) ->
+		if ignoreArticulationPoints and brick.isSignificantArticulationPoint()
+			brick.label = null
+			return
+
 		# TODO
 		# Check whether looking at upper / lower neighbors suffices
 		# and speeds up runtime
@@ -14,6 +20,8 @@ module.exports.findConnectedComponents = (bricks) =>
 		conLabels = new Set()
 
 		conBricks.forEach (conBrick) ->
+			if ignoreArticulationPoints and conBrick.isSignificantArticulationPoint()
+						return
 			conLabels.add conBrick.label if conBrick.label?
 
 		if conLabels.size > 0

@@ -14,38 +14,51 @@ class LayoutOptimizer
 
 	optimizeLayoutStability: (grid) =>
 		maxNumPasses = 15
+		articulationPoints = new Set()
 
 		for pass in [0...maxNumPasses]
 			bricks = grid.getAllBricks()
-			log.debug '\t# of bricks: ', bricks.size
+			log.debug '\t# of bricks:\t\t\t', bricks.size
+			log.debug '\t# of APs:\t\t\t\t', articulationPoints.size
 
 			# Connected Components
 			bricks.forEach (brick) -> brick.label = null
-			numberOfComponents = ConComp.findConnectedComponents bricks
-			log.debug '\t# of components: ', numberOfComponents
+			numberOfComponents = ConComp.findConnectedComponents bricks, true
+			log.debug '\t# of components:\t\t', numberOfComponents
 			bricksToSplit = ConComp.bricksOnComponentInterfaces bricks
-			log.debug '\t# of bricks to split: ', bricksToSplit.size
+			log.debug '\t# of bricks to split:\t', bricksToSplit.size
 
-			# TODO
-			# break if
-			# pass > 1 and
-				# bricksToSplit.size is 0
-				# or
-				# if all bricksToSplit are Articulation Points
-			if bricksToSplit.size is 0
+			if bricksToSplit.size is 0 and pass > 0
 				break
 			else
+				# add articulations points to bricksToSplit if there
+				articulationPoints.forEach (ap) ->
+					bricksToSplit.add ap
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false, false
 
 			# Articulation Points
-			bricks.forEach (brick) =>
+			bricks.forEach (brick) ->
 				brick.resetArticulationPointData()
 			articulationPoints = AP.findArticulationPoints bricks
-			# TODO
-			# ignore APs in next connected components
-			# add them to the bricksToSplit for the next round
+
 
 		log.debug '\tfinished optimization after ', pass , 'passes'
+
+
+		bricks = grid.getAllBricks()
+		log.debug '\t# of bricks:\t\t\t', bricks.size
+
+		bricks.forEach (brick) ->
+			brick.resetArticulationPointData()
+		articulationPoints = AP.findArticulationPoints bricks
+		log.debug '\t# of APs:\t\t\t\t', articulationPoints.size
+
+		bricks.forEach (brick) -> brick.label = null
+		numberOfComponents = ConComp.findConnectedComponents bricks, false
+		log.debug '\t# of components:\t\t', numberOfComponents
+
+
+
 		return Promise.resolve grid
 
 	###

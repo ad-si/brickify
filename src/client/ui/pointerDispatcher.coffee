@@ -38,7 +38,7 @@ class PointerDispatcher
 		#notify hint ui
 		@hintUi.pointerDown event, handled
 
-		# stop event if a plugin handled it (else let orbit controls work)
+		# Stop event if a plugin handled it (else let pointer controls work)
 		@_stop event if handled
 
 		return
@@ -56,7 +56,7 @@ class PointerDispatcher
 		# notify hint ui
 		@hintUi.pointerMove event, handled
 
-		# stop event if a plugin handled it (else let orbit controls work)
+		# Stop event if a plugin handled it (else let pointer controls work)
 		@_stop event if handled
 
 		return

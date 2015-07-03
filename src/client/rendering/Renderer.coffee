@@ -1,5 +1,5 @@
 THREE = require 'three'
-OrbitControls = require('three-orbit-controls')(THREE)
+PointerControls = require('three-pointer-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/FxaaPart'
 SsaoShaderPart = require './shader/ssaoPart'
@@ -321,17 +321,11 @@ class Renderer
 		@camera.up.set(0, 0, 1)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-	setupControls: (globalConfig, controls) ->
-		if controls?
-			controls.addObject @camera
-			controls.addDomElement @threeRenderer.domElement
-			controls.update()
-			@controls = controls
-		else
-			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-			for key, value of globalConfig.orbitControls
-				@controls[key] = value
-			@controls.target.set(0, 0, 0)
+	setupControls: (globalConfig, @controls = new PointerControls()) ->
+		@controls.control(@camera).with(@threeRenderer.domElement)
+
+	getControls: =>
+		@controls
 
 	_setupLighting: (scene) ->
 		ambientLight = new THREE.AmbientLight(0x404040)
@@ -354,9 +348,6 @@ class Renderer
 		scene = @_setupScene(@globalConfig)
 		@_setupLighting(scene)
 		return scene
-
-	getControls: =>
-		@controls
 
 	toggleRendering: =>
 		if @animationRequestID?

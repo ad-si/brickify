@@ -75,7 +75,7 @@ rendering:
   # shall pipeline rendering be allowed?
   usePipeline: true
 
-orbitControls:
+controls:
   autoRotate: false
   autoRotateSpeed: 1.0
   maxDistance: 1500

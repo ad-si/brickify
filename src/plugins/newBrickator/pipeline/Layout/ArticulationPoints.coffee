@@ -44,10 +44,8 @@ dfsWithAP = (brick, discoveryTime, articulationPoints) =>
 			# than discovery value of u
 			if (brick.parent isnt null and conBrick.low >= brick.discoveryTime)
 				brick.isArticulationPoint = true
-				if subgraphIsSmallerThan2Bricks brick, conBrick
-					brick.isInsignificantAP = true
-				else
-					brick.isInsignificantAP = false
+				if not subgraphIsSmallerThan2Bricks brick, conBrick
+					brick.isSignificantAP = true
 					articulationPoints.add brick
 
 			# Update low value of brick for parent function calls

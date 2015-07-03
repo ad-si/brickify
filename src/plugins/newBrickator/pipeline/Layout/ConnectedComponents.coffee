@@ -9,7 +9,7 @@ module.exports.findConnectedComponents = (
 
 	# First pass
 	bricks.forEach (brick) ->
-		if ignoreArticulationPoints and brick.isSignificantArticulationPoint()
+		if ignoreArticulationPoints and brick.isSignificantAP
 			brick.label = null
 			return
 
@@ -20,7 +20,7 @@ module.exports.findConnectedComponents = (
 		conLabels = new Set()
 
 		conBricks.forEach (conBrick) ->
-			if ignoreArticulationPoints and conBrick.isSignificantArticulationPoint()
+			if ignoreArticulationPoints and conBrick.isSignificantAP
 						return
 			conLabels.add conBrick.label if conBrick.label?
 

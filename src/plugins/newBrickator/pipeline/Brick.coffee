@@ -68,10 +68,7 @@ class Brick
 		# Count of children in DFS Tree
 		@children = 0
 		@isArticulationPoint = false
-		@isInsignificantAP = false
-
-	isSignificantArticulationPoint: =>
-		return @isArticulationPoint and not @isInsignificantAP
+		@isSignificantAP = false
 
 	# Enumerates over each voxel that belongs to this brick
 	forEachVoxel: (callback) =>

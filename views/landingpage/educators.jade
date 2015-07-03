@@ -26,6 +26,15 @@ block body
 					td
 						h3= sample.title
 						p= sample.description
+						.attribution
+							p
+								|"
+								a(href= sample.originalLink)=sample.originalName
+								|" by&nbsp;
+								a(href= sample.creatorLink)= sample.creator
+								|, used under&nbsp;
+								a(href= sample.licenseLink)= sample.license
+							p= sample.notice
 					td.download
 						a.btn.btn-success.notAvailable Get course material!
 			tr

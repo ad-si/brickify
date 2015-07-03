@@ -1,5 +1,13 @@
 name: Citrus Juicer
 description: >
   Make tasty orange juice with your students!
-printTime: 20 min
+printTime: 95 min
 name: citrusJuicer
+
+originalName: Citrus Juicer
+originalLink: http://www.thingiverse.com/thing:44328/#files
+creator: walter
+creatorLink: http://www.thingiverse.com/walter
+license: CC BY-SA 3.0
+licenseLink: http://creativecommons.org/licenses/by-sa/3.0/
+notice: Modified from original.

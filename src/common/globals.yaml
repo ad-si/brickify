@@ -15,7 +15,7 @@ colors:
   basePlateStud: 0x5a5a5a
 
   modelColor: 0xeeeeee
-  modelOpacity: 0.8
+  modelOpacity: 1.08
   modelOpacityLandingPage: 1.0
 
   modelShadowColor: 0x000000
@@ -56,8 +56,8 @@ offerDownload: false
 #load these plugins
 plugins:
   dummy: false
-  coordinateSystem: true
-  legoBoard: true
+  #coordinateSystem: true
+  #legoBoard: true
   newBrickator: true
   nodeVisualizer: true
   fidelityControl: true

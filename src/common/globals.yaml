@@ -76,10 +76,9 @@ rendering:
   usePipeline: true
 
 controls:
-  autoRotate: false
-  autoRotateSpeed: 1.0
-  maxDistance: 1500
-  minDistance: 2
+  dolly:
+    minDistance: 2
+    maxDistance: 1500
 
 minimalPrintVolume: 100 # in mm^3 (roughly half the volume of a 1x1 brick)
 

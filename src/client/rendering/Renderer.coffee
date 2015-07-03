@@ -1,3 +1,4 @@
+extend = require 'extend'
 THREE = require 'three'
 PointerControls = require('three-pointer-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
@@ -11,11 +12,11 @@ threeHelper = require '../threeHelper'
 # @class Renderer
 ###
 class Renderer
-	constructor: (@pluginHooks, globalConfig) ->
+	constructor: (@pluginHooks, globalConfig, controls) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
-		@init globalConfig
+		@init globalConfig, controls
 		@pipelineEnabled = false
 		@useBigRendertargets = false
 		@usePipelineSsao = false
@@ -247,11 +248,13 @@ class Renderer
 		# Zooms out/in the camera so that the object is fully visible
 		threeHelper.zoomToBoundingSphere @camera, @scene, @controls, boundingSphere
 
-	init: (@globalConfig) ->
+	init: (@globalConfig, controls) ->
 		@_setupSize @globalConfig
 		@_setupRenderer @globalConfig
 		@scene = @getDefaultScene()
 		@_setupCamera @globalConfig
+		@_setupControls @globalConfig, controls
+
 		@animationRequestID = requestAnimationFrame @localRenderer
 
 	_setupSize: (globalConfig) ->
@@ -321,7 +324,11 @@ class Renderer
 		@camera.up.set(0, 0, 1)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-	setupControls: (globalConfig, @controls = new PointerControls()) ->
+	_setupControls: (globalConfig, controls) ->
+		unless controls
+			controls = new PointerControls()
+			extend true, controls.config, globalConfig.controls
+		@controls = controls
 		@controls.control(@camera).with(@threeRenderer.domElement)
 
 	getControls: =>

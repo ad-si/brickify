@@ -33,7 +33,7 @@ dfsWithAP = (brick, discoveryTime, articulationPoints) =>
 
 			# brick is an articulation point in following cases
 
-			# (1) brick is root of DFS tree and has two or more children
+			# (1) Brick is root of DFS tree and has two or more children
 			if (brick.parent is null and brick.children > 1)
 				# TODO
 				# test for insignificant
@@ -47,9 +47,10 @@ dfsWithAP = (brick, discoveryTime, articulationPoints) =>
 				if subgraphIsSmallerThan2Bricks brick, conBrick
 					brick.isInsignificantAP = true
 				else
+					brick.isInsignificantAP = false
 					articulationPoints.add brick
 
-			# Update low value of u for parent function calls
+			# Update low value of brick for parent function calls
 		else if conBrick isnt brick.parent
 			brick.low = Math.min brick.low, conBrick.discoveryTime
 

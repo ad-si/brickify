@@ -18,66 +18,13 @@ class LegoInstructions
 
 		log.debug 'Creating instructions...'
 
-		# pseudoisometric
-		camera = new THREE.PerspectiveCamera(
-			@renderer.camera.fov, @renderer.camera.aspect, 1, 1000
-		)
-
-		camera.position.set(1, 1, 1)
-		camera.lookAt new THREE.Vector3(0, 0, 0)
-		camera.up = new THREE.Vector3(0, 0, 1)
-
-		oldVisualizationMode = @nodeVisualizer.getDisplayMode()
-
-		@nodeVisualizer.getBrickThreeNode node
-		.then (brickNode) =>
-			threeHelper.zoomToBoundingSphere(
-				camera
-				@renderer.scene
-				null
-				threeHelper.getBoundingSphere brickNode
-			)
-			# disable pipeline and fidelity changes
-			@fidelityControl.enableScreenshotMode()
-			# enter build mode
-			@nodeVisualizer.setDisplayMode node, 'build'
-		.then => @newBrickator.getNodeData node
+		return @newBrickator.getNodeData node
 		.then (data) =>
-			return @nodeVisualizer.getNumberOfBuildSteps node
-			.then (numLayers) =>
-				# scad and piece list generation
-				bricks = data.grid.getAllBricks()
-				return null if bricks.size is 0
+			# scad and piece list generation
+			bricks = data.grid.getAllBricks()
+			return null if bricks.size is 0
 
-				files = []
-				files.push openScadGenerator.generateScad bricks
-
-				# add instructions html to download
-				pieceList = pieceListGenerator.generatePieceList bricks
-				files.push @_createHtml numLayers, pieceList
-
-				# Take screenshots and convert them to png
-				screenshots = @_takeScreenshots node, numLayers, camera
-				.then (images) ->
-					files.push images...
-					log.debug 'Finished instruction screenshots'
-
-				# Load and save piece images
-				imageDownload = @_downloadPieceListImages pieceList
-				.then (imageFiles) ->
-					files.push imageFiles...
-
-				Promise.all [screenshots, imageDownload]
-				.then -> return files
-		.then (files) =>
-			# reset display mode
-			@nodeVisualizer.setDisplayMode node, oldVisualizationMode
-			@fidelityControl.disableScreenshotMode()
-
-			return files
-		.catch (error) ->
-			log.error error
-			return null
+			return openScadGenerator.generateScad bricks
 
 	showPartListPopup: (node) =>
 		@newBrickator.getNodeData node

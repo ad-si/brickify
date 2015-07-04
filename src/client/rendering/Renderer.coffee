@@ -328,6 +328,8 @@ class Renderer
 			controls = new PointerControls()
 			extend true, controls.config, globalConfig.controls
 		@controls = controls
+
+	initControls: ->
 		@controls.control(@camera).with(@threeRenderer.domElement)
 
 	getControls: =>

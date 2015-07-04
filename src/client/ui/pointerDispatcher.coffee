@@ -116,14 +116,6 @@ class PointerDispatcher
 		event.stopImmediatePropagation()
 		event.preventDefault()
 
-	_getResponsiblePluginFor: (event) =>
-		return interactionHelper.getResponsiblePlugin(
-			event
-			@bundle.ui.renderer
-			@bundle.ui.renderer.scene.children
-			(plugin) -> plugin.name not in ['lego-board', 'coordinate-system']
-		)
-
 	# call plugin after plugin until a plugin reacts to this pointer event
 	# returns false if no plugin handled this event
 	_dispatchEvent: (event, type) ->

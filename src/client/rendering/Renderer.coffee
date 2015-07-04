@@ -41,7 +41,6 @@ class Renderer
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
-		@controls?.update()
 		@animationRequestID = requestAnimationFrame @localRenderer
 
 	# Renders all plugins
@@ -360,10 +359,10 @@ class Renderer
 		if @animationRequestID?
 			cancelAnimationFrame @animationRequestID
 			@animationRequestID = null
-			@controls.enabled = false
+			@controls.config.enabled = false
 		else
 			@animationRequestID = requestAnimationFrame @localRenderer
-			@controls.enabled = true
+			@controls.config.enabled = true
 
 
 module.exports = Renderer

@@ -58,7 +58,7 @@
     "stringify": "^3.1.0",
     "stylus": "^0.50.0",
     "three": "brickify/three.js#dev-20150416",
-    "three-pointer-controls": "^0.5.2",
+    "three-pointer-controls": "^0.5.3",
     "winston": "^0.8.1",
     "zeroclipboard": "^2.2.0"
   },

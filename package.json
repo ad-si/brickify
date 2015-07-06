@@ -29,7 +29,7 @@
     "envify": "^3.2.0",
     "errorhandler": "^1.2.2",
     "es6-collections": "^0.5.1",
-    "es6-collections-iterators": "^0.1.0",
+    "es6-collections-iterators": "^0.2.1",
     "es6-promise": "^2.0.0",
     "express": "^4.12.3",
     "filesaver.js": "^0.1.1",

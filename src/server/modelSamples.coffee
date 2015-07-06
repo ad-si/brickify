@@ -30,8 +30,11 @@ get = (name) ->
 		return Promise.reject name
 
 getSamples = ->
-	return Object.keys samples
+	samplesArray = Object.keys samples
 		.map (key) -> samples[key]
+	samplesArray.sort (a, b) ->
+		return a.printTime - b.printTime
+	return samplesArray
 
 module.exports = {
 	exists

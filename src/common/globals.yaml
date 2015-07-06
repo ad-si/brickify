@@ -56,8 +56,8 @@ offerDownload: false
 #load these plugins
 plugins:
   dummy: false
-  #coordinateSystem: true
-  #legoBoard: true
+  coordinateSystem: true
+  legoBoard: true
   newBrickator: true
   nodeVisualizer: true
   fidelityControl: true

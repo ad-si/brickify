@@ -162,6 +162,9 @@ class BrickLayouter extends Layouter
 		tlBrick = thirdLayerBricks.values().next().value
 		return null unless tlBrick.isSize(1, 1, 1)
 
-		return new Set([slBrick, tlBrick])
+		neighbors = new Set()
+		neighbors.add slBrick
+		neighbors.add tlBrick
+		return neighbors
 
 module.exports = BrickLayouter

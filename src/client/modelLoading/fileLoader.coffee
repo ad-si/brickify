@@ -64,6 +64,7 @@ handleLoadedFile = (feedbackTarget, filename, spinnerOptions) -> (event) ->
 
 			model
 			.setFileName filename
+			.setName filename
 			.calculateNormals()
 			.buildFaceVertexMesh()
 			.done()

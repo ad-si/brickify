@@ -27,7 +27,7 @@ class BrickVisualization
 		@printVoxels = []
 
 		@isStabilityView = false
-		@_highlightVoxelVisiblity = true
+		@_highlightVoxelVisibility = true
 
 	initialize: (@grid) =>
 		@voxelWireframe = new VoxelWireframe(
@@ -183,32 +183,33 @@ class BrickVisualization
 			@voxelWireframe.setVisibility @_legoBoxVisibilityBeforeStability
 
 	showBrickLayer: (layer) =>
+		layer += @_getBuildLayerModifier()
+
 		# Hide highlight when in build mode
 		@_highlightVoxel.visible = false
+		@unhighlightBigBrush()
 
 		visibleLayers = @_getVisibleLayers()
 		for i in [0...visibleLayers.length] by 1
 			threeLayer = visibleLayers[i]
 			if i <= layer
-				threeLayer.visible = true
 				if i < layer
 					@_makeLayerGrayscale threeLayer
 				else
 					@_makeLayerColored threeLayer
-					for visibleBrick in threeLayer.children
-						visibleBrick.visible = true
-						visibleBrick.setStudVisibility true
+				for visibleBrick in threeLayer.children
+					visibleBrick.visible = true
 			else
 				for visibleBrick in threeLayer.children
 					visibleBrick.visible = false
 
 		# Set stud visibility in second pass so that visibility of
 		# all bricks in all layers is in the correct state
-		for i in [0...layer] by 1
-			threeLayer = visibleLayers[i]
+		for threeLayer in visibleLayers
 			for visibleBrick in threeLayer.children
-				visibleBrick.visible = true
 				@_setStudVisibility visibleBrick.brick
+
+		return
 
 	_makeLayerGrayscale: (layer) ->
 		for threeBrick in layer.children
@@ -226,6 +227,17 @@ class BrickVisualization
 	getNumberOfVisibleLayers: =>
 		return @_getVisibleLayers().length
 
+	getNumberOfBuildLayers: =>
+		numLayers = @getNumberOfVisibleLayers()
+		numLayers -= @_getBuildLayerModifier()
+		return numLayers
+
+	_getBuildLayerModifier: =>
+		# If there is 3D print below first lego layer, show lego starting
+		# with layer 1 and show only 3D print in first instruction layer
+		minLayer = @grid.getLegoVoxelsZRange().min
+		return if minLayer > 0 then -1 else 0
+
 	_getVisibleLayers: =>
 		@_visibleChildLayers ?= @bricksSubnode.children.filter (layer) ->
 			return layer.children.length > 0
@@ -236,7 +248,7 @@ class BrickVisualization
 		# Invert type, because if we are highlighting a 'lego' voxel,
 		# we want to display it as 'could be 3d printed'
 		voxelType = '3d'
-		voxelType = 'lego' if type == '3d'
+		voxelType = 'lego' if type is '3d'
 
 		highlightMaterial = @defaultColoring.getHighlightMaterial voxelType
 		hVoxel = highlightMaterial.voxel
@@ -244,7 +256,7 @@ class BrickVisualization
 
 		voxel = @voxelSelector.getVoxel event, {type: type}
 		if voxel?
-			@_highlightVoxel.visible = true and @_highlightVoxelVisiblity
+			@_highlightVoxel.visible = true and @_highlightVoxelVisibility
 			worldPos = @grid.mapVoxelToWorld voxel.position
 			@_highlightVoxel.position.set(
 				worldPos.x, worldPos.y, worldPos.z
@@ -317,7 +329,7 @@ class BrickVisualization
 					visualBrick.visible = false
 			# Hide visual voxels for 3d printed geometry
 			for temporaryVoxel in @temporaryVoxels.children
-				if temporaryVoxel.voxelPosition == voxel.position
+				if temporaryVoxel.voxelPosition is voxel.position
 					temporaryVoxel.visible = false
 					break
 
@@ -329,13 +341,13 @@ class BrickVisualization
 	makeAllVoxels3dPrinted: (selectedNode) =>
 		voxels = @voxelSelector.getAllVoxels(selectedNode)
 		@printVoxels = []
-		everything3D = true
+		changedVoxels = []
 		for voxel in voxels
-			everything3D = everything3D && !voxel.isLego()
+			changedVoxels.push voxel if voxel.isLego()
 			voxel.make3dPrinted()
 			@printVoxels.push voxel
 		@voxelSelector.clearSelection()
-		return !everything3D
+		return changedVoxels
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
@@ -391,10 +403,13 @@ class BrickVisualization
 			.filter (voxel) -> not voxel.isLego()
 		return @voxelSelector.clearSelection()
 
-	setHighlightVoxelVisibility: (@_highlightVoxelVisiblity) => return
+	setHighlightVoxelVisibility: (@_highlightVoxelVisibility) => return
 
 	setFidelity: (@fidelity) =>
 		@_highlightVoxel?.setFidelity @fidelity
+
+		for voxel in @temporaryVoxels.children
+			voxel.setFidelity @fidelity
 
 		for layer in @bricksSubnode.children
 			for threeBrick in layer.children

@@ -32,6 +32,7 @@ get = (name) ->
 getSamples = ->
 	return Object.keys samples
 		.map (key) -> samples[key]
+		.sort (a, b) -> a.printTime - b.printTime
 
 module.exports = {
 	exists

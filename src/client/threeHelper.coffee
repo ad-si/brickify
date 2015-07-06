@@ -57,10 +57,4 @@ module.exports.zoomToBoundingSphere = (
 	camera.position.set position.x, position.y, position.z
 	camera.lookAt target
 
-	_updateControls controls, position, target if controls?
-
-_updateControls = (controls, position, target) ->
-	controls.update()
-	controls.target = controls.target0 = target.clone()
-	controls.position = controls.position0 = position.clone()
-	controls.reset()
+	controls.set { target, position } if controls?

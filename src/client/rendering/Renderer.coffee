@@ -294,6 +294,8 @@ class Renderer
 		else
 			@threeRenderer.hasStencilBuffer = true
 
+		dpr = window.devicePixelRatio || 1
+		@threeRenderer.setPixelRatio dpr
 		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.autoClear = false
 

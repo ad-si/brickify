@@ -28,11 +28,6 @@ module.exports = class Ui
 	_initListeners: =>
 		@pointerDispatcher.init()
 
-		window.addEventListener(
-			'resize'
-			@windowResizeHandler
-		)
-
 	_initHotkeys: =>
 		@hotkeys = new Hotkeys(@pluginHooks, @bundle.sceneManager)
 		@hotkeys.addEvents @bundle.sceneManager.getHotkeys()

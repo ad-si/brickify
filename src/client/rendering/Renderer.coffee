@@ -21,6 +21,10 @@ class Renderer
 		@useBigRendertargets = false
 		@usePipelineSsao = false
 		@imageRenderQueries = []
+		window.addEventListener(
+			'resize'
+			@windowResizeHandler
+		)
 
 	# renders the current scene to an image, uses the camera if provided
 	# returns a promise which will resolve with the image
@@ -234,11 +238,10 @@ class Renderer
 	getCamera: ->
 		return @camera
 
-	windowResizeHandler: ->
-		if not @staticRendererSize
-			@camera.aspect = @size().width / @size().height
-			@camera.updateProjectionMatrix()
-			@threeRenderer.setSize @size().width, @size().height
+	windowResizeHandler: =>
+		@camera.aspect = @size().width / @size().height
+		@camera.updateProjectionMatrix()
+		@threeRenderer.setSize @size().width, @size().height
 
 		@threeRenderer.render @scene, @camera
 
@@ -257,18 +260,13 @@ class Renderer
 		@animationRequestID = requestAnimationFrame @localRenderer
 
 	_setupSize: (globalConfig) ->
-		if not globalConfig.staticRendererSize
-			@staticRendererSize = false
-		else
-			@staticRendererSize = true
-			@staticRendererWidth = globalConfig.staticRendererWidth
-			@staticRendererHeight = globalConfig.staticRendererHeight
+		@$canvasWrapper = $ '.canvasWrapper'
 
 	size: ->
-		if @staticRendererSize
-			return {width: @staticRendererWidth, height: @staticRendererHeight}
-		else
-			return {width: window.innerWidth, height: window.innerHeight}
+		return {
+			width: @$canvasWrapper.width()
+			height: @$canvasWrapper.height()
+		}
 
 	_setupRenderer: (globalConfig) ->
 		@threeRenderer = new THREE.WebGLRenderer(

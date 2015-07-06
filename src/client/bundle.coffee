@@ -16,13 +16,13 @@ DownloadUi = require './ui/workflowUi/DownloadUi'
 # @class Bundle
 ###
 module.exports = class Bundle
-	constructor: (@globalConfig, @controls) ->
+	constructor: (@globalConfig, controls) ->
 		Spinner.startOverlay document.getElementById @globalConfig.renderAreaId
 		@pluginLoader = new PluginLoader(@)
 		@pluginHooks = @pluginLoader.pluginHooks
 		@modelLoader = new ModelLoader(@)
 		@sceneManager = new SceneManager(@)
-		@renderer = new Renderer(@pluginHooks, @globalConfig)
+		@renderer = new Renderer(@pluginHooks, @globalConfig, controls)
 		@pluginInstances = @pluginLoader.loadPlugins()
 		if @globalConfig.buildUi
 			@ui = new Ui(@)
@@ -32,7 +32,7 @@ module.exports = class Bundle
 	init: =>
 		@pluginLoader.initPlugins()
 		@ui?.init()
-		@renderer.setupControls @globalConfig, @controls
+		@renderer.initControls()
 		return @sceneManager.init()
 		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId
 

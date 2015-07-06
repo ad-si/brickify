@@ -16,8 +16,8 @@ class HintUi
 	pointerDown: (event, handled) =>
 		return if event.buttons == 0
 
-		switch event.button
-			when 0, 2
+		switch event.buttons
+			when 1, 2
 				# Left or right mouse button
 				if handled
 					@$brushHint.fadeOut()
@@ -31,8 +31,8 @@ class HintUi
 		# Ignore plain mouse movement
 		return if event.buttons == 0
 
-		switch event.button
-			when 0
+		switch event.buttons
+			when 1
 				# Left mouse button
 				if not handled
 					@$rotateHint.fadeOut()
@@ -40,7 +40,7 @@ class HintUi
 				else
 					@$brushHint.fadeOut()
 					@brushHintVisible = false
-			when 1
+			when 4
 				# Middle mouse button
 				@$zoomHint.fadeOut()
 				@zoomHintVisible = false

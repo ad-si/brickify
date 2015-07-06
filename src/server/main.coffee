@@ -118,7 +118,7 @@ module.exports.setupRouting = ->
 		'PEP'
 		'path'
 		'three'
-		'three-orbit-controls'
+		'three-pointer-controls'
 		'zeroclipboard'
 	]
 	webapp.get '/shared.js', browserify(shared, {

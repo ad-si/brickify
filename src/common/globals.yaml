@@ -79,6 +79,8 @@ controls:
   dolly:
     minDistance: 2
     maxDistance: 1500
+  animation:
+    afterInteraction: 0 # ANIMATION.PLAY
 
 minimalPrintVolume: 100 # in mm^3 (roughly half the volume of a 1x1 brick)
 

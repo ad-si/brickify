@@ -18,7 +18,9 @@ block body
 				tr
 					td.printTime
 						span.fa.fa-clock-o
-						p= sample.printTime+' min'
+						|&nbsp;
+						= sample.printTime
+						|&nbsp;min
 					td.sample
 						a(href='app#initialModel='+sample.name)
 							img(src='/img/modelSamples/'+sample.name+'.png')
@@ -29,7 +31,7 @@ block body
 						.attribution
 							p
 								|"
-								a(href= sample.originalLink)=sample.originalName
+								a(href= sample.originalLink)= sample.originalName
 								|" by&nbsp;
 								a(href= sample.creatorLink)= sample.creator
 								|, used under&nbsp;

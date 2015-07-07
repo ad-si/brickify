@@ -1,5 +1,6 @@
+extend = require 'extend'
 THREE = require 'three'
-OrbitControls = require('three-orbit-controls')(THREE)
+PointerControls = require('three-pointer-controls')(THREE)
 renderTargetHelper = require './renderTargetHelper'
 FxaaShaderPart = require './shader/FxaaPart'
 SsaoShaderPart = require './shader/ssaoPart'
@@ -11,11 +12,11 @@ threeHelper = require '../threeHelper'
 # @class Renderer
 ###
 class Renderer
-	constructor: (@pluginHooks, globalConfig) ->
+	constructor: (@pluginHooks, globalConfig, controls) ->
 		@scene = null
 		@camera = null
 		@threeRenderer = null
-		@init globalConfig
+		@init globalConfig, controls
 		@pipelineEnabled = false
 		@useBigRendertargets = false
 		@usePipelineSsao = false
@@ -40,7 +41,6 @@ class Renderer
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
-		@controls?.update()
 		@animationRequestID = requestAnimationFrame @localRenderer
 
 	# Renders all plugins
@@ -247,11 +247,13 @@ class Renderer
 		# Zooms out/in the camera so that the object is fully visible
 		threeHelper.zoomToBoundingSphere @camera, @scene, @controls, boundingSphere
 
-	init: (@globalConfig) ->
+	init: (@globalConfig, controls) ->
 		@_setupSize @globalConfig
 		@_setupRenderer @globalConfig
 		@scene = @getDefaultScene()
 		@_setupCamera @globalConfig
+		@_setupControls @globalConfig, controls
+
 		@animationRequestID = requestAnimationFrame @localRenderer
 
 	_setupSize: (globalConfig) ->
@@ -321,17 +323,17 @@ class Renderer
 		@camera.up.set(0, 0, 1)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-	setupControls: (globalConfig, controls) ->
-		if controls?
-			controls.addObject @camera
-			controls.addDomElement @threeRenderer.domElement
-			controls.update()
-			@controls = controls
-		else
-			@controls = new OrbitControls(@camera, @threeRenderer.domElement)
-			for key, value of globalConfig.orbitControls
-				@controls[key] = value
-			@controls.target.set(0, 0, 0)
+	_setupControls: (globalConfig, controls) ->
+		unless controls
+			controls = new PointerControls()
+			extend true, controls.config, globalConfig.controls
+		@controls = controls
+
+	initControls: ->
+		@controls.control(@camera).with(@threeRenderer.domElement)
+
+	getControls: =>
+		@controls
 
 	_setupLighting: (scene) ->
 		ambientLight = new THREE.AmbientLight(0x404040)
@@ -355,17 +357,14 @@ class Renderer
 		@_setupLighting(scene)
 		return scene
 
-	getControls: =>
-		@controls
-
 	toggleRendering: =>
 		if @animationRequestID?
 			cancelAnimationFrame @animationRequestID
 			@animationRequestID = null
-			@controls.enabled = false
+			@controls.config.enabled = false
 		else
 			@animationRequestID = requestAnimationFrame @localRenderer
-			@controls.enabled = true
+			@controls.config.enabled = true
 
 
 module.exports = Renderer

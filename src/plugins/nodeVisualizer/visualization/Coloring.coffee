@@ -33,7 +33,10 @@ module.exports = class Coloring
 		@_setPolygonOffset @legoShadowMat, +2, +2
 
 		# printed object material
-		@objectPrintMaterial = @_createMaterial @globalConfig.colors.modelColor, 0.8
+		@objectPrintMaterial = @_createMaterial(
+			@globalConfig.colors.modelColor
+			@globalConfig.colors.modelOpacity
+		)
 
 		# remove z-Fighting on baseplate
 		@_setPolygonOffset @objectPrintMaterial, +3, +3

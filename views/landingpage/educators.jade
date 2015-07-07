@@ -18,7 +18,9 @@ block body
 				tr
 					td.printTime
 						span.fa.fa-clock-o
-						p= sample.printTime
+						|&nbsp;
+						= sample.printTime
+						|&nbsp;min
 					td.sample
 						a(href='app#initialModel='+sample.name)
 							img(src='/img/modelSamples/'+sample.name+'.png')
@@ -26,6 +28,15 @@ block body
 					td
 						h3= sample.title
 						p= sample.description
+						.attribution
+							p
+								|"
+								a(href= sample.originalLink)= sample.originalName
+								|" by&nbsp;
+								a(href= sample.creatorLink)= sample.creator
+								|, used under&nbsp;
+								a(href= sample.licenseLink)= sample.license
+								|&nbsp;*
 					td.download
 						a.btn.btn-success.notAvailable Get course material!
 			tr
@@ -33,7 +44,7 @@ block body
 				td.sample
 				td
 					h3 Thingiverse
-					p Search thingiverse. You can use Brickolage with any .stl file.
+					p Search thingiverse. You can use brickify with any .stl file.
 					form.form-inline.form-group(action='http://www.thingiverse' +
 					'.com/search')
 						input.form-control(name='q' placeholder='Enter a search term')
@@ -49,6 +60,7 @@ block body
 					h3 Custom
 					p Click here if you want to use your own models
 				td
+		|* Modified from original.
 
 	include footer
 

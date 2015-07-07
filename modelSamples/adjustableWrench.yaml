@@ -1,5 +1,12 @@
 title: Wrench
 description: >
-  A tool with a fully functional adjustable jaw
-printTime: 20 min
+  A tool with a fully functional adjustable jaw.
+printTime: 360
 name: adjustableWrench
+
+originalName: Fully assembled 3D printable wrench
+originalLink: http://www.thingiverse.com/thing:139268
+creator: barspin
+creatorLink: http://www.thingiverse.com/barspin
+license: CC BY 3.0
+licenseLink: http://creativecommons.org/licenses/by/3.0/

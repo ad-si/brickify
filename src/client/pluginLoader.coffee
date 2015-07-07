@@ -70,11 +70,6 @@ module.exports = class PluginLoader
 				require '../plugins/newBrickator'
 				require '../plugins/newBrickator/package.json'
 			)
-		if @globalConfig.plugins.fidelityControl
-			@pluginInstances.push @_loadPlugin(
-				require '../plugins/fidelityControl'
-				require '../plugins/fidelityControl/package.json'
-			)
 		if @globalConfig.plugins.editController
 			@pluginInstances.push @_loadPlugin(
 				require '../plugins/editController'

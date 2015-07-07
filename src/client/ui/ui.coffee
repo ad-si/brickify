@@ -50,6 +50,16 @@ module.exports = class Ui
 					hotkey: 'l'
 					callback: @_toggleAssemblyView
 				}
+				{
+					description: 'Increase visual complexity (turns off automatic adjustment)'
+					hotkey: 'i'
+					callback: @renderer.fidelityControl.manualIncrease
+				}
+				{
+					description: 'Decrease visual complexity (turns off automatic adjustment)'
+					hotkey: 'd'
+					callback: @renderer.fidelityControl.manualDecrease
+				}
 			]
 		}
 		@hotkeys.addEvents gridHotkeys

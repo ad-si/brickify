@@ -57,7 +57,6 @@ plugins:
   legoBoard: true
   newBrickator: true
   nodeVisualizer: true
-  fidelityControl: true
   editController: true
   csg: true
   legoInstructions: true

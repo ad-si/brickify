@@ -33,6 +33,7 @@ module.exports = class Bundle
 		@pluginLoader.initPlugins()
 		@ui?.init()
 		@renderer.initControls()
+		@renderer.render()
 		return @sceneManager.init()
 		.then => Spinner.stop document.getElementById @globalConfig.renderAreaId
 

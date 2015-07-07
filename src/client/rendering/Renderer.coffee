@@ -45,7 +45,7 @@ class Renderer
 
 		# call update hook
 		@pluginHooks.on3dUpdate timestamp
-		@animationRequestID = requestAnimationFrame @localRenderer
+		@animationRequestID = null
 
 	# Renders all plugins
 	_renderFrame: (timestamp, camera, renderTarget = null) =>
@@ -257,8 +257,6 @@ class Renderer
 		@_setupCamera @globalConfig
 		@_setupControls @globalConfig, controls
 
-		@animationRequestID = requestAnimationFrame @localRenderer
-
 	_setupSize: (globalConfig) ->
 		@$canvasWrapper = $ '.canvasWrapper'
 
@@ -320,6 +318,8 @@ class Renderer
 		)
 		@camera.up.set(0, 0, 1)
 		@camera.lookAt(new THREE.Vector3(0, 0, 0))
+		Object.observe @camera.position, =>
+			@render()
 
 	_setupControls: (globalConfig, controls) ->
 		unless controls
@@ -355,14 +355,8 @@ class Renderer
 		@_setupLighting(scene)
 		return scene
 
-	toggleRendering: =>
-		if @animationRequestID?
-			cancelAnimationFrame @animationRequestID
-			@animationRequestID = null
-			@controls.config.enabled = false
-		else
+	render: =>
+		if not @animationRequestID?
 			@animationRequestID = requestAnimationFrame @localRenderer
-			@controls.config.enabled = true
-
 
 module.exports = Renderer

@@ -52,12 +52,6 @@ module.exports = class Ui
 				}
 			]
 		}
-		if process.env.NODE_ENV is 'development'
-			gridHotkeys.events.push {
-				description: 'Toggle rendering'
-				hotkey: 'p'
-				callback: @_toggleRendering
-			}
 		@hotkeys.addEvents gridHotkeys
 
 	_toggleGridVisibility: =>
@@ -69,8 +63,3 @@ module.exports = class Ui
 
 	_toggleAssemblyView: =>
 		@workflowUi.toggleAssemblyView()
-
-	_toggleRendering: =>
-		fidelityControl = @bundle.getPlugin 'FidelityControl'
-		fidelityControl?.reset()
-		@renderer.toggleRendering()

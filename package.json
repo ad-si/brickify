@@ -55,7 +55,7 @@
     "serve-favicon": "^2.1.6",
     "spin": "0.0.1",
     "stl-exporter": "^0.3.2",
-    "stl-parser": "^0.8.0",
+    "stl-parser": "^0.9.1",
     "string.prototype.endswith": "^0.2.0",
     "stringify": "^3.1.0",
     "stylus": "^0.50.0",

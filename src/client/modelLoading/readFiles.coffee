@@ -2,6 +2,7 @@ ReadableFileStream = require('filestream').read
 stlParser = require 'stl-parser'
 meshlib = require 'meshlib'
 Nanobar = require 'nanobar'
+log = require 'loglevel'
 
 modelCache = require './modelCache'
 
@@ -65,6 +66,8 @@ module.exports = (files) ->
 				progress = (data.number / faceCounter) * loadingPercentage
 				if progress < loadingPercentage
 					nanobar.go progress
+
+		streamingStlParser.on 'warning', log.warn
 
 		modelBuilder.on 'model', (model) ->
 			nanobar.go processingPercentage

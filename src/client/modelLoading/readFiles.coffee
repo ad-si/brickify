@@ -1,20 +1,21 @@
 ReadableFileStream = require('filestream').read
 stlParser = require 'stl-parser'
 meshlib = require 'meshlib'
-Nanobar = require 'nanobar'
 log = require 'loglevel'
 
 modelCache = require './modelCache'
 
 averageFaceSize = 240 # Bytes
-nanobar = new Nanobar {
-	bg: '#acf'
-	target: document.getElementById 'loadButton'
-	id: 'progressBar'
-}
+
 loadingPercentage = 80
 processingPercentage = 90
+
+idleText = 'Drop an STL File'
+processingText = 'Processing Geometry'
+viewPreparationText = 'Preparing View'
+
 $loadingTextElement = $ '#loadingStatus'
+progressBarElement = document.getElementById 'progressBar'
 
 module.exports = (files) ->
 
@@ -40,7 +41,7 @@ module.exports = (files) ->
 
 		faceCounter = file.size / averageFaceSize
 
-		nanobar.go 0
+		progressBarElement.style.width = 0
 		$loadingTextElement.text 'Loading File'
 
 		fileStream = new ReadableFileStream file
@@ -65,23 +66,26 @@ module.exports = (files) ->
 			else
 				progress = (data.number / faceCounter) * loadingPercentage
 				if progress < loadingPercentage
-					nanobar.go progress
+					progressBarElement.style.width = progress + '%'
 
 		streamingStlParser.on 'warning', log.warn
 
 		streamingStlParser.on 'error', (error) ->
-			@end null, null, -> nanobar.go 100
+			@end()
 			streamingStlParser.unpipe modelBuilder
 			bootbox.alert {
 				title: 'Invalid STL-file'
 				message: error.message
+				callback: ->
+					progressBarElement.style.width = 0
+					$loadingTextElement.text idleText
 			}
 			reject error
 
 
 		modelBuilder.on 'model', (model) ->
-			nanobar.go processingPercentage
-			$loadingTextElement.text 'Processing Geometry'
+			progressBarElement.style.width = loadingPercentage + '%'
+			$loadingTextElement.text processingText
 
 			processModel = ->
 				model
@@ -90,12 +94,14 @@ module.exports = (files) ->
 				.buildFaceVertexMesh()
 				.done()
 				.then ->
-					$loadingTextElement.text 'Preparing View'
+					progressBarElement.style.width = processingPercentage + '%'
+					$loadingTextElement.text viewPreparationText
 					return modelCache.store model
 				.then (hash) ->
-					nanobar.go 100
-					$loadingTextElement.text 'Drop an STL File'
+					progressBarElement.style.width = '100%'
+					$loadingTextElement.text idleText
 					resolve hash
+					progressBarElement.style.width = 0
 
 			# Give time to render text
 			setTimeout processModel, 50

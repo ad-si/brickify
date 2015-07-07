@@ -54,6 +54,8 @@ module.exports = (files) ->
 			reject error
 
 		streamingStlParser = stlParser {blocking: false}
+		modelBuilder = new meshlib.ModelBuilder()
+
 		streamingStlParser.on 'data', (data) ->
 			# if data-chunk is the header
 			if data.faceCount?
@@ -64,7 +66,6 @@ module.exports = (files) ->
 				if progress < loadingPercentage
 					nanobar.go progress
 
-		modelBuilder = new meshlib.ModelBuilder()
 		modelBuilder.on 'model', (model) ->
 			nanobar.go processingPercentage
 			$loadingTextElement.text 'Processing Geometry'

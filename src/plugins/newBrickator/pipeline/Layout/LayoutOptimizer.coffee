@@ -37,14 +37,13 @@ class LayoutOptimizer
 				@splitBricksAndRelayoutLocally bricksToSplit, grid, false, false
 
 			# Articulation Points
-			bricks.forEach (brick) ->
-				brick.resetArticulationPointData()
+			bricks.forEach (brick) -> brick.resetArticulationPointData()
 			articulationPoints = AP.findArticulationPoints bricks
-
 
 		log.debug '\tfinished optimization after ', pass , 'passes'
 
 
+		# Last pass to find final number of components and articulationPoints
 		bricks = grid.getAllBricks()
 		log.debug '\t# of bricks:\t\t\t', bricks.size
 
@@ -56,8 +55,6 @@ class LayoutOptimizer
 		bricks.forEach (brick) -> brick.label = null
 		numberOfComponents = ConComp.findConnectedComponents bricks, false
 		log.debug '\t# of components:\t\t', numberOfComponents
-
-
 
 		return Promise.resolve grid
 

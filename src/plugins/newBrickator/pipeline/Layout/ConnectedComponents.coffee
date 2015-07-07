@@ -1,6 +1,6 @@
 DataHelper = require '../DataHelper'
 
-# Connected components using the connected component labelling algo
+# Connected components using the connected component labelling algorithm
 module.exports.findConnectedComponents = (
 		bricks,
 		ignoreArticulationPoints = false) =>
@@ -13,9 +13,6 @@ module.exports.findConnectedComponents = (
 			brick.label = null
 			return
 
-		# TODO
-		# Check whether looking at upper / lower neighbors suffices
-		# and speeds up runtime
 		conBricks = brick.connectedBricks()
 		conLabels = new Set()
 
@@ -24,6 +21,7 @@ module.exports.findConnectedComponents = (
 						return
 			conLabels.add conBrick.label if conBrick.label?
 
+		# Found neighbors that are already labelled
 		if conLabels.size > 0
 			smallestLabel = DataHelper.smallestElement conLabels
 			# Assign label to this brick
@@ -32,10 +30,10 @@ module.exports.findConnectedComponents = (
 				if conLabels.has labels[i]
 					labels[i] = labels[smallestLabel]
 
-		else # No neighbor has a label
+		# No neighbor has a label
+		else
 			brick.label = id
 			labels[id] = id
-
 			id++
 
 	# Second pass - applying labels

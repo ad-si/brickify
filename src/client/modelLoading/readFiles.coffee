@@ -69,6 +69,16 @@ module.exports = (files) ->
 
 		streamingStlParser.on 'warning', log.warn
 
+		streamingStlParser.on 'error', (error) ->
+			@end null, null, -> nanobar.go 100
+			streamingStlParser.unpipe modelBuilder
+			bootbox.alert {
+				title: 'Invalid STL-file'
+				message: error.message
+			}
+			reject error
+
+
 		modelBuilder.on 'model', (model) ->
 			nanobar.go processingPercentage
 			$loadingTextElement.text 'Processing Geometry'

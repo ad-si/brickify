@@ -24,6 +24,8 @@ $wizardHoleImage = undefined
 $studSizeSelect = undefined
 $holeSizeSelect = undefined
 $wizardStepObjects = undefined
+$textMap = undefined
+$numberMap = undefined
 
 alphabeticalList = (i, range) ->
 	# A = 65
@@ -102,7 +104,11 @@ initializeWizard = ($modal) ->
 			disableWizard()
 		else
 			$wizardStepObjects[currentWizardStep]
-			.fadeIn wizardFadeTime
+			.fadeIn wizardFadeTime, ->
+				# Trigger image map resize after images are loaded
+				# and shown, since image size is not set accurately
+				# before
+				updateImageMapSize()
 
 		# Update calibration preview on last step
 		if currentWizardStep is wizardSteps.length - 1
@@ -164,10 +170,12 @@ initializeImageMaps = ($modal) ->
 	$wizardStudImage = $modal.find '#wizardStudImage'
 	$wizardHoleImage = $modal.find '#wizardHoleImage'
 
-	$modal.find('#textMap').imageMapResize()
-	$modal.find('#numberMap').imageMapResize()
+	$textMap = $modal.find('#textMap')
+	$textMap.imageMapResize()
+	$numberMap = $modal.find('#numberMap')
+	$numberMap.imageMapResize()
 
-	$modal.find('#textMap area').each ->
+	$textMap.find('area').each ->
 		thisArea  = $(@)
 		id = thisArea.attr 'id'
 		thisArea.hover ->
@@ -179,7 +187,7 @@ initializeImageMaps = ($modal) ->
 			.filter -> return $(@).html() is id
 			.attr('selected', true)
 
-	$modal.find('#numberMap area').each ->
+	$numberMap.find('area').each ->
 		thisArea  = $(@)
 		id = thisArea.attr 'id'
 		thisArea.hover ->
@@ -190,6 +198,10 @@ initializeImageMaps = ($modal) ->
 			.find('option')
 			.filter -> return $(@).html() is id
 			.attr('selected', true)
+
+updateImageMapSize = ->
+	$textMap.imageMapResize()
+	$numberMap.imageMapResize()
 
 getModal = ({testStrip, stl, lego, steps} = {}) ->
 	$modal ?= $('#downloadModal')

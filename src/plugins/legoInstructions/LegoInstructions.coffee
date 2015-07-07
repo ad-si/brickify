@@ -43,36 +43,32 @@ class LegoInstructions
 			@nodeVisualizer.setDisplayMode node, 'build'
 		.then => @newBrickator.getNodeData node
 		.then (data) =>
-			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
-			numLayers = maxLayer - minLayer + 1
-			# If there is 3D print below first lego layer, show lego starting
-			# with layer 1 and show only 3D print in first instruction layer
-			numLayers += 1 if minLayer > 0
+			return @nodeVisualizer.getNumberOfBuildLayers node
+			.then (numLayers) =>
+				# scad and piece list generation
+				bricks = data.grid.getAllBricks()
+				return null if bricks.size is 0
 
-			# scad and piece list generation
-			bricks = data.grid.getAllBricks()
-			return null if bricks.size is 0
+				files = []
+				files.push openScadGenerator.generateScad bricks
 
-			files = []
-			files.push openScadGenerator.generateScad bricks
+				# add instructions html to download
+				pieceList = pieceListGenerator.generatePieceList bricks
+				files.push @_createHtml numLayers, pieceList
 
-			# add instructions html to download
-			pieceList = pieceListGenerator.generatePieceList bricks
-			files.push @_createHtml numLayers, pieceList
+				# Take screenshots and convert them to png
+				screenshots = @_takeScreenshots node, numLayers, camera
+				.then (images) ->
+					files.push images...
+					log.debug 'Finished instruction screenshots'
 
-			# Take screenshots and convert them to png
-			screenshots = @_takeScreenshots node, numLayers, camera
-			.then (images) ->
-				files.push images...
-				log.debug 'Finished instruction screenshots'
+				# Load and save piece images
+				imageDownload = @_downloadPieceListImages pieceList
+				.then (imageFiles) ->
+					files.push imageFiles...
 
-			# Load and save piece images
-			imageDownload = @_downloadPieceListImages pieceList
-			.then (imageFiles) ->
-				files.push imageFiles...
-
-			Promise.all [screenshots, imageDownload]
-			.then -> return files
+				Promise.all [screenshots, imageDownload]
+				.then -> return files
 		.then (files) =>
 			# reset display mode
 			@nodeVisualizer.setDisplayMode node, oldVisualizationMode
@@ -121,7 +117,7 @@ class LegoInstructions
 			return @_convertToPng(flippedImage)
 			.then (pngData) ->
 				return (
-					fileName: "LEGO assembly instructions #{layer}.png"
+					fileName: "img/instructions/layer-#{layer}.png"
 					data: pngData.buffer
 					imageWidth: flippedImage.width
 				)
@@ -231,12 +227,12 @@ class LegoInstructions
 		for i in [1..numLayers]
 			html += '<br><br>'
 			html += '<h3 class="pageBreak"> Layer ' + i + '</h3>'
-			html += '<p><img src="LEGO%20assembly%20instructions%20' + i + '.png"></p>'
+			html += '<p><img src="img/instructions/layer-' + i + '.png"></p>'
 
 		html += '</body></html>'
 
 		return {
-			fileName: 'LEGO Assembly instructions.html'
+			fileName: 'LEGO_Assembly_instructions.html'
 			data: html
 		}
 
@@ -246,7 +242,7 @@ class LegoInstructions
 	_downloadPieceImage: (piece) ->
 		return new Promise (resolve, reject) ->
 			xhr = new XMLHttpRequest()
-			fileName = "img/partList/partList (#{piece.sizeIndex+1}).png"
+			fileName = "img/partList/partList-#{piece.sizeIndex + 1}.png"
 			xhr.open 'GET', fileName
 			xhr.responseType = 'arraybuffer'
 			xhr.onload = (event) ->

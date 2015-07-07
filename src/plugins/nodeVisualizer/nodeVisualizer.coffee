@@ -15,16 +15,26 @@ PrintingTimeEstimator = require './printingTimeEstimator'
 class NodeVisualizer
 	constructor: ->
 		# rendering properties
-		@brickShadowOpacity = 0.5
-		@objectOpacity = 0.8
-		@objectShadowOpacity = 0.5
-		@objectColorMult = new THREE.Vector3(1, 1, 1)
-		@objectShadowColorMult = new THREE.Vector3(0.1, 0.1, 0.1)
 		@brickVisualizations = {}
 		@fidelity = 0
 
 	init: (@bundle) =>
 		@coloring = new Coloring(@bundle.globalConfig)
+
+		@objectColorMult = new THREE.Vector3(
+			@bundle.globalConfig.colors.objectColorMult
+			@bundle.globalConfig.colors.objectColorMult
+			@bundle.globalConfig.colors.objectColorMult
+		)
+		@objectShadowColorMult = new THREE.Vector3(
+			@bundle.globalConfig.colors.objectShadowColorMult
+			@bundle.globalConfig.colors.objectShadowColorMult
+			@bundle.globalConfig.colors.objectShadowColorMult
+		)
+		@brickShadowOpacity = @bundle.globalConfig.colors.brickShadowOpacity
+		@objectOpacity = @bundle.globalConfig.colors.modelOpacity
+		@objectShadowOpacity = @bundle.globalConfig.colors.modelShadowOpacity
+
 		if @bundle.globalConfig.buildUi
 			@brickCounter = $ '#brickCount'
 			@timeEstimate = $ '#timeEstimate'
@@ -377,20 +387,17 @@ class NodeVisualizer
 	getNumberOfBuildLayers: (selectedNode) =>
 		return @_getCachedData(selectedNode)
 			.then (cachedData) ->
-				return cachedData.brickVisualization.getNumberOfVisibleLayers()
+				return cachedData.brickVisualization.getNumberOfBuildLayers()
 
 	# when build mode is enabled, this tells the visualization to show
 	# bricks up to the specified layer
 	showBuildLayer: (selectedNode, layer) =>
-		return @newBrickator.getNodeData selectedNode
-		.then (data) =>
-			{min: minLayer, max: maxLayer} = data.grid.getLegoVoxelsZRange()
-			@_getCachedData(selectedNode).then (cachedData) ->
-				gridLayer = layer - 1
-				# If there is 3D print below first lego layer, show lego starting
-				# with layer 1 and show only 3D print in first instruction layer
-				gridLayer -= 1 if minLayer > 0
-				cachedData.brickVisualization.showBrickLayer gridLayer
+
+		# Start counting at 0 internally
+		layer--
+
+		return @_getCachedData(selectedNode).then (cachedData) ->
+			cachedData.brickVisualization.showBrickLayer layer
 
 	_updateBrickCount: (bricks) =>
 		@brickCounter?.text bricks.size

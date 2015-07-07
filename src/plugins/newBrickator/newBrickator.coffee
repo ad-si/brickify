@@ -97,20 +97,6 @@ class NewBrickator
 		.catch (error) ->
 			log.error error
 
-	everythingPrint: (selectedNode) =>
-		@getNodeData selectedNode
-		.then (cachedData) =>
-			settings = new PipelineSettings(@bundle.globalConfig)
-			settings.onlyInitLayout()
-
-			data = grid: cachedData.grid
-
-			@pipeline.run data, settings, true
-			.then =>
-				cachedData.csgNeedsRecalculation = true
-
-				@nodeVisualizer?.objectModified selectedNode, cachedData
-
 	_createDataStructure: (selectedNode) =>
 		return selectedNode.getModel().then (model) =>
 			# Create grid

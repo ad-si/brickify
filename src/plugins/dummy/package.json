@@ -1,5 +1,5 @@
 {
-  "name": "dummy-client-plugin",
+  "name": "dummy-plugin",
   "version": "0.1.0",
   "description": "Demo implementation of a client-side plugin.",
   "brickify": {

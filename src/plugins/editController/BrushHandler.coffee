@@ -149,13 +149,15 @@ class BrushHandler
 			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
-	_everythingPrint: (selectedNode) =>
-		@nodeVisualizer._getCachedData selectedNode
+	_everythingPrint: (node) =>
+		@nodeVisualizer._getCachedData node
 		.then (cachedData) =>
-			return unless cachedData.
-				brickVisualization.makeAllVoxels3dPrinted selectedNode
+			changedVoxels = cachedData.brickVisualization.makeAllVoxels3dPrinted node
+			return if changedVoxels.length is 0
 			piwikTracking.trackEvent 'Editor', 'BrushAction', 'MakeEverythingPrint'
 			cachedData.brickVisualization.updateModifiedVoxels()
-			@editController.everythingPrint selectedNode
+			@editController.relayoutModifiedParts(
+				node, cachedData, changedVoxels, true
+			)
 
 module.exports = BrushHandler

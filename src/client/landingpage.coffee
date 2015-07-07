@@ -18,7 +18,6 @@ globalConfig.staticRendererSize = true
 globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
-globalConfig.orbitControls.autoRotate = true
 globalConfig.plugins.dummy = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
@@ -55,6 +54,7 @@ config1.renderAreaId = 'renderArea1'
 bundle1 = new Bundle config1
 b1 = bundle1.init().then ->
 	controls = bundle1.getControls()
+	controls.animation.orbit yawSpeed: -1 / 30
 	config2.renderAreaId = 'renderArea2'
 	bundle2 = new Bundle config2, controls
 	b2 = bundle2.init()

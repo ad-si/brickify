@@ -1,3 +1,5 @@
+log = require 'loglevel'
+
 THREE = require 'three'
 Voxel = require './Voxel'
 Brick = require './Brick'
@@ -276,6 +278,12 @@ module.exports = class Grid
 				bricks.add voxel.brick
 
 		return bricks
+
+	getAllVoxels: =>
+		voxels = new Set()
+		@forEachVoxel (voxel) ->
+			voxels.add voxel
+		return voxels
 
 	# Chooses a random brick
 	chooseRandomBrick: =>

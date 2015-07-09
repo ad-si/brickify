@@ -87,7 +87,6 @@ class FidelityControl
 		)
 
 	_adjustFidelity: (fps) =>
-		console.log 'fps ' + fps
 		return if @screenShotMode or not @autoAdjust
 
 		if fps < minimalAcceptableFps and @currentFidelityLevel > 0

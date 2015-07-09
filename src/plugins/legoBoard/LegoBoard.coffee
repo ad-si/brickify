@@ -94,8 +94,7 @@ module.exports = class LegoBoard
 		studTexture = THREE.ImageUtils.loadTexture(
 			'img/baseplateStud.png'
 			undefined
-			=>
-				@bundle.renderer.render()
+			@bundle.renderer.render
 		)
 		studTexture.wrapS = THREE.RepeatWrapping
 		studTexture.wrapT = THREE.RepeatWrapping

@@ -244,7 +244,7 @@ class NodeVisualizer
 			.then =>
 				solid = cachedData.modelVisualization.getSolid()
 				@_zoomToNode solid if solid?
-			.then => @_render()
+			.then @_render
 
 	onNodeRemove: (node) =>
 		@brickRootNode.remove threeHelper.find node, @brickRootNode

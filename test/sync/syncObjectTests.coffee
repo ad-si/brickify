@@ -170,6 +170,24 @@ describe 'SyncObject tests', ->
 					to.deep.have.property('[0].packet').deep.equal(expected)
 				expect(dataPackets.putCalls).to.deep.have.property('[0].put', true)
 
+		it 'should save newly added properties', ->
+			dataPackets.nextPuts.push true
+			dataPackets.nextPuts.push true
+			pojso = {a: 'b', c: {d: 'e'}}
+			packet = {id: 'abcdefgh', data: pojso}
+			expected = clone packet
+			expected.data.dummyProperty = 'a'
+			request = Dummy.from packet
+			request.then (dummy) ->
+				dummy.save().then ->
+					dummy.newProperty = 'b'
+					expected.data.newProperty = 'b'
+					dummy.save().then ->
+						expect(dataPackets.calls).to.equal(2)
+						expect(dataPackets.putCalls).
+						to.deep.have.property('[1].packet').deep.equal(expected)
+						expect(dataPackets.putCalls).to.deep.have.property('[0].put', true)
+
 		it 'should delete the right datapacket', ->
 			dataPackets.nextIds.push nextId = 'abcdefgh'
 			dataPackets.nextDeletes.push true

@@ -35,6 +35,12 @@ class ModelVisualization
 			parent.add solid
 			parent.solid = solid
 
+			# visible black lines, again!
+			lineObject = new THREE.Mesh geometry
+			lines = new THREE.EdgesHelper lineObject, 0x000000, 30
+			lines.material = @coloring.objectLineMatFront
+			parent.add lines
+
 		_addWireframe = (geometry, parent) =>
 			wireframe = new THREE.Object3D()
 
@@ -57,10 +63,11 @@ class ModelVisualization
 				.then (modelObject) =>
 					geometry = threeConverter.toStandardGeometry modelObject
 
-					if @globalConfig.rendering.showModel
-						_addSolid geometry, @threeNode
 					if @globalConfig.rendering.showShadowAndWireframe
 						_addWireframe geometry, @threeNode
+
+					if @globalConfig.rendering.showModel
+						_addSolid geometry, @threeNode
 
 					threeHelper.applyNodeTransforms node, @threeNode
 

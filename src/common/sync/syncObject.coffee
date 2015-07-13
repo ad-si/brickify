@@ -94,7 +94,7 @@ class SyncObject
 	# @return {Boolean} true if the key should be ignored
 	###
 	_isTransient: (key) ->
-		return -1 isnt ['id', 'ready', '_packet'].indexOf key
+		return -1 isnt ['id', 'ready'].indexOf key
 
 	###
 	# For JSON serialization of parent objects only write a reference.
@@ -122,7 +122,7 @@ class SyncObject
 		return pojso
 
 	_getPacket: =>
-		return @_packet ?= {id: @getId(), data: @toPOJSO()}
+		return {id: @getId(), data: @toPOJSO()}
 
 	###
 	# Saves any non-transient data of this object to the server.

@@ -28,6 +28,9 @@ class ModelVisualization
 	getSolid: =>
 		@threeNode.solid
 
+	getSolidLines: =>
+		@threeNode.solidLines
+
 	_createVisualization: (node) =>
 
 		_addSolid = (geometry, parent) =>
@@ -40,6 +43,7 @@ class ModelVisualization
 			lines = new THREE.EdgesHelper lineObject, 0x000000, 30
 			lines.material = @coloring.objectLineMatFront
 			parent.add lines
+			parent.solidLines = lines
 
 		_addWireframe = (geometry, parent) =>
 			wireframe = new THREE.Object3D()

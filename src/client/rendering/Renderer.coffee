@@ -250,6 +250,7 @@ class Renderer
 		@threeRenderer.setSize @size().width, @size().height
 
 		@threeRenderer.render @scene, @camera
+		@render()
 
 	zoomToNode: (threeNode) ->
 		boundingSphere = threeHelper.getBoundingSphere threeNode

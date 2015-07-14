@@ -8,7 +8,7 @@ module.exports.getSeed = ->
 	return seed
 
 module.exports.usePseudoRandom = (boolean) ->
-	#usePseudoRandom = boolean
+	usePseudoRandom = true
 
 module.exports.next = (max) ->
 	if usePseudoRandom

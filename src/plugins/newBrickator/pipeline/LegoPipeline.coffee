@@ -5,7 +5,7 @@ VolumeFiller = require './voxelization/VolumeFiller'
 BrickLayouter = require './Layout/BrickLayouter'
 PlateLayouter = require './Layout/PlateLayouter'
 LayoutOptimizer = require './Layout/LayoutOptimizer'
-Random = require './Random'
+Random = require './LayoutRandom'
 
 module.exports = class LegoPipeline
 	constructor: ->
@@ -83,8 +83,8 @@ module.exports = class LegoPipeline
 		 (voxelizing: #{options.voxelizing}, layouting: #{options.layouting},
 		 onlyReLayout: #{options.reLayout})"
 
-		randomSeed = Math.floor Math.random() * 1000000
-		Random.setSeed randomSeed
+		randomSeed = 42
+		Random.setSeed 42
 		log.debug 'Using random seed', randomSeed
 
 		start = new Date()

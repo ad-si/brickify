@@ -3,7 +3,7 @@ log = require 'loglevel'
 Brick = require '../Brick'
 Voxel = require '../Voxel'
 DataHelper = require '../DataHelper'
-Random = require '../Random'
+Random = require '../LayoutRandom'
 Layouter = require './Layouter'
 
 ###
@@ -12,7 +12,7 @@ Layouter = require './Layouter'
 
 class BrickLayouter extends Layouter
 	constructor: (pseudoRandom = false) ->
-		Random.usePseudoRandom pseudoRandom
+		Random.usePseudoRandom true
 
 	_isBrickLayouter: ->
 		return true

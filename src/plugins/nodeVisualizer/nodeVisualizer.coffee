@@ -136,7 +136,7 @@ class NodeVisualizer
 		gl.stencilMask(stencilBits.visibleObjectMask | stencilBits.hiddenObjectMask)
 
 		# render visible parts
-		threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
+		#threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
 
 		# render invisible parts (object behind lego bricks)
 		if @visualizationMode? and @visualizationMode == 'printBrush'
@@ -152,7 +152,7 @@ class NodeVisualizer
 			gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
 
 			gl.disable(gl.DEPTH_TEST)
-			threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
+			#threeRenderer.render @objectsSceneTarget.quadScene, camera, target, false
 			gl.enable(gl.DEPTH_TEST)
 
 			# Reset material to non-shadow properties
@@ -240,7 +240,7 @@ class NodeVisualizer
 			cachedData.modelVisualization.createVisualization()
 			cachedData.modelVisualization.afterCreation().then =>
 				solid = cachedData.modelVisualization.getSolid()
-				@_zoomToNode solid if solid?
+				# @_zoomToNode solid if solid?
 
 	onNodeRemove: (node) =>
 		@brickRootNode.remove threeHelper.find node, @brickRootNode

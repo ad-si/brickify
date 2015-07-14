@@ -3,7 +3,7 @@ log = require 'loglevel'
 THREE = require 'three'
 Voxel = require './Voxel'
 Brick = require './Brick'
-Random = require './Random'
+Random = require './LayoutRandom'
 
 module.exports = class Grid
 	constructor: (@spacing = {x: 8, y: 8, z: 3.2}) ->

@@ -1,5 +1,6 @@
 THREE = require 'three'
 LineMatGenerator = require './LineMatGenerator'
+Random = require './ColorRandom'
 
 # Provides a simple implementation on how to color voxels and bricks
 module.exports = class Coloring
@@ -65,6 +66,7 @@ module.exports = class Coloring
 		material.polygonOffsetUnits = polygonOffsetUnits
 
 	setPipelineMode: (enabled) =>
+		Random.setSeed 42
 		@objectPrintMaterial.transparent = !enabled
 
 		@objectShadowMat.visible = !enabled
@@ -166,7 +168,7 @@ module.exports = class Coloring
 		 @getMaterialForBrick brick
 
 	_getRandomBrickMaterials: =>
-		i = Math.floor(Math.random() * @_brickMaterials.length)
+		i = Math.floor(Random.next(@_brickMaterials.length))
 		return {
 			color: @_brickMaterials[i]
 			colorStuds: @_studMaterials[i]

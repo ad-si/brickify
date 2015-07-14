@@ -2,7 +2,7 @@ log = require 'loglevel'
 
 Brick = require '../Brick'
 Voxel = require '../Voxel'
-Random = require '../Random'
+Random = require '../LayoutRandom'
 Layouter = require './Layouter'
 
 

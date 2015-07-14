@@ -1,6 +1,6 @@
 log = require 'loglevel'
 
-Random = require '../Random'
+Random = require '../LayoutRandom'
 DataHelper = require '../DataHelper'
 
 ###

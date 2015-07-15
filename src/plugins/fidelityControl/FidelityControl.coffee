@@ -46,6 +46,9 @@ class FidelityControl
 
 		@timesBelowMinimumFps = 0
 
+		@averageFpsTime = 0
+		@averageFpsFrames = 0
+
 		@showFps = process.env.NODE_ENV is 'development'
 		@_setupFpsDisplay()
 
@@ -79,6 +82,10 @@ class FidelityControl
 
 		if @accumulatedTime > accumulationTime
 			fps = (@accumulatedFrames / @accumulatedTime) * 1000
+
+			@averageFpsFrames += @accumulatedFrames
+			@averageFpsTime += @accumulatedTime
+
 			@accumulatedFrames = 0
 			@accumulatedTime %= accumulationTime
 			@_adjustFidelity fps
@@ -119,6 +126,9 @@ class FidelityControl
 			@_increaseFidelity()
 
 	_increaseFidelity: =>
+		@averageFpsTime = 0
+		@averageFpsFrames = 0
+
 		# only allow pipeline when we have the extensions needed for it
 		return if @currentFidelityLevel == 2 and not @pipelineAvailable
 
@@ -127,6 +137,9 @@ class FidelityControl
 		@_setFidelity()
 
 	_decreaseFidelity: =>
+		@averageFpsTime = 0
+		@averageFpsFrames = 0
+
 		# Decrease fidelity
 		@currentFidelityLevel--
 		@_setFidelity()
@@ -175,10 +188,11 @@ class FidelityControl
 	_showFps: (timestamp, fps) =>
 		return unless @showFps
 		if timestamp - @lastDisplayUpdate > fpsDisplayUpdateTime
+			avgFps = (@averageFpsFrames / @averageFpsTime) * 1000
 			@lastDisplayUpdate = timestamp
 			levelAbbreviation = FidelityControl.fidelityLevels[@currentFidelityLevel]
 				.match(/[A-Z]/g).join('')
-			fpsText = Math.round(fps) + '/' + levelAbbreviation
+			fpsText = fps.toFixed(1) + '/' + avgFps.toFixed(2) + '/' + levelAbbreviation
 			@$fpsDisplay.text fpsText
 
 	# disables pipeline for screenshots

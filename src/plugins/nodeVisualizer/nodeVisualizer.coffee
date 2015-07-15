@@ -204,7 +204,7 @@ class NodeVisualizer
 
 		if fidelityLevel >= availableLevels.indexOf 'PipelineHigh'
 			@fidelity = 2
-		else if fidelityLevel > availableLevels.indexOf 'DefaultMedium'
+		else if fidelityLevel > availableLevels.indexOf 'DefaultLow'
 			@fidelity = 1
 		else
 			@fidelity = 0

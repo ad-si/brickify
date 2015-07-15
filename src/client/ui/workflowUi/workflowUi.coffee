@@ -4,6 +4,7 @@ LoadUi = require './LoadUi'
 EditUi = require './EditUi'
 PreviewUi = require './PreviewUi'
 ExportUi = require './ExportUi'
+DevelopmentUi = require './DevelopmentUi'
 
 class WorkflowUi
 	constructor: (@bundle) -> return
@@ -41,6 +42,7 @@ class WorkflowUi
 			edit: new EditUi @
 			preview: new PreviewUi @
 			export: new ExportUi @
+			development: new DevelopmentUi @
 
 		@enableOnly @workflow.load
 

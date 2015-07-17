@@ -96,7 +96,7 @@ class NodeVisualizer
 
 			@brickShadowSceneTarget = RenderTargetHelper.createRenderTarget(
 				threeRenderer,
-				null,
+				[new ExpandBlackPart(2)],
 				null,
 				@brickShadowOpacity
 			)

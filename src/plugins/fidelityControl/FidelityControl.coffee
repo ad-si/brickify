@@ -6,7 +6,7 @@
 ###
 
 $ = require 'jquery'
-piwikTracking = require '../piwikTracking'
+piwikTracking = require '../../client/piwikTracking'
 
 minimalAcceptableFps = 20
 upgradeThresholdFps = 40
@@ -31,7 +31,10 @@ class FidelityControl
 	]
 	@minimalPipelineLevel = @fidelityLevels.indexOf 'PipelineLow'
 
-	init: (@pluginHooks, globalConfig, @renderer) =>
+	init: (@bundle) =>
+		@pluginHooks = @bundle.pluginHooks
+		@renderer = @bundle.renderer
+
 		@currentFidelityLevel = 0
 
 		@autoAdjust = true
@@ -48,7 +51,7 @@ class FidelityControl
 
 		# allow pipeline only if we have the needed extension and a stencil buffer
 		# and if the pipeline is enabled in the global config
-		usePipeline = globalConfig.rendering.usePipeline
+		usePipeline = @bundle.globalConfig.rendering.usePipeline
 		depth = @renderer.threeRenderer.supportsDepthTextures()
 		fragDepth = @renderer.threeRenderer.extensions.get 'EXT_frag_depth'
 		stencilBuffer = @renderer.threeRenderer.hasStencilBuffer
@@ -63,7 +66,10 @@ class FidelityControl
 		@pipelineAvailable = usePipeline and depth? and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
-	update: (delta) =>
+	on3dUpdate: (time, delta) =>
+		# delta is not set the very first time
+		return unless delta
+
 		@accumulatedDelta += delta
 		@accumulatedFrames++
 
@@ -133,12 +139,29 @@ class FidelityControl
 		@_showFidelity()
 		@renderer.render()
 
-	manualIncrease: =>
+	getHotkeys: =>
+		return {
+			title: 'Visual Complexity'
+			events: [
+				{
+					description: 'Increase visual complexity (turns off automatic adjustment)'
+					hotkey: 'i'
+					callback: @_manualIncrease
+				}
+				{
+					description: 'Decrease visual complexity (turns off automatic adjustment)'
+					hotkey: 'd'
+					callback: @_manualDecrease
+				}
+			]
+		}
+
+	_manualIncrease: =>
 		@autoAdjust = false
 		if @currentFidelityLevel < FidelityControl.fidelityLevels.length - 1
 			@_increaseFidelity()
 
-	manualDecrease: =>
+	_manualDecrease: =>
 		@autoAdjust = false
 		@_decreaseFidelity() if @currentFidelityLevel > 0
 

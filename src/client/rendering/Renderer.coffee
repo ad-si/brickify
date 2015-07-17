@@ -7,7 +7,6 @@ SsaoShaderPart = require './shader/ssaoPart'
 SsaoBlurPart = require './shader/ssaoBlurPart'
 log = require 'loglevel'
 threeHelper = require '../threeHelper'
-FidelityControl = require './FidelityControl'
 
 ###
 # @class Renderer
@@ -22,8 +21,6 @@ class Renderer
 		@useBigRendertargets = false
 		@usePipelineSsao = false
 		@imageRenderQueries = []
-		@fidelityControl = new FidelityControl()
-		@fidelityControl.init @pluginHooks, globalConfig, @
 		window.addEventListener(
 			'resize'
 			@windowResizeHandler
@@ -43,15 +40,15 @@ class Renderer
 	localRenderer: (timestamp) =>
 		startTime = window.performance.now()
 		# Call update hook
-		@pluginHooks.on3dUpdate timestamp
+		@pluginHooks.on3dUpdate timestamp, @lastFrameTime
 
 		if @imageRenderQueries.length == 0
 			@_renderFrame timestamp, @camera, null
 		else
 			@_renderImage timestamp
 
-		@fidelityControl.update window.performance.now() - startTime
 		@animationRequestID = null
+		@lastFrameTime = window.performance.now() - startTime
 
 	# Renders all plugins
 	_renderFrame: (timestamp, camera, renderTarget = null) =>

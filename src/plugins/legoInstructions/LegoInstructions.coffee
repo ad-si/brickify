@@ -10,7 +10,7 @@ class LegoInstructions
 		@renderer = bundle.renderer
 		@nodeVisualizer = bundle.getPlugin 'nodeVisualizer'
 		@newBrickator = bundle.getPlugin 'newBrickator'
-		@fidelityControl = bundle.renderer.fidelityControl
+		@fidelityControl = bundle.getPlugin 'fidelity-control'
 		@imageResolution = bundle.globalConfig.legoInstructionResolution
 
 	getDownload: (node, downloadOptions) =>

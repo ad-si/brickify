@@ -116,7 +116,7 @@ class FidelityControl
 
 	_increaseFidelity: =>
 		# only allow pipeline when we have the extensions needed for it
-		return if @currentFidelityLevel == 2 and not @pipelineAvailable
+		return if @currentFidelityLevel is 2 and not @pipelineAvailable
 
 		# Increase fidelity
 		@currentFidelityLevel++
@@ -137,7 +137,12 @@ class FidelityControl
 		)
 
 		@_showFidelity()
-		@renderer.render()
+		if @currentFidelityLevel is FidelityControl.fidelityLevels.indexOf 'PipelineUltra'
+			@renderer.render()
+			.then @renderer.render
+			.then @renderer.render
+		else
+			@renderer.render()
 
 	getHotkeys: =>
 		return {

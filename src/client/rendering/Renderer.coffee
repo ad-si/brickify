@@ -47,7 +47,8 @@ class Renderer
 		else
 			@_renderImage timestamp
 
-		@animationRequestID = null
+		@renderPromiseResolver()
+		@renderPromise = null
 		@lastFrameTime = window.performance.now() - startTime
 
 	# Renders all plugins
@@ -360,7 +361,9 @@ class Renderer
 		return scene
 
 	render: =>
-		if not @animationRequestID?
-			@animationRequestID = requestAnimationFrame @localRenderer
+		if not @renderPromise?
+			@renderPromise = new Promise (@renderPromiseResolver) =>
+				requestAnimationFrame @localRenderer
+		return @renderPromise
 
 module.exports = Renderer

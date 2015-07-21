@@ -66,10 +66,9 @@ module.exports = class Voxelizer
 					voxelSpaceCoordinates[i + 2] = coordinate.z
 
 				normals = faceVertexMesh.faceNormalCoordinates
-				directions = []
-				for i in [2...normals.length] by 3
-					z = normals[i]
-					directions.push @_getTolerantDirection z, options.zTolerance
+				directions = new Array normals.length / 3
+				for i in [0...normals.length / 3] by 1
+					directions[i] = normals[i * 3 + 2]
 
 				return {
 					coordinates: voxelSpaceCoordinates
@@ -80,9 +79,6 @@ module.exports = class Voxelizer
 	_getWorker: ->
 		return @worker if @worker?
 		return operative HullVoxelWorker
-
-	_getTolerantDirection: (dZ, tolerance) ->
-		return if dZ > tolerance then 1 else if dZ < -tolerance then -1 else 0
 
 	setupGrid: (model, options) ->
 		@voxelGrid = new Grid(options.gridSpacing)

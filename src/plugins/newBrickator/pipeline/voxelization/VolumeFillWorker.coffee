@@ -33,10 +33,10 @@ module.exports =
 
 				@_setVoxels grid, x, y, currentFillVoxelQueue, 0
 
-				if dir is 1
+				if dir > 0
 	# leaving model
 					insideModel = false
-				else if dir is -1
+				else if dir < 0
 	# entering model
 					insideModel = true
 			else

@@ -183,16 +183,26 @@ module.exports =
 		grid[x][y] = [] unless grid[x][y]
 		oldValue = grid[x][y][z]
 		if oldValue
-	# Update dir if new zValue is higher than the old one
-	# by at least floatDelta to avoid setting direction to -1 if it is
-	# within the tolerance of floatDelta
-			if (direction isnt 0 and zValue > oldValue.z + @floatDelta) or
-			# Prefer setting direction to 1 (i.e. close the voxel)
-			(direction is 1 and zValue > oldValue.z - @floatDelta)
-				oldValue.z = zValue
-				oldValue.dir = direction
+			@_setNewVoxelValue zValue, direction, oldValue
 		else
 			grid[x][y][z] = z: zValue, dir: direction
+
+	_setNewVoxelValue: (zValue, direction, oldValue) ->
+		if zValue > oldValue.z + @floatDelta
+			# New zValue is higher than the old one by more than floatDelta.
+			# --> set new values
+			oldValue.z = zValue
+			oldValue.dir = direction
+		else if Math.abs(zValue - oldValue.z) < @floatDelta and
+		# New zValue is the same as the old one.
+		Math.abs(direction) > oldValue.dir
+		# And new direction is steeper than the old one.
+		# Because the two lines (i.e. faces) meet within this voxel they can
+		# either point away or towards one another. This can be determined by
+		# comparing the angles. The steeper one determines the arrangement.
+		# See https://github.com/brickify/brickify/issues/731
+			oldValue.z = zValue
+			oldValue.dir = direction
 
 	_resetProgress: ->
 		@lastProgress = -1

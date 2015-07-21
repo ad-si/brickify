@@ -66,11 +66,11 @@ class FidelityControl
 		@pipelineAvailable = usePipeline and depth? and fragDepth? and stencilBuffer
 		@noPipelineDecisions = 0
 
-	on3dUpdate: (time, delta) =>
-		# delta is not set the very first time
-		return unless delta
+	on3dUpdate: (time, lastFrameTime) =>
+		# lastFrameTime is not set the very first time
+		return unless lastFrameTime
 
-		@accumulatedDelta += delta
+		@accumulatedDelta += lastFrameTime
 		@accumulatedFrames++
 
 		if @accumulatedFrames > accumulationFrames
@@ -137,7 +137,8 @@ class FidelityControl
 		)
 
 		@_showFidelity()
-		if @currentFidelityLevel is FidelityControl.fidelityLevels.indexOf 'PipelineUltra'
+		pipelineUltraIndex = FidelityControl.fidelityLevels.indexOf 'PipelineUltra'
+		if @currentFidelityLevel is pipelineUltraIndex
 			@renderer.render()
 			.then @renderer.render
 			.then @renderer.render

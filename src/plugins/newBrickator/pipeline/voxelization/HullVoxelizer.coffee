@@ -12,7 +12,6 @@ module.exports = class Voxelizer
 
 	_addDefaults: (options) ->
 		options.accuracy ?= 16
-		options.zTolerance ?= 0.01
 
 	voxelize: (model, options = {}, progressCallback) =>
 		@_addDefaults options

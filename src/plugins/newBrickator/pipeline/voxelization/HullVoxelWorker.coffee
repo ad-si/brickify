@@ -20,12 +20,9 @@ module.exports =
 		}
 		return
 
-	_voxelizePolygon: (p0, p1, p2, dZ, lineStepSize, grid) ->
+	_voxelizePolygon: (p0, p1, p2, direction, lineStepSize, grid) ->
 	# transform model coordinates to voxel coordinates
 	# (object may be moved/rotated)
-
-	#store information for filling solids
-		direction = dZ
 
 		l0len = @_getLength p0, p1
 		l1len = @_getLength p1, p2
@@ -129,7 +126,7 @@ module.exports =
 		z: Math.round z
 		}
 
-	_getGreatestZInVoxel: (a, b, {x: x, y: y, z: z}) ->
+	_getGreatestZInVoxel: (a, b, {x, y, z}) ->
 		roundA = @_roundVoxelSpaceToVoxel a
 		roundB = @_roundVoxelSpaceToVoxel b
 
@@ -146,37 +143,42 @@ module.exports =
 		d = x: b.x - a.x, y: b.y - a.y, z: b.z - a.z
 
 		if d.z is 0
-	# return the value that must be the greatest z in voxel --> a.z == b.z
+		# Return the value that must be the greatest z in voxel --> a.z == b.z
 			return a.z
+
+		minZ = z - 0.5
+		maxZ = z + 0.5
 
 		if d.x isnt 0
 			k = (x - 0.5 - a.x) / d.x
 			if 0 <= k <= 1
-				return a.z + k * d.z
+				zValue = a.z + k * d.z
+				return zValue if minZ <= zValue <= maxZ
 
 			k = (x + 0.5 - a.x) / d.x
 			if 0 <= k <= 1
-				return a.z + k * d.z
+				zValue = a.z + k * d.z
+				return zValue if minZ <= zValue <= maxZ
 
 		if d.y isnt 0
 			k = (y - 0.5 - a.y) / d.y
 			if 0 <= k <= 1
-				return a.z + k * d.z
+				zValue = a.z + k * d.z
+				return zValue if minZ <= zValue <= maxZ
 
 			k = (y + 0.5 - a.y) / d.y
 			if 0 <= k <= 1
-				return a.z + k * d.z
+				zValue = a.z + k * d.z
+				return zValue if minZ <= zValue <= maxZ
 
 		if d.z isnt 0
-			minZ = z - 0.5
-			k = (minZ - a.z) / d.z
-			if 0 <= k <= 1
-				return minZ
-
-			maxZ = z + 0.5
 			k = (maxZ - a.z) / d.z
 			if 0 <= k <= 1
 				return maxZ
+
+			k = (minZ - a.z) / d.z
+			if 0 <= k <= 1
+				return minZ
 
 	_setVoxel: ({x: x, y: y, z: z}, zValue, direction, grid) ->
 		grid[x] = [] unless grid[x]

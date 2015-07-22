@@ -2,26 +2,26 @@ class Undo
 	constructor: ->
 		@clear()
 
-	addAction: (undo, redo) =>
+	addTask: (undo, redo) =>
 		action = {undo, redo}
-		@undo.append action
-		@redo = []
+		@undoTasks.append action
+		@redoTasks = []
 		return
 
 	undo: =>
-		action = @undo.pop()
+		action = @undoTasks.pop()
 		return unless action?
 
-		@redo.append action
+		@redoTasks.append action
 		action.undo()
 
 		return
 
 	redo: =>
-		action = @redo.pop()
+		action = @redoTasks.pop()
 		return unless action?
 
-		@undo.append action
+		@undoTasks.append action
 		action.redo()
 
 		return
@@ -44,7 +44,7 @@ class Undo
 		}
 
 	clear: =>
-		@undo = []
-		@redo = []
+		@undoTasks = []
+		@redoTasks = []
 
 module.exports = Undo

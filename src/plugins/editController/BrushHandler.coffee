@@ -124,10 +124,18 @@ class BrushHandler
 			changedVoxels = cachedData.brickVisualization.makeAllVoxelsLego node
 			return if changedVoxels.length is 0
 			piwikTracking.trackEvent 'Editor', 'BrushAction', 'MakeEverythingLego'
-			@editController.rerunLegoPipeline node
-			brickVis = cachedData.brickVisualization
-			brickVis.updateModifiedVoxels()
-			brickVis.updateVisualization(null, true)
+			do apply = =>
+				@editController.rerunLegoPipeline node
+				brickVis = cachedData.brickVisualization
+				brickVis.updateModifiedVoxels()
+				brickVis.updateVisualization(null, true)
+
+			action = @_buildAction changedVoxels, node, cachedData
+			redo = =>
+				cachedData.brickVisualization.makeAllVoxelsLego node
+				apply()
+			@undo?.addTask action.toPrint, redo
+
 
 	_printDown: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
@@ -184,5 +192,8 @@ class BrushHandler
 			@editController.relayoutModifiedParts(
 				node, cachedData, changedVoxels, true
 			)
+
+			action = @_buildAction changedVoxels, node, cachedData
+			@undo?.addTask action.toLego, action.toPrint
 
 module.exports = BrushHandler

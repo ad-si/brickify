@@ -1,7 +1,6 @@
 class Undo
 	constructor: ->
-		@undo = []
-		@redo = []
+		@clear()
 
 	addAction: (undo, redo) =>
 		action = {undo, redo}
@@ -43,5 +42,9 @@ class Undo
 			}
 		]
 		}
+
+	clear: =>
+		@undo = []
+		@redo = []
 
 module.exports = Undo

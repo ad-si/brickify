@@ -118,12 +118,13 @@ class BrushHandler
 			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
-	_everythingLego: (selectedNode) =>
-		@nodeVisualizer._getCachedData selectedNode
+	_everythingLego: (node) =>
+		@nodeVisualizer._getCachedData node
 		.then (cachedData) =>
-			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
+			changedVoxels = cachedData.brickVisualization.makeAllVoxelsLego node
+			return if changedVoxels.length is 0
 			piwikTracking.trackEvent 'Editor', 'BrushAction', 'MakeEverythingLego'
-			@editController.rerunLegoPipeline selectedNode
+			@editController.rerunLegoPipeline node
 			brickVis = cachedData.brickVisualization
 			brickVis.updateModifiedVoxels()
 			brickVis.updateVisualization(null, true)

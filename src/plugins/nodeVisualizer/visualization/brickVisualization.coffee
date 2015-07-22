@@ -336,18 +336,14 @@ class BrickVisualization
 		return voxels
 
 	###
-	# @return {Boolean} true if anything changed, false otherwise
+	# @return {Array} the list of changed voxels
 	###
 	makeAllVoxels3dPrinted: (selectedNode) =>
-		voxels = @voxelSelector.getAllVoxels(selectedNode)
-		@printVoxels = []
-		changedVoxels = []
-		for voxel in voxels
-			changedVoxels.push voxel if voxel.isLego()
-			voxel.make3dPrinted()
-			@printVoxels.push voxel
+		@printVoxels = @voxelSelector.getAllVoxels(selectedNode)
+		legoVoxels = @printVoxels.filter (voxel) -> voxel.isLego()
+		legoVoxels.map (voxel) -> voxel.make3dPrinted()
 		@voxelSelector.clearSelection()
-		return changedVoxels
+		return legoVoxels
 
 	resetTouchedVoxelsToLego: =>
 		voxel.makeLego() for voxel in @voxelSelector.touchedVoxels
@@ -380,17 +376,14 @@ class BrickVisualization
 		return voxels
 
 	###
-	# @return {Boolean} true if anything changed, false otherwise
+	# @return {Array} the list of changed voxels
 	###
 	makeAllVoxelsLego: (selectedNode) =>
-		voxels = @voxelSelector.getAllVoxels(selectedNode)
-		everythingLego = true
+		printVoxels = @printVoxels
 		@printVoxels = []
-		for voxel in voxels
-			everythingLego = everythingLego && voxel.isLego()
-			voxel.makeLego()
+		printVoxels.map (voxel) -> voxel.makeLego()
 		@voxelSelector.clearSelection()
-		return !everythingLego
+		return printVoxels
 
 	resetTouchedVoxelsTo3dPrinted: =>
 		voxel.make3dPrinted() for voxel in @voxelSelector.touchedVoxels

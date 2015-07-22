@@ -149,11 +149,11 @@ initializeWizard = ($modal) ->
 			applyCurrentWizardStep()
 			updateButtonCaptions()
 
-	setHoleImageToSelectValue = () ->
+	setHoleImageToSelectValue = ->
 		id = $wizardHoleSizeSelect.find('option:selected').html()
 		$wizardHoleImage.attr 'src', "img/testStripWizard/holes/#{id}.png"
 
-	setStudImageToSelectValue = () ->
+	setStudImageToSelectValue = ->
 		id = $wizardStudSizeSelect.find('option:selected').html()
 		$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
 
@@ -165,10 +165,10 @@ initializeWizard = ($modal) ->
 		setStudImageToSelectValue()
 
 	# Reset image when leaving the selection area
-	$wizardTextOverlayHole.mouseleave () ->
+	$wizardTextOverlayHole.mouseleave ->
 		setHoleImageToSelectValue()
 
-	$wizardTextOverlayStud.mouseleave () ->
+	$wizardTextOverlayStud.mouseleave ->
 		setStudImageToSelectValue()
 
 	# Fade out size select, start wizard on click

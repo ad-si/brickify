@@ -2,6 +2,9 @@ class Undo
 	constructor: ->
 		@clear()
 
+	onNodeRemove: =>
+		@clear()
+
 	addTask: (undo, redo) =>
 		action = {undo, redo}
 		@undoTasks.push action

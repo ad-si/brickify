@@ -4,7 +4,7 @@ class Undo
 
 	addTask: (undo, redo) =>
 		action = {undo, redo}
-		@undoTasks.append action
+		@undoTasks.push action
 		@redoTasks = []
 		return
 
@@ -12,7 +12,7 @@ class Undo
 		action = @undoTasks.pop()
 		return unless action?
 
-		@redoTasks.append action
+		@redoTasks.push action
 		action.undo()
 
 		return
@@ -21,7 +21,7 @@ class Undo
 		action = @redoTasks.pop()
 		return unless action?
 
-		@undoTasks.append action
+		@undoTasks.push action
 		action.redo()
 
 		return

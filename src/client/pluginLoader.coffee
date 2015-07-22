@@ -50,6 +50,11 @@ module.exports = class PluginLoader
 				require '../plugins/dummy'
 				require '../plugins/dummy/package.json'
 			)
+		if @globalConfig.plugins.undo
+			@pluginInstances.push @_loadPlugin(
+				require '../plugins/undo'
+				require '../plugins/undo/package.json'
+			)
 		if @globalConfig.plugins.coordinateSystem
 			@pluginInstances.push @_loadPlugin(
 				require '../plugins/coordinateSystem'

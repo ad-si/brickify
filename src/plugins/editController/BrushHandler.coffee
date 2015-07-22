@@ -4,7 +4,6 @@ piwikTracking = require '../../client/piwikTracking'
 class BrushHandler
 	constructor: ( @bundle, @nodeVisualizer, @editController ) ->
 		@undo = @bundle.getPlugin 'undo'
-		console.log @undo
 
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
@@ -59,11 +58,17 @@ class BrushHandler
 
 	_buildAction: (touchedVoxels, selectedNode, cachedData) =>
 		toLego = =>
-			voxel.makeLego() for voxel in touchedVoxels
+			for voxel in touchedVoxels
+				voxel.makeLego()
+				cachedData.brickVisualization.voxelSelector.touch voxel
+			cachedData.brickVisualization.updateModifiedVoxels()
 			@_applyChanges touchedVoxels, selectedNode, cachedData
 
 		toPrint = =>
-			voxel.make3dPrinted() for voxel in touchedVoxels
+			for voxel in touchedVoxels
+				voxel.make3dPrinted()
+				cachedData.brickVisualization.voxelSelector.touch voxel
+			cachedData.brickVisualization.updateModifiedVoxels()
 			@_applyChanges touchedVoxels, selectedNode, cachedData
 
 		return { toLego, toPrint }

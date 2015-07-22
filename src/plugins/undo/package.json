@@ -1,0 +1,9 @@
+{
+  "name": "undo",
+  "version": "0.1.0",
+  "description": "Collects and executes undo/redo actions",
+  "brickify": {
+    "type": "controller"
+  },
+  "browser": "./undo.coffee"
+}

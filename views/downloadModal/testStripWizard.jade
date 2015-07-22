@@ -34,8 +34,8 @@ h4.disabled Download stl for 3d printer
 			area(shape="circle" coords="188, 277, 61" id='B')
 			area(shape="circle" coords="314, 200, 61" id='A')
 
-		img(src='img/testStripWizard/studs/textOverlay.png' usemap='#textMap')
-		img(src='img/testStripWizard/studs/E.png' usemap='#textMap' id='wizardStudImage')
+		img(src='img/testStripWizard/studs/textOverlay.png' usemap='#textMap' id='wizardTextOverlayStud')
+		img(src='img/testStripWizard/studs/E.png' usemap='#textMap' id='wizardStudImage' onmouseleave="alert('leave2');")
 
 	p.wizardSelect This size fits best:
 		select.form-control#wizardStudSizeSelect
@@ -55,7 +55,7 @@ h4.disabled Download stl for 3d printer
 			area(shape="circle" coords="189, 294, 61" id='1')
 			area(shape="circle" coords="310, 209, 61" id='0')
 
-		img(src='img/testStripWizard/holes/numberOverlay.png' usemap='#numberMap')
+		img(src='img/testStripWizard/holes/numberOverlay.png' usemap='#numberMap' id='wizardTextOverlayHole')
 		img(src='img/testStripWizard/holes/5.png' usemap='#numberMap' id='wizardHoleImage')
 
 	p.wizardSelect.clear This size fits best:

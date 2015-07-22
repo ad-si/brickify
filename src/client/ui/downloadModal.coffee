@@ -21,6 +21,8 @@ $wizardHoleSizeSelect = undefined
 $wizardStudSizeSelect = undefined
 $wizardStudImage = undefined
 $wizardHoleImage = undefined
+$wizardTextOverlayStud = undefined
+$wizardTextOverlayHole = undefined
 $studSizeSelect = undefined
 $holeSizeSelect = undefined
 $wizardStepObjects = undefined
@@ -147,14 +149,27 @@ initializeWizard = ($modal) ->
 			applyCurrentWizardStep()
 			updateButtonCaptions()
 
-	# Update image on selection change
-	$wizardHoleSizeSelect.on 'change', ->
+	setHoleImageToSelectValue = () ->
 		id = $wizardHoleSizeSelect.find('option:selected').html()
 		$wizardHoleImage.attr 'src', "img/testStripWizard/holes/#{id}.png"
 
-	$wizardStudSizeSelect.on 'change', ->
+	setStudImageToSelectValue = () ->
 		id = $wizardStudSizeSelect.find('option:selected').html()
 		$wizardStudImage.attr 'src', "img/testStripWizard/studs/#{id}.png"
+
+	# Update image on selection change
+	$wizardHoleSizeSelect.on 'change', ->
+		setHoleImageToSelectValue()
+
+	$wizardStudSizeSelect.on 'change', ->
+		setStudImageToSelectValue()
+
+	# Reset image when leaving the selection area
+	$wizardTextOverlayHole.mouseleave () ->
+		setHoleImageToSelectValue()
+
+	$wizardTextOverlayStud.mouseleave () ->
+		setStudImageToSelectValue()
 
 	# Fade out size select, start wizard on click
 	$startWizard.click ->
@@ -169,6 +184,8 @@ initializeWizard = ($modal) ->
 initializeImageMaps = ($modal) ->
 	$wizardStudImage = $modal.find '#wizardStudImage'
 	$wizardHoleImage = $modal.find '#wizardHoleImage'
+	$wizardTextOverlayHole = $modal.find '#wizardTextOverlayHole'
+	$wizardTextOverlayStud = $modal.find '#wizardTextOverlayStud'
 
 	$textMap = $modal.find('#textMap')
 	$textMap.imageMapResize()

@@ -1,33 +1,58 @@
+nullData =
+	undoTasks: []
+	redoTasks: []
+
+nullNode =
+	getPluginData: -> Promise.resolve nullData
+
 class Undo
 	constructor: ->
-		@clear()
+		@currentNode = nullNode
 
-	onNodeRemove: =>
-		@clear()
+	onNodeAdd: (node) =>
+		nodeData =
+			undoTasks: []
+			redoTasks: []
+		node.storePluginData 'undo', nodeData
+		@currentNode = node
+		return
+
+	onNodeSelect: (node) =>
+		@currentNode = node
+		return
+
+	onNodeDeselect: =>
+		@currentNode = nullNode
+		return
+
+	onNodeRemove: (node) =>
+		if node is @currentNode
+			@currentNode = nullNode
+		return
 
 	addTask: (undo, redo) =>
-		action = {undo, redo}
-		@undoTasks.push action
-		@redoTasks = []
-		return
+		@currentNode.getPluginData 'undo'
+		.then ({undoTasks, redoTasks}) ->
+			undoTasks.push {undo, redo}
+			redoTasks = []
 
 	undo: =>
-		action = @undoTasks.pop()
-		return unless action?
+		@currentNode.getPluginData 'undo'
+		.then ({undoTasks, redoTasks}) ->
+			action = undoTasks.pop()
+			return unless action?
 
-		@redoTasks.push action
-		action.undo()
-
-		return
+			redoTasks.push action
+			action.undo()
 
 	redo: =>
-		action = @redoTasks.pop()
-		return unless action?
+		@currentNode.getPluginData 'undo'
+		.then ({undoTasks, redoTasks}) ->
+			action = redoTasks.pop()
+			return unless action?
 
-		@undoTasks.push action
-		action.redo()
-
-		return
+			undoTasks.push action
+			action.redo()
 
 	getHotkeys: =>
 		return {
@@ -45,9 +70,5 @@ class Undo
 			}
 		]
 		}
-
-	clear: =>
-		@undoTasks = []
-		@redoTasks = []
 
 module.exports = Undo

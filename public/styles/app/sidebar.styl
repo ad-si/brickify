@@ -6,6 +6,7 @@
 	top 0
 	left 0
 	user-select none
+	cursor default
 
 	.navbar-toggle
 		margin-top 5px
@@ -43,6 +44,13 @@
 			top -5px
 
 	#editGroup
+		#editControls
+			float right
+			span
+				cursor pointer
+				margin-left 5px
+			span.disabled
+				cursor inherit
 		#brushContainer
 			.bigBrush
 				border-top-width 1px

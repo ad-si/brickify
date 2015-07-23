@@ -3,6 +3,8 @@ piwikTracking = require '../../client/piwikTracking'
 
 class BrushHandler
 	constructor: ( @bundle, @nodeVisualizer, @editController ) ->
+		@undo = @bundle.getPlugin 'undo'
+
 		@highlightMaterial = new THREE.MeshLambertMaterial({
 			color: 0x00ff00
 		})
@@ -45,6 +47,32 @@ class BrushHandler
 		return if @editController.interactionDisabled
 		@nodeVisualizer.setDisplayMode selectedNode, 'printBrush'
 
+	_applyChanges: (touchedVoxels, selectedNode, cachedData) =>
+		return unless touchedVoxels.length > 0
+		log.debug "Will re-layout #{touchedVoxels.length} voxel"
+
+		@editController.relayoutModifiedParts(
+			selectedNode, cachedData, touchedVoxels, true
+		)
+		cachedData.brickVisualization.unhighlightBigBrush()
+
+	_buildAction: (touchedVoxels, selectedNode, cachedData) =>
+		toLego = =>
+			for voxel in touchedVoxels
+				voxel.makeLego()
+				cachedData.brickVisualization.voxelSelector.touch voxel
+			cachedData.brickVisualization.updateModifiedVoxels()
+			@_applyChanges touchedVoxels, selectedNode, cachedData
+
+		toPrint = =>
+			for voxel in touchedVoxels
+				voxel.make3dPrinted()
+				cachedData.brickVisualization.voxelSelector.touch voxel
+			cachedData.brickVisualization.updateModifiedVoxels()
+			@_applyChanges touchedVoxels, selectedNode, cachedData
+
+		return { toLego, toPrint }
+
 	_legoDown: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
 		.then (cachedData) =>
@@ -68,15 +96,14 @@ class BrushHandler
 
 			brush = 'LegoBrush'
 			brush += 'Big' if @bigBrushSelected
-			piwikTracking.trackEvent 'Editor', 'BrushAction', brush, touchedVoxels.length
-
-			return unless touchedVoxels.length > 0
-			log.debug "Will re-layout #{touchedVoxels.length} voxel"
-
-			@editController.relayoutModifiedParts(
-				selectedNode, cachedData, touchedVoxels, true
+			piwikTracking.trackEvent(
+				'Editor', 'BrushAction', brush, touchedVoxels.length
 			)
-			cachedData.brickVisualization.unhighlightBigBrush()
+
+			@_applyChanges touchedVoxels, selectedNode, cachedData
+
+			action = @_buildAction touchedVoxels, selectedNode, cachedData
+			@undo?.addTask action.toPrint, action.toLego
 
 	_legoHover: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
@@ -91,15 +118,24 @@ class BrushHandler
 			cachedData.brickVisualization.updateVisualization()
 			cachedData.brickVisualization.unhighlightBigBrush()
 
-	_everythingLego: (selectedNode) =>
-		@nodeVisualizer._getCachedData selectedNode
+	_everythingLego: (node) =>
+		@nodeVisualizer._getCachedData node
 		.then (cachedData) =>
-			return unless cachedData.brickVisualization.makeAllVoxelsLego selectedNode
+			changedVoxels = cachedData.brickVisualization.makeAllVoxelsLego node
+			return if changedVoxels.length is 0
 			piwikTracking.trackEvent 'Editor', 'BrushAction', 'MakeEverythingLego'
-			@editController.rerunLegoPipeline selectedNode
-			brickVis = cachedData.brickVisualization
-			brickVis.updateModifiedVoxels()
-			brickVis.updateVisualization(null, true)
+			do apply = =>
+				@editController.rerunLegoPipeline node
+				brickVis = cachedData.brickVisualization
+				brickVis.updateModifiedVoxels()
+				brickVis.updateVisualization(null, true)
+
+			action = @_buildAction changedVoxels, node, cachedData
+			redo = =>
+				cachedData.brickVisualization.makeAllVoxelsLego node
+				apply()
+			@undo?.addTask action.toPrint, redo
+
 
 	_printDown: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
@@ -128,13 +164,10 @@ class BrushHandler
 				'Editor', 'BrushAction',  brush, touchedVoxels.length
 			)
 
-			return unless touchedVoxels.length > 0
-			log.debug "Will re-layout #{touchedVoxels.length} voxel"
+			@_applyChanges touchedVoxels, selectedNode, cachedData
 
-			@editController.relayoutModifiedParts(
-				selectedNode, cachedData, touchedVoxels, true
-			)
-			cachedData.brickVisualization.unhighlightBigBrush()
+			action = @_buildAction touchedVoxels, selectedNode, cachedData
+			@undo?.addTask action.toLego, action.toPrint
 
 	_printHover: (event, selectedNode) =>
 		@nodeVisualizer._getCachedData selectedNode
@@ -159,5 +192,8 @@ class BrushHandler
 			@editController.relayoutModifiedParts(
 				node, cachedData, changedVoxels, true
 			)
+
+			action = @_buildAction changedVoxels, node, cachedData
+			@undo?.addTask action.toLego, action.toPrint
 
 module.exports = BrushHandler

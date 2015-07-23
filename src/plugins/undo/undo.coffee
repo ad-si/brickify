@@ -34,7 +34,7 @@ class Undo
 		@currentNode.getPluginData 'undo'
 		.then ({undoTasks, redoTasks}) ->
 			undoTasks.push {undo, redo}
-			redoTasks = []
+			redoTasks.length = 0
 
 	undo: =>
 		@currentNode.getPluginData 'undo'

@@ -17,6 +17,7 @@ globalConfig.staticRendererWidth = 388
 globalConfig.staticRendererHeight = 300
 globalConfig.buildUi = false
 globalConfig.plugins.dummy = false
+globalConfig.plugins.undo = false
 globalConfig.plugins.coordinateSystem = false
 globalConfig.plugins.legoBoard = false
 globalConfig.plugins.editController = false

@@ -34,6 +34,8 @@ class Renderer
 			}
 
 	localRenderer: (timestamp) =>
+		@_updateSize()
+
 		if @imageRenderQueries.length == 0
 			@_renderFrame timestamp, @camera, null
 		else
@@ -238,7 +240,7 @@ class Renderer
 		if not @staticRendererSize
 			@camera.aspect = @size().width / @size().height
 			@camera.updateProjectionMatrix()
-			@threeRenderer.setSize @size().width, @size().height
+			@_updateSize true
 
 		@threeRenderer.render @scene, @camera
 
@@ -294,8 +296,14 @@ class Renderer
 		else
 			@threeRenderer.hasStencilBuffer = true
 
-		@threeRenderer.setSize @size().width, @size().height
 		@threeRenderer.autoClear = false
+
+	_updateSize: (forceUpdate) ->
+		devicePixelRatio = window.devicePixelRatio || 1
+		if forceUpdate or devicePixelRatio isnt @devicePixelRatio
+			@devicePixelRatio = devicePixelRatio
+			@threeRenderer.setPixelRatio devicePixelRatio
+			@threeRenderer.setSize @size().width, @size().height
 
 	_setupScene: (globalConfig) ->
 		scene = new THREE.Scene()

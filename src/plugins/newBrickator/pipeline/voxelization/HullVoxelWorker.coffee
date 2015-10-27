@@ -89,10 +89,13 @@ module.exports =
 	###
 	# Voxelizes the line from a to b. Stores data in each generated voxel.
 	#
-	# @param a point the start point of the line
-	# @param b point the end point of the line
-	# @param voxelData Object data to store in the voxel grid for each voxel
-	# @param stepSize Number the stepSize to use for sampling the line
+	# @param {point} a the start point of the line
+	# @param {point} b the end point of the line
+	# @param {Number} direction direction value that is associated with the face
+	# that this line is part of. Refer to HullVoxelizer.coffee to see how this
+	# value is computed.
+	# @param {Number} stepSize the stepSize to use for sampling the line
+	# @param {Array} grid the voxel grid
 	###
 	_voxelizeLine: (a, b, direction, stepSize, grid) ->
 		length = @_getLength a, b

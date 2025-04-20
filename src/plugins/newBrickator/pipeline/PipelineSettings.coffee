@@ -32,4 +32,3 @@ module.exports = class PipelineSettings
 
 	setModelTransform: (transformMatrix) =>
 		@modelTransform = transformMatrix
-

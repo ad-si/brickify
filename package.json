@@ -1,14 +1,33 @@
 {
-  "name": "Brickify",
+  "name": "brickify",
   "version": "0.11.0",
   "description": "Faster 3D-printing with LEGO bricks",
+  "private": true,
   "keywords": [
     "fabrication",
     "3d printing",
-    "lego"
+    "3d modeling",
+    "lego",
+    "cad",
+    "diy"
   ],
   "homepage": "http://brickify.it",
   "bugs": "http://github.com/brickify/brickify/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/brickify/brickify.git"
+  },
+  "contributors": [
+    "Adrian Sieber",
+    "Arthur Silber",
+    "Johannes Deselaers",
+    "Stefan Neubert",
+    "Yannis Kommana"
+  ],
+  "license": "All rights reserved",
+  "scripts": {
+    "prepublish": "make prepublish"
+  },
   "dependencies": {
     "PEP": "brickify/PEP#0.3.1",
     "array.prototype.find": "^1.0.0",
@@ -78,44 +97,5 @@
     "karma-cli": "0.0.4",
     "karma-mocha": "^0.1.10",
     "mocha": "^2.1.0"
-  },
-  "scripts": {
-    "build": "./node_modules/.bin/cake build",
-    "clean": "./node_modules/.bin/cake clean",
-    "start": "./node_modules/.bin/cake start",
-    "linkHooks": "./node_modules/.bin/cake linkHooks",
-    "checkStyle": "./node_modules/.bin/coffeelint Cakefile .",
-    "apiDocumentation": "./node_modules/.bin/crojsdoc -o apidoc src/**/*.coffee",
-    "documentation": "./node_modules/.bin/groc",
-    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register --recursive",
-    "testClient": "./node_modules/.bin/karma start",
-    "prepublish": "npm test && npm run checkStyle"
-  },
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/brickify/brickify.git"
-  },
-  "author": "HPI HCI-Bachelorprojekt 2014",
-  "contributors": [
-    {
-      "name": "Adrian Sieber"
-    },
-    {
-      "name": "Arthur Silber"
-    },
-    {
-      "name": "Johannes Deselaers"
-    },
-    {
-      "name": "Stefan Neubert"
-    },
-    {
-      "name": "Yannis Kommana"
-    }
-  ],
-  "license": "All rights reserved",
-  "private": true,
-  "engines": {
-    "node": "~0.12.0"
   }
 }

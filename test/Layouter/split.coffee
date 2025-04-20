@@ -32,4 +32,3 @@ describe 'brickLayouter split', ->
 		#expect to be more than 1 brick
 		bricks = grid.getAllBricks()
 		expect(bricks.size > 1).to.equal(true)
-

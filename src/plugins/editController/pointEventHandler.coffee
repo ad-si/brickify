@@ -68,4 +68,3 @@ class PointEventHandler
 		return false
 
 module.exports = PointEventHandler
-

@@ -61,4 +61,3 @@ module.exports = class PluginHooks
 		if @hasHook plugin, hook
 			index = @lists[hook].indexOf plugin[hook]
 			@lists[hook].splice index, 1 if index != -1
-

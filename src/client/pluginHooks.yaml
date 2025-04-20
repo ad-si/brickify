@@ -98,14 +98,14 @@
 # each brush should have the json structure like in this example:
 #
 # {
-#	text: 'Make Lego'
-#	onBrushSelect: # when the brush is selected, selectedNode as argument
-#	onBrushDeselect: # when the brush is deselected
-#	onBrushDown: # when a node is selected and mouse is pressed
-#	onBrushMove: # after being pressed, when mouse is moved
-#	onBrushOver: # when the mouse is moved, but not pressed
-#	onBrushUp: # when mouse is released
-#	onBrushCancel: # when interaction is canceled (ESC, two buttons pressed)
+# text: 'Make Lego'
+# onBrushSelect: # when the brush is selected, selectedNode as argument
+# onBrushDeselect: # when the brush is deselected
+# onBrushDown: # when a node is selected and mouse is pressed
+# onBrushMove: # after being pressed, when mouse is moved
+# onBrushOver: # when the mouse is moved, but not pressed
+# onBrushUp: # when mouse is released
+# onBrushCancel: # when interaction is canceled (ESC, two buttons pressed)
 # }
 #
 

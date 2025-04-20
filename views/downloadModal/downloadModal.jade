@@ -1,19 +1,19 @@
 #downloadModal(tabindex='-1').modal.fade
-	.modal-dialog
-		.modal-content
-			.modal-header
-				button(data-dismiss='modal').close &#215;
-				h4.modal-title.disabled Download
-			.modal-body
-				#testStripContent
-					include testStripWizard.jade
-				#stlContent
-					.btn.btn-success.btn-block.disabled#stlDownloadButton.
-						Download stl for 3D printer
-				#legoContent
-					h4.disabled Download instructions
-					.btn.btn-success.btn-block.disabled#downloadInstructionsButton.
-						Download LEGO instructions and scad file
-			.modal-footer
-				button(data-dismiss='modal').btn.btn-primary.disabled Close
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button(data-dismiss='modal').close &#215;
+        h4.modal-title.disabled Download
+      .modal-body
+        #testStripContent
+          include testStripWizard.jade
+        #stlContent
+          .btn.btn-success.btn-block.disabled#stlDownloadButton.
+            Download stl for 3D printer
+        #legoContent
+          h4.disabled Download instructions
+          .btn.btn-success.btn-block.disabled#downloadInstructionsButton.
+            Download LEGO instructions and scad file
+      .modal-footer
+        button(data-dismiss='modal').btn.btn-primary.disabled Close
 

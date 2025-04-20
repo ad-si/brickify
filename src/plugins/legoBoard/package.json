@@ -2,8 +2,9 @@
   "name": "lego-board",
   "version": "0.1.0",
   "description": "Lego board as a workspace surface",
+  "type": "module",
   "brickify": {
     "type": "renderer"
   },
-  "browser": "./LegoBoard.coffee"
+  "browser": "./LegoBoard.js"
 }

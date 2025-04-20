@@ -45,9 +45,9 @@ module Brick(size){
                     tz = 0;
                     translate([tx, ty, tz - brickSpacing.z]){
                         cylinder(
-                        	r = holeRadius,
-                        	h = 2 + brickSpacing.z,
-                        	$fs = 0.5
+                          r = holeRadius,
+                          h = 2 + brickSpacing.z,
+                          $fs = 0.5
                         );
                     }
                 }

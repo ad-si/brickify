@@ -1,126 +1,126 @@
 extends ../rootLayout
 
 block styles
-	link(rel='stylesheet', href='/styles/screen.css')
+  link(rel='stylesheet', href='/styles/screen.css')
 
 block body
-	.container
+  .container
 
-		h1: a(href='/') brickify
+    h1: a(href='/') brickify
 
-		h2 Imprint
+    h2 Imprint
 
-		h4 Angaben gemäß § 5 TMG:
+    h4 Angaben gemäß § 5 TMG:
 
-		p
-			| Hasso-Plattner-Institut für Softwaresystemtechnik GmbH
-			br
-			| Chair for Human Computer Interaction
-			br
-			| Prof.-Dr.-Helmert-Str. 2-3
-			br
-			| 14482 Potsdam
-			br
+    p
+      | Hasso-Plattner-Institut für Softwaresystemtechnik GmbH
+      br
+      | Chair for Human Computer Interaction
+      br
+      | Prof.-Dr.-Helmert-Str. 2-3
+      br
+      | 14482 Potsdam
+      br
 
-		h4 Vertreten durch:
-		p Geschäftsführer Prof. Dr. Christoph Meinel
+    h4 Vertreten durch:
+    p Geschäftsführer Prof. Dr. Christoph Meinel
 
-		h4 Inhaltliche Verantwortung
-		p Prof. Dr. Patrick Baudisch
+    h4 Inhaltliche Verantwortung
+    p Prof. Dr. Patrick Baudisch
 
-		h4 Kontakt:
-		p
-			| Telefon: +4933155090
-			br
-			| Telefax: +493315509129
-			br
-			= 'E-Mail: '
-			script.
-				var mailString = '%74%6b%6d%61%79%31%37%3d%5b%27%' +
-								'25%36%33%25%36%66%25%36%65%25%37%' +
-								'34%25%36%31%25%36%33%25%37%34%27%' +
-								'2c%5b%27%25%36%39%25%37%34%27%2c%' +
-								'27%25%36%32%25%37%32%25%36%39%25%' +
-								'36%33%25%36%62%25%36%39%25%36%36%' +
-								'25%37%39%27%5d%2e%72%65%76%65%72%' +
-								'73%65%28%29%2e%6a%6f%69%6e%28%27%' +
-								'2e%27%29%5d%2e%6a%6f%69%6e%28%27%' +
-								'40%27%29%3b%6a%76%61%71%68%39%36%' +
-								'3d%75%6e%65%73%63%61%70%65%28%74%' +
-								'6b%6d%61%79%31%37%29%3b%64%6f%63%' +
-								'75%6d%65%6e%74%2e%77%72%69%74%65%' +
-								'28%6a%76%61%71%68%39%36%2e%6c%69%' +
-								'6e%6b%28%27%6d%61%69%27%2b%27%6c%' +
-								'74%6f%3a%27%2b%74%6b%6d%61%79%31%' +
-								'37%29%29%3b'
-				eval(decodeURIComponent(mailString))
-			br
+    h4 Kontakt:
+    p
+      | Telefon: +4933155090
+      br
+      | Telefax: +493315509129
+      br
+      = 'E-Mail: '
+      script.
+        var mailString = '%74%6b%6d%61%79%31%37%3d%5b%27%' +
+                '25%36%33%25%36%66%25%36%65%25%37%' +
+                '34%25%36%31%25%36%33%25%37%34%27%' +
+                '2c%5b%27%25%36%39%25%37%34%27%2c%' +
+                '27%25%36%32%25%37%32%25%36%39%25%' +
+                '36%33%25%36%62%25%36%39%25%36%36%' +
+                '25%37%39%27%5d%2e%72%65%76%65%72%' +
+                '73%65%28%29%2e%6a%6f%69%6e%28%27%' +
+                '2e%27%29%5d%2e%6a%6f%69%6e%28%27%' +
+                '40%27%29%3b%6a%76%61%71%68%39%36%' +
+                '3d%75%6e%65%73%63%61%70%65%28%74%' +
+                '6b%6d%61%79%31%37%29%3b%64%6f%63%' +
+                '75%6d%65%6e%74%2e%77%72%69%74%65%' +
+                '28%6a%76%61%71%68%39%36%2e%6c%69%' +
+                '6e%6b%28%27%6d%61%69%27%2b%27%6c%' +
+                '74%6f%3a%27%2b%74%6b%6d%61%79%31%' +
+                '37%29%29%3b'
+        eval(decodeURIComponent(mailString))
+      br
 
-		h4 Registereintrag:
-		p
-			| Eintragung im Handelsregister.
-			br
-			| Registergericht: Amtsgericht Potsdam
-			br
-			| Registernummer: HRB 12184
-			br
-			| Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz:
-			| DE812987194
-			br
+    h4 Registereintrag:
+    p
+      | Eintragung im Handelsregister.
+      br
+      | Registergericht: Amtsgericht Potsdam
+      br
+      | Registernummer: HRB 12184
+      br
+      | Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz:
+      | DE812987194
+      br
 
-		h4 Haftungsausschluss (Disclaimer)
-		p Haftung für Inhalte
+    h4 Haftungsausschluss (Disclaimer)
+    p Haftung für Inhalte
 
-		p.
-			Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene
-			Inhalte auf diesen Seiten nach den allgemeinen Gesetzen
-			verantwortlich.
-			Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht
-			verpflichtet, übermittelte oder gespeicherte fremde Informationen
-			zu überwachen oder nach Umständen zu forschen,
-			die auf eine rechtswidrige Tätigkeit hinweisen.
-			Verpflichtungen zur Entfernung oder Sperrung der Nutzung von
-			Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt.
-			Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt
-			der Kenntnis einer konkreten Rechtsverletzung möglich.
-			Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir
-			diese Inhalte umgehend entfernen.
+    p.
+      Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene
+      Inhalte auf diesen Seiten nach den allgemeinen Gesetzen
+      verantwortlich.
+      Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht
+      verpflichtet, übermittelte oder gespeicherte fremde Informationen
+      zu überwachen oder nach Umständen zu forschen,
+      die auf eine rechtswidrige Tätigkeit hinweisen.
+      Verpflichtungen zur Entfernung oder Sperrung der Nutzung von
+      Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt.
+      Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt
+      der Kenntnis einer konkreten Rechtsverletzung möglich.
+      Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir
+      diese Inhalte umgehend entfernen.
 
-		p Haftung für Links
+    p Haftung für Links
 
-		p.
-			Unser Angebot enthält Links zu externen Webseiten Dritter,
-			auf deren Inhalte wir keinen Einfluss haben.
-			Deshalb können wir für diese fremden Inhalte
-			auch keine Gewähr übernehmen.
-			Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter
-			oder Betreiber der Seiten verantwortlich.
-			Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche
-			Rechtsverstöße überprüft.
-			Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.
-			Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch
-			ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar.
-			Bei Bekanntwerden von Rechtsverletzungen werden wir
-			derartige Links umgehend entfernen.
+    p.
+      Unser Angebot enthält Links zu externen Webseiten Dritter,
+      auf deren Inhalte wir keinen Einfluss haben.
+      Deshalb können wir für diese fremden Inhalte
+      auch keine Gewähr übernehmen.
+      Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter
+      oder Betreiber der Seiten verantwortlich.
+      Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche
+      Rechtsverstöße überprüft.
+      Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.
+      Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch
+      ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar.
+      Bei Bekanntwerden von Rechtsverletzungen werden wir
+      derartige Links umgehend entfernen.
 
-		p Urheberrecht
+    p Urheberrecht
 
-		p.
-			Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen
-			Seiten unterliegen dem deutschen Urheberrecht.
-			Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der
-			Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der
-			schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
-			Downloads und Kopien dieser Seite sind nur für den privaten,
-			nicht kommerziellen Gebrauch gestattet.
-			Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden,
-			werden die Urheberrechte Dritter beachtet.
-			Insbesondere werden Inhalte Dritter als solche gekennzeichnet.
-			Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden,
-			bitten wir um einen entsprechenden Hinweis.
-			Bei Bekanntwerden von Rechtsverletzungen werden wir
-			derartige Inhalte umgehend entfernen.
+    p.
+      Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen
+      Seiten unterliegen dem deutschen Urheberrecht.
+      Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der
+      Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der
+      schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+      Downloads und Kopien dieser Seite sind nur für den privaten,
+      nicht kommerziellen Gebrauch gestattet.
+      Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden,
+      werden die Urheberrechte Dritter beachtet.
+      Insbesondere werden Inhalte Dritter als solche gekennzeichnet.
+      Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden,
+      bitten wir um einen entsprechenden Hinweis.
+      Bei Bekanntwerden von Rechtsverletzungen werden wir
+      derartige Inhalte umgehend entfernen.
 
-		p Quelle: http://e-recht24.de
+    p Quelle: http://e-recht24.de
 
-	include footer
+  include footer

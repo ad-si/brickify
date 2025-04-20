@@ -2,8 +2,9 @@
   "name": "undo",
   "version": "0.1.0",
   "description": "Collects and executes undo/redo actions",
+  "type": "module",
   "brickify": {
     "type": "controller"
   },
-  "browser": "./undo.coffee"
+  "browser": "./undo.js"
 }

@@ -1,21 +1,21 @@
 extends ../rootLayout
 
 block styles
-	link(rel='stylesheet', href='/styles/screen.css')
+  link(rel='stylesheet', href='/styles/screen.css')
 
 block body
-	include teaser
+  include teaser
 
-	include quickconvert
+  include quickconvert
 
-	include footer
+  include footer
 
-	include feedback
+  include feedback
 
-	include ../downloadModal/downloadModal.jade
+  include ../downloadModal/downloadModal.jade
 
 block scripts
-	script(src='/libs/webglCheck.js')
-	script(src='shared.js')
-	script(src='landingpage.js')
-	script(src = '/node_modules/bootbox/bootbox.min.js')
+  script(src='/libs/webglCheck.js')
+  script(src='shared.js')
+  script(src='landingpage.js')
+  script(src = '/node_modules/bootbox/bootbox.min.js')

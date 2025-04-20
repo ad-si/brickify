@@ -1,33 +1,33 @@
 header
-	.container
-		.col-lg-8.pitch
-			h1 brickify
-			h2 Faster 3D-printing with LEGO#[sup &reg;] bricks
+  .container
+    .col-lg-8.pitch
+      h1 brickify
+      h2 Faster 3D-printing with LEGO#[sup &reg;] bricks
 
-			.drop
-				label#loadButton.btn.btn-primary.dropper(for='fileInput')
-					img#spinner(src='./img/spinner.gif')
+      .drop
+        label#loadButton.btn.btn-primary.dropper(for='fileInput')
+          img#spinner(src='./img/spinner.gif')
 
-				input#fileInput(
-					type='file'
-					accept='.stl'
-					style='display: none'
-				)
+        input#fileInput(
+          type='file'
+          accept='.stl'
+          style='display: none'
+        )
 
-			#educators
-				#preview
-					for sample in samples
-						a(
-							href = '/educators'
-							draggable = 'true'
-							data-identifier = sample.name
-						)
-							img(
-								src = '/img/modelSamples/' + sample.name + '.png'
-								draggable = 'true'
-								data-identifier = sample.name
-							)
+      #educators
+        #preview
+          for sample in samples
+            a(
+              href = '/educators'
+              draggable = 'true'
+              data-identifier = sample.name
+            )
+              img(
+                src = '/img/modelSamples/' + sample.name + '.png'
+                draggable = 'true'
+                data-identifier = sample.name
+              )
 
-				p Are you an educator? Check out our example models!
+        p Are you an educator? Check out our example models!
 
-		#makey.col-lg-4
+    #makey.col-lg-4

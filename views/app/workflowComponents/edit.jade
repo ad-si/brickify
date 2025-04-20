@@ -1,52 +1,52 @@
 #editGroup
-	#editControls
-		span#undo.fa.fa-undo(title="undo last brush action")
-			span.sr-only undo
-		= ' '
-		span#redo.fa.fa-repeat(title="redo last brush action")
-			span.sr-only redo
-	h4 1. Edit
-	.row.twoButtonRow
-		.col-xs-6
-			.btn.btn-primary.btn-block#everythingLego
-				| Make everything
-				br
-				| LEGO
-		.col-xs-6
-			.btn.btn-primary.btn-block#everythingPrinted
-				| Make everything
-				br
-				| 3D-print
-	.row.twoButtonRow#bigBrushContainer
-		.col-xs-6
-			.btn.btn-primary.btn-block#legoBrush
-				| Make LEGO
-				br
-				img(draggable='false' src='img/bigLegoBrush.png' width=64 height=64)
-		.col-xs-6
-			.btn.btn-primary.btn-block#printBrush
-				| Make 3D-print
-				br
-				img(draggable='false' src='img/bigPrintBrush.png' width=64 height=64)
-	.row.twoButtonRow#brushContainer
-		.col-xs-6
-			.btn.btn-primary.btn-block#legoBrush
-				| Make LEGO
-				br
-				img(draggable='false' src='img/legoBrush.png' width=64 height=64)
-		.col-xs-6
-			.btn.btn-primary.btn-block#printBrush
-				| Make 3D-print
-				br
-				img(draggable='false' src='img/printBrush.png' width=64 height=64)
-	.row.twoButtonRow
-		.col-xs-6.estimate#brickCountContainer
-				span#brickCount 0
-				|  bricks
-				= ' '
-				span.fa.fa-info-circle
-		.col-xs-6.estimate
-			span.fa.fa-clock-o
-			= ' '
-			span#timeEstimate 0
-			|  min
+  #editControls
+    span#undo.fa.fa-undo(title="undo last brush action")
+      span.sr-only undo
+    = ' '
+    span#redo.fa.fa-repeat(title="redo last brush action")
+      span.sr-only redo
+  h4 1. Edit
+  .row.twoButtonRow
+    .col-xs-6
+      .btn.btn-primary.btn-block#everythingLego
+        | Make everything
+        br
+        | LEGO
+    .col-xs-6
+      .btn.btn-primary.btn-block#everythingPrinted
+        | Make everything
+        br
+        | 3D-print
+  .row.twoButtonRow#bigBrushContainer
+    .col-xs-6
+      .btn.btn-primary.btn-block#legoBrush
+        | Make LEGO
+        br
+        img(draggable='false' src='img/bigLegoBrush.png' width=64 height=64)
+    .col-xs-6
+      .btn.btn-primary.btn-block#printBrush
+        | Make 3D-print
+        br
+        img(draggable='false' src='img/bigPrintBrush.png' width=64 height=64)
+  .row.twoButtonRow#brushContainer
+    .col-xs-6
+      .btn.btn-primary.btn-block#legoBrush
+        | Make LEGO
+        br
+        img(draggable='false' src='img/legoBrush.png' width=64 height=64)
+    .col-xs-6
+      .btn.btn-primary.btn-block#printBrush
+        | Make 3D-print
+        br
+        img(draggable='false' src='img/printBrush.png' width=64 height=64)
+  .row.twoButtonRow
+    .col-xs-6.estimate#brickCountContainer
+        span#brickCount 0
+        |  bricks
+        = ' '
+        span.fa.fa-info-circle
+    .col-xs-6.estimate
+      span.fa.fa-clock-o
+      = ' '
+      span#timeEstimate 0
+      |  min

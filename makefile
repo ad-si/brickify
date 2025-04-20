@@ -6,36 +6,31 @@ help: makefile
 .PHONY: build
 build:
 	npx cake build
+	cakeUtilities.buildServer()
 
 
+# The main server part which is responsible for delivering the
+# website and for server-side plugin integration and model processing
 .PHONY: start
 start:
-	npx cake start
+	require './src/server/main'
+		.setupRouting()
+		.startServer()
 
 
-.PHONY: link-hooks
-link-hooks:
-	npx cake linkHooks
+# .PHONY: link-hooks  # Links git hooks into .git/hooks
+# link-hooks:
+# 	cakeUtilities.linkHooks()
 
 
-.PHONY: check-style
-check-style:
-	npx coffeelint Cakefile .
-
-
-.PHONY: api-docs
-api-docs:
-	npx crojsdoc -o apidoc src/**/*.coffee
-
-
-.PHONY: docs
-docs:
-	npx groc
+.PHONY: lint
+lint:
+	npx eslint --max-warnings=0 --ignore-pattern=.gitignore .
 
 
 .PHONY: test
-test: check-style
-	npx mocha --compilers coffee:coffee-script/register --recursive
+test: # check-style
+	npx mocha --recursive
 
 
 .PHONY: test-client

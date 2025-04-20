@@ -2,9 +2,7 @@ node_modules
 npm-debug.log
 .idea
 *.iml
-*.js
 *.js.map
-!/public/libs/**/*.js
 *.css
 /modelCache
 /doc

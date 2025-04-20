@@ -1,16 +1,16 @@
 #previewGroup
-	h4 2. Preview
-	.btn.btn-primary.btn-block#stabilityCheckButton
-		| Check stability
-	.btn.btn-primary.btn-block#buildButton
-		| Show LEGO assembly
-	#buildContainer.hidden
-		br
-		button.btn.btn-primary.fa.fa-chevron-left#buildDecrement
-		button.btn.btn-primary.fa.fa-chevron-right#buildIncrement
-		#textWrapper
-			| Showing Layer&nbsp;
-			span#currentBuildLayer 1
-			| &nbsp;of&nbsp;
-			span#maxBuildLayer 0
-		input(type='range')#buildSlider
+  h4 2. Preview
+  .btn.btn-primary.btn-block#stabilityCheckButton
+    | Check stability
+  .btn.btn-primary.btn-block#buildButton
+    | Show LEGO assembly
+  #buildContainer.hidden
+    br
+    button.btn.btn-primary.fa.fa-chevron-left#buildDecrement
+    button.btn.btn-primary.fa.fa-chevron-right#buildIncrement
+    #textWrapper
+      | Showing Layer&nbsp;
+      span#currentBuildLayer 1
+      | &nbsp;of&nbsp;
+      span#maxBuildLayer 0
+    input(type='range')#buildSlider

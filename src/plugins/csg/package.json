@@ -2,8 +2,9 @@
   "name": "csg",
   "version": "0.1.0",
   "description": "Creates Constructive Solid Geometry",
+  "type": "module",
   "brickify": {
     "type": "?"
   },
-  "browser": "./csg.coffee"
+  "browser": "./csg.js"
 }

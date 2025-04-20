@@ -1,17 +1,17 @@
 section.quickConvert
-	.container
-		.row
-			.col-lg-5.text-center
-				h3
-					center Original Model
-				canvas#renderArea1.quickConvertCanvas(touch-action="none")
-			.col-lg-2.text-center.convert-arrow
-				img.img-responsive(src='/img/convertArrow.png')
-			.col-lg-5.text-center
-				h3
-					center With LEGO#[sup &reg;] bricks
-				canvas#renderArea2.quickConvertCanvas(touch-action="none")
-				#applinks
-					a.btn.btn-success#downloadButton Download
-					= ' '
-					a.btn.btn-primary.applink(href='app#initialModel=goggles') Customize
+  .container
+    .row
+      .col-lg-5.text-center
+        h3
+          center Original Model
+        canvas#renderArea1.quickConvertCanvas(touch-action="none")
+      .col-lg-2.text-center.convert-arrow
+        img.img-responsive(src='/img/convertArrow.png')
+      .col-lg-5.text-center
+        h3
+          center With LEGO#[sup &reg;] bricks
+        canvas#renderArea2.quickConvertCanvas(touch-action="none")
+        #applinks
+          a.btn.btn-success#downloadButton Download
+          = ' '
+          a.btn.btn-primary.applink(href='app#initialModel=goggles') Customize

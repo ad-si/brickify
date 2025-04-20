@@ -2,8 +2,9 @@
   "name": "fidelity-control",
   "version": "0.1.0",
   "description": "Framerate-based rendering quality management",
+  "type": "module",
   "brickify": {
     "type": "controller"
   },
-  "browser": "./FidelityControl.coffee"
+  "browser": "./FidelityControl.js"
 }

@@ -2,8 +2,9 @@
   "name": "editController",
   "version": "0.1.0",
   "description": "Controls user interaction with brushes",
+  "type": "module",
   "brickify": {
     "type": "ui"
   },
-  "browser": "./editController.coffee"
+  "browser": "./editController.js"
 }

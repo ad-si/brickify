@@ -1,22 +1,22 @@
 #logo
-	button#toggleMenu.navbar-toggle.btn.btn-default.visible-xs-block
-		span.sr-only Toggle menu
-		span.icon-bar &nbsp;
-		span.icon-bar &nbsp;
-		span.icon-bar &nbsp;
-	
-	h1: a(href='/') brickify
+  button#toggleMenu.navbar-toggle.btn.btn-default.visible-xs-block
+    span.sr-only Toggle menu
+    span.icon-bar &nbsp;
+    span.icon-bar &nbsp;
+    span.icon-bar &nbsp;
+  
+  h1: a(href='/') brickify
 
 #sidebar-content
-	include ./workflowComponents/load.jade
+  include ./workflowComponents/load.jade
 
-	include ./workflowComponents/edit.jade
+  include ./workflowComponents/edit.jade
 
-	include ./workflowComponents/preview.jade
+  include ./workflowComponents/preview.jade
 
-	include ./workflowComponents/export.jade
+  include ./workflowComponents/export.jade
 
-	#feedbackGroup.visible-xs
-		a.btn.btn-primary(target='_blank'
-		href='https://docs.google.com/forms/d/14_gpbiIdyQciLczzW1SGx9inXeuj3eNF9w2cBZzIoC4/viewform?usp=send_form')
-			| Give Feedback!
+  #feedbackGroup.visible-xs
+    a.btn.btn-primary(target='_blank'
+    href='https://docs.google.com/forms/d/14_gpbiIdyQciLczzW1SGx9inXeuj3eNF9w2cBZzIoC4/viewform?usp=send_form')
+      | Give Feedback!

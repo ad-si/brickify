@@ -1,7 +1,7 @@
 import CsgExtractor from "./CsgExtractor.js"
-import threeHelper from "../../client/threeHelper.js"
-import csgCleaner from "./csgCleaner.js"
-import threeConverter from "../../client/threeConverter.js"
+import * as threeHelper from "../../client/threeHelper.js"
+import clean from "./csgCleaner.js"
+import * as threeConverter from "../../client/threeConverter.js"
 
 export default class CSG {
   constructor () {
@@ -108,7 +108,7 @@ export default class CSG {
 
         options.split = true
         options.filterSmallGeometries = !result.isOriginalModel
-        cachedData.csg = csgCleaner.clean(result.csg, options)
+        cachedData.csg = clean(result.csg, options)
 
         cachedData.csgNeedsRecalculation = false
         return cachedData.csg

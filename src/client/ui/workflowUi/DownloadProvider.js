@@ -3,8 +3,8 @@ import saveAs from "filesaver.js"
 import JSZip from "jszip"
 import log from "loglevel"
 
-import Spinner from "../../Spinner.js"
-import piwikTracking from "../../piwikTracking.js"
+import * as Spinner from "../../Spinner.js"
+import * as piwikTracking from "../../piwikTracking.js"
 
 
 export default class DownloadProvider {

@@ -1,4 +1,4 @@
-import pointerEnums from "../../client/ui/pointerEnums.js"
+import * as pointerEnums from "../../client/ui/pointerEnums.js"
 
 export default class PointEventHandler {
   constructor (sceneManager, brushUi) {

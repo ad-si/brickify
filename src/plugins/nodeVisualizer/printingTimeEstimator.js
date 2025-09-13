@@ -91,7 +91,7 @@ const getEstimate = function (height, surface, volume) {
   return 2 + (2 * height) + (0.3 * surface) + (2.5 * volume)
 }
 
-module.exports.getPrintingTimeEstimate = function (geometries) {
+export function getPrintingTimeEstimate (geometries) {
   let time = 0
   for (const geometry of Array.from(geometries)) {
     const height = getHeight(geometry)
@@ -104,7 +104,7 @@ module.exports.getPrintingTimeEstimate = function (geometries) {
   return time
 }
 
-module.exports.getPrintingTimeEstimateForVoxels = function (voxels, gridSpacing) {
+export function getPrintingTimeEstimateForVoxels (voxels, gridSpacing) {
   let z
   if (voxels.length === 0) {
     return 0

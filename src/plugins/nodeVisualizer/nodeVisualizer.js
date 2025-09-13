@@ -1,13 +1,13 @@
-import threeHelper from "../../client/threeHelper.js"
+import * as threeHelper from "../../client/threeHelper.js"
 import BrickVisualization from "./visualization/brickVisualization.js"
 import ModelVisualization from "./modelVisualization.js"
-import interactionHelper from "../../client/interactionHelper.js"
-import RenderTargetHelper from "../../client/rendering/renderTargetHelper.js"
+import * as interactionHelper from "../../client/interactionHelper.js"
+import * as RenderTargetHelper from "../../client/rendering/renderTargetHelper.js"
 import stencilBits from "../../client/rendering/stencilBits.js"
 import Coloring from "./visualization/Coloring.js"
 import ColorMultPart from "../../client/rendering/shader/ColorMultPart.js"
 import ExpandBlackPart from "../../client/rendering/shader/ExpandBlackPart.js"
-import PrintingTimeEstimator from "./printingTimeEstimator.js"
+import * as PrintingTimeEstimator from "./printingTimeEstimator.js"
 
 /*
  * @class NodeVisualizer
@@ -47,23 +47,25 @@ export default class NodeVisualizer {
 
   init (bundle) {
     this.bundle = bundle
-    this.coloring = new Coloring(this.bundle.globalConfig)
+    const cfg = (bundle && bundle.globalConfig) ? bundle.globalConfig : null
+    this.coloring = new Coloring(cfg)
 
+    const colors = (cfg && cfg.colors) ? cfg.colors : this.coloring.globalConfig.colors
     this.objectColorMult = new THREE.Vector3(
-      this.bundle.globalConfig.colors.objectColorMult,
-      this.bundle.globalConfig.colors.objectColorMult,
-      this.bundle.globalConfig.colors.objectColorMult,
+      colors.objectColorMult,
+      colors.objectColorMult,
+      colors.objectColorMult,
     )
     this.objectShadowColorMult = new THREE.Vector3(
-      this.bundle.globalConfig.colors.objectShadowColorMult,
-      this.bundle.globalConfig.colors.objectShadowColorMult,
-      this.bundle.globalConfig.colors.objectShadowColorMult,
+      colors.objectShadowColorMult,
+      colors.objectShadowColorMult,
+      colors.objectShadowColorMult,
     )
-    this.brickShadowOpacity = this.bundle.globalConfig.colors.brickShadowOpacity
-    this.objectOpacity = this.bundle.globalConfig.colors.modelOpacity
-    this.objectShadowOpacity = this.bundle.globalConfig.colors.modelShadowOpacity
+    this.brickShadowOpacity = colors.brickShadowOpacity
+    this.objectOpacity = colors.modelOpacity
+    this.objectShadowOpacity = colors.modelShadowOpacity
 
-    if (this.bundle.globalConfig.buildUi) {
+    if (bundle.globalConfig.buildUi) {
       this.brickCounter = $("#brickCount")
       return this.timeEstimate = $("#timeEstimate")
     }

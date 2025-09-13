@@ -14,7 +14,7 @@ import THREE from "three"
  * @return {Array<Object>} an array of intersections
  * @memberOf interactionHelper
  */
-const getIntersections = function (event, renderer, objects) {
+export function getIntersections (event, renderer, objects) {
   const ray = calculateRay(event, renderer)
 
   const raycaster = new THREE.Raycaster()
@@ -22,7 +22,6 @@ const getIntersections = function (event, renderer, objects) {
 
   return raycaster.intersectObjects(objects, true)
 }
-module.exports.getIntersections = getIntersections
 
 /*
  * Determines the responsible plugin for a screen space interaction based on
@@ -37,7 +36,7 @@ module.exports.getIntersections = getIntersections
  * @return {Plugin|undefined} the name of the plugin
  * @memberOf interactionHelper
  */
-const getResponsiblePlugin = function (event, renderer, objects, filter) {
+export function getResponsiblePlugin (event, renderer, objects, filter) {
   if (filter == null) {
     filter = () => true
   }
@@ -57,7 +56,6 @@ const getResponsiblePlugin = function (event, renderer, objects, filter) {
 
   return undefined
 }
-module.exports.getResponsiblePlugin = getResponsiblePlugin
 
 /*
  * Determines the position of an event on the z=0 plane
@@ -68,8 +66,10 @@ module.exports.getResponsiblePlugin = getResponsiblePlugin
  * @return {Object} a vector {x, y, z}
  * @memberOf interactionHelper
  */
-const getGridPosition = (event, renderer) => getPlanePosition(event, renderer, 0)
-module.exports.getGridPosition = getGridPosition
+export function getGridPosition (event, renderer) {
+  return getPlanePosition(event, renderer, 0)
+}
+
 
 /*
  * Determines the position of an event on the given z plane
@@ -81,7 +81,7 @@ module.exports.getGridPosition = getGridPosition
  * @return {Object} a vector {x, y, z}
  * @memberOf interactionHelper
  */
-var getPlanePosition = function (event, renderer, z) {
+export function getPlanePosition (event, renderer, z) {
   const ray = calculateRay(event, renderer)
 
   const camera = renderer.getCamera()
@@ -91,7 +91,6 @@ var getPlanePosition = function (event, renderer, z) {
 
   return posInWorld
 }
-module.exports.getPlanePosition = getPlanePosition
 
 /*
  * Determines the position of an event in canvas space
@@ -102,7 +101,7 @@ module.exports.getPlanePosition = getPlanePosition
  * @return {Object} a three vector
  * @memberOf interactionHelper
  */
-const calculatePositionInCanvasSpace = function (event, renderer) {
+export function calculatePositionInCanvasSpace (event, renderer) {
   const canvas = renderer.getDomElement()
 
   return new THREE.Vector3(
@@ -111,7 +110,7 @@ const calculatePositionInCanvasSpace = function (event, renderer) {
     0.5,
   )
 }
-module.exports.calculatePositionInCanvasSpace = calculatePositionInCanvasSpace
+
 
 /*
  * Determines the position of the event in camera space
@@ -122,11 +121,10 @@ module.exports.calculatePositionInCanvasSpace = calculatePositionInCanvasSpace
  * @return {Object} a three vector
  * @memberOf interactionHelper
  */
-const calculatePositionInCameraSpace = function (event, renderer) {
+export function calculatePositionInCameraSpace (event, renderer) {
   const positionInCanvasCS = calculatePositionInCanvasSpace(event, renderer)
   return positionInCanvasCS.unproject(renderer.getCamera())
 }
-module.exports.calculatePositionInCameraSpace = calculatePositionInCameraSpace
 
 /*
  * Determines a virtual ray that a screen space interaction casts
@@ -137,9 +135,8 @@ module.exports.calculatePositionInCameraSpace = calculatePositionInCameraSpace
  * @return {Object} a normalized three vector {x, y, z}
  * @memberOf interactionHelper
  */
-var calculateRay = function (event, renderer) {
+export function calculateRay (event, renderer) {
   const positionInCameraCS = calculatePositionInCameraSpace(event, renderer)
   return positionInCameraCS.sub(renderer.getCamera().position)
     .normalize()
 }
-module.exports.calculateRay = calculateRay

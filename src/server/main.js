@@ -1,7 +1,7 @@
 import { exec } from "child_process"
 import http from "http"
 import path from "path"
-import fs from "fs"
+import fsp from "fs/promises"
 
 import bootstrap from "bootstrap-styl"
 import winston from "winston"
@@ -14,15 +14,11 @@ import favicon from "serve-favicon"
 import stylus from "stylus"
 import nib from "nib"
 import yaml from "js-yaml"
-// Load yaml configuration into javascript file
-import browserifyData from "browserify-data"
-import envify from "envify"
-// Load strings with browserify
-import stringify from "stringify"
-import browserify from "browserify-middleware"
 import cookieParser from "cookie-parser"
 
-import urlSessions from "./urlSessions.js"
+import * as urlSessions from "./urlSessions.js"
+
+const __dirname = import.meta.dirname
 
 // Make logger available to other modules.
 // Must be instantiated before requiring bundled modules
@@ -34,16 +30,16 @@ winston.loggers.add("log", {
 })
 const log = winston.loggers.get("log")
 
-import pluginLoader from "./pluginLoader.js"
+import * as pluginLoader from "./pluginLoader.js"
 import app from "../../routes/app.js"
-import landingPage from "../../routes/landingpage.js"
-import models from "../../routes/models.js"
-import dataPackets from "../../routes/dataPackets.js"
+import * as landingPage from "../../routes/landingpage.js"
+import * as models from "../../routes/models.js"
+import * as dataPackets from "../../routes/dataPackets.js"
 import sharelinkGen from "../../routes/share.js"
-
 const globalConfig = yaml.safeLoad(
-  fs.readFileSync(path.resolve(__dirname, "../common/globals.yaml")),
+  await fsp.readFile(path.resolve(__dirname, "../common/globals.yaml"), "utf8")
 )
+
 const webapp = express()
 
 // Express assumes that no env means develop.
@@ -64,15 +60,8 @@ if (testMode) {
   loggingLevel = "error"
 }
 
-browserify.settings({
-  transform: [stringify([".scad"]), browserifyData, envify],
-})
 
-const server = http.createServer(webapp)
-let port = process.env.NODEJS_PORT || process.env.PORT || 3000
-let ip = process.env.NODEJS_IP || "127.0.0.1"
-
-export function setupRouting () {
+export async function setupRouting (port) {
   webapp.set("hostname", developmentMode ? `localhost:${port}`
     : process.env.HOSTNAME || "brickify.it",
   )
@@ -85,66 +74,35 @@ export function setupRouting () {
   webapp.use(compress())
 
   webapp.use(stylus.middleware({
-    src: "public",
-    compile (string, path) {
+    src: path.resolve(__dirname, "../../public"),
+    dest: path.resolve(__dirname, "../../public"),
+    compile (string, filePath) {
       return stylus(string)
-        .set("filename", path)
+        .set("filename", filePath || "")
         .set("compress", !developmentMode)
-        .set("sourcemap", {
-          comment: developmentMode,
-          inline: true, // Generating an extra map file doesn't seem to work
-        })
+        .set("sourcemap", developmentMode ? {
+          comment: true,
+          inline: true,
+          basePath: path.resolve(__dirname, "../../public")
+        } : false)
         .set("include css", true)
+        .set("paths", [
+          path.resolve(__dirname, "../../public/styles"),
+          path.resolve(__dirname, "../../node_modules")
+        ])
         .use(nib())
         .use(bootstrap())
       // Ugly because of github.com/LearnBoost/stylus/issues/1828
         .define("backgroundColor", "#" + ("000000" +
         globalConfig.colors.background.toString(16)).slice(-6))
     },
-  }),
-  )
+  }))
 
-  webapp.use((req, res, next) => {
+  webapp.use((_req, res, next) => {
     res.locals.app = webapp
     return next()
   })
 
-  const shared = [
-    "blueimp-md5",
-    "bootstrap",
-    "clone",
-    "es6-promise",
-    "filesaver.js",
-    "jquery",
-    "mousetrap",
-    "nanobar",
-    "operative",
-    "PEP",
-    "path",
-    "three",
-    "three-pointer-controls",
-    "zeroclipboard",
-  ]
-  webapp.get("/shared.js", browserify(shared, {
-    cache: true,
-    precompile: true,
-    noParse: shared,
-  }),
-  )
-
-  webapp.get("/app.js", browserify("src/client/main.js", {
-    extensions: [".js"],
-    external: shared,
-    insertGlobals: developmentMode,
-  }),
-  )
-
-  webapp.get("/landingpage.js", browserify("src/client/landingpage.js", {
-    extensions: [".js"],
-    external: shared,
-    insertGlobals: developmentMode,
-  }),
-  )
 
   const fontAwesomeRegex = /\/fonts\/fontawesome-.*/
   webapp.get(fontAwesomeRegex, express.static("node_modules/font-awesome/"))
@@ -200,7 +158,7 @@ export function setupRouting () {
     .head(dataPackets.exists)
     .get(dataPackets.get)
     .put(jsonParser, dataPackets.put)
-    .delete(dataPackets.delete)
+    .delete(dataPackets.delete_)
 
   webapp.post("/updateGitAndRestart", jsonParser, (request, response) => {
     if (request.body.ref != null) {
@@ -231,37 +189,37 @@ export function setupRouting () {
     })
   })
 
-  pluginLoader.loadPlugins(path.resolve(__dirname, "../plugins"))
+  await pluginLoader.loadPlugins(path.resolve(__dirname, "../plugins"))
 
   if (developmentMode) {
     webapp.use(errorHandler())
   }
 
-  webapp.use((req, res) => res
+  webapp.use((_req, res) => res
     .status(404)
     .render("404"))
-
-  return module.exports
 }
 
-export function startServer (_port, _ip) {
-  port = _port || port
-  ip = _ip || ip
+
+export async function startServer (_port, _ip) {
+  const server = http.createServer(webapp)
+  const srvrPort = _port || process.env.NODEJS_PORT || process.env.PORT || 3000
+  const srvrIp = _ip || process.env.NODEJS_IP || "127.0.0.1"
 
   server.on("error", (error) => {
     if (error.code === "EADDRINUSE") {
-      return log.error(`Another Server is already listening on ${ip}:${port}`)
+      return log.error(`Another Server is already listening on ${srvrIp}:${srvrPort}`)
     }
     else {
       return log.error("Server could not be started:", error)
     }
   })
 
-  server.listen(
-    port,
-    ip,
-    () => log.info(`Server is listening on ${ip}:${port}`),
-  )
+  await setupRouting(srvrPort)
 
-  return server
+  server.listen(
+    srvrPort,
+    srvrIp,
+    () => log.info(`Server is listening on ${srvrIp}:${srvrPort}`),
+  )
 }

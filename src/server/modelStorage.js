@@ -2,7 +2,7 @@ let createCacheDirectory
 import fs from "fs"
 import fsp from "fs-promise"
 import mkdirp from "mkdirp"
-import { md5 } from "blueimp-md5"
+import md5 from "blueimp-md5"
 import log from "winston"
 
 const cacheDirectory = "modelCache/";

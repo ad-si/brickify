@@ -11,16 +11,16 @@ const sanitizeJqXHRError = jqXHR => Promise.reject({
   responseText: jqXHR.responseText,
 })
 
-module.exports.create = () => Promise.resolve($.ajax("/datapacket", {type: "POST"}))
+export const create = () => Promise.resolve($.ajax("/datapacket", {type: "POST"}))
   .catch(sanitizeJqXHRError)
 
-module.exports.exists = id => Promise.resolve($.ajax("/datapacket/" + id, {type: "HEAD"}))
+export const exists = id => Promise.resolve($.ajax("/datapacket/" + id, {type: "HEAD"}))
   .catch(sanitizeJqXHRError)
 
-module.exports.get = id => Promise.resolve($.ajax("/datapacket/" + id, {type: "GET"}))
+export const get = id => Promise.resolve($.ajax("/datapacket/" + id, {type: "GET"}))
   .catch(sanitizeJqXHRError)
 
-module.exports.put = packet => Promise.resolve(
+export const put = packet => Promise.resolve(
   $.ajax("/datapacket/" + packet.id, {type: "PUT"}, {
     contentType: "application/json",
     data: JSON.stringify(packet.data),
@@ -28,5 +28,5 @@ module.exports.put = packet => Promise.resolve(
 )
   .catch(sanitizeJqXHRError)
 
-module.exports.delete = id => Promise.resolve($.ajax("/datapacket/" + id, {type: "DELETE"}))
+export const delete_ = id => Promise.resolve($.ajax("/datapacket/" + id, {type: "DELETE"}))
   .catch(sanitizeJqXHRError)

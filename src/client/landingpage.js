@@ -1,13 +1,16 @@
 import $ from "jquery"
 window.jQuery = window.$ = $
-import piwikTracking from "./piwikTracking.js"
+import * as piwikTracking from "./piwikTracking.js"
 
 // Init quickconvert after basic page functionality has been initialized
-import globalConfig from "../common/globals.yaml"
+
 import Bundle from "./bundle.js"
 import clone from "clone"
-import fileLoader from "./modelLoading/fileLoader.js"
-import modelCache from "./modelLoading/modelCache.js"
+import * as fileLoader from "./modelLoading/fileLoader.js"
+import * as fileDropper from "./modelLoading/fileDropper.js"
+import * as modelCache from "./modelLoading/modelCache.js"
+
+import globalConfig from "../common/globals.yaml"
 
 // Set renderer size to fit to 3 bootstrap columns
 globalConfig.staticRendererSize = true
@@ -94,7 +97,6 @@ var b1 = bundle1.init()
       }
     }
 
-    import fileDropper from "./modelLoading/fileDropper.js"
     fileDropper.init(dropAndInputCallback)
 
     const fileInput = document.getElementById("fileInput")

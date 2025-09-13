@@ -183,7 +183,7 @@ export default class SyncObject {
    * @promise
    */
   delete () {
-    this.ready = this.ready.then(() => SyncObject.dataPacketProvider.delete(this.getId()))
+    this.ready = this.ready.then(() => SyncObject.dataPacketProvider.delete_(this.getId()))
     this.ready.then(() => {
       return this.ready = Promise.reject(
         new ReferenceError(`${this.constructor.name} \#${this.getId()} was deleted`),

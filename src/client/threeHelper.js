@@ -1,26 +1,34 @@
 import THREE from "three"
 
-module.exports.link = (node, threeNode) => threeNode.brickifyNode = node.id
 
-module.exports.find = (node, threeParentNode) => threeParentNode.getObjectByProperty("brickifyNode", node.id, true)
+export function link (node, threeNode) {
+  return threeNode.brickifyNode = node.id
+}
 
-const applyNodeTransforms = function (node, threeNode) {
+
+export function find (node, threeParentNode) {
+  return threeParentNode.getObjectByProperty("brickifyNode", node.id, true)
+}
+
+
+export function applyNodeTransforms (node, threeNode) {
   const _set = (property, vector) => property.set(vector.x, vector.y, vector.z)
 
   _set(threeNode.position, node.transform.position)
   _set(threeNode.rotation, node.transform.rotation)
   return _set(threeNode.scale, node.transform.scale)
 }
-module.exports.applyNodeTransforms = applyNodeTransforms
 
-module.exports.getTransformMatrix = function (node) {
+
+export function getTransformMatrix (node) {
   const threeNode = new THREE.Object3D()
   applyNodeTransforms(node, threeNode)
   threeNode.updateMatrix()
   return threeNode.matrix
 }
 
-module.exports.getBoundingSphere = function (threeNode) {
+
+export function getBoundingSphere (threeNode) {
   if (threeNode.geometry != null) {
     const {
       geometry,
@@ -40,13 +48,16 @@ module.exports.getBoundingSphere = function (threeNode) {
     const boundingBox = new THREE.Box3()
       .setFromObject(threeNode)
     const size = boundingBox.size()
-    const radius = Math.sqrt((size.x * size.x) + (size.y * size.y) + (size.z * size.z)) / 2
+    const radius = Math.sqrt(
+      (size.x * size.x) + (size.y * size.y) + (size.z * size.z),
+    ) / 2
     const center = boundingBox.center()
     return {radius, center}
   }
 }
 
-module.exports.zoomToBoundingSphere = function (
+
+export function zoomToBoundingSphere (
   camera, scene, controls, boundingSphere) {
   const {
     radius,

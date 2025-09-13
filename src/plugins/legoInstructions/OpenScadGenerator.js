@@ -1,9 +1,73 @@
-import _scadBase from "./brick.scad"
+const scadDisclaimer = `
+/**
+ * Brick layout for OpenSCAD
+ * Generated with https://github.com/ad-si/brickify
+ *
+ */
 
-const toScadVector = vector => `[${vector.x}, ${vector.y}, ${vector.z}]`
+`
 
-module.exports.generateScad = function (bricks) {
-  let scad = _scadDisclaimer()
+const scadBase = `
+gridSpacing = [ 8, 8, 3.2 ];
+brickSpacing = [ 0.2, 0.2, 0.2 ];
+studRadius = 2.4;
+holeRadius = 2.6;
+studHeight = 1.8;
+
+module GridTranslate(position) {
+  translate([
+    position[0] * gridSpacing[0] + brickSpacing[0] / 2,
+    position[1] * gridSpacing[1] + brickSpacing[1] / 2,
+    position[2] * gridSpacing[2]
+  ]) {
+    children();
+  }
+}
+
+module Brick(size) {
+  difference() {
+    union() {
+      cube(
+          [
+            size[0] * gridSpacing[0] - brickSpacing[0],
+            size[1] * gridSpacing[1] - brickSpacing[1],
+            size[2] * gridSpacing[2] - brickSpacing[2]
+          ],
+          false);
+
+      for (sx = [1:size[0]]) {
+        for (sy = [1:size[1]]) {
+          tx = sx * gridSpacing[0] - gridSpacing[0] / 2 - brickSpacing[0] / 2;
+          ty = sy * gridSpacing[1] - gridSpacing[1] / 2 - brickSpacing[1] / 2;
+          tz = size[2] * gridSpacing[2] - brickSpacing[2];
+          translate([ tx, ty, tz ]) {
+            cylinder(r = studRadius, h = studHeight, $fs = 0.5);
+          }
+        }
+      }
+    }
+    union() {
+      for (sx = [1:size[0]]) {
+        for (sy = [1:size[1]]) {
+          tx = sx * gridSpacing[0] - gridSpacing[0] / 2 - brickSpacing[0] / 2;
+          ty = sy * gridSpacing[1] - gridSpacing[1] / 2 - brickSpacing[1] / 2;
+          tz = 0;
+          translate([ tx, ty, tz - brickSpacing.z ]) {
+            cylinder(r = holeRadius, h = 2 + brickSpacing.z, $fs = 0.5);
+          }
+        }
+      }
+    }
+  }
+}
+`
+
+function toScadVector (vector) {
+  return `[${vector.x}, ${vector.y}, ${vector.z}]`
+}
+
+export default function generateScad (bricks) {
+  let scad = scadDisclaimer
 
   bricks.forEach((brick) => {
     const pos = toScadVector(brick.getPosition())
@@ -12,19 +76,10 @@ module.exports.generateScad = function (bricks) {
   })
 
   scad += "\n\n"
-  scad += _scadBase
+  scad += scadBase
 
   return {
     fileName: "bricks.scad",
     data: scad,
   }
 }
-
-var _scadDisclaimer = () => "\
-/*\n \
-* \n \
-* Brick layout for openSCAD\n \
-* Generated with http://brickify.it\n \
-*\n \
-*/\n\n\
-"

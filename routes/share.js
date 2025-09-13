@@ -1,4 +1,4 @@
-import urlSessions from "../src/server/urlSessions.js"
+import * as urlSessions from "../src/server/urlSessions.js"
 
 export default function (request, response) {
   if (request.session != null) {

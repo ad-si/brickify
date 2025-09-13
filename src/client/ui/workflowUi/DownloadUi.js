@@ -1,6 +1,6 @@
 import DownloadProvider from "./DownloadProvider.js"
-import downloadModal from "../downloadModal.js"
-import piwikTracking from "../../piwikTracking.js"
+import { getModal as downloadModal } from "../downloadModal.js"
+import * as piwikTracking from "../../piwikTracking.js"
 
 export default class DownloadUi {
   constructor (bundle) {

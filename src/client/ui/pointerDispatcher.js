@@ -1,4 +1,4 @@
-import pointerEnums from "./pointerEnums.js"
+import * as pointerEnums from "./pointerEnums.js"
 
 export default class PointerDispatcher {
   constructor (bundle, hintUi) {

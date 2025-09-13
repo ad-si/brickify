@@ -3,16 +3,16 @@ import THREE from "three"
 import PipelineTargetPart from "./shader/PipelineTargetPart.js"
 import ShaderGenerator from "./shader/ShaderGenerator.js"
 
-/*
- * @module renderTargetHelper
- */
 
 let _chooseBiggerSize = false
 let _overrideSizeValue = null
-module.exports.configureSize = function (chooseBiggerSize, overrideSizeValue = null) {
+
+
+export function configureSize (chooseBiggerSize, overrideSizeValue = null) {
   _chooseBiggerSize = chooseBiggerSize
   return _overrideSizeValue = overrideSizeValue
 }
+
 
 /*
  * Creates a structure that can be used as a render target and later
@@ -28,7 +28,7 @@ module.exports.configureSize = function (chooseBiggerSize, overrideSizeValue = n
  * render the screen aligned quad to the screen
  * @memberOf renderTargetHelper
  */
-module.exports.createRenderTarget = function (
+export function createRenderTarget (
   threeRenderer,
   shaderParts,
   additionalUniforms,
@@ -97,8 +97,9 @@ module.exports.createRenderTarget = function (
   }
 }
 
+
 // Clones the originalTarget but creates a new custom blendingMat shader
-module.exports.cloneRenderTarget = function (
+export function cloneRenderTarget (
   originalTarget,
   shaderParts, additionalUniforms, opacity,
 ) {
@@ -128,12 +129,17 @@ module.exports.cloneRenderTarget = function (
   }
 }
 
+
 // Generates an THREE.Mesh that will be displayed as a screen aligned quad
 // and will draw the supplied rttTexture while setting the depth value to
 // the values specified in rttDepthTexture
-var generateQuad =  function (
-  rttTexture, rttDepthTexture, shaderParts, additionalUniforms, opacity) {
-
+export function generateQuad (
+  rttTexture,
+  rttDepthTexture,
+  shaderParts,
+  additionalUniforms,
+  opacity,
+) {
   let usedShaderParts = []
   usedShaderParts.push(new PipelineTargetPart())
   usedShaderParts = usedShaderParts.concat(shaderParts)
@@ -165,10 +171,10 @@ var generateQuad =  function (
   mesh.frustumCulled = false
   return mesh
 }
-module.exports.generateQuad = generateQuad
+
 
 // Chooses the next 2^n size that matches the screen resolution best
-var getNextValidTextureDimension = function (size) {
+export function getNextValidTextureDimension (size) {
   if (size == null) {
     return null
   }
@@ -191,12 +197,12 @@ var getNextValidTextureDimension = function (size) {
 
   return selectedDim
 }
-module.exports.getNextValidTextureDimension = getNextValidTextureDimension
+
 
 // Returns true, if the render target has the right
 // (in terms of 2^n, see getNextValidTextureDimension)
 // size for the domElement of the threeRenderer
-const renderTargetHasRightSize = function (renderTarget, threeRenderer) {
+export function renderTargetHasRightSize  (renderTarget, threeRenderer) {
   const screenW = threeRenderer.domElement.clientWidth
   const screenH = threeRenderer.domElement.clientHeight
 
@@ -212,14 +218,17 @@ const renderTargetHasRightSize = function (renderTarget, threeRenderer) {
   (renderTarget.height === targetTexHeight)
 }
 
-module.exports.renderTargetHasRightSize = renderTargetHasRightSize
 
-const deleteRenderTarget = function (renderTarget, threeRenderer) {
+export function deleteRenderTarget (renderTarget, threeRenderer) {
   renderTarget.renderTarget.dispose()
 
-  if ((renderTarget.depthTexture != null ? renderTarget.depthTexture.__webglTexture : undefined) != null) {
-    return threeRenderer.context.deleteTexture(renderTarget.depthTexture.__webglTexture)
+  if (
+    (renderTarget.depthTexture != null
+      ? renderTarget.depthTexture.__webglTexture
+      : undefined) != null
+  ) {
+    return threeRenderer.context.deleteTexture(
+      renderTarget.depthTexture.__webglTexture,
+    )
   }
 }
-
-module.exports.deleteRenderTarget = deleteRenderTarget

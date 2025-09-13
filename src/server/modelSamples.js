@@ -1,25 +1,33 @@
-let loadSamples
 import fsp from "fs-promise"
 import yaml from "js-yaml"
 import log from "winston"
 
+
 const samplesDirectory = "modelSamples/"
 
-const samples = {};
+let samples = null
 
-// load samples on require (read: on server startup)
-(loadSamples = function () {
+
+export function loadSamples () {
+  if (samples !== null) {
+    return samples
+  }
+
+  samples = {}
+
   fsp
     .readdirSync(samplesDirectory)
     .filter(file => file.endsWith(".yaml"))
     .map(file => yaml.load(fsp.readFileSync(samplesDirectory + file)))
     .forEach(sample => samples[sample.name] = sample)
-  return log.info("Sample models loaded")
-})()
 
-// API
+  log.info("Sample models loaded")
 
-export default function exists (name) {
+  return samples
+}
+
+
+export function exists (name) {
   if (samples[name] != null) {
     return Promise.resolve(name)
   }
@@ -28,7 +36,8 @@ export default function exists (name) {
   }
 }
 
-export default function get (name) {
+
+export function get (name) {
   if (samples[name] != null) {
     return fsp.readFile(samplesDirectory + name)
   }
@@ -37,8 +46,9 @@ export default function get (name) {
   }
 }
 
-export default function getSamples () {
-  return Object.keys(samples)
+
+export function getSamples () {
+  return Object.keys(loadSamples())
     .map(key => samples[key])
     .sort((a, b) => a.printTime - b.printTime)
 }

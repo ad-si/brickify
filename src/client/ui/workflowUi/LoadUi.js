@@ -1,6 +1,6 @@
-import fileDropper from "../../modelLoading/fileDropper.js"
-import fileLoader from "../../modelLoading/fileLoader.js"
-import piwikTracking from "../../piwikTracking.js"
+import * as fileDropper from "../../modelLoading/fileDropper.js"
+import * as fileLoader from "../../modelLoading/fileLoader.js"
+import * as piwikTracking from "../../piwikTracking.js"
 
 export default class LoadUi {
   constructor (workflowUi) {

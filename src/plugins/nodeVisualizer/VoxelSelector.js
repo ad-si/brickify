@@ -1,6 +1,6 @@
 import THREE from "three"
 
-import interactionHelper from "../../client/interactionHelper.js"
+import * as interactionHelper from "../../client/interactionHelper.js"
 
 /*
  * @class VoxelSelector

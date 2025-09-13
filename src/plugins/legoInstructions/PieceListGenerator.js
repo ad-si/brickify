@@ -5,7 +5,7 @@ import Brick from "../newBrickator/pipeline/Brick.js"
 
 // generates a list of how many bricks of which size
 // is in the given set of bricks
-module.exports.generatePieceList = function (bricks) {
+export function generatePieceList (bricks) {
   const pieceList = []
 
   bricks.forEach((brick) => {
@@ -43,7 +43,8 @@ module.exports.generatePieceList = function (bricks) {
   return pieceList
 }
 
-module.exports.getHtml = function (list, caption) {
+
+export function getHtml (list, caption) {
   if (caption == null) {
     caption = true
   }

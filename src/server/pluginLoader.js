@@ -1,32 +1,35 @@
-// File system support
-import fs from "fs"
-// Manipulate platform-independent path strings
+import fsp from "fs/promises"
 import path from "path"
-// Colorful logger for console
 import winston from "winston"
-const log = winston.loggers.get("log")
-// Load the hook list and initialize the pluginHook management
 import yaml from "js-yaml"
 
-import PluginHooks from "../common/pluginHooks"
-const pluginHooks = new PluginHooks()
-module.exports.pluginHooksInstance = pluginHooks
+import PluginHooks from "../common/pluginHooks.js"
+import packageJson from "../../package.json" with { type: "json"}
 
-const hooks = yaml.load(fs.readFileSync(path.join(__dirname, "pluginHooks.yaml")))
+const log = winston.loggers.get("log")
+
+// Load the hook list and initialize the pluginHook management
+export const pluginHooks = new PluginHooks()
+
+const __dirname = import.meta.dirname
+const hooks = yaml.load(
+  await fsp.readFile(path.join(__dirname, "pluginHooks.yaml"), "utf8")
+)
 pluginHooks.initHooks(hooks)
 
-const initPluginInstance = function (pluginInstance) {
+function initPluginInstance (pluginInstance) {
   if (typeof pluginInstance.init === "function") {
     pluginInstance.init()
   }
   return pluginHooks.register(pluginInstance)
 }
 
-const loadPlugin = function (directory) {
+async function loadPlugin (directory) {
+  log.info(`Loading plugin "${directory}" …`)
+
   let instance
   try {
-    instance = require(directory)
-
+    instance = await import(`${directory}/${path.basename(directory)}.js`)
   }
   catch (error) {
     if (error.code !== "MODULE_NOT_FOUND") {
@@ -35,20 +38,23 @@ const loadPlugin = function (directory) {
     return
   }
 
-  import object from path.join(directory, "package.json")
-  for (const key of Object.keys(object || {})) {
-    const value = object[key]
-    instance[key] = value
-  }
+  const fullInstance = Object.assign(
+    {},
+    instance.default || instance,
+    packageJson,
+  )
 
-  initPluginInstance(instance)
-  return log.info(`Plugin ${instance.name} loaded`)
+  initPluginInstance(fullInstance)
+
+  log.info(`Plugin ${fullInstance.name} loaded`)
 }
 
+// TODO: Maybe load plugins in parallel
+export async function loadPlugins (directory) {
+  const dirs = (await fsp.readdir(directory))
+    .filter(dir => dir !== ".DS_Store" && dir !== "dummy")
 
-module.exports.loadPlugins = directory => fs.readdir(directory, (error, dirs) => {
-  if (error) {
-    throw error
+  for (const dir of dirs) {
+    await loadPlugin(path.resolve(__dirname, `../plugins/${dir}`))
   }
-  return dirs.forEach(dir => loadPlugin(path.resolve(__dirname, "../plugins/" + dir)))
-})
+}

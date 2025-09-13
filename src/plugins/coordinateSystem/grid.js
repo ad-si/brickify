@@ -7,6 +7,10 @@
 
 import THREE from "three"
 
+let materialGridNormal
+let materialGrid5
+let materialGrid10
+
 export default function (threejsNode, globalConfig) {
   setupMaterials(globalConfig)
   axisLines(threejsNode, globalConfig)
@@ -19,18 +23,19 @@ export default function (threejsNode, globalConfig) {
   Every 5<sup>th</sup> and 10<sup>th</sup> line is thicker than the others.
 */
 var setupMaterials = function (globalConfig) {
-  this.materialGridNormal = new THREE.LineBasicMaterial({
+  materialGridNormal = new THREE.LineBasicMaterial({
     color: globalConfig.colors.gridNormal,
     linewidth: globalConfig.gridLineWidthNormal,
   })
-  this.materialGrid5 = new THREE.LineBasicMaterial({
+  materialGrid5 = new THREE.LineBasicMaterial({
     color: globalConfig.colors.grid5,
     linewidth: globalConfig.gridLineWidth5,
   })
-  return this.materialGrid10 = new THREE.LineBasicMaterial({
+  materialGrid10 = new THREE.LineBasicMaterial({
     color: globalConfig.colors.grid10,
     linewidth: globalConfig.gridLineWidth10,
   })
+  return materialGrid10
 }
 
 /*
@@ -40,7 +45,7 @@ var setupMaterials = function (globalConfig) {
   Make half as big to prevent z-fighting with colored axis indicators
 */
 var axisLines = function (threejsNode, globalConfig) {
-  const material = this.materialGrid10
+  const material = materialGrid10
   const gridLineGeometryXPositive = new THREE.Geometry()
   const gridLineGeometryYPositive = new THREE.Geometry()
   const gridLineGeometryXNegative = new THREE.Geometry()
@@ -98,13 +103,13 @@ var otherLines = function (threejsNode, globalConfig) {
       var material
       const num = i * globalConfig.gridStepSize
       if ((i % 10) === 0) {
-        material = this.materialGrid10
+        material = materialGrid10
       }
       else if ((i % 5) === 0) {
-        material = this.materialGrid5
+        material = materialGrid5
       }
       else {
-        material = this.materialGridNormal
+        material = materialGridNormal
       }
       const gridLineGeometryXPositive = new THREE.Geometry()
       const gridLineGeometryYPositive = new THREE.Geometry()

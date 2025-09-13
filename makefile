@@ -5,17 +5,14 @@ help: makefile
 
 .PHONY: build
 build:
-	npx cake build
-	cakeUtilities.buildServer()
+	npx vite build
 
 
 # The main server part which is responsible for delivering the
 # website and for server-side plugin integration and model processing
 .PHONY: start
 start:
-	require './src/server/main'
-		.setupRouting()
-		.startServer()
+	./bin/cli.js start
 
 
 # .PHONY: link-hooks  # Links git hooks into .git/hooks
@@ -45,4 +42,5 @@ prepublish:
 
 .PHONY: clean
 clean:
-	npx cake clean
+	rm -rf node_modules
+	rm -rf public

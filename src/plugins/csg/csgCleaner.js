@@ -1,6 +1,6 @@
 import log from "loglevel"
 
-const clean = function (geometry, options) {
+export default function clean (geometry, options) {
   let d; let geometries
   if (options == null) {
     options = {}
@@ -190,5 +190,3 @@ var compactClasses = function (equivalenceClasses) {
     return result
   })()
 }
-
-module.exports.clean = clean

@@ -5,7 +5,7 @@ import VolumeFiller from "./voxelization/VolumeFiller.js"
 import BrickLayouter from "./Layout/BrickLayouter.js"
 import PlateLayouter from "./Layout/PlateLayouter.js"
 import LayoutOptimizer from "./Layout/LayoutOptimizer.js"
-import Random from "./Random.js"
+import * as Random from "./Random.js"
 
 export default class LegoPipeline {
   constructor () {
@@ -187,8 +187,13 @@ onlyReLayout: ${options.reLayout})`,
     }
     this.terminated = true
     __guardMethod__(this.currentStep, "terminate", o => o.terminate())
+    
+    // Terminate persistent workers
+    this.voxelizer.terminate()
+    this.volumeFiller.terminate()
+    
     if (typeof this.reject === "function") {
-      this.reject(`LegoPipeline was terminated at step ${this.currentStep.name}`)
+      this.reject(`LegoPipeline was terminated at step ${this.currentStep ? this.currentStep.name : 'unknown'}`)
     }
     this.currentStep = null
     return this.reject = null

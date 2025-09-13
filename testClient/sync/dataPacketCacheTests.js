@@ -357,7 +357,7 @@ describe("dataPacket client cache", () => {
         responseText: "Invalid data packet id provided",
       })
       const packet = {id: "äöü", data: {a: 0, b: "c"}}
-      const del = dataPackets.delete(packet.id)
+      const del = dataPackets.delete_(packet.id)
       return Promise.all([
         expect(del).not.to.be.fulfilled,
         del.catch(error => expect(error).to.have.property("status", 400)),
@@ -379,7 +379,7 @@ describe("dataPacket client cache", () => {
         },
       })
       const packet = {id: "abcdefgh", data: {a: 0, b: "c"}}
-      const del = dataPackets.delete(packet.id)
+      const del = dataPackets.delete_(packet.id)
       return Promise.all([
         expect(del).not.to.be.fulfilled,
         del.catch((error) => {
@@ -402,7 +402,7 @@ describe("dataPacket client cache", () => {
         responseText: "",
       })
       const packet = {id: "abcdefgh", data: {a: 0, b: "c"}}
-      const del = dataPackets.delete(packet.id)
+      const del = dataPackets.delete_(packet.id)
       return Promise.all([
         expect(del).to.be.fulfilled,
         expect(del).to.eventually.be.empty,
@@ -432,7 +432,7 @@ describe("dataPacket client cache", () => {
         },
       })
       const packet = {id: "abcdefgh", data: {a: 0, b: "c"}}
-      return dataPackets.delete(packet.id)
+      return dataPackets.delete_(packet.id)
         .then(() => {
           const existence = dataPackets.exists(packet.id)
           return Promise.all([

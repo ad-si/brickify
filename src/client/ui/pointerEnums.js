@@ -1,4 +1,4 @@
-module.exports.events = {
+export const events = Object.freeze({
   PointerOver: "PointerOver",
   PointerEnter: "PointerEnter",
   PointerDown: "PointerDown",
@@ -10,10 +10,9 @@ module.exports.events = {
   GotPointerCapture: "GotPointerCapture",
   LostPointerCapture: "LostPointerCapture",
   ContextMenu: "ContextMenu",
-}
-Object.freeze(module.exports.events)
+})
 
-module.exports.buttonStates = {
+export const buttonStates = Object.freeze({
   none: 0,
   left: 1,
   right: 2,
@@ -21,6 +20,4 @@ module.exports.buttonStates = {
   x1: 8,
   x2: 16,
   eraser: 32,
-}
-
-Object.freeze(module.exports.buttonStates)
+})

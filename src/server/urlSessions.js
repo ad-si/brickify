@@ -3,7 +3,7 @@ import clone from "clone"
 const sessions = {}
 const shareLinks = {}
 
-module.exports.middleware = function (request, response, next) {
+export function middleware (request, response, next) {
   // if in /app, do we have a share url?
   let sessionId
   if ((request.path === "/app") && (request.query.share != null)) {
@@ -26,7 +26,7 @@ module.exports.middleware = function (request, response, next) {
   }
 }
 
-module.exports.generateShareId = function (sid) {
+export function generateShareId (sid) {
   // check if share id exists
   for (const key of Object.keys(shareLinks || {})) {
     if (shareLinks[key] === sid) {

@@ -16,12 +16,22 @@ export default class Coloring {
     this._getRandomBrickMaterials = this._getRandomBrickMaterials.bind(this)
     this._createBrickMaterials = this._createBrickMaterials.bind(this)
     this.getTextureMaterialForBrick = this.getTextureMaterialForBrick.bind(this)
-    this.globalConfig = globalConfig
+    // Provide minimal defaults if no config provided
+    const defaultConfig = { colors: {
+      modelColor: 0xeeeeee,
+      modelOpacity: 0.8,
+      objectColorMult: 1,
+      objectShadowColorMult: 0.1,
+      brickShadowOpacity: 0.5,
+      modelShadowOpacity: 0.5,
+    } }
+    const mergedColors = Object.assign({}, defaultConfig.colors, (globalConfig && globalConfig.colors) || {})
+    this.globalConfig = Object.assign({}, defaultConfig, globalConfig, { colors: mergedColors })
     this.textureMaterialCache = {}
 
     this.brickMaterial = this._createMaterial(0xfff000) // orange
 
-    this.studTexture = THREE.ImageUtils.loadTexture("img/stud.png")
+    this.studTexture = THREE.ImageUtils.loadTexture("/img/stud.png")
     this.studTexture.wrapS = THREE.RepeatWrapping
     this.studTexture.wrapT = THREE.RepeatWrapping
 

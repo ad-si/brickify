@@ -4,7 +4,7 @@ export default class DataPacketsMock {
     this.exists = this.exists.bind(this)
     this.get = this.get.bind(this)
     this.put = this.put.bind(this)
-    this.delete = this.delete.bind(this)
+    this.delete_ = this.delete_.bind(this)
     this.calls = 0
     this.createCalls = []
     this.nextIds = []
@@ -67,7 +67,7 @@ export default class DataPacketsMock {
     }
   }
 
-  delete (id) {
+  delete_ (id) {
     this.calls++
     const nextDelete = this.nextDeletes.shift()
     this.deleteCalls.push({id, delete: nextDelete})

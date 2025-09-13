@@ -8,40 +8,31 @@
 let packets = {}
 
 // cache is the big brother of put: it will always store the packet and resolve
-module.exports.cache = packet => packets[packet.id] = Promise.resolve(packet)
-const {
-  cache,
-} = module.exports
+export const cache = packet => packets[packet.id] = Promise.resolve(packet)
 
 // ensureDelete is the big brother of delete: it will delete the packet if
 // present and always resolve
-module.exports.ensureDelete = function (id) {
+export const ensureDelete = function (id) {
   delete packets[id]
   return Promise.resolve()
 }
-const {
-  ensureDelete,
-} = module.exports
 
-module.exports.create = packet => cache(packet)
+export const create = packet => cache(packet)
 
-module.exports.exists = function (id) {
+export const exists = function (id) {
   if (packets[id] == null) {
     packets[id] = Promise.reject(id)
   }
   return packets[id].then(() => id)
 }
-const {
-  exists,
-} = module.exports
 
-module.exports.get = id => packets[id] != null ? packets[id] : packets[id] = Promise.reject(id)
+export const get = id => packets[id] != null ? packets[id] : packets[id] = Promise.reject(id)
 
-module.exports.put = packet => exists(packet.id)
+export const put = packet => exists(packet.id)
   .then(() => cache(packet))
   .then(Promise.resolve(packet.id))
 
-module.exports.delete = function (id) {
+export const delete_ = function (id) {
   if (packets[id] != null) {
     return ensureDelete(id)
   }
@@ -50,7 +41,7 @@ module.exports.delete = function (id) {
   }
 }
 
-module.exports.clear = function () {
+export const clear = function () {
   packets = {}
   return Promise.resolve()
 }

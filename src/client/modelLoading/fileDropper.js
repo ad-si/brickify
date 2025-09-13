@@ -1,6 +1,6 @@
 let lastTarget = null
 
-module.exports.init = function (callback) {
+export const init = function (callback) {
   const target = document.body
   const overlay = addOverlay(target)
   return bindDropHandler(target, overlay, callback)

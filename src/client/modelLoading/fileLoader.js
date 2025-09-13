@@ -2,15 +2,15 @@ import log from "loglevel"
 import meshlib from "meshlib"
 import stlParser from "stl-parser"
 
-import modelCache from "./modelCache.js"
-import Spinner from "../Spinner.js"
+import * as modelCache from "./modelCache.js"
+import * as Spinner from "../Spinner.js"
 
 const readingString = "Reading file"
 const uploadString = "Uploading file"
 const loadedString = "File loaded!"
 const errorString = "Import failed!"
 
-module.exports.onLoadFile = function (files, feedbackTarget, spinnerOptions) {
+export const onLoadFile = function (files, feedbackTarget, spinnerOptions) {
   if (files.length < 1) {
     return Promise.reject()
   }

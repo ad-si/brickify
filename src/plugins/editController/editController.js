@@ -1,6 +1,6 @@
 import BrushHandler from "./BrushHandler.js"
 import PointEventHandler from "./pointEventHandler.js"
-import pointerEnums from "../../client/ui/pointerEnums.js"
+import * as pointerEnums from "../../client/ui/pointerEnums.js"
 
 export default class EditController {
   constructor () {

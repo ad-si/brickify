@@ -1,7 +1,7 @@
 import Brick from "../Brick.js"
 import Voxel from "../Voxel.js"
-import DataHelper from "../DataHelper.js"
-import Random from "../Random.js"
+import * as DataHelper from "../DataHelper.js"
+import * as Random from "../Random.js"
 import Layouter from "./Layouter.js"
 
 /*
@@ -9,6 +9,7 @@ import Layouter from "./Layouter.js"
  */
 export default class BrickLayouter extends Layouter {
   constructor (pseudoRandom) {
+    super()
     this._findMergeableNeighbors = this._findMergeableNeighbors.bind(this)
     this._findMergeableNeighborsInDirection = this._findMergeableNeighborsInDirection.bind(this)
     this._minFractionOfConnectionsPresent = this._minFractionOfConnectionsPresent.bind(this)

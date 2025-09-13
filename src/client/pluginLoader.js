@@ -55,76 +55,96 @@ export default class PluginLoader {
 
   // Since browserify.js does not support dynamic require
   // all plugins must be explicitly written down
-  loadPlugins () {
+  async loadPlugins () {
     this.pluginInstances = []
 
     if (this.globalConfig.plugins.dummy) {
+      const DummyPlugin = await import("../plugins/dummy/client.js")
+      const dummyPackage = await import("../plugins/dummy/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/dummy"),
-        require("../plugins/dummy/package.json"),
+        DummyPlugin.default,
+        dummyPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.undo) {
+      const UndoPlugin = await import("../plugins/undo/undo.js")
+      const undoPackage = await import("../plugins/undo/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/undo"),
-        require("../plugins/undo/package.json"),
+        UndoPlugin.default,
+        undoPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.coordinateSystem) {
+      const CoordinateSystemPlugin = await import("../plugins/coordinateSystem/coordinateSystem.js")
+      const coordinateSystemPackage = await import("../plugins/coordinateSystem/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/coordinateSystem"),
-        require("../plugins/coordinateSystem/package.json"),
+        CoordinateSystemPlugin.default,
+        coordinateSystemPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.nodeVisualizer) {
+      const NodeVisualizerPlugin = await import("../plugins/nodeVisualizer/nodeVisualizer.js")
+      const nodeVisualizerPackage = await import("../plugins/nodeVisualizer/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/nodeVisualizer"),
-        require("../plugins/nodeVisualizer/package.json"),
+        NodeVisualizerPlugin.default,
+        nodeVisualizerPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.legoBoard) {
+      const LegoBoardPlugin = await import("../plugins/legoBoard/LegoBoard.js")
+      const legoBoardPackage = await import("../plugins/legoBoard/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/legoBoard"),
-        require("../plugins/legoBoard/package.json"),
+        LegoBoardPlugin.default,
+        legoBoardPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.newBrickator) {
+      const NewBrickatorPlugin = await import("../plugins/newBrickator/newBrickator.js")
+      const newBrickatorPackage = await import("../plugins/newBrickator/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/newBrickator"),
-        require("../plugins/newBrickator/package.json"),
+        NewBrickatorPlugin.default,
+        newBrickatorPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.fidelityControl) {
+      const FidelityControlPlugin = await import("../plugins/fidelityControl/FidelityControl.js")
+      const fidelityControlPackage = await import("../plugins/fidelityControl/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/fidelityControl"),
-        require("../plugins/fidelityControl/package.json"),
+        FidelityControlPlugin.default,
+        fidelityControlPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.editController) {
+      const EditControllerPlugin = await import("../plugins/editController/editController.js")
+      const editControllerPackage = await import("../plugins/editController/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/editController"),
-        require("../plugins/editController/package.json"),
+        EditControllerPlugin.default,
+        editControllerPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.csg) {
+      const CsgPlugin = await import("../plugins/csg/csg.js")
+      const csgPackage = await import("../plugins/csg/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/csg"),
-        require("../plugins/csg/package.json"),
+        CsgPlugin.default,
+        csgPackage.default,
       ),
       )
     }
     if (this.globalConfig.plugins.legoInstructions) {
+      const LegoInstructionsPlugin = await import("../plugins/legoInstructions/LegoInstructions.js")
+      const legoInstructionsPackage = await import("../plugins/legoInstructions/package.json")
       this.pluginInstances.push(this._loadPlugin(
-        require("../plugins/legoInstructions"),
-        require("../plugins/legoInstructions/package.json"),
+        LegoInstructionsPlugin.default,
+        legoInstructionsPackage.default,
       ),
       )
     }

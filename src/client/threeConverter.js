@@ -1,5 +1,4 @@
-module.exports.toStandardGeometry = function (modelObject) {
-
+export function toStandardGeometry (modelObject) {
   const {
     vertexCoordinates,
     faceVertexIndices,
@@ -34,8 +33,8 @@ module.exports.toStandardGeometry = function (modelObject) {
   return geometry
 }
 
-module.exports.toBufferGeometry = function (modelObject) {
 
+export function toBufferGeometry (modelObject) {
   let i
   let asc; let end
   let asc1; let end1
@@ -74,8 +73,7 @@ module.exports.toBufferGeometry = function (modelObject) {
 }
 
 
-module.exports.threeGeometryToFaceVertexMesh = function (threeGeometry) {
-
+export function threeGeometryToFaceVertexMesh (threeGeometry) {
   let index; let offset
   const faceVertexMesh = {
     vertexCoordinates: new Array(threeGeometry.vertices.length * 3),

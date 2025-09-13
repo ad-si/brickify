@@ -1,30 +1,30 @@
-import samples from "../src/server/modelSamples.js"
-import storage from "../src/server/modelStorage.js"
+import * as modelSamples from "../src/server/modelSamples.js"
+import * as storage from "../src/server/modelStorage.js"
 
-const exists = identifier => samples.exists(identifier)
+const existsIden = identifier => modelSamples.exists(identifier)
   .catch(() => storage.exists(identifier))
 
-module.exports.exists = function (request, response) {
+export function exists (request, response) {
   const {
     identifier,
   } = request.params
 
-  return exists(identifier)
+  return existsIden(identifier)
     .then(() => response.status(200)
       .send(identifier))
     .catch(() => response.status(404)
       .send(identifier))
 }
 
-const get = identifier => samples.get(identifier)
+const getIden = identifier => modelSamples.get(identifier)
   .catch(() => storage.get(identifier))
 
-module.exports.get = function (request, response) {
+export function get (request, response) {
   const {
     identifier,
   } = request.params
 
-  return get(identifier)
+  return getIden(identifier)
     .then((model) => {
       response.set("Content-Type", "application/octet-stream")
       return response.send(model)
@@ -33,7 +33,7 @@ module.exports.get = function (request, response) {
       .send(identifier))
 }
 
-module.exports.store = function (request, response) {
+export function store (request, response) {
   const {
     identifier,
   } = request.params

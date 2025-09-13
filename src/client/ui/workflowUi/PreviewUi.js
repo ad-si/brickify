@@ -1,5 +1,5 @@
 import PreviewAssemblyUi from "./PreviewAssemblyUi.js"
-import piwikTracking from "../../piwikTracking.js"
+import * as piwikTracking from "../../piwikTracking.js"
 
 export default class PreviewUi {
   constructor (workflowUi) {

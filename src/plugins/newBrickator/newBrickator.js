@@ -4,9 +4,9 @@ import log from "loglevel"
 import LegoPipeline from "./pipeline/LegoPipeline.js"
 import PipelineSettings from "./pipeline/PipelineSettings.js"
 import Brick from "./pipeline/Brick.js"
-import threeHelper from "../../client/threeHelper.js"
-import threeConverter from "../../client/threeConverter.js"
-import Spinner from "../../client/Spinner.js"
+import * as threeHelper from "../../client/threeHelper.js"
+import * as threeConverter from "../../client/threeConverter.js"
+// Spinner is only available in the browser; load lazily when needed
 
 /*
  * @class NewBrickator
@@ -24,6 +24,8 @@ export default class NewBrickator {
     this._prepareCSGOptions = this._prepareCSGOptions.bind(this)
     this.getHotkeys = this.getHotkeys.bind(this)
     this.pipeline = new LegoPipeline()
+    this.Spinner = null
+    this._runWithSpinner = this._runWithSpinner.bind(this)
   }
 
   init (bundle) {
@@ -32,19 +34,17 @@ export default class NewBrickator {
 
   onNodeAdd (node) {
     this.nodeVisualizer = this.bundle.getPlugin("nodeVisualizer")
-
-    Spinner.startOverlay(this.bundle.renderer.getDomElement())
-    return this.getNodeData(node)
-      .then(cachedData => {
-        if (this.nodeVisualizer != null) {
-          this.nodeVisualizer.objectModified(node, cachedData)
-        }
-        return Spinner.stop(this.bundle.renderer.getDomElement())
-      })
-      .catch(error => {
-        log.error(error)
-        return Spinner.stop(this.bundle.renderer.getDomElement())
-      })
+    return this._runWithSpinner(() =>
+      this.getNodeData(node)
+        .then(cachedData => {
+          if (this.nodeVisualizer != null) {
+            this.nodeVisualizer.objectModified(node, cachedData)
+          }
+        })
+    ).catch(error => {
+      const msg = (error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
+      log.error("newBrickator.onNodeAdd failed:", msg)
+    })
   }
 
   onNodeRemove (node) {
@@ -52,34 +52,33 @@ export default class NewBrickator {
   }
 
   runLegoPipeline (selectedNode) {
-    Spinner.startOverlay(this.bundle.renderer.getDomElement())
-    return this.getNodeData(selectedNode)
-      .then(cachedData => {
-        // since cached data already contains voxel grid, only run lego
-        const settings = new PipelineSettings(this.bundle.globalConfig)
-        settings.deactivateVoxelizing()
+    return this._runWithSpinner(() =>
+      this.getNodeData(selectedNode)
+        .then(cachedData => {
+          // since cached data already contains voxel grid, only run lego
+          const settings = new PipelineSettings(this.bundle.globalConfig)
+          settings.deactivateVoxelizing()
 
-        settings.setModelTransform(threeHelper.getTransformMatrix(selectedNode))
+          settings.setModelTransform(threeHelper.getTransformMatrix(selectedNode))
 
-        const data = {
-          optimizedModel: cachedData.optimizedModel,
-          grid: cachedData.grid,
-        }
+          const data = {
+            optimizedModel: cachedData.optimizedModel,
+            grid: cachedData.grid,
+          }
 
-        return this.pipeline.run(data, settings, true)
-          .then(() => {
-            cachedData.csgNeedsRecalculation = true
+          return this.pipeline.run(data, settings, true)
+            .then(() => {
+              cachedData.csgNeedsRecalculation = true
 
-            if (this.nodeVisualizer != null) {
-              this.nodeVisualizer.objectModified(selectedNode, cachedData)
-            }
-            return Spinner.stop(this.bundle.renderer.getDomElement())
-          })
-      })
-      .catch(error => {
-        log.error(error)
-        return Spinner.stop(this.bundle.renderer.getDomElement())
-      })
+              if (this.nodeVisualizer != null) {
+                this.nodeVisualizer.objectModified(selectedNode, cachedData)
+              }
+            })
+        })
+    ).catch(error => {
+      const msg = (error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
+      log.error("newBrickator.runLegoPipeline failed:", msg)
+    })
   }
 
   /*
@@ -124,7 +123,10 @@ export default class NewBrickator {
             return this.nodeVisualizer != null ? this.nodeVisualizer.objectModified(selectedNode, cachedData) : undefined
           })
       })
-      .catch(error => log.error(error))
+      .catch(error => {
+        const msg = (error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
+        log.error("newBrickator.relayoutModifiedParts failed:", msg)
+      })
   }
 
   _createDataStructure (selectedNode) {
@@ -270,6 +272,28 @@ export default class NewBrickator {
           callback: () => this.pipeline.terminate(),
         },
       ],
+    }
+  }
+
+  async _runWithSpinner (action) {
+    // Ensure Spinner module is loaded first to avoid start/stop race
+    if (typeof window === "undefined") {
+      return action()
+    }
+    if (!this.Spinner) {
+      try {
+        this.Spinner = await import("../../client/Spinner.js")
+      } catch (_e) {
+        // If spinner cannot be loaded, run action without it
+        return action()
+      }
+    }
+    const target = this.bundle.renderer.getDomElement()
+    this.Spinner.startOverlay(target)
+    try {
+      return await action()
+    } finally {
+      this.Spinner.stop(target)
     }
   }
 }

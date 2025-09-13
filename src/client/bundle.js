@@ -3,12 +3,14 @@ import Ui from "./ui/ui.js"
 import Renderer from "./rendering/Renderer.js"
 import ModelLoader from "./modelLoading/modelLoader.js"
 import SceneManager from "./sceneManager.js"
-import Spinner from "./Spinner.js"
+import * as Spinner from "./Spinner.js"
 
 import SyncObject from "../common/sync/syncObject.js"
-SyncObject.dataPacketProvider = require("./sync/dataPackets.js")
+import * as dataPackets from "./sync/dataPackets.js"
+SyncObject.dataPacketProvider = dataPackets
 import Node from "../common/project/node.js"
-Node.modelProvider = require("./modelLoading/modelCache.js")
+import * as modelCache from "./modelLoading/modelCache.js"
+Node.modelProvider = modelCache
 
 import DownloadUi from "./ui/workflowUi/DownloadUi.js"
 
@@ -28,7 +30,9 @@ export default class Bundle {
     this.modelLoader = new ModelLoader(this)
     this.sceneManager = new SceneManager(this)
     this.renderer = new Renderer(this.pluginHooks, this.globalConfig, controls)
-    this.pluginInstances = this.pluginLoader.loadPlugins()
+    // Ensure pluginInstances exists early to avoid undefined iteration
+    this.pluginInstances = []
+    // Note: pluginInstances will be set by loadPlugins() method
     if (this.globalConfig.buildUi) {
       this.ui = new Ui(this)
     }
@@ -37,7 +41,8 @@ export default class Bundle {
     }
   }
 
-  init () {
+  async init () {
+    this.pluginInstances = await this.pluginLoader.loadPlugins()
     this.pluginLoader.initPlugins()
     if (this.ui != null) {
       this.ui.init()
@@ -48,7 +53,8 @@ export default class Bundle {
   }
 
   getPlugin (name) {
-    for (const p of Array.from(this.pluginInstances)) {
+    const instances = this.pluginInstances || []
+    for (const p of instances) {
       if (p.name === name) {
         return p
       }

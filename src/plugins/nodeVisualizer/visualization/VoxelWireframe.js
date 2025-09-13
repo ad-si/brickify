@@ -1,7 +1,7 @@
 import THREE from "three"
 
 import VoxelUnion from "../../csg/VoxelUnion.js"
-import interactionHelper from "../../../client/interactionHelper.js"
+import * as interactionHelper from "../../../client/interactionHelper.js"
 
 
 // This class creates a wireframe representation with darkened sides

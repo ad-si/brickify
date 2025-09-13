@@ -1,13 +1,17 @@
 import $ from "jquery"
+// Ensure Bootstrap plugins attach to the same jQuery instance used in the app
 window.jQuery = window.$ = $
+// Kick off loading Bootstrap (no top-level await to support legacy targets)
+const bootstrapReady = import("bootstrap/dist/js/bootstrap.js")
 
 import ZeroClipboard from "zeroclipboard"
 import log from "loglevel"
 
 import Bundle from "./bundle.js"
+
 import globalConfig from "../common/globals.yaml"
 
-import piwikTracking from "./piwikTracking.js"
+import * as piwikTracking from "./piwikTracking.js"
 
 if (process.env.NODE_ENV === "development") {
   log.enableAll()
@@ -58,7 +62,9 @@ bundle.init()
   .then(postInitCallback)
 
 Promise.resolve($.get("/share"))
-  .then((link) => {
+  .then(async (link) => {
+    // Ensure Bootstrap plugins are ready before using tooltips
+    await bootstrapReady
   // init share logic
     ZeroClipboard.config(
       {swfPath: "/node_modules/zeroclipboard/dist/ZeroClipboard.swf"})

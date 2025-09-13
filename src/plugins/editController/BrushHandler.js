@@ -1,5 +1,5 @@
 import log from "loglevel"
-import piwikTracking from "../../client/piwikTracking.js"
+import * as piwikTracking from "../../client/piwikTracking.js"
 
 export default class BrushHandler {
   constructor ( bundle, nodeVisualizer, editController ) {

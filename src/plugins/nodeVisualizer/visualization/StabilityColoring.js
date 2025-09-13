@@ -2,6 +2,7 @@ import Coloring from "./Coloring.js"
 
 export default class StabilityColoring extends Coloring {
   constructor () {
+    super()
     this._createStabilityMaterials = this._createStabilityMaterials.bind(this)
     this.getMaterialsForBrick = this.getMaterialsForBrick.bind(this)
     this._createStabilityMaterials()

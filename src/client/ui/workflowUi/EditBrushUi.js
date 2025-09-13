@@ -1,4 +1,4 @@
-import piwikTracking from "../../piwikTracking.js"
+import * as piwikTracking from "../../piwikTracking.js"
 
 /*
  * @class EditBrushUi

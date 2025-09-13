@@ -1,6 +1,6 @@
 import THREE from "three"
-import threeHelper from "../../client/threeHelper.js"
-import threeConverter from "../../client/threeConverter.js"
+import * as threeHelper from "../../client/threeHelper.js"
+import * as threeConverter from "../../client/threeConverter.js"
 
 export default class ModelVisualization {
   constructor (globalConfig, node, threeNode, coloring) {

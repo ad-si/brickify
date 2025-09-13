@@ -7,9 +7,11 @@
 
 import THREE from "three"
 
-import globalConfig from "../../common/globals.yaml"
-import RenderTargetHelper from "../../client/rendering/renderTargetHelper.js"
+import * as RenderTargetHelper from "../../client/rendering/renderTargetHelper.js"
 import stencilBits from "../../client/rendering/stencilBits.js"
+import DisposableResource from "../../client/rendering/DisposableResource.js"
+
+// Global config will be loaded conditionally
 
 const dimension = 400
 
@@ -26,6 +28,10 @@ export default class LegoBoard {
     this.toggleVisibility = this.toggleVisibility.bind(this)
     this.setFidelity = this.setFidelity.bind(this)
     this._updateFidelitySettings = this._updateFidelitySettings.bind(this)
+    this.dispose = this.dispose.bind(this)
+    
+    // Initialize disposable resource tracking
+    this.disposableResource = new DisposableResource()
   }
 
   init (bundle) {
@@ -51,20 +57,20 @@ export default class LegoBoard {
 
   _initbaseplateBox () {
     // Create baseplate with 5 faces in each direction
-    const box = new THREE.BoxGeometry(dimension, dimension, 8, 5, 5)
-    const bufferGeometry = new THREE.BufferGeometry()
+    const box = this.disposableResource.track(new THREE.BoxGeometry(dimension, dimension, 8, 5, 5))
+    const bufferGeometry = this.disposableResource.track(new THREE.BufferGeometry())
     bufferGeometry.fromGeometry(box)
-    this.baseplateBox = new THREE.Mesh(bufferGeometry, this.baseplateMaterial)
+    this.baseplateBox = this.disposableResource.track(new THREE.Mesh(bufferGeometry, this.baseplateMaterial))
     this.baseplateBox.translateZ(-4)
     return this.threejsNode.add(this.baseplateBox)
   }
 
   _initStudGeometries () {
-    this.studsContainer = this._generateStuds(7)
+    this.studsContainer = this.disposableResource.track(this._generateStuds(7))
     this.studsContainer.visible = false
     this.threejsNode.add(this.studsContainer)
 
-    this.highFiStudsContainer = this._generateStuds(42)
+    this.highFiStudsContainer = this.disposableResource.track(this._generateStuds(42))
     this.highFiStudsContainer.visible = false
     return this.threejsNode.add(this.highFiStudsContainer)
   }
@@ -98,46 +104,57 @@ export default class LegoBoard {
         studsGeometry.merge(studGeometry, translation)
       }
     }
+    
+    // Dispose the original study geometry since it's been merged
+    studGeometry.dispose()
+    
     const bufferGeometry = new THREE.BufferGeometry()
     bufferGeometry.fromGeometry(studsGeometry)
+    
+    // Dispose the original geometry after conversion
+    studsGeometry.dispose()
 
     const container = new THREE.Object3D()
     for (x = (-dimension + xSpacing) / 2, end2 = dimension / 2, step2 = studsGeometrySize, asc2 = step2 > 0; asc2 ? x < end2 : x > end2; x += step2) {
       var asc3; var end3; var step3
       for (y = (-dimension + ySpacing) / 2, end3 = dimension / 2, step3 = studsGeometrySize, asc3 = step3 > 0; asc3 ? y < end3 : y > end3; y += step3) {
+        // Track the buffer geometry and mesh
         const mesh = new THREE.Mesh(bufferGeometry, this.studMaterial)
         mesh.translateX(x)
         mesh.translateY(y)
         container.add(mesh)
       }
     }
+    
+    // Track the buffer geometry for disposal
+    this.disposableResource.track(bufferGeometry)
 
     return container
   }
 
   _initMaterials () {
-    const studTexture = THREE.ImageUtils.loadTexture("img/baseplateStud.png")
+    const studTexture = this.disposableResource.track(THREE.ImageUtils.loadTexture("/img/baseplateStud.png"))
     studTexture.wrapS = THREE.RepeatWrapping
     studTexture.wrapT = THREE.RepeatWrapping
     studTexture.repeat.set(dimension / 8, dimension / 8)
 
-    this.baseplateMaterial = new THREE.MeshLambertMaterial({
-      color: globalConfig.colors.basePlate,
-    })
-    this.baseplateTexturedMaterial = new THREE.MeshLambertMaterial({
+    this.baseplateMaterial = this.disposableResource.track(new THREE.MeshLambertMaterial({
+      color: this.globalConfig.colors.basePlate,
+    }))
+    this.baseplateTexturedMaterial = this.disposableResource.track(new THREE.MeshLambertMaterial({
       map: studTexture,
-    })
+    }))
     this.currentBaseplateMaterial = this.baseplateTexturedMaterial
 
-    this.baseplateTransparentMaterial = new THREE.MeshLambertMaterial({
-      color: globalConfig.colors.basePlate,
+    this.baseplateTransparentMaterial = this.disposableResource.track(new THREE.MeshLambertMaterial({
+      color: this.globalConfig.colors.basePlate,
       opacity: 0.4,
       transparent: true,
-    })
+    }))
 
-    return this.studMaterial = new THREE.MeshLambertMaterial({
-      color: globalConfig.colors.basePlateStud,
-    })
+    return this.studMaterial = this.disposableResource.track(new THREE.MeshLambertMaterial({
+      color: this.globalConfig.colors.basePlateStud,
+    }))
   }
 
   on3dUpdate () {
@@ -179,11 +196,12 @@ export default class LegoBoard {
     ))) {
       if (this.pipelineSceneTarget != null) {
         RenderTargetHelper.deleteRenderTarget(this.pipelineSceneTarget, threeRenderer)
+        this.disposableResource.untrack(this.pipelineSceneTarget)
       }
 
-      this.pipelineSceneTarget = RenderTargetHelper.createRenderTarget(
+      this.pipelineSceneTarget = this.disposableResource.track(RenderTargetHelper.createRenderTarget(
         threeRenderer, null, null, 1.0,
-      )
+      ))
       this.renderTargetsInitialized = true
     }
 
@@ -298,5 +316,46 @@ export default class LegoBoard {
       this.baseplateBox.material = this.baseplateMaterial
     }
     return this.currentBaseplateMaterial = this.baseplateBox.material
+  }
+
+  dispose() {
+    if (this.disposableResource && !this.disposableResource.isDisposed()) {
+      // Clean up render targets
+      if (this.pipelineSceneTarget) {
+        RenderTargetHelper.deleteRenderTarget(this.pipelineSceneTarget, this.bundle?.renderer?.threeRenderer)
+      }
+      
+      // Remove objects from scenes
+      if (this.threejsNode) {
+        if (this.baseplateBox) this.threejsNode.remove(this.baseplateBox)
+        if (this.studsContainer) this.threejsNode.remove(this.studsContainer)
+        if (this.highFiStudsContainer) this.threejsNode.remove(this.highFiStudsContainer)
+      }
+      
+      if (this.pipelineScene) {
+        if (this.baseplateBox) this.pipelineScene.remove(this.baseplateBox)
+        if (this.studsContainer) this.pipelineScene.remove(this.studsContainer)
+        if (this.highFiStudsContainer) this.pipelineScene.remove(this.highFiStudsContainer)
+      }
+      
+      // Dispose all tracked resources
+      this.disposableResource.dispose()
+      this.disposableResource = null
+      
+      // Clear references
+      this.bundle = null
+      this.globalConfig = null
+      this.threejsNode = null
+      this.pipelineScene = null
+      this.baseplateBox = null
+      this.studsContainer = null
+      this.highFiStudsContainer = null
+      this.pipelineSceneTarget = null
+      this.baseplateMaterial = null
+      this.baseplateTexturedMaterial = null
+      this.baseplateTransparentMaterial = null
+      this.studMaterial = null
+      this.currentBaseplateMaterial = null
+    }
   }
 }

@@ -7,7 +7,7 @@
 
 import $ from "jquery"
 
-import piwikTracking from "../../client/piwikTracking.js"
+import * as piwikTracking from "../../client/piwikTracking.js"
 
 
 const minimalAcceptableFps = 20

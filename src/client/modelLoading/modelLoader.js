@@ -4,7 +4,7 @@
 
 import log from "loglevel"
 
-import modelCache from "./modelCache.js"
+import * as modelCache from "./modelCache.js"
 import Node from "../../common/project/node.js"
 
 /*

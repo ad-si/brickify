@@ -41,13 +41,14 @@ const addDefaults = options => (() => {
   return result
 })()
 
+
 /*
  * Starts a spinner attached to the given target node.
  * @param {DOMNode} [target=document.body] the target node
  * @return {Number} the number of start invocations of this spinner
  * @memberOf Spinner
  */
-const start = function (target, options) {
+export function start (target, options) {
   if (options == null) {
     options = {}
   }
@@ -67,7 +68,7 @@ const start = function (target, options) {
 
   return ++spinnerState.count
 }
-module.exports.start = start
+
 
 /*
  * Starts a spinner located centered above the given target node.
@@ -75,7 +76,7 @@ module.exports.start = start
  * @return {Number} the number of start invocations of this spinner
  * @memberOf Spinner
  */
-const startOverlay = function (target, options) {
+export function startOverlay (target, options) {
   if (options == null) {
     options = {}
   }
@@ -103,7 +104,7 @@ const startOverlay = function (target, options) {
 
   return spinnerState.count++
 }
-module.exports.startOverlay = startOverlay
+
 
 /*
  * Stops a spinner associated with the given target node.
@@ -111,7 +112,7 @@ module.exports.startOverlay = startOverlay
  * @return {Number} the number of remaining start invocations of this spinner
  * @memberOf Spinner
  */
-const stop = function (target) {
+export function stop (target) {
   if (target == null) {
     target = defaultTarget
   }
@@ -135,4 +136,3 @@ const stop = function (target) {
   spinners.delete(target)
   return 0
 }
-module.exports.stop = stop

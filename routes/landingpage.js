@@ -1,35 +1,46 @@
 import path from "path"
-import samples from "../src/server/modelSamples.js"
+import { getSamples } from "../src/server/modelSamples.js"
 
-samples.getSamples()
+const samples = getSamples()
 
-module.exports.getLandingpage = (request, response) => response.render(
-  path.join("landingpage", "landingpage"), {
-    page: "landing",
-    samples,
-  },
-)
+export function getLandingpage (_request, response) {
+  return response.render(
+    path.join("landingpage", "landingpage"),
+    {
+      page: "landing",
+      samples,
+    },
+  )
+}
 
-module.exports.getContribute = (request, response) => response.render(
-  path.join("landingpage", "contribute"),
-  {pageTitle: "Contribute"},
-)
+export function getContribute (_request, response) {
+  return response.render(
+    path.join("landingpage", "contribute"),
+    { pageTitle: "Contribute" },
+  )
+}
 
-module.exports.getTeam = (request, response) => response.render(
-  path.join("landingpage", "team"),
-  {pageTitle: "Team"},
-)
+export function getTeam (_request, response) {
+  return response.render(
+    path.join("landingpage", "team"),
+    { pageTitle: "Team" },
+  )
+}
 
-module.exports.getImprint = (request, response) => response.render(
-  path.join("landingpage", "imprint"),
-  {pageTitle: "Imprint"},
-)
+export function getImprint (_request, response) {
+  return response.render(
+    path.join("landingpage", "imprint"),
+    { pageTitle: "Imprint" },
+  )
+}
 
-module.exports.getEducators = (request, response) => response.render(
-  path.join("landingpage", "educators"),
-  {
-    page: "landing",
-    pageTitle: "Educators",
-    samples,
-  },
-)
+export function getEducators (_request, response) {
+  return response.render(
+    path.join("landingpage", "educators"),
+    {
+      page: "landing",
+      pageTitle: "Educators",
+      samples,
+    },
+  )
+}

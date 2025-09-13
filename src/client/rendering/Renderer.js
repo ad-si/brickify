@@ -1,13 +1,13 @@
 import extend from "extend"
 import THREE from "three"
-import PointerControls from "three-pointer-controls"
+import threePointerControls from "three-pointer-controls"
 import log from "loglevel"
 
-import renderTargetHelper from "./renderTargetHelper.js"
+import * as renderTargetHelper from "./renderTargetHelper.js"
 import FxaaShaderPart from "./shader/FxaaPart.js"
 import SsaoShaderPart from "./shader/ssaoPart.js"
 import SsaoBlurPart from "./shader/ssaoBlurPart.js"
-import threeHelper from "../threeHelper.js"
+import * as threeHelper from "../threeHelper.js"
 
 /*
  * @class Renderer
@@ -38,9 +38,7 @@ export default class Renderer {
   // returns a promise which will resolve with the image
   renderToImage (camera, resolution = null) {
     if (camera == null) {
-      ({
-        camera,
-      } = this)
+      camera = this.camera
     }
     return new Promise((resolve, reject) => {
       return this.imageRenderQueries.push({
@@ -201,7 +199,7 @@ export default class Renderer {
 
       if (this.usePipelineSsao) {
         // Get a random texture for SSAO
-        const randomTex = THREE.ImageUtils.loadTexture("img/randomTexture.png")
+        const randomTex = THREE.ImageUtils.loadTexture("/img/randomTexture.png")
         randomTex.wrapS = THREE.RepeatWrapping
         randomTex.wrapT = THREE.RepeatWrapping
 
@@ -406,6 +404,7 @@ Rendering will be (partly) broken",
 
   _setupControls (globalConfig, controls) {
     if (!controls) {
+      const PointerControls = threePointerControls(THREE)
       controls = new PointerControls()
       extend(true, controls.config, globalConfig.controls)
     }

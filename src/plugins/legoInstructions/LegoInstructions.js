@@ -2,8 +2,8 @@ import { PNG } from "node-png"
 import THREE from "three"
 import log from "loglevel"
 
-import threeHelper from "../../client/threeHelper.js"
-import pieceListGenerator from "./PieceListGenerator.js"
+import * as threeHelper from "../../client/threeHelper.js"
+import * as pieceListGenerator from "./PieceListGenerator.js"
 import openScadGenerator from "./OpenScadGenerator.js"
 
 

@@ -45,23 +45,64 @@ export default class Voxelizer {
           }
 
           return this._getOptimizedVoxelSpaceModel(model, options)
-            .then(voxelSpaceModel => {
-              this.worker = this._getWorker()
-              return this.worker.voxelize(
-                voxelSpaceModel,
-                lineStepSize,
-                floatDelta,
-                voxelRoundingThreshold,
-                progressAndFinishedCallback,
-              )
-            })
+            .then(voxelSpaceModel => this._getWorker()
+              .then(worker => {
+                // Fallback to synchronous execution when worker is unavailable
+                if (!worker || typeof worker.postMessage !== "function") {
+                  HullVoxelWorker.voxelize(
+                    voxelSpaceModel,
+                    lineStepSize,
+                    floatDelta,
+                    voxelRoundingThreshold,
+                    progressAndFinishedCallback,
+                  )
+                  return
+                }
+
+                return new Promise((resolveWorker, rejectWorker) => {
+                  const cleanup = () => {
+                    worker.removeEventListener("message", handleMessage)
+                    worker.removeEventListener("error", handleError)
+                  }
+                  const handleMessage = (event) => {
+                    const message = event.data
+                    if (!message || !message.state) return
+                    if (message.state === "progress") {
+                      progressAndFinishedCallback(message)
+                    }
+                    else if (message.state === "finished") {
+                      cleanup()
+                      resolveWorker(progressAndFinishedCallback(message))
+                    }
+                    else if (message.state === "error") {
+                      cleanup()
+                      rejectWorker(new Error(message.error || "Worker error"))
+                    }
+                  }
+                  const handleError = (err) => {
+                    cleanup()
+                    rejectWorker(err)
+                  }
+                  worker.addEventListener("message", handleMessage)
+                  worker.addEventListener("error", handleError, { once: true })
+                  worker.postMessage({
+                    type: "voxelize",
+                    data: {
+                      model: voxelSpaceModel,
+                      lineStepSize,
+                      floatDelta,
+                      voxelRoundingThreshold,
+                    },
+                  })
+                })
+              }))
         })
-        .catch(error => reject(console.error))
+        .catch(error => reject(error))
     })
   }
 
   terminate () {
-    if (this.worker != null) {
+    if (this.worker != null && typeof this.worker.terminate === "function") {
       this.worker.terminate()
     }
     return this.worker = null
@@ -105,9 +146,26 @@ export default class Voxelizer {
 
   _getWorker () {
     if (this.worker != null) {
-      return this.worker
+      return Promise.resolve(this.worker)
     }
-    return operative(HullVoxelWorker)
+    if (typeof window === "undefined") {
+      return Promise.reject(new Error("Web Worker not available in this context"))
+    }
+    try {
+      const worker = new Worker("/js/workers/hullVoxel.worker.js")
+      this.worker = worker
+      return Promise.resolve(worker)
+    }
+    catch (e) {
+      // Fallback: provide a dummy that won't crash callers
+      this.worker = {
+        postMessage: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        terminate: () => {},
+      }
+      return Promise.resolve(this.worker)
+    }
   }
 
   _getTolerantDirection (dZ, tolerance) {

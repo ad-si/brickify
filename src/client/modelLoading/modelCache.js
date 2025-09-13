@@ -19,7 +19,7 @@ const exists = identifier => Promise.resolve(
   .catch((jqXHR) => {
     throw new Error(jqXHR.statusText)
   })
-module.exports.exists = exists
+export { exists }
 
 // sends the model to the server if the server hasn't got a model
 // with the same identifier
@@ -44,7 +44,7 @@ const submitDataToServer = function (identifier, data) {
     .catch(send)
 }
 
-module.exports.store = model => model
+export const store = model => model
   .getBase64()
   .then((base64Model) => {
     const identifier = md5(base64Model)
@@ -68,4 +68,4 @@ const buildModelPromise = identifier => requestDataFromServer(identifier)
 // Request an optimized mesh with the given identifier
 // The mesh will be provided by the cache if present or loaded from the server
 // if available.
-module.exports.request = identifier => modelCache[identifier] != null ? modelCache[identifier] : modelCache[identifier] = buildModelPromise(identifier)
+export const request = identifier => modelCache[identifier] != null ? modelCache[identifier] : modelCache[identifier] = buildModelPromise(identifier)

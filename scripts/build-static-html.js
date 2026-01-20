@@ -3,11 +3,17 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import jade from 'jade'
 import yaml from 'js-yaml'
+import stylus from 'stylus'
+import nib from 'nib'
+import bootstrap from 'bootstrap-styl'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
 const distDir = path.resolve(projectRoot, 'dist-static')
 const samplesDirectory = path.resolve(projectRoot, 'modelSamples')
+const globalConfig = yaml.load(
+  fs.readFileSync(path.resolve(projectRoot, 'src/common/globals.yaml'), 'utf8')
+)
 
 function loadSamples() {
   const samples = {}
@@ -73,6 +79,41 @@ compileTemplate('views/landingpage/landingpage.jade', 'index.html', { page: 'lan
 
 console.log('HTML templates compiled successfully')
 
+// Compile Stylus to CSS
+const stylusSource = fs.readFileSync(
+  path.resolve(projectRoot, 'public/styles/screen.styl'),
+  'utf8'
+)
+
+const compiledCss = await new Promise((resolve, reject) => {
+  stylus(stylusSource)
+    .set('filename', path.resolve(projectRoot, 'public/styles/screen.styl'))
+    .set('compress', true)
+    .set('include css', true)
+    .set('paths', [
+      path.resolve(projectRoot, 'public/styles'),
+      path.resolve(projectRoot, 'node_modules')
+    ])
+    .use(nib())
+    .use(bootstrap())
+    .define('backgroundColor', '#' + ('000000' +
+      globalConfig.colors.background.toString(16)).slice(-6))
+    .render((err, css) => {
+      if (err) reject(err)
+      else resolve(css)
+    })
+})
+
+// Fix font paths for static serving (convert absolute to relative)
+let css = compiledCss
+  .replace(/url\("\/node_modules\//g, 'url("./node_modules/')
+  .replace(/url\('\/node_modules\//g, "url('./node_modules/")
+
+const cssOutputPath = path.resolve(distDir, 'styles/screen.css')
+fs.mkdirSync(path.dirname(cssOutputPath), { recursive: true })
+fs.writeFileSync(cssOutputPath, css)
+console.log('Compiled: styles/screen.css')
+
 // Copy required node_modules files
 const nodeModulesToCopy = [
   'jquery/dist/jquery.min.js',
@@ -121,15 +162,6 @@ for (const jsFile of jsFilesToFix) {
   }
 }
 
-// Fix CSS paths for static serving - convert absolute paths to relative
-const cssPath = path.resolve(distDir, 'styles', 'screen.css')
-if (fs.existsSync(cssPath)) {
-  let css = fs.readFileSync(cssPath, 'utf8')
-  // Fix font paths from /node_modules/ to ./node_modules/
-  css = css.replace(/url\("\/node_modules\//g, 'url("./node_modules/')
-  fs.writeFileSync(cssPath, css)
-  console.log('Fixed paths in: styles/screen.css')
-}
 
 // Copy bootstrap fonts
 const bootstrapFontsDir = path.resolve(projectRoot, 'node_modules/bootstrap-styl/fonts')

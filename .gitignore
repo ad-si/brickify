@@ -5,6 +5,7 @@
 *.js.map
 /apidoc
 /batchtesting/models/*
+/dist-static
 /doc
 /modelCache
 /public

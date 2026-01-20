@@ -4,6 +4,13 @@ export default class ShareUi {
   constructor () {
     this.setEnabled = this.setEnabled.bind(this)
     this.$shareButton = $("#shareButton")
+
+    // Hide share button in static builds (no server to generate share links)
+    if (typeof IS_STATIC_BUILD !== 'undefined' && IS_STATIC_BUILD) {
+      this.$shareButton.hide()
+      return
+    }
+
     this._initNotImplementedMessages()
   }
 

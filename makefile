@@ -44,3 +44,11 @@ prepublish:
 clean:
 	rm -rf node_modules
 	rm -rf public
+
+
+.PHONY: build-static
+build-static:
+	npx vite build --config vite.config.static.js
+	node scripts/build-static-html.js
+	@echo "Static build complete in dist-static/"
+	@echo "Open dist-static/index.html in your browser to run without a server"

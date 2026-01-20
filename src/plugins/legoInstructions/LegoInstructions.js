@@ -4,7 +4,7 @@ import log from "loglevel"
 
 import * as threeHelper from "../../client/threeHelper.js"
 import * as pieceListGenerator from "./PieceListGenerator.js"
-import openScadGenerator from "./OpenScadGenerator.js"
+import generateScad from "./OpenScadGenerator.js"
 
 
 export default class LegoInstructions {
@@ -68,7 +68,7 @@ export default class LegoInstructions {
             }
 
             const files = []
-            files.push(openScadGenerator.generateScad(bricks))
+            files.push(generateScad(bricks))
 
             // add instructions html to download
             const pieceList = pieceListGenerator.generatePieceList(bricks)

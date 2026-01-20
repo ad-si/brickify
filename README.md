@@ -2,7 +2,7 @@
 
 ## Installation
 
-`$ git clone https://github.com/brickify/brickify.git`
+`$ git clone https://github.com/ad-si/brickify.git`
 
 `$ cd brickify`
 
@@ -43,18 +43,11 @@ Following scripts are currently available:
 ## Package management
 
 We use [npm](https://npmjs.org) for package management.
-In order to bundle the modules for the browser we use [browserify](http://browserify.org).
+In order to bundle the modules for the browser,
+we use [Vite](https://vite.dev/) and [Browserify](https://browserify.org).
 
 
 ## Styleguide
 
 The code must be formatted as described in
 https://github.com/style-guides/JavaScript
-
-
-## Server
-
-The server currently serves:
-
-- [brickify.it](http://brickify.it): current master-branch
-- [dev.brickify.it](http://dev.brickify.it): current develop-branch

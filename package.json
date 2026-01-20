@@ -13,11 +13,11 @@
     "diy"
   ],
   "bin": "./bin/cli.js",
-  "homepage": "http://brickify.it",
-  "bugs": "http://github.com/brickify/brickify/issues",
+  "homepage": "https://brickify.ad-si.com",
+  "bugs": "http://github.com/ad-si/brickify/issues",
   "repository": {
     "type": "git",
-    "url": "http://github.com/brickify/brickify.git"
+    "url": "http://github.com/ad-si/brickify.git"
   },
   "contributors": [
     "Adrian Sieber",

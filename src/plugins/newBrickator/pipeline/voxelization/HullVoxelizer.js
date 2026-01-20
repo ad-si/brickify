@@ -152,7 +152,11 @@ export default class Voxelizer {
       return Promise.reject(new Error("Web Worker not available in this context"))
     }
     try {
-      const worker = new Worker("/js/workers/hullVoxel.worker.js")
+      // Use relative path for static builds, absolute for server builds
+      const workerPath = (typeof IS_STATIC_BUILD !== "undefined" && IS_STATIC_BUILD)
+        ? "./js/workers/hullVoxel.worker.js"
+        : "/js/workers/hullVoxel.worker.js"
+      const worker = new Worker(workerPath)
       this.worker = worker
       return Promise.resolve(worker)
     }

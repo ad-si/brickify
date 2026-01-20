@@ -82,7 +82,11 @@ export default class VolumeFiller {
       return Promise.reject(new Error('Web Worker not available in this context'))
     }
     try {
-      const worker = new Worker('/js/workers/volumeFill.worker.js')
+      // Use relative path for static builds, absolute for server builds
+      const workerPath = (typeof IS_STATIC_BUILD !== "undefined" && IS_STATIC_BUILD)
+        ? "./js/workers/volumeFill.worker.js"
+        : "/js/workers/volumeFill.worker.js"
+      const worker = new Worker(workerPath)
       this.worker = worker
       return Promise.resolve(worker)
     } catch (e) {

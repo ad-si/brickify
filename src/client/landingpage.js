@@ -6,7 +6,6 @@ import Bundle from "./bundle.js"
 import clone from "clone"
 import * as fileLoader from "./modelLoading/fileLoader.js"
 import * as fileDropper from "./modelLoading/fileDropper.js"
-import * as modelCache from "./modelLoading/modelCache.js"
 
 import globalConfig from "../common/globals.yaml"
 
@@ -76,37 +75,22 @@ var b1 = bundle1.init()
     // load and process model
     loadAndConvert("goggles")
 
-    const dropAndInputCallback = function (event) {
+    const fileLoadCallback = function (event) {
       const files = event.target.files != null ? event.target.files : event.dataTransfer.files
       if (files.length) {
         return fileLoader.onLoadFile(files, $("#loadButton")[0], {shadow: false})
           .then(loadAndConvert)
       }
-      else {
-        const identifier = event.dataTransfer.getData("text/plain")
-        return modelCache.exists(identifier)
-          .then(() => loadAndConvert(identifier))
-          .catch(() => bootbox.alert({
-            title: "This is not a valid model!",
-            message: "You can only drop stl files or our example images.",
-          }))
-      }
     }
 
-    fileDropper.init(dropAndInputCallback)
+    fileDropper.init(fileLoadCallback)
 
     const fileInput = document.getElementById("fileInput")
     fileInput.addEventListener("change", (event) => {
-      dropAndInputCallback(event)
+      fileLoadCallback(event)
       return fileInput.value = ""
     })
 
     $(".dropper")
-      .text("Drop an stl file")
-    return $("#preview img, #preview a")
-      .on( "dragstart",
-        e => e.originalEvent.dataTransfer.setData(
-          "text/plain",
-          e.originalEvent.target.getAttribute("data-identifier"),
-        ))
+      .text("Drop an STL file")
   })

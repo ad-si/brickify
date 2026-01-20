@@ -354,16 +354,15 @@ class Node {
   clone () {
     const node = new Node()
 
+    node.divider = this.divider && this.divider.clone()
 
-    divider = this.divider.clone()
-
-    polygons = this.polygons.map( ( polygon ) => {
+    node.polygons = this.polygons.map( ( polygon ) => {
       return polygon.clone()
     } )
 
-    front = this.front && this.front.clone()
+    node.front = this.front && this.front.clone()
 
-    back = this.back && this.back.clone()
+    node.back = this.back && this.back.clone()
 
     return node
   }
@@ -406,8 +405,7 @@ class Node {
   }
 
   clipTo ( node ) {
-    this.polygons =
-    clipPolygons( this.polygons )
+    this.polygons = node.clipPolygons( this.polygons )
     if ( this.front ) this.front.clipTo( node )
     if ( this.back ) this.back.clipTo( node )
   }

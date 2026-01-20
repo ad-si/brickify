@@ -59,7 +59,7 @@ function compileTemplate(templatePath, outputPath, locals = {}) {
     .replace(/src="\/img\//g, 'src="./img/')
     .replace(/src="\/node_modules\//g, 'src="./node_modules/')
     .replace(/href="\/node_modules\//g, 'href="./node_modules/')
-    .replace(/href="\/educators"/g, 'href="./educators.html"')
+    .replace(/href="\/examples"/g, 'href="./examples.html"')
     .replace(/href="\/team"/g, 'href="./team.html"')
     .replace(/href="\/imprint"/g, 'href="./imprint.html"')
     .replace(/href="app#/g, 'href="./app.html#')
@@ -75,7 +75,10 @@ function compileTemplate(templatePath, outputPath, locals = {}) {
 }
 
 compileTemplate('views/app/app.jade', 'app.html', { page: 'editor' })
-compileTemplate('views/landingpage/landingpage.jade', 'index.html', { page: 'landingpage' })
+compileTemplate('views/landingpage/landingpage.jade', 'index.html', { page: 'landing' })
+compileTemplate('views/landingpage/team.jade', 'team.html', { page: 'landing', pageTitle: 'Team' })
+compileTemplate('views/landingpage/imprint.jade', 'imprint.html', { page: 'landing', pageTitle: 'Imprint' })
+compileTemplate('views/landingpage/examples.jade', 'examples.html', { page: 'landing', pageTitle: 'Examples' })
 
 console.log('HTML templates compiled successfully')
 

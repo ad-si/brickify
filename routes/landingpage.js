@@ -34,12 +34,12 @@ export function getImprint (_request, response) {
   )
 }
 
-export function getEducators (_request, response) {
+export function getExamples (_request, response) {
   return response.render(
-    path.join("landingpage", "educators"),
+    path.join("landingpage", "examples"),
     {
       page: "landing",
-      pageTitle: "Educators",
+      pageTitle: "Examples",
       samples,
     },
   )

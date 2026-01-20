@@ -8,6 +8,9 @@
 /dist-static
 /doc
 /modelCache
-/public
+/public/*
+!/public/js/
+/public/js/*
+!/public/js/workers/
 node_modules
 npm-debug.log

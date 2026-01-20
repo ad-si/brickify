@@ -1,5 +1,6 @@
 import log from "loglevel"
 
+import ThreeBSP from "./ThreeCSG.js"
 import VoxelUnion from "./VoxelUnion.js"
 
 

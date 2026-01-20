@@ -12,15 +12,23 @@ export default class PreviewUi {
     this.toggleAssemblyView = this.toggleAssemblyView.bind(this)
     this.workflowUi = workflowUi
     this.$panel = $("#previewGroup")
-    const {
-      bundle,
-    } = this.workflowUi
-    this.nodeVisualizer = bundle.getPlugin("nodeVisualizer")
-    this.editController = bundle.getPlugin("editController")
-    this.newBrickator = bundle.getPlugin("newBrickator")
-    this.sceneManager = bundle.sceneManager
+    this.sceneManager = this.workflowUi.bundle.sceneManager
     this._initStabilityView()
     this._initAssemblyView()
+  }
+
+  // Lazy getters for plugins - these are not available during construction
+  // because plugins are loaded asynchronously after the UI is created
+  get nodeVisualizer () {
+    return this.workflowUi.bundle.getPlugin("nodeVisualizer")
+  }
+
+  get editController () {
+    return this.workflowUi.bundle.getPlugin("editController")
+  }
+
+  get newBrickator () {
+    return this.workflowUi.bundle.getPlugin("newBrickator")
   }
 
   setEnabled (enabled) {

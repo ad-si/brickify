@@ -26,17 +26,16 @@ export default class EditUi {
   }
 
   _initPartList () {
-    this.legoInstructions = this.bundle.getPlugin("lego-instructions")
-    if (this.legoInstructions == null) {
-      return
-    }
-
     return $("#brickCountContainer")
       .click(() => {
+        const legoInstructions = this.bundle.getPlugin("lego-instructions")
+        if (legoInstructions == null) {
+          return
+        }
         if (this.bundle.sceneManager.selectedNode == null) {
           return
         }
-        return this.legoInstructions.showPartListPopup(this.bundle.sceneManager.selectedNode)
+        return legoInstructions.showPartListPopup(this.bundle.sceneManager.selectedNode)
       })
   }
 

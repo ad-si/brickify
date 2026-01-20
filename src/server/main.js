@@ -144,7 +144,6 @@ export async function setupRouting (port) {
   webapp.get("/", landingPage.getLandingpage)
   webapp.get("/contribute", landingPage.getContribute)
   webapp.get("/team", landingPage.getTeam)
-  webapp.get("/imprint", landingPage.getImprint)
   webapp.get("/examples", landingPage.getExamples)
   webapp.get("/app", app)
   webapp.get("/share", sharelinkGen)

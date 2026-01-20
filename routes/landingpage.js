@@ -27,13 +27,6 @@ export function getTeam (_request, response) {
   )
 }
 
-export function getImprint (_request, response) {
-  return response.render(
-    path.join("landingpage", "imprint"),
-    { pageTitle: "Imprint" },
-  )
-}
-
 export function getExamples (_request, response) {
   return response.render(
     path.join("landingpage", "examples"),

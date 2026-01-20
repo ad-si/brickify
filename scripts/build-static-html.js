@@ -61,7 +61,6 @@ function compileTemplate(templatePath, outputPath, locals = {}) {
     .replace(/href="\/node_modules\//g, 'href="./node_modules/')
     .replace(/href="\/examples"/g, 'href="./examples.html"')
     .replace(/href="\/team"/g, 'href="./team.html"')
-    .replace(/href="\/imprint"/g, 'href="./imprint.html"')
     .replace(/href="app#/g, 'href="./app.html#')
     .replace(/href="\/"/g, 'href="./"')
     // Also handle paths without leading slash (relative paths in templates)
@@ -77,7 +76,6 @@ function compileTemplate(templatePath, outputPath, locals = {}) {
 compileTemplate('views/app/app.jade', 'app.html', { page: 'editor' })
 compileTemplate('views/landingpage/landingpage.jade', 'index.html', { page: 'landing' })
 compileTemplate('views/landingpage/team.jade', 'team.html', { page: 'landing', pageTitle: 'Team' })
-compileTemplate('views/landingpage/imprint.jade', 'imprint.html', { page: 'landing', pageTitle: 'Imprint' })
 compileTemplate('views/landingpage/examples.jade', 'examples.html', { page: 'landing', pageTitle: 'Examples' })
 
 console.log('HTML templates compiled successfully')

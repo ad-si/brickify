@@ -95,18 +95,19 @@ export function getPlanePosition (event, renderer, z) {
 /*
  * Determines the position of an event in canvas space
  * @param {Object} event usually a mouse or tap or pointer event
- * @param {Number} event.pageX the x coordinate on the screen
- * @param {Number} event.pageY the y coordinate on the screen
+ * @param {Number} event.clientX the x coordinate relative to the viewport
+ * @param {Number} event.clientY the y coordinate relative to the viewport
  * @param {Renderer} renderer the renderer that provides the camera and canvas
  * @return {Object} a three vector
  * @memberOf interactionHelper
  */
 export function calculatePositionInCanvasSpace (event, renderer) {
   const canvas = renderer.getDomElement()
+  const rect = canvas.getBoundingClientRect()
 
   return new THREE.Vector3(
-    ((event.pageX / canvas.width) * 2) - 1,
-    ((-event.pageY / canvas.height) * 2) + 1,
+    (((event.clientX - rect.left) / rect.width) * 2) - 1,
+    ((-(event.clientY - rect.top) / rect.height) * 2) + 1,
     0.5,
   )
 }

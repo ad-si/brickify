@@ -1,7 +1,5 @@
 import $ from "jquery"
 window.jQuery = window.$ = $
-import * as piwikTracking from "./piwikTracking.js"
-
 // Init quickconvert after basic page functionality has been initialized
 
 import Bundle from "./bundle.js"
@@ -81,13 +79,11 @@ var b1 = bundle1.init()
     const dropAndInputCallback = function (event) {
       const files = event.target.files != null ? event.target.files : event.dataTransfer.files
       if (files.length) {
-        piwikTracking.trackEvent("Landingpage", "LoadModel", files[0].name)
         return fileLoader.onLoadFile(files, $("#loadButton")[0], {shadow: false})
           .then(loadAndConvert)
       }
       else {
         const identifier = event.dataTransfer.getData("text/plain")
-        piwikTracking.trackEvent("Landingpage", "LoadModelFromImage", identifier)
         return modelCache.exists(identifier)
           .then(() => loadAndConvert(identifier))
           .catch(() => bootbox.alert({

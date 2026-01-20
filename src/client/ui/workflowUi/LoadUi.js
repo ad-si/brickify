@@ -1,6 +1,5 @@
 import * as fileDropper from "../../modelLoading/fileDropper.js"
 import * as fileLoader from "../../modelLoading/fileLoader.js"
-import * as piwikTracking from "../../piwikTracking.js"
 
 export default class LoadUi {
   constructor (workflowUi) {
@@ -39,7 +38,6 @@ export default class LoadUi {
         if (!loadConfirmed) {
           return
         }
-        piwikTracking.trackEvent("Editor", "LoadModel", files[0].name)
         const spinnerOptions = {
           length: 5,
           radius: 3,

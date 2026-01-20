@@ -1,5 +1,3 @@
-import * as piwikTracking from "../../piwikTracking.js"
-
 /*
  * @class EditBrushUi
  */
@@ -77,13 +75,6 @@ export default class EditBrushUi {
   _brushSelect (brush) {
     // deselect currently selected brush
     this._deselectBrush(this.selectedNode)
-
-    // piwik select event
-    let big = ""
-    if (this._bigBrushSelected) {
-      big = "Big"
-    }
-    piwikTracking.trackEvent("Editor", "BrushSelect", brush.containerId + big)
 
     // select new brush
     this._selectedBrush = brush

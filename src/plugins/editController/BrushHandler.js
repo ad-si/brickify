@@ -1,5 +1,4 @@
 import log from "loglevel"
-import * as piwikTracking from "../../client/piwikTracking.js"
 
 export default class BrushHandler {
   constructor ( bundle, nodeVisualizer, editController ) {
@@ -142,14 +141,6 @@ export default class BrushHandler {
       .then(cachedData => {
         const touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 
-        let brush = "LegoBrush"
-        if (this.bigBrushSelected) {
-          brush += "Big"
-        }
-        piwikTracking.trackEvent(
-          "Editor", "BrushAction", brush, touchedVoxels.length,
-        )
-
         this._applyChanges(touchedVoxels, selectedNode, cachedData)
 
         const action = this._buildAction(touchedVoxels, selectedNode, cachedData)
@@ -182,7 +173,6 @@ export default class BrushHandler {
         if (changedVoxels.length === 0) {
           return
         }
-        piwikTracking.trackEvent("Editor", "BrushAction", "MakeEverythingLego");
         (apply = () => {
           this.editController.rerunLegoPipeline(node)
           const brickVis = cachedData.brickVisualization
@@ -227,14 +217,6 @@ export default class BrushHandler {
       .then(cachedData => {
         const touchedVoxels = cachedData.brickVisualization.updateModifiedVoxels()
 
-        let brush = "PrintBrush"
-        if (this.bigBrushSelected) {
-          brush += "Big"
-        }
-        piwikTracking.trackEvent(
-          "Editor", "BrushAction",  brush, touchedVoxels.length,
-        )
-
         this._applyChanges(touchedVoxels, selectedNode, cachedData)
 
         const action = this._buildAction(touchedVoxels, selectedNode, cachedData)
@@ -266,7 +248,6 @@ export default class BrushHandler {
         if (changedVoxels.length === 0) {
           return
         }
-        piwikTracking.trackEvent("Editor", "BrushAction", "MakeEverythingPrint")
         cachedData.brickVisualization.updateModifiedVoxels()
         this.editController.relayoutModifiedParts(
           node, cachedData, changedVoxels, true,

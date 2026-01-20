@@ -1,5 +1,3 @@
-import * as piwikTracking from "../../piwikTracking.js"
-
 export default class ShareUi {
   constructor () {
     this.setEnabled = this.setEnabled.bind(this)
@@ -22,9 +20,6 @@ Please check back later.",
     })
 
     return this.$shareButton.click(() => {
-      piwikTracking.trackEvent(
-        "trackEvent", "Editor", "ExportAction", "ShareButtonClick",
-      )
       return alertCallback()
     })
   }

@@ -1,6 +1,5 @@
 import DownloadProvider from "./DownloadProvider.js"
 import { getModal as downloadModal } from "../downloadModal.js"
-import * as piwikTracking from "../../piwikTracking.js"
 
 export default class DownloadUi {
   constructor (bundle) {
@@ -31,7 +30,6 @@ export default class DownloadUi {
 
     // show modal when clicking on download button
     return this.$downloadButton.click(() => {
-      piwikTracking.trackEvent("Editor", "ExportAction", "DownloadButtonClick")
       return this.$downloadModal.modal("show")
     })
   }

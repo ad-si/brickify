@@ -11,8 +11,6 @@ import Bundle from "./bundle.js"
 
 import globalConfig from "../common/globals.yaml"
 
-import * as piwikTracking from "./piwikTracking.js"
-
 if (process.env.NODE_ENV === "development") {
   log.enableAll()
 }
@@ -22,9 +20,6 @@ else {
 
 const commandFunctions = {
   initialModel (identifier) {
-    piwikTracking.trackEvent(
-      "trackEvent", "Editor", "StartWithInitialModel", identifier,
-    )
     // load selected model
     log.debug("loading initial model")
     bundle.sceneManager.clearScene()
@@ -47,10 +42,6 @@ const postInitCallback = function () {
     if (commandFunctions[key] != null) {
       prom = prom.then(runCmd(key, value))
     }
-  }
-
-  if (commands.length === 0) {
-    piwikTracking.trackEvent("Editor", "Start", "StartWithoutInitialModel")
   }
 
   // clear url hash after executing commands

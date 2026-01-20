@@ -7,8 +7,6 @@
 
 import $ from "jquery"
 
-import * as piwikTracking from "../../client/piwikTracking.js"
-
 
 const minimalAcceptableFps = 20
 const upgradeThresholdFps = 40
@@ -16,7 +14,6 @@ const accumulationTime = 200
 const timesBelowThreshold = 10
 const fpsDisplayUpdateTime = 1000
 const maxNoPipelineDecisions = 3
-const piwikStatInterval = 20
 
 /*
  * @class FidelityControl
@@ -25,7 +22,6 @@ export default class FidelityControl {
   constructor () {
     this.init = this.init.bind(this)
     this.on3dUpdate = this.on3dUpdate.bind(this)
-    this._sendFpsStats = this._sendFpsStats.bind(this)
     this._adjustFidelity = this._adjustFidelity.bind(this)
     this._increaseFidelity = this._increaseFidelity.bind(this)
     this._decreaseFidelity = this._decreaseFidelity.bind(this)
@@ -65,8 +61,6 @@ export default class FidelityControl {
     this.accumulatedFrames = 0
     this.accumulatedTime = 0
 
-    this.currentPiwikStat = 0
-
     this.timesBelowMinimumFps = 0
 
     this.showFps = process.env.NODE_ENV === "development"
@@ -92,8 +86,6 @@ export default class FidelityControl {
       capabilites += "stencilBuffer "
     }
 
-    piwikTracking.setCustomSessionVariable(0, "GpuCapabilities", capabilites)
-
     this.pipelineAvailable = usePipeline && (depth != null) && (fragDepth != null) && stencilBuffer
     return this.noPipelineDecisions = 0
   }
@@ -116,21 +108,7 @@ export default class FidelityControl {
       this.accumulatedTime %= accumulationTime
       this._adjustFidelity(fps)
       this._showFps(timestamp, fps)
-
-      this.currentPiwikStat++
-      if (this.currentPiwikStat > piwikStatInterval) {
-        this._sendFpsStats(fps)
-        return this.currentPiwikStat = 0
-      }
     }
-  }
-
-  _sendFpsStats (fps) {
-    return piwikTracking.trackEvent(
-      "FidelityControl", "FpsAverage",
-      FidelityControl.fidelityLevels[this.currentFidelityLevel],
-      fps,
-    )
   }
 
   _adjustFidelity (fps) {

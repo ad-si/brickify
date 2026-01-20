@@ -1,5 +1,4 @@
 import PreviewAssemblyUi from "./PreviewAssemblyUi.js"
-import * as piwikTracking from "../../piwikTracking.js"
 
 export default class PreviewUi {
   constructor (workflowUi) {
@@ -74,7 +73,6 @@ export default class PreviewUi {
       return this.nodeVisualizer.setDisplayMode(this.sceneManager.selectedNode, "stability")
     }
     else {
-      piwikTracking.trackEvent("Editor", "PreviewAction", "StabilityView")
       return this.editController.enableInteraction()
     }
   }
@@ -101,7 +99,6 @@ export default class PreviewUi {
     this._quitStabilityView()
 
     if (this.assemblyViewEnabled) {
-      piwikTracking.trackEvent("Editor", "PreviewAction", "AssemblyView")
       this.workflowUi.enableOnly(this)
     }
     else {

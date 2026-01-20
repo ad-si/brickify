@@ -4,7 +4,6 @@ import JSZip from "jszip"
 import log from "loglevel"
 
 import * as Spinner from "../../Spinner.js"
-import * as piwikTracking from "../../piwikTracking.js"
 
 
 export default class DownloadProvider {
@@ -50,16 +49,6 @@ export default class DownloadProvider {
       type,
       studRadius: this.exportUi.studRadius,
       holeRadius: this.exportUi.holeRadius,
-    }
-
-    if (type === "stl") {
-      piwikTracking.trackEvent("EditorExport", "DownloadStlClick")
-      piwikTracking.trackEvent(
-        "EditorExport", "StudRadius", this.exportUi.studRadiusSelection,
-      )
-      piwikTracking.trackEvent(
-        "EditorExport", "HoleRadius", this.exportUi.holeRadiusSelection,
-      )
     }
 
     const promisesArray = this.bundle.pluginHooks.getDownload(

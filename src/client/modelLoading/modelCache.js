@@ -1,5 +1,5 @@
 import $ from "jquery"
-import { md5 } from "blueimp-md5"
+import md5 from "blueimp-md5"
 import meshlib from "meshlib"
 import log from "loglevel"
 

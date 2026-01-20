@@ -62,14 +62,15 @@ if (testMode) {
 
 
 export async function setupRouting (port) {
-  webapp.set("hostname", developmentMode ? `localhost:${port}`
-    : process.env.HOSTNAME || "brickify.it",
+  webapp.set("hostname", developmentMode
+    ? `localhost:${port}`
+    : process.env.HOSTNAME,
   )
 
   webapp.set("views", path.normalize("views"))
   webapp.set("view engine", "jade")
 
-  webapp.use(favicon(path.normalize("public/img/favicon.png", {maxAge: 1000})))
+  webapp.use(favicon(path.normalize("public/img/favicon.ico", {maxAge: 1000})))
 
   webapp.use(compress())
 
@@ -144,7 +145,7 @@ export async function setupRouting (port) {
   webapp.get("/contribute", landingPage.getContribute)
   webapp.get("/team", landingPage.getTeam)
   webapp.get("/imprint", landingPage.getImprint)
-  webapp.get("/educators", landingPage.getEducators)
+  webapp.get("/examples", landingPage.getExamples)
   webapp.get("/app", app)
   webapp.get("/share", sharelinkGen)
 

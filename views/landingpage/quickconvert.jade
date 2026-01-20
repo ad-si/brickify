@@ -6,10 +6,11 @@ section.quickConvert
           center Original Model
         canvas#renderArea1.quickConvertCanvas(touch-action="none")
       .col-lg-2.text-center.convert-arrow
-        img.img-responsive(src='/img/convertArrow.png')
+        svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24' width='120' height='64' fill='white')
+          path(d='M28 4l-1.41 1.41L32.17 11H4v2h28.17l-5.58 5.59L28 20l8-8z')
       .col-lg-5.text-center
         h3
-          center With LEGO#[sup &reg;] bricks
+          center With LEGO Bricks
         canvas#renderArea2.quickConvertCanvas(touch-action="none")
         #applinks
           a.btn.btn-success#downloadButton Download

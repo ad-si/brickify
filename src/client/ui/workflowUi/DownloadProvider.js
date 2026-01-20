@@ -1,5 +1,5 @@
 import $ from "jquery"
-import saveAs from "filesaver.js"
+import { saveAs } from "file-saver"
 import JSZip from "jszip"
 import log from "loglevel"
 

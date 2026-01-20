@@ -2,12 +2,17 @@
 // Ensure jQuery and Bootstrap plugins attach to the same instance
 import $ from "jquery"
 window.jQuery = window.$ = $
+
+// Import bootbox after jQuery is available on window
+// bootbox needs window.jQuery to be set before it initializes
+import bootbox from "bootbox"
+window.bootbox = bootbox
 // THREE is provided via ESM import and exposed globally for legacy plugins
 import THREE from "three"
 import md5 from "blueimp-md5"
 import clone from "clone"
 import "es6-promise"
-import { saveAs } from "filesaver.js"
+import { saveAs } from "file-saver"
 import Nanobar from "nanobar"
 import "PEP"
 import path from "path-browserify"

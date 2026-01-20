@@ -203,8 +203,9 @@ export function getNextValidTextureDimension (size) {
 // (in terms of 2^n, see getNextValidTextureDimension)
 // size for the domElement of the threeRenderer
 export function renderTargetHasRightSize  (renderTarget, threeRenderer) {
-  const screenW = threeRenderer.domElement.clientWidth
-  const screenH = threeRenderer.domElement.clientHeight
+  // Use .width/.height to match createRenderTarget (not clientWidth/clientHeight)
+  const screenW = threeRenderer.domElement.width
+  const screenH = threeRenderer.domElement.height
 
   let targetTexWidth = getNextValidTextureDimension(screenW, _chooseBiggerSize)
   let targetTexHeight = getNextValidTextureDimension(screenH, _chooseBiggerSize)

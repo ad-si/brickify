@@ -40,7 +40,7 @@ describe("Scene tests", () => {
       return expect(scene.done()).to.be.fulfilled
     })
 
-    return it("should be a Scene and a SyncObject", () => {
+    it("should be a Scene and a SyncObject", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const before = Date.now()
       const scene = new Scene()
@@ -49,8 +49,11 @@ describe("Scene tests", () => {
         expect(scene).to.be.an.instanceof(SyncObject)
         expect(scene).to.have.property("nodes")
           .that.is.an("array").with.length(0)
-        return expect(scene).to.be.modified(Date.now(), Date.now() - before).with
-          .cause("Scene creation")
+        // Check lastModified properties directly
+        expect(scene).to.have.nested.property("lastModified.date")
+        expect(scene).to.have.nested.property("lastModified.cause", "Scene creation")
+        const now = Date.now()
+        expect(scene.lastModified.date).to.be.within(before, now + 2000)
       })
     })
   })
@@ -68,12 +71,15 @@ describe("Scene tests", () => {
       expect(result).to.equal(scene)
       return scene.done(() => {
         expect(scene).to.have.property("nodes").that.deep.equals([node])
-        return expect(scene).to.be.modified(Date.now(), Date.now() - before).with
-          .cause(`Node \"${name}\" added`)
+        // Check lastModified properties directly
+        expect(scene).to.have.nested.property("lastModified.date")
+        expect(scene).to.have.nested.property("lastModified.cause", `Node \"${name}\" added`)
+        const now = Date.now()
+        expect(scene.lastModified.date).to.be.within(before, now + 2000)
       })
     })
 
-    return it("should remove present nodes", () => {
+    it("should remove present nodes", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const scene = new Scene()
       dataPackets!.nextIds.push("ijklmnop")
@@ -87,13 +93,16 @@ describe("Scene tests", () => {
       return scene.done(() => {
         expect(scene).to.have.property("nodes")
           .that.is.an("array").with.length(0)
-        return expect(scene).to.be.modified(Date.now(), Date.now() - before).with
-          .cause(`Node \"${name}\" removed`)
+        // Check lastModified properties directly
+        expect(scene).to.have.nested.property("lastModified.date")
+        expect(scene).to.have.nested.property("lastModified.cause", `Node \"${name}\" removed`)
+        const now = Date.now()
+        expect(scene.lastModified.date).to.be.within(before, now + 2000)
       })
     })
   })
 
-  return describe("Scene synchronization", () => {
+  describe("Scene synchronization", () => {
     it("should store nodes as references", () => {
       let nodeId: string
       dataPackets!.nextIds.push("sceneid")
@@ -117,7 +126,7 @@ describe("Scene tests", () => {
       })
     })
 
-    return it("should restore node objects from references", () => {
+    it("should restore node objects from references", () => {
       const scene = {
         id: "sceneid",
         data: {

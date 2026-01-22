@@ -27,7 +27,7 @@ describe("Node tests", () => {
       return expect(node.done()).to.be.fulfilled
     })
 
-    return it("should be a Node and a SyncObject", () => {
+    it("should be a Node and a SyncObject", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const node = new Node()
       return node.done(() => {
@@ -124,7 +124,7 @@ describe("Node tests", () => {
         })
     })
 
-    return it("should set the node's name in constructor", () => {
+    it("should set the node's name in constructor", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const name = "Beautiful Model"
       const node = new Node({name})
@@ -186,7 +186,7 @@ describe("Node tests", () => {
         })
     })
 
-    return it("should store plugin data if transient set to false in later call", () => {
+    it("should store plugin data if transient set to false in later call", () => {
       dataPackets!.nextIds.push("abcdefgh")
       dataPackets!.nextPuts.push(true)
       const node = new Node()
@@ -205,7 +205,7 @@ describe("Node tests", () => {
     })
   })
 
-  return describe("node transform", () => {
+  describe("node transform", () => {
     it("should provide reasonable default transforms", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const node = new Node()
@@ -311,7 +311,7 @@ describe("Node tests", () => {
       return expect(node.getTransform()).to.eventually.deep.equal(transform)
     })
 
-    return it("should store the transform", () => {
+    it("should store the transform", () => {
       dataPackets!.nextIds.push("abcdefgh")
       dataPackets!.nextPuts.push(true)
       const node = new Node()

@@ -232,11 +232,15 @@ export default class SyncObject {
     const provider = SyncObject.dataPacketProvider
     this.ready = this.ready.then(() => provider.delete_(this.getId()))
     this.ready.then(() => {
+      // After deletion completes, replace ready with a permanently rejected promise.
+      // This ensures all future calls to done()/next()/save() will reject.
       this.ready = Promise.reject(
         new ReferenceError(`${this.constructor.name} #${this.getId()} was deleted`),
       )
-      return this.ready
-    })
+      // Attach a no-op catch handler to prevent Node.js "unhandled rejection" warnings.
+      // The error will still propagate to any explicit .done()/.catch() calls.
+      this.ready.catch(() => undefined)
+    }).catch(() => undefined)
     return this.ready
   }
 

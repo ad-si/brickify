@@ -24,6 +24,9 @@ export default class Project extends SyncObject {
     this.scenes = [] as unknown as ScenesArray
     this.scenes.active = new Scene()
     this.scenes.push(this.scenes.active)
+    // Suppress unhandled rejection warnings while preserving error propagation.
+    // The promise will be properly handled when Project.done() is called.
+    void this.scenes.active.ready.catch(() => undefined)
   }
 
   getScene (): Promise<Scene | undefined> {

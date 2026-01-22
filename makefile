@@ -42,7 +42,7 @@ test-client:
 
 .PHONY: test-units
 test-units:
-	npx tsx node_modules/mocha/bin/mocha --recursive --extensions ts 'test/**/*.ts'
+	npx vitest run --config vitest.config.node.ts
 
 
 .PHONY: test

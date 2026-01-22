@@ -172,7 +172,7 @@ describe("SyncObject tests", () => {
       }))
     })
 
-    return it("should support loading from many references", () => {
+    it("should support loading from many references", () => {
       let j
       let i
       const pojsos: Record<string, unknown>[] = []
@@ -272,7 +272,7 @@ describe("SyncObject tests", () => {
         })
     })
 
-    return it("should reject after deletion", () => {
+    it("should reject after deletion", () => {
       let nextId: string
       dataPackets!.nextIds.push(nextId = "abcdefgh")
       dataPackets!.nextDeletes.push(true)
@@ -282,7 +282,7 @@ describe("SyncObject tests", () => {
     })
   })
 
-  return describe("Task chaining", () => {
+  describe("Task chaining", () => {
     it("should return itself when calling next", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const dummy = new Dummy()
@@ -311,7 +311,7 @@ describe("SyncObject tests", () => {
       })).to.be.rejectedWith(error)
     })
 
-    return it("should catch previous errors",  () => {
+    it("should catch previous errors",  () => {
       dataPackets!.nextIds.push("abcdefgh")
       const dummy = new Dummy()
       const error = "Something bad happened"

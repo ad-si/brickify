@@ -47,11 +47,12 @@ describe("server-side dataPacket-storage tests", () => {
       return response.whenSent.then(() => {
         expect(response).to.have.property("type", "text")
         expect(response).to.have.property("code", 404)
-        return expect(response).to.have.property("content", id)
+        expect(response.content).to.be.an.instanceof(Error)
+        return expect((response.content as Error).message).to.equal(id)
       })
     })
 
-    return it("should find existing packet", () => {
+    it("should find existing packet", () => {
       const createResponse = Response()
       dataPackets.create(Request(), createResponse)
       return createResponse.whenSent.then(() => {
@@ -94,11 +95,12 @@ describe("server-side dataPacket-storage tests", () => {
       return response.whenSent.then(() => {
         expect(response).to.have.property("type", "text")
         expect(response).to.have.property("code", 404)
-        return expect(response).to.have.property("content", "abcdefgh")
+        expect(response.content).to.be.an.instanceof(Error)
+        return expect((response.content as Error).message).to.equal("abcdefgh")
       })
     })
 
-    return it("should return existing packet", () => {
+    it("should return existing packet", () => {
       const createResponse = Response()
       dataPackets.create(Request(), createResponse)
       return createResponse.whenSent.then(() => {
@@ -150,11 +152,12 @@ describe("server-side dataPacket-storage tests", () => {
       return response.whenSent.then(() => {
         expect(response).to.have.property("type", "text")
         expect(response).to.have.property("code", 404)
-        return expect(response).to.have.property("content", "abcdefgh")
+        expect(response.content).to.be.an.instanceof(Error)
+        return expect((response.content as Error).message).to.equal("abcdefgh")
       })
     })
 
-    return it("should put existing packet", () => {
+    it("should put existing packet", () => {
       const createResponse = Response()
       dataPackets.create(Request(), createResponse)
       return createResponse.whenSent.then(() => {
@@ -176,7 +179,7 @@ describe("server-side dataPacket-storage tests", () => {
     })
   })
 
-  return describe("dataPacket deletion", () => {
+  describe("dataPacket deletion", () => {
     it("should reject invalid id puts", () => {
       const response = Response()
       dataPackets.delete_(
@@ -198,7 +201,8 @@ describe("server-side dataPacket-storage tests", () => {
       return response.whenSent.then(() => {
         expect(response).to.have.property("type", "text")
         expect(response).to.have.property("code", 404)
-        return expect(response).to.have.property("content", "abcdefgh")
+        expect(response.content).to.be.an.instanceof(Error)
+        return expect((response.content as Error).message).to.equal("abcdefgh")
       })
     })
 
@@ -219,7 +223,7 @@ describe("server-side dataPacket-storage tests", () => {
       })
     })
 
-    return it("should not find deleted packets", () => {
+    it("should not find deleted packets", () => {
       const createResponse = Response()
       dataPackets.create(Request(), createResponse)
       return createResponse.whenSent.then(() => {
@@ -240,7 +244,8 @@ describe("server-side dataPacket-storage tests", () => {
           return existsResponse.whenSent.then(() => {
             expect(existsResponse).to.have.property("type", "text")
             expect(existsResponse).to.have.property("code", 404)
-            return expect(existsResponse).to.have.property("content", id)
+            expect(existsResponse.content).to.be.an.instanceof(Error)
+            return expect((existsResponse.content as Error).message).to.equal(id)
           })
         })
       })

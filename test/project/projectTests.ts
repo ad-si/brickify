@@ -15,7 +15,7 @@ describe("Project tests", () => {
     return SyncObject.dataPacketProvider = dataPackets
   })
 
-  return describe("Project creation", () => {
+  describe("Project creation", () => {
     it("should resolve after creation", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const project = new Project()
@@ -31,7 +31,7 @@ describe("Project tests", () => {
       })
     })
 
-    return it("should have one scene that is active", () => {
+    it("should have one scene that is active", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const project = new Project()
       return project.done(() => {

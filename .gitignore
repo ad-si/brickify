@@ -1,8 +1,21 @@
-!karma.conf.js
 .idea
 *.css
 *.iml
 *.js.map
+*.d.ts.map
+
+# Generated files from TypeScript compilation
+/bin/**/*.js
+/routes/**/*.js
+/src/**/*.js
+/test/**/*.js
+/testClient/**/*.js
+/bin/**/*.d.ts
+/routes/**/*.d.ts
+/src/**/*.d.ts
+/test/**/*.d.ts
+/testClient/**/*.d.ts
+
 /apidoc
 /batchtesting/models/*
 /dist-static

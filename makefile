@@ -3,8 +3,18 @@ help: makefile
 	@tail -n +4 makefile | grep ".PHONY"
 
 
+.PHONY: typecheck
+typecheck:
+	npx tsc --noEmit
+
+
+.PHONY: build-workers
+build-workers:
+	npx vite build --config vite.config.workers.ts
+
+
 .PHONY: build
-build:
+build: typecheck build-workers
 	npx vite build
 
 
@@ -12,7 +22,7 @@ build:
 # website and for server-side plugin integration and model processing
 .PHONY: start
 start:
-	./bin/cli.js start
+	npx ts-node --esm bin/cli.ts start
 
 
 # .PHONY: link-hooks  # Links git hooks into .git/hooks
@@ -26,13 +36,13 @@ lint:
 
 
 .PHONY: test
-test: # check-style
-	npx mocha --recursive
+test:
+	npx tsx node_modules/mocha/bin/mocha --recursive --extensions ts 'test/**/*.ts'
 
 
 .PHONY: test-client
 test-client:
-	npx karma start
+	npx vitest run
 
 
 .PHONY: prepublish
@@ -48,7 +58,7 @@ clean:
 
 .PHONY: build-static
 build-static:
-	npx vite build --config vite.config.static.js
-	node scripts/build-static-html.js
+	npx vite build --config vite.config.static.ts
+	npx ts-node --esm scripts/build-static-html.ts
 	@echo "Static build complete in dist-static/"
 	@echo "Open dist-static/index.html in your browser to run without a server"

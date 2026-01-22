@@ -1,0 +1,113 @@
+import clone from "clone"
+import { Request, Response, NextFunction } from "express"
+
+interface Session {
+  id: string;
+  [key: string]: unknown;
+}
+
+const sessions: Record<string, Session> = {}
+const shareLinks: Record<string, string> = {}
+
+export function middleware (request: Request, response: Response, next: NextFunction) {
+  // if in /app, do we have a share url?
+  let sessionId: string
+  if ((request.path === "/app") && (request.query.share != null)) {
+    sessionId = String(request.query.share)
+    return resolveShare(sessionId, request, response, next)
+    // if in /app, do we have a url parameter that indicates a session?
+  }
+  else if ((request.path === "/app") && (request.query.s != null)) {
+    sessionId = String(request.query.s)
+    return checkSession(sessionId, request, response, next)
+    // do we have a cookie that indicates a session?
+  }
+  else if (request.cookies.s != null) {
+    sessionId = request.cookies.s
+    return checkSession(sessionId, request, response, next)
+    // no session indication -> create a new session
+  }
+  else {
+    return newSession(request, response, next)
+  }
+}
+
+export function generateShareId (sid: string): string {
+  // check if share id exists
+  for (const key of Object.keys(shareLinks || {})) {
+    if (shareLinks[key] === sid) {
+      return key
+    }
+  }
+
+  // create new one
+  const id = generateId(10)
+  shareLinks[id] = sid
+  return id
+}
+
+const checkSession = function (sessionId: string, request: Request, response: Response, next: NextFunction) {
+  // Does the session exist?
+  if (sessions[sessionId] != null) {
+    // if in /app, redirect to /app?s=id (always show session id)
+    if ((request.path === "/app") && (request.query.s == null)) {
+      response.redirect("/app?s=" + sessionId)
+      return
+    }
+
+    // apply session for further processing
+    (request as Request & { session: Session }).session = sessions[sessionId]
+    response.cookie("s", sessionId)
+    return next()
+  }
+  else {
+    // create a new session for invalid Ids and redirect
+    return newSession(request, response, next)
+  }
+}
+
+const resolveShare = function (shareId: string, request: Request, response: Response, next: NextFunction) {
+  // Is this a valid share link?
+  if (shareLinks[shareId] != null) {
+    // create a new session with a copy of the shared state
+    const sid = shareLinks[shareId]
+    const session = sessions[sid]
+    const cloned = clone(session)
+    return newSession(request, response, next, cloned)
+  }
+  else {
+    // invalid share id - generate new state
+    return newSession(request, response, next)
+  }
+}
+
+const newSession = function (request: Request, response: Response, next: NextFunction, sessionData: Partial<Session> | null = null) {
+  (request as Request & { session: Session }).session = generateSession(sessionData)
+  response.cookie("s", (request as Request & { session: Session }).session.id)
+
+  // only redirect if already in /app (but maybe with wrong session id)
+  // prevents from redirection from mainpage etc
+  if (request.path === "/app") {
+    return response.redirect("/app?s=" + (request as Request & { session: Session }).session.id)
+  }
+  else {
+    return next()
+  }
+}
+
+const generateSession = function (sessionData: Partial<Session> | null = null): Session {
+  const id = generateId(10)
+  sessions[id] = { ...sessionData, id } as Session
+  return sessions[id]
+}
+
+const generateId = function (length: number): string {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyz"
+  let result = ""
+  for (let i = 0, end = length; i < end; i++) {
+    const index = Math.floor(Math.random() * chars.length)
+    const c = chars[index]
+    result += c
+  }
+  return result
+}

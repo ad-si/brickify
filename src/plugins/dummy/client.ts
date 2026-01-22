@@ -2,9 +2,9 @@
  * Dummy Plugin
  */
 
-import type { Object3D } from 'three';
-import type Bundle from '../../client/bundle.js';
-import type Node from '../../common/project/node.js';
+import type { Object3D } from 'three'
+import type Bundle from '../../client/bundle.js'
+import type Node from '../../common/project/node.js'
 
 /*
  * A demo plugin implementation for client-side
@@ -32,7 +32,7 @@ export default class DummyPlugin {
    * @see pluginLoader
    */
   init (_bundle: Bundle) {
-    return console.log("Dummy Client Plugin initialization")
+    console.log("Dummy Client Plugin initialization")
   }
 
   /*
@@ -46,7 +46,7 @@ export default class DummyPlugin {
    * @see pluginLoader
    */
   init3d (_threejsNode: Object3D) {
-    return console.log("Dummy Client Plugin initializes 3d")
+    console.log("Dummy Client Plugin initializes 3d")
   }
 
   /*
@@ -121,14 +121,14 @@ export default class DummyPlugin {
           hotkey: "+",
           description: "display alert",
           callback () {
-            return alert("Dummy client plugin reports: '+' was pressed")
+            alert("Dummy client plugin reports: '+' was pressed")
           },
         },
         {
           hotkey: "-",
           description: "display alert",
           callback () {
-            return alert("Dummy client plugin reports: '-' was pressed")
+            alert("Dummy client plugin reports: '-' was pressed")
           },
         },
       ],
@@ -144,19 +144,19 @@ export default class DummyPlugin {
       text: "dummy-brush",
       icon: "move",
       onBrushDown () {
-        return console.log("dummy-brush modifies scene (pointer down)")
+        console.log("dummy-brush modifies scene (pointer down)")
       },
       onBrushMove () {
-        return console.log("dumy-brush modifies scene (pointer move)")
+        console.log("dumy-brush modifies scene (pointer move)")
       },
       onBrushUp () {
-        return console.log("dummy-brush modifies scene (pointer up)")
+        console.log("dummy-brush modifies scene (pointer up)")
       },
       onBrushSelect () {
-        return console.log("dummy-brush was selected")
+        console.log("dummy-brush was selected")
       },
       onBrushDeselect () {
-        return console.log("dummy-brush was deselected")
+        console.log("dummy-brush was deselected")
       },
     }]
   }

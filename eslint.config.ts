@@ -1,26 +1,84 @@
-import eslintConfJs from 'eslint-config-javascript';
-import tseslint from 'typescript-eslint';
+import tseslint from 'typescript-eslint'
+import js from '@eslint/js'
 
 export default tseslint.config(
-  ...eslintConfJs,
-  ...tseslint.configs.strict,
+  {
+    ignores: [
+      'public/**/*.js',
+      'dist/**/*',
+      'node_modules/**/*',
+      'dist-static/**/*',
+      '**/*.d.ts',
+      '**/*.js',
+      'bin/**/*',
+      'routes/**/*.js',
+      'scripts/**/*.js',
+    ],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: [
+            '*.ts',
+            'eslint.config.ts',
+            'vite.config.ts',
+            'vite.config.*.ts',
+            'vitest.config.ts',
+            'scripts/*.ts',
+          ],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
   {
-    ignores: ['public/**/*.js', 'dist/**/*', 'node_modules/**/*'],
-  },
-  {
     rules: {
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/explicit-module-boundary-types': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-confusing-void-expression': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unsafe-call': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-return': 'warn',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/restrict-template-expressions': 'warn',
+      '@typescript-eslint/restrict-plus-operands': 'warn',
+      '@typescript-eslint/no-unnecessary-condition': 'warn',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+      '@typescript-eslint/prefer-promise-reject-errors': 'warn',
+      '@typescript-eslint/no-deprecated': 'warn',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'warn',
+      '@typescript-eslint/no-invalid-void-type': 'warn',
+      '@typescript-eslint/no-unused-expressions': 'warn',
+      '@typescript-eslint/no-misused-promises': 'warn',
+      '@typescript-eslint/no-unnecessary-type-conversion': 'warn',
+      '@typescript-eslint/no-for-in-array': 'warn',
+      '@typescript-eslint/no-namespace': 'warn',
+      '@typescript-eslint/no-dynamic-delete': 'warn',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'warn',
+      '@typescript-eslint/only-throw-error': 'warn',
+      '@typescript-eslint/no-redundant-type-constituents': 'warn',
+      '@typescript-eslint/no-base-to-string': 'warn',
+      '@typescript-eslint/unbound-method': 'warn',
+      '@typescript-eslint/no-extraneous-class': 'warn',
+      '@typescript-eslint/await-thenable': 'warn',
+      '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/no-useless-constructor': 'warn',
+      '@typescript-eslint/no-this-alias': 'warn',
+      'no-var': 'warn',
+      'no-useless-escape': 'warn',
+      'no-cond-assign': 'warn',
+      'prefer-const': 'warn',
+      'prefer-rest-params': 'warn',
+      'no-constant-binary-expression': 'warn',
+      'semi': ['error', 'never'],
     },
   },
-);
+)

@@ -120,7 +120,7 @@ export default class BrickLayouter extends Layouter {
     // noMerge if any not present
     // noMerge if any brick not 1x1x1
     let mergeVoxelIter = mergeVoxels.values()
-    while (mVoxel = mergeVoxelIter.next().value as VoxelLike | undefined) {
+    while (mVoxel = mergeVoxelIter.next().value) {
       const mBrick = mVoxel?.brick
       if (!mBrick || !mBrick.isSize(1, 1, 1)) {
         return null
@@ -141,7 +141,7 @@ export default class BrickLayouter extends Layouter {
     // This is necessary for the 2 brick steps of larger bricks
     const mergeVoxels2 = new Set<VoxelLike>()
     mergeVoxelIter = mergeVoxels.values()
-    while (mVoxel = mergeVoxelIter.next().value as VoxelLike | undefined) {
+    while (mVoxel = mergeVoxelIter.next().value) {
       mVoxel2 = mVoxel.neighbors?.[dir]
       if (mVoxel2 == null) {
         return null
@@ -150,7 +150,7 @@ export default class BrickLayouter extends Layouter {
     }
 
     const mergeVoxel2Iter = mergeVoxels2.values()
-    while (mVoxel2 = mergeVoxel2Iter.next().value as VoxelLike | undefined) {
+    while (mVoxel2 = mergeVoxel2Iter.next().value) {
       const mBrick2 = mVoxel2?.brick
       if (!mBrick2 || !mBrick2.isSize(1, 1, 1)) {
         return null
@@ -217,7 +217,7 @@ export default class BrickLayouter extends Layouter {
     }
 
     const slBrick = secondLayerBricks.values()
-      .next().value as Brick | undefined
+      .next().value
     if (!slBrick || !slBrick.isSize(1, 1, 1)) {
       return null
     }
@@ -228,7 +228,7 @@ export default class BrickLayouter extends Layouter {
     }
 
     const tlBrick = thirdLayerBricks.values()
-      .next().value as Brick | undefined
+      .next().value
     if (!tlBrick || !tlBrick.isSize(1, 1, 1)) {
       return null
     }

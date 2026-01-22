@@ -235,18 +235,18 @@ describe("VoxelUnion", () => {
       }
     }
 
-    expect(data.zLayers[0]![0]![0]!.voxel).to.equal(false)
-    expect(data.zLayers[0]![1]![0]!.voxel).to.equal(true)
-    expect(data.zLayers[0]![2]![0]!.voxel).to.equal(false)
-    expect(data.zLayers[0]![0]![1]!.voxel).to.equal(true)
-    expect(data.zLayers[0]![1]![1]!.voxel).to.equal(true)
-    expect(data.zLayers[0]![2]![1]!.voxel).to.equal(true)
-    expect(data.zLayers[0]![0]![2]!.voxel).to.equal(false)
-    expect(data.zLayers[0]![1]![2]!.voxel).to.equal(true)
-    expect(data.zLayers[0]![2]![2]!.voxel).to.equal(false)
+    expect(data.zLayers[0][0][0].voxel).to.equal(false)
+    expect(data.zLayers[0][1][0].voxel).to.equal(true)
+    expect(data.zLayers[0][2][0].voxel).to.equal(false)
+    expect(data.zLayers[0][0][1].voxel).to.equal(true)
+    expect(data.zLayers[0][1][1].voxel).to.equal(true)
+    expect(data.zLayers[0][2][1].voxel).to.equal(true)
+    expect(data.zLayers[0][0][2].voxel).to.equal(false)
+    expect(data.zLayers[0][1][2].voxel).to.equal(true)
+    expect(data.zLayers[0][2][2].voxel).to.equal(false)
 
-    expect(data.zLayers[1]![1]![1]!.voxel).to.equal(false)
-    return expect(data.zLayers[-1]![1]![1]!.voxel).to.equal(false)
+    expect(data.zLayers[1][1][1].voxel).to.equal(false)
+    return expect(data.zLayers[-1][1][1].voxel).to.equal(false)
   })
 
   return it('should create a filled "+" plate point list', () => {

@@ -71,6 +71,7 @@
     "zeroclipboard": "^2.2.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@modyfi/vite-plugin-yaml": "^1.1.1",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/body-parser": "^1.19.6",
@@ -96,8 +97,8 @@
     "chai": "^2.0.0",
     "chai-as-promised": "^4.1.1",
     "chai-shallow-deep-equal": "^1.2.0",
-    "eslint": "^9.25.0",
-    "eslint-config-javascript": "^3.0.0",
+    "eslint": "^9.39.2",
+    "jiti": "^2.6.1",
     "jsdom": "^27.4.0",
     "mocha": "^11.1.0",
     "ts-migrate": "^0.1.35",

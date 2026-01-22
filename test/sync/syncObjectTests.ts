@@ -79,7 +79,7 @@ describe("SyncObject tests", () => {
 
       for (j = 0, i = j; j <= 2; j++, i = j) {
         pojsos[i] = {a: "b" + i, c: {d: "e" + i}}
-        packets[i] = {id: "abcdefgh" + i, data: pojsos[i]!}
+        packets[i] = {id: "abcdefgh" + i, data: pojsos[i]}
       }
 
       const requests = Promise.all(Dummy.from(packets) as Promise<Dummy>[])
@@ -131,8 +131,8 @@ describe("SyncObject tests", () => {
       for (j = 0, i = j; j <= 2; j++, i = j) {
         pojsos[i] = {a: "b" + i, c: {d: "e" + i}}
         ids[i] = "abcdefgh" + i
-        packets[i] = {id: ids[i]!, data: pojsos[i]!}
-        dataPackets!.nextGets.push(packets[i]!)
+        packets[i] = {id: ids[i], data: pojsos[i]}
+        dataPackets!.nextGets.push(packets[i])
       }
 
       const requests = Promise.all(Dummy.from(ids) as Promise<Dummy>[])
@@ -184,9 +184,9 @@ describe("SyncObject tests", () => {
       for (j = 0, i = j; j <= 2; j++, i = j) {
         pojsos[i] = {a: "b" + i, c: {d: "e" + i}}
         ids[i] = "abcdefgh" + i
-        references[i] = {dataPacketRef: ids[i]!}
-        packets[i] = {id: ids[i]!, data: pojsos[i]!}
-        dataPackets!.nextGets.push(packets[i]!)
+        references[i] = {dataPacketRef: ids[i]}
+        packets[i] = {id: ids[i], data: pojsos[i]}
+        dataPackets!.nextGets.push(packets[i])
       }
 
       const requests = Promise.all(Dummy.from(references) as Promise<Dummy>[])

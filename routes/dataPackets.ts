@@ -12,49 +12,57 @@ export function create (_request: Request, response: Response) {
 }
 
 export function exists (request: Request, response: Response) {
-  const id = request.params.id ?? ""
+  const id = request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.exists(id)
       .then(resultId => response.status(200)
         .send(resultId))
-      .catch(resultId => response.status(404)
-        .send(resultId)))
+      .catch((resultId: unknown) => {
+        const message = resultId instanceof Error ? resultId.message : String(resultId)
+        return response.status(404).send(message)
+      }))
     .catch(() => response.status(400)
       .send("Invalid data packet id provided"))
 }
 
 export function get (request: Request, response: Response) {
-  const id = request.params.id ?? ""
+  const id = request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.get(id)
       .then(packet => response.status(200)
         .json(packet))
-      .catch(resultId => response.status(404)
-        .send(resultId)))
+      .catch((resultId: unknown) => {
+        const message = resultId instanceof Error ? resultId.message : String(resultId)
+        return response.status(404).send(message)
+      }))
     .catch(() => response.status(400)
       .send("Invalid data packet id provided"))
 }
 
 export function put (request: Request, response: Response) {
-  const id = request.params.id ?? ""
+  const id = request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.put({id, data: request.body})
       .then(() => response.status(200)
         .send(id))
-      .catch(resultId => response.status(404)
-        .send(resultId)))
+      .catch((resultId: unknown) => {
+        const message = resultId instanceof Error ? resultId.message : String(resultId)
+        return response.status(404).send(message)
+      }))
     .catch(() => response.status(400)
       .send("Invalid data packet id provided"))
 }
 
 export function delete_ (request: Request, response: Response) {
-  const id = request.params.id ?? ""
+  const id = request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.delete_(id)
       .then(() => response.status(204)
         .send())
-      .catch(resultId => response.status(404)
-        .send(resultId)))
+      .catch((resultId: unknown) => {
+        const message = resultId instanceof Error ? resultId.message : String(resultId)
+        return response.status(404).send(message)
+      }))
     .catch(() => response.status(400)
       .send("Invalid data packet id provided"))
 }

@@ -1,4 +1,4 @@
-import type { Plugin } from '../types/plugin.js';
+import type { Plugin } from '../types/plugin.js'
 
 type HookCallback = (...args: unknown[]) => unknown;
 
@@ -6,7 +6,7 @@ type HookCallback = (...args: unknown[]) => unknown;
  * Plugin Hook implementation
  */
 export default class PluginHooks {
-  private hooks: string[];
+  private hooks: string[]
   private lists: Record<string, HookCallback[]>;
 
   // Dynamic hook methods added by initHooks
@@ -14,23 +14,23 @@ export default class PluginHooks {
 
   constructor() {
     // list of all hooks
-    this.hooks = [];
+    this.hooks = []
     // list of all hooks and their registered callbacks
-    this.lists = {};
+    this.lists = {}
   }
 
   // **check if a plugin provides a named hook method**
   hasHook(plugin: Plugin, hook: string): boolean {
-    return typeof (plugin as Record<string, unknown>)[hook] === 'function';
+    return typeof (plugin as Record<string, unknown>)[hook] === 'function'
   }
 
   // **call the plugin's hook if provided with the passed arguments**
   call<T = unknown>(plugin: Plugin, hook: string, ...args: unknown[]): T | undefined {
     if (this.hasHook(plugin, hook)) {
-      const method = (plugin as Record<string, (...args: unknown[]) => T>)[hook];
-      return method?.(...args);
+      const method = (plugin as Record<string, (...args: unknown[]) => T>)[hook]
+      return method?.(...args)
     }
-    return undefined;
+    return undefined
   }
 
   // ***
@@ -49,57 +49,57 @@ export default class PluginHooks {
     `foo`.
   */
   initHooks(hookList: string[]): void {
-    this.hooks = hookList;
+    this.hooks = hookList
     for (const hook of this.hooks) {
-      this.lists[hook] = [];
+      this.lists[hook] = []
     }
     for (const hook of this.hooks) {
       // Create a closure to capture the hook name
       (this as Record<string, unknown>)[hook] = (
         (h: string) =>
         (...args: unknown[]): unknown[] => {
-          return (this.lists[h] ?? []).map((callback) => callback(...args));
+          return (this.lists[h] ?? []).map((callback) => callback(...args))
         }
-      )(hook);
+      )(hook)
     }
   }
 
   // **register a plugin for all the hooks it provides**
   register(plugin: Plugin): void {
     for (const hook of this.hooks) {
-      this.registerHook(plugin, hook);
+      this.registerHook(plugin, hook)
     }
   }
 
   // **register a plugin for a specific hook if provided**
   registerHook(plugin: Plugin, hook: string): void {
-    const method = (plugin as Record<string, HookCallback | undefined>)[hook];
+    const method = (plugin as Record<string, HookCallback | undefined>)[hook]
     if (typeof method === 'function') {
-      this.lists[hook]?.push(method.bind(plugin));
+      this.lists[hook]?.push(method.bind(plugin))
     }
   }
 
   // **get all callbacks that are registered for a specific hook**
   get(hook: string): HookCallback[] {
-    return this.lists[hook] ?? [];
+    return this.lists[hook] ?? []
   }
 
   // **unregister a plugin for all hooks it was registered for**
   unregister(plugin: Plugin): void {
     for (const hook of this.hooks) {
-      this.unregisterHook(plugin, hook);
+      this.unregisterHook(plugin, hook)
     }
   }
 
   // **unregister a plugin for a specific hook if provided and registered**
   unregisterHook(plugin: Plugin, hook: string): void {
-    const method = (plugin as Record<string, HookCallback | undefined>)[hook];
+    const method = (plugin as Record<string, HookCallback | undefined>)[hook]
     if (typeof method === 'function') {
-      const hookList = this.lists[hook];
+      const hookList = this.lists[hook]
       if (hookList) {
-        const index = hookList.indexOf(method);
+        const index = hookList.indexOf(method)
         if (index !== -1) {
-          hookList.splice(index, 1);
+          hookList.splice(index, 1)
         }
       }
     }

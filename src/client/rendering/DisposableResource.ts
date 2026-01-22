@@ -207,7 +207,7 @@ export default class DisposableResource {
 
     // Dispose in reverse order to handle parent-child relationships
     for (let i = toDispose.length - 1; i >= 0; i--) {
-      const object = toDispose[i]!
+      const object = toDispose[i]
 
       // Remove from parent
       if (object.parent) {

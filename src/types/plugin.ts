@@ -1,6 +1,6 @@
-import type { Object3D, WebGLRenderer, PerspectiveCamera, WebGLRenderTarget } from 'three';
-import type Bundle from '../client/bundle.js';
-import type Node from '../common/project/node.js';
+import type { Object3D, WebGLRenderer, PerspectiveCamera, WebGLRenderTarget } from 'three'
+import type Bundle from '../client/bundle.js'
+import type Node from '../common/project/node.js'
 
 export interface Plugin {
   name: string;

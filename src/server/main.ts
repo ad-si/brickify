@@ -110,7 +110,7 @@ export async function setupRouting (port: number | string): Promise<void> {
 
   webapp.use((_req, res, next) => {
     res.locals.app = webapp
-    return next()
+    next()
   })
 
 
@@ -124,7 +124,7 @@ export async function setupRouting (port: number | string): Promise<void> {
     webapp.use(morgan("dev", {
       stream: {
         write (str: string) {
-          return log.info(str.substring(0, str.length - 1))
+          log.info(str.substring(0, str.length - 1))
         },
       },
     },
@@ -135,7 +135,7 @@ export async function setupRouting (port: number | string): Promise<void> {
     webapp.use(morgan("combined", {
       stream: {
         write (str: string) {
-          return log.info(str.substring(0, str.length - 1))
+          log.info(str.substring(0, str.length - 1))
         },
       },
     },
@@ -204,9 +204,9 @@ export async function setupRouting (port: number | string): Promise<void> {
     webapp.use(errorHandler())
   }
 
-  webapp.use((_req, res) => res
+  webapp.use((_req, res) => { res
     .status(404)
-    .render("404"))
+    .render("404") })
 }
 
 
@@ -221,10 +221,12 @@ export async function startServer (_port?: number | string, _ip?: string): Promi
 
   server.on("error", (error: NodeError) => {
     if (error.code === "EADDRINUSE") {
-      return log.error(`Another Server is already listening on ${srvrIp}:${srvrPort}`)
+      log.error(`Another Server is already listening on ${srvrIp}:${srvrPort}`)
+      return
     }
     else {
-      return log.error("Server could not be started:", error)
+      log.error("Server could not be started:", error)
+      return
     }
   })
 
@@ -233,6 +235,6 @@ export async function startServer (_port?: number | string, _ip?: string): Promi
   server.listen(
     Number(srvrPort),
     srvrIp,
-    () => log.info(`Server is listening on ${srvrIp}:${srvrPort}`),
+    () => { log.info(`Server is listening on ${srvrIp}:${srvrPort}`) },
   )
 }

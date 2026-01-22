@@ -60,13 +60,14 @@ export default class PreviewUi {
     this.$panel.find(".btn, .panel, h4")
       .toggleClass("disabled", !enabled)
     if (!enabled) {
-      return this.quit()
+      this.quit()
+      return
     }
   }
 
   quit () {
     this._quitStabilityView()
-    return this._quitAssemblyView()
+    this._quitAssemblyView()
   }
 
   _initStabilityView () {
@@ -74,7 +75,7 @@ export default class PreviewUi {
     this.$stabilityViewButton = $("#stabilityCheckButton")
     return this.$stabilityViewButton.click(() => {
       this.toggleStabilityView()
-      return this.workflowUi.hideMenuIfPossible()
+      this.workflowUi.hideMenuIfPossible()
     })
   }
 
@@ -84,7 +85,7 @@ export default class PreviewUi {
     }
     this.$stabilityViewButton.removeClass("active disabled")
     this.stabilityViewEnabled = false
-    return this.editController.enableInteraction()
+    this.editController.enableInteraction()
   }
 
   toggleStabilityView () {
@@ -106,7 +107,8 @@ export default class PreviewUi {
       return this.nodeVisualizer.setDisplayMode(this.sceneManager.selectedNode, "stability")
     }
     else {
-      return this.editController.enableInteraction()
+      this.editController.enableInteraction()
+      return
     }
   }
 
@@ -124,7 +126,7 @@ export default class PreviewUi {
     this.$assemblyViewButton.removeClass("active disabled")
     this.assemblyViewEnabled = false
     this.previewAssemblyUi.setEnabled(false)
-    return this.editController.enableInteraction()
+    this.editController.enableInteraction()
   }
 
   toggleAssemblyView () {
@@ -144,10 +146,12 @@ export default class PreviewUi {
     this.previewAssemblyUi.setEnabled(this.assemblyViewEnabled)
 
     if (this.assemblyViewEnabled) {
-      return this.editController.disableInteraction()
+      this.editController.disableInteraction()
+      return
     }
     else {
-      return this.editController.enableInteraction()
+      this.editController.enableInteraction()
+      return
     }
   }
 }

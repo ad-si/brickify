@@ -108,7 +108,7 @@ describe("Scene tests", () => {
       return scene.done(() => {
         const {
           packet,
-        } = dataPackets!.putCalls[0]!
+        } = dataPackets!.putCalls[0]
         expect(packet).to.have.deep.property("data.nodes").that.is.an("array")
         const {
           nodes,

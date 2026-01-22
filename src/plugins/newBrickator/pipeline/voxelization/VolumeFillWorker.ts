@@ -51,10 +51,10 @@ const VolumeFillWorker: VolumeFillWorkerType = {
 
     for (x in grid) {
       voxelPlane = grid[x as unknown as number]
-      const xNum = parseInt(x as string)
+      const xNum = parseInt(x)
       for (y in voxelPlane) {
         voxelColumn = voxelPlane[y as unknown as number]
-        const yNum = parseInt(y as string)
+        const yNum = parseInt(y)
         this._postProgress(callback, xNum, yNum, numVoxelsX, numVoxelsY)
         this._fillUp(grid, xNum, yNum, numVoxelsZ)
       }
@@ -132,7 +132,7 @@ const VolumeFillWorker: VolumeFillWorkerType = {
       return
     }
     this.lastProgress = progress
-    return callback({state: "progress", progress})
+    callback({state: "progress", progress})
   },
 }
 

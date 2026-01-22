@@ -1,7 +1,7 @@
 import DownloadProvider from "./DownloadProvider.js"
 import { getModal as downloadModal } from "../downloadModal.js"
 import type Bundle from "../../bundle.js"
-import type { StudSizeConfig, HoleSizeConfig, DownloadSettingsConfig } from "../../../types/index.js"
+import type { StudSizeConfig, HoleSizeConfig } from "../../../types/index.js"
 
 export default class DownloadUi {
   bundle: Bundle
@@ -40,13 +40,13 @@ export default class DownloadUi {
   }
 
   _initDownloadModal () {
-    this.$downloadModal = downloadModal(this.bundle.globalConfig.downloadSettings as DownloadSettingsConfig)
+    this.$downloadModal = downloadModal(this.bundle.globalConfig.downloadSettings)
     $("body")
       .append(this.$downloadModal)
 
     // show modal when clicking on download button
     return this.$downloadButton.click(() => {
-      return (this.$downloadModal as JQuery & { modal: (action: string) => void }).modal("show")
+      ;(this.$downloadModal as JQuery & { modal: (action: string) => void }).modal("show")
     })
   }
 

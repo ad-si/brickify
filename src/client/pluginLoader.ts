@@ -51,14 +51,15 @@ export default class PluginLoader {
     this.pluginHooks.register(instance)
 
     if (threeNode != null) {
-      return this.bundle.renderer.addToScene(threeNode)
+      this.bundle.renderer.addToScene(threeNode)
+      return
     }
   }
 
   initPlugins () {
     return Array.from(this.pluginInstances)
       .map((plugin) =>
-        this._initPlugin(plugin))
+        { this._initPlugin(plugin) })
   }
 
   // Since browserify.js does not support dynamic require

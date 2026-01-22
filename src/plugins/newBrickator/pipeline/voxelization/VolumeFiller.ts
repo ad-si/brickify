@@ -101,7 +101,7 @@ export default class VolumeFiller {
       const worker = new Worker(workerPath) as unknown as WorkerInterface
       this.worker = worker
       return Promise.resolve(worker)
-    } catch (e) {
+    } catch {
       // Fallback: provide a dummy
       this.worker = {
         postMessage: () => {},

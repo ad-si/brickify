@@ -79,13 +79,15 @@ export default class Voxelizer {
 
           const progressAndFinishedCallback = (message: WorkerMessage) => {
             if (message.state === "progress") {
-              return progressCallback(message.progress!)
+              progressCallback(message.progress!)
+      return
             }
             else { // if state is 'finished'
-              return resolve({
+              resolve({
                 grid: voxelGrid,
                 gridPOJO: message.data,
               })
+      return
             }
           }
 
@@ -143,7 +145,7 @@ export default class Voxelizer {
                 })
               }))
         })
-        .catch((error: Error) => reject(error))
+        .catch((error: unknown) => { reject(error) })
     })
   }
 
@@ -206,7 +208,7 @@ export default class Voxelizer {
       this.worker = worker
       return Promise.resolve(worker)
     }
-    catch (e) {
+    catch {
       // Fallback: provide a dummy that won't crash callers
       this.worker = {
         postMessage: () => {},

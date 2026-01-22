@@ -1,9 +1,9 @@
 export default class Response {
-  whenSent: Promise<void>;
-  content: unknown;
-  type: string;
-  code: number;
-  private setContent: (type: string) => (content: unknown) => void;
+  whenSent: Promise<void>
+  content: unknown
+  type: string
+  code: number
+  private setContent: (type: string) => (content: unknown) => void
 
   constructor () {
     this.content = undefined

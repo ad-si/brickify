@@ -1,4 +1,4 @@
-import THREE, { Object3D, Mesh, Material, Geometry, BufferGeometry } from "three"
+import THREE, { Mesh, Material, Geometry, BufferGeometry } from "three"
 import DisposableResource from "../../../client/rendering/DisposableResource.js"
 import type Brick from "../../newBrickator/pipeline/Brick.js"
 
@@ -107,9 +107,9 @@ export default class BrickObject extends THREE.Object3D {
   }
 
   _updateStuds (): boolean {
-    ;(this.children[1] as Object3D).visible = (this.fidelity === 1) && this.areStudsVisible
-    ;(this.children[2] as Object3D).visible = (this.fidelity === 2) && this.areStudsVisible
-    return (this.children[3] as Object3D).visible = (this.fidelity === 0) && this.areStudsVisible
+    ;(this.children[1]).visible = (this.fidelity === 1) && this.areStudsVisible
+    ;(this.children[2]).visible = (this.fidelity === 2) && this.areStudsVisible
+    return (this.children[3]).visible = (this.fidelity === 0) && this.areStudsVisible
   }
 
   dispose(): void {

@@ -13,8 +13,8 @@ describe("dataPacket client cache", () => {
     vi.clearAllMocks()
   })
 
-  afterEach(() => {
-    dataPackets.clear()
+  afterEach(async () => {
+    await dataPackets.clear()
   })
 
   describe("dataPacket creation", () => {
@@ -90,7 +90,7 @@ describe("dataPacket client cache", () => {
       try {
         await dataPackets.exists(id)
         expect.fail("Should have rejected")
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(err).toHaveProperty("status", 404)
         expect(err).toHaveProperty("responseText", id)
       }
@@ -139,7 +139,7 @@ describe("dataPacket client cache", () => {
       try {
         await dataPackets.get(packet.id)
         expect.fail("Should have rejected")
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(err).toHaveProperty("status", 404)
         expect(err).toHaveProperty("responseText", packet.id)
       }
@@ -165,7 +165,7 @@ describe("dataPacket client cache", () => {
       try {
         await dataPackets.put(packet)
         expect.fail("Should have rejected")
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(err).toHaveProperty("status", 404)
         expect(err).toHaveProperty("responseText", packet.id)
       }
@@ -213,7 +213,7 @@ describe("dataPacket client cache", () => {
       try {
         await dataPackets.delete_(packet.id)
         expect.fail("Should have rejected")
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(err).toHaveProperty("status", 404)
         expect(err).toHaveProperty("responseText", packet.id)
       }
@@ -224,9 +224,8 @@ describe("dataPacket client cache", () => {
       mockedProxy.delete_.mockResolvedValue(undefined)
 
       const packet = {id: "abcdefgh", data: {a: 0, b: "c"}}
-      const result = await dataPackets.delete_(packet.id)
+      await dataPackets.delete_(packet.id)
 
-      expect(result).toEqual(undefined)
       expect(mockedProxy.delete_).toHaveBeenCalledTimes(1)
       expect(mockedProxy.delete_).toHaveBeenCalledWith(packet.id)
     })
@@ -248,7 +247,7 @@ describe("dataPacket client cache", () => {
       try {
         await dataPackets.exists(packet.id)
         expect.fail("Should have rejected")
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(err).toHaveProperty("status", 404)
         expect(err).toHaveProperty("responseText", packet.id)
       }

@@ -73,7 +73,8 @@ export default class EditBrushUi {
       this._bigBrushSelected = false
       const lastBrush = this._brushList[this._brushList.length - 1]
       if (lastBrush) {
-        return this._brushSelect(lastBrush)
+        this._brushSelect(lastBrush)
+      return
       }
     }
   }
@@ -87,12 +88,12 @@ export default class EditBrushUi {
     brush.brushButton.on("click", (_event: JQuery.ClickEvent) => {
       this._bigBrushSelected = false
       this._brushSelect(brush)
-      return this.workflowUi.hideMenuIfPossible()
+      this.workflowUi.hideMenuIfPossible()
     })
     return brush.bigBrushButton.on("click", (_event: JQuery.ClickEvent) => {
       this._bigBrushSelected = true
       this._brushSelect(brush)
-      return this.workflowUi.hideMenuIfPossible()
+      this.workflowUi.hideMenuIfPossible()
     })
   }
 
@@ -108,7 +109,7 @@ export default class EditBrushUi {
     if (this._bigBrushSelected) {
       brush.bigBrushButton.addClass("active")
     }
-    return typeof brush.onBrushSelect === "function" ? brush.onBrushSelect(this.selectedNode, this._bigBrushSelected) : undefined
+    typeof brush.onBrushSelect === "function" ? brush.onBrushSelect(this.selectedNode, this._bigBrushSelected) : undefined
   }
 
   _deselectBrush (node: Node | null): null | void {

@@ -45,11 +45,11 @@ export default class WorkflowUi {
   }
 
   onNodeSelect (node: Node) {
-    return this.workflow.edit.onNodeSelect(node)
+    this.workflow.edit.onNodeSelect(node)
   }
 
   onNodeDeselect (node: Node) {
-    return this.workflow.edit.onNodeDeselect(node)
+    this.workflow.edit.onNodeDeselect(node)
   }
 
   enableOnly (groupUi: WorkflowStepUi): unknown[] {
@@ -101,7 +101,7 @@ export default class WorkflowUi {
     const sidebar = document.getElementById("leftSidebar")
     if (sidebar) {
       perfectScrollbar.initialize(sidebar)
-      window.addEventListener("resize", () => perfectScrollbar.update(sidebar))
+      window.addEventListener("resize", () => { perfectScrollbar.update(sidebar) })
     }
   }
 
@@ -146,6 +146,6 @@ export default class WorkflowUi {
   }
 
   toggleAssemblyView () {
-    return this.workflow.preview.toggleAssemblyView()
+    this.workflow.preview.toggleAssemblyView()
   }
 }

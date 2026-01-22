@@ -112,7 +112,7 @@ withoutMerge ${numRandomChoicesWithoutMerge}`,
             if (neighbor.getSize().z === 1) {
               const newBricks = brick.splitUp()
               bricksToLayout.delete(brick)
-              newBricks.forEach(newBrick => bricksToLayout!.add(newBrick))
+              newBricks.forEach(newBrick => bricksToLayout.add(newBrick))
               continue MAINLOOP// ;
             }
           }
@@ -151,7 +151,7 @@ withoutMerge ${numRandomChoicesWithoutMerge}`,
     mergeNeighbors: Set<Brick>, bricksToLayout: BricksSet): Brick {
     mergeNeighbors.forEach((neighborToMergeWith: Brick) => {
       bricksToLayout.delete(neighborToMergeWith)
-      return brick.mergeWith(neighborToMergeWith)
+      brick.mergeWith(neighborToMergeWith)
     })
     return brick
   }

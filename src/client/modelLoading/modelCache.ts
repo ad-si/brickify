@@ -20,8 +20,9 @@ const exists = (identifier: string): Promise<void> => Promise.resolve(
   $.ajax("/model/" + identifier,
     {type: "HEAD"}),
 )
-  .catch((jqXHR: JQuery.jqXHR) => {
-    throw new Error(jqXHR.statusText)
+  .catch((jqXHR: unknown) => {
+    const statusText = (jqXHR as { statusText?: string })?.statusText ?? 'Request failed'
+    throw new Error(statusText)
   })
 export { exists }
 
@@ -36,12 +37,15 @@ const submitDataToServer = function (identifier: string, data: string): Promise<
         contentType: "application/octet-stream",
       }),
     )
-      .catch((jqXHR: JQuery.jqXHR) => {
-        throw new Error(jqXHR.statusText)
+      .catch((jqXHR: unknown) => {
+        const statusText = (jqXHR && typeof jqXHR === 'object' && 'statusText' in jqXHR)
+          ? String(jqXHR.statusText)
+          : 'Unknown error'
+        throw new Error(statusText)
       })
     prom.then(
-      () => log.debug("Sent model to the server"),
-      () => log.error("Unable to send model to the server"))
+      () => { log.debug("Sent model to the server") },
+      () => { log.error("Unable to send model to the server") })
     return prom
   }
   return exists(identifier)
@@ -59,8 +63,9 @@ export const store = (model: MeshModel): Promise<string> => model
 
 // requests a mesh with the given identifier from the server
 const requestDataFromServer = (identifier: string): Promise<string> => Promise.resolve($.get("/model/" + identifier))
-  .catch((jqXHR: JQuery.jqXHR) => {
-    throw new Error(jqXHR.statusText)
+  .catch((jqXHR: unknown) => {
+    const statusText = (jqXHR as { statusText?: string })?.statusText ?? 'Request failed'
+    throw new Error(statusText)
   })
 
 const buildModelPromise = (identifier: string): Promise<unknown> => requestDataFromServer(identifier)

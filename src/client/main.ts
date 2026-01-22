@@ -24,7 +24,7 @@ const commandFunctions: Record<string, CommandFunction> = {
   initialModel (identifier: string) {
     // load selected model
     log.debug("loading initial model")
-    bundle.sceneManager.clearScene()
+    void bundle.sceneManager.clearScene()
     return bundle.modelLoader.loadByIdentifier(identifier)
   },
 }
@@ -51,15 +51,15 @@ const postInitCallback = function () {
 }
 
 var bundle = new Bundle(globalConfig)
-bundle.init()
+void bundle.init()
   .then(postInitCallback)
 
 // Initialize UI elements after Bootstrap is ready
-bootstrapReady.then(() => {
+void bootstrapReady.then(() => {
   // init direct help (always available)
-  ($("#cmdHelp") as JQuery<HTMLElement> & { tooltip(opts: unknown): JQuery<HTMLElement> })
+  ($("#cmdHelp") as JQuery & { tooltip(opts: unknown): JQuery })
     .tooltip({placement: "bottom"})
-    .click(() => (bundle as Bundle & { ui: { hotkeys: { showHelp(): void } } }).ui.hotkeys.showHelp())
+    .click(() => { (bundle as Bundle & { ui: { hotkeys: { showHelp(): void } } }).ui.hotkeys.showHelp() })
 
   // init share logic (only works with server session)
   $.get("/share")
@@ -67,10 +67,10 @@ bootstrapReady.then(() => {
       ZeroClipboard.config(
         {swfPath: "/node_modules/zeroclipboard/dist/ZeroClipboard.swf"})
       const url = document.location.origin + "/app?share=" + link
-      ;($("#cmdShare") as JQuery<HTMLElement> & { tooltip(opts: unknown): JQuery<HTMLElement> })
+      ;($("#cmdShare") as JQuery & { tooltip(opts: unknown): JQuery })
         .tooltip({placement: "bottom"})
         .click(() => {
-          (bundle as Bundle & { saveChanges(): Promise<void> }).saveChanges()
+          void (bundle as Bundle & { saveChanges(): Promise<void> }).saveChanges()
             .then(() =>
               bootbox.dialog({
                 title: "Share your work!",

@@ -125,7 +125,7 @@ export default class LegoInstructions {
         // disable pipeline and fidelity changes
         this.fidelityControl.enableScreenshotMode()
         // enter build mode
-        return this.nodeVisualizer.setDisplayMode(node, "build")
+        this.nodeVisualizer.setDisplayMode(node, "build")
       })
       .then(() => this.newBrickator.getNodeData(node))
       .then((data: NodeData) => {
@@ -148,7 +148,7 @@ export default class LegoInstructions {
             const screenshots = this._takeScreenshots(node, numLayers, camera)
               .then((images) => {
                 files.push(...Array.from(images || []))
-                return log.debug("Finished instruction screenshots")
+                log.debug("Finished instruction screenshots")
               })
 
             // Load and save piece images
@@ -166,7 +166,7 @@ export default class LegoInstructions {
 
         return files
       })
-      .catch((error: Error): null => {
+      .catch((error: unknown): null => {
         log.error(error)
         return null
       })
@@ -243,7 +243,7 @@ export default class LegoInstructions {
         newData.set(data, pngData.length)
         return pngData = newData
       })
-      return png.on("end", () => resolve(pngData))
+      return png.on("end", () => { resolve(pngData) })
     })
   }
 
@@ -359,7 +359,7 @@ td{min-width: 80px;} \
       xhr.open("GET", fileName)
       xhr.responseType = "arraybuffer"
       xhr.onload = function (_event: ProgressEvent) {
-        return resolve({
+        resolve({
           fileName,
           // as requested, response is an ArrayBuffer
           data: this.response,
@@ -368,7 +368,7 @@ td{min-width: 80px;} \
       xhr.onerror = reject
       xhr.onabort = reject
       xhr.ontimeout = reject
-      return xhr.send()
+      xhr.send()
     })
   }
 }

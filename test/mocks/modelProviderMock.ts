@@ -9,11 +9,11 @@ interface RequestCall {
 }
 
 export default class ModelProviderMock {
-  calls: number;
-  storeCalls: StoreCall[];
-  nextStore: unknown;
-  requestCalls: RequestCall[];
-  nextRequest: unknown;
+  calls: number
+  storeCalls: StoreCall[]
+  nextStore: unknown
+  requestCalls: RequestCall[]
+  nextRequest: unknown
 
   constructor () {
     this.store = this.store.bind(this)
@@ -32,7 +32,7 @@ export default class ModelProviderMock {
       return Promise.resolve()
     }
     else {
-      return Promise.reject()
+      return Promise.reject(new Error("Mock rejection"))
     }
   }
 
@@ -43,7 +43,7 @@ export default class ModelProviderMock {
       return Promise.resolve(this.nextRequest)
     }
     else {
-      return Promise.reject()
+      return Promise.reject(new Error("Mock rejection"))
     }
   }
 }

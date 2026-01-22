@@ -132,7 +132,7 @@ export default class Brick {
 
   // Enumerates over each voxel that belongs to this brick
   forEachVoxel (callback: (voxel: Voxel) => void) {
-    return this.voxels.forEach(callback)
+    this.voxels.forEach(callback)
   }
 
   // Returns the voxel the brick consists of, if it consists out
@@ -229,13 +229,13 @@ export default class Brick {
         size.minZ = voxel.position.z
       }
 
-      if (size.maxX! < voxel.position.x) {
+      if (size.maxX < voxel.position.x) {
         size.maxX = voxel.position.x
       }
-      if (size.maxY! < voxel.position.y) {
+      if (size.maxY < voxel.position.y) {
         size.maxY = voxel.position.y
       }
-      if (size.maxZ! < voxel.position.z) {
+      if (size.maxZ < voxel.position.z) {
         size.maxZ = voxel.position.z
       }
     })
@@ -273,16 +273,17 @@ export default class Brick {
     */
     // Checking the cache for correctness
     if (this._neighbors?.[direction] != null) {
-      this._neighbors[direction]!.forEach(neighbor => {
+      this._neighbors[direction].forEach(neighbor => {
         if (neighbor.voxels.size === 0) {
           log.warn("got outdated neighbor from cache")
-          return this.clearNeighborsCache()
+          this.clearNeighborsCache()
+      return
         }
       })
     }
 
     if (this._neighbors?.[direction] != null) {
-      return this._neighbors[direction]!
+      return this._neighbors[direction]
     }
 
     const neighbors = new Set<Brick>()
@@ -310,7 +311,7 @@ export default class Brick {
 
     [Brick.direction.Xp, Brick.direction.Xm, Brick.direction.Yp,
       Brick.direction.Ym].forEach(direction => {
-      return this.getNeighbors(direction)
+      this.getNeighbors(direction)
         .forEach(brick => neighbors.add(brick))
     })
 
@@ -355,7 +356,7 @@ export default class Brick {
     // Tell neighbors to update their cache
     for (const direction in Brick.direction) {
       const neighbors = this.getNeighbors(direction)
-      neighbors.forEach(neighbor => neighbor.clearNeighborsCache())
+      neighbors.forEach(neighbor => { neighbor.clearNeighborsCache() })
     }
 
     // Create new bricks
@@ -383,7 +384,7 @@ export default class Brick {
       }
     }
     this._visualBrick = visualBrick
-    return this._visualBrick != null ? this._visualBrick.setBrick(this) : undefined
+    this._visualBrick != null ? this._visualBrick.setBrick(this) : undefined
   }
 
   // Removes all references to this brick from voxels
@@ -392,21 +393,21 @@ export default class Brick {
     // Clear references
     this.forEachVoxel(voxel => voxel.brick = false)
     // And stored data
-    return this._clearData()
+    this._clearData()
   }
 
   _clearData () {
     // clear stored data
     this._clearCache()
     this.setVisualBrick(null)
-    return this.voxels.clear()
+    this.voxels.clear()
   }
 
   _clearCache () {
     this._size = null
     this._position = null
     this.label = null
-    return this.clearNeighborsCache()
+    this.clearNeighborsCache()
   }
 
   clearNeighborsCache (): void {
@@ -421,10 +422,10 @@ export default class Brick {
     // Tell neighbors to update their cache
     for (const direction in Brick.direction) {
       const neighbors = this.getNeighbors(direction)
-      neighbors.forEach(neighbor => neighbor.clearNeighborsCache())
+      neighbors.forEach(neighbor => { neighbor.clearNeighborsCache() })
 
       const otherNeighbors = otherBrick.getNeighbors(direction)
-      otherNeighbors.forEach(neighbor => neighbor.clearNeighborsCache())
+      otherNeighbors.forEach(neighbor => { neighbor.clearNeighborsCache() })
     }
 
     // clear size, position and neighbors (to be recomputed)
@@ -440,7 +441,7 @@ export default class Brick {
 
     otherBrick.clear()
 
-    return newVoxels.forEach(voxel => {
+    newVoxels.forEach(voxel => {
       voxel.brick = this
       return this.voxels.add(voxel)
     })
@@ -481,7 +482,7 @@ export default class Brick {
 
     let hasHoles = false
     for (const val in voxelCheck) {
-      if (voxelCheck[val] === false) {
+      if (!voxelCheck[val]) {
         hasHoles = true
         break
       }

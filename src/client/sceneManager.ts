@@ -60,7 +60,7 @@ export default class SceneManager {
     return this.scene
       .then((scene: any) => {
         if (scene.nodes.length > 0) {
-          this.remove(scene.nodes[0])
+          void this.remove(scene.nodes[0])
         }
         return this._addNodeToScene(node)
       })
@@ -70,7 +70,7 @@ export default class SceneManager {
     return this.scene
       .then((scene: any) => scene.addNode(node))
       .then(() => this._notify("onNodeAdd", node))
-      .then(() => this.select(node))
+      .then(() => { this.select(node) })
   }
 
   remove (node: Node) {
@@ -79,7 +79,8 @@ export default class SceneManager {
       .then(() => this._notify("onNodeRemove",  node))
       .then(() => {
         if (node === this.selectedNode) {
-          return this.deselect()
+          this.deselect()
+          return
         }
       })
   }
@@ -97,12 +98,12 @@ export default class SceneManager {
 
   select (selectedNode: Node) {
     this.selectedNode = selectedNode
-    this._notify("onNodeSelect", this.selectedNode)
+    void this._notify("onNodeSelect", this.selectedNode)
   }
 
   deselect () {
     if (this.selectedNode != null) {
-      this._notify("onNodeDeselect", this.selectedNode)
+      void this._notify("onNodeDeselect", this.selectedNode)
       this.selectedNode = null
     }
   }
@@ -120,14 +121,15 @@ export default class SceneManager {
     }
 
     this.bootboxOpen = true
-    this.selectedNode.getName()
+    void this.selectedNode.getName()
       .then((name: any) => {
         const question = `Do you really want to delete ${name}?`
         return bootbox.confirm(question, result => {
           this.bootboxOpen = false
           if (result) {
-            this.remove(this.selectedNode!)
-            return this.deselect()
+            void this.remove(this.selectedNode!)
+            this.deselect()
+          return
           }
         })
       })

@@ -179,7 +179,7 @@ export default class PlateLayouter extends Layouter {
 
       neighborSet.forEach((neighbor: Brick) => {
         const neighborConnections = neighbor.connectedBricks()
-        return neighborConnections.forEach(brick => connectedBricks.add(brick))
+        neighborConnections.forEach(brick => connectedBricks.add(brick))
       })
 
       numConnections.push({

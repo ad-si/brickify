@@ -3,7 +3,7 @@ import path from "path"
 
 import winston from "winston"
 
-const buildLog = winston.loggers.get("buildLog")
+const buildLog: winston.Logger = winston.loggers.get("buildLog")
 
 export function linkHooks (): void {
   // The first 9 hooks are taken from `git init` which creates .sample files
@@ -31,12 +31,12 @@ export function linkHooks (): void {
       const hookPath = path.join("hooks", hook)
       const gitHookPath = path.join(".git/hooks", hook)
 
-      return fs.unlink(gitHookPath, (error) => {
+      fs.unlink(gitHookPath, (error) => {
         if (error && (error.code === !"ENOENT")) {
           buildLog.error(error)
         }
 
-        return fs.link(hookPath, gitHookPath, (error) => {
+        fs.link(hookPath, gitHookPath, (error) => {
           if (error) {
             if (error.code === !"ENOENT") {
               return buildLog.error(error)

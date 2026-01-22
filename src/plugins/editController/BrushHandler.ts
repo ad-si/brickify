@@ -133,7 +133,7 @@ export default class BrushHandler {
     if (this.editController.interactionDisabled) {
       return
     }
-    return this.nodeVisualizer.setDisplayMode(selectedNode, "legoBrush")
+    this.nodeVisualizer.setDisplayMode(selectedNode, "legoBrush")
   }
 
   _printSelect (selectedNode: Node, bigBrushSelected: boolean) {
@@ -142,7 +142,7 @@ export default class BrushHandler {
     if (this.editController.interactionDisabled) {
       return
     }
-    return this.nodeVisualizer.setDisplayMode(selectedNode, "printBrush")
+    this.nodeVisualizer.setDisplayMode(selectedNode, "printBrush")
   }
 
   _applyChanges (touchedVoxels: Voxel[], selectedNode: Node, cachedData: CachedData) {
@@ -154,7 +154,7 @@ export default class BrushHandler {
     this.editController.relayoutModifiedParts(
       selectedNode, cachedData, touchedVoxels, true,
     )
-    return cachedData.brickVisualization.unhighlightBigBrush()
+    cachedData.brickVisualization.unhighlightBigBrush()
   }
 
   _buildAction (touchedVoxels: Voxel[], selectedNode: Node, cachedData: CachedData): BrushAction {
@@ -164,7 +164,7 @@ export default class BrushHandler {
         cachedData.brickVisualization.voxelSelector.touch(voxel)
       }
       cachedData.brickVisualization.updateModifiedVoxels()
-      return this._applyChanges(touchedVoxels, selectedNode, cachedData)
+      this._applyChanges(touchedVoxels, selectedNode, cachedData)
     }
 
     const toPrint = () => {
@@ -173,7 +173,7 @@ export default class BrushHandler {
         cachedData.brickVisualization.voxelSelector.touch(voxel)
       }
       cachedData.brickVisualization.updateModifiedVoxels()
-      return this._applyChanges(touchedVoxels, selectedNode, cachedData)
+      this._applyChanges(touchedVoxels, selectedNode, cachedData)
     }
 
     return { toLego, toPrint }
@@ -209,14 +209,14 @@ export default class BrushHandler {
         this._applyChanges(touchedVoxels, selectedNode, cachedData)
 
         const action = this._buildAction(touchedVoxels, selectedNode, cachedData)
-        return this.undo != null ? this.undo.addTask(action.toPrint, action.toLego) : undefined
+        this.undo != null ? this.undo.addTask(action.toPrint, action.toLego) : undefined
       })
   }
 
   _legoHover (event: PointerEvent, selectedNode: Node) {
     return this.nodeVisualizer._getCachedData(selectedNode)
       .then((cachedData: CachedData) => {
-        return cachedData.brickVisualization
+        cachedData.brickVisualization
           .highlightVoxel(event, selectedNode, "3d", this.bigBrushSelected)
       })
   }
@@ -226,7 +226,7 @@ export default class BrushHandler {
       .then((cachedData: CachedData) => {
         cachedData.brickVisualization.resetTouchedVoxelsTo3dPrinted()
         cachedData.brickVisualization.updateVisualization()
-        return cachedData.brickVisualization.unhighlightBigBrush()
+        cachedData.brickVisualization.unhighlightBigBrush()
       })
   }
 
@@ -242,15 +242,15 @@ export default class BrushHandler {
           this.editController.rerunLegoPipeline(node)
           const brickVis = cachedData.brickVisualization
           brickVis.updateModifiedVoxels()
-          return brickVis.updateVisualization(null, true)
+          brickVis.updateVisualization(null, true)
         })()
 
         const action = this._buildAction(changedVoxels, node, cachedData)
         const redo = () => {
           cachedData.brickVisualization.makeAllVoxelsLego(node)
-          return apply()
+          apply()
         }
-        return this.undo != null ? this.undo.addTask(action.toPrint, redo) : undefined
+        this.undo != null ? this.undo.addTask(action.toPrint, redo) : undefined
       })
   }
 
@@ -285,14 +285,14 @@ export default class BrushHandler {
         this._applyChanges(touchedVoxels, selectedNode, cachedData)
 
         const action = this._buildAction(touchedVoxels, selectedNode, cachedData)
-        return this.undo != null ? this.undo.addTask(action.toLego, action.toPrint) : undefined
+        this.undo != null ? this.undo.addTask(action.toLego, action.toPrint) : undefined
       })
   }
 
   _printHover (event: PointerEvent, selectedNode: Node) {
     return this.nodeVisualizer._getCachedData(selectedNode)
       .then((cachedData: CachedData) => {
-        return cachedData.brickVisualization
+        cachedData.brickVisualization
           .highlightVoxel(event, selectedNode, "lego", this.bigBrushSelected)
       })
   }
@@ -302,7 +302,7 @@ export default class BrushHandler {
       .then((cachedData: CachedData) => {
         cachedData.brickVisualization.resetTouchedVoxelsToLego()
         cachedData.brickVisualization.updateVisualization()
-        return cachedData.brickVisualization.unhighlightBigBrush()
+        cachedData.brickVisualization.unhighlightBigBrush()
       })
   }
 
@@ -319,7 +319,7 @@ export default class BrushHandler {
         )
 
         const action = this._buildAction(changedVoxels, node, cachedData)
-        return this.undo != null ? this.undo.addTask(action.toLego, action.toPrint) : undefined
+        this.undo != null ? this.undo.addTask(action.toLego, action.toPrint) : undefined
       })
   }
 }

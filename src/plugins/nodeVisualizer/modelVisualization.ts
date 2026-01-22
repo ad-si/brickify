@@ -113,7 +113,7 @@ export default class ModelVisualization {
             _addWireframe(geometry, this.threeNode)
           }
 
-          return threeHelper.applyNodeTransforms(node as any, this.threeNode)
+          threeHelper.applyNodeTransforms(node as any, this.threeNode)
         })
     }
 

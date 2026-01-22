@@ -25,7 +25,7 @@ export function find (node: NodeWithTransform, threeParentNode: Object3D): Objec
 
 
 export function applyNodeTransforms (node: NodeWithTransform, threeNode: Object3D): void {
-  const _set = (property: ThreeProperty, vector: { x: number; y: number; z: number }) => property.set(vector.x, vector.y, vector.z)
+  const _set = (property: ThreeProperty, vector: { x: number; y: number; z: number }) => { property.set(vector.x, vector.y, vector.z) }
 
   _set(threeNode.position, node.transform.position)
   _set(threeNode.rotation, node.transform.rotation)

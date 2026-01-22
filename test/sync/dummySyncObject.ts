@@ -5,9 +5,9 @@ interface DummyClass {
 }
 
 export default class Dummy extends SyncObject {
-  static dummyClassProperty: string;
+  static dummyClassProperty: string
 
-  dummyProperty: string;
+  dummyProperty: string
   dummyTransient: string;
   [key: string]: unknown;
 

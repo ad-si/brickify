@@ -14,7 +14,7 @@ const errorString = "Import failed!"
 
 export const onLoadFile = function (files: FileList, feedbackTarget: HTMLElement, spinnerOptions: SpinnerOptions) {
   if (files.length < 1) {
-    return Promise.reject()
+    return Promise.reject(new Error("No files provided"))
   }
 
   const file = files[0]
@@ -25,22 +25,22 @@ export const onLoadFile = function (files: FileList, feedbackTarget: HTMLElement
       message: "Only .stl files are supported at the moment. \
 We are working on adding more file formats",
     })
-    return Promise.reject("Wrong file format")
+    return Promise.reject(new Error("Wrong file format"))
   }
 
   return loadFile(feedbackTarget, file, spinnerOptions)
     .then(handleLoadedFile(feedbackTarget, file.name, spinnerOptions) as (value: ProgressEvent<FileReader>) => Promise<string>)
-    .catch((error) => {
+    .catch((error: unknown) => {
       bootbox.alert({
         title: "Import failed",
         message:
           `<p>Your file contains errors that we could not fix.</p> \
 <p>Details:</br> \
-<small>${error.message}</small> \
+<small>${error instanceof Error ? error.message : String(error)}</small> \
 </p>`,
       })
       feedbackTarget.innerHTML = errorString
-      return log.error(error)
+      log.error(error)
     })
 }
 
@@ -52,7 +52,7 @@ var loadFile = function (feedbackTarget: HTMLElement, file: File, spinnerOptions
     reader.onload = resolve
     reader.onerror = reject
     reader.onabort = reject
-    return setTimeout(() => reader.readAsArrayBuffer(file))
+    return setTimeout(() => { reader.readAsArrayBuffer(file) })
   })
 }
 
@@ -92,7 +92,7 @@ function detectStlType (arrayBuffer: ArrayBuffer): "ascii" | "binary" {
   const checkLength = Math.min(1000, bytes.length)
   for (let i = 0; i < checkLength; i++) {
     // Printable ASCII or whitespace
-    const byte = bytes[i]!
+    const byte = bytes[i]
     if ((byte >= 32 && byte <= 126) || byte === 9 || byte === 10 || byte === 13) {
       asciiCount++
     }
@@ -130,7 +130,7 @@ var handleLoadedFile = (feedbackTarget: HTMLElement, filename: string, spinnerOp
 
     const stlParserInstance = stlParser(stlBuffer, parserOptions)
 
-    stlParserInstance.on("error", (error: Error) => reject(error))
+    stlParserInstance.on("error", (error: Error) => { reject(error) })
 
     // Track if we've already processed valid model data
     // The parser may emit multiple data events (parsed model + raw buffer)
@@ -161,9 +161,9 @@ var handleLoadedFile = (feedbackTarget: HTMLElement, filename: string, spinnerOp
         .then((md5hash: string) => {
           Spinner.stop(feedbackTarget)
           feedbackTarget.innerHTML = loadedString
-          return resolve(md5hash)
+          resolve(md5hash)
         })
-        .catch((error: Error) => reject(error))
+        .catch((error: unknown) => { reject(error) })
     })
 
     // Explicitly start the stream flowing (needed for some stream polyfills)

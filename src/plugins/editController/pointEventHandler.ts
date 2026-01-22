@@ -45,7 +45,7 @@ export default class PointEventHandler {
 
     // perform brush action
     this.isBrushing = true
-    __guardMethod__(this.brushUi.getSelectedBrush(), "onBrushDown", (o: Brush) => o.onBrushDown!(event, this.sceneManager.selectedNode as Node))
+    __guardMethod__(this.brushUi.getSelectedBrush(), "onBrushDown", (o: Brush) => { o.onBrushDown!(event, this.sceneManager.selectedNode as Node) })
     return true
   }
 
@@ -83,7 +83,7 @@ export default class PointEventHandler {
 
     // end brush action
     this.isBrushing = false
-    __guardMethod__(this.brushUi.getSelectedBrush(), "onBrushUp", (o: Brush) => o.onBrushUp!(event, this.sceneManager.selectedNode as Node))
+    __guardMethod__(this.brushUi.getSelectedBrush(), "onBrushUp", (o: Brush) => { o.onBrushUp!(event, this.sceneManager.selectedNode as Node) })
 
     this._untoggleBrush()
     return true
@@ -95,9 +95,9 @@ export default class PointEventHandler {
     }
 
     this.isBrushing = false
-    __guardMethod__(this.brushUi.getSelectedBrush(), "onBrushCancel", (o: Brush) => o.onBrushCancel!(
+    __guardMethod__(this.brushUi.getSelectedBrush(), "onBrushCancel", (o: Brush) => { o.onBrushCancel!(
       event, this.sceneManager.selectedNode as Node,
-    ))
+    ) })
 
     this._untoggleBrush()
     return true

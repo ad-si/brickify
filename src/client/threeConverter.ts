@@ -33,9 +33,9 @@ export function toStandardGeometry (modelObject: ModelObject): Geometry {
 
   for (let fi = 0, end1 = faceVertexIndices.length - 1; fi <= end1; fi += 3) {
     geometry.faces.push(new Face3(
-      faceVertexIndices[fi]!,
-      faceVertexIndices[fi + 1]!,
-      faceVertexIndices[fi + 2]!,
+      faceVertexIndices[fi],
+      faceVertexIndices[fi + 1],
+      faceVertexIndices[fi + 2],
       new Vector3(
         faceNormalCoordinates?.[fi] ?? 0,
         faceNormalCoordinates?.[fi + 1] ?? 0,
@@ -97,7 +97,7 @@ export function threeGeometryToFaceVertexMesh (threeGeometry: Geometry): FaceVer
   }
 
   for (index = 0; index < threeGeometry.vertices.length; index++) {
-    const vertex = threeGeometry.vertices[index]!
+    const vertex = threeGeometry.vertices[index]
     offset = index * 3
     faceVertexMesh.vertexCoordinates[offset] = vertex.x
     faceVertexMesh.vertexCoordinates[offset + 1] = vertex.y
@@ -105,7 +105,7 @@ export function threeGeometryToFaceVertexMesh (threeGeometry: Geometry): FaceVer
   }
 
   for (index = 0; index < threeGeometry.faces.length; index++) {
-    const face = threeGeometry.faces[index]!
+    const face = threeGeometry.faces[index]
     offset = index * 3
     faceVertexMesh.faceVertexIndices[offset] = face.a
     faceVertexMesh.faceVertexIndices[offset + 1] = face.b

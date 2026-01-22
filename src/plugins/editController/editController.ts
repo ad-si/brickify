@@ -61,14 +61,16 @@ export default class EditController {
     this.interactionDisabled = false
 
     if (this.brushHandler.legoBrushSelected) {
-      return this.nodeVisualizer.setDisplayMode(
+      this.nodeVisualizer.setDisplayMode(
         this.bundle.sceneManager.selectedNode as Node, "legoBrush",
       )
+      return
     }
     else {
-      return this.nodeVisualizer.setDisplayMode(
+      this.nodeVisualizer.setDisplayMode(
         this.bundle.sceneManager.selectedNode as Node, "printBrush",
       )
+      return
     }
   }
 
@@ -114,10 +116,10 @@ export default class EditController {
   // Methods called by brush handler
   relayoutModifiedParts (
     selectedNode: Node, _cachedData: unknown, touchedVoxels: unknown[], createBricks: boolean) {
-    return this.newBrickator.relayoutModifiedParts(selectedNode, touchedVoxels, createBricks)
+    this.newBrickator.relayoutModifiedParts(selectedNode, touchedVoxels, createBricks)
   }
 
   rerunLegoPipeline (selectedNode: Node) {
-    return this.newBrickator.runLegoPipeline(selectedNode)
+    this.newBrickator.runLegoPipeline(selectedNode)
   }
 }

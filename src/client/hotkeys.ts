@@ -12,9 +12,9 @@ export default class Hotkeys {
     this.bootboxOpen = false
     this.events = {}
     this.bind("?", "General", "Show this help", () => {
-      return this.showHelp()
+      this.showHelp()
     })
-    this.bind("esc", "General", "Close modal window", () => bootbox.hideAll())
+    this.bind("esc", "General", "Close modal window", () => { bootbox.hideAll() })
 
     for (const events of Array.from(pluginHooks.getHotkeys())) {
       this.addEvents(events)
@@ -65,8 +65,8 @@ export default class Hotkeys {
    * @param {Function} callback Callback to be called when event is triggered
    */
   bind (hotkey: string, titlegroup: string, description: string, callback: (node: any) => void) {
-    Mousetrap.bind(hotkey.toLowerCase(), () => callback(this.sceneManager.selectedNode))
-    Mousetrap.bind(hotkey.toUpperCase(), () => callback(this.sceneManager.selectedNode))
+    Mousetrap.bind(hotkey.toLowerCase(), () => { callback(this.sceneManager.selectedNode) })
+    Mousetrap.bind(hotkey.toUpperCase(), () => { callback(this.sceneManager.selectedNode) })
     if (this.events[titlegroup] === undefined) {
       this.events[titlegroup] = []
     }

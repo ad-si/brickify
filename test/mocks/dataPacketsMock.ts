@@ -21,17 +21,17 @@ interface DeleteCall {
 }
 
 export default class DataPacketsMock {
-  calls: number;
-  createCalls: string[];
-  nextIds: string[];
-  existsCalls: ExistsCall[];
-  nextExists: boolean[];
-  getCalls: GetCall[];
-  nextGets: DataPacket[];
-  putCalls: PutCall[];
-  nextPuts: boolean[];
-  deleteCalls: DeleteCall[];
-  nextDeletes: boolean[];
+  calls: number
+  createCalls: string[]
+  nextIds: string[]
+  existsCalls: ExistsCall[]
+  nextExists: boolean[]
+  getCalls: GetCall[]
+  nextGets: DataPacket[]
+  putCalls: PutCall[]
+  nextPuts: boolean[]
+  deleteCalls: DeleteCall[]
+  nextDeletes: boolean[]
 
   constructor () {
     this.create = this.create.bind(this)
@@ -60,7 +60,7 @@ export default class DataPacketsMock {
       return Promise.resolve({id: nextId, data: {}})
     }
     else {
-      return Promise.reject()
+      return Promise.reject(new Error("No ID available"))
     }
   }
 
@@ -72,7 +72,7 @@ export default class DataPacketsMock {
       return Promise.resolve(id)
     }
     else {
-      return Promise.reject(id)
+      return Promise.reject(new Error(id))
     }
   }
 
@@ -84,7 +84,7 @@ export default class DataPacketsMock {
       return Promise.resolve(nextGet)
     }
     else {
-      return Promise.reject(id)
+      return Promise.reject(new Error(id))
     }
   }
 
@@ -97,7 +97,7 @@ export default class DataPacketsMock {
       return Promise.resolve()
     }
     else {
-      return Promise.reject(p.id)
+      return Promise.reject(new Error(p.id))
     }
   }
 
@@ -109,7 +109,7 @@ export default class DataPacketsMock {
       return Promise.resolve()
     }
     else {
-      return Promise.reject(id)
+      return Promise.reject(new Error(id))
     }
   }
 }

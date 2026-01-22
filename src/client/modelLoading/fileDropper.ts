@@ -3,7 +3,7 @@ let lastTarget: EventTarget | null = null
 export const init = function (callback: (event: DragEvent) => void) {
   const target = document.body
   const overlay = addOverlay(target)
-  return bindDropHandler(target, overlay, callback)
+  bindDropHandler(target, overlay, callback)
 }
 
 var addOverlay = function (target: HTMLElement) {
@@ -24,9 +24,9 @@ var bindDropHandler = function (target: HTMLElement, overlay: HTMLDivElement, ca
   target.addEventListener("drop", (event: DragEvent) => {
     hideOverlay(overlay)
     callback(event)
-    return stopEvent(event)
+    stopEvent(event)
   })
-  target.addEventListener("dragover", (event: DragEvent) => stopEvent(event))
+  target.addEventListener("dragover", (event: DragEvent) => { stopEvent(event) })
   target.addEventListener("dragenter", (event: DragEvent) => {
     stopEvent(event)
     showOverlay(overlay)
@@ -47,5 +47,5 @@ var hideOverlay = (overlay: HTMLDivElement) => overlay.style.opacity = "0"
 
 var stopEvent = function (event: DragEvent) {
   event.preventDefault()
-  return event.stopPropagation()
+  event.stopPropagation()
 }

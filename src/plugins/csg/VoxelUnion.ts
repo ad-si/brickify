@@ -138,40 +138,40 @@ export default class VoxelUnion {
         // +x direction
         if (!s.zLayers[z][x + 1][y].voxel) {
           geo.faces.push(new THREE.Face3(
-            upperIndices![3], upperIndices![0], v.points![0]),
+            upperIndices[3], upperIndices[0], v.points![0]),
           )
           geo.faces.push(new THREE.Face3(
-            v.points![0], v.points![3], upperIndices![3]),
+            v.points![0], v.points![3], upperIndices[3]),
           )
         }
 
         // -x direction
         if (!s.zLayers[z][x - 1][y].voxel) {
           geo.faces.push(new THREE.Face3(
-            upperIndices![1], upperIndices![2], v.points![2]),
+            upperIndices[1], upperIndices[2], v.points![2]),
           )
           geo.faces.push(new THREE.Face3(
-            v.points![2], v.points![1], upperIndices![1]),
+            v.points![2], v.points![1], upperIndices[1]),
           )
         }
 
         // +y direction
         if (!s.zLayers[z][x][y + 1].voxel) {
           geo.faces.push(new THREE.Face3(
-            upperIndices![2], upperIndices![3], v.points![3]),
+            upperIndices[2], upperIndices[3], v.points![3]),
           )
           geo.faces.push(new THREE.Face3(
-            v.points![3], v.points![2], upperIndices![2]),
+            v.points![3], v.points![2], upperIndices[2]),
           )
         }
 
         // -y direction
         if (!s.zLayers[z][x][y - 1].voxel) {
           geo.faces.push(new THREE.Face3(
-            upperIndices![0], upperIndices![1], v.points![0]),
+            upperIndices[0], upperIndices[1], v.points![0]),
           )
           geo.faces.push(new THREE.Face3(
-            v.points![1], v.points![0], upperIndices![1]),
+            v.points![1], v.points![0], upperIndices[1]),
           )
         }
       }

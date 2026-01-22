@@ -69,8 +69,8 @@ export default class NodeVisualizer {
   brickShadowOpacity!: number
   objectOpacity!: number
   objectShadowOpacity!: number
-  brickCounter?: JQuery<HTMLElement>
-  timeEstimate?: JQuery<HTMLElement>
+  brickCounter?: JQuery
+  timeEstimate?: JQuery
   threeJsRootNode!: Object3D
   usePipeline!: boolean
   brickScene!: Scene
@@ -121,7 +121,7 @@ export default class NodeVisualizer {
     this.fidelity = 0
   }
 
-  init (bundle: Bundle): JQuery<HTMLElement> | undefined {
+  init (bundle: Bundle): JQuery | undefined {
     this.bundle = bundle
     const cfg = (bundle && bundle.globalConfig) ? bundle.globalConfig : null
     this.coloring = new Coloring(cfg)
@@ -360,7 +360,7 @@ export default class NodeVisualizer {
 
         // brick count / printing time
         this._updateBrickCount(cachedData.brickVisualization.grid.getAllBricks())
-        return this._updateQuickPrintTime(
+        this._updateQuickPrintTime(
           cachedData.brickVisualization.grid.getDisabledVoxels(),
           cachedData.brickVisualization.grid.spacing,
         )
@@ -381,7 +381,8 @@ export default class NodeVisualizer {
           .then(() => {
             const solid = cachedData.modelVisualization.getSolid()
             if (solid != null) {
-              return this._zoomToNode(solid)
+              this._zoomToNode(solid)
+      return
             }
           })
       })
@@ -406,7 +407,7 @@ export default class NodeVisualizer {
   }
 
   _zoomToNode (threeNode: Object3D): void {
-    return this.bundle.renderer.zoomToNode(threeNode)
+    this.bundle.renderer.zoomToNode(threeNode)
   }
 
   // initialize visualization with data from newBrickator
@@ -484,20 +485,20 @@ export default class NodeVisualizer {
           case "legoBrush":
             this._resetStabilityView(cachedData)
             this._resetBuildMode(cachedData)
-            return this._applyLegoBrushMode(cachedData)
+            { this._applyLegoBrushMode(cachedData); return }
           case "printBrush":
             this._resetStabilityView(cachedData)
             this._resetBuildMode(cachedData)
-            return this._applyPrintBrushMode(cachedData)
+            { this._applyPrintBrushMode(cachedData); return }
           case "stability":
             this._resetBuildMode(cachedData)
-            return this._applyStabilityView(cachedData)
+            { this._applyStabilityView(cachedData); return }
           case "build":
             this._resetStabilityView(cachedData)
-            return this._applyBuildMode(cachedData)
+            { this._applyBuildMode(cachedData); return }
           default:
             this._resetStabilityView(cachedData)
-            return this._resetBuildMode(cachedData)
+            { this._resetBuildMode(cachedData); return }
         }
       })
   }
@@ -571,7 +572,7 @@ export default class NodeVisualizer {
     layer--
 
     return this._getCachedData(selectedNode)
-      .then((cachedData: CachedData) => cachedData.brickVisualization.showBrickLayer(layer))
+      .then((cachedData: CachedData) => { cachedData.brickVisualization.showBrickLayer(layer) })
   }
 
   _updateBrickCount (bricks: Set<Brick>): void {
@@ -619,7 +620,7 @@ export default class NodeVisualizer {
     return this.csg.getCSG(cachedData.node, options)
       .then((csg: THREE.BufferGeometry[]) => {
         cachedData.brickVisualization.showCsg(csg)
-        return this._updatePrintTime(csg)
+        this._updatePrintTime(csg)
       })
   }
 

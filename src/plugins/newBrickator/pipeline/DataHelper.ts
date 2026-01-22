@@ -42,7 +42,7 @@ export function smallestElement<T> (set: Set<T>): T | null {
     if (min == null) {
       min = element
     }
-    if (element < min!) {
+    if (element < min) {
       min = element
     }
   })

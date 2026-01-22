@@ -200,28 +200,28 @@ class Vertex {
     )
   }
 
-  add ( vertex: Vertex ): Vertex {
+  add ( vertex: Vertex ): this {
     this.x += vertex.x
     this.y += vertex.y
     this.z += vertex.z
     return this
   }
 
-  subtract ( vertex: Vertex ): Vertex {
+  subtract ( vertex: Vertex ): this {
     this.x -= vertex.x
     this.y -= vertex.y
     this.z -= vertex.z
     return this
   }
 
-  multiplyScalar ( scalar: number ): Vertex {
+  multiplyScalar ( scalar: number ): this {
     this.x *= scalar
     this.y *= scalar
     this.z *= scalar
     return this
   }
 
-  cross ( vertex: Vertex ): Vertex {
+  cross ( vertex: Vertex ): this {
     const x = this.x
     const y = this.y
     const z = this.z
@@ -233,7 +233,7 @@ class Vertex {
     return this
   }
 
-  normalize (): Vertex {
+  normalize (): this {
     const length = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z )
 
     this.x /= length
@@ -247,7 +247,7 @@ class Vertex {
     return this.x * vertex.x + this.y * vertex.y + this.z * vertex.z
   }
 
-  lerp ( a: Vertex, t: number ): Vertex {
+  lerp ( a: Vertex, t: number ): this {
     this.add(
       a.clone()
         .subtract( this )
@@ -274,7 +274,7 @@ class Vertex {
       .lerp( other, t )
   }
 
-  applyMatrix4 ( m: THREE.Matrix4 ): Vertex {
+  applyMatrix4 ( m: THREE.Matrix4 ): this {
 
     // input: THREE.Matrix4 affine matrix
 
@@ -382,7 +382,7 @@ class Node {
     return node
   }
 
-  invert (): Node {
+  invert (): this {
     let i: number; let polygon_count: number; let temp: Node | undefined
 
     for ( i = 0, polygon_count = this.polygons.length; i < polygon_count; i++ ) {
@@ -633,7 +633,7 @@ export default class ThreeBSP {
         )
 
         geometry.faces.push( face )
-        geometry.faceVertexUvs[0]!.push( verticeUvs )
+        geometry.faceVertexUvs[0].push( verticeUvs )
       }
 
     }

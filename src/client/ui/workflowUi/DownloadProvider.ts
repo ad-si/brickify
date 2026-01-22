@@ -49,7 +49,7 @@ export default class DownloadProvider {
     this.$stlButton.on("click", (): number | undefined => {
       const selNode = this.sceneManager.selectedNode
       if (selNode != null) {
-        Spinner.startOverlay(this.$stlButton[0] as HTMLElement)
+        Spinner.startOverlay(this.$stlButton[0])
         this.$stlButton.addClass("disabled")
         return window.setTimeout(
           () => this._createDownload("stl", selNode),
@@ -63,7 +63,7 @@ export default class DownloadProvider {
     return this.$instructionsButton.on("click", (): number | undefined => {
       const selNode = this.sceneManager.selectedNode
       if (selNode != null) {
-        Spinner.startOverlay(this.$instructionsButton[0] as HTMLElement)
+        Spinner.startOverlay(this.$instructionsButton[0])
         this.$instructionsButton.addClass("disabled")
         return window.setTimeout(
           () => this._createDownload("instructions", selNode),
@@ -93,21 +93,21 @@ export default class DownloadProvider {
 
         // Stop showing spinner
         if (type === "instructions") {
-          Spinner.stop(this.$instructionsButton[0] as HTMLElement)
+          Spinner.stop(this.$instructionsButton[0])
           this.$instructionsButton.removeClass("disabled")
         }
         else {
-          Spinner.stop(this.$stlButton[0] as HTMLElement)
+          Spinner.stop(this.$stlButton[0])
           this.$stlButton.removeClass("disabled")
         }
 
 
         if (files.length === 1 && files[0]) {
-          return saveAs(
+          saveAs(
             new Blob([files[0].data]),
             files[0].fileName.replace(/\.stl$/gi, "") + ".stl",
           )
-
+          return
         }
         else if (files.length > 1) {
           const zip = new JSZip()
@@ -122,13 +122,13 @@ export default class DownloadProvider {
               fileObjects.forEach(fileObject => {
                 if (fileObject) {
                   zip.file(
-                    (fileObject as ZippableFile).fileName,
-                    (fileObject as ZippableFile).data,
+                    (fileObject).fileName,
+                    (fileObject).data,
                   )
                 }
               })
 
-              return saveAs(
+              saveAs(
                 zip.generate({type: "blob"}),
                 `brickify-${selectedNode.name}.zip`,
               )
@@ -136,16 +136,17 @@ export default class DownloadProvider {
 
         }
         else {
-          return bootbox.alert({
+          bootbox.alert({
             title: "There is nothing to download at the moment",
             message: "This happens when your whole model \
 is made out of LEGO \
 and you have not selected anything to be 3D-printed. \
 Use the Make 3D-print brush for that.",
           })
+          return
         }
       })
-      .catch(error => log.error(error))
+      .catch((error: unknown) => { log.error(error) })
   }
 
   _collectFiles (array: unknown[]): DownloadFile[] {
@@ -192,7 +193,7 @@ Use the Make 3D-print brush for that.",
           },
         })
       default:
-        return log.warn(`No conversion method found for file ${fileName}`)
+        { log.warn(`No conversion method found for file ${fileName}`); return }
     }
   }
 
@@ -200,16 +201,16 @@ Use the Make 3D-print brush for that.",
   _arrayBufferFromBlob (blob: Blob, fileName: string): Promise<ZippableFile> {
     const reader = new FileReader()
     return new Promise((resolve, reject) => {
-      reader.onload = () => resolve({
+      reader.onload = () => { resolve({
         data: reader.result as ArrayBuffer,
         fileName,
         options: {
           binary: true,
         },
-      })
+      }) }
       reader.onerror = reject
       reader.onabort = reject
-      return reader.readAsArrayBuffer(blob)
+      reader.readAsArrayBuffer(blob)
     })
   }
 }

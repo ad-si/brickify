@@ -28,8 +28,8 @@ const nullNode: NullNode = {
 
 export default class Undo {
   currentNode: Node | NullNode
-  $undo!: JQuery<HTMLElement>
-  $redo!: JQuery<HTMLElement>
+  $undo!: JQuery
+  $redo!: JQuery
 
   constructor () {
     this.onNodeAdd = this.onNodeAdd.bind(this)
@@ -93,7 +93,7 @@ export default class Undo {
         }
 
         redoTasks.push(action)
-        return action.undo()
+        action.undo()
       })
       .then(this._updateUi)
   }
@@ -108,7 +108,7 @@ export default class Undo {
         }
 
         undoTasks.push(action)
-        return action.redo()
+        action.redo()
       })
       .then(this._updateUi)
   }

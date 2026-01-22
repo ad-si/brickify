@@ -76,7 +76,7 @@ export default class LayoutOptimizer {
         // Assign label to this brick
         brick.label = labels[smallestLabel]!
         for (let i = 0, end = labels.length, asc = end >= 0; asc ? i <= end : i >= end; asc ? i++ : i--) {
-          if (conLabels.has(labels[i]!)) {
+          if (conLabels.has(labels[i])) {
             labels[i] = labels[smallestLabel]!
           }
         }
@@ -159,7 +159,7 @@ export default class LayoutOptimizer {
 
     const bricksToBeDeleted = new Set<Brick>()
 
-    newBricks.forEach((brick: Brick) => brick.forEachVoxel((voxel) => {
+    newBricks.forEach((brick: Brick) => { brick.forEachVoxel((voxel) => {
       // Delete bricks where voxels are disabled (3d printed)
       if (!voxel.enabled) {
         // Remove from relayout list
@@ -167,7 +167,7 @@ export default class LayoutOptimizer {
         // Delete brick from structure
         brick.clear()
       }
-    }))
+    }) })
 
     bricksToBeDeleted.forEach((brick: Brick) => newBricks.delete(brick))
 

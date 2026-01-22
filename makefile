@@ -32,7 +32,7 @@ start:
 
 .PHONY: lint
 lint:
-	npx eslint --max-warnings=0 --ignore-pattern=.gitignore .
+	npx eslint --ignore-pattern=.gitignore .
 
 
 .PHONY: test

@@ -31,7 +31,7 @@ export const create = (packet: Packet): Promise<Packet> => cache(packet)
 
 export const exists = function (id: string): Promise<string> {
   if (packets[id] == null) {
-    return Promise.reject(id)
+    return Promise.reject(new Error(id))
   }
   return packets[id].then(() => id)
 }
@@ -40,7 +40,7 @@ export const get = (id: string): Promise<Packet> => {
   if (packets[id] != null) {
     return packets[id]
   }
-  return Promise.reject(id)
+  return Promise.reject(new Error(id))
 }
 
 export const put = (packet: Packet): Promise<void> => exists(packet.id)
@@ -52,7 +52,7 @@ export const delete_ = function (id: string): Promise<void> {
     return ensureDelete(id)
   }
   else {
-    return Promise.reject(id)
+    return Promise.reject(new Error(id))
   }
 }
 

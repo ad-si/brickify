@@ -100,13 +100,13 @@ const compiledCss = await new Promise((resolve, reject) => {
     .define('backgroundColor', '#' + ('000000' +
       globalConfig.colors.background.toString(16)).slice(-6))
     .render((err, css) => {
-      if (err) reject(err)
+      if (err) reject(err instanceof Error ? err : new Error(String(err)))
       else resolve(css)
     })
 })
 
 // Fix font paths for static serving (convert absolute to relative)
-let css = compiledCss
+const css = compiledCss
   .replace(/url\("\/node_modules\//g, 'url("./node_modules/')
   .replace(/url\('\/node_modules\//g, "url('./node_modules/")
 

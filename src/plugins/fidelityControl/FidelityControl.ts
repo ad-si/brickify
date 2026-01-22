@@ -51,7 +51,7 @@ export default class FidelityControl {
   noPipelineDecisions: number = 0
   _lastTimestamp: number | null = null
   lastDisplayUpdate: number = 0
-  $fpsDisplay: JQuery<HTMLElement> | null = null
+  $fpsDisplay: JQuery | null = null
   _levelBeforeScreenshot: number = 0
 
   constructor () {
@@ -97,16 +97,17 @@ export default class FidelityControl {
     const fragDepth = (this.bundle.renderer as any).threeRenderer.extensions.get("EXT_frag_depth")
     const stencilBuffer = (this.bundle.renderer as any).threeRenderer.hasStencilBuffer
 
-    let capabilites = ""
-    if (depth != null) {
-      capabilites += "DepthTextures "
-    }
-    if (fragDepth != null) {
-      capabilites += "ExtFragDepth "
-    }
-    if (stencilBuffer) {
-      capabilites += "stencilBuffer "
-    }
+    // Capabilities detection (for debugging)
+    // let _capabilites = ""
+    // if (depth != null) {
+    //   _capabilites += "DepthTextures "
+    // }
+    // if (fragDepth != null) {
+    //   _capabilites += "ExtFragDepth "
+    // }
+    // if (stencilBuffer) {
+    //   _capabilites += "stencilBuffer "
+    // }
 
     this.pipelineAvailable = usePipeline && (depth != null) && (fragDepth != null) && stencilBuffer
     return this.noPipelineDecisions = 0

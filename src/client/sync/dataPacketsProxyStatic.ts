@@ -47,7 +47,11 @@ export const exists = (id: string): Promise<string> => {
   if (packets[id]) {
     return Promise.resolve(id)
   }
-  return Promise.reject({ status: 404, statusText: 'Not Found', responseText: id })
+  const error = new Error('Not Found') as Error & { status: number; statusText: string; responseText: string }
+  error.status = 404
+  error.statusText = 'Not Found'
+  error.responseText = id
+  return Promise.reject(error)
 }
 
 export const get = (id: string): Promise<Packet> => {
@@ -55,7 +59,11 @@ export const get = (id: string): Promise<Packet> => {
   if (packets[id]) {
     return Promise.resolve(packets[id])
   }
-  return Promise.reject({ status: 404, statusText: 'Not Found', responseText: id })
+  const error = new Error('Not Found') as Error & { status: number; statusText: string; responseText: string }
+  error.status = 404
+  error.statusText = 'Not Found'
+  error.responseText = id
+  return Promise.reject(error)
 }
 
 export const put = (packet: Packet): Promise<string> => {
@@ -65,7 +73,11 @@ export const put = (packet: Packet): Promise<string> => {
     saveStorage(packets)
     return Promise.resolve(packet.id)
   }
-  return Promise.reject({ status: 404, statusText: 'Not Found', responseText: packet.id })
+  const error = new Error('Not Found') as Error & { status: number; statusText: string; responseText: string }
+  error.status = 404
+  error.statusText = 'Not Found'
+  error.responseText = packet.id
+  return Promise.reject(error)
 }
 
 export const delete_ = (id: string): Promise<void> => {
@@ -75,5 +87,9 @@ export const delete_ = (id: string): Promise<void> => {
     saveStorage(packets)
     return Promise.resolve()
   }
-  return Promise.reject({ status: 404, statusText: 'Not Found', responseText: id })
+  const error = new Error('Not Found') as Error & { status: number; statusText: string; responseText: string }
+  error.status = 404
+  error.statusText = 'Not Found'
+  error.responseText = id
+  return Promise.reject(error)
 }

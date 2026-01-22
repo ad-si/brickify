@@ -14,21 +14,25 @@ export function middleware (request: Request, response: Response, next: NextFunc
   let sessionId: string
   if ((request.path === "/app") && (request.query.share != null)) {
     sessionId = String(request.query.share)
-    return resolveShare(sessionId, request, response, next)
+    resolveShare(sessionId, request, response, next)
+      return
     // if in /app, do we have a url parameter that indicates a session?
   }
   else if ((request.path === "/app") && (request.query.s != null)) {
     sessionId = String(request.query.s)
-    return checkSession(sessionId, request, response, next)
+    checkSession(sessionId, request, response, next)
+      return
     // do we have a cookie that indicates a session?
   }
   else if (request.cookies.s != null) {
     sessionId = request.cookies.s
-    return checkSession(sessionId, request, response, next)
+    checkSession(sessionId, request, response, next)
+      return
     // no session indication -> create a new session
   }
   else {
-    return newSession(request, response, next)
+    newSession(request, response, next)
+      return
   }
 }
 
@@ -58,11 +62,13 @@ const checkSession = function (sessionId: string, request: Request, response: Re
     // apply session for further processing
     (request as Request & { session: Session }).session = sessions[sessionId]
     response.cookie("s", sessionId)
-    return next()
+    next()
+      return
   }
   else {
     // create a new session for invalid Ids and redirect
-    return newSession(request, response, next)
+    newSession(request, response, next)
+      return
   }
 }
 
@@ -73,11 +79,13 @@ const resolveShare = function (shareId: string, request: Request, response: Resp
     const sid = shareLinks[shareId]
     const session = sessions[sid]
     const cloned = clone(session)
-    return newSession(request, response, next, cloned)
+    newSession(request, response, next, cloned)
+      return
   }
   else {
     // invalid share id - generate new state
-    return newSession(request, response, next)
+    newSession(request, response, next)
+      return
   }
 }
 
@@ -88,10 +96,12 @@ const newSession = function (request: Request, response: Response, next: NextFun
   // only redirect if already in /app (but maybe with wrong session id)
   // prevents from redirection from mainpage etc
   if (request.path === "/app") {
-    return response.redirect("/app?s=" + (request as Request & { session: Session }).session.id)
+    response.redirect("/app?s=" + (request as Request & { session: Session }).session.id)
+      return
   }
   else {
-    return next()
+    next()
+      return
   }
 }
 

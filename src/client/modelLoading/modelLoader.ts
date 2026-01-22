@@ -24,9 +24,9 @@ export default class ModelLoader {
     return modelCache
       .request(identifier)
       .then((model: any) => this._load(model, identifier))
-      .catch((error: Error) => {
+      .catch((error: unknown) => {
         log.error(`Could not load model ${identifier}`)
-        return log.error(error.stack)
+        log.error(error instanceof Error ? error.stack : String(error))
       })
   }
 

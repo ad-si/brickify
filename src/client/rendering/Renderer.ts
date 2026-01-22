@@ -204,9 +204,10 @@ export default class Renderer {
         )
 
         // Take the SSAO values and render a gaussed version on the screen
-        return void this.threeRenderer!.render(
+        this.threeRenderer!.render(
           this.ssaoBlurTarget!.quadScene, this.camera!,
         )
+      return
       }
     }
   }
@@ -265,7 +266,7 @@ export default class Renderer {
     }
 
     // resolve promise
-    return void imageQuery.resolve({
+    imageQuery.resolve({
       viewWidth: this.size().width,
       viewHeight: this.size().height,
       imageWidth: width,
@@ -405,7 +406,7 @@ export default class Renderer {
   zoomToNode (threeNode: Object3D): void {
     const boundingSphere = threeHelper.getBoundingSphere(threeNode)
     // Zooms out/in the camera so that the object is fully visible
-    threeHelper.zoomToBoundingSphere(this.camera!, this.scene!, this.controls!, boundingSphere)
+    threeHelper.zoomToBoundingSphere(this.camera!, this.scene!, this.controls, boundingSphere)
   }
 
   init (globalConfig: GlobalConfig, controls?: PointerControls): number {

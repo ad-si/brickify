@@ -24,9 +24,9 @@ export interface SyncObjectParams {
  * @class SyncObject
  */
 export default class SyncObject {
-  static dataPacketProvider: DataPacketProvider | null = null;
+  static dataPacketProvider: DataPacketProvider | null = null
 
-  id!: string;
+  id!: string
   ready: Promise<unknown>;
   [key: string]: unknown;
 
@@ -43,28 +43,28 @@ export default class SyncObject {
    * @memberOf SyncObject
    */
   constructor(param?: SyncObjectParams) {
-    this.getId = this.getId.bind(this);
-    this.toJSON = this.toJSON.bind(this);
-    this.toPOJSO = this.toPOJSO.bind(this);
-    this._getPacket = this._getPacket.bind(this);
-    this.save = this.save.bind(this);
-    this.delete = this.delete.bind(this);
-    this.next = this.next.bind(this);
-    this.done = this.done.bind(this);
-    this.catch = this.catch.bind(this);
+    this.getId = this.getId.bind(this)
+    this.toJSON = this.toJSON.bind(this)
+    this.toPOJSO = this.toPOJSO.bind(this)
+    this._getPacket = this._getPacket.bind(this)
+    this.save = this.save.bind(this)
+    this.delete = this.delete.bind(this)
+    this.next = this.next.bind(this)
+    this.done = this.done.bind(this)
+    this.catch = this.catch.bind(this)
 
-    const _generateId = param?._generateId;
+    const _generateId = param?._generateId
 
     if (_generateId || _generateId == null) {
       if (!SyncObject.dataPacketProvider) {
-        throw new Error('dataPacketProvider not set');
+        throw new Error('dataPacketProvider not set')
       }
       this.ready = SyncObject.dataPacketProvider.create().then((packet) => {
-        this.id = packet.id;
-        return this.id;
-      });
+        this.id = packet.id
+        return this.id
+      })
     } else {
-      this.ready = Promise.resolve();
+      this.ready = Promise.resolve()
     }
   }
 
@@ -85,47 +85,47 @@ export default class SyncObject {
     syncObjectDescriptor: string | DataPacket | SyncObjectReference | Array<string | DataPacket | SyncObjectReference>,
   ): Promise<T> | Array<Promise<T>> {
     const _syncObjectFromPacket = (packet: DataPacket): Promise<T> => {
-      const instance = new this({ _generateId: false });
+      const instance = new this({ _generateId: false })
       return instance.next((syncObject: T) => {
         for (const p of Object.keys(packet.data || {})) {
-          (syncObject as Record<string, unknown>)[p] = packet.data[p];
+          (syncObject as Record<string, unknown>)[p] = packet.data[p]
         }
-        syncObject.id = packet.id;
-        const loadResult = syncObject._loadSubObjects();
+        syncObject.id = packet.id
+        const loadResult = syncObject._loadSubObjects()
         // If _loadSubObjects returns a promise, wait for it before returning
-        if (loadResult && typeof (loadResult as Promise<void>).then === 'function') {
-          return (loadResult as Promise<void>).then(() => syncObject);
+        if (loadResult && typeof (loadResult).then === 'function') {
+          return (loadResult).then(() => syncObject)
         }
-        return syncObject;
-      }).ready as Promise<T>;
-    };
+        return syncObject
+      }).ready as Promise<T>
+    }
 
     const _packetFromId = (id: string): Promise<DataPacket> => {
       if (!SyncObject.dataPacketProvider) {
-        return Promise.reject(new Error('dataPacketProvider not set'));
+        return Promise.reject(new Error('dataPacketProvider not set'))
       }
-      return SyncObject.dataPacketProvider.get(id);
-    };
+      return SyncObject.dataPacketProvider.get(id)
+    }
 
     const _fromOne = (descriptor: string | DataPacket | SyncObjectReference): Promise<T> => {
-      let packet: Promise<DataPacket>;
+      let packet: Promise<DataPacket>
       if (typeof descriptor === 'string') {
-        packet = _packetFromId(descriptor);
+        packet = _packetFromId(descriptor)
       } else if (SyncObject.isSyncObjectReference(descriptor)) {
-        packet = _packetFromId(descriptor.dataPacketRef);
+        packet = _packetFromId(descriptor.dataPacketRef)
       } else if (SyncObject.isDataPacket(descriptor)) {
-        packet = Promise.resolve(descriptor);
+        packet = Promise.resolve(descriptor)
       } else {
-        throw new Error(String(descriptor) + ' is not an id, a packet or a reference.');
+        throw new Error(String(descriptor) + ' is not an id, a packet or a reference.')
       }
 
-      return packet.then(_syncObjectFromPacket);
-    };
+      return packet.then(_syncObjectFromPacket)
+    }
 
     if (Array.isArray(syncObjectDescriptor)) {
-      return syncObjectDescriptor.map(_fromOne);
+      return syncObjectDescriptor.map(_fromOne)
     } else {
-      return _fromOne(syncObjectDescriptor);
+      return _fromOne(syncObjectDescriptor)
     }
   }
 
@@ -142,7 +142,7 @@ export default class SyncObject {
   }
 
   getId(): string {
-    return this.id;
+    return this.id
   }
 
   /*
@@ -155,7 +155,7 @@ export default class SyncObject {
    * @return {Boolean} true if the key should be ignored
    */
   _isTransient(key: string): boolean {
-    return ['id', 'ready'].indexOf(key) !== -1;
+    return ['id', 'ready'].indexOf(key) !== -1
   }
 
   /*
@@ -163,7 +163,7 @@ export default class SyncObject {
    * @return {String} a DataPacket reference to this SyncObject.
    */
   toJSON(): SyncObjectReference {
-    return { dataPacketRef: this.getId() };
+    return { dataPacketRef: this.getId() }
   }
 
   static isSyncObjectReference(pojso: unknown): pojso is SyncObjectReference {
@@ -172,7 +172,7 @@ export default class SyncObject {
       pojso !== null &&
       'dataPacketRef' in pojso &&
       typeof (pojso as SyncObjectReference).dataPacketRef === 'string'
-    );
+    )
   }
 
   static isDataPacket(pojso: unknown): pojso is DataPacket {
@@ -183,7 +183,7 @@ export default class SyncObject {
       typeof (pojso as DataPacket).id === 'string' &&
       'data' in pojso &&
       (pojso as DataPacket).data != null
-    );
+    )
   }
 
   /*
@@ -192,18 +192,18 @@ export default class SyncObject {
    * @return {Object} key/value mapping of this object's non-transient properties
    */
   toPOJSO(): Record<string, unknown> {
-    const pojso: Record<string, unknown> = {};
+    const pojso: Record<string, unknown> = {}
     const keys = Object.keys(this).filter(
       (key) => typeof this[key] !== 'function' && !this._isTransient(key),
-    );
+    )
     for (const key of keys) {
-      pojso[key] = this[key];
+      pojso[key] = this[key]
     }
-    return pojso;
+    return pojso
   }
 
   _getPacket(): DataPacket {
-    return { id: this.getId(), data: this.toPOJSO() };
+    return { id: this.getId(), data: this.toPOJSO() }
   }
 
   /*
@@ -212,11 +212,11 @@ export default class SyncObject {
    */
   save(): Promise<unknown> {
     if (!SyncObject.dataPacketProvider) {
-      return Promise.reject(new Error('dataPacketProvider not set'));
+      return Promise.reject(new Error('dataPacketProvider not set'))
     }
-    const provider = SyncObject.dataPacketProvider;
-    this.ready = this.ready.then(() => provider.put(this._getPacket()));
-    return this.ready;
+    const provider = SyncObject.dataPacketProvider
+    this.ready = this.ready.then(() => provider.put(this._getPacket()))
+    return this.ready
   }
 
   /*
@@ -227,17 +227,17 @@ export default class SyncObject {
    */
   delete(): Promise<unknown> {
     if (!SyncObject.dataPacketProvider) {
-      return Promise.reject(new Error('dataPacketProvider not set'));
+      return Promise.reject(new Error('dataPacketProvider not set'))
     }
-    const provider = SyncObject.dataPacketProvider;
-    this.ready = this.ready.then(() => provider.delete_(this.getId()));
+    const provider = SyncObject.dataPacketProvider
+    this.ready = this.ready.then(() => provider.delete_(this.getId()))
     this.ready.then(() => {
       this.ready = Promise.reject(
         new ReferenceError(`${this.constructor.name} #${this.getId()} was deleted`),
-      );
-      return this.ready;
-    });
-    return this.ready;
+      )
+      return this.ready
+    })
+    return this.ready
   }
 
   /*
@@ -258,8 +258,8 @@ export default class SyncObject {
     onFulfilled?: (self: this) => T | PromiseLike<T>,
     onRejected?: (reason: unknown) => T | PromiseLike<T>,
   ): this {
-    this.done(onFulfilled, onRejected);
-    return this;
+    this.done(onFulfilled, onRejected)
+    return this
   }
 
   /*
@@ -277,9 +277,9 @@ export default class SyncObject {
   ): Promise<T | undefined> {
     // we don't want to pass return values from a previous then but pass @
     const onFulfilledThis = (): T | PromiseLike<T> | undefined =>
-      typeof onFulfilled === 'function' ? onFulfilled(this) : undefined;
-    this.ready = this.ready.then(onFulfilledThis, onRejected);
-    return this.ready as Promise<T | undefined>;
+      typeof onFulfilled === 'function' ? onFulfilled(this) : undefined
+    this.ready = this.ready.then(onFulfilledThis, onRejected)
+    return this.ready as Promise<T | undefined>
   }
 
   /*
@@ -289,7 +289,7 @@ export default class SyncObject {
    * @promise
    */
   catch<T = unknown>(onRejected: (reason: unknown) => T | PromiseLike<T>): Promise<unknown> {
-    this.ready = this.ready.catch(onRejected);
-    return this.ready;
+    this.ready = this.ready.catch(onRejected)
+    return this.ready
   }
 }

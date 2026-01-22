@@ -1,14 +1,14 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-import { defineConfig } from 'vite';
-import legacy from '@vitejs/plugin-legacy';
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
-import ViteYaml from '@modyfi/vite-plugin-yaml';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { defineConfig } from 'vite'
+import legacy from '@vitejs/plugin-legacy'
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
+import ViteYaml from '@modyfi/vite-plugin-yaml'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   base: '/js/',
@@ -68,4 +68,4 @@ export default defineConfig({
     format: 'es',
     plugins: () => [nodePolyfills()],
   },
-});
+})

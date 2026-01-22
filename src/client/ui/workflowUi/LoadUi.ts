@@ -39,7 +39,7 @@ export default class LoadUi {
           .then(() => {
             $("#fileInput")
               .val("")
-            return this.workflowUi.hideMenuIfPossible()
+            this.workflowUi.hideMenuIfPossible()
           })
       })
   }

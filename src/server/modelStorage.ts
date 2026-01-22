@@ -4,33 +4,35 @@ import mkdirp from "mkdirp"
 import md5 from "blueimp-md5"
 import log from "winston"
 
-const cacheDirectory = "modelCache/";
+const cacheDirectory = "modelCache/"
 
 // create cache directory on require (read: on server startup)
-mkdirp(cacheDirectory).catch((error: Error) => {
-  log.warn("Unable to create cache directory: " + error)
+mkdirp(cacheDirectory).catch((error: unknown) => {
+  log.warn("Unable to create cache directory: " + String(error))
 })
 
 // API
 
 export function exists (hash: string): Promise<string> {
   if (!checkHash(hash)) {
-    return Promise.reject("invalid hash")
+    return Promise.reject(new Error("invalid hash"))
   }
 
-  return new Promise((resolve, reject) => fs.exists(cacheDirectory + hash, (exists) => {
+  return new Promise((resolve, reject) => { fs.exists(cacheDirectory + hash, (exists) => {
     if (exists) {
-      return resolve(hash)
+      resolve(hash)
+      return
     }
     else {
-      return reject(hash)
+      reject(new Error(hash))
+      return
     }
-  }))
+  }) })
 }
 
 export function get (hash: string): Promise<Buffer> {
   if (!checkHash(hash)) {
-    return Promise.reject("invalid hash")
+    return Promise.reject(new Error("invalid hash"))
   }
 
   return fsp.readFile(cacheDirectory + hash) as unknown as Promise<Buffer>
@@ -38,11 +40,11 @@ export function get (hash: string): Promise<Buffer> {
 
 export function store (hash: string, model: string): Promise<string> {
   if (!checkHash(hash)) {
-    return Promise.reject("invalid hash")
+    return Promise.reject(new Error("invalid hash"))
   }
 
   if (hash !== md5(model)) {
-    return Promise.reject("wrong hash")
+    return Promise.reject(new Error("wrong hash"))
   }
 
   return fsp.writeFile(cacheDirectory + hash, model)

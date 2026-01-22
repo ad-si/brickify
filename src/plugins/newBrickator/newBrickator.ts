@@ -110,14 +110,14 @@ export default class NewBrickator {
             this.nodeVisualizer.objectModified(node, cachedData)
           }
         })
-    ).catch((error: Error) => {
-      const msg = (error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
+    ).catch((error: unknown) => {
+      const msg = (error instanceof Error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
       log.error("newBrickator.onNodeAdd failed:", msg)
     })
   }
 
   onNodeRemove (_node: Node) {
-    return this.pipeline.terminate()
+    this.pipeline.terminate()
   }
 
   runLegoPipeline (selectedNode: Node) {
@@ -189,11 +189,11 @@ export default class NewBrickator {
           .then(() => {
             cachedData.csgNeedsRecalculation = true
 
-            return this.nodeVisualizer != null ? this.nodeVisualizer.objectModified(selectedNode, cachedData) : undefined
+            this.nodeVisualizer != null ? this.nodeVisualizer.objectModified(selectedNode, cachedData) : undefined
           })
       })
-      .catch((error: Error) => {
-        const msg = (error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
+      .catch((error: unknown) => {
+        const msg = (error instanceof Error && (error.stack || error.message)) ? (error.stack || error.message) : String(error)
         log.error("newBrickator.relayoutModifiedParts failed:", msg)
       })
   }
@@ -292,12 +292,12 @@ export default class NewBrickator {
                 }
               })
 
-              return resolve(results)
+              resolve(results)
             })
         })
-        .catch((error: Error) => {
+        .catch((error: unknown) => {
           log.error(error)
-          return reject(error)
+          reject(error)
         })
     })
 
@@ -338,7 +338,7 @@ export default class NewBrickator {
         {
           hotkey: "c",
           description: "cancel current pipeline operation",
-          callback: () => this.pipeline.terminate(),
+          callback: () => { this.pipeline.terminate() },
         },
       ],
     }
@@ -352,7 +352,7 @@ export default class NewBrickator {
     if (!this.Spinner) {
       try {
         this.Spinner = await import("../../client/Spinner.js") as unknown as SpinnerModule
-      } catch (_e) {
+      } catch {
         // If spinner cannot be loaded, run action without it
         return action()
       }

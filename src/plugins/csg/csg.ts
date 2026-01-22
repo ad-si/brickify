@@ -121,9 +121,9 @@ export default class CSG {
         return selectedNode.getPluginData("newBrickator")
           .then((newBrickatorData: unknown) => {
             const brickatorData = newBrickatorData as { grid: unknown; csgNeedsRecalculation: boolean }
-            data!.grid = brickatorData.grid
+            data.grid = brickatorData.grid
             if (brickatorData.csgNeedsRecalculation) {
-              data!.csgNeedsRecalculation = true
+              data.csgNeedsRecalculation = true
             }
             brickatorData.csgNeedsRecalculation = false
             // finally return own data + newBrickator grid
@@ -173,9 +173,9 @@ export default class CSG {
         .then((model: { model: THREE.Object3D }) => {
           const threeGeometry = threeConverter.toStandardGeometry(model.model as any)
           threeGeometry.applyMatrix(threeHelper.getTransformMatrix(selectedNode as any))
-          return resolve(threeGeometry)
+          resolve(threeGeometry)
         })
-        .catch((error: unknown) => reject(error))
+        .catch((error: unknown) => { reject(error) })
     })
   }
 

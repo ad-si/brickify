@@ -58,12 +58,12 @@ var b1 = bundle1.init()
     const b2 = bundle2.init()
 
     const loadAndConvert = function (identifier: string) {
-      b1
+      void b1
         .then(() => bundle1.sceneManager.clearScene())
         .then(() => bundle1.loadByIdentifier(identifier))
         .then(() => $("#" + config1.renderAreaId)
           .css("backgroundImage", "none"))
-      b2
+      void b2
         .then(() => bundle2.sceneManager.clearScene())
         .then(() => bundle2.loadByIdentifier(identifier))
         .then(() => $("#" + config2.renderAreaId)
@@ -78,7 +78,7 @@ var b1 = bundle1.init()
     const fileLoadCallback = function (event: DragEvent | Event): void {
       const files = (event.target as HTMLInputElement).files != null ? (event.target as HTMLInputElement).files : (event as DragEvent).dataTransfer?.files
       if (files && files.length) {
-        fileLoader.onLoadFile(files, $("#loadButton")[0] as HTMLElement, {})
+        void fileLoader.onLoadFile(files, $("#loadButton")[0], {})
           .then((identifier) => {
             if (typeof identifier === "string") {
               loadAndConvert(identifier)

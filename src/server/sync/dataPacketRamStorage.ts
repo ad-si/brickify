@@ -20,7 +20,7 @@ let packets: PacketsMap = {}
 export function create (): Promise<DataPacket> {
   const id = idGenerator.generate((id: string) => packets[id] == null)
   if (id === null) {
-    return Promise.reject("Could not generate unique id")
+    return Promise.reject(new Error("Could not generate unique id"))
   }
   packets[id] = {
     id,
@@ -34,7 +34,7 @@ export function isSaneId (id: string): Promise<string> {
     return Promise.resolve(id)
   }
   else {
-    return Promise.reject(id)
+    return Promise.reject(new Error(id))
   }
 }
 
@@ -43,7 +43,7 @@ export function exists (id: string): Promise<string> {
     return Promise.resolve(id)
   }
   else {
-    return Promise.reject(id)
+    return Promise.reject(new Error(id))
   }
 }
 
@@ -52,7 +52,7 @@ export function get (id: string): Promise<DataPacket> {
     return Promise.resolve(packets[id])
   }
   else {
-    return Promise.reject(id)
+    return Promise.reject(new Error(id))
   }
 }
 
@@ -62,7 +62,7 @@ export function put (packet: DataPacket): Promise<string> {
     return Promise.resolve(packet.id)
   }
   else {
-    return Promise.reject(packet.id)
+    return Promise.reject(new Error(packet.id))
   }
 }
 
@@ -72,7 +72,7 @@ export function delete_ (id: string): Promise<void> {
     return Promise.resolve()
   }
   else {
-    return Promise.reject(id)
+    return Promise.reject(new Error(id))
   }
 }
 

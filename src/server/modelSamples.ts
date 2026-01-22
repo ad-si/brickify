@@ -44,7 +44,7 @@ export function exists (name: string): Promise<string> {
     return Promise.resolve(name)
   }
   else {
-    return Promise.reject(name)
+    return Promise.reject(new Error(name))
   }
 }
 
@@ -55,7 +55,7 @@ export function get (name: string): Promise<Buffer> {
     return fsp.readFile(samplesDirectory + name) as unknown as Promise<Buffer>
   }
   else {
-    return Promise.reject(name)
+    return Promise.reject(new Error(name))
   }
 }
 

@@ -146,7 +146,7 @@ export default class Node extends SyncObject {
     if (param == null) {
       param = {}
     }
-    return this.next(() => this._setTransform(param))
+    return this.next(() => { this._setTransform(param) })
   }
 
   getTransform (): Promise<Transform | undefined> {

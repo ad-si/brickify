@@ -48,15 +48,15 @@ export default class EditUi {
         if (this.bundle.sceneManager.selectedNode == null) {
           return
         }
-        return legoInstructions.showPartListPopup(this.bundle.sceneManager.selectedNode)
+        legoInstructions.showPartListPopup(this.bundle.sceneManager.selectedNode)
       })
   }
 
   onNodeSelect (node: Node) {
-    return this.brushUi.onNodeSelect(node)
+    this.brushUi.onNodeSelect(node)
   }
 
   onNodeDeselect (node: Node) {
-    return this.brushUi.onNodeDeselect(node)
+    this.brushUi.onNodeDeselect(node)
   }
 }

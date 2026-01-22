@@ -538,7 +538,7 @@ export default class BrickVisualization {
   makeAllVoxels3dPrinted (_selectedNode: unknown): VoxelLike[] {
     this.printVoxels = this.voxelSelector.getAllVoxels() as unknown as VoxelLike[]
     const legoVoxels = this.printVoxels.filter((voxel: VoxelLike) => voxel.isLego())
-    legoVoxels.map((voxel: VoxelLike) => voxel.make3dPrinted())
+    legoVoxels.map((voxel: VoxelLike) => { voxel.make3dPrinted() })
     this.voxelSelector.clearSelection()
     return legoVoxels
   }
@@ -591,7 +591,7 @@ export default class BrickVisualization {
       printVoxels,
     } = this
     this.printVoxels = []
-    printVoxels.map((voxel: VoxelLike) => voxel.makeLego())
+    printVoxels.map((voxel: VoxelLike) => { voxel.makeLego() })
     this.voxelSelector.clearSelection()
     return printVoxels
   }

@@ -34,17 +34,17 @@ export default class PreviewAssemblyUi {
     }
 
     this.buildLayerUi.slider.on("input", () => {
-      return this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
+      this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
     })
 
     this.buildLayerUi.increment.on("click", () => {
       this.buildLayerUi.slider.val(Number(this.buildLayerUi.slider.val()) + 1)
-      return this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
+      this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
     })
 
     this.buildLayerUi.decrement.on("click", () => {
       this.buildLayerUi.slider.val(Number(this.buildLayerUi.slider.val()) - 1)
-      return this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
+      this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
     })
   }
 
@@ -70,7 +70,7 @@ export default class PreviewAssemblyUi {
             this.buildLayerUi.maxLayer.text(numLayers)
 
             this.buildLayerUi.slider.val(1)
-            return this._updateBuildLayer(selectedNode)
+            this._updateBuildLayer(selectedNode)
           })
       })
   }
@@ -78,7 +78,7 @@ export default class PreviewAssemblyUi {
   _updateBuildLayer (selectedNode: Node | null) {
     const layer = Number(this.buildLayerUi.slider.val())
     this.buildLayerUi.curLayer.text(layer)
-    return this.previewUi.nodeVisualizer.showBuildLayer(selectedNode, layer)
+    this.previewUi.nodeVisualizer.showBuildLayer(selectedNode, layer)
   }
 
   _disableBuildMode (selectedNode: Node | null) {

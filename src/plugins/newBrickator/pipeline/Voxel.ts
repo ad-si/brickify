@@ -66,13 +66,13 @@ export default class Voxel {
           size.minZ = voxel.position.z
         }
 
-        if (size.maxX! < voxel.position.x) {
+        if (size.maxX < voxel.position.x) {
           size.maxX = voxel.position.x
         }
-        if (size.maxY! < voxel.position.y) {
+        if (size.maxY < voxel.position.y) {
           size.maxY = voxel.position.y
         }
-        if (size.maxZ! < voxel.position.z) {
+        if (size.maxZ < voxel.position.z) {
           size.maxZ = voxel.position.z
         }
       })

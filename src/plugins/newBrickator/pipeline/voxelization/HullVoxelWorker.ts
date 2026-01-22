@@ -87,7 +87,7 @@ const HullVoxelWorker: HullVoxelWorkerType = {
         lineStepSize,
         grid,
       )
-      return self._postProgress(progress, progressCallback)
+      self._postProgress(progress, progressCallback)
     })
 
     progressCallback({
@@ -330,7 +330,7 @@ const HullVoxelWorker: HullVoxelWorkerType = {
       return
     }
     this.lastProgress = currentProgress
-    return callback({state: "progress", progress: currentProgress})
+    callback({state: "progress", progress: currentProgress})
   },
 
   _forEachPolygon (

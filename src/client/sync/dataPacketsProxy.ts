@@ -12,11 +12,13 @@ interface JqXHRError {
   responseText: string;
 }
 
-const sanitizeJqXHRError = (jqXHR: JQuery.jqXHR): Promise<never> => Promise.reject({
-  status: jqXHR.status,
-  statusText: jqXHR.statusText,
-  responseText: jqXHR.responseText,
-} as JqXHRError)
+const sanitizeJqXHRError = (jqXHR: JQuery.jqXHR): Promise<never> => {
+  const error = new Error(jqXHR.statusText) as Error & JqXHRError
+  error.status = jqXHR.status
+  error.statusText = jqXHR.statusText
+  error.responseText = jqXHR.responseText
+  return Promise.reject(error)
+}
 
 export const create = (): Promise<DataPacket> => Promise.resolve($.ajax("/datapacket", {type: "POST"}))
   .catch(sanitizeJqXHRError)

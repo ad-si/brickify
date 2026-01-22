@@ -85,7 +85,7 @@ const VolumeFillWorker = {
       return;
     }
     this.lastProgress = progress;
-    return callback({ state: "progress", progress });
+    callback({ state: "progress", progress });
   }
 };
 self.onmessage = (event) => {

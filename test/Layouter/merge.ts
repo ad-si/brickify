@@ -1,10 +1,8 @@
-import chai from "chai"
+import { expect } from "chai"
 
 import PlateLayouter from "../../src/plugins/newBrickator/pipeline/Layout/PlateLayouter.js"
 import Grid from "../../src/plugins/newBrickator/pipeline/Grid.js"
 import type Brick from "../../src/plugins/newBrickator/pipeline/Brick.js"
-
-const { expect } = chai
 
 describe("brickLayouter merge", () => {
   it("should find mergeable neighbor brick xp and xm", () => {

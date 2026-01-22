@@ -1,4 +1,4 @@
-import chai from "chai"
+import * as chai from "chai"
 import chaiAsPromised from "chai-as-promised"
 import chaiShallowDeepEqual from "chai-shallow-deep-equal"
 
@@ -12,7 +12,6 @@ import sceneChaiHelper from "./sceneChaiHelper.js"
 declare global {
   namespace Chai {
     interface Assertion {
-      resolve: Assertion;
       modified(time: number, delta?: number): Assertion;
       cause(cause: string): Assertion;
       shallowDeepEqual(expected: unknown): Assertion;
@@ -38,7 +37,7 @@ describe("Scene tests", () => {
     it("should resolve after creation", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const scene = new Scene()
-      return expect(scene.done()).to.resolve
+      return expect(scene.done()).to.be.fulfilled
     })
 
     return it("should be a Scene and a SyncObject", () => {
@@ -109,7 +108,7 @@ describe("Scene tests", () => {
         const {
           packet,
         } = dataPackets!.putCalls[0]
-        expect(packet).to.have.deep.property("data.nodes").that.is.an("array")
+        expect(packet).to.have.nested.property("data.nodes").that.is.an("array")
         const {
           nodes,
         } = packet.data as { nodes: Array<{ dataPacketRef: string }> }
@@ -133,7 +132,7 @@ describe("Scene tests", () => {
       dataPackets!.nextGets.push(node)
 
       const request = Scene.from("sceneid")
-      expect(request).to.resolve
+      expect(request).to.be.fulfilled
       return (request as Promise<Scene>).then(scene => scene.done(() => {
         expect(scene).to.have.property("nodes").that.is.an("array")
         const {

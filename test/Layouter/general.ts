@@ -1,9 +1,7 @@
-import chai from "chai"
+import { expect } from "chai"
 
 import Layouter from "../../src/plugins/newBrickator/pipeline/Layout/Layouter.js"
 import Grid from "../../src/plugins/newBrickator/pipeline/Grid.js"
-
-const { expect } = chai
 
 describe("Layouter", () => it("should choose random brick", () => {
   const grid = new Grid()

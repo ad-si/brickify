@@ -1,9 +1,7 @@
-import chai from "chai"
+import { expect } from "chai"
 
 import Grid from "../../src/plugins/newBrickator/pipeline/Grid.js"
 import type Voxel from "../../src/plugins/newBrickator/pipeline/Voxel.js"
-
-const { expect } = chai
 
 describe("Grid", () => {
   it("should set a voxel", () => {

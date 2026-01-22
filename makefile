@@ -35,14 +35,18 @@ lint:
 	npx eslint --ignore-pattern=.gitignore .
 
 
-.PHONY: test
-test:
-	npx tsx node_modules/mocha/bin/mocha --recursive --extensions ts 'test/**/*.ts'
-
-
 .PHONY: test-client
 test-client:
 	npx vitest run
+
+
+.PHONY: test-units
+test-units:
+	npx tsx node_modules/mocha/bin/mocha --recursive --extensions ts 'test/**/*.ts'
+
+
+.PHONY: test
+test: typecheck lint test-units test-client
 
 
 .PHONY: prepublish

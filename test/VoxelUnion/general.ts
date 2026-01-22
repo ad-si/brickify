@@ -1,10 +1,8 @@
 import * as THREE from "three"
-import chai from "chai"
+import { expect } from "chai"
 
 import Grid from "../../src/plugins/newBrickator/pipeline/Grid.js"
 import VoxelUnion from "../../src/plugins/csg/VoxelUnion.js"
-
-const { expect } = chai
 
 describe("VoxelUnion", () => {
   const grid = new Grid()

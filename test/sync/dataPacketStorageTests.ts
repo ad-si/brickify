@@ -1,11 +1,9 @@
-import chai from "chai"
+import { expect } from "chai"
 import type { Request as ExpressRequest, Response as ExpressResponse } from "express"
 
 import * as dataPackets from "../../routes/dataPackets.js"
 import MockRequest from "../mocks/express-request.js"
 import MockResponse from "../mocks/express-response.js"
-
-const { expect } = chai
 
 // Helper to create mock request/response with proper types for testing
 const Request = (params?: Record<string, string>, body?: unknown) =>
@@ -21,8 +19,8 @@ describe("server-side dataPacket-storage tests", () => {
     return response.whenSent.then(() => {
       expect(response).to.have.property("type", "json")
       expect(response).to.have.property("code", 201)
-      expect(response).to.have.deep.property("content.id")
-      return expect(response).to.have.deep.property("content.data").to.be.empty
+      expect(response).to.have.nested.property("content.id")
+      return expect(response).to.have.nested.property("content.data").to.be.empty
     })
   }))
 
@@ -122,8 +120,8 @@ describe("server-side dataPacket-storage tests", () => {
           return getResponse.whenSent.then(() => {
             expect(getResponse).to.have.property("type", "json")
             expect(getResponse).to.have.property("code", 200)
-            expect(getResponse).to.have.deep.property("content.id", id)
-            return expect(getResponse).to.have.deep.property("content.data", content)
+            expect(getResponse).to.have.nested.property("content.id", id)
+            return expect(getResponse).to.have.nested.property("content.data").that.deep.equals(content)
           })
         })
       })
@@ -216,7 +214,7 @@ describe("server-side dataPacket-storage tests", () => {
         return deleteResponse.whenSent.then(() => {
           expect(deleteResponse).to.have.property("type", "text")
           expect(deleteResponse).to.have.property("code", 204)
-          return expect(deleteResponse).to.have.property("content").which.is.empty
+          return expect(deleteResponse.content).to.satisfy((c: unknown) => c === undefined || c === "" || (typeof c === "string" && c.length === 0))
         })
       })
     })

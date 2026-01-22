@@ -1,5 +1,5 @@
 import clone from "clone"
-import chai from "chai"
+import * as chai from "chai"
 import chaiAsPromised from "chai-as-promised"
 import chaiShallowDeepEqual from "chai-shallow-deep-equal"
 
@@ -11,7 +11,6 @@ import Dummy from "./dummySyncObject.js"
 declare global {
   namespace Chai {
     interface Assertion {
-      resolve: Assertion;
       shallowDeepEqual(expected: unknown): Assertion;
     }
   }
@@ -33,7 +32,7 @@ describe("SyncObject tests", () => {
     it("should resolve after creation", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const dummy = new Dummy()
-      return expect(dummy.done()).to.resolve
+      return expect(dummy.done()).to.be.fulfilled
     })
 
     it("should be a Dummy and a SyncObject", () => {
@@ -60,7 +59,7 @@ describe("SyncObject tests", () => {
       const pojso = {a: "b", c: {d: "e"}}
       const packet = {id: "abcdefgh", data: pojso}
       const request = Dummy.from(packet)
-      expect(request).to.resolve
+      expect(request).to.be.fulfilled
       return (request as Promise<Dummy>).then((dummy) => {
         expect(dataPackets!.calls).to.equal(0)
         return dummy.done(() => {
@@ -83,7 +82,7 @@ describe("SyncObject tests", () => {
       }
 
       const requests = Promise.all(Dummy.from(packets) as Promise<Dummy>[])
-      expect(requests).to.resolve
+      expect(requests).to.be.fulfilled
       return requests.then((dummies) => {
         expect(dummies).to.have.length(packets.length)
         const promises = dummies.map(dummy => dummy.done())
@@ -111,7 +110,7 @@ describe("SyncObject tests", () => {
       const packet = {id, data: pojso}
       dataPackets!.nextGets.push(packet)
       const request = Dummy.from(id)
-      expect(request).to.resolve
+      expect(request).to.be.fulfilled
       return (request as Promise<Dummy>).then(dummy => dummy.done(() => {
         expect(dataPackets!.calls).to.equal(1)
         expect(dataPackets!.getCalls).to.have.length(1)
@@ -136,7 +135,7 @@ describe("SyncObject tests", () => {
       }
 
       const requests = Promise.all(Dummy.from(ids) as Promise<Dummy>[])
-      expect(requests).to.resolve
+      expect(requests).to.be.fulfilled
       return requests.then((dummies) => {
         expect(dummies).to.have.length(ids.length)
         expect(dataPackets!.calls).to.equal(ids.length)
@@ -163,7 +162,7 @@ describe("SyncObject tests", () => {
       const packet = {id, data: pojso}
       dataPackets!.nextGets.push(packet)
       const request = Dummy.from({dataPacketRef: id})
-      expect(request).to.resolve
+      expect(request).to.be.fulfilled
       return (request as Promise<Dummy>).then(dummy => dummy.done(() => {
         expect(dataPackets!.calls).to.equal(1)
         expect(dataPackets!.getCalls).to.have.length(1)
@@ -190,7 +189,7 @@ describe("SyncObject tests", () => {
       }
 
       const requests = Promise.all(Dummy.from(references) as Promise<Dummy>[])
-      expect(requests).to.resolve
+      expect(requests).to.be.fulfilled
       return requests.then((dummies) => {
         expect(dummies).to.have.length(references.length)
         expect(dataPackets!.calls).to.equal(references.length)

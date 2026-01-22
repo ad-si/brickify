@@ -13,7 +13,7 @@ export default function (chaiObj: any, utils: any): void {
     if (delta == null) {
       delta = 2000
     }
-    new chaiObj.Assertion(this._obj).to.have.deep.property("lastModified.date")
+    new chaiObj.Assertion(this._obj).to.have.nested.property("lastModified.date")
     // the date should be between time-delta and time
     const assertDate = new chaiObj.Assertion((this._obj as ObjectWithLastModified).lastModified.date)
     utils.transferFlags(this, assertDate, false)
@@ -23,7 +23,7 @@ export default function (chaiObj: any, utils: any): void {
 
   return chaiObj.Assertion.addMethod("cause", function (this: any, cause: string) {
     // the property should always be there
-    new chaiObj.Assertion(this._obj).to.have.deep.property("lastModified.cause")
+    new chaiObj.Assertion(this._obj).to.have.nested.property("lastModified.cause")
     // the cause should match
     const assertCause = new chaiObj.Assertion((this._obj as ObjectWithLastModified).lastModified.cause)
     utils.transferFlags(this, assertCause, false)

@@ -1,7 +1,5 @@
-import chai from "chai"
+import { expect } from "chai"
 import * as idGenerator from "../../src/server/sync/idGenerator.js"
-
-const { expect } = chai
 
 describe("id generator tests", () => {
   it("should only contain alphanumeric characters", () => {

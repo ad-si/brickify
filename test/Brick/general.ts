@@ -1,10 +1,8 @@
-import chai from "chai"
+import { expect } from "chai"
 import NewBrick from "../../src/plugins/newBrickator/pipeline/Brick.js"
 import Grid from "../../src/plugins/newBrickator/pipeline/Grid.js"
 import type Voxel from "../../src/plugins/newBrickator/pipeline/Voxel.js"
 import type Brick from "../../src/plugins/newBrickator/pipeline/Brick.js"
-
-const { expect } = chai
 
 describe("Brick", () => {
   it("should take ownership of voxels", () => {

@@ -12,7 +12,7 @@ export function create (_request: Request, response: Response) {
 }
 
 export function exists (request: Request, response: Response) {
-  const id = request.params.id
+  const id = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.exists(id)
       .then(resultId => response.status(200)
@@ -26,7 +26,7 @@ export function exists (request: Request, response: Response) {
 }
 
 export function get (request: Request, response: Response) {
-  const id = request.params.id
+  const id = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.get(id)
       .then(packet => response.status(200)
@@ -40,7 +40,7 @@ export function get (request: Request, response: Response) {
 }
 
 export function put (request: Request, response: Response) {
-  const id = request.params.id
+  const id = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.put({id, data: request.body})
       .then(() => response.status(200)
@@ -54,7 +54,7 @@ export function put (request: Request, response: Response) {
 }
 
 export function delete_ (request: Request, response: Response) {
-  const id = request.params.id
+  const id = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id
   return dpStorage.isSaneId(id)
     .then(() => dpStorage.delete_(id)
       .then(() => response.status(204)

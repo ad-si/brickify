@@ -1,19 +1,10 @@
-import chai from "chai"
+import * as chai from "chai"
 import chaiAsPromised from "chai-as-promised"
 
 import DataPacketsMock from "../mocks/dataPacketsMock.js"
 import SyncObject from "../../src/common/sync/syncObject.js"
 import ModelProviderMock from "../mocks/modelProviderMock.js"
 import Node from "../../src/common/project/node.js"
-
-// Extend chai assertion interface to include custom methods
-declare global {
-  namespace Chai {
-    interface Assertion {
-      resolve: Assertion;
-    }
-  }
-}
 
 chai.use(chaiAsPromised)
 const { expect } = chai
@@ -33,7 +24,7 @@ describe("Node tests", () => {
     it("should resolve after creation", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const node = new Node()
-      return expect(node.done()).to.resolve
+      return expect(node.done()).to.be.fulfilled
     })
 
     return it("should be a Node and a SyncObject", () => {
@@ -96,8 +87,8 @@ describe("Node tests", () => {
       expect(model).to.eventually.equal("dummy")
       return model.then(() => {
         expect(modelProvider!.calls).to.equal(1)
-        return expect(modelProvider!.requestCalls)
-          .to.have.deep.property("[0].identifier", identifier)
+        return expect(modelProvider!.requestCalls[0])
+          .to.have.property("identifier", identifier)
       })
     })
 
@@ -128,8 +119,8 @@ describe("Node tests", () => {
         .then(() => {
           expect(dataPackets!.calls).to.equal(2)
           expect(dataPackets!.createCalls).to.have.length(1)
-          return expect(dataPackets!.putCalls)
-            .to.have.deep.property("[0].packet.data.name", name)
+          return expect(dataPackets!.putCalls[0].packet.data)
+            .to.have.property("name", name)
         })
     })
 
@@ -234,7 +225,7 @@ describe("Node tests", () => {
       const position = {x: 10, y: 20, z: 30}
       const result = node.setPosition(position)
       expect(result).to.equal(node)
-      return result.done(() => expect(node).to.have.deep.property("transform.position", position))
+      return result.done(() => expect(node).to.have.nested.property("transform.position").that.deep.equals(position))
     })
 
     it("should get the position", () => {
@@ -251,7 +242,7 @@ describe("Node tests", () => {
       const rotation = {x: 1, y: 2, z: 3}
       const result = node.setRotation(rotation)
       expect(result).to.equal(node)
-      return result.done(() => expect(node).to.have.deep.property("transform.rotation", rotation))
+      return result.done(() => expect(node).to.have.nested.property("transform.rotation").that.deep.equals(rotation))
     })
 
     it("should get the rotation", () => {
@@ -268,7 +259,7 @@ describe("Node tests", () => {
       const scale = {x: 2, y: 2, z: 2}
       const result = node.setScale(scale)
       expect(result).to.equal(node)
-      return result.done(() => expect(node).to.have.deep.property("transform.scale", scale))
+      return result.done(() => expect(node).to.have.nested.property("transform.scale").that.deep.equals(scale))
     })
 
     it("should get the scale", () => {
@@ -289,9 +280,9 @@ describe("Node tests", () => {
       const result = node.setTransform(transform)
       expect(result).to.equal(node)
       return result.done(() => {
-        expect(node).to.have.deep.property("transform.position", position)
-        expect(node).to.have.deep.property("transform.rotation", rotation)
-        return expect(node).to.have.deep.property("transform.scale", scale)
+        expect(node).to.have.nested.property("transform.position").that.deep.equals(position)
+        expect(node).to.have.nested.property("transform.rotation").that.deep.equals(rotation)
+        return expect(node).to.have.nested.property("transform.scale").that.deep.equals(scale)
       })
     })
 

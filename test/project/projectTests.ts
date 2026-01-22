@@ -1,18 +1,9 @@
-import chai from "chai"
+import * as chai from "chai"
 import chaiAsPromised from "chai-as-promised"
 
 import DataPacketsMock from "../mocks/dataPacketsMock.js"
 import SyncObject from "../../src/common/sync/syncObject.js"
 import Project from "../../src/common/project/project.js"
-
-// Extend chai assertion interface to include custom methods
-declare global {
-  namespace Chai {
-    interface Assertion {
-      resolve: Assertion;
-    }
-  }
-}
 
 chai.use(chaiAsPromised)
 const { expect } = chai
@@ -28,7 +19,7 @@ describe("Project tests", () => {
     it("should resolve after creation", () => {
       dataPackets!.nextIds.push("abcdefgh")
       const project = new Project()
-      return expect(project.done()).to.resolve
+      return expect(project.done()).to.be.fulfilled
     })
 
     it("should be a Project and a SyncObject", () => {
@@ -46,7 +37,7 @@ describe("Project tests", () => {
       return project.done(() => {
         expect(project).to.have.property("scenes")
           .that.is.an("array").with.length(1)
-        return expect(project).to.have.deep.property("scenes.active")
+        return expect(project).to.have.nested.property("scenes.active")
           .that.equals(project.scenes[0])
       })
     })

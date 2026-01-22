@@ -1,4 +1,4 @@
-import perfectScrollbar from "perfect-scrollbar"
+import PerfectScrollbar from "perfect-scrollbar"
 
 import LoadUi from "./LoadUi.js"
 import EditUi from "./EditUi.js"
@@ -23,6 +23,7 @@ interface WorkflowStepUi {
 export default class WorkflowUi {
   bundle: Bundle
   workflow!: WorkflowSteps
+  private scrollbar?: PerfectScrollbar
 
   constructor (bundle: Bundle) {
     this.onNodeAdd = this.onNodeAdd.bind(this);   this.onNodeRemove = this.onNodeRemove.bind(this);   this.onNodeSelect = this.onNodeSelect.bind(this);   this.onNodeDeselect = this.onNodeDeselect.bind(this);   this.enableOnly = this.enableOnly.bind(this);   this.enableAll = this.enableAll.bind(this);   this._enable = this._enable.bind(this);   this.init = this.init.bind(this);   this.toggleStabilityView = this.toggleStabilityView.bind(this);   this.toggleAssemblyView = this.toggleAssemblyView.bind(this);   this.bundle = bundle
@@ -100,8 +101,8 @@ export default class WorkflowUi {
   _initScrollbar () {
     const sidebar = document.getElementById("leftSidebar")
     if (sidebar) {
-      perfectScrollbar.initialize(sidebar)
-      window.addEventListener("resize", () => { perfectScrollbar.update(sidebar) })
+      this.scrollbar = new PerfectScrollbar(sidebar)
+      window.addEventListener("resize", () => { this.scrollbar?.update() })
     }
   }
 

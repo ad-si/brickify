@@ -1,14 +1,14 @@
 section.quickConvert
   .container
     .row
-      .col-lg-5.text-center
+      .col-lg-5.col-md-6.col-sm-6.col-xs-12.text-center
         h3
           center Original Model
         canvas#renderArea1.quickConvertCanvas(touch-action="none")
-      .col-lg-2.text-center.convert-arrow
+      .col-lg-2.hidden-md.hidden-sm.hidden-xs.text-center.convert-arrow
         svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24' width='120' height='64' fill='white')
           path(d='M28 4l-1.41 1.41L32.17 11H4v2h28.17l-5.58 5.59L28 20l8-8z')
-      .col-lg-5.text-center
+      .col-lg-5.col-md-6.col-sm-6.col-xs-12.text-center
         h3
           center With LEGO Bricks
         canvas#renderArea2.quickConvertCanvas(touch-action="none")

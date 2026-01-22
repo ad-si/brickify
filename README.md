@@ -1,5 +1,16 @@
 # Brickify
 
+Brickify is a web app that transforms 3D models
+into step-by-step LEGO brick building instructions.
+Simply upload your 3D model files and receive detailed instructions
+for recreating them with LEGO bricks.
+
+The app also supports hybrid 3D-LEGO prototyping,
+allowing you to rapidly iterate on physical designs
+by building partial LEGO prototypes
+before committing to a full 3D print.
+
+
 ## Installation
 
 `$ git clone https://github.com/ad-si/brickify.git`

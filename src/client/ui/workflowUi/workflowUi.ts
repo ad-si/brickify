@@ -106,6 +106,10 @@ export default class WorkflowUi {
   }
 
   _initToggleButton () {
+    // Start with sidebar collapsed on mobile
+    if ($("#toggleMenu:visible").length > 0) {
+      $("#leftSidebar").addClass("collapsed-sidebar")
+    }
     return $("#toggleMenu")
       .click(() => this.toggleMenu())
   }

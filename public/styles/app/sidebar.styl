@@ -16,6 +16,12 @@
   &.collapsed-sidebar
     height auto
 
+  // On mobile, start with sidebar collapsed
+  @media(max-width $screen-xs-max)
+    height auto
+    #sidebar-content
+      display none
+
   @media(min-width $screen-xs-max)
     height 100% !important
     #sidebar-content

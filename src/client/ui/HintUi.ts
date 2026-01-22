@@ -25,7 +25,7 @@ export default class HintUi {
     this.rotateHintVisible = false
     this.zoomHintVisible = false
 
-    if (this._userNeedsHint()) {
+    if (this._userNeedsHint() && !this._isMobile()) {
       this.$hintContainer.show()
       this.moveHintVisible = true
       this.brushHintVisible = true
@@ -122,5 +122,9 @@ export default class HintUi {
   _anyHintVisible (): boolean {
     return this.moveHintVisible || this.brushHintVisible ||
     this.zoomHintVisible || this.rotateHintVisible
+  }
+
+  _isMobile (): boolean {
+    return window.matchMedia("(max-width: 767px)").matches
   }
 }

@@ -26,7 +26,7 @@
     "Stefan Neubert",
     "Yannis Kommana"
   ],
-  "license": "All rights reserved",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "blueimp-md5": "^2.19.0",
     "body-parser": "^2.2.2",

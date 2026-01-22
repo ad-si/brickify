@@ -18,12 +18,10 @@ export function exists (request: Request, response: Response) {
       .then(resultId => response.status(200)
         .send(resultId))
       .catch((resultId: unknown) => {
-        const message = (resultId as any)?.message ?? String(resultId)
-        return response.status(404).send(message)
+        return response.status(404).send(resultId)
       }))
     .catch((error: unknown) => {
-      const message = (error as any)?.message ?? String(error)
-      return response.status(400).send(message)
+      return response.status(400).send(error)
     })
 }
 
@@ -34,28 +32,24 @@ export function get (request: Request, response: Response) {
       .then(packet => response.status(200)
         .json(packet))
       .catch((resultId: unknown) => {
-        const message = (resultId as any)?.message ?? String(resultId)
-        return response.status(404).send(message)
+        return response.status(404).send(resultId)
       }))
     .catch((error: unknown) => {
-      const message = (error as any)?.message ?? String(error)
-      return response.status(400).send(message)
+      return response.status(400).send(error)
     })
 }
 
 export function put (request: Request, response: Response) {
   const id = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id
   return dpStorage.isSaneId(id)
-    .then(() => dpStorage.put({id, data: request.body})
+    .then(() => dpStorage.put({id, data: request.body as Record<string, unknown>})
       .then(() => response.status(200)
         .send(id))
       .catch((resultId: unknown) => {
-        const message = (resultId as any)?.message ?? String(resultId)
-        return response.status(404).send(message)
+        return response.status(404).send(resultId)
       }))
     .catch((error: unknown) => {
-      const message = (error as any)?.message ?? String(error)
-      return response.status(400).send(message)
+      return response.status(400).send(error)
     })
 }
 
@@ -66,12 +60,10 @@ export function delete_ (request: Request, response: Response) {
       .then(() => response.status(204)
         .send())
       .catch((resultId: unknown) => {
-        const message = (resultId as any)?.message ?? String(resultId)
-        return response.status(404).send(message)
+        return response.status(404).send(resultId)
       }))
     .catch((error: unknown) => {
-      const message = (error as any)?.message ?? String(error)
-      return response.status(400).send(message)
+      return response.status(400).send(error)
     })
 }
 

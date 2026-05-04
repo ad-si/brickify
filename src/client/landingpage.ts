@@ -100,5 +100,5 @@ const b1 = bundle1.init()
     }
 
     $(".dropper")
-      .text("Drop an STL file")
+      .text("Open an STL file")
   })

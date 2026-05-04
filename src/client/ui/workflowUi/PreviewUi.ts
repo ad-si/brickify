@@ -8,7 +8,7 @@ interface NodeVisualizerPlugin extends Plugin {
   setDisplayMode(node: Node | null, mode: string): Promise<void>
   getDisplayMode(): string
   getNumberOfBuildLayers(node: Node | null): Promise<number>
-  showBuildLayer(node: Node | null, layer: number): void
+  showBuildLayer(node: Node | null, layer: number): Promise<void>
 }
 
 interface EditControllerPlugin extends Plugin {

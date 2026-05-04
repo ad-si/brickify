@@ -1,3 +1,4 @@
+import * as Spinner from "../../Spinner.js"
 import type PreviewUi from "./PreviewUi.js"
 import type Node from "../../../common/project/node.js"
 
@@ -34,17 +35,17 @@ export default class PreviewAssemblyUi {
     }
 
     this.buildLayerUi.slider.on("input", () => {
-      this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
+      void this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
     })
 
     this.buildLayerUi.increment.on("click", () => {
       this.buildLayerUi.slider.val(Number(this.buildLayerUi.slider.val()) + 1)
-      this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
+      void this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
     })
 
     this.buildLayerUi.decrement.on("click", () => {
       this.buildLayerUi.slider.val(Number(this.buildLayerUi.slider.val()) - 1)
-      this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
+      void this._updateBuildLayer(this.previewUi.sceneManager.selectedNode)
     })
   }
 
@@ -70,15 +71,28 @@ export default class PreviewAssemblyUi {
             this.buildLayerUi.maxLayer.text(numLayers)
 
             this.buildLayerUi.slider.val(1)
-            this._updateBuildLayer(selectedNode)
+            return this._updateBuildLayer(selectedNode)
           })
       })
   }
 
-  _updateBuildLayer (selectedNode: Node | null) {
+  async _updateBuildLayer (selectedNode: Node | null): Promise<void> {
     const layer = Number(this.buildLayerUi.slider.val())
     this.buildLayerUi.curLayer.text(layer)
-    this.previewUi.nodeVisualizer.showBuildLayer(selectedNode, layer)
+
+    const bundle = this.previewUi.workflowUi.bundle
+    const renderArea = document.getElementById(bundle.globalConfig.renderAreaId)
+    Spinner.startOverlay(renderArea)
+    try {
+      // Yield so the browser paints the spinner before the synchronous
+      // layer-update work blocks the main thread.
+      await new Promise<void>(resolve => setTimeout(resolve, 0))
+      await this.previewUi.nodeVisualizer.showBuildLayer(selectedNode, layer)
+      await bundle.renderer.render()
+    }
+    finally {
+      Spinner.stop(renderArea)
+    }
   }
 
   _disableBuildMode (selectedNode: Node | null) {

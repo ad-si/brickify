@@ -4,7 +4,6 @@ declare global {
   interface Window {
     jQuery: JQueryStatic;
     $: JQueryStatic;
-    bootbox: Bootbox;
     md5: (value: string) => string;
     clone: <T>(obj: T) => T;
     saveAs: (blob: Blob, filename: string) => void;
@@ -13,8 +12,6 @@ declare global {
     ZeroClipboard: any;
     THREE: typeof import('three').default;
   }
-
-  const bootbox: Bootbox;
 
   const Mousetrap: {
     bind(keys: string | string[], callback: (e: KeyboardEvent, combo: string) => boolean | void, action?: string): void;

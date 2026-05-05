@@ -1,5 +1,6 @@
 import * as fileDropper from "../../modelLoading/fileDropper.js"
 import * as fileLoader from "../../modelLoading/fileLoader.js"
+import * as dialog from "../dialog.js"
 import type WorkflowUiClass from "./workflowUi.js"
 
 type WorkflowUi = WorkflowUiClass
@@ -86,7 +87,7 @@ Loading the new model will replace the existing model!"
       if (scene == null || scene.nodes.length === 0) {
         return true
       }
-      return new Promise(resolve => bootbox.confirm(question, resolve))
+      return new Promise(resolve => dialog.confirm(question, resolve))
     })
   }
 }

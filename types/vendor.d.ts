@@ -1,61 +1,3 @@
-interface Bootbox {
-  dialog(options: BootboxDialogOptions): JQuery;
-  alert(message: string, callback?: () => void): JQuery;
-  alert(options: BootboxAlertOptions): JQuery;
-  confirm(message: string, callback: (result: boolean) => void): JQuery;
-  confirm(options: BootboxConfirmOptions): JQuery;
-  prompt(message: string, callback: (result: string | null) => void): JQuery;
-  prompt(options: BootboxPromptOptions): JQuery;
-  hideAll(): void;
-}
-
-interface BootboxDialogOptions {
-  title?: string;
-  message: string | JQuery;
-  onEscape?: boolean | (() => void);
-  show?: boolean;
-  backdrop?: boolean;
-  closeButton?: boolean;
-  animate?: boolean;
-  className?: string;
-  size?: 'small' | 'large';
-  buttons?: Record<string, BootboxButton>;
-}
-
-interface BootboxAlertOptions {
-  message: string;
-  callback?: () => void;
-  title?: string;
-  size?: 'small' | 'large';
-}
-
-interface BootboxConfirmOptions {
-  message: string;
-  callback: (result: boolean) => void;
-  title?: string;
-  size?: 'small' | 'large';
-}
-
-interface BootboxPromptOptions {
-  message?: string;
-  title: string;
-  callback: (result: string | null) => void;
-  value?: string;
-  inputType?: 'text' | 'textarea' | 'email' | 'select' | 'checkbox' | 'date' | 'time' | 'number' | 'password';
-  inputOptions?: Array<{ text: string; value: string }>;
-}
-
-interface BootboxButton {
-  label: string;
-  className?: string;
-  callback?: () => boolean | void;
-}
-
-declare module 'bootbox' {
-  const bootbox: Bootbox;
-  export = bootbox;
-}
-
 declare module 'nanobar' {
   interface NanobarOptions {
     target?: HTMLElement;
@@ -397,10 +339,6 @@ declare module 'path-browserify' {
   }
   const path: Path;
   export default path;
-}
-
-declare module 'bootstrap/dist/js/bootstrap.js' {
-  // Bootstrap JavaScript module
 }
 
 declare module 'jszip' {

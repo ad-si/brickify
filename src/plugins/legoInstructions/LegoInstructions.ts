@@ -9,6 +9,7 @@ import type Node from "../../common/project/node.js"
 import type { Plugin } from "../../types/plugin.js"
 
 import * as threeHelper from "../../client/threeHelper.js"
+import * as dialog from "../../client/ui/dialog.js"
 import * as pieceListGenerator from "./PieceListGenerator.js"
 import generateScad from "./OpenScadGenerator.js"
 import type Brick from "../newBrickator/pipeline/Brick.js"
@@ -181,10 +182,10 @@ export default class LegoInstructions {
         const pieceList = pieceListGenerator.generatePieceList(bricks)
         const pieceListHtml = pieceListGenerator.getHtml(pieceList, false)
 
-        return window.bootbox.dialog({
+        return dialog.show({
           title: "Parts needed",
           message: pieceListHtml,
-          backdrop: true,
+          buttons: [{label: "Close", className: "btn-default"}],
         })
       })
   }

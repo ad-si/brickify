@@ -1,3 +1,5 @@
+import * as dialog from "../dialog.js"
+
 export default class ShareUi {
   private $shareButton: JQuery
 
@@ -15,7 +17,7 @@ export default class ShareUi {
   }
 
   _initNotImplementedMessages () {
-    const alertCallback = () => bootbox.alert({
+    const alertCallback = () => dialog.alert({
       title: "Not implemented yet",
       message: "We are sorry, but this feature is not implemented yet. \
 Please check back later.",

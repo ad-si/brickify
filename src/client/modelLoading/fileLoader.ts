@@ -5,6 +5,7 @@ import stlParser from "stl-parser"
 
 import * as modelCache from "./modelCache.js"
 import * as Spinner from "../Spinner.js"
+import * as dialog from "../ui/dialog.js"
 import type { SpinnerOptions } from "../Spinner.js"
 
 const readingString = "Reading file"
@@ -20,7 +21,7 @@ export const onLoadFile = function (files: FileList, feedbackTarget: HTMLElement
   const file = files[0]
   if (!file.name.toLowerCase()
     .endsWith(".stl")) {
-    bootbox.alert({
+    dialog.alert({
       title: "Your file does not have the right format!",
       message: "Only .stl files are supported at the moment. \
 We are working on adding more file formats",
@@ -31,7 +32,7 @@ We are working on adding more file formats",
   return loadFile(feedbackTarget, file, spinnerOptions)
     .then(handleLoadedFile(feedbackTarget, file.name, spinnerOptions) as (value: ProgressEvent<FileReader>) => Promise<string>)
     .catch((error: unknown): undefined => {
-      bootbox.alert({
+      dialog.alert({
         title: "Import failed",
         message:
           `<p>Your file contains errors that we could not fix.</p> \

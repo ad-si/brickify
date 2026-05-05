@@ -41,12 +41,11 @@ export default class DownloadUi {
 
   _initDownloadModal () {
     this.$downloadModal = downloadModal(this.bundle.globalConfig.downloadSettings)
-    $("body")
-      .append(this.$downloadModal)
+    const dialogEl = this.$downloadModal[0] as HTMLDialogElement | undefined
 
     // show modal when clicking on download button
     return this.$downloadButton.on("click", () => {
-      ;(this.$downloadModal as JQuery & { modal: (action: string) => void }).modal("show")
+      dialogEl?.showModal()
     })
   }
 

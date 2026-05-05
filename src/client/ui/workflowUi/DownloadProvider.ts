@@ -4,6 +4,7 @@ import JSZip from "jszip"
 import log from "loglevel"
 
 import * as Spinner from "../../Spinner.js"
+import * as dialog from "../dialog.js"
 import type Bundle from "../../bundle.js"
 import type SceneManager from "../../sceneManager.js"
 import type Node from "../../../common/project/node.js"
@@ -139,7 +140,7 @@ export default class DownloadProvider {
 
         }
         else {
-          bootbox.alert({
+          dialog.alert({
             title: "There is nothing to download at the moment",
             message: "This happens when your whole model \
 is made out of LEGO \

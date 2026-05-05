@@ -2,6 +2,7 @@ import Project from "../common/project/project.js"
 import type Scene from "../common/project/scene.js"
 import type Bundle from "./bundle.js"
 import type Node from "../common/project/node.js"
+import * as dialog from "./ui/dialog.js"
 
 /*
  * @class SceneManager
@@ -13,7 +14,7 @@ export default class SceneManager {
   pluginHooks: any
   project: Promise<Project>
   scene: Promise<Scene | undefined>
-  bootboxOpen?: boolean
+  confirmOpen?: boolean
 
   constructor (bundle: Bundle) {
     this.init = this.init.bind(this)
@@ -121,19 +122,19 @@ export default class SceneManager {
   //
 
   _deleteCurrentNode (): void {
-    if (this.bootboxOpen) {
+    if (this.confirmOpen) {
       return
     }
     if (this.selectedNode == null) {
       return
     }
 
-    this.bootboxOpen = true
+    this.confirmOpen = true
     void this.selectedNode.getName()
       .then((name: unknown) => {
         const question = `Do you really want to delete ${String(name)}?`
-        return bootbox.confirm(question, result => {
-          this.bootboxOpen = false
+        return dialog.confirm(question, result => {
+          this.confirmOpen = false
           if (result) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             void this.remove(this.selectedNode!)

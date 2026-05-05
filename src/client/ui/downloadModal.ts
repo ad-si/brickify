@@ -209,10 +209,14 @@ export function getModal (param: ModalParams = {}): JQuery {
 
   if (!wizardLogicInitialized) {
     initializeWizard($modal)
+    // Wire close buttons (replaces Bootstrap's data-dismiss="modal")
+    const dialogEl = $modal[0] as HTMLDialogElement | undefined
+    if (dialogEl) {
+      $modal.find(".dialogClose").on("click", () => { dialogEl.close() })
+      // Reset wizard when closing the dialog
+      dialogEl.addEventListener("close", () => { disableWizard() })
+    }
   }
-
-  // Reset wizard when closing the modal
-  $modal.on("hidden.bs.modal", () => disableWizard())
 
   return $modal
 }

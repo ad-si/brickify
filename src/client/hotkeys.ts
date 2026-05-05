@@ -1,5 +1,6 @@
 import type SceneManager from "./sceneManager.js"
 import type Node from "../common/project/node.js"
+import * as dialog from "./ui/dialog.js"
 
 interface HotkeyEvent {
   hotkey: string
@@ -21,18 +22,18 @@ export interface HotkeysPluginHooks {
  */
 export default class Hotkeys {
   sceneManager: SceneManager
-  bootboxOpen: boolean
+  helpOpen: boolean
   events: Partial<Record<string, Array<{hotkey: string, description: string}>>>
 
   constructor (pluginHooks: HotkeysPluginHooks, sceneManager: SceneManager) {
     this.showHelp = this.showHelp.bind(this)
     this.sceneManager = sceneManager
-    this.bootboxOpen = false
+    this.helpOpen = false
     this.events = {}
     this.bind("?", "General", "Show this help", () => {
       this.showHelp()
     })
-    this.bind("esc", "General", "Close modal window", () => { bootbox.hideAll() })
+    this.bind("esc", "General", "Close modal window", () => { dialog.hideAll() })
 
     for (const events of pluginHooks.getHotkeys()) {
       this.addEvents(events)
@@ -40,7 +41,7 @@ export default class Hotkeys {
   }
 
   showHelp (): void {
-    if (this.bootboxOpen) {
+    if (this.helpOpen) {
       return
     }
     let message = ""
@@ -57,22 +58,16 @@ export default class Hotkeys {
       }
       message += "</section>"
     }
-    const callback = () => {
-      this.bootboxOpen = false
-      return true
-    }
-    this.bootboxOpen = true
-    bootbox.dialog({
+    this.helpOpen = true
+    dialog.show({
       title: "Keyboard shortcuts",
       message,
-      buttons: {
-        success: {
-          label: "Got it!",
-          className: "btn-primary",
-          callback,
-        },
-      },
-      onEscape: callback,
+      buttons: [{
+        label: "Got it!",
+        className: "btn-primary",
+        callback: () => { this.helpOpen = false },
+      }],
+      onCancel: () => { this.helpOpen = false },
     })
   }
 

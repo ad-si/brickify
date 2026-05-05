@@ -1,0 +1,59 @@
+.appDialog
+  padding 0
+  border 1px solid #888
+  border-radius 6px
+  box-shadow 0 5px 15px rgba(0, 0, 0, 0.5)
+  max-width 600px
+  width 90vw
+  background #fff
+  color #333
+
+  &::backdrop
+    background rgba(0, 0, 0, 0.5)
+
+  .appDialog-header
+    position relative
+    padding 15px
+    border-bottom 1px solid #e5e5e5
+
+  .appDialog-title
+    margin 0
+    font-size 18px
+    line-height 1.4
+
+  .appDialog-close
+    position absolute
+    top 10px
+    right 14px
+    background none
+    border none
+    font-size 24px
+    line-height 1
+    color #555
+    cursor pointer
+    padding 0 4px
+
+    &:hover
+      color #000
+
+  .appDialog-body
+    padding 15px
+
+    section h4
+      margin-top 12px
+      margin-bottom 6px
+
+    p
+      margin 4px 0
+
+  .appDialog-footer
+    padding 12px 15px
+    border-top 1px solid #e5e5e5
+    text-align right
+
+    .btn + .btn
+      margin-left 6px
+
+  kbd
+    text-transform capitalize
+    box-shadow inset 0 0 10px #505050, 0 2px 1px #1e1e1e, 0 3px 0 #282828, 0 4px 3px #141414

@@ -17,13 +17,15 @@ let $testStripContent: JQuery | undefined = undefined
 let $wizardButtons: JQuery | undefined = undefined
 let $wizardHoleSizeSelect: JQuery | undefined = undefined
 let $wizardStudSizeSelect: JQuery | undefined = undefined
+let $wizardStudImage: JQuery | undefined = undefined
+let $wizardHoleImage: JQuery | undefined = undefined
 let $studSizeSelect: JQuery | undefined = undefined
 let $holeSizeSelect: JQuery | undefined = undefined
 
 const alphabeticalList = (i: number, range: number): string => // A = 65
   String.fromCharCode(65 + (range + i))
 
-const numericalList = (i: number, range: number): number => range + i + 1
+const numericalList = (i: number, range: number): number => range + i
 
 const addOptions = function ($select: JQuery, range: number, defaultValue: number, listFunction: (i: number, range: number) => string | number): JQuery {
   for (let i = -range, end = range, asc = -range <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
@@ -46,6 +48,26 @@ const disableWizard = function (): number {
   return currentWizardStep = 0
 }
 
+const setStudImageToSelected = (): void => {
+  const id = $wizardStudSizeSelect?.find("option:selected").text() ?? ""
+  $wizardStudImage?.attr("src", `img/testStripWizard/studs/${id}.png`)
+}
+
+const setHoleImageToSelected = (): void => {
+  const id = $wizardHoleSizeSelect?.find("option:selected").text() ?? ""
+  $wizardHoleImage?.attr("src", `img/testStripWizard/holes/${id}.png`)
+}
+
+const selectOptionByLabel = ($select: JQuery, label: string): void => {
+  $select
+    .find("option")
+    .each(function () {
+      const $option = $(this)
+      $option.prop("selected", $option.text() === label)
+    })
+  $select.trigger("input")
+}
+
 // Initializes the logic for the test strip wizard
 const initializeWizard = function (modalElement: JQuery): void {
   wizardLogicInitialized = true
@@ -60,6 +82,11 @@ const initializeWizard = function (modalElement: JQuery): void {
   $wizardButtons.hide()
 
   const $startWizard = modalElement.find("#startWizard")
+
+  $wizardStudImage = modalElement.find("#wizardStudImage")
+  $wizardHoleImage = modalElement.find("#wizardHoleImage")
+  const $studsContainer = modalElement.find("#wizardStepStuds .selectContainer")
+  const $holesContainer = modalElement.find("#wizardStepHoles .selectContainer")
 
   const $wizardStepObjects = wizardSteps.map((selector) => {
     const $wizardStep = modalElement.find(selector)
@@ -139,6 +166,45 @@ const initializeWizard = function (modalElement: JQuery): void {
       applyCurrentWizardStep()
       return updateButtonCaptions()
     }))
+
+  // Hover/click handlers for the clickable stud overlay
+  $studsContainer.find("polygon.studHit").each(function () {
+    const $area = $(this)
+    const id = $area.attr("data-option") ?? ""
+    $area.on("mouseenter", () => {
+      $wizardStudImage?.attr("src", `img/testStripWizard/studs/${id}.png`)
+    })
+    $area.on("click", () => {
+      if ($wizardStudSizeSelect != null) {
+        selectOptionByLabel($wizardStudSizeSelect, id)
+      }
+      setStudImageToSelected()
+    })
+  })
+
+  // Hover/click handlers for the clickable hole overlay
+  $holesContainer.find("polygon.holeHit").each(function () {
+    const $area = $(this)
+    const id = $area.attr("data-option") ?? ""
+    $area.on("mouseenter", () => {
+      $wizardHoleImage?.attr("src", `img/testStripWizard/holes/${id}.png`)
+    })
+    $area.on("click", () => {
+      if ($wizardHoleSizeSelect != null) {
+        selectOptionByLabel($wizardHoleSizeSelect, id)
+      }
+      setHoleImageToSelected()
+    })
+  })
+
+  // Restore the image to the currently selected option when the cursor
+  // leaves the clickable area, so the preview matches the dropdown.
+  $studsContainer.on("mouseleave", setStudImageToSelected)
+  $holesContainer.on("mouseleave", setHoleImageToSelected)
+
+  // Keep the preview in sync if the user picks a value via the dropdown.
+  modalElement.find("#wizardStudSizeSelect").on("change", setStudImageToSelected)
+  modalElement.find("#wizardHoleSizeSelect").on("change", setHoleImageToSelected)
 
   // Fade out size select, start wizard on click
   $startWizard.on("click", () => {

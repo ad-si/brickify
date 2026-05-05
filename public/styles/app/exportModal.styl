@@ -6,9 +6,37 @@
 #testStripContent
   #calibrationResult
     text-align center
+  // Use a serif so the user can tell capital "I" from "1" / lowercase "l".
   #calibrationSettings
     font-size 2em
+    font-family Georgia, "Times New Roman", serif
   .wizardSelect
     margin-top 0.5em
   img
     width 100%
+
+  .selectContainer
+    position relative
+    width 100%
+    margin-top -8%
+
+    .dynamicImage,
+    .hitMap
+      position absolute
+      left 0
+      top 0
+      width 100%
+      height 100%
+
+    .overlayImage
+      position relative
+      width 100%
+      pointer-events none
+
+    .hitMap polygon
+      fill transparent
+      pointer-events all
+      cursor pointer
+
+      &:hover
+        fill rgba(255, 215, 0, 0.25)

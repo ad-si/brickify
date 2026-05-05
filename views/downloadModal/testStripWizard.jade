@@ -1,34 +1,58 @@
 h4.disabled Download stl for 3d printer
 #sizeSelect
   p.
-    Please enter your printer type:
+    Use our wizard to calibrate our software for your 3D-printer:
+  button.btn.btn-primary.btn-block#startWizard Start wizard
+  br
+  p.
+    If you already know your settings, choose them here:
   .row
     .col-sm-6
       select.form-control#studSizeSelect
     .col-sm-6
       select.form-control#holeSizeSelect
   br
-  p.
-    If you don't know your printer's type, use our wizard to find it out:
-  button.btn.btn-primary.btn-block#startWizard Start wizard
-  br
 #wizardStepIntro
   p.
-    Every 3D-printer is different and produces slightly differnt 3D-printed objects.
-    Therefore, to ensure a good fit between the 3D-printed parts and your LEGO-bricks,
-    you need to calibrate your printer.
+    Every 3D-printer is different and produces slightly different 3D-printed objects.
+    To ensure a good fit between the 3D-printed parts and your LEGO-bricks,
+    we calibrate our software for your printer.
   p.
     For the calibration, download the #[a(href='download/testStrip.zip') test strip] and print it.
 #wizardStepStuds
   p.
     Try to connect the test strip studs into a LEGO-brick. Which size fits best?
-  img(src='img/testStripWizard-studSize.png')
+  .selectContainer
+    img.dynamicImage#wizardStudImage(src='img/testStripWizard/studs/E.png')
+    img.overlayImage#wizardTextOverlayStud(src='img/testStripWizard/studs/textOverlay.png')
+    svg.hitMap(viewBox='0 0 800 800', preserveAspectRatio='xMidYMid meet')
+      polygon.studHit(data-option='I', points='476,328 583,151 388,109 391,303')
+      polygon.studHit(data-option='H', points='517,390 706,337 591,170 479,341')
+      polygon.studHit(data-option='G', points='523,397 511,469 710,552 713,351')
+      polygon.studHit(data-option='F', points='445,529 520,708 706,565 507,481')
+      polygon.studHit(data-option='E', points='340,537 274,691 478,695 437,533')
+      polygon.studHit(data-option='D', points='270,480 79,577 254,696 335,531')
+      polygon.studHit(data-option='C', points='256,398 264,472 72,563 48,365')
+      polygon.studHit(data-option='B', points='304,329 263,386 48,357 179,199')
+      polygon.studHit(data-option='A', points='310,324 385,302 378,109 186,192')
   p.wizardSelect This size fits best:
     select.form-control#wizardStudSizeSelect
 #wizardStepHoles
   p.
     Now connect the LEGO-brick studs into the test strip. Which size fits best?
-  img(src='img/testStripWizard-holeSize.png')
+  .selectContainer
+    img.dynamicImage#wizardHoleImage(src='img/testStripWizard/holes/4.png')
+    img.overlayImage#wizardTextOverlayHole(src='img/testStripWizard/holes/numberOverlay.png')
+    svg.hitMap(viewBox='0 0 800 800', preserveAspectRatio='xMidYMid meet')
+      polygon.holeHit(data-option='6', points='529,370 518,447 696,524 705,331')
+      polygon.holeHit(data-option='8', points='396,270 472,294 581,146 388,104')
+      polygon.holeHit(data-option='7', points='478,300 533,363 707,325 588,154')
+      polygon.holeHit(data-option='5', points='444,506 521,719 687,527 510,454')
+      polygon.holeHit(data-option='4', points='332,508 440,512 515,721 260,704')
+      polygon.holeHit(data-option='3', points='258,448 329,508 251,704 72,537')
+      polygon.holeHit(data-option='2', points='247,365 255,444 73,532 69,335')
+      polygon.holeHit(data-option='1', points='300,296 252,358 76,329 202,174')
+      polygon.holeHit(data-option='0', points='303,290 386,272 373,101 205,164')
   p.wizardSelect This size fits best:
     select.form-control#wizardHoleSizeSelect
 #wizardStepFinished

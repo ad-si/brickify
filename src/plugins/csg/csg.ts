@@ -1,17 +1,20 @@
-import CsgExtractor from "./CsgExtractor.js"
 import * as threeHelper from "../../client/threeHelper.js"
-import clean from "./csgCleaner.js"
+import type * as THREE from "three"
 import * as threeConverter from "../../client/threeConverter.js"
+import CsgWorkerClient from "./CsgWorkerClient.js"
+import {
+  csgWorkerHelpers,
+} from "./CsgWorkerJob.js"
+import type {
+  SerializedFaceVertexMesh,
+  SerializedVoxel,
+} from "./CsgWorkerJob.js"
 
 interface CsgOptions {
   minimalPrintVolume?: number
   holeSize?: { radius: number; height: number }
   studSize?: { radius: number; height: number }
   addStuds?: boolean
-  transformedModel?: THREE.Geometry
-  modelBsp?: unknown
-  split?: boolean
-  filterSmallGeometries?: boolean
 }
 
 interface CsgDefaults {
@@ -21,12 +24,22 @@ interface CsgDefaults {
   addStuds: boolean
 }
 
+interface VoxelLike {
+  enabled: boolean
+  position: { x: number; y: number; z: number }
+}
+
+interface GridLike {
+  spacing: { x: number; y: number; z: number }
+  origin: { x: number; y: number; z: number }
+  forEachVoxel(callback: (voxel: VoxelLike) => void): void
+}
+
 interface CachedData {
   grid?: unknown
   csgNeedsRecalculation?: boolean
-  csg?: THREE.Geometry | THREE.Geometry[] | null
+  csg?: THREE.Geometry[] | null
   transformedThreeGeometry?: THREE.Geometry
-  modelBsp?: unknown
   oldOptions?: string
 }
 
@@ -40,6 +53,8 @@ interface Bundle {
 }
 
 interface SelectedNode {
+  id?: string
+  getId?: () => string
   getPluginData(plugin: string): Promise<unknown>
   storePluginData(plugin: string, data: unknown, flag: boolean): void
   getModel(): Promise<{ model: THREE.Object3D }>
@@ -47,7 +62,7 @@ interface SelectedNode {
 
 export default class CSG {
   defaults: CsgDefaults | null = null
-  csgExtractor: CsgExtractor | null = null
+  worker: CsgWorkerClient | null = null
 
   constructor () {
     this.init = this.init.bind(this)
@@ -70,9 +85,9 @@ export default class CSG {
   /*
    * Returns a promise which will, when resolved, provide
    * the volumetric subtraction of ModelGeometry - LegoBricks
-   * as a THREE.Mesh
+   * as a list of THREE.Geometry instances.
    *
-   * @return {THREE.Mesh} the volumetric subtraction
+   * @return {THREE.Geometry[]} the volumetric subtraction
    * @param {Object} options the options which may consist out of:
    * @param {Object} options.studSize radius and height of LEGO studs
    * @param {Object} options.holeSize radius and height of holes for
@@ -89,20 +104,13 @@ export default class CSG {
 
   // applies default values if they don't exist yet
   _applyDefaultValues (options: CsgOptions) {
-    return (() => {
-      const result: unknown[] = []
-      if (!this.defaults) return result
-      for (const key in this.defaults) {
-        const value = this.defaults[key as keyof CsgDefaults]
-        if ((options as Record<string, unknown>)[key] == null) {
-          result.push((options as Record<string, unknown>)[key] = value)
-        }
-        else {
-          result.push(undefined)
-        }
+    if (!this.defaults) return
+    for (const key in this.defaults) {
+      const value = this.defaults[key as keyof CsgDefaults]
+      if ((options as Record<string, unknown>)[key] == null) {
+        (options as Record<string, unknown>)[key] = value
       }
-      return result
-    })()
+    }
   }
 
   // returns own cached data and links grid from newBrickator data
@@ -133,33 +141,75 @@ export default class CSG {
   }
 
   // Creates a CSG subtraction between the node - lego voxels from grid
-  _createCSG (cachedData: CachedData, selectedNode: SelectedNode, options: CsgOptions) {
+  _createCSG (cachedData: CachedData, selectedNode: SelectedNode, options: CsgOptions): Promise<THREE.Geometry[]> {
     if (!this._csgNeedsRecalculation(cachedData, options)) {
-      return Promise.resolve(cachedData.csg)
+      return Promise.resolve(cachedData.csg ?? [])
     }
 
     return this._prepareModel(cachedData, selectedNode)
       .then(threeGeometry => {
         cachedData.transformedThreeGeometry = threeGeometry
-        if (this.csgExtractor == null) {
-          this.csgExtractor = new CsgExtractor()
+        if (this.worker == null) {
+          this.worker = new CsgWorkerClient()
         }
 
-        options.transformedModel = cachedData.transformedThreeGeometry
-        options.modelBsp = cachedData.modelBsp
+        const grid = cachedData.grid as GridLike
+        const voxels: SerializedVoxel[] = []
+        grid.forEachVoxel((v) => {
+          voxels.push({
+            x: v.position.x,
+            y: v.position.y,
+            z: v.position.z,
+            enabled: v.enabled,
+          })
+        })
 
-        const result = this.csgExtractor.extractGeometry(
-          cachedData.grid as Parameters<CsgExtractor["extractGeometry"]>[0],
-          options as Parameters<CsgExtractor["extractGeometry"]>[1],
+        const cacheKey = this._getCacheKey(selectedNode)
+
+        const serializedModel: SerializedFaceVertexMesh =
+          csgWorkerHelpers.serializeGeometry(threeGeometry)
+
+        const jobOptions: {
+          addStuds?: boolean
+          studSize?: { radius: number; height: number }
+          holeSize?: { radius: number; height: number }
+          minimalPrintVolume?: number
+        } = {}
+        if (options.addStuds !== undefined) {
+          jobOptions.addStuds = options.addStuds
+        }
+        if (options.studSize !== undefined) {
+          jobOptions.studSize = options.studSize
+        }
+        if (options.holeSize !== undefined) {
+          jobOptions.holeSize = options.holeSize
+        }
+        if (options.minimalPrintVolume !== undefined) {
+          jobOptions.minimalPrintVolume = options.minimalPrintVolume
+        }
+
+        const jobInput: Parameters<CsgWorkerClient["extractCsg"]>[0] = {
+          model: serializedModel,
+          grid: {
+            spacing: grid.spacing,
+            origin: grid.origin,
+            voxels,
+          },
+          options: jobOptions,
+        }
+        if (cacheKey !== undefined) {
+          jobInput.cacheKey = cacheKey
+        }
+
+        return this.worker.extractCsg(jobInput)
+      })
+      .then(result => {
+        const geometries = result.geometries.map(g =>
+          csgWorkerHelpers.deserializeGeometry(g),
         )
-        cachedData.modelBsp = result.modelBsp
-
-        options.split = true
-        options.filterSmallGeometries = !result.isOriginalModel
-        cachedData.csg = clean(result.csg, options)
-
+        cachedData.csg = geometries
         cachedData.csgNeedsRecalculation = false
-        return cachedData.csg
+        return geometries
       })
   }
 
@@ -180,6 +230,16 @@ export default class CSG {
         })
         .catch((error: unknown) => { reject(error instanceof Error ? error : new Error(String(error))) })
     })
+  }
+
+  _getCacheKey (selectedNode: SelectedNode): string | undefined {
+    if (typeof selectedNode.getId === "function") {
+      return selectedNode.getId()
+    }
+    if (typeof selectedNode.id === "string") {
+      return selectedNode.id
+    }
+    return undefined
   }
 
   // determines whether the CSG operation needs recalculation

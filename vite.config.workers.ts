@@ -14,6 +14,7 @@ export default defineConfig({
       entry: {
         'hullVoxel.worker': path.resolve(__dirname, 'src/plugins/newBrickator/pipeline/voxelization/hullVoxel.worker.ts'),
         'volumeFill.worker': path.resolve(__dirname, 'src/plugins/newBrickator/pipeline/voxelization/volumeFill.worker.ts'),
+        'csg.worker': path.resolve(__dirname, 'src/plugins/csg/csg.worker.ts'),
       },
       formats: ['es'],
       fileName: (_, entryName) => `${entryName}.js`,

@@ -511,7 +511,7 @@ export default class Renderer {
 
   _setupRenderer (globalConfig: GlobalConfig): void {
     this.threeRenderer = new THREE.WebGLRenderer({
-      alpha: true,
+      alpha: false,
       antialias: true,
       stencil: true,
       preserveDrawingBuffer: true,

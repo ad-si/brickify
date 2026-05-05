@@ -1,6 +1,7 @@
 import log from "loglevel"
 
 import Brick from "../Brick.js"
+import * as DataHelper from "../DataHelper.js"
 import * as Random from "../Random.js"
 import Layouter from "./Layouter.js"
 import type Grid from "../Grid.js"
@@ -93,73 +94,103 @@ export default class PlateLayouter extends Layouter {
     widthFn: (obj: Size3D | Position3D) => number,
     lengthFn: (obj: Size3D | Position3D) => number
   ): Set<Brick> | null {
-    const neighborsInDirection = brick.getNeighbors(dir)
-    if (neighborsInDirection.size === 0) {
+    if (widthFn(brick.getSize()) > 2 && lengthFn(brick.getSize()) >= 2) {
       return null
     }
 
-    // Check that the neighbors together don't exceed this brick's width
-    let width = 0
-    let noMerge: boolean = false
+    const neighbors = brick.getNeighbors(dir)
+    if (neighbors.size === 0) {
+      return null
+    }
 
-    neighborsInDirection.forEach((neighbor: Brick) => {
-      const neighborSize = neighbor.getSize()
-      if (neighborSize.z !== brick.getSize().z) {
-        noMerge = true
-      }
-      if (neighbor.getPosition().z !== brick.getPosition().z) {
-        noMerge = true
-      }
-      return width += widthFn(neighborSize)
+    const firstLength = this._checkNeighbors(brick, neighbors, widthFn, lengthFn)
+    if (firstLength === null) {
+      return null
+    }
+
+    if (Brick.isValidSize(
+      widthFn(brick.getSize()),
+      lengthFn(brick.getSize()) + firstLength,
+      brick.getSize().z,
+    )) {
+      return neighbors
+    }
+
+    // The neighbors line up with the brick but the combined size is invalid
+    // (e.g. 1x4 + 1x1 = 1x5). Try one more row out — combining with the
+    // neighbors-of-neighbors might land on a valid size (e.g. 1x4 + 1x1 + 1x1
+    // = 1x6).
+    const neighborsOfNeighbors = new Set<Brick>()
+    neighbors.forEach((neighbor) => {
+      neighbor.getNeighbors(dir).forEach(nn => neighborsOfNeighbors.add(nn))
     })
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (noMerge) {
+
+    const secondLength = this._checkNeighbors(
+      brick, neighborsOfNeighbors, widthFn, lengthFn,
+    )
+    if (secondLength === null) {
       return null
     }
 
-    // If they have the same accumulative width
-    // check if they are in the correct positions,
-    // i.e. no spacing between neighbors
-    if (width !== widthFn(brick.getSize())) {
+    if (Brick.isValidSize(
+      widthFn(brick.getSize()),
+      lengthFn(brick.getSize()) + firstLength + secondLength,
+      brick.getSize().z,
+    )) {
+      return DataHelper.union([neighbors, neighborsOfNeighbors])
+    }
+
+    return null
+  }
+
+  // Validates that the given neighbors line up with brick along its width,
+  // share the same z-layer, and all have equal length. Returns the per-row
+  // length the neighbors would add to the brick, or null if not mergeable.
+  _checkNeighbors (
+    brick: Brick,
+    neighbors: Set<Brick>,
+    widthFn: (obj: Size3D | Position3D) => number,
+    lengthFn: (obj: Size3D | Position3D) => number,
+  ): number | null {
+    if (neighbors.size === 0) {
       return null
     }
 
-    const minWidth = widthFn(brick.getPosition())
+    const minWPos = widthFn(brick.getPosition())
+    const maxWPos = minWPos + widthFn(brick.getSize()) - 1
 
-    const maxWidth = (minWidth + widthFn(brick.getSize())) - 1
+    let totalNeighborWidth = 0
+    let neighborLength: number | null = null
 
-    let length: number | null = null
+    const iter = neighbors.values()
+    let next = iter.next()
+    while (!next.done) {
+      const neighbor = next.value
+      const nSize = neighbor.getSize()
+      const nPos = neighbor.getPosition()
 
-    let invalidSize: boolean = false
-    neighborsInDirection.forEach((neighbor: Brick) => {
-      if (length == null) {
-        length = lengthFn(neighbor.getSize())
+      if (nSize.z !== brick.getSize().z) return null
+      if (nPos.z !== brick.getPosition().z) return null
+
+      if (widthFn(nPos) < minWPos) return null
+      if (widthFn(nPos) + widthFn(nSize) - 1 > maxWPos) return null
+
+      if (neighborLength === null) {
+        neighborLength = lengthFn(nSize)
       }
-      if (widthFn(neighbor.getPosition()) < minWidth) {
-        invalidSize = true
+      else if (lengthFn(nSize) !== neighborLength) {
+        return null
       }
-      const neighborWidth = (widthFn(neighbor.getPosition()) +
-        widthFn(neighbor.getSize())) - 1
-      if (neighborWidth > maxWidth) {
-        invalidSize = true
-      }
-      if (lengthFn(neighbor.getSize()) !== length) {
-        invalidSize = true
-      }
-    })
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (invalidSize) {
+
+      totalNeighborWidth += widthFn(nSize)
+      next = iter.next()
+    }
+
+    if (totalNeighborWidth !== widthFn(brick.getSize())) {
       return null
     }
 
-    if (Brick.isValidSize(widthFn(brick.getSize()), lengthFn(brick.getSize()) +
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        length!, brick.getSize().z)) {
-      return neighborsInDirection
-    }
-    else {
-      return null
-    }
+    return neighborLength
   }
 
 

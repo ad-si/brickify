@@ -1,3 +1,5 @@
+// Code in this file was taken from https://github.com/mattdesl/glsl-fxaa
+
 import ShaderPart from "./ShaderPart.js"
 
 export default class FxaaPart extends ShaderPart {

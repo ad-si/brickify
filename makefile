@@ -30,7 +30,7 @@ build: typecheck build-workers node_modules
 # The main server part which is responsible for delivering the
 # website and for server-side plugin integration and model processing
 .PHONY: start
-start: node_modules
+start: node_modules build-workers
 	npx tsx bin/cli.ts start
 
 
@@ -70,7 +70,7 @@ clean:
 
 
 .PHONY: build-static
-build-static: node_modules
+build-static: node_modules build-workers
 	npx vite build --config vite.config.static.ts
 	npx tsx scripts/build-static-html.ts
 	@echo "Static build complete in dist-static/"
